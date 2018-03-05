@@ -1,6 +1,8 @@
 require 'pry'
 require 'capybara/rspec'
 require 'selenium-webdriver'
+require 'faraday'
+require 'faraday_middleware'
 
 def base_url
   @base_url ||= ENV['LEIHS_HTTP_BASE_URL'].presence || 'http://localhost:3211'
@@ -51,4 +53,14 @@ RSpec.configure do |config|
     set_capybara_values
     set_browser example
   end
+end
+
+
+def plain_faraday_client
+  Faraday.new(
+    url: base_url,
+    headers: { accept: 'application/json' }) do |conn|
+      conn.adapter Faraday.default_adapter
+      conn.response :json, content_type: /\bjson$/
+    end
 end

@@ -52,6 +52,9 @@
 
 (def user* (atom (dom/data-attribute "body" "user")))
 
+(def settings* (atom (dom/data-attribute "body" "settings")))
+
+
 (def debug?* (reaction (:debug @global-state*)))
 
 (defn update-state [state-ref key-seq fun]

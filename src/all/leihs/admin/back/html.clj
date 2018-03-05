@@ -41,13 +41,23 @@
         (->> (user/user-query user-id)
              (jdbc/query (:tx request)) first)))))
 
+(defn settings-data [request]
+  (url/encode
+    (to-json
+      (-> request
+          :settings
+          (select-keys
+            [:shibboleth_enabled
+             :shibboleth_login_path])))))
+
 (defn not-found-handler [request]
   {:status 404
    :headers {"Content-Type" "text/html"}
    :body (html5
            (head)
            [:body
-            {:data-user (user-data request)}
+            {:data-user (user-data request)
+             :data-settings (settings-data request)}
             [:div.container-fluid
              [:h1.text-danger "Error 404 - Not Found"]]])})
 
@@ -56,10 +66,18 @@
    :body (html5
            (head)
            [:body
-            {:data-user (user-data request)}
+            {:data-user (user-data request)
+             :data-settings (settings-data request)}
             [:div#app.container-fluid
              [:div.alert.alert-warning
               [:h1 "Leihs Admin2"]
               [:p "This application requires Javascript."]]]
             (hiccup.page/include-js
               (cache-buster/cache-busted-path "/admin/js/app.js"))])})
+
+
+;#### debug ###################################################################
+;(logging-config/set-logger! :level :debug)
+;(logging-config/set-logger! :level :info)
+;(debug/debug-ns 'cider-ci.utils.shutdown)
+;(debug/debug-ns *ns*)

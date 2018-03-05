@@ -94,7 +94,8 @@
         (assoc-in [:cookies (str USER_SESSION_COOKIE_NAME)]
                   {:value cvalue
                    :http-only true
-                   :max-age (* 10 356 24 60 60)
+                   ; for now session only because of shibboleth
+                   ;:max-age (* 10 356 24 60 60)
                    :path "/"
                    :secure (:sessions_force_secure settings)}))))
 
