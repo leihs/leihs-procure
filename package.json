@@ -3,15 +3,70 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.4",
+    "@fortawesome/fontawesome-free-solid": "^5.0.8",
+    "@fortawesome/react-fontawesome": "0.0.17",
     "bootstrap": "^4.0.0",
+    "classnames": "^2.2.5",
+    "lodash": "^4.17.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.1"
+    "react-icons": "^2.2.7",
+    "react-scripts": "^1.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.7.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-react": "^7.7.0",
+    "prettier": "^1.11.1",
+    "prettier-eslint": "^8.2.1"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "semi": false,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": true
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "browser": true,
+      "commonjs": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2016,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "impliedStrict": true,
+        "jsx": true,
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "plugins": [
+      "prettier",
+      "react"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "prettier",
+      "prettier/react",
+      "prettier/standard",
+      "plugin:react/recommended"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error"
+      ],
+      "react/prop-types": "off"
+    }
   }
 }
