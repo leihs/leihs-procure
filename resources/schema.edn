@@ -12,4 +12,9 @@
   {:type :Request
    :args
    {:id {:type ID}}
-   :resolve :request-by-id}}}
+   :resolve :request-by-id}}
+ :requests
+ {:type (list :Request)
+  :args
+  {:category_id {:type ID}}
+  :resolve :requests}}

@@ -6,9 +6,9 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [com.walmartlabs/lacinia "0.21.0"]
                  [org.clojure/java.jdbc "0.7.1"],
-                 [org.postgresql/postgresql "42.1.4"]]
+                 [org.postgresql/postgresql "42.1.4"],
+                 [honeysql "0.9.2"]]
   :main ^:skip-aot procurement-graphql.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :plugins [[lein-exec "0.3.7"]]
-  )
+  :plugins [[lein-exec "0.3.7"]])
