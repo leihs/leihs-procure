@@ -1,14 +1,11 @@
 @import '~bootstrap/dist/css/bootstrap.css';
 
-/* example header */
-.App-header {
-  background-color: #222;
-  /* height: 150px; */
-  padding: 0.5rem 1rem 0.1rem 1rem;
-  color: white;
-}
-.App-title {
-  font-size: 1.5rem;
-}
-
 /* app styles */
+
+/* action buttons ? */
+/* .btn {
+  box-shadow: 0 0.2rem 0 0 rgba(52, 58, 64, 0.25);
+} */
+.btn:not(.btn-flat) {
+  border-bottom-width: 0.2rem;
+}

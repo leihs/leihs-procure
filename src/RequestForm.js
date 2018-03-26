@@ -1,203 +1,233 @@
-import React, { Component } from 'react'
-import cx from 'classnames'
+// TODO: move all translations here (not FormField)
+
+import React from 'react'
 import f from 'lodash'
 
+import t from './translate'
 import Icon from './Icons'
+import {
+  Span,
+  Row,
+  Col,
+  FilePicker,
+  FormGroup,
+  FormField,
+  Select,
+  ButtonRadio
+} from './Bootstrap'
 
-// debugger
+import { ControlledForm } from './ReactUtils'
 
 // dev
+import ROOMS_JSON from 'rooms.json'
 window.f = f
 
-const t = key => {
-  const translations = {
-    form_btn_save: 'Speichern',
-    form_btn_cancel: 'Abbrechen',
-    form_btn_move_category: 'Kategorie ändern',
-    form_btn_change_budget_period: 'Budgetperiode ändern',
-    form_btn_delete: 'Löschen',
-    request_state: 'Status',
-    field: {
-      article: 'Artikel oder Projekt',
-      article_nr: 'Artikelnr. oder Herstellernr.',
-      supplier: 'Lieferant',
-      receiver_name: 'Name des Empfängers',
-      building: 'Gebäude',
-      room: 'Raum',
-      purpose: 'Begründung',
-      priority_requester: 'Priorität',
-      priority_inspector: 'Priorität des Prüfers',
-      is_new: 'Ersatz / Neu',
-      price: 'Stückpreis CHF',
-      price_help: 'inkl. MwSt',
-      quantity_requested: 'Menge beantragt',
-      quantity_approved: 'Menge bewilligt',
-      quantity_ordered: 'Bestellmenge',
-      price_total: 'Total CHF',
-      price_total_help: 'inkl. MwSt',
-      comment_inspector: 'Kommentar des Prüfers',
-      attachments: 'Anhänge',
-      accounting_type: 'Abrechnungsart',
-      cost_center: 'Kostenstelle',
-      general_ledger_account: 'Sachkonto',
-      internal_order_number: 'Innenauftrag'
-    },
-    accounting_type_investment: 'Investition',
-    accounting_type_aquisition: 'Beschaffung'
-  }
-  return f.get(translations, key) || `[${key}]`
-}
-
-const F = React.Fragment
-const Div = ({ cls, className, ...props }) => <div className={cx(cls, className)} {...props} />
-const Row = props => <Div {...props} cls="row" />
-const Col = props => {
-  const sizes = ['sm', 'md', 'lg', 'xl']
-  const restProps = f.omit(props, sizes)
-  const size = f.first(f.intersection(f.keys(props), sizes))
-  const cls = size ? `col-${size}` : 'col'
-  return <Div {...restProps} cls={cls} />
-}
-
-const FormGroup = ({ id, label, helpText, children, ...props }) => {
-  return (
-    <Div {...props} cls="form-group">
-      <label htmlFor={id}>{label}</label>
-      {children}
-      {helpText && (
-        <small id={`${id}--Help`} className="form-text text-muted">
-          {helpText}
-        </small>
-      )}
-    </Div>
-  )
-}
-
-const TextField = ({
-  id,
-  label,
-  labelSmall,
-  type = 'text',
-  name,
-  placeholder,
-  helpText,
-  input,
-  ...restInputProps
-}) => {
-  if (!id) id = name
-  if (!name) name = id
-  if (!label) label = t(`field.${name}`)
-
-  const inputNode = input || (
-    <input
-      type={type}
-      id={id}
-      name={name}
-      placeholder={placeholder}
-      aria-describedby={helpText ? `${id}--Help` : null}
-      className="form-control"
-      {...restInputProps}
-    />
-  )
-
-  const labelContent = (
-    <F>
-      {label}
-      {labelSmall && (
-        <F>
-          {' '}
-          <small>{labelSmall}</small>
-        </F>
-      )}
-    </F>
-  )
-
-  return (
-    <FormGroup label={labelContent} helpText={helpText}>
-      {inputNode}
-    </FormGroup>
-  )
-}
-
-class RequestForm extends Component {
-  render() {
-    return (
-      <form>
-        <Row>
-          <Col sm>
-            <TextField name="article" />
-
-            <TextField name="article_nr" />
-
-            <TextField name="supplier" />
-
-            <TextField name="receiver_name" />
-
-            <TextField name="building" />
-
-            <TextField name="room" />
-
-            <TextField name="purpose" />
-
-            <TextField name="priority_requester" />
-
-            <TextField name="priority_inspector" />
-
-            <TextField name="is_new" />
-          </Col>
-
-          <Col sm>
-            <TextField name="price" labelSmall={t('field.price_help')} />
-
-            <TextField name="quantity_requested" helpText="Bitte nur ganze Zahlen eingeben" />
-
-            <TextField name="quantity_approved" />
-
-            <TextField name="quantity_ordered" />
-
-            <TextField name="price_total" labelSmall={t('field.price_total_help')} />
-
-            <TextField name="comment_inspector" />
-
-            <TextField name="attachments" />
-
-            <FormGroup label={t('field.attachments')}>
-              <input />
-            </FormGroup>
-
-            <TextField name="accounting_type" />
-
-            <TextField name="cost_center" />
-
-            <TextField name="general_ledger_account" />
-
-            <TextField name="internal_order_number" />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm>
-            <button type="submit" className="btn m-1 btn-primary">
-              <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-            </button>
-            <button type="submit" className="btn m-1 btn-outline-secondary">
-              {t('form_btn_cancel')}
-            </button>
-          </Col>
-          <Col sm className="mt-3 mt-sm-0">
-            <button type="submit" className="btn m-1 btn-outline-dark">
-              <Icon.Exchange /> {t('form_btn_move_category')}
-            </button>
-            <button type="submit" className="btn m-1 btn-outline-dark">
-              <Icon.Calendar /> {t('form_btn_change_budget_period')}
-            </button>
-            <button type="submit" className="btn m-1 btn-outline-danger">
-              <Icon.Trash /> {t('form_btn_delete')}
-            </button>
-          </Col>
-        </Row>
-      </form>
+const TotalAmount = ({ fields }) => {
+  const quantity = f.last(
+    f.filter(
+      ['requested', 'approved', 'ordered'].map(k => fields[`quantity_${k}`])
     )
-  }
+  )
+  return (parseInt(quantity, 10) || 0) * (parseInt(fields.price, 10) || 0)
 }
+const RequestForm = () => (
+  <ControlledForm
+    idPrefix="request_form"
+    render={({ fields, formPropsFor }) => {
+      return (
+        <form
+          id="request_form"
+          className="XXXwas-validated"
+          onSubmit={e => {
+            e.preventDefault()
+            alert(JSON.stringify(fields, 0, 2))
+          }}>
+          <Row>
+            <Col lg>
+              <FormField {...formPropsFor('article')} />
+
+              <FormField {...formPropsFor('article_nr')} />
+
+              <FormField {...formPropsFor('supplier')} />
+
+              <FormField
+                {...formPropsFor('receiver_name')}
+                autoComplete="name"
+              />
+
+              <FormField {...formPropsFor('building')} />
+
+              <FormField>
+                <Select
+                  {...formPropsFor('room')}
+                  options={ROOMS_JSON.slice(0, 100).map(({ id, name }) => ({
+                    value: id,
+                    label: name
+                  }))}
+                />
+              </FormField>
+
+              <FormField {...formPropsFor('purpose')} />
+
+              <Row>
+                <Col sm>
+                  <FormField>
+                    <Select
+                      {...formPropsFor('priority_requester')}
+                      options={[0, 1, 2, 3].map(n => ({
+                        value: n,
+                        label: t(`field.request_priority_inspector_labels.${n}`)
+                      }))}
+                    />
+                  </FormField>
+                </Col>
+                <Col sm>
+                  <FormField>
+                    <Select
+                      {...formPropsFor('priority_inspector')}
+                      options={[0, 1, 2, 3].map(n => ({
+                        value: n,
+                        label: t(`field.request_priority_inspector_labels.${n}`)
+                      }))}
+                    />
+                  </FormField>
+                </Col>
+              </Row>
+
+              <FormField>
+                <ButtonRadio
+                  {...formPropsFor('replacement')}
+                  options={['replacement', 'new'].map(k => ({
+                    value: k,
+                    label: t(`field.request_replacement_labels_${k}`)
+                  }))}
+                />
+              </FormField>
+            </Col>
+
+            <Col lg>
+              <Row>
+                <Col sm>
+                  <FormField
+                    {...formPropsFor('price')}
+                    type="number-integer"
+                    labelSmall={t('field.price_help')}
+                    helpText="Bitte nur ganze Zahlen eingeben"
+                  />
+                </Col>
+                <Col sm>
+                  <FormField
+                    type="text-static"
+                    name="price_total"
+                    value={<TotalAmount fields={fields} />}
+                    label={t('field.price_total')}
+                    labelSmall={t('field.price_help')}>
+                    <Span cls="text-bold" />
+                  </FormField>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col sm>
+                  <FormField
+                    {...formPropsFor('quantity_requested')}
+                    type="number-integer"
+                  />
+                </Col>
+                <Col sm>
+                  <FormField
+                    {...formPropsFor('quantity_approved')}
+                    type="number-integer"
+                    max={fields.quantity_requested}
+                  />
+                </Col>
+                <Col sm>
+                  <FormField
+                    {...formPropsFor('quantity_ordered')}
+                    type="number-integer"
+                    max={fields.quantity_approved}
+                  />
+                </Col>
+              </Row>
+
+              <FormField
+                {...formPropsFor('comment_inspector')}
+                type="textarea"
+                beforeInput={
+                  <Select
+                    id="priority_requester"
+                    m="b-3"
+                    cls="form-control-sm"
+                    options={['foo', 'bar', 'baz'].map(s => ({
+                      value: s,
+                      label: s
+                    }))}
+                  />
+                }
+              />
+
+              <FormGroup label={t('field.attachments')}>
+                <FilePicker id="attachments" name="attachments" />
+              </FormGroup>
+
+              <FormField>
+                <ButtonRadio
+                  {...formPropsFor('accounting_type')}
+                  options={['aquisition', 'investment'].map(k => ({
+                    value: k,
+                    label: t(`field.accounting_type_label_${k}`)
+                  }))}
+                />
+              </FormField>
+
+              {fields.accounting_type !== 'investment' ? (
+                <FormField {...formPropsFor('cost_center')} />
+              ) : (
+                <Row>
+                  <Col sm>
+                    <FormField {...formPropsFor('internal_order_number')} />
+                  </Col>
+
+                  <Col sm>
+                    <FormField
+                      type="text-static"
+                      value="123456789"
+                      name="general_ledger_account"
+                    />
+                  </Col>
+                </Row>
+              )}
+            </Col>
+          </Row>
+
+          <hr m="mt-0" />
+
+          <Row m="t-5">
+            <Col lg>
+              <button type="submit" className="btn m-1 btn-outline-dark">
+                <Icon.Exchange /> {t('form_btn_move_category')}
+              </button>
+              <button type="submit" className="btn m-1 btn-outline-dark">
+                <Icon.Calendar /> {t('form_btn_change_budget_period')}
+              </button>
+              <button type="submit" className="btn m-1 btn-outline-danger">
+                <Icon.Trash /> {t('form_btn_delete')}
+              </button>
+            </Col>
+            <Col lg order="first" className="mt-3 mt-lg-0">
+              <button type="submit" className="btn m-1 btn-primary">
+                <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+              </button>
+              <button type="submit" className="btn m-1 btn-outline-secondary">
+                {t('form_btn_cancel')}
+              </button>
+            </Col>
+          </Row>
+          <pre>{JSON.stringify({ fields }, 0, 2)}</pre>
+        </form>
+      )
+    }}
+  />
+)
 
 export default RequestForm

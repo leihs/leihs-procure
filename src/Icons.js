@@ -1,41 +1,16 @@
 import React from 'react'
 import f from 'lodash'
 
-// pick and choose what we use, then export all in one object w/ defaults
-// import Checkmark from 'react-icons/lib/fa/check'
-
-// const ICONS = {
-//   Checkmark: {
-//     src: Checkmark,
-//     description: 'Save Buttons and other kinds of confirmations'
-//     // },
-//     // Exchange: {
-//     //   component: Exchange
-//   }
-// }
-
-// const Icons = f.fromPairs(
-//   f.map(ICONS, (v, k) => {
-//     const LibIcon = ICONS[k].src
-//     return [
-//       k,
-//       function Icon(props) {
-//         if (props.children) {
-//           throw new Error('Icons cant have `children`!')
-//         }
-//         return <LibIcon style={{ verticalAlign: 'text-bottom' }} {...props} />
-//       }
-//     ]
-//   })
-// )
-
-// if only FA is used, this is enough:
+// pick & choose what we use, name & describe it, then export all in one object of components
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
 import faExchange from '@fortawesome/fontawesome-free-solid/faExchangeAlt'
 import faCalendarAlt from '@fortawesome/fontawesome-free-solid/faCalendarAlt'
 import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt'
 import faChartPie from '@fortawesome/fontawesome-free-solid/faChartPie'
+import faPaperclip from '@fortawesome/fontawesome-free-solid/faPaperclip'
+import faCircle from '@fortawesome/fontawesome-free-solid/faCircle'
+import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
 
 const ICONS = {
   Checkmark: {
@@ -52,21 +27,28 @@ const ICONS = {
     src: faTrashAlt,
     description: 'Deleting things'
   },
-  ProcurementLogo: { src: faChartPie }
+  ProcurementLogo: { src: faChartPie },
+  Paperclip: {
+    src: faPaperclip
+  },
+  RadioCheckedOn: {
+    src: faCheckCircle
+  },
+  RadioCheckedOff: {
+    src: faCircle
+  }
 }
 
 const Icons = f.fromPairs(
-  f.map(ICONS, (v, k) => {
-    const faIcon = ICONS[k].src
-    return [
-      k,
-      function Icon(props) {
-        if (props.children) {
-          throw new Error('Icons cant have `children`!')
-        }
-        return <FontAwesomeIcon icon={faIcon} {...props} />
+  f.map(ICONS, ({ src }, name) => {
+    const iconComponent = props => {
+      if (props.children) {
+        throw new Error('Icons cant have `children`!')
       }
-    ]
+      return <FontAwesomeIcon icon={src} {...props} />
+    }
+    iconComponent.displayName = `Icon.${name}`
+    return [name, iconComponent]
   })
 )
 
