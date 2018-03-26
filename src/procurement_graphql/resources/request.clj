@@ -1,6 +1,6 @@
 (ns procurement-graphql.resources.request
   (:require [honeysql.core :as sql]
-            [honeysql.helpers :refer :all :as helpers]
+            [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
             [procurement-graphql.db :as db]))
 

@@ -10,9 +10,8 @@
   (let [request (request-res/get-request id)
         budget_period (budget-period-res/get-budget-period (:budget_period_id request))
         user (user-res/get-user user-id)]
-    (and (user-res/procurement-requester? user-id)
+    (and (user-res/procurement-requester? user)
          (= (:user-id request) user-id)
-         ; (budget-period/in-requesting-phase?)
-         )))
+         (budget-period-res/in-requesting-phase? budget_period))))
 
 (edit? request-id user-id)

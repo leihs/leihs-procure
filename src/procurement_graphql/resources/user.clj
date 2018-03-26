@@ -1,6 +1,6 @@
 (ns procurement-graphql.resources.user
   (:require [honeysql.core :as sql]
-            [honeysql.helpers :refer :all :as helpers]
+            [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
             [procurement-graphql.db :as db]))
 
@@ -15,11 +15,7 @@
 (defn get-user [id]
   (first (jdbc/query db/db (user-query id))))
 
-(defn procurement-requester? [id]
-  (:is_procurement_requester (get-user id)))
+(defn procurement-requester? [user]
+  (:is_procurement_requester user))
 
 ; (procurement-requester? user-id)
-
-; (in-ns 'procurement-graphql.resources.user)
-
-; (require '([procurement-graphql.resources.user :reload-all true]))
