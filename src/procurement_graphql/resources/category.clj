@@ -1,27 +1,19 @@
-(ns procurement-graphql.resources.user
+(ns procurement-graphql.resources.category
   (:require [honeysql.core :as sql]
             [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
             [procurement-graphql.db :as db]))
 
-(def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
-
-(defn user-query [id]
+(defn category-query [id]
   (-> (select :*)
-      (from :users)
-      (where [:= :users.id (sql/call :cast id :uuid)])
+      (from :procurement_categories)
+      (where [:= :procurement_categories.id (sql/call :cast id :uuid)])
       sql/format))
 
-(defn get-user [id]
-  (first (jdbc/query db/db (user-query id))))
+(defn get-category [id]
+  (first (jdbc/query db/db (category-query id))))
 
-(defn procurement-requester? [user]
-  (:is_procurement_requester user))
-
-(defn procurement-admin? [user]
-  (:is_procurement_admin user))
-
-(defn procurement-inspector? [user]
+(defn inspectable-by? [user category]
   (:result
     (jdbc/query
       db/db
@@ -32,8 +24,9 @@
                    (from :procurement_category_inspectors)
                    (where [:=
                            :procurement_category_inspectors.user_id
-                           (:id user)])))
+                           (:id user)])
+                   (merge-where [:=
+                                 :procurement_category_inspectors.category_id
+                                 (:id category)])))
              :result])
           sql/format))))
-
-; (procurement-inspector? (get-user user-id))

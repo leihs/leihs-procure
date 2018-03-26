@@ -18,7 +18,8 @@
 (defn in-requesting-phase? [budget-period]
   (:result
     (first
-      (jdbc/query db/db
+      (jdbc/query
+        db/db
         (-> (select
               [(sql/call :<
                          (sql/call :cast (sql/call :now) :date)
@@ -26,4 +27,16 @@
                :result])
             sql/format)))))
 
-(in-requesting-phase? (get-budget-period budget-period-id))
+(defn past? [budget-period]
+  (:result
+    (first
+      (jdbc/query
+        db/db
+        (-> (select
+              [(sql/call :>
+                         (sql/call :cast (sql/call :now) :date)
+                         (sql/call :cast (:end_date budget-period) :date))
+               :result])
+            sql/format)))))
+
+(past? (get-budget-period budget-period-id))
