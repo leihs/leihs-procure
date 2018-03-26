@@ -1,0 +1,15 @@
+{:objects
+ {:Request
+  {:fields
+   {:id {:type ID}
+    :article_name {:type (non-null String)}
+    :requested_quantity {:type Int}
+    :approved_quantity {:type Int}
+    :inspection_comment {:type String}}}}
+
+ :queries
+ {:request_by_id
+  {:type :Request
+   :args
+   {:id {:type ID}}
+   :resolve :request-by-id}}}
