@@ -9,6 +9,7 @@
                  [org.postgresql/postgresql "42.1.4"],
                  [honeysql "0.9.2"]]
   :main ^:skip-aot procurement-graphql.core
+  ; :jvm-opts ["-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl}"]
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :plugins [[lein-exec "0.3.7"]])
