@@ -1,9 +1,9 @@
-(ns procurement-graphql.permissions.request-field
-  (:require [procurement-graphql.resources.user :as u]
-            [procurement-graphql.resources.request :as r]
-            [procurement-graphql.resources.category :as c]
-            [procurement-graphql.resources.budget-period :as bp]
-            [procurement-graphql.permissions.request :as r-perm]))
+(ns leihs.procurement.permissions.request-field
+  (:require [leihs.procurement.resources.user :as u]
+            [leihs.procurement.resources.request :as r]
+            [leihs.procurement.resources.category :as c]
+            [leihs.procurement.resources.budget-period :as bp]
+            [leihs.procurement.permissions.request :as r-perm]))
 
 (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 (def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")

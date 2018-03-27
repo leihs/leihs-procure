@@ -1,4 +1,4 @@
-(defproject procurement-graphql "0.1.0-SNAPSHOT"
+(defproject leihs-procurement "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -8,8 +8,6 @@
                  [org.clojure/java.jdbc "0.7.1"],
                  [org.postgresql/postgresql "42.1.4"],
                  [honeysql "0.9.2"]]
-  :main ^:skip-aot procurement-graphql.core
-  ; :jvm-opts ["-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl}"]
+  :main ^:skip-aot leihs.procurement.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}}
-  :plugins [[lein-exec "0.3.7"]])
+  :profiles {:uberjar {:aot :all}})

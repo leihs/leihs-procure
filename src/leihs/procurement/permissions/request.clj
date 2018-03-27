@@ -1,7 +1,7 @@
-(ns procurement-graphql.permissions.request
-  (:require [procurement-graphql.resources.request :as r]
-            [procurement-graphql.resources.budget-period :as bp]
-            [procurement-graphql.resources.user :as u]))  
+(ns leihs.procurement.permissions.request
+  (:require [leihs.procurement.resources.request :as r]
+            [leihs.procurement.resources.budget-period :as bp]
+            [leihs.procurement.resources.user :as u]))  
 
 ; (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 ; (def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")

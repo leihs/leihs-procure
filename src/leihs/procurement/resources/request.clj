@@ -1,8 +1,8 @@
-(ns procurement-graphql.resources.request
+(ns leihs.procurement.resources.request
   (:require [honeysql.core :as sql]
             [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
-            [procurement-graphql.db :as db]))
+            [leihs.procurement.db :as db]))
 
 (defn request-query [id]
   (-> (select :*)
@@ -11,7 +11,7 @@
       sql/format))
 
 (defn get-request [id]
-  (first (jdbc/query db/db (request-query id))))
+  (first (jdbc/query db/conn (request-query id))))
 
 (defn requested-by-user? [request user]
   (= (:user_id request) (:id user)))

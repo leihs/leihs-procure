@@ -1,8 +1,8 @@
-(ns procurement-graphql.resources.user
+(ns leihs.procurement.resources.user
   (:require [honeysql.core :as sql]
             [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
-            [procurement-graphql.db :as db]))
+            [leihs.procurement.db :as db]))
 
 (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 
@@ -13,7 +13,7 @@
       sql/format))
 
 (defn get-user [id]
-  (first (jdbc/query db/db (user-query id))))
+  (first (jdbc/query db/conn (user-query id))))
 
 (defn procurement-requester? [user]
   (:is_procurement_requester user))
@@ -24,7 +24,7 @@
 (defn procurement-inspector? [user]
   (:result
     (jdbc/query
-      db/db
+      db/conn
       (-> (select
             [(sql/call
                :exists

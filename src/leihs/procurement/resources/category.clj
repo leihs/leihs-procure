@@ -1,8 +1,8 @@
-(ns procurement-graphql.resources.category
+(ns leihs.procurement.resources.category
   (:require [honeysql.core :as sql]
             [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
-            [procurement-graphql.db :as db]))
+            [leihs.procurement.db :as db]))
 
 (defn category-query [id]
   (-> (select :*)
@@ -11,12 +11,12 @@
       sql/format))
 
 (defn get-category [id]
-  (first (jdbc/query db/db (category-query id))))
+  (first (jdbc/query db/conn (category-query id))))
 
 (defn inspectable-by? [user category]
   (:result
     (jdbc/query
-      db/db
+      db/conn
       (-> (select
             [(sql/call
                :exists

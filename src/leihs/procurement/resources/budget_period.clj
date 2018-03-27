@@ -1,8 +1,8 @@
-(ns procurement-graphql.resources.budget-period
+(ns leihs.procurement.resources.budget-period
   (:require [honeysql.core :as sql]
             [honeysql.helpers :refer :all :rename {update honey-update}]
             [clojure.java.jdbc :as jdbc]
-            [procurement-graphql.db :as db])) 
+            [leihs.procurement.db :as db])) 
 
 (def budget-period-id "aba0576e-d65f-5fe0-aa80-89ce226ec9b1")
 
@@ -13,13 +13,13 @@
       sql/format))
 
 (defn get-budget-period [id]
-  (first (jdbc/query db/db (budget-period-query id))))
+  (first (jdbc/query db/conn (budget-period-query id))))
 
 (defn in-requesting-phase? [budget-period]
   (:result
     (first
       (jdbc/query
-        db/db
+        db/conn
         (-> (select
               [(sql/call :<
                          (sql/call :cast (sql/call :now) :date)
@@ -31,7 +31,7 @@
   (:result
     (first
       (jdbc/query
-        db/db
+        db/conn
         (-> (select
               [(sql/call :>
                          (sql/call :cast (sql/call :now) :date)
