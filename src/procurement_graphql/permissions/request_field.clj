@@ -8,15 +8,15 @@
 (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 (def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")
 
-(def user (u/get-user user-id))
-(def request (r/get-request request-id))
+(def test-user (u/get-user user-id))
+(def test-request (r/get-request request-id))
 
 (defn all-for-user-and-request [user, request]
   (let [budget-period (bp/get-budget-period (:budget_period_id request))
         category (c/get-category (:category_id request))
         request-editable-by-user (r-perm/edit? user request)
         request-without-template (not (:template_id request))
-        requested-by-user (= (:user_id request) (:id user))
+        requested-by-user (r/requested-by-user? request user)
         user-is-requester (u/procurement-requester? user)
         user-is-inspector (u/procurement-inspector? user)
         user-is-admin (u/procurement-admin? user)
@@ -44,4 +44,4 @@
                           :write (and (not budget-period-is-past)
                                       category-inspectable-by-user)}}))
 
-(all-for-user-and-request user request)
+(all-for-user-and-request test-user test-request)

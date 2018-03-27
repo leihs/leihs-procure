@@ -1,14 +1,18 @@
-(ns procurement-graphql.resources.request
-  (:require [honeysql.core :as sql]
-            [honeysql.helpers :refer :all :rename {update honey-update}]
-            [clojure.java.jdbc :as jdbc]
-            [procurement-graphql.db :as db]))
+(ns procurement-graphql.permissions.request
+  (:require [procurement-graphql.resources.request :as r]
+            [procurement-graphql.resources.budget-period :as bp]
+            [procurement-graphql.resources.user :as u]))  
 
-(defn request-query [id]
-  (-> (select :*)
-      (from :procurement_requests)
-      (where [:= :procurement_requests.id (sql/call :cast id :uuid)])
-      sql/format))
+; (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
+; (def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")
 
-(defn get-request [id]
-  (first (jdbc/query db/db (request-query id))))
+; (def test-user (u/get-user user-id))
+; (def test-request (r/get-request request-id))
+
+(defn edit? [user request]
+  (let [budget_period (bp/get-budget-period (:budget_period_id request))]
+    (and (u/procurement-requester? user)
+         (r/requested-by-user? request user)
+         (bp/in-requesting-phase? budget_period))))
+
+; (edit? test-user test-request)

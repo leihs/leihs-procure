@@ -12,3 +12,6 @@
 
 (defn get-request [id]
   (first (jdbc/query db/db (request-query id))))
+
+(defn requested-by-user? [request user]
+  (= (:user_id request) (:id user)))
