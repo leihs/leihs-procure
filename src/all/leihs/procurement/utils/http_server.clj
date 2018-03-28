@@ -1,4 +1,4 @@
-(ns leihs.admin.utils.http-server
+(ns leihs.procurement.utils.http-server
   (:require
     [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]

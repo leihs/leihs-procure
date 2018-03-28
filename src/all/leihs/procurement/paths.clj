@@ -1,10 +1,10 @@
-(ns leihs.admin.paths
+(ns leihs.procurement.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.utils.core :refer [keyword str presence]]
+    [leihs.procurement.utils.core :refer [keyword str presence]]
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
-    [leihs.admin.utils.url.query-params :refer [encode-query-params]]
+    [leihs.procurement.utils.url.query-params :refer [encode-query-params]]
     [uritemplate-clj.core :as uri-templ]
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]

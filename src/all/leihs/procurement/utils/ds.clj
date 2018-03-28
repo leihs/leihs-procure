@@ -1,6 +1,6 @@
-(ns leihs.admin.utils.ds
+(ns leihs.procurement.utils.ds
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [logbug.catcher :as catcher]
     [clojure.java.jdbc :as jdbc]

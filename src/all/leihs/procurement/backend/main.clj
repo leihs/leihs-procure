@@ -1,9 +1,9 @@
-(ns leihs.admin.back.main
+(ns leihs.procurement.back.main
   (:require
     [clojure.tools.cli :as cli :refer [parse-opts]]
     [clojure.pprint :refer [pprint]]
 
-    [leihs.admin.back.run :as run]
+    [leihs.procurement.back.run :as run]
 
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]

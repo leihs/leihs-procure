@@ -1,4 +1,4 @@
-(ns leihs.admin.utils.sql
+(ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format])
   (:require
     [honeysql.format :as format]

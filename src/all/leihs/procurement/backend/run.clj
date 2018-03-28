@@ -1,15 +1,15 @@
-(ns leihs.admin.back.run
+(ns leihs.procurement.back.run
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.routes :as routes]
-    [leihs.admin.env]
-    [leihs.admin.paths]
-    [leihs.admin.utils.ds :as ds]
-    [leihs.admin.utils.http-server :as http-server]
-    [leihs.admin.utils.url.http :as http-url]
-    [leihs.admin.utils.url.jdbc :as jdbc-url]
-    [leihs.admin.utils.url.jdbc]
+    [leihs.procurement.routes :as routes]
+    [leihs.procurement.env]
+    [leihs.procurement.paths]
+    [leihs.procurement.utils.ds :as ds]
+    [leihs.procurement.utils.http-server :as http-server]
+    [leihs.procurement.utils.url.http :as http-url]
+    [leihs.procurement.utils.url.jdbc :as jdbc-url]
+    [leihs.procurement.utils.url.jdbc]
     [clojure.tools.cli :as cli :refer [parse-opts]]
     [clojure.pprint :refer [pprint]]
     [clojure.tools.logging :as logging]
@@ -20,7 +20,7 @@
 
 (def defaults
   {:LEIHS_HTTP_BASE_URL "http://localhost:3211"
-   :LEIHS_SECRET (when (= leihs.admin.env/env :dev) "secret")
+   :LEIHS_SECRET (when (= leihs.procurement.env/env :dev) "secret")
    :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"
    })
 
