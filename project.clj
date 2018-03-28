@@ -54,12 +54,21 @@
                       ["--add-modules" "java.xml.bind"]
                       []))
 
+
+  ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
+
   :target-path "target/%s"
   :source-paths ["src/all"]
   :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
   :main leihs.procurement.backend.main
-  :profiles {:dev {:source-paths ["src/dev"]
+  :profiles {:dev {:dependencies [
+                                  [threatgrid/ring-graphql-ui "0.1.1"]
+                                  ; [com.walmartlabs/lacinia-pedestal "0.7.0"]
+                                  ]
+                   :source-paths ["src/dev"]
                    :resource-paths ["resources/dev"]
-                   :env {:dev true}}}
+                   :env {:dev true}
+                   ; :aot [#"user"]
+                   :main user}}
   )
