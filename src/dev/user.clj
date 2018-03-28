@@ -26,7 +26,6 @@
 (defn start []
   (let [{:keys [options]} (cli/parse-opts () run/cli-options :in-order true)
         ds (ds/init {:database-url options})]
-    (logging/info ds)
     ds))
 
 ; (q "{ request_by_id(id: \"91805c8c-0f47-45f1-bcce-b11da5427294\") { id article_name }}")

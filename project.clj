@@ -69,6 +69,6 @@
                    :source-paths ["src/dev"]
                    :resource-paths ["resources/dev"]
                    :env {:dev true}
-                   ; :aot [#"user"]
+                   :aot [user clojure.tools.logging.impl]
                    :main user}}
   )
