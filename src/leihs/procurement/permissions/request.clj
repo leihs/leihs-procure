@@ -9,10 +9,4 @@
 ; (def test-user (u/get-user user-id))
 ; (def test-request (r/get-request request-id))
 
-(defn edit? [user request]
-  (let [budget_period (bp/get-budget-period (:budget_period_id request))]
-    (and (u/procurement-requester? user)
-         (r/requested-by-user? request user)
-         (bp/in-requesting-phase? budget_period))))
-
 ; (edit? test-user test-request)

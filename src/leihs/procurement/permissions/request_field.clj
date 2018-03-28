@@ -14,34 +14,107 @@
 (defn all-for-user-and-request [user, request]
   (let [budget-period (bp/get-budget-period (:budget_period_id request))
         category (c/get-category (:category_id request))
-        request-editable-by-user (r-perm/edit? user request)
         request-without-template (not (:template_id request))
         requested-by-user (r/requested-by-user? request user)
         user-is-requester (u/procurement-requester? user)
         user-is-inspector (u/procurement-inspector? user)
         user-is-admin (u/procurement-admin? user)
         budget-period-is-past (bp/past? budget-period)
+        budget-period-in-requesting-phase (bp/in-requesting-phase? budget-period)
         category-inspectable-by-user (c/inspectable-by? user category)]
     {:article_name {:read true,
-                    :write (and request-editable-by-user
-                                request-without-template)}
+                    :write (and request-without-template
+                                (not budget-period-is-past)
+                                (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                    category-inspectable-by-user 
+                                    user-is-admin))}
+
+     :article_number {:read true,
+                      :write (and request-without-template
+                                  (not budget-period-is-past)
+                                  (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                      category-inspectable-by-user 
+                                      user-is-admin))}
+
+     :supplier {:read true,
+                :write (and request-without-template
+                            (not budget-period-is-past)
+                            (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                category-inspectable-by-user 
+                                user-is-admin))}
+
+     :receiver {:read true,
+                :write (and (not budget-period-is-past)
+                            (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                category-inspectable-by-user 
+                                user-is-admin))}
+
+     :building_id {:read true,
+                   :write (and (not budget-period-is-past)
+                               (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                   category-inspectable-by-user 
+                                   user-is-admin))}
+
+     :room_id {:read true,
+               :write (and (not budget-period-is-past)
+                           (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                               category-inspectable-by-user 
+                               user-is-admin))}
+
+     :motivation {:read true,
+                  :write (and (not budget-period-is-past)
+                              (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                  category-inspectable-by-user 
+                                  user-is-admin))}
 
      :requested_quantity {:read true
-                          :write request-editable-by-user}
+                          :write (and (not budget-period-is-past)
+                                      (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                          category-inspectable-by-user 
+                                          user-is-admin))}
 
-     :approved_quantity {:read (or (and user-is-requester
-                                        requested-by-user)
+     :approved_quantity {:read (or (and user-is-requester requested-by-user budget-period-is-past)
                                    user-is-inspector
                                    user-is-admin)
                          :write (and (not budget-period-is-past)
-                                     category-inspectable-by-user)}
+                                     (or category-inspectable-by-user
+                                         user-is-admin))}
 
-     :inspection_comment {:read (or (and user-is-requester
-                                         requested-by-user
-                                         budget-period-is-past)
+     :order_quantity {:read (or user-is-inspector
+                                user-is-admin)
+                      :write (and (not budget-period-is-past)
+                                  (or category-inspectable-by-user
+                                      user-is-admin))}
+
+     :inspection_comment {:read (or (and user-is-requester requested-by-user budget-period-is-past)
                                     user-is-inspector
                                     user-is-admin)
                           :write (and (not budget-period-is-past)
-                                      category-inspectable-by-user)}}))
+                                      (or category-inspectable-by-user
+                                          user-is-admin))}
+     
+     :attachments {:read true
+                   :write (and (not budget-period-is-past)
+                               (or (and user-is-requester requested-by-user budget-period-in-requesting-phase)
+                                   category-inspectable-by-user 
+                                   user-is-admin))}
 
-(all-for-user-and-request test-user test-request)
+     :accounting_type {:read user-is-inspector
+                       :write (and (not budget-period-is-past)
+                                   (or category-inspectable-by-user
+                                       user-is-admin))}
+
+     :internal_order_number {:read user-is-inspector
+                             :write (and (not budget-period-is-past)
+                                         (or category-inspectable-by-user
+                                             user-is-admin))}
+
+     :state {:read true
+             :write (and (not budget-period-is-past)
+                         (or category-inspectable-by-user
+                             user-is-admin))}
+     }))
+
+; (into {}
+;       (filter #(:read (second %))
+;               (seq (all-for-user-and-request test-user test-request))))
