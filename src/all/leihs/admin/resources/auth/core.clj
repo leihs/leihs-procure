@@ -4,9 +4,11 @@
   (:require
     [leihs.admin.constants :refer [USER_SESSION_COOKIE_NAME]]
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.admin.resources.auth.back.authorize :as authorize]
     [leihs.admin.resources.auth.back.session :as session]
+    [leihs.admin.resources.auth.back.system-admin :as system-admin]
     [leihs.admin.resources.auth.back.token :as token]
+    [leihs.admin.utils.sql :as sql]
 
     [cider-ci.open-session.encryptor :as encryptor]
     [clojure.java.jdbc :as jdbc]
@@ -132,13 +134,43 @@
     (cpj/POST (path :auth-password-sign-in) [] #'password-sign-in)
     (cpj/POST (path :auth-sign-out) [] #'sign-out)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn wrap-authenticate [handler]
   (-> handler
+      token/wrap
       session/wrap
-      token/wrap))
+      system-admin/wrap))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn wrap-authorize 
+  ([handler skip-authorization-handler-keys ]
+   (fn [request]
+     (wrap-authorize request handler skip-authorization-handler-keys)))
+  ([request handler skip-authorization-handler-keys]
+   (cond 
+     (authorize/handler-is-ignored? 
+       skip-authorization-handler-keys request) (handler request)
+     (authorize/admin-and-safe? 
+       request) (handler request)
+     (authorize/admin-write-scope-and-unsafe?
+       request) (handler request)
+     (authorize/authenticated-entity-not-present? 
+       request) {:status 401
+                 :body "Authentication required!"}
+     (authorize/is-not-admin? 
+       request) {:status 403 
+                 :body "Only for admins!"}
+     (authorize/violates-admin-write-scope? 
+       request) {:status 403
+                 :body "No permission to write/modify data!"}
+     :else {:status 500
+            :body "Authorization check is not implement error!"})))
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

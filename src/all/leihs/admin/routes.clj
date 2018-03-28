@@ -41,28 +41,28 @@
 
 (declare redirect-to-root-handler)
 
+(def skip-authorization-handler-keys
+  #{:auth-shib-sign-in
+    :auth-password-sign-in
+    :initial-admin
+    :status})
+
+(def do-not-dispatch-to-std-frontend-handler-keys
+  #{
+    :redirect-to-root 
+    :not-found 
+    :auth-shib-sign-in})
+
 (def handler-resolve-table
-  {
-   :admin html/html-handler
-   :api-token api-token/routes
-   :api-token-delete html/html-handler
-   :api-token-edit html/html-handler
-   :api-token-new html/html-handler
+  {:api-token api-token/routes
    :api-tokens api-tokens/routes
    :auth auth/routes
    :auth-password-sign-in auth/routes
    :auth-shib-sign-in auth/routes
    :auth-sign-out auth/routes
-   :borrow html/html-handler
-   :debug html/html-handler
    :initial-admin initial-admin/routes
-   :leihs html/html-handler
-   :manage html/html-handler
    :not-found html/not-found-handler
-   :procure html/html-handler
    :redirect-to-root redirect-to-root-handler
-   :request html/html-handler
-   :requests html/html-handler
    :status status/routes
    :shutdown shutdown/routes
    :user user/routes
@@ -101,20 +101,31 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn wrap-dispatch-to-html
+(defn wrap-dispatch-content-type
   ([handler]
    (fn [request]
-     (wrap-dispatch-to-html handler request)))
+     (wrap-dispatch-content-type handler request)))
   ([handler request]
-   (let [response (handler request)]
-     (if (and (nil? response)
-              ; TODO we might not need the following after we check (?nil response)
-              (not (do-not-dispatch-to-std-frontend-handler-keys
-                     (:handler-key request)))
-              (not (#{:post :put :patch :delete} (:request-method request)))
-              (= (-> request :accept :mime) :html))
-       (html/html-handler request)
-       response))))
+   (cond
+     ; accept json always goes to the backend handlers, i.e. the normal routing
+     (= (-> request :accept :mime) :json) (or (handler request)
+                                              (throw (ex-info "This resource does not provide a json response."
+                                                              {:status 406})))
+     ; accept HTML and GET (or HEAD) wants allmost always the frontend
+     (and (= (-> request :accept :mime) :html)
+          (#{:get :head} (:request-method request))
+          (not (do-not-dispatch-to-std-frontend-handler-keys
+                 (:handler-key request)))) (html/html-handler request)
+     ; other request might need to go the backend and return frontend nevertheless
+     :else (let [response (handler request)]
+             (if (and (nil? response)
+                      ; TODO we might not need the following after we check (?nil response)
+                      (not (do-not-dispatch-to-std-frontend-handler-keys
+                             (:handler-key request)))
+                      (not (#{:post :put :patch :delete} (:request-method request)))
+                      (= (-> request :accept :mime) :html))
+               (html/html-handler request)
+               response)))))
 
 (defn wrap-resolve-handler
   ([handler]
@@ -174,8 +185,8 @@
 (defn init [secret]
   (I> wrap-handler-with-logging
       dispatch-to-handler
-      wrap-dispatch-to-html
-      wrap-assert-handler
+      (auth/wrap-authorize skip-authorization-handler-keys)
+      wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap

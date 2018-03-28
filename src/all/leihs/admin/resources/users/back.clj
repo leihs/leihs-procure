@@ -90,7 +90,6 @@
      {:users
       (jdbc/query (:tx request) (users-query request))}}))
 
-
 (def routes
   (cpj/routes
     (cpj/GET (path :users) [] #'users)
