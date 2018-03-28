@@ -12,6 +12,9 @@
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.utils.core :refer [keyword str presence]]
 
+    [leihs.admin.utils.seq :refer [with-index]]
+    [leihs.admin.resources.users.shared :as shared]
+
     [accountant.core :as accountant]
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
@@ -21,28 +24,26 @@
 
 (def current-query-paramerters* (reaction (-> @state/routing-state* :query-params)))
 
-(def default-query-parameters {:is_admin nil
-                               :role "any"
-                               :page 1
-                               :per-page 12
-                               :term ""
-                               :type "any" })
+(def current-url* (reaction (:url @state/routing-state*)))
 
 (def current-query-paramerters-normalized*
-  (reaction (merge default-query-parameters
-           @current-query-paramerters*)))
+  (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
 (def fetch-users-id* (reagent/atom nil))
-(def users* (reagent/atom {}))
-(def page-is-active?* (reaction (= (-> @state/routing-state* :handler-key) :users)))
+
+(def data* (reagent/atom {}))
 
 (defn fetch-users []
-  (let [query-paramerters @current-query-paramerters-normalized*]
+  "Fetches the the currernt url with accept/json 
+  after 1/5 second timeout if query-params have not changed in the meanwhile 
+  yet and stores the result in the map data* under this url."
+  (let [url @current-url*
+        normalize-query-params @current-query-paramerters-normalized*]
     (go (<! (timeout 200))
-        (when (= query-paramerters @current-query-paramerters-normalized*)
+        (when (= url @current-url*)
           (let [resp-chan (async/chan)
-                id (requests/send-off {:url (path :users) :method :get
-                                       :query-params query-paramerters}
+                id (requests/send-off {:url url 
+                                       :method :get}
                                       {:modal false
                                        :title "Fetch Users"
                                        :handler-key :users
@@ -52,31 +53,28 @@
             (go (let [resp (<! resp-chan)]
                   (when (and (= (:status resp) 200) ;success
                              (= id @fetch-users-id*) ;still the most recent request
-                             (= query-paramerters @current-query-paramerters-normalized*)) ;query-params have not changed yet
-                    ;(reset! effective-query-paramerters* current-query-paramerters)
-                    (swap! users* assoc query-paramerters (->> (-> resp :body :users)
-                                                               (map-indexed (fn [idx u]
-                                                                              (assoc u :key (:id u)
-                                                                                     :c idx)))
-                                                               ))))))))))
+                             (= url @current-url*)) ;query-params have still not changed yet
+                    (let [body (-> resp :body)
+                          page (:page normalize-query-params)
+                          per-page (:per-page normalize-query-params)
+                          offet (* per-page (- page 1))
+                          body-with-indexed-users (update-in body [:users] (partial with-index offet))]
+                      (swap! data* assoc url body-with-indexed-users))))))))))
 
 (defn escalate-query-paramas-update [_]
   (fetch-users)
   (swap! state/global-state*
          assoc :users-query-params @current-query-paramerters-normalized*))
 
-(defn current-query-params-component []
-  (reagent/create-class
-    {:component-did-mount escalate-query-paramas-update
-     :component-did-update escalate-query-paramas-update
-     :reagent-render
-     (fn [_] [:div.current-query-parameters
-              {:style {:display (if @state/debug?* :block :none)}}
-              [:h3 "@current-query-paramerters-normalized*"]
-              [components/pre-component @current-query-paramerters-normalized*]])}))
-
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn page-path-for-query-params [query-params]
+  (path (:handler-key @state/routing-state*) 
+        (:route-params @state/routing-state*)
+        (merge @current-query-paramerters-normalized*
+               query-params)))
+
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -89,10 +87,8 @@
      :value (or (-> @current-query-paramerters-normalized* :term presence) "")
      :on-change (fn [e]
                   (let [val (or (-> e .-target .-value presence) "")]
-                    (accountant/navigate! (path :users {}
-                                                (merge @current-query-paramerters-normalized*
-                                                       {:page 1
-                                                        :term val})))))}]])
+                    (accountant/navigate! (page-path-for-query-params
+                                            {:page 1 :term val}))))}]])
 
 (defn form-admins-filter []
   [:div.form-group.ml-2.mr-2.mt-2
@@ -105,10 +101,9 @@
                                     ("true" true) nil
                                     true)]
                     (js/console.log (with-out-str (pprint new-state)))
-                    (accountant/navigate! (path :users {}
-                                                (merge @current-query-paramerters-normalized*
-                                                       {:page 1
-                                                        :is_admin new-state}))))
+                    (accountant/navigate! (page-path-for-query-params 
+                                             {:page 1
+                                              :is_admin new-state})))
       :checked (case (-> @current-query-paramerters-normalized*
                          :is_admin presence)
                  (nil false "false") false
@@ -122,10 +117,9 @@
       {:value type
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (path :users {}
-                                                  (merge @current-query-paramerters-normalized*
-                                                         {:page 1
-                                                          :type val})))))}
+                      (accountant/navigate! (page-path-for-query-params 
+                                              {:page 1
+                                               :type val}))))}
       (for [t ["any" "org" "manual"]]
         [:option {:key t :value t} t])]]))
 
@@ -137,10 +131,9 @@
       {:value role
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (path :users {}
-                                                  (merge @current-query-paramerters-normalized*
-                                                         {:page 1
-                                                          :role val})))))}
+                      (accountant/navigate! (page-path-for-query-params 
+                                              {:page 1
+                                               :role val}))))}
       (for [a [ "any" "customer" "group_manager" "inventory_manager" "lending_manager"]]
         [:option {:key a :value a} a])]]))
 
@@ -152,10 +145,9 @@
       {:value per-page
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "12")]
-                      (accountant/navigate! (path :users {}
-                                                  (merge @current-query-paramerters-normalized*
-                                                         {:page 1
-                                                          :per-page val})))))}
+                      (accountant/navigate! (page-path-for-query-params
+                                              {:page 1
+                                               :per-page val}))))}
       (for [p [12 25 50 100 250 500 1000]]
         [:option {:key p :value p} p])]]))
 
@@ -163,11 +155,11 @@
   [:div.form-group.mt-2
    [:label.sr-only {:for :users-filter-reset} "Reset"]
    [:a#users-filter-reset.btn.btn-warning
-    {:href (path :users {} default-query-parameters)}
+    {:href (page-path-for-query-params shared/default-query-parameters)}
     [:i.fas.fa-times]
     " Reset "]])
 
-(defn filter-form []
+(defn filter-component []
   [:div.card.bg-light
    [:div.card-body
    [:div.form-inline
@@ -180,45 +172,61 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn users-thead-component []
+(def default-colconfig 
+  {:id true
+   :org_id true
+   :firstname true
+   :lastname true
+   :email true
+   :customcols []})
+
+(defn users-thead-component [colconfig]
   [:thead
    [:tr
     [:th]
     [:th]
-    [:th "Id"]
-    [:th "Org id"]
-    [:th "Firstname"]
-    [:th "Lastname"]
-    [:th "Email"]]])
+    (when (:id colconfig) [:th "Id"])
+    (when (:org_id colconfig) [:th "Org id"])
+    (when (:firstname colconfig) [:th "Firstname"])
+    (when (:lastname colconfig) [:th "Lastname"]) 
+    (when (:email colconfig) [:th "Email"])
+    (for [{th :th key :key} (:customcols colconfig)]
+      [th {:key key}])]])
 
-(defn user-row-component [user]
-  [:tr {:key (:key user)}
-   [:td (:count user)]
+(defn user-row-component [colconfig user]
+  [:tr {:key (:id user)}
+   [:td (:index user)]
    [:td [:a {:href (path :user {:user-id (:id user)})}
          [:img {:src (or (:img32_data_url user)
                          (gravatar-url (:email user)))}]]]
-   [:td [:a {:href (path :user {:user-id (:id user)})}
-         (short-id (:id user))]]
-   [:td {:style {:font-family "monospace"}} (:org_id user)]
-   [:td (:firstname user)]
-   [:td (:lastname user)]
-   [:td [:a {:href (str "mailto:" (:email user))}
-         [:i.fas.fa-envelope] " " (:email user)]]])
+   (when (:id colconfig)
+     [:td [:a {:href (path :user {:user-id (:id user)})}
+           (short-id (:id user))]])
+   (when (:org_id colconfig)
+     [:td {:style {:font-family "monospace"}} (:org_id user)])
+   (when (:firstname colconfig)
+     [:td (:firstname user)])
+   (when (:lastname colconfig)
+     [:td (:lastname user)])
+   (when (:email colconfig)
+     [:td [:a {:href (str "mailto:" (:email user))}
+           [:i.fas.fa-envelope] " " (:email user)]])
+   (for [{td :td} (:customcols colconfig)]
+     [td user])])
 
-(defn users-table-component []
-  (if-not (contains? @users* @current-query-paramerters-normalized*)
+(defn users-table-component [colconfig]
+  (if-not (contains? @data* @current-url*)
     [:div.text-center
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
-    (if-let [users (-> @users* (get  @current-query-paramerters-normalized* []) seq)]
+    (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
       [:table.table.table-striped.table-sm
-       [users-thead-component]
+       [users-thead-component colconfig]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)
               per-page (:per-page @current-query-paramerters-normalized*)]
           (doall (for [user users]
-                   (user-row-component
-                     (assoc user :count (+ 1 (:c user) (* per-page (- page 1))))))))]]
+                   (user-row-component colconfig user))))]]
       [:div.alert.alert-warning.text-center "No (more) users found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -229,13 +237,12 @@
      [:div.float-left
       [:a.btn.btn-primary.btn-sm
        {:class (when (< page 1) "disabled")
-        :href (path :users {} (assoc @current-query-paramerters-normalized*
-                                     :page page))}
+        :href (page-path-for-query-params {:page page})}
        [:i.fas.fa-arrow-circle-left] " Previous " ]])
    [:div.float-right
     [:a.btn.btn-primary.btn-sm
-     {:href (path :users {} (assoc @current-query-paramerters-normalized*
-                                   :page (inc (:page @current-query-paramerters-normalized*))))}
+     {:href (page-path-for-query-params 
+              {:page (inc (:page @current-query-paramerters-normalized*))})}
      " Next " [:i.fas.fa-arrow-circle-right]]]])
 
 (defn debug-component []
@@ -243,9 +250,23 @@
     [:section.debug
      [:hr]
      [:h2 "Page Debug"]
-     [:div.users
-      [:h3 "@users*"]
-      [:pre (with-out-str (pprint @users*))]]]))
+     [:div
+      [:h3 "@current-url*"]
+      [:pre (with-out-str (pprint @current-url*))]]
+     [:div
+      [:h3 "@data*"]
+      [:pre (with-out-str (pprint @data*))]]]))
+
+(defn main-page-content-component [colconfig]
+  [:div
+   [state/hidden-routing-state-component
+    {:will-mount escalate-query-paramas-update
+     :did-update escalate-query-paramas-update}]
+   [filter-component]
+   [pagination-component]
+   [users-table-component colconfig]
+   [pagination-component]
+   [debug-component]])
 
 (defn page []
   [:div.users
@@ -253,11 +274,6 @@
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
       (breadcrumbs/users-li)]
-     [(breadcrumbs/user-new-li)])
-   [current-query-params-component]
+     [(breadcrumbs/user-add-li)])
    [:h1 "Users"]
-   [filter-form]
-   [pagination-component]
-   [users-table-component]
-   [pagination-component]
-   [debug-component]])
+   [main-page-content-component default-colconfig]])

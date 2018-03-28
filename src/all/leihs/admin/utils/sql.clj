@@ -44,14 +44,17 @@
 (defalias join helpers/join)
 (defalias limit helpers/limit)
 (defalias merge-join helpers/merge-join)
+(defalias merge-left-join helpers/merge-left-join)
+(defalias merge-select helpers/merge-select)
 (defalias merge-where helpers/merge-where)
 (defalias modifiers helpers/modifiers)
 (defalias offset helpers/offset)
 (defalias order-by helpers/order-by)
-;(defalias returning helpers/returning)
 (defalias select helpers/select)
-;(defalias using helpers/using)
 (defalias where helpers/where)
+
+;(defalias returning helpers/returning)
+;(defalias using helpers/using)
 
 
 ;#### debug ###################################################################

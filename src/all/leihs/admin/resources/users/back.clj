@@ -5,6 +5,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.utils.sql :as sql]
     [leihs.admin.resources.user.back :as user]
+    [leihs.admin.resources.users.shared :as shared]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -22,8 +23,7 @@
       ))
 
 (defn set-per-page-and-offset
-  ([query {{per-page :per-page page :page} :query-params}]
-   (logging/info 'per-page per-page)
+  ([query {per-page :per-page page :page}]
    (when (or (-> per-page presence not)
              (-> per-page integer? not)
              (> per-page 1000)
@@ -76,19 +76,26 @@
       query)))
 
 (defn users-query [request]
-  (-> users-base-query
-      (set-per-page-and-offset request)
-      (term-fitler request)
-      (type-filter request)
-      (role-filter request)
-      (admins-filter request)
+  (let [query-params (-> request :query-params 
+                         shared/normalized-query-parameters)]
+    (-> users-base-query
+        (set-per-page-and-offset query-params)
+        (term-fitler request)
+        (type-filter request)
+        (role-filter request)
+        (admins-filter request))))
+
+(defn users-formated-query [request]
+  (-> request
+      users-query
       sql/format))
+
 
 (defn users [request]
   (when (= :json (-> request :accept :mime))
     {:body
      {:users
-      (jdbc/query (:tx request) (users-query request))}}))
+      (jdbc/query (:tx request) (users-formated-query request))}}))
 
 (def routes
   (cpj/routes

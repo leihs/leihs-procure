@@ -1,4 +1,4 @@
-(ns leihs.admin.front.dom
+(ns leihs.admin.utils.dom
   (:refer-clojure :exclude [str keyword])
   (:require
     [leihs.admin.utils.core :refer [keyword str presence]]

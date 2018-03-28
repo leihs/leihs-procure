@@ -10,6 +10,9 @@
     [leihs.admin.resources.api-token.back :as api-token]
     [leihs.admin.resources.api-tokens.back :as api-tokens]
     [leihs.admin.resources.auth.core :as auth]
+    [leihs.admin.resources.delegation.back :as delegation]
+    [leihs.admin.resources.delegations.back :as delegations]
+    [leihs.admin.resources.delegation.users.back :as delegation-users]
     [leihs.admin.resources.initial-admin.core :as initial-admin]
     [leihs.admin.resources.settings.back :as settings]
     [leihs.admin.resources.shutdown.back :as shutdown]
@@ -60,21 +63,22 @@
    :auth-password-sign-in auth/routes
    :auth-shib-sign-in auth/routes
    :auth-sign-out auth/routes
+   :delegation delegation/routes
+   :delegation-add-choose-responsible-user delegation/routes
+   :delegation-edit-choose-responsible-user delegation/routes
+   :delegation-user delegation-users/routes
+   :delegation-users delegation-users/routes
+   :delegations delegations/routes
    :initial-admin initial-admin/routes
    :not-found html/not-found-handler
    :redirect-to-root redirect-to-root-handler
-   :status status/routes
    :shutdown shutdown/routes
+   :status status/routes
    :user user/routes
-   :user-delete html/html-handler
-   :user-edit html/html-handler
-   :user-new html/html-handler
    :user-transfer-data user/routes
-   :users users/routes
-   })
+   :users users/routes })
 
-(def do-not-dispatch-to-std-frontend-handler-keys
-  #{:redirect-to-root :not-found})
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -85,21 +89,22 @@
   (get handler-resolve-table handler-key nil))
 
 (defn dispatch-to-handler [request]
-  (when-let [handler (:handler request)]
-    (handler request)))
+  (if-let [handler (:handler request)]
+    (handler request)
+    (throw 
+      (ex-info 
+        "There is no handler for this resource and the accepted content type."
+        {:status 404}))))
 
-(defn wrap-assert-handler
-  ([handler]
-   (fn [request]
-     (wrap-assert-handler handler request)))
-  ([handler request]
-   (if (:handler request)
-     (handler request)
-     (throw
-       (ex-info "Implementation error: the handler for this request could not be resolved."
-                (assoc request :status 500))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn browser-request-matches-javascript? [request]
+  "Returns true if the accepted type is javascript or
+  if the :uri ends with .js. Note that browsers do not 
+  use the proper accept type for javascript script tags."
+  (boolean (or (= (-> request :accept :mime) :javascript)
+               (re-find #".+\.js$" (or (-> request :uri presence) "")))))
 
 (defn wrap-dispatch-content-type
   ([handler]
@@ -114,8 +119,10 @@
      ; accept HTML and GET (or HEAD) wants allmost always the frontend
      (and (= (-> request :accept :mime) :html)
           (#{:get :head} (:request-method request))
-          (not (do-not-dispatch-to-std-frontend-handler-keys
-                 (:handler-key request)))) (html/html-handler request)
+          (not (do-not-dispatch-to-std-frontend-handler-keys 
+                 (:handler-key request)))
+          (not (browser-request-matches-javascript? request))
+          ) (html/html-handler request)
      ; other request might need to go the backend and return frontend nevertheless
      :else (let [response (handler request)]
              (if (and (nil? response)
@@ -123,7 +130,8 @@
                       (not (do-not-dispatch-to-std-frontend-handler-keys
                              (:handler-key request)))
                       (not (#{:post :put :patch :delete} (:request-method request)))
-                      (= (-> request :accept :mime) :html))
+                      (= (-> request :accept :mime) :html)
+                      (not (browser-request-matches-javascript? request)))
                (html/html-handler request)
                response)))))
 
@@ -149,9 +157,11 @@
   (ring.middleware.accept/wrap-accept
     handler
     {:mime
-     ["application/json-roa+json" :qs 1 :as :json-roa
-      "application/json" :qs 1 :as :json
-      "text/html" :qs 1 :as :html ]}))
+     ["application/json" :qs 1 :as :json
+      "application/json-roa+json" :qs 1 :as :json-roa
+      "image/apng" :qs 0.8 :as :apng
+      "text/css" :qs 1 :as :css 
+      "text/html" :qs 1 :as :html]}))
 
 (defn canonicalize-params-map [params]
   (if-not (map? params)

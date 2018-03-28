@@ -4,7 +4,7 @@
     [reagent.ratom :as ratom :refer [reaction]])
   (:require
     [leihs.admin.utils.core :refer [keyword str presence]]
-    [leihs.admin.front.dom :as dom]
+    [leihs.admin.utils.dom :as dom]
 
     [clojure.pprint :refer [pprint]]
     [reagent.core :as reagent]
@@ -13,6 +13,22 @@
     ))
 
 (defonce routing-state* (reagent/atom {:debug true}))
+
+(defn hidden-state-component [handlers component-with-state]
+	(reagent/create-class
+		{:component-will-mount (fn [& args] (when-let [handler (:will-mount handlers)]
+																					(apply handler args)))
+		 :component-will-unmount (fn [& args] (when-let [handler (:will-unmount handlers)]
+																						(apply handler args)))
+		 :component-did-mount (fn [& args] (when-let [handler (:did-mount handlers)]
+																				 (apply handler args)))
+		 :component-did-update (fn [& args] (when-let [handler (:did-update handlers)]
+																					(apply handler args)))
+		 :reagent-render (fn [_]
+											 [:div.hidden-state-component
+												{:style {:display :none}}
+												[component-with-state]
+												])}))
 
 (defn hidden-routing-state-component [handlers]
   "handlers is a map of keys to functions where the keys :will-mount,

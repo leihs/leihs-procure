@@ -10,10 +10,13 @@
     [leihs.admin.front.requests.pages.requests]
     [leihs.admin.front.state :refer [routing-state*]]
     [leihs.admin.paths :refer [path paths]]
-    [leihs.admin.resources.api-tokens.front :as api-tokens]
-    [leihs.admin.resources.api-token.front :as api-token]
     [leihs.admin.resources.admin.core :as admin]
+    [leihs.admin.resources.api-token.front :as api-token]
+    [leihs.admin.resources.api-tokens.front :as api-tokens]
     [leihs.admin.resources.auth.core :as auth]
+    [leihs.admin.resources.delegation.front :as delegation]
+    [leihs.admin.resources.delegation.users.front :as delegation-users]
+    [leihs.admin.resources.delegations.front :as delegations]
     [leihs.admin.resources.initial-admin.core :as initial-admin]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
@@ -30,14 +33,22 @@
 (def resolve-table
   {
    :admin #'admin/page
-   :api-token-new #'api-token/new-page
    :api-token #'api-token/show-page
-   :api-token-edit #'api-token/edit-page
    :api-token-delete #'api-token/delete-page
+   :api-token-edit #'api-token/edit-page
+   :api-token-new #'api-token/new-page
    :api-tokens #'api-tokens/page
    :auth #'auth/auth-page
    :auth-password-sign-in #'auth/password-sign-in-page
    :debug #'leihs.admin.front.pages.debug/page
+   :delegation #'delegation/show-page
+   :delegation-delete #'delegation/delete-page
+   :delegation-edit #'delegation/edit-page
+   :delegation-edit-choose-responsible-user #'delegation/choose-responsible-user-page
+   :delegation-add #'delegation/new-page
+   :delegation-users #'delegation-users/index-page
+   :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
+   :delegations #'delegations/page
    :initial-admin #'initial-admin/page
    :leihs #'leihs.admin.front.pages.leihs/page
    :request #'leihs.admin.front.requests.pages.request/page

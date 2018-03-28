@@ -5,7 +5,7 @@
     [leihs.admin.env :refer [env]]
     [leihs.admin.resources.user.back :as user]
     [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
-    [leihs.admin.utils.json-protocol :refer [to-json]]
+    [leihs.admin.utils.json :refer [to-json]]
     [leihs.admin.utils.url.core :as url]
 
     [clojure.java.jdbc :as jdbc]
@@ -24,7 +24,7 @@
 
 (defn include-font-css []
   (hiccup.page/include-css
-    "/admin/css/fontawesome-free-5.0.1//css/fontawesome-all.css"))
+    "/admin/css/fontawesome-free-5.0.9/css/fontawesome-all.css"))
 
 (defn head []
   [:head

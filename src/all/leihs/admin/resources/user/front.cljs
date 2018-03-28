@@ -383,7 +383,7 @@
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
       (breadcrumbs/users-li)
-      (breadcrumbs/user-new-li)
+      (breadcrumbs/user-add-li)
       ][])
    [:div.row
     [:div.col-lg

@@ -15,6 +15,26 @@
           ])))
 
 
+(def delegation-paths
+  (branch "/delegations"
+          (leaf "/" :delegations)
+          (branch "/add"
+                  (leaf "" :delegation-add)
+                  (leaf "/choose-responsible-user" :delegation-add-choose-responsible-user))
+          (branch "/"
+                  (param :delegation-id)
+                  (leaf "" :delegation)
+                  (leaf "/delete" :delegation-delete)
+                  (branch "/edit"
+                          (leaf "" :delegation-edit)
+                          (leaf "/choose-responsible-user" :delegation-edit-choose-responsible-user))
+                  (branch "/users"
+                          (leaf "/" :delegation-users)
+                          (leaf "/add" :delegation-users-add)
+                          (branch "/"
+                                  (param :user-id)
+                                  (leaf "" :delegation-user))))))
+
 (def paths
   (branch ""
           (leaf "/" :leihs)
@@ -37,6 +57,7 @@
                                   (branch "/" (param :id)
                                           (leaf "" :request))))
                   (leaf "/" :admin)
+                  delegation-paths
                   (leaf "/users/new" :user-new)
                   (leaf "/users/" :users)
                   (branch "/users/"

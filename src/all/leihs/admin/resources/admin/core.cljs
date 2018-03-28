@@ -19,6 +19,7 @@
        [(breadcrumbs/leihs-li)
         (breadcrumbs/admin-li)]
        [(breadcrumbs/auth-li)
+        (breadcrumbs/delegations-li)
         (breadcrumbs/users-li)]))
 
    [:div

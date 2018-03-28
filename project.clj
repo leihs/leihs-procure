@@ -34,7 +34,6 @@
    [org.clojure/tools.logging "0.4.0"]
    [org.clojure/tools.nrepl "0.2.13"]
    [org.slf4j/slf4j-log4j12 "1.7.25"]
-   [org.slf4j/slf4j-log4j12 "1.7.25"]
    [pg-types "2.3.0"]
    [reagent "0.7.0"]
    [ring "1.6.3"]
@@ -57,10 +56,13 @@
   :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"]
 
   :source-paths ["src/all"]
+
   :resource-paths ["resources/all"]
+
   :test-paths ["src/test"]
 
   :aot [#"leihs.admin.*"]
+
   :main leihs.admin.back.main
 
   :plugins [[lein-environ "1.1.0"]
@@ -111,12 +113,12 @@
               :injections [(require 'pjstadig.humane-test-output)
                            (pjstadig.humane-test-output/activate!)]
               :env {:dev true}}
-              :uberjar {:hooks [minify-assets.plugin/hooks]
-                     :source-paths ["src/all" "src/prod"]
-                     :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
-                     :resource-paths ["resources/all" "resources/prod" "target/cljsbuild"]
-                     :aot [#"leihs\..*"]
-                     :uberjar-name "leihs-admin.jar"}
+             :uberjar {:hooks [minify-assets.plugin/hooks]
+                       :source-paths ["src/all" "src/prod"]
+                       :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
+                       :resource-paths ["resources/all" "resources/prod" "target/cljsbuild"]
+                       :aot [#"leihs\..*"]
+                       :uberjar-name "leihs-admin.jar"}
              :test {:resource-paths ["resources/all" "resources/test" "target/cljsbuild"]}}
 
 

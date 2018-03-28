@@ -12,14 +12,14 @@
 
 (def current-modal-request
   (do (reaction
-        (let [[id r]  (->> @shared/state* :requests
-                           (filter (fn [[_ r]] (or (-> r :meta :modal)
-                                                   (and (-> r :response)
-                                                        (-> r :response :success not)
-                                                        (= (-> r :meta :handler-key)
-                                                           (-> @state/routing-state* :handler-key))))))
-                           first)]
-          (when r
+        (when-not ((:handler-key @state/routing-state*) 
+                   #{:request :requests})
+          (when-let [[id r] (->> @shared/state* :requests
+                                 (filter (fn [[_ r]] 
+                                           (or (-> r :meta :modal)
+                                               (and (-> r :response)
+                                                    (-> r :response :success not)))))
+                                 first)]
             (assoc r :id id))))))
 
 (defn progress-bar-component [status bootstrap-status request]

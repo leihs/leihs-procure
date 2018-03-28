@@ -30,5 +30,4 @@
                            (fn [date-time jsonGenerator]
                              (.writeString jsonGenerator
                                            (date-time-to-string date-time))))
-(defn to-json [d]
-  (cheshire.core/generate-string d))
+
