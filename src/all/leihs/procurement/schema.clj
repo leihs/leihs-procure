@@ -6,21 +6,18 @@
     [com.walmartlabs.lacinia.schema :as schema]
     [clojure.edn :as edn]
     [leihs.procurement.db :as db]
-    [leihs.procurement.resources.request :as request]
+    [leihs.procurement.resources.request :as r]
     ))
 
 (defn get-request [context arguments value]
   (let [{:keys [id]} arguments]
-    (first (jdbc/query db/conn (request/request-query id)))))
+    (r/get-request id)))
 
-(defn resolver-map []
-  {:request-by-id get-request})
+(def resolver-map {:request-by-id get-request})
 
 (defn load-schema []
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (util/attach-resolvers (resolver-map))
+      (util/attach-resolvers resolver-map)
       schema/compile))
-
-; (require '[leihs.procurement.schema :reload-all true])
