@@ -4,9 +4,7 @@
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
     [clojure.edn :as edn]
-    [leihs.procurement.db :as db]
-    [leihs.procurement.resources.request :as r]
-    ))
+    [leihs.procurement.resources.request :as r]))
 
 (defn get-request [context arguments value]
   (let [{:keys [id]} arguments]

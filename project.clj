@@ -48,8 +48,18 @@
    ; force transitive dependency resolution
    [ring/ring-core "1.6.3"]
    ]
-  ; :main ^:skip-aot leihs.procurement.core
+
+  ; jdk 9 needs ["--add-modules" "java.xml.bind"]
+  :jvm-opts #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
+                      ["--add-modules" "java.xml.bind"]
+                      []))
+
   :target-path "target/%s"
   :source-paths ["src/all"]
-  :profiles {:uberjar {:aot :all}}
+  :resource-paths ["resources/all"]
+  :aot [#"leihs.procurement.*"]
+  :main leihs.procurement.backend.main
+  :profiles {:dev {:source-paths ["src/dev"]
+                   :resource-paths ["resources/dev"]
+                   :env {:dev true}}}
   )

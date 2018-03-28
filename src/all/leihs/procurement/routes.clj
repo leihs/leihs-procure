@@ -3,21 +3,21 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.back.html :as html]
+    [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
     [leihs.procurement.paths :refer [path paths]]
-    [leihs.procurement.resources.api-token.back :as api-token]
-    [leihs.procurement.resources.api-tokens.back :as api-tokens]
-    [leihs.procurement.resources.auth.core :as auth]
-    [leihs.procurement.resources.delegation.back :as delegation]
-    [leihs.procurement.resources.delegations.back :as delegations]
-    [leihs.procurement.resources.initial-admin.core :as initial-admin]
-    [leihs.procurement.resources.settings.back :as settings]
-    [leihs.procurement.resources.shutdown.back :as shutdown]
-    [leihs.procurement.resources.status.back :as status]
-    [leihs.procurement.resources.user.back :as user]
-    [leihs.procurement.resources.users.back :as users]
+    ; [leihs.procurement.resources.api-token.backend :as api-token]
+    ; [leihs.procurement.resources.api-tokens.backend :as api-tokens]
+    ; [leihs.procurement.resources.auth.core :as auth]
+    ; [leihs.procurement.resources.delegation.backend :as delegation]
+    ; [leihs.procurement.resources.delegations.backend :as delegations]
+    ; [leihs.procurement.resources.initial-admin.core :as initial-admin]
+    ; [leihs.procurement.resources.settings.backend :as settings]
+    ; [leihs.procurement.resources.shutdown.backend :as shutdown]
+    ; [leihs.procurement.resources.status.backend :as status]
+    ; [leihs.procurement.resources.user.backend :as user]
+    ; [leihs.procurement.resources.users.backend :as users]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
     [leihs.procurement.utils.json-protocol]
@@ -56,22 +56,24 @@
     :auth-shib-sign-in})
 
 (def handler-resolve-table
-  {:api-token api-token/routes
-   :api-tokens api-tokens/routes
-   :auth auth/routes
-   :auth-password-sign-in auth/routes
-   :auth-shib-sign-in auth/routes
-   :auth-sign-out auth/routes
-   :delegation delegation/routes
-   :delegations delegations/routes
-   :initial-admin initial-admin/routes
-   :not-found html/not-found-handler
-   :redirect-to-root redirect-to-root-handler
-   :shutdown shutdown/routes
-   :status status/routes
-   :user user/routes
-   :user-transfer-data user/routes
-   :users users/routes })
+  {
+   ; :api-token api-token/routes
+   ; :api-tokens api-tokens/routes
+   ; :auth auth/routes
+   ; :auth-password-sign-in auth/routes
+   ; :auth-shib-sign-in auth/routes
+   ; :auth-sign-out auth/routes
+   ; :delegation delegation/routes
+   ; :delegations delegations/routes
+   ; :initial-admin initial-admin/routes
+   ; :not-found html/not-found-handler
+   ; :redirect-to-root redirect-to-root-handler
+   ; :shutdown shutdown/routes
+   ; :status status/routes
+   ; :user user/routes
+   ; :user-transfer-data user/routes
+   ; :users users/routes
+   })
 
 
 
@@ -178,18 +180,18 @@
 (defn init [secret]
   (I> wrap-handler-with-logging
       dispatch-to-handler
-      (auth/wrap-authorize skip-authorization-handler-keys)
+      ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
-      auth/wrap-authenticate
+      ; auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       ring-exception/wrap
       (wrap-secret-byte-array secret)
-      initial-admin/wrap
-      settings/wrap
+      ; initial-admin/wrap
+      ; settings/wrap
       ds/wrap-tx
       wrap-accept
       wrap-resolve-handler

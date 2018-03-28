@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.request
   (:require [leihs.procurement.utils.sql :as sql]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.db :as db]))
+            [leihs.procurement.utils.ds :refer [get-ds]]
+            [clojure.java.jdbc :as jdbc]))
 
 (defn request-query [id]
   (-> (sql/select :*)
@@ -10,7 +10,7 @@
       sql/format))
 
 (defn get-request [id]
-  (first (jdbc/query db/conn (request-query id))))
+  (first (jdbc/query (get-ds) (request-query id))))
 
 (defn requested-by-user? [request user]
   (= (:user_id request) (:id user)))

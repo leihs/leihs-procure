@@ -4,11 +4,11 @@
             [leihs.procurement.resources.category :as c]
             [leihs.procurement.resources.budget-period :as bp]))
 
-(def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
-(def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")
+; (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
+; (def request-id "91805c8c-0f47-45f1-bcce-b11da5427294")
 
-(def test-user (u/get-user user-id))
-(def test-request (r/get-request request-id))
+; (def test-user (u/get-user user-id))
+; (def test-request (r/get-request request-id))
 
 (defn all-for-user-and-request [user, request]
   (let [budget-period (bp/get-budget-period (:budget_period_id request))

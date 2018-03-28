@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.user
   (:require [leihs.procurement.utils.sql :as sql]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.db :as db]))
+            [leihs.procurement.utils.ds :refer [get-ds]]
+            [clojure.java.jdbc :as jdbc]))
 
 (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 
@@ -12,7 +12,7 @@
       sql/format))
 
 (defn get-user [id]
-  (first (jdbc/query db/conn (user-query id))))
+  (first (jdbc/query (get-ds) (user-query id))))
 
 (defn procurement-requester? [user]
   (:is_procurement_requester user))
@@ -23,7 +23,7 @@
 (defn procurement-inspector? [user]
   (:result
     (jdbc/query
-      db/conn
+      (get-ds)
       (-> (sql/select
             [(sql/call
                :exists

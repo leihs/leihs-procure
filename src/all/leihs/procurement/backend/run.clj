@@ -1,4 +1,4 @@
-(ns leihs.procurement.back.run
+(ns leihs.procurement.backend.run
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
@@ -21,7 +21,7 @@
 (def defaults
   {:LEIHS_HTTP_BASE_URL "http://localhost:3211"
    :LEIHS_SECRET (when (= leihs.procurement.env/env :dev) "secret")
-   :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"
+   :LEIHS_DATABASE_URL "jdbc:postgresql://mkmit:mkmit@localhost:5432/leihs_dev?max-pool-size=5"
    })
 
 (defn run [options]
@@ -31,9 +31,10 @@
     (when (nil? (:secret options))
       (throw (IllegalStateException. "LEIHS_SECRET resp. secret must be present!")))
     (let [ds (ds/init (:database-url options))
-          secret (-> options :secret)
-          app-handler (routes/init secret)
-          http-server (http-server/start (:http-base-url options) app-handler)])))
+          ; secret (-> options :secret)
+          ; app-handler (routes/init secret)
+          ; http-server (http-server/start (:http-base-url options) app-handler)
+          ])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -85,7 +86,8 @@
   (let [{:keys [options arguments errors summary]}
         (cli/parse-opts args cli-options :in-order true)
         pass-on-args (->> [options (rest arguments)]
-                          flatten (into []))]
+                          flatten
+                          (into []))]
     (cond
       (:help options) (println (main-usage summary {:args args :options options}))
       :else (run options))))

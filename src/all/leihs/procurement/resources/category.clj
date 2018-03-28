@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.category
-  (:require [leihs.procurement.resources.sql :as sql]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.db :as db]))
+  (:require [leihs.procurement.utils.sql :as sql]
+            [leihs.procurement.utils.ds :refer [get-ds]]
+            [clojure.java.jdbc :as jdbc]))
 
 (defn category-query [id]
   (-> (sql/select :*)
@@ -10,12 +10,12 @@
       sql/format))
 
 (defn get-category [id]
-  (first (jdbc/query db/conn (category-query id))))
+  (first (jdbc/query (get-ds) (category-query id))))
 
 (defn inspectable-by? [user category]
   (:result
     (jdbc/query
-      db/conn
+      (get-ds)
       (-> (sql/select
             [(sql/call
                :exists

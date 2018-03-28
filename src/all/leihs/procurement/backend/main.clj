@@ -1,9 +1,9 @@
-(ns leihs.procurement.back.main
+(ns leihs.procurement.backend.main
   (:require
     [clojure.tools.cli :as cli :refer [parse-opts]]
     [clojure.pprint :refer [pprint]]
 
-    [leihs.procurement.back.run :as run]
+    [leihs.procurement.backend.run :as run]
 
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
@@ -39,7 +39,8 @@
   (let [{:keys [options arguments errors summary]}
         (cli/parse-opts args cli-options :in-order true)
         pass-on-args (->> [options (rest arguments)]
-                          flatten (into []))]
+                          flatten
+                          (into []))]
     (cond
       (:help options) (println (main-usage summary {:args args :options options}))
       :else (case (-> arguments first keyword)
