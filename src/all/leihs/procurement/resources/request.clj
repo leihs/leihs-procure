@@ -1,13 +1,12 @@
 (ns leihs.procurement.resources.request
-  (:require [honeysql.core :as sql]
-            [honeysql.helpers :refer :all :rename {update honey-update}]
+  (:require [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [leihs.procurement.db :as db]))
 
 (defn request-query [id]
-  (-> (select :*)
-      (from :procurement_requests)
-      (where [:= :procurement_requests.id (sql/call :cast id :uuid)])
+  (-> (sql/select :*)
+      (sql/from :procurement_requests)
+      (sql/where [:= :procurement_requests.id (sql/call :cast id :uuid)])
       sql/format))
 
 (defn get-request [id]

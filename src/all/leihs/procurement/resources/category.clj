@@ -1,13 +1,12 @@
 (ns leihs.procurement.resources.category
-  (:require [honeysql.core :as sql]
-            [honeysql.helpers :refer :all :rename {update honey-update}]
+  (:require [leihs.procurement.resources.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [leihs.procurement.db :as db]))
 
 (defn category-query [id]
-  (-> (select :*)
-      (from :procurement_categories)
-      (where [:= :procurement_categories.id (sql/call :cast id :uuid)])
+  (-> (sql/select :*)
+      (sql/from :procurement_categories)
+      (sql/where [:= :procurement_categories.id (sql/call :cast id :uuid)])
       sql/format))
 
 (defn get-category [id]
@@ -17,16 +16,16 @@
   (:result
     (jdbc/query
       db/conn
-      (-> (select
+      (-> (sql/select
             [(sql/call
                :exists
-               (-> (select 1)
-                   (from :procurement_category_inspectors)
-                   (where [:=
-                           :procurement_category_inspectors.user_id
-                           (:id user)])
-                   (merge-where [:=
-                                 :procurement_category_inspectors.category_id
-                                 (:id category)])))
+               (-> (sql/select 1)
+                   (sql/from :procurement_category_inspectors)
+                   (sql/where [:=
+                               :procurement_category_inspectors.user_id
+                               (:id user)])
+                   (sql/merge-where [:=
+                                     :procurement_category_inspectors.category_id
+                                     (:id category)])))
              :result])
           sql/format))))

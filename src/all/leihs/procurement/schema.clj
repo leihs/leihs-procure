@@ -1,7 +1,6 @@
 (ns leihs.procurement.schema
   (:require
     [clojure.java.io :as io]
-    [clojure.java.jdbc :as jdbc]
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
     [clojure.edn :as edn]
