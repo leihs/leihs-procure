@@ -1,3 +1,3 @@
-# leihs-procurement_graphql
+# leihs-procurement
 
-For now just a prototype for dealing with requests using graphql.
+TODO
