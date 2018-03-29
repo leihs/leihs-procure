@@ -42,6 +42,7 @@
    [ring-middleware-accept "2.0.3"]
    [ring/ring-json "0.4.0"]
    [timothypratley/patchin "0.3.5"]
+   [threatgrid/ring-graphql-ui "0.1.1"]
    [uritemplate-clj "1.1.1"]
    [venantius/accountant "0.2.4"]
 
@@ -63,12 +64,13 @@
   :aot [#"leihs.procurement.*"]
   :main leihs.procurement.backend.main
   :profiles {:dev {:dependencies [
-                                  [threatgrid/ring-graphql-ui "0.1.1"]
+                                  ; [threatgrid/ring-graphql-ui "0.1.1"]
                                   ; [com.walmartlabs/lacinia-pedestal "0.7.0"]
                                   ]
                    :source-paths ["src/dev"]
                    :resource-paths ["resources/dev"]
                    :env {:dev true}
-                   :aot [user clojure.tools.logging.impl]
-                   :main user}}
+                   ; :aot [user clojure.tools.logging.impl]
+                   ; :main user
+                   }}
   )

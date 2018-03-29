@@ -31,9 +31,9 @@
     (when (nil? (:secret options))
       (throw (IllegalStateException. "LEIHS_SECRET resp. secret must be present!")))
     (let [ds (ds/init (:database-url options))
-          ; secret (-> options :secret)
-          ; app-handler (routes/init secret)
-          ; http-server (http-server/start (:http-base-url options) app-handler)
+          secret (-> options :secret)
+          app-handler (routes/init secret)
+          http-server (http-server/start (:http-base-url options) app-handler)
           ])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

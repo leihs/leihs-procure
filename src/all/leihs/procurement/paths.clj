@@ -15,45 +15,18 @@
 
 (def paths
   (branch ""
-          (leaf "/" :leihs)
-          (branch "/auth"
-                  (leaf "" :auth)
-                  (leaf "/password-sign-in" :auth-password-sign-in)
-                  (leaf "/sign-out" :auth-sign-out))
-          (leaf "/procure" :procure)
-          (leaf "/manage" :lend)
-          (leaf "/borrow" :borrow)
-          (branch "/admin"
-                  (leaf "/status" :status)
-                  (leaf "/shutdown" :shutdown)
-                  (leaf "/initial-admin" :initial-admin)
-                  (branch "/debug"
-                          (leaf "" :debug)
-                          (branch "/requests"
-                                  (leaf "/" :requests)
-                                  (branch "/" (param :id)
-                                          (leaf "" :request))))
-                  (leaf "/" :admin)
-                  (leaf "/users/new" :user-new)
-                  (leaf "/users/" :users)
-                  (branch "/users/"
-                          (param :user-id)
-                          (leaf "" :user)
-                          (leaf "/delete" :user-delete)
-                          (leaf "/edit" :user-edit)
-                          (branch "/api-tokens/"
-                                  (leaf "" :api-tokens)
-                                  (leaf "new" :api-token-new)
-                                  (branch ""
-                                          (param :api-token-id)
-                                          (leaf "" :api-token)
-                                          (leaf "/delete" :api-token-delete)
-                                          (leaf "/edit" :api-token-edit)))
-                          (branch "/transfer/"
-                                  (param :target-user-id)
-                                  (leaf "" :user-transfer-data))))
-          (leaf "/" :redirect-to-root)
-          (leaf true :not-found)))
+          (branch "/procure"
+                  (leaf "/graphql" :graphql))
+          ; (leaf "/" :leihs)
+          ; (branch "/auth"
+          ;         (leaf "" :auth)
+          ;         (leaf "/password-sign-in" :auth-password-sign-in)
+          ;         (leaf "/sign-out" :auth-sign-out))
+          ; (leaf "/manage" :lend)
+          ; (leaf "/borrow" :borrow)
+          ; (leaf "/" :redirect-to-root)
+          (leaf true :not-found)
+          ))
 
 ;(path-for (paths) :user :user-id "{user-id}")
 ;(match-route (paths) "/users/512")

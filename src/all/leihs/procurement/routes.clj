@@ -6,18 +6,8 @@
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
+    [leihs.procurement.graphql :as graphql]
     [leihs.procurement.paths :refer [path paths]]
-    ; [leihs.procurement.resources.api-token.backend :as api-token]
-    ; [leihs.procurement.resources.api-tokens.backend :as api-tokens]
-    ; [leihs.procurement.resources.auth.core :as auth]
-    ; [leihs.procurement.resources.delegation.backend :as delegation]
-    ; [leihs.procurement.resources.delegations.backend :as delegations]
-    ; [leihs.procurement.resources.initial-admin.core :as initial-admin]
-    ; [leihs.procurement.resources.settings.backend :as settings]
-    ; [leihs.procurement.resources.shutdown.backend :as shutdown]
-    ; [leihs.procurement.resources.status.backend :as status]
-    ; [leihs.procurement.resources.user.backend :as user]
-    ; [leihs.procurement.resources.users.backend :as users]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
     [leihs.procurement.utils.json-protocol]
@@ -33,7 +23,9 @@
     [ring.middleware.json]
     [ring.middleware.params]
     [ring.util.response :refer [redirect]]
+    [ring-graphql-ui.core :refer [wrap-graphiql]]
 
+    [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug :refer [I>]]
@@ -57,22 +49,14 @@
 
 (def handler-resolve-table
   {
-   ; :api-token api-token/routes
-   ; :api-tokens api-tokens/routes
+   :graphql graphql/handler
+
    ; :auth auth/routes
    ; :auth-password-sign-in auth/routes
    ; :auth-shib-sign-in auth/routes
    ; :auth-sign-out auth/routes
-   ; :delegation delegation/routes
-   ; :delegations delegations/routes
-   ; :initial-admin initial-admin/routes
    ; :not-found html/not-found-handler
    ; :redirect-to-root redirect-to-root-handler
-   ; :shutdown shutdown/routes
-   ; :status status/routes
-   ; :user user/routes
-   ; :user-transfer-data user/routes
-   ; :users users/routes
    })
 
 
@@ -127,11 +111,9 @@
    (fn [request]
      (wrap-resolve-handler handler request)))
   ([handler request]
-   (let [path (or (-> request :path-info presence)
-                  (-> request :uri presence))
-         {route-params :route-params
-          handler-key :handler} (bidi/match-pair paths {:remainder path
-                                                        :route paths})
+   (let [path (or (-> request :path-info presence) (-> request :uri presence))
+         {route-params :route-params handler-key :handler} (bidi/match-pair paths {:remainder path
+                                                                                   :route paths})
          handler-fn (handler-resolver handler-key)]
      (handler (assoc request
                      :route-params route-params
@@ -195,6 +177,7 @@
       ds/wrap-tx
       wrap-accept
       wrap-resolve-handler
+      (wrap-graphiql {:path "/procure/graphiql" :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
       (wrap-resource
@@ -209,7 +192,7 @@
       ring-exception/wrap))
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
-;(debug/debug-ns *ns*)
+; (debug/debug-ns *ns*)
