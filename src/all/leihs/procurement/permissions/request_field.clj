@@ -107,11 +107,6 @@
                              :write (and (not budget-period-is-past)
                                          (or category-inspectable-by-user
                                              user-is-admin))}
-
-     :state {:read true
-             :write (and (not budget-period-is-past)
-                         (or category-inspectable-by-user
-                             user-is-admin))}
      }))
 
 ; (into {}

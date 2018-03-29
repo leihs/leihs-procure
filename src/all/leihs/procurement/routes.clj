@@ -7,6 +7,9 @@
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
     [leihs.procurement.graphql :as graphql]
+    ; ONLY DEV MODE =================
+    [leihs.procurement.mock :as mock]
+    ; ===============================
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
@@ -167,7 +170,7 @@
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
-      ; auth/wrap-authenticate
+      mock/wrap-set-authenticated-user ; auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       ring-exception/wrap

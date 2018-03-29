@@ -9,14 +9,18 @@
 
 (def schema (schema/load-schema))
 
-(defn exec-query [query-string]
-  (lacinia/execute schema query-string nil nil))
+(defn exec-query
+  ([query-string] (exec-query query-string nil nil))
+  ([query-string request]
+   (lacinia/execute schema query-string nil request)))
 
-(defn handler [{{query :query} :body}]
-  {:body (exec-query query)})
+(defn handler [{{query :query} :body, :as request}]
+  {:body (exec-query query
+                     (select-keys request [:tx :authenticated-entity]))})
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)
+(debug/undebug-ns *ns*)
