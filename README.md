@@ -11,3 +11,5 @@ WIP
    * default is `http://localhost:3211`
 4. `lein run "run"`
 5. `graphiql` is now available at `http://localhost:3211/procure/graphiql/index.html`
+
+In `src/dev/leihs/procurement/mock.clj` you can change the authenticated `user-id`.
