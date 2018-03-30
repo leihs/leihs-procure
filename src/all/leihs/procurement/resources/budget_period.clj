@@ -11,14 +11,14 @@
       (sql/where [:= :procurement_budget_periods.id (sql/call :cast id :uuid)])
       sql/format))
 
-(defn get-budget-period [id]
-  (first (jdbc/query (get-ds) (budget-period-query id))))
+(defn get-budget-period [{tx :tx} id]
+  (first (jdbc/query tx (budget-period-query id))))
 
-(defn in-requesting-phase? [budget-period]
+(defn in-requesting-phase? [{tx :tx} budget-period]
   (:result
     (first
       (jdbc/query
-        (get-ds)
+        tx
         (-> (sql/select
               [(sql/call :<
                          (sql/call :cast (sql/call :now) :date)
@@ -26,11 +26,11 @@
                :result])
             sql/format)))))
 
-(defn past? [budget-period]
+(defn past? [{tx :tx} budget-period]
   (:result
     (first
       (jdbc/query
-        (get-ds)
+        tx
         (-> (sql/select
               [(sql/call :>
                          (sql/call :cast (sql/call :now) :date)

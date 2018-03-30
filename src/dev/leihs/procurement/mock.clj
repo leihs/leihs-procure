@@ -6,5 +6,5 @@
 
 (defn wrap-set-authenticated-user [handler]
   (fn [request]
-    (let [user-auth-entity (u/get-user user-id)]
+    (let [user-auth-entity (u/get-user request user-id)]
       (handler (assoc request :authenticated-entity user-auth-entity)))))

@@ -9,13 +9,13 @@
       (sql/where [:= :procurement_categories.id (sql/call :cast id :uuid)])
       sql/format))
 
-(defn get-category [id]
-  (first (jdbc/query (get-ds) (category-query id))))
+(defn get-category [{tx :tx} id]
+  (first (jdbc/query tx (category-query id))))
 
-(defn inspectable-by? [user category]
+(defn inspectable-by? [{tx :tx} user category]
   (:result
     (jdbc/query
-      (get-ds)
+      tx
       (-> (sql/select
             [(sql/call
                :exists

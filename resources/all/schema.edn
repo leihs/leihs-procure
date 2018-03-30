@@ -6,7 +6,14 @@
  ;    :name {:type (non-null String)}
  ;    }}}
 
- {:Request
+ {:request_field
+  {:fields
+   {:name {:type String}
+    :value {:type String}
+    :read {:type Boolean}
+    :write {:type Boolean}}}
+
+  :request
   {:fields
    {:id {:type ID}
     :article_name {:type (non-null String)}
@@ -29,15 +36,21 @@
 
  {
   :request_by_id
-  {:type :Request
+  {:type :request
    :args
    {:id {:type ID}}
    :resolve :request-by-id}
 
   :requests
-  {:type (list :Request)
+  {:type (list :request)
    :args
    {:requested_by_auth_user {:type Boolean}}
    :resolve :requests}
+
+  :request_fields_by_id
+  {:type (list :request_field)
+   :args
+   {:request_id {:type ID}}
+   :resolve :request-fields-by-id}
  }
 }

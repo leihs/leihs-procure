@@ -32,11 +32,11 @@
 (defn get-requests-not-by-requester [{tx :tx, auth-entity :authenticated-entity}]
   (jdbc/query tx (requests-not-by-requester-query (:id auth-entity))))
 
-(defn requested-by-user? [request user]
+(defn requested-by-user? [{tx :tx} request user]
   (= (:user_id request) (:id user)))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

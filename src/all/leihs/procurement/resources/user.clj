@@ -11,19 +11,19 @@
       (sql/where [:= :users.id (sql/call :cast id :uuid)])
       sql/format))
 
-(defn get-user [id]
-  (first (jdbc/query (get-ds) (user-query id))))
+(defn get-user [{tx :tx} id]
+  (first (jdbc/query tx (user-query id))))
 
-(defn procurement-requester? [user]
+(defn procurement-requester? [{tx :tx} user]
   (:is_procurement_requester user))
 
-(defn procurement-admin? [user]
+(defn procurement-admin? [{tx :tx} user]
   (:is_procurement_admin user))
 
-(defn procurement-inspector? [user]
+(defn procurement-inspector? [{tx :tx} user]
   (:result
     (jdbc/query
-      (get-ds)
+      tx
       (-> (sql/select
             [(sql/call
                :exists
@@ -34,5 +34,3 @@
                                (:id user)])))
              :result])
           sql/format))))
-
-; (procurement-inspector? (get-user user-id))

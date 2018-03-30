@@ -7,20 +7,20 @@
     [logbug.debug :as debug]
     ))
 
-(def schema (schema/load-schema))
+; (def schema (schema/load-schema))
 
-(defn exec-query
-  ([query-string] (exec-query query-string nil nil))
-  ([query-string request]
-   (lacinia/execute schema query-string nil request)))
+(defn exec-query [query-string request]
+  (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
+                   query-string
+                   nil
+                   {:request request}))
 
 (defn handler [{{query :query} :body, :as request}]
-  {:body (exec-query query
-                     (select-keys request [:tx :authenticated-entity]))})
+  {:body (exec-query query request)})
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)
-(debug/undebug-ns *ns*)
+; (debug/undebug-ns *ns*)
