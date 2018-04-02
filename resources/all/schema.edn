@@ -6,7 +6,12 @@
  ;    :name {:type (non-null String)}
  ;    }}}
 
- {:request_field
+ {:category
+  {:fields
+   {:id {:type ID}
+    :name {:type String}}}
+
+  :request_field
   {:fields
    {:name {:type String}
     :value {:type String}
@@ -21,7 +26,8 @@
     ; :supplier {:type :Supplier}
     :receiver {:type String}
     :building_id {:type ID}
-    :category_id {:type ID}
+    :category {:type category
+               :resolve :category}
     :organization_id {:type ID}
     :budget_period_id {:type ID}
     :room_id {:type ID}
@@ -38,8 +44,7 @@
 
  :queries
 
- {
-  :request_by_id
+ {:request_by_id
   {:type :request
    :args
    {:id {:type ID}}

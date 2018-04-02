@@ -8,8 +8,12 @@
     [clojure.edn :as edn]
     [logbug.debug :as debug]
     [leihs.procurement.permissions.request-field :as rf-perms]  
+    [leihs.procurement.resources.category :as c]
     [leihs.procurement.resources.request :as r]
     [leihs.procurement.resources.requests :as rs]))
+
+(defn get-category [{request :request} _ {id :category_id}]
+  (c/get-category request id))
 
 (defn get-request [context arguments _]
   (let [{:keys [id]} arguments]
@@ -26,7 +30,8 @@
          (seq rf-perms))))
 
 (defn resolver-map []
-  {:request-by-id get-request
+  {:category get-category
+   :request-by-id get-request
    :requests get-requests
    :request-fields-by-id get-request-fields})
 
@@ -38,7 +43,7 @@
       schema/compile))
 
 ;#### debug ###################################################################
-; (logging-config/set-logger! :level :debug)
+(logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)
