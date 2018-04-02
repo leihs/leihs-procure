@@ -10,8 +10,11 @@
 ; (def test-user (u/get-user user-id))
 ; (def test-request (r/get-request request-id))
 
-(defn all-for-user-and-request [request, user, proc-request]
-  (let [budget-period (bp/get-budget-period request (:budget_period_id request))
+(defn all-for-user-and-request [context]
+  (let [proc-request (:proc-request context)
+        request (:request context)
+        user (u/get-user request (-> request :authenticated-entity :id))
+        budget-period (bp/get-budget-period request (:budget_period_id request))
         category (c/get-category request (:category_id proc-request))
         request-without-template (not (:template_id proc-request))
         requested-by-user (r/requested-by-user? request proc-request user)

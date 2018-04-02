@@ -21,8 +21,12 @@
     ; :supplier {:type :Supplier}
     :receiver {:type String}
     :building_id {:type ID}
+    :category_id {:type ID}
+    :organization_id {:type ID}
+    :budget_period_id {:type ID}
     :room_id {:type ID}
     :motivation {:type String}
+    :priority {:type String}
     :requested_quantity {:type (non-null Int)}
     :approved_quantity {:type Int}
     :order_quantity {:type Int}
@@ -44,7 +48,13 @@
   :requests
   {:type (list :request)
    :args
-   {:requested_by_auth_user {:type Boolean}}
+   {:requested_by_auth_user {:type Boolean}
+    :category_id {:type (list ID)}
+    :budget_period_id {:type (list ID)}
+    :organization_id {:type (list ID)}
+    :priority {:type (list String)}
+    :inspectory_priority {:type (list String)}
+    }
    :resolve :requests}
 
   :request_fields_by_id
@@ -52,5 +62,5 @@
    :args
    {:request_id {:type ID}}
    :resolve :request-fields-by-id}
+  }
  }
-}

@@ -8,23 +8,20 @@
     [clojure.edn :as edn]
     [logbug.debug :as debug]
     [leihs.procurement.permissions.request-field :as rf-perms]  
-    [leihs.procurement.resources.request :as r]))
+    [leihs.procurement.resources.request :as r]
+    [leihs.procurement.resources.requests :as rs]))
 
 (defn get-request [context arguments _]
   (let [{:keys [id]} arguments]
     (r/get-request (:request context) id)))
 
 (defn get-requests [context arguments _]
-  (let [{requested-by-auth-user :requested_by_auth_user} arguments]
-    (if requested-by-auth-user
-      (r/get-requests-by-requester (:request context))
-      (r/get-requests-not-by-requester (:request context)))))
+  (rs/get-requests context arguments))
 
 (defn get-request-fields [context arguments _]
-  (let [{request-id :request_id} arguments
-        request (r/get-request (:request context) request-id)
-        user (-> context :request :authenticated-entity)
-        rf-perms (rf-perms/all-for-user-and-request (:request context) user request)]
+  (let [request (r/get-request context arguments)
+        rf-perms (rf-perms/all-for-user-and-request
+                   (assoc context :proc-request request))]
     (map (fn [[k v]] (merge v {:name k, :value (k request)}))
          (seq rf-perms))))
 
