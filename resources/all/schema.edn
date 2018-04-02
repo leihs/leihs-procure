@@ -54,6 +54,7 @@
   {:type (list :request)
    :args
    {:requested_by_auth_user {:type Boolean}
+    :from_categories_of_auth_user {:type Boolean}
     :category_id {:type (list ID)}
     :budget_period_id {:type (list ID)}
     :organization_id {:type (list ID)}

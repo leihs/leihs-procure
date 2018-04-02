@@ -17,6 +17,7 @@
         priority (:priority arguments)
         inspector-priority (:inspector_priority arguments)
         requested-by-auth-user (:requested_by_auth_user arguments)
+        from-categories-of-auth-user (:from_categories_of_auth_user arguments)
         ; state (:state arguments)
         ]
     (debug/identity-with-logging
@@ -41,6 +42,17 @@
           (sql/merge-where [:=
                             :procurement_requests.user_id
                             (sql/call :cast (-> context :request :authenticated-entity :id) :uuid)]) 
+
+          from-categories-of-auth-user
+          (sql/merge-where [:in
+                            :procurement_requests.category_id
+                            (-> (sql/select :category_id)
+                                (sql/from :procurement_category_inspectors)
+                                (sql/merge-where [:=
+                                                  :procurement_category_inspectors.user_id
+                                                  (sql/call :cast
+                                                            (-> context :request :authenticated-entity :id)
+                                                            :uuid)]))])
           )))))
 
   (defn get-requests [context arguments]
