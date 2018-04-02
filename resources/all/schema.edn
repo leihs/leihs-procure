@@ -40,6 +40,7 @@
     ; :attachments {:type (list :Attachment)}
     :accounting_type {:type (non-null String)}
     :internal_order_id {:type String}
+    :state {:type String}
     }}}
 
  :queries
@@ -60,6 +61,7 @@
     :organization_id {:type (list ID)}
     :priority {:type (list String)}
     :inspectory_priority {:type (list String)}
+    :state {:type (list String)}
     }
    :resolve :requests}
 

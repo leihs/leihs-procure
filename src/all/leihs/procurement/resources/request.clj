@@ -5,14 +5,15 @@
     [leihs.procurement.utils.sql :as sql]
     [clojure.java.jdbc :as jdbc]))
 
-(defn request-query [{id :id}]
+(defn request-base-query [{id :id}]
   (-> (sql/select :*)
       (sql/from :procurement_requests)
       (sql/where [:= :procurement_requests.id (sql/call :cast id :uuid)])
       sql/format))
 
 (defn get-request [context arguments]
-  (first (jdbc/query (-> context :request :tx) (request-query arguments))))
+  (first (jdbc/query (-> context :request :tx)
+                     (request-base-query arguments))))
 
 (defn requested-by-user? [{tx :tx} request user]
   (= (:user_id request) (:id user)))

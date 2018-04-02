@@ -6,8 +6,21 @@
     [leihs.procurement.utils.sql :as sql]
     [clojure.java.jdbc :as jdbc]))
 
+(def state-sql
+  (sql/call :case
+            [:= :procurement_requests.approved_quantity nil]
+            "new"
+            [:= :procurement_requests.approved_quantity 0]
+            "denied"
+            [:and
+             [:< 0 :procurement_requests.approved_quantity]
+             [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity]]
+            "partially_approved"
+            [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity]
+            "approved"))
+
 (defn requests-base-query []
-  (-> (sql/select :*)
+  (-> (sql/select :* [state-sql :state])
       (sql/from :procurement_requests)))
 
 (defn requests-query [context arguments]
@@ -18,44 +31,54 @@
         inspector-priority (:inspector_priority arguments)
         requested-by-auth-user (:requested_by_auth_user arguments)
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
-        ; state (:state arguments)
+        state (:state arguments)
         ]
     (debug/identity-with-logging
       (sql/format
         (cond-> (requests-base-query)
           category-id
-          (sql/merge-where [:in :procurement_requests.category_id category-id])
+          (sql/merge-where
+            [:in :procurement_requests.category_id category-id])
 
           budget-period-id
-          (sql/merge-where [:in :procurement_requests.budget_period_id budget-period-id])
+          (sql/merge-where
+            [:in :procurement_requests.budget_period_id budget-period-id])
 
           organization-id
-          (sql/merge-where [:in :procurement_requests.organization_id organization-id])
+          (sql/merge-where
+            [:in :procurement_requests.organization_id organization-id])
 
           priority
-          (sql/merge-where [:in :procurement_requests.priority priority])
+          (sql/merge-where
+            [:in :procurement_requests.priority priority])
 
           inspector-priority
-          (sql/merge-where [:in :procurement_requests.inspector_priority inspector-priority])
+          (sql/merge-where
+            [:in :procurement_requests.inspector_priority inspector-priority])
+
+          state
+          (sql/merge-where [:in state-sql state])
 
           requested-by-auth-user
-          (sql/merge-where [:=
-                            :procurement_requests.user_id
-                            (sql/call :cast (-> context :request :authenticated-entity :id) :uuid)]) 
+          (sql/merge-where
+            [:=
+             :procurement_requests.user_id
+             (sql/call :cast (-> context :request :authenticated-entity :id) :uuid)]) 
 
           from-categories-of-auth-user
-          (sql/merge-where [:in
-                            :procurement_requests.category_id
-                            (-> (sql/select :category_id)
-                                (sql/from :procurement_category_inspectors)
-                                (sql/merge-where [:=
-                                                  :procurement_category_inspectors.user_id
-                                                  (sql/call :cast
-                                                            (-> context :request :authenticated-entity :id)
-                                                            :uuid)]))])
+          (sql/merge-where
+            [:in
+             :procurement_requests.category_id
+             (-> (sql/select :category_id)
+                 (sql/from :procurement_category_inspectors)
+                 (sql/merge-where [:=
+                                   :procurement_category_inspectors.user_id
+                                   (sql/call :cast
+                                             (-> context :request :authenticated-entity :id)
+                                             :uuid)]))])
           )))))
 
-  (defn get-requests [context arguments]
+(defn get-requests [context arguments]
     (jdbc/query (-> context :request :tx) (requests-query context arguments)))
 
   ;#### debug ###################################################################
