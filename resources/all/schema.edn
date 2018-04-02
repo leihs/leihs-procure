@@ -6,19 +6,19 @@
  ;    :name {:type (non-null String)}
  ;    }}}
 
- {:category
+ {:Category
   {:fields
    {:id {:type ID}
     :name {:type String}}}
 
-  :request_field
+  :RequestField
   {:fields
    {:name {:type String}
     :value {:type String}
     :read {:type Boolean}
     :write {:type Boolean}}}
 
-  :request
+  :Request
   {:fields
    {:id {:type ID}
     :article_name {:type (non-null String)}
@@ -26,7 +26,7 @@
     ; :supplier {:type :Supplier}
     :receiver {:type String}
     :building_id {:type ID}
-    :category {:type category
+    :category {:type Category
                :resolve :category}
     :organization_id {:type ID}
     :budget_period_id {:type ID}
@@ -46,13 +46,13 @@
  :queries
 
  {:request_by_id
-  {:type :request
+  {:type :Request
    :args
    {:id {:type ID}}
    :resolve :request-by-id}
 
   :requests
-  {:type (list :request)
+  {:type (list :Request)
    :args
    {:requested_by_auth_user {:type Boolean}
     :from_categories_of_auth_user {:type Boolean}
@@ -66,7 +66,7 @@
    :resolve :requests}
 
   :request_fields_by_id
-  {:type (list :request_field)
+  {:type (list :RequestField)
    :args
    {:request_id {:type ID}}
    :resolve :request-fields-by-id}
