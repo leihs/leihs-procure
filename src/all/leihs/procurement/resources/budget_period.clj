@@ -3,8 +3,6 @@
             [leihs.procurement.utils.sql :as sql]
             ))
 
-(def budget-period-id "aba0576e-d65f-5fe0-aa80-89ce226ec9b1")
-
 (defn budget-period-query [id]
   (-> (sql/select :*)
       (sql/from :procurement_budget_periods)

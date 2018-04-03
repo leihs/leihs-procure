@@ -7,11 +7,15 @@
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
     [leihs.procurement.permissions.request-field :as rf-perms]  
+    [leihs.procurement.resources.budget-periods :as bps]
     [leihs.procurement.resources.category :as c]
     [leihs.procurement.resources.categories :as cs]
     [leihs.procurement.resources.request :as r]
     [leihs.procurement.resources.requests :as rs]
     [logbug.debug :as debug]))
+
+(defn get-budget-periods [context arguments _]
+  (bps/get-budget-periods context arguments))
 
 (defn get-category [{request :request} _ {id :category_id}]
   (c/get-category request id))
@@ -34,7 +38,8 @@
          (seq rf-perms))))
 
 (defn resolver-map []
-  {:category get-category
+  {:budget_periods get-budget-periods
+   :category get-category
    :categories get-categories
    :request-by-id get-request
    :requests get-requests

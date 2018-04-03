@@ -1,4 +1,9 @@
-{:objects {:Category {:fields {:id {:type ID}
+{:objects {:BudgetPeriod {:fields {:id {:type ID}
+                                   :name {:type String}
+                                   :inspection_start_date {:type String}
+                                   :end_date {:type String}}}
+
+           :Category {:fields {:id {:type ID}
                                :name {:type String}}}
 
            :RequestField {:fields {:name {:type String}
@@ -28,7 +33,10 @@
                               :internal_order_id {:type String}
                               :state {:type String}}}}
 
- :queries {:categories {:type (list :Category)
+ :queries {:budget_periods {:type (list :BudgetPeriod)
+                            :resolve :budget_periods}
+           
+           :categories {:type (list :Category)
                         :args {:inspected_by_auth_user {:type Boolean}}
                         :resolve :categories}
 
