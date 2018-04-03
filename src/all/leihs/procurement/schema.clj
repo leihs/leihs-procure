@@ -10,6 +10,7 @@
     [leihs.procurement.resources.budget-periods :as bps]
     [leihs.procurement.resources.category :as c]
     [leihs.procurement.resources.categories :as cs]
+    [leihs.procurement.resources.main_categories :as mcs]
     [leihs.procurement.resources.organizations :as os]
     [leihs.procurement.resources.request :as r]
     [leihs.procurement.resources.requests :as rs]
@@ -23,6 +24,9 @@
 
 (defn get-categories [context arguments _]
   (cs/get-categories context arguments))
+
+(defn get-main-categories [context arguments _]
+  (mcs/get-main-categories context arguments))
 
 (defn get-organizations [context arguments _]
   (os/get-organizations context arguments))
@@ -45,6 +49,7 @@
   {:budget_periods get-budget-periods
    :category get-category
    :categories get-categories
+   :main_categories get-main-categories
    :organizations get-organizations
    :request-by-id get-request
    :requests get-requests

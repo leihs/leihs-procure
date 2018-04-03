@@ -6,6 +6,9 @@
            :Category {:fields {:id {:type ID}
                                :name {:type String}}}
 
+           :MainCategory {:fields {:id {:type ID}
+                                   :name {:type String}}}
+
            :Organization {:fields {:id {:type ID}
                                    :name {:type String}
                                    :shortname {:type String}
@@ -45,6 +48,9 @@
                         :args {:inspected_by_auth_user {:type Boolean}}
                         :resolve :categories}
            
+           :main_categories {:type (list :MainCategory)
+                             :resolve :main_categories}
+
            :organizations {:type (list :Organization)
                            :resolve :organizations}
 
