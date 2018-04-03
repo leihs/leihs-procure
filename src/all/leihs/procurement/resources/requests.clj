@@ -61,7 +61,7 @@
         (sql/merge-where
           [:=
            :procurement_requests.user_id
-           (sql/call :cast (-> context :request :authenticated-entity :id) :uuid)]) 
+           (-> context :request :authenticated-entity :id)]) 
 
         from-categories-of-auth-user
         (sql/merge-where
@@ -71,9 +71,7 @@
                (sql/from :procurement_category_inspectors)
                (sql/merge-where [:=
                                  :procurement_category_inspectors.user_id
-                                 (sql/call :cast
-                                           (-> context :request :authenticated-entity :id)
-                                           :uuid)]))])
+                                 (-> context :request :authenticated-entity :id)]))])
         ))))
 
 (defn get-requests [context arguments]

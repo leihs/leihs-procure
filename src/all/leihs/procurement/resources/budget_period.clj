@@ -8,7 +8,7 @@
 (defn budget-period-query [id]
   (-> (sql/select :*)
       (sql/from :procurement_budget_periods)
-      (sql/where [:= :procurement_budget_periods.id (sql/call :cast id :uuid)])
+      (sql/where [:= :procurement_budget_periods.id id])
       sql/format))
 
 (defn get-budget-period [{tx :tx} id]

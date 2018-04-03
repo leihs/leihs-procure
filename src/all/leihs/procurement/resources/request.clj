@@ -8,7 +8,7 @@
 (defn request-base-query [{id :id}]
   (-> (sql/select :*)
       (sql/from :procurement_requests)
-      (sql/where [:= :procurement_requests.id (sql/call :cast id :uuid)])
+      (sql/where [:= :procurement_requests.id id])
       sql/format))
 
 (defn get-request [context arguments]

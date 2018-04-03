@@ -6,7 +6,7 @@
 (defn category-query [id]
   (-> (sql/select :*)
       (sql/from :procurement_categories)
-      (sql/where [:= :procurement_categories.id (sql/call :cast id :uuid)])
+      (sql/where [:= :procurement_categories.id id])
       sql/format))
 
 (defn get-category [{tx :tx} id]

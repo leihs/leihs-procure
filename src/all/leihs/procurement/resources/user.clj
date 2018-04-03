@@ -9,7 +9,7 @@
 (defn user-query [id]
   (-> (sql/select :*)
       (sql/from :users)
-      (sql/where [:= :users.id (sql/call :cast id :uuid)])
+      (sql/where [:= :users.id id])
       sql/format))
 
 (defn get-user [{tx :tx} id]

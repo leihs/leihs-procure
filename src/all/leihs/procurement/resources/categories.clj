@@ -21,9 +21,7 @@
           (sql/merge-where
             [:=
              :procurement_category_inspectors.user_id
-             (sql/call :cast
-                       (-> context :request :authenticated-entity :id)
-                       :uuid)]))))))
+             (-> context :request :authenticated-entity :id)]))))))
 
 (defn get-categories [context arguments]
   (jdbc/query (-> context :request :tx)
