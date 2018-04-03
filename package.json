@@ -6,11 +6,15 @@
     "@fortawesome/fontawesome": "^1.1.4",
     "@fortawesome/fontawesome-free-solid": "^5.0.8",
     "@fortawesome/react-fontawesome": "0.0.17",
+    "apollo-boost": "^0.1.4",
     "bootstrap": "^4.0.0",
     "classnames": "^2.2.5",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.8.0",
     "lodash": "^4.17.5",
     "node-sass-chokidar": "^1.2.0",
     "react": "^16.2.0",
+    "react-apollo": "^2.1.1",
     "react-dom": "^16.2.0",
     "react-icons": "^2.2.7",
     "react-scripts": "^1.1.1"
@@ -19,6 +23,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom"
+  },
+  "proxy": {
+    "/graphql": {
+      "target": "http://localhost:3003",
+      "pathRewrite": {
+        "^/graphql": "/procure/graphql"
+      }
+    }
   },
   "devDependencies": {
     "eslint": "^4.19.1",
