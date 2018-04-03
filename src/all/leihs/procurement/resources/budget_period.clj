@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.budget-period
-  (:require [leihs.procurement.utils.sql :as sql]
-            [leihs.procurement.utils.ds :refer [get-ds]]
-            [clojure.java.jdbc :as jdbc]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]
+            ))
 
 (def budget-period-id "aba0576e-d65f-5fe0-aa80-89ce226ec9b1")
 

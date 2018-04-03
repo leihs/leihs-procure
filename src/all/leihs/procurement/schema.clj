@@ -2,16 +2,16 @@
   (:require
     [clojure.java.io :as io]
     [clj-logging-config.log4j :as logging-config]
+    [clojure.edn :as edn]
     [clojure.tools.logging :as logging]
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
-    [clojure.edn :as edn]
-    [logbug.debug :as debug]
     [leihs.procurement.permissions.request-field :as rf-perms]  
     [leihs.procurement.resources.category :as c]
     [leihs.procurement.resources.categories :as cs]
     [leihs.procurement.resources.request :as r]
-    [leihs.procurement.resources.requests :as rs]))
+    [leihs.procurement.resources.requests :as rs]
+    [logbug.debug :as debug]))
 
 (defn get-category [{request :request} _ {id :category_id}]
   (c/get-category request id))

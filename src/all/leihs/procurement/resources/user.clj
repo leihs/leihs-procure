@@ -1,7 +1,8 @@
 (ns leihs.procurement.resources.user
-  (:require [leihs.procurement.utils.sql :as sql]
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.ds :refer [get-ds]]
-            [clojure.java.jdbc :as jdbc]))
+            ))
 
 (def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
 

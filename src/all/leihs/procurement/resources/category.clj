@@ -1,6 +1,7 @@
 (ns leihs.procurement.resources.category
-  (:require [leihs.procurement.utils.sql :as sql]
-            [clojure.java.jdbc :as jdbc]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]
+            ))
 
 (defn category-query [id]
   (-> (sql/select :*)
