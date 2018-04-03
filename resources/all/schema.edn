@@ -1,74 +1,52 @@
-{:objects
+{:objects {:Category {:fields {:id {:type ID}
+                               :name {:type String}}}
 
- ; {:Supplier
- ;  {:fields
- ;   {:id {:type ID}
- ;    :name {:type (non-null String)}
- ;    }}}
+           :RequestField {:fields {:name {:type String}
+                                   :value {:type String}
+                                   :read {:type Boolean}
+                                   :write {:type Boolean}}}
 
- {:Category
-  {:fields
-   {:id {:type ID}
-    :name {:type String}}}
+           :Request {:fields {:id {:type ID}
+                              :article_name {:type (non-null String)}
+                              :article_number {:type String}
+                              ; :supplier {:type :Supplier}
+                              :receiver {:type String}
+                              :building_id {:type ID}
+                              :category {:type Category
+                                         :resolve :category}
+                              :organization_id {:type ID}
+                              :budget_period_id {:type ID}
+                              :room_id {:type ID}
+                              :motivation {:type String}
+                              :priority {:type String}
+                              :requested_quantity {:type (non-null Int)}
+                              :approved_quantity {:type Int}
+                              :order_quantity {:type Int}
+                              :inspection_comment {:type String}
+                              ; :attachments {:type (list :Attachment)}
+                              :accounting_type {:type (non-null String)}
+                              :internal_order_id {:type String}
+                              :state {:type String}}}}
 
-  :RequestField
-  {:fields
-   {:name {:type String}
-    :value {:type String}
-    :read {:type Boolean}
-    :write {:type Boolean}}}
+ :queries {:categories {:type (list :Category)
+                        :args {:inspector_id {:type ID}}
+                        :resolve :categories}
 
-  :Request
-  {:fields
-   {:id {:type ID}
-    :article_name {:type (non-null String)}
-    :article_number {:type String}
-    ; :supplier {:type :Supplier}
-    :receiver {:type String}
-    :building_id {:type ID}
-    :category {:type Category
-               :resolve :category}
-    :organization_id {:type ID}
-    :budget_period_id {:type ID}
-    :room_id {:type ID}
-    :motivation {:type String}
-    :priority {:type String}
-    :requested_quantity {:type (non-null Int)}
-    :approved_quantity {:type Int}
-    :order_quantity {:type Int}
-    :inspection_comment {:type String}
-    ; :attachments {:type (list :Attachment)}
-    :accounting_type {:type (non-null String)}
-    :internal_order_id {:type String}
-    :state {:type String}
-    }}}
+           :request_by_id {:type :Request
+                           :args {:id {:type ID}}
+                           :resolve :request-by-id}
 
- :queries
+           :requests {:type (list :Request)
+                      :args {:requested_by_auth_user {:type Boolean}
+                             :from_categories_of_auth_user {:type Boolean}
+                             :category_id {:type (list ID)}
+                             :budget_period_id {:type (list ID)}
+                             :organization_id {:type (list ID)}
+                             :priority {:type (list String)}
+                             :inspectory_priority {:type (list String)}
+                             :state {:type (list String)}}
+                      :resolve :requests}
 
- {:request_by_id
-  {:type :Request
-   :args
-   {:id {:type ID}}
-   :resolve :request-by-id}
-
-  :requests
-  {:type (list :Request)
-   :args
-   {:requested_by_auth_user {:type Boolean}
-    :from_categories_of_auth_user {:type Boolean}
-    :category_id {:type (list ID)}
-    :budget_period_id {:type (list ID)}
-    :organization_id {:type (list ID)}
-    :priority {:type (list String)}
-    :inspectory_priority {:type (list String)}
-    :state {:type (list String)}
-    }
-   :resolve :requests}
-
-  :request_fields_by_id
-  {:type (list :RequestField)
-   :args
-   {:request_id {:type ID}}
-   :resolve :request-fields-by-id}
-  }
- }
+           :request_fields_by_id {:type (list :RequestField)
+                                  :args {:request_id {:type ID}}
+                                  :resolve :request-fields-by-id}}}
