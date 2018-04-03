@@ -29,7 +29,7 @@
                               :state {:type String}}}}
 
  :queries {:categories {:type (list :Category)
-                        :args {:inspector_id {:type ID}}
+                        :args {:inspected_by_auth_user {:type Boolean}}
                         :resolve :categories}
 
            :request_by_id {:type :Request

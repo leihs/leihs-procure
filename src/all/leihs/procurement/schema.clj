@@ -9,11 +9,15 @@
     [logbug.debug :as debug]
     [leihs.procurement.permissions.request-field :as rf-perms]  
     [leihs.procurement.resources.category :as c]
+    [leihs.procurement.resources.categories :as cs]
     [leihs.procurement.resources.request :as r]
     [leihs.procurement.resources.requests :as rs]))
 
 (defn get-category [{request :request} _ {id :category_id}]
   (c/get-category request id))
+
+(defn get-categories [context arguments _]
+  (cs/get-categories context arguments))
 
 (defn get-request [context arguments _]
   (let [{:keys [id]} arguments]
@@ -31,6 +35,7 @@
 
 (defn resolver-map []
   {:category get-category
+   :categories get-categories
    :request-by-id get-request
    :requests get-requests
    :request-fields-by-id get-request-fields})
