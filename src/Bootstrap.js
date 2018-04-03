@@ -1,4 +1,4 @@
-import React, { Component, Fragment as F } from 'react'
+import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -195,16 +195,10 @@ export const Select = ({
 
 // TODO: responsive when long labels (e.g. btn-group-vertical)
 // https://getbootstrap.com/docs/4.0/components/buttons/#checkbox-and-radio-buttons
+// TODO: a11y
+// https://inclusive-components.design/toggle-button/
 // https://www.w3.org/TR/2016/WD-wai-aria-practices-1.1-20160317/examples/radio/radio.html
-export class ButtonRadio extends Component {
-  constructor(props) {
-    super()
-    this.state = {
-      // holds the `value` of the currently selected item
-      selected: props.selected || props.value
-    }
-  }
-
+export class ButtonRadio extends React.PureComponent {
   getSelectedValueProp(value, selected) {
     // `value` or `selected` is accepted, depending on consistency
     // with DOM or between coomponents is desired.
@@ -213,30 +207,29 @@ export class ButtonRadio extends Component {
         'Props `value` and `selected` were given, please only use 1 of them!'
       )
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.state.selected === nextProps.selected) return
-    this.setState(state => {
-      if (state.selected === nextProps.selected) return
-      return {
-        selected: nextProps.selected
-      }
-    })
+    return value || selected
   }
 
   render({ props } = this) {
-    const { id, onChange, options = [], withIcons = true, ...restProps } = props
-    const wrapperProps = f.omit(restProps, ['value', 'selected'])
+    const {
+      id,
+      name,
+      value,
+      selected,
+      onChange,
+      options = [],
+      withIcons = true,
+      ...restProps
+    } = props
+    const selectedValue = this.getSelectedValueProp(value, selected)
     return (
       <div
-        {...wrapperProps}
+        {...restProps}
         className="btn-group btn-group-block"
         role="radiogroup">
-        {options.map(({ name, label, value, ...item }, n) => {
-          name = name || id
+        {options.map(({ label, value, ...item }, n) => {
           const inputID = `${id}_radio_${n}`
-          const isSelected = this.state.selected === value
+          const isSelected = value === selectedValue
           return (
             <F key={n}>
               <label
@@ -258,8 +251,8 @@ export class ButtonRadio extends Component {
                   aria-checked={isSelected}
                   tabIndex={n === 0 ? 0 : -1}
                   onChange={() => {
-                    this.setState({ selected: value }, () => {
-                      onChange({ target: { name: name || id, value: value } })
+                    onChange({
+                      target: { name: name, value: value }
                     })
                   }}
                   className="sr-only"

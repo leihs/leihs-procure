@@ -3,9 +3,12 @@ import React, { Component, Fragment as F } from 'react'
 import Icon from './Icons'
 import RequestForm from './RequestForm'
 
+const TITLE = 'Bedarfsermittlung'
+
 const Brand = () => (
   <F>
-    <Icon.ProcurementLogo className="mr-2" />Bedarfsermittlung
+    <Icon.ProcurementLogo className="mr-2" />
+    {TITLE}
   </F>
 )
 

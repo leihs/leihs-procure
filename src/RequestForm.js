@@ -6,7 +6,6 @@ import f from 'lodash'
 import t from './translate'
 import Icon from './Icons'
 import {
-  Span,
   Row,
   Col,
   FilePicker,
@@ -19,10 +18,11 @@ import {
 import { ControlledForm } from './ReactUtils'
 
 // dev
-import ROOMS_JSON from 'rooms.json'
-window.f = f
+// import ROOMS_JSON from 'rooms.json'
+// window.f = f
+const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
 
-const TotalAmount = ({ fields }) => {
+const TotalAmount = ( fields ) => {
   const quantity = f.last(
     f.filter(
       ['requested', 'approved', 'ordered'].map(k => fields[`quantity_${k}`])
@@ -119,11 +119,10 @@ const RequestForm = () => (
                   <FormField
                     type="text-static"
                     name="price_total"
-                    value={<TotalAmount fields={fields} />}
+                    value={TotalAmount(fields)}
                     label={t('field.price_total')}
-                    labelSmall={t('field.price_help')}>
-                    <Span cls="text-bold" />
-                  </FormField>
+                    labelSmall={t('field.price_help')}
+                  />
                 </Col>
               </Row>
 
