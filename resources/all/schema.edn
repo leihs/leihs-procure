@@ -6,6 +6,11 @@
            :Category {:fields {:id {:type ID}
                                :name {:type String}}}
 
+           :Organization {:fields {:id {:type ID}
+                                   :name {:type String}
+                                   :shortname {:type String}
+                                   :parent_id {:type ID}}}
+
            :RequestField {:fields {:name {:type String}
                                    :value {:type String}
                                    :read {:type Boolean}
@@ -39,6 +44,9 @@
            :categories {:type (list :Category)
                         :args {:inspected_by_auth_user {:type Boolean}}
                         :resolve :categories}
+           
+           :organizations {:type (list :Organization)
+                           :resolve :organizations}
 
            :request_by_id {:type :Request
                            :args {:id {:type ID}}
