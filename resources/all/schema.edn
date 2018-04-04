@@ -34,14 +34,14 @@
                               :approved_quantity {:type Int}
                               :article_name {:type (non-null String)}
                               :article_number {:type String}
-                              :attachments {:type (list Attachment)
+                              :attachments {:type (list :Attachment)
                                             :resolve :attachments}
                               :budget_period_id {:type ID}
-                              :category {:type Category
+                              :category {:type :Category
                                          :resolve :category}
                               :inspection_comment {:type String}
                               :internal_order_id {:type String}
-                              :model {:type Model
+                              :model {:type :Model
                                       :resolve :model}
                               :motivation {:type String}
                               :order_quantity {:type Int}
@@ -49,16 +49,16 @@
                               :priority {:type String}
                               :receiver {:type String}
                               :requested_quantity {:type (non-null Int)}
-                              :room {:type Room
+                              :room {:type :Room
                                      :resolve :room}
                               :state {:type String}
-                              :supplier {:type Supplier
+                              :supplier {:type :Supplier
                                          :resolve :supplier}
-                              :user {:type User
+                              :user {:type :User
                                      :resolve :user}}}
 
            :Room {:fields {:id {:type ID}
-                           :building {:type Building
+                           :building {:type :Building
                                       :resolve :building}
                            :name {:type String}}}
 
@@ -100,4 +100,8 @@
 
            :request_fields_by_id {:type (list :RequestField)
                                   :args {:request_id {:type ID}}
-                                  :resolve :request-fields-by-id}}}
+                                  :resolve :request-fields-by-id}
+           
+           :rooms {:type (list :Room)
+                   :args {:building_id {:type ID}}
+                   :resolve :rooms}}}

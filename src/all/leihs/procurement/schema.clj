@@ -18,6 +18,7 @@
     [leihs.procurement.resources.request :as proc-request]
     [leihs.procurement.resources.requests :as proc-requests]
     [leihs.procurement.resources.room :as room]
+    [leihs.procurement.resources.rooms :as rooms]
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
     [logbug.debug :as debug]))
@@ -55,6 +56,9 @@
 (defn get-room [{request :request} _ {id :room_id}]
   (room/get-room request id))
 
+(defn get-rooms [context arguments _]
+  (rooms/get-rooms context arguments))
+
 (defn get-request-fields [context arguments _]
   (let [request (proc-request/get-request {:request context} arguments)
         rf-perms (rf-perms/all-for-user-and-request
@@ -81,6 +85,7 @@
    :requests get-requests
    :request-fields-by-id get-request-fields
    :room get-room
+   :rooms get-rooms
    :supplier get-supplier
    :user get-user})
 
