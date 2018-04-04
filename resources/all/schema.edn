@@ -48,6 +48,8 @@
                               :organization_id {:type ID}
                               :priority {:type String}
                               :receiver {:type String}
+                              :price_cents {:type (non-null Int)}
+                              :price_currency {:type String}
                               :requested_quantity {:type (non-null Int)}
                               :room {:type :Room
                                      :resolve :room}
