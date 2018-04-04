@@ -7,6 +7,7 @@
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
     [leihs.procurement.permissions.request-field :as rf-perms]  
+    [leihs.procurement.resources.attachments :as attachments]  
     [leihs.procurement.resources.budget-periods :as budget-periods]
     [leihs.procurement.resources.building :as building]
     [leihs.procurement.resources.category :as category]
@@ -20,6 +21,9 @@
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
     [logbug.debug :as debug]))
+
+(defn get-attachments [{request :request} _ {request_id :id}]
+  (attachments/get-attachments request request_id))
 
 (defn get-budget-periods [context arguments _]
   (budget-periods/get-budget-periods context arguments))
@@ -66,7 +70,8 @@
   (user/get-user request id))
 
 (defn resolver-map []
-  {:budget_periods get-budget-periods
+  {:attachments get-attachments
+   :budget_periods get-budget-periods
    :building get-building
    :category get-category
    :categories get-categories

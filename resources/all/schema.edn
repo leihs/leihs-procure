@@ -1,4 +1,7 @@
-{:objects {:BudgetPeriod {:fields {:id {:type ID}
+{:objects {:Attachment {:fields {:id {:type ID}
+                                 :filename {:type String}}}
+
+           :BudgetPeriod {:fields {:id {:type ID}
                                    :name {:type String}
                                    :inspection_start_date {:type String}
                                    :end_date {:type String}}}
@@ -31,6 +34,8 @@
                               :approved_quantity {:type Int}
                               :article_name {:type (non-null String)}
                               :article_number {:type String}
+                              :attachments {:type (list Attachment)
+                                            :resolve :attachments}
                               :budget_period_id {:type ID}
                               :category {:type Category
                                          :resolve :category}
@@ -46,7 +51,6 @@
                               :requested_quantity {:type (non-null Int)}
                               :room {:type Room
                                      :resolve :room}
-                              ; :attachments {:type (list :Attachment)}
                               :state {:type String}
                               :supplier {:type Supplier
                                          :resolve :supplier}
