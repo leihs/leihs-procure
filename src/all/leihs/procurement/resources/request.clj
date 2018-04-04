@@ -2,18 +2,18 @@
   (:require 
     [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
+    [leihs.procurement.resources.requests :refer [state-sql]]
     [leihs.procurement.utils.sql :as sql]
     [clojure.java.jdbc :as jdbc]))
 
-(defn request-base-query [{id :id}]
-  (-> (sql/select :*)
+(defn request-base-query [id]
+  (-> (sql/select :* [state-sql :state])
       (sql/from :procurement_requests)
       (sql/where [:= :procurement_requests.id id])
       sql/format))
 
-(defn get-request [context arguments]
-  (first (jdbc/query (-> context :request :tx)
-                     (request-base-query arguments))))
+(defn get-request [{tx :tx} {id :id}]
+  (first (jdbc/query tx (request-base-query id))))
 
 (defn requested-by-user? [{tx :tx} request user]
   (= (:user_id request) (:id user)))

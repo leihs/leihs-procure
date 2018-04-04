@@ -46,9 +46,8 @@
 (defn get-organizations [context arguments _]
   (organizations/get-organizations context arguments))
 
-(defn get-request [context arguments _]
-  (let [{:keys [id]} arguments]
-    (proc-request/get-request (:request context) id)))
+(defn get-request [{request :request} arguments _]
+  (proc-request/get-request request arguments))
 
 (defn get-requests [context arguments _]
   (proc-requests/get-requests context arguments))
@@ -57,7 +56,7 @@
   (room/get-room request id))
 
 (defn get-request-fields [context arguments _]
-  (let [request (r/get-request context arguments)
+  (let [request (proc-request/get-request {:request context} arguments)
         rf-perms (rf-perms/all-for-user-and-request
                    (assoc context :proc-request request))]
     (map (fn [[k v]] (merge v {:name k, :value (k request)}))
