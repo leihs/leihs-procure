@@ -1,5 +1,6 @@
 import React from 'react'
 import f from 'lodash'
+import cx from 'classnames'
 
 // pick & choose what we use, name & describe it, then export all in one object of components
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
@@ -11,6 +12,10 @@ import faChartPie from '@fortawesome/fontawesome-free-solid/faChartPie'
 import faPaperclip from '@fortawesome/fontawesome-free-solid/faPaperclip'
 import faCircle from '@fortawesome/fontawesome-free-solid/faCircle'
 import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
+import faCircleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch'
+import faTag from '@fortawesome/fontawesome-free-solid/faTag'
+import faQuestion from '@fortawesome/fontawesome-free-solid/faQuestion'
+import faShoppingCart from '@fortawesome/fontawesome-free-solid/faShoppingCart'
 
 const ICONS = {
   Checkmark: {
@@ -36,16 +41,37 @@ const ICONS = {
   },
   RadioCheckedOff: {
     src: faCircle
+  },
+  Spinner: {
+    src: faCircleNotch,
+    extraProps: { className: 'fa-spin' }
+  },
+  PriceTag: {
+    src: faTag,
+    extraProps: { flip: 'horizontal' }
+  },
+  QuestionMark: {
+    src: faQuestion
+  },
+  ShoppingCart: {
+    src: faShoppingCart
   }
 }
 
 const Icons = f.fromPairs(
-  f.map(ICONS, ({ src }, name) => {
-    const iconComponent = props => {
-      if (props.children) {
+  f.map(ICONS, ({ src, extraProps = {} }, name) => {
+    const iconComponent = givenProps => {
+      if (givenProps.children) {
         throw new Error('Icons cant have `children`!')
       }
-      return <FontAwesomeIcon icon={src} {...props} />
+      return (
+        <FontAwesomeIcon
+          {...extraProps}
+          {...givenProps}
+          icon={src}
+          className={cx(extraProps.className, givenProps.className)}
+        />
+      )
     }
     iconComponent.displayName = `Icon.${name}`
     return [name, iconComponent]

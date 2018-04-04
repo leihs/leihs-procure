@@ -1,7 +1,7 @@
 import React, { Component, Fragment as F } from 'react'
 
 import Icon from './Icons'
-import RequestForm from './RequestForm'
+import RequestsIndex from './RequestsIndex'
 
 const TITLE = 'Bedarfsermittlung'
 
@@ -21,9 +21,7 @@ class App extends Component {
             <Brand />
           </span>
         </nav>
-        <div className="App-body p-3 m-2 border rounded">
-          <RequestForm />
-        </div>
+        <RequestsIndex />
       </F>
     )
   }

@@ -6,6 +6,16 @@ import t from './translate'
 import Icon from './Icons'
 
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
+const BOOTSTRAP_MODIFIERS = [
+  'primary',
+  'secondary',
+  'success',
+  'danger',
+  'warning',
+  'info',
+  'light',
+  'dark'
+]
 window.React = React
 
 // https://getbootstrap.com/docs/4.0/utilities/spacing/#notation
@@ -20,10 +30,10 @@ const bsSizeUtils = ({ m, p, ...props }) => {
   }
   const margin = extract('m', m)
   const padding = extract('p', p)
-  return [cx(cls, margin, padding, className), restProps]
+  return [cx(margin, padding, cls, className), restProps]
 }
 
-export const Node = ({ tag = 'div', ...props }) => {
+const Node = ({ tag = 'div', ...props }) => {
   const Tag = tag
   const [bsClasses, restProps] = bsSizeUtils(props)
   return <Tag {...restProps} className={bsClasses} />
@@ -35,9 +45,9 @@ export const Span = props => Node({ ...props, tag: 'span' })
 export const Code = props => Node({ ...props, tag: 'span' })
 export const Hr = props => Node({ ...props, tag: 'span' })
 
-export const Row = props => Node({ ...props, cls: 'row' })
+export const Row = props => Node({ ...props, cls: ['row', props.cls] })
 
-export const Col = ({ order, ...props }) => {
+export const Col = ({ order, cls, ...props }) => {
   const restProps = f.omit(props, BOOTSTRAP_BREAKPOINTS)
   const breakpoint = f.first(
     f.intersection(f.keys(props), BOOTSTRAP_BREAKPOINTS)
@@ -45,7 +55,15 @@ export const Col = ({ order, ...props }) => {
   const colCls = breakpoint ? `col-${breakpoint}` : 'col'
   const orderCls =
     order && (breakpoint ? `order-${breakpoint}-${order}` : `order-${order}`)
-  return Node({ ...restProps, cls: cx(colCls, orderCls) })
+  return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
+}
+
+export const Badge = props => {
+  const restProps = f.omit(props, BOOTSTRAP_MODIFIERS)
+  const mod =
+    f.first(f.intersection(f.keys(props), BOOTSTRAP_MODIFIERS)) ||
+    BOOTSTRAP_MODIFIERS[0]
+  return <Span {...restProps} cls={[props.cls, 'badge', `badge-${mod}`]} />
 }
 
 export const FormGroup = ({

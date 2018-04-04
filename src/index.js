@@ -7,23 +7,16 @@ import App from './App'
 import registerServiceWorker from './registerServiceWorker'
 
 import ApolloClient from 'apollo-boost'
-import gql from 'graphql-tag'
+import { ApolloProvider } from 'react-apollo'
 
 const client = new ApolloClient({
   uri: '/graphql'
 })
 
-client
-  .query({
-    query: gql`
-      {
-        requests {
-          id
-        }
-      }
-    `
-  })
-  .then(data => console.log({ data })) // eslint-disable-line no-console
-
-ReactDOM.render(<App />, document.getElementById('root'))
+const Root = () => (
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>
+)
+ReactDOM.render(<Root />, document.getElementById('root'))
 registerServiceWorker()

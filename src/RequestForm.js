@@ -1,7 +1,6 @@
 // TODO: move all translations here (not FormField)
 
 import React from 'react'
-import f from 'lodash'
 
 import t from './translate'
 import Icon from './Icons'
@@ -16,20 +15,12 @@ import {
 } from './Bootstrap'
 
 import { ControlledForm } from './ReactUtils'
+import { RequestTotalAmount as TotalAmount } from './AppUtils'
 
 // dev
 // import ROOMS_JSON from 'rooms.json'
-// window.f = f
 const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
 
-const TotalAmount = ( fields ) => {
-  const quantity = f.last(
-    f.filter(
-      ['requested', 'approved', 'ordered'].map(k => fields[`quantity_${k}`])
-    )
-  )
-  return (parseInt(quantity, 10) || 0) * (parseInt(fields.price, 10) || 0)
-}
 const RequestForm = () => (
   <ControlledForm
     idPrefix="request_form"
