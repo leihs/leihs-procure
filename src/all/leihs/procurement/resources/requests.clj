@@ -23,7 +23,7 @@
   (-> (sql/select :procurement_requests.* [state-sql :state])
       (sql/from :procurement_requests)))
 
-(defn requests-query [context arguments]
+(defn requests-query [context arguments _]
   (let [category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
@@ -74,8 +74,9 @@
                                  (-> context :request :authenticated-entity :id)]))])
         ))))
 
-(defn get-requests [context arguments]
-    (jdbc/query (-> context :request :tx) (requests-query context arguments)))
+(defn get-requests [context arguments value]
+    (jdbc/query (-> context :request :tx)
+                (requests-query context arguments value)))
 
 ;#### debug ###################################################################
 (logging-config/set-logger! :level :debug)

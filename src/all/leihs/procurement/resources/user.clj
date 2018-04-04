@@ -7,24 +7,20 @@
     [logbug.debug :as debug]
     ))
 
-(def user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8")
-
 (defn user-query [id]
   (-> (sql/select :*)
       (sql/from :users)
       (sql/where [:= :users.id id])
       sql/format))
 
-(defn get-user [{tx :tx} id]
+(defn get-user [context _ value]
+  (first (jdbc/query (-> context :request :tx)
+                     (user-query (:user_id value)))))
+
+(defn get-user-by-id [tx id]
   (first (jdbc/query tx (user-query id))))
 
-(defn procurement-requester? [{tx :tx} user]
-  (:is_procurement_requester user))
-
-(defn procurement-admin? [{tx :tx} user]
-  (:is_procurement_admin user))
-
-(defn procurement-inspector? [{tx :tx} user]
+(defn procurement-inspector? [tx user]
   (:result
     (first 
       (jdbc/query

@@ -6,6 +6,6 @@
   (-> (sql/select :procurement_main_categories.*)
       (sql/from :procurement_main_categories)))
 
-(defn get-main-categories [context _]
+(defn get-main-categories [context _ _]
   (jdbc/query (-> context :request :tx)
               (sql/format main-categories-base-query)))

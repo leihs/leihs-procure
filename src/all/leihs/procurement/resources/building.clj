@@ -12,8 +12,9 @@
       (sql/where [:= :buildings.id id])
       sql/format))
 
-(defn get-building [{tx :tx} id]
-  (first (jdbc/query tx (building-query id))))
+(defn get-building [context args value]
+  (first (jdbc/query (-> context :request :tx)
+                     (building-query (:building_id value)))))
 
 ;#### debug ###################################################################
 (logging-config/set-logger! :level :debug)

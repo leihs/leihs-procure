@@ -12,8 +12,9 @@
       (sql/where [:= :models.id id])
       sql/format))
 
-(defn get-model [{tx :tx} id]
-  (first (jdbc/query tx (model-query id))))
+(defn get-model [context _ value]
+  (first (jdbc/query (-> context :request :tx)
+                     (model-query (:model_id value)))))
 
 ;#### debug ###################################################################
 (logging-config/set-logger! :level :debug)

@@ -8,7 +8,7 @@
   (-> (sql/select :procurement_categories.*)
       (sql/from :procurement_categories)))
 
-(defn categories-query [context arguments]
+(defn categories-query [context arguments _]
   (let [inspected-by-auth-user (:inspected_by_auth_user arguments)]
     (sql/format
       (cond-> categories-base-query
@@ -23,9 +23,9 @@
              :procurement_category_inspectors.user_id
              (-> context :request :authenticated-entity :id)]))))))
 
-(defn get-categories [context arguments]
+(defn get-categories [context arguments _]
   (jdbc/query (-> context :request :tx)
-              (categories-query context arguments)))
+              (categories-query context arguments _)))
 
 ;#### debug ###################################################################
 (logging-config/set-logger! :level :debug)

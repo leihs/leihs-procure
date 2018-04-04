@@ -12,6 +12,6 @@
       building_id
       (sql/merge-where [:= :rooms.building_id building_id]))))
 
-(defn get-rooms [context args]
+(defn get-rooms [context args _]
   (jdbc/query (-> context :request :tx)
               (sql/format (rooms-query args))))

@@ -12,8 +12,9 @@
       (sql/where [:= :rooms.id id])
       sql/format))
 
-(defn get-room [{tx :tx} id]
-  (first (jdbc/query tx (room-query id))))
+(defn get-room [context _ value]
+  (first (jdbc/query (-> context :request :tx)
+                     (room-query (:room_id value)))))
 
 ;#### debug ###################################################################
 (logging-config/set-logger! :level :debug)

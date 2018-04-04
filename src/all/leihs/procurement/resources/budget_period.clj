@@ -9,10 +9,10 @@
       (sql/where [:= :procurement_budget_periods.id id])
       sql/format))
 
-(defn get-budget-period [{tx :tx} id]
+(defn get-budget-period-by-id [tx id]
   (first (jdbc/query tx (budget-period-query id))))
 
-(defn in-requesting-phase? [{tx :tx} budget-period]
+(defn in-requesting-phase? [tx budget-period]
   (:result
     (first
       (jdbc/query
@@ -24,7 +24,7 @@
                :result])
             sql/format)))))
 
-(defn past? [{tx :tx} budget-period]
+(defn past? [tx budget-period]
   (:result
     (first
       (jdbc/query

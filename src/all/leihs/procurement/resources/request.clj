@@ -12,11 +12,9 @@
       (sql/where [:= :procurement_requests.id id])
       sql/format))
 
-(defn get-request [{tx :tx} {id :id}]
-  (first (jdbc/query tx (request-base-query id))))
-
-(defn requested-by-user? [{tx :tx} request user]
-  (= (:user_id request) (:id user)))
+(defn get-request [context args _]
+  (first (jdbc/query (-> context :request :tx)
+                     (request-base-query (:request_id args)))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

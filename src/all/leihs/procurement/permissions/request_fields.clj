@@ -1,23 +1,24 @@
-(ns leihs.procurement.permissions.request-field
-  (:require [leihs.procurement.resources.user :as u]
-            [leihs.procurement.resources.request :as r]
-            [leihs.procurement.resources.category :as c]
-            [leihs.procurement.resources.budget-period :as bp]))
+(ns leihs.procurement.permissions.request-fields
+  (:require [leihs.procurement.resources.user :as user]
+            [leihs.procurement.resources.request :as request]
+            [leihs.procurement.resources.category :as category]
+            [leihs.procurement.resources.budget-period :as budget-period]))
 
-(defn all-for-user-and-request [context]
+(defn all-for-user-and-request [context _ _]
   (let [proc-request (:proc-request context)
         request (:request context)
-        user (u/get-user request (-> request :authenticated-entity :id))
-        budget-period (bp/get-budget-period request (:budget_period_id request))
-        category (c/get-category request (:category_id proc-request))
+        tx (:tx request)
+        user (user/get-user-by-id tx (-> request :authenticated-entity :id))
+        budget-period (budget-period/get-budget-period-by-id tx (:budget_period_id proc-request))
+        category (category/get-category-by-id tx (:category_id proc-request))
         request-without-template (not (:template_id proc-request))
-        requested-by-user (r/requested-by-user? request proc-request user)
-        user-is-requester (u/procurement-requester? request user)
-        user-is-inspector (u/procurement-inspector? request user)
-        user-is-admin (u/procurement-admin? request user)
-        budget-period-is-past (bp/past? request budget-period)
-        budget-period-in-requesting-phase (bp/in-requesting-phase? request budget-period)
-        category-inspectable-by-user (c/inspectable-by? request user category)]
+        requested-by-user (= (:user_id proc-request) (:id user))
+        user-is-requester (:is_procurement_requester user)
+        user-is-inspector (user/procurement-inspector? tx user)
+        user-is-admin (:is_procurement_admin user)
+        budget-period-is-past (budget-period/past? tx budget-period)
+        budget-period-in-requesting-phase (budget-period/in-requesting-phase? tx budget-period)
+        category-inspectable-by-user (category/inspectable-by? tx user category)]
     {:article_name {:read true,
                     :write (and request-without-template
                                 (not budget-period-is-past)
