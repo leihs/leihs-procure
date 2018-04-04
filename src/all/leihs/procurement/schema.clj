@@ -7,36 +7,50 @@
     [com.walmartlabs.lacinia.util :as util]
     [com.walmartlabs.lacinia.schema :as schema]
     [leihs.procurement.permissions.request-field :as rf-perms]  
-    [leihs.procurement.resources.budget-periods :as bps]
-    [leihs.procurement.resources.category :as c]
-    [leihs.procurement.resources.categories :as cs]
-    [leihs.procurement.resources.main_categories :as mcs]
-    [leihs.procurement.resources.organizations :as os]
-    [leihs.procurement.resources.request :as r]
-    [leihs.procurement.resources.requests :as rs]
+    [leihs.procurement.resources.budget-periods :as budget-periods]
+    [leihs.procurement.resources.building :as building]
+    [leihs.procurement.resources.category :as category]
+    [leihs.procurement.resources.categories :as categories]
+    [leihs.procurement.resources.main_categories :as main-categories]
+    [leihs.procurement.resources.model :as model]
+    [leihs.procurement.resources.organizations :as organizations]
+    [leihs.procurement.resources.request :as proc-request]
+    [leihs.procurement.resources.requests :as proc-requests]
+    [leihs.procurement.resources.room :as room]
+    [leihs.procurement.resources.supplier :as supplier]
+    [leihs.procurement.resources.user :as user]
     [logbug.debug :as debug]))
 
 (defn get-budget-periods [context arguments _]
-  (bps/get-budget-periods context arguments))
+  (budget-periods/get-budget-periods context arguments))
+
+(defn get-building [{request :request} _ {id :building_id}]
+  (building/get-building request id))
 
 (defn get-category [{request :request} _ {id :category_id}]
-  (c/get-category request id))
+  (category/get-category request id))
 
 (defn get-categories [context arguments _]
-  (cs/get-categories context arguments))
+  (categories/get-categories context arguments))
 
 (defn get-main-categories [context arguments _]
-  (mcs/get-main-categories context arguments))
+  (main-categories/get-main-categories context arguments))
+
+(defn get-model [{request :request} _ {id :model_id}]
+  (model/get-model request id))
 
 (defn get-organizations [context arguments _]
-  (os/get-organizations context arguments))
+  (organizations/get-organizations context arguments))
 
 (defn get-request [context arguments _]
   (let [{:keys [id]} arguments]
-    (r/get-request (:request context) id)))
+    (proc-request/get-request (:request context) id)))
 
 (defn get-requests [context arguments _]
-  (rs/get-requests context arguments))
+  (proc-requests/get-requests context arguments))
+
+(defn get-room [{request :request} _ {id :room_id}]
+  (room/get-room request id))
 
 (defn get-request-fields [context arguments _]
   (let [request (r/get-request context arguments)
@@ -45,15 +59,26 @@
     (map (fn [[k v]] (merge v {:name k, :value (k request)}))
          (seq rf-perms))))
 
+(defn get-supplier [{request :request} _ {id :supplier_id}]
+  (supplier/get-supplier request id))
+
+(defn get-user [{request :request} _ {id :user_id}]
+  (user/get-user request id))
+
 (defn resolver-map []
   {:budget_periods get-budget-periods
+   :building get-building
    :category get-category
    :categories get-categories
    :main_categories get-main-categories
+   :model get-model
    :organizations get-organizations
    :request-by-id get-request
    :requests get-requests
-   :request-fields-by-id get-request-fields})
+   :request-fields-by-id get-request-fields
+   :room get-room
+   :supplier get-supplier
+   :user get-user})
 
 (defn load-schema []
   (-> (io/resource "schema.edn")
