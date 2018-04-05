@@ -13,7 +13,7 @@ import { ApolloProvider } from 'react-apollo'
 import RequestsIndex from './pages/RequestsIndex'
 
 const client = new ApolloClient({
-  uri: '/graphql'
+  uri: '/procure/graphql'
 })
 
 const Root = () => (
@@ -24,4 +24,5 @@ const Root = () => (
   </ApolloProvider>
 )
 ReactDOM.render(<Root />, document.getElementById('root'))
-registerServiceWorker()
+
+// registerServiceWorker() // not yet…

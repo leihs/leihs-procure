@@ -26,10 +26,7 @@
   },
   "proxy": {
     "/graphql": {
-      "target": "http://localhost:3003",
-      "pathRewrite": {
-        "^/graphql": "/procure/graphql"
-      }
+      "target": "http://localhost:3003"
     }
   },
   "devDependencies": {
