@@ -34,27 +34,27 @@
         state (:state arguments)]
     (sql/format
       (cond-> requests-base-query
-        category-id
+        (not (empty? category-id))
         (sql/merge-where
           [:in :procurement_requests.category_id category-id])
 
-        budget-period-id
+        (not (empty? budget-period-id))
         (sql/merge-where
           [:in :procurement_requests.budget_period_id budget-period-id])
 
-        organization-id
+        (not (empty? organization-id))
         (sql/merge-where
           [:in :procurement_requests.organization_id organization-id])
 
-        priority
+        (not (empty? priority))
         (sql/merge-where
           [:in :procurement_requests.priority priority])
 
-        inspector-priority
+        (not (empty? inspector-priority))
         (sql/merge-where
           [:in :procurement_requests.inspector_priority inspector-priority])
 
-        state
+        (not (empty? state))
         (sql/merge-where [:in state-sql state])
 
         requested-by-auth-user
@@ -76,7 +76,7 @@
 
 (defn get-requests [context arguments value]
     (jdbc/query (-> context :request :tx)
-                (requests-query context arguments value)))
+                (debug/identity-with-logging (requests-query context arguments value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
