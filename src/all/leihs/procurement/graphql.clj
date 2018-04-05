@@ -12,7 +12,7 @@
 (defn exec-query [query-string request]
   (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
                    query-string
-                   nil
+                   (-> request :body :variables)
                    {:request request}))
 
 (defn handler [{{query :query} :body, :as request}]
