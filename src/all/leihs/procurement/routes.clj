@@ -78,7 +78,7 @@
     (throw 
       (ex-info 
         "There is no handler for this resource and the accepted content type."
-        {:status 404}))))
+        {:status 404 :uri (get request :uri)}))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
