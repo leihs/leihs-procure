@@ -4,8 +4,13 @@ import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import * as Fragments from '../GraphQlFragments'
-import Loading from '../components/Loading'
 import RequestsListFiltered from '../components/RequestsListFiltered'
+
+// NOTE: there are 2 separate queries for filterbar and request list.
+// they are not coordinated in any way (yet), so for now its a 2-step loading UI.
+// will revisit when setup is complete – could be a non-problem in the end,
+// if, like in v1, the user's filter settings are persisted in DB
+// (bc the first query can get everything in 1 fetch)
 
 class RequestsIndexWithData extends React.Component {
   constructor() {
@@ -25,13 +30,17 @@ class RequestsIndexWithData extends React.Component {
   render({ state } = this) {
     const filters = state.currentFilters
     // FIXME: use real variables, not String interpolation!
-    const query = gql`
-      query RequestsIndex($budgetPeriods: [ID]) {
-        # for filterbar:
+    const filtersQuery = gql`
+      query RequestFilters {
         budget_periods {
           id
           name
         }
+      }
+    `
+
+    const requestsQuery = gql`
+      query RequestsIndexFiltered($budgetPeriods: [ID]) {
         # main index:
         requests(budget_period_id: ${JSON.stringify(filters.budgetPeriods)}) {
           ...RequestFieldsForIndex
@@ -40,20 +49,25 @@ class RequestsIndexWithData extends React.Component {
       ${Fragments.RequestFieldsForIndex}
     `
 
-    const render = ({ loading, error, data }) => {
-      if (loading) return <Loading />
-      if (error) return <p>Error :(</p>
-
-      return (
-        <RequestsListFiltered
-          requests={data.requests}
-          filters={{ available: { budgetPeriods: data.budget_periods } }}
-          onFilterChange={this.onFilterChange}
-        />
-      )
-    }
-
-    return <Query query={query}>{render}</Query>
+    return (
+      <Query query={filtersQuery}>
+        {filtersData => {
+          return (
+            <Query query={requestsQuery}>
+              {requestsData => {
+                return (
+                  <RequestsListFiltered
+                    requests={requestsData}
+                    filters={filtersData}
+                    onFilterChange={this.onFilterChange}
+                  />
+                )
+              }}
+            </Query>
+          )
+        }}
+      </Query>
+    )
   }
 }
 

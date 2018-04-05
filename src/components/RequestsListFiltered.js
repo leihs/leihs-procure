@@ -1,10 +1,11 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 
-import { RequestTotalAmount as TotalAmount } from '../components/decorators'
-import { Div, Row, Col, Badge } from '../components/Bootstrap'
-import Icon from '../components/Icons'
-import { MainWithSidebar } from '../components/Layout'
+import { RequestTotalAmount as TotalAmount } from './decorators'
+import { Div, Row, Col, Badge } from './Bootstrap'
+import Icon from './Icons'
+import { MainWithSidebar } from './Layout'
+import Loading from './Loading'
 
 const RequestLine = ({ fields }) => (
   <F>
@@ -48,34 +49,58 @@ const RequestLine = ({ fields }) => (
   </F>
 )
 
-const FilterBar = ({ filters, onFilterChange }) => (
-  <Div cls="pt-2">
-    <h5>Filters</h5>
-    <fieldset>
-      <legend className="h6">Budgetperioden</legend>
-      {f.sortBy(filters.available.budgetPeriods, 'name').map(({ id, name }) => (
-        <F key={id}>
-          <label>
-            <input
-              type="radio"
-              name="budgetPeriods"
-              value={id}
-              onChange={() => onFilterChange({ budgetPeriods: [id] })}
-            />
-            {name}
-          </label>
-          <br />
-        </F>
-      ))}
-    </fieldset>
-  </Div>
-)
+const FilterBar = ({ filters: { loading, error, data }, onFilterChange }) => {
+  if (loading) return <Loading />
+  if (error)
+    return (
+      <div>
+        <p>Error :(</p>
+        <pre>{error.toString()}</pre>
+      </div>
+    )
 
+  const available = { budgetPeriods: data.budget_periods }
+
+  return (
+    <Div cls="pt-2">
+      <h5>Filters</h5>
+      <fieldset>
+        <legend className="h6">Budgetperioden</legend>
+        {f.sortBy(available.budgetPeriods, 'name').map(({ id, name }) => (
+          <F key={id}>
+            <label>
+              <input
+                type="radio"
+                name="budgetPeriods"
+                value={id}
+                onChange={() => onFilterChange({ budgetPeriods: [id] })}
+              />
+              {name}
+            </label>
+            <br />
+          </F>
+        ))}
+      </fieldset>
+    </Div>
+  )
+}
+
+const RequestsList = ({ requests: { loading, error, data } }) => {
+  if (loading) return <Loading />
+  if (error) return <p>Error :(</p>
+  const requests = data && data.requests ? data.requests : []
+  return (
+    <F>
+      {' '}
+      <h4>{requests.length} Requests</h4>
+      {requests.map(r => <RequestLine key={r.id} fields={r} />)}
+    </F>
+  )
+}
 const RequestsIndex = ({ requests, filters, onFilterChange }) => (
   <MainWithSidebar
     sidebar={<FilterBar filters={filters} onFilterChange={onFilterChange} />}>
-    <h4>{requests.length} Requests</h4>
-    {requests.map(r => <RequestLine key={r.id} fields={r} />)}
+    <RequestsList requests={requests} />
   </MainWithSidebar>
 )
 
