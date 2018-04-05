@@ -1,19 +1,10 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
-import { Query } from 'react-apollo'
-import gql from 'graphql-tag'
 
-import * as Fragments from './GraphQlFragments'
-import { RequestTotalAmount as TotalAmount } from './AppUtils'
-import { Div, Row, Col, Badge } from './Bootstrap'
-import Icon from './Icons'
-import { MainWithSidebar } from './Layout'
-
-const Loading = () => (
-  <div className="w-100 p-3 h1 text-center">
-    <Icon.Spinner /> Loading...
-  </div>
-)
+import { RequestTotalAmount as TotalAmount } from '../components/decorators'
+import { Div, Row, Col, Badge } from '../components/Bootstrap'
+import Icon from '../components/Icons'
+import { MainWithSidebar } from '../components/Layout'
 
 const RequestLine = ({ fields }) => (
   <F>
@@ -88,54 +79,4 @@ const RequestsIndex = ({ requests, filters, onFilterChange }) => (
   </MainWithSidebar>
 )
 
-class RequestsIndexWithData extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      currentFilters: {
-        budgetPeriods: ['2292d02b-44cc-4342-8c76-0cc29ff7a92b']
-      }
-    }
-    this.onFilterChange = this.onFilterChange.bind(this)
-  }
-  onFilterChange(filters) {
-    this.setState({
-      currentFilters: { ...this.state.currentFilters, ...filters }
-    })
-  }
-  render({ state } = this) {
-    const filters = state.currentFilters
-    // FIXME: use real variables, not String interpolation!
-    const query = gql`
-    query RequestsIndex($budgetPeriods: [ID]) {
-      # for filterbar:
-      budget_periods {
-        id
-        name
-      }
-      # main index:
-      requests(budget_period_id: ${JSON.stringify(filters.budgetPeriods)}) {
-        ...RequestFieldsForIndex
-      }
-    }
-    ${Fragments.RequestFieldsForIndex}
-  `
-
-    const render = ({ loading, error, data }) => {
-      if (loading) return <Loading />
-      if (error) return <p>Error :(</p>
-
-      return (
-        <RequestsIndex
-          requests={data.requests}
-          filters={{ available: { budgetPeriods: data.budget_periods } }}
-          onFilterChange={this.onFilterChange}
-        />
-      )
-    }
-
-    return <Query query={query}>{render}</Query>
-  }
-}
-
-export default RequestsIndexWithData
+export default RequestsIndex

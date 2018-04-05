@@ -1,8 +1,6 @@
-// TODO: move all translations here (not FormField)
-
 import React from 'react'
 
-import t from './translate'
+import t from '../locale/translate'
 import Icon from './Icons'
 import {
   Row,
@@ -15,7 +13,7 @@ import {
 } from './Bootstrap'
 
 import { ControlledForm } from './ReactUtils'
-import { RequestTotalAmount as TotalAmount } from './AppUtils'
+import { RequestTotalAmount as TotalAmount } from './decorators'
 
 // dev
 // import ROOMS_JSON from 'rooms.json'

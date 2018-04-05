@@ -1,7 +1,6 @@
 import React, { Component, Fragment as F } from 'react'
 
 import Icon from './Icons'
-import RequestsIndex from './RequestsIndex'
 
 const TITLE = 'Bedarfsermittlung'
 
@@ -13,7 +12,7 @@ const Brand = () => (
 )
 
 class App extends Component {
-  render() {
+  render({ props: { children } } = this) {
     return (
       <F>
         <nav className="navbar navbar-dark bg-dark">
@@ -21,7 +20,7 @@ class App extends Component {
             <Brand />
           </span>
         </nav>
-        <RequestsIndex />
+        {children}
       </F>
     )
   }

@@ -1,13 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import './styles.css'
+import './styles/index.css'
 
-import App from './App'
+import App from './components/App'
 import registerServiceWorker from './registerServiceWorker'
 
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
+
+// no router, just 1 page:
+import RequestsIndex from './pages/RequestsIndex'
 
 const client = new ApolloClient({
   uri: '/graphql'
@@ -15,7 +18,9 @@ const client = new ApolloClient({
 
 const Root = () => (
   <ApolloProvider client={client}>
-    <App />
+    <App>
+      <RequestsIndex />
+    </App>
   </ApolloProvider>
 )
 ReactDOM.render(<Root />, document.getElementById('root'))

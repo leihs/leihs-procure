@@ -2,7 +2,6 @@ import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
-import t from './translate'
 import Icon from './Icons'
 
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
@@ -126,7 +125,6 @@ export const FormField = ({
 
   if (!id) id = name
   if (!name) name = id
-  if (!label) label = t(`field.${name}`)
 
   if (type === 'number-integer') {
     type = 'number'
@@ -185,10 +183,10 @@ export const FormField = ({
 //   </div>
 // )
 
-export const FilePicker = ({ id, name }) => (
+export const FilePicker = ({ id, name, label }) => (
   <div>
     <label className="btn btn-sm btn-block btn-flat btn-outline-secondary text-left">
-      <Icon.Paperclip /> {t('form_filepicker_label')}
+      <Icon.Paperclip /> {label}
       <input id={id} name={name} type="file" style={{ opacity: 0, width: 0 }} />
     </label>
   </div>

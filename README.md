@@ -1,3 +1,20 @@
+dirs
+
+```
+src/
+├── [main app stuff]
+├── components
+│   └── [UI components specific to this app]
+├── locale
+│   └── [translations etc]
+├── pages
+│   └── [Views / UI incl. Queries / things that a router routes to]
+└── styles
+    └── [CSS etc]
+```
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
