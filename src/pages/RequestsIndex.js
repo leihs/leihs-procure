@@ -28,8 +28,6 @@ class RequestsIndexWithData extends React.Component {
     })
   }
   render({ state } = this) {
-    const filters = state.currentFilters
-    // FIXME: use real variables, not String interpolation!
     const filtersQuery = gql`
       query RequestFilters {
         budget_periods {
@@ -42,7 +40,7 @@ class RequestsIndexWithData extends React.Component {
     const requestsQuery = gql`
       query RequestsIndexFiltered($budgetPeriods: [ID]) {
         # main index:
-        requests(budget_period_id: ${JSON.stringify(filters.budgetPeriods)}) {
+        requests(budget_period_id: $budgetPeriods) {
           ...RequestFieldsForIndex
         }
       }
@@ -53,7 +51,7 @@ class RequestsIndexWithData extends React.Component {
       <Query query={filtersQuery}>
         {filtersData => {
           return (
-            <Query query={requestsQuery}>
+            <Query query={requestsQuery} variables={state.currentFilters}>
               {requestsData => {
                 return (
                   <RequestsListFiltered
