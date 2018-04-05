@@ -29,14 +29,21 @@ export class ControlledForm extends React.Component {
   }
 
   handleInputChange(event) {
-    this.updateField(getFieldFromEvent(event))
+    this.updateField(getFieldFromEvent(event), fields => {
+      if (this.props.onChange) {
+        this.props.onChange(fields)
+      }
+    })
   }
 
-  updateField({ name, value }) {
-    this.setState(state => ({
-      ...state,
-      fields: { ...state.fields, [name]: value }
-    }))
+  updateField({ name, value }, callback) {
+    this.setState(
+      state => ({
+        ...state,
+        fields: { ...state.fields, [name]: value }
+      }),
+      () => callback(this.state.fields)
+    )
   }
 
   render({ props, state } = this) {

@@ -194,7 +194,7 @@ export const FilePicker = ({ id, name, label }) => (
 
 export const Select = ({
   options,
-  emptyOption = { children: '---' },
+  emptyOption = { children: '---', value: '' },
   ...props
 }) => {
   return (

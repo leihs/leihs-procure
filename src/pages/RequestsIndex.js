@@ -12,7 +12,7 @@ import RequestsListFiltered from '../components/RequestsListFiltered'
 // if, like in v1, the user's filter settings are persisted in DB
 // (bc the first query can get everything in 1 fetch)
 
-class RequestsIndexWithData extends React.Component {
+class RequestsIndexPage extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -23,9 +23,9 @@ class RequestsIndexWithData extends React.Component {
     this.onFilterChange = this.onFilterChange.bind(this)
   }
   onFilterChange(filters) {
-    this.setState({
-      currentFilters: { ...this.state.currentFilters, ...filters }
-    })
+    this.setState(state => ({
+      currentFilters: { ...state.filters, ...filters }
+    }))
   }
   render({ state } = this) {
     const filtersQuery = gql`
@@ -57,6 +57,7 @@ class RequestsIndexWithData extends React.Component {
                   <RequestsListFiltered
                     requests={requestsData}
                     filters={filtersData}
+                    currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
                   />
                 )
@@ -69,4 +70,4 @@ class RequestsIndexWithData extends React.Component {
   }
 }
 
-export default RequestsIndexWithData
+export default RequestsIndexPage
