@@ -90,14 +90,17 @@
   ([handler request]
    (cond
      ; accept json always goes to the backend handlers, i.e. the normal routing
-     (= (-> request :accept :mime) :json) (or (handler request)
-                                              (throw (ex-info "This resource does not provide a json response."
-                                                              {:status 406})))
+     (= (-> request :accept :mime) :json)
+     (or (handler request)
+         (throw (ex-info "This resource does not provide a json response."
+                         {:status 406})))
+
      ; accept HTML and GET (or HEAD) wants allmost always the frontend
      (and (= (-> request :accept :mime) :html)
           (#{:get :head} (:request-method request))
           (not (do-not-dispatch-to-std-frontend-handler-keys
                  (:handler-key request)))) (html/html-handler request)
+
      ; other request might need to go the backend and return frontend nevertheless
      :else (let [response (handler request)]
              (if (and (nil? response)
@@ -167,13 +170,14 @@
       dispatch-to-handler
       ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
+      ring-exception/wrap-for-graphql
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
       mock/wrap-set-authenticated-user ; auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
       wrap-empty
-      ; ring-exception/wrap
+      ring-exception/wrap ; why two times???
       (wrap-secret-byte-array secret)
       ; initial-admin/wrap
       ; settings/wrap
@@ -192,11 +196,11 @@
       ;                                  #".+_[0-9a-f]{40}\..+"]
       ;             :enabled? (= env/env :prod)})
       wrap-content-type
-      ; ring-exception/wrap
+      ring-exception/wrap ; why two times???
       ))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
-;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
+; (logging-config/set-logger! :level :info)
+; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)
