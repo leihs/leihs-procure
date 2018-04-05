@@ -11,7 +11,7 @@ function getFieldFromEvent({ target }) {
         ? target.selected
         : // text, number, etc:
           target.value
-  return { name, value }
+  return { name, value: value || null }
 }
 
 // state container to handle a flat form like in plain HTML.
@@ -20,12 +20,17 @@ function getFieldFromEvent({ target }) {
 // which will be called with the fields, a callback, and helper.
 // helper `formPropsFor` is recommended for normal usage,
 // `fields`, `connectFormProps`, `onChange` are given as well for customizations
-export class ControlledForm extends React.Component {
+export default class ControlledForm extends React.Component {
   constructor() {
     super()
     this.state = { fields: {} }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.values === prevState.fields) return null
+    return { fields: { ...prevState.fields, ...nextProps.values } }
   }
 
   handleInputChange(event) {
@@ -38,10 +43,7 @@ export class ControlledForm extends React.Component {
 
   updateField({ name, value }, callback) {
     this.setState(
-      state => ({
-        ...state,
-        fields: { ...state.fields, [name]: value }
-      }),
+      state => ({ fields: { ...state.fields, [name]: value } }),
       () => callback(this.state.fields)
     )
   }

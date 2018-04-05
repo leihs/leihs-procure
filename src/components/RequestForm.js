@@ -12,7 +12,7 @@ import {
   ButtonRadio
 } from './Bootstrap'
 
-import { ControlledForm } from './ReactUtils'
+import ControlledForm from './ControlledForm'
 import { RequestTotalAmount as TotalAmount } from './decorators'
 
 // dev

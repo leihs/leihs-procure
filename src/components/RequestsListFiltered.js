@@ -2,7 +2,7 @@ import React, { Fragment as F } from 'react'
 import f from 'lodash'
 
 import { FormField, Select } from './Bootstrap'
-import { ControlledForm } from './ReactUtils'
+import ControlledForm from './ControlledForm'
 import { MainWithSidebar } from './Layout'
 import Loading from './Loading'
 import RequestLine from './RequestLine'
@@ -35,6 +35,7 @@ const FilterBar = ({
             <FormField label={'Budgetperioden'}>
               <Select
                 {...formPropsFor('budgetPeriods')}
+                emptyOption={false}
                 options={f
                   .sortBy(available.budgetPeriods, 'name')
                   .map(({ id, name }) => ({ value: id, label: name }))}
