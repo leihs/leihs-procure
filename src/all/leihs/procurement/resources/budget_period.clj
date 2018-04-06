@@ -9,6 +9,10 @@
       (sql/where [:= :procurement_budget_periods.id id])
       sql/format))
 
+(defn get-budget-period [context _ value]
+  (first (jdbc/query (-> context :request :tx)
+                     (budget-period-query (:budget_period_id value)))))
+
 (defn get-budget-period-by-id [tx id]
   (first (jdbc/query tx (budget-period-query id))))
 

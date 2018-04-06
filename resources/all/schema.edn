@@ -6,6 +6,14 @@
                                    :inspection_start_date {:type String}
                                    :end_date {:type String}}}
 
+           :BudgetLimit {:fields {:id {:type ID}
+                                  :budget_period {:type :BudgetPeriod
+                                                  :resolve :budget_period}
+                                  :main_category {:type :MainCategory
+                                                  :resolve :main_category}
+                                  :amount_cents {:type (non-null Int)}
+                                  :amount_currency {:type String}}}
+
            :Building {:fields {:id {:type ID}
                                :name {:type String}}}
 
@@ -13,7 +21,9 @@
                                :name {:type String}}}
 
            :MainCategory {:fields {:id {:type ID}
-                                   :name {:type String}}}
+                                   :name {:type String}
+                                   :budget_limits {:type (list :BudgetLimit)
+                                                   :resolve :budget_limits}}}
 
            :Model {:fields {:id {:type ID}
                             :product {:type String}
@@ -72,7 +82,10 @@
                            :lastname {:type String}
                            :email {:type String}}}}
 
- :queries {:budget_periods {:type (list :BudgetPeriod)
+ :queries {:budget_limits {:type (list :BudgetLimit)
+                           :resolve :budget_limits}
+           
+           :budget_periods {:type (list :BudgetPeriod)
                             :resolve :budget_periods}
            
            :categories {:type (list :Category)

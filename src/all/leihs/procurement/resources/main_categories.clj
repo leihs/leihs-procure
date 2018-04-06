@@ -1,4 +1,4 @@
-(ns leihs.procurement.resources.main_categories
+(ns leihs.procurement.resources.main-categories
   (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sql]))
 
