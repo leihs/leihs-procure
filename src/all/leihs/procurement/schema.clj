@@ -4,8 +4,9 @@
     [clj-logging-config.log4j :as logging-config]
     [clojure.edn :as edn]
     [clojure.tools.logging :as logging]
-    [com.walmartlabs.lacinia.util :as util]
-    [com.walmartlabs.lacinia.schema :as schema]
+    [com.walmartlabs.lacinia.util :as graphql-util]
+    [com.walmartlabs.lacinia.resolve :as graphql-resolve]
+    [com.walmartlabs.lacinia.schema :as graphql-schema]
     [leihs.procurement.resources.attachments :as attachments]  
     [leihs.procurement.resources.budget-limits :as budget-limits]
     [leihs.procurement.resources.budget-period :as budget-period]
@@ -24,9 +25,23 @@
     [leihs.procurement.resources.rooms :as rooms]
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
+    [leihs.procurement.utils.ring-exception :refer [get-cause]]
     [logbug.debug :as debug]))
 
-(defn resolver-map []
+(defn wrap-resolver-with-error [resolver]
+  (fn [context args value]
+    (try
+      (resolver context args value)
+      (catch Throwable _e
+        (let [e (get-cause _e)
+              m (if (or (instance? clojure.lang.ExceptionInfo e)
+                        (instance? org.postgresql.util.PSQLException e))
+                  (.getMessage e)
+                  "Unclassified error, see the server logs for details.")]
+          (logging/warn m)
+          (graphql-resolve/resolve-as value {:message m}))))))
+
+(def resolver-map
   {:attachments attachments/get-attachments
    :budget_limits budget-limits/get-budget-limits
    :budget_period budget-period/get-budget-period
@@ -46,12 +61,15 @@
    :supplier supplier/get-supplier
    :user user/get-user})
 
+(defn- wrap-map-with-error [arg]
+  (into {} (for [[k v] arg] [k (wrap-resolver-with-error v)])))
+
 (defn load-schema []
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (util/attach-resolvers (resolver-map))
-      schema/compile))
+      (graphql-util/attach-resolvers (wrap-map-with-error resolver-map))
+      graphql-schema/compile))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

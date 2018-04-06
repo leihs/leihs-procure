@@ -170,7 +170,6 @@
       dispatch-to-handler
       ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
-      ring-exception/wrap-for-graphql
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
