@@ -8,9 +8,9 @@
 
            :BudgetLimit {:fields {:id {:type ID}
                                   :budget_period {:type :BudgetPeriod
-                                                  :resolve :budget_period}
+                                                  :resolve :budget-period}
                                   :main_category {:type :MainCategory
-                                                  :resolve :main_category}
+                                                  :resolve :main-category}
                                   :amount_cents {:type (non-null Int)}
                                   :amount_currency {:type String}}}
 
@@ -20,10 +20,13 @@
            :Category {:fields {:id {:type ID}
                                :name {:type String}}}
 
+           :CurrentUser {:fields {:user {:type :User}
+                                  :saved_filters {:type :SavedFilters}}}
+
            :MainCategory {:fields {:id {:type ID}
                                    :name {:type String}
                                    :budget_limits {:type (list :BudgetLimit)
-                                                   :resolve :budget_limits}}}
+                                                   :resolve :budget-limits}}}
 
            :Model {:fields {:id {:type ID}
                             :product {:type String}
@@ -74,26 +77,41 @@
                                       :resolve :building}
                            :name {:type String}}}
 
+           :SavedFilters {:fields {:sort_by {:type String}
+                                   :sort_dir {:type String}
+                                   :search {:type String}
+                                   :category_ids {:type (list ID)}
+                                   :categories_with_requests {:type Boolean}
+                                   :organization_ids {:type (list ID)}
+                                   :priorities {:type (list String)}
+                                   :inspector_priorities {:type (list String)}
+                                   :states {:type (list String)}
+                                   :budget_period_ids {:type (list ID)}}}
+
            :Supplier {:fields {:id {:type ID}
                                :name {:type String}}}
 
            :User {:fields {:id {:type ID}
+                           :email {:type String}
                            :firstname {:type String}
                            :lastname {:type String}
-                           :email {:type String}}}}
+                           :login {:type String}}}}
 
  :queries {:budget_limits {:type (list :BudgetLimit)
-                           :resolve :budget_limits}
+                           :resolve :budget-limits}
            
            :budget_periods {:type (list :BudgetPeriod)
-                            :resolve :budget_periods}
+                            :resolve :budget-periods}
            
            :categories {:type (list :Category)
                         :args {:inspected_by_auth_user {:type Boolean}}
                         :resolve :categories}
+
+           :current_user {:type :CurrentUser
+                          :resolve :current-user}
            
            :main_categories {:type (list :MainCategory)
-                             :resolve :main_categories}
+                             :resolve :main-categories}
 
            :organizations {:type (list :Organization)
                            :resolve :organizations}
