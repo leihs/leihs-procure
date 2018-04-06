@@ -75,8 +75,11 @@
         ))))
 
 (defn get-requests [context arguments value]
+  (if (some #(= (% arguments) [])
+            [:budget_period_id :category_id :organization_id :user_id])
+    []
     (jdbc/query (-> context :request :tx)
-                (debug/identity-with-logging (requests-query context arguments value))))
+                (requests-query context arguments value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
