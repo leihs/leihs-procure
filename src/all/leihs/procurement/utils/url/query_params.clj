@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [str keyword encode decode])
   (:require
     [leihs.procurement.utils.core :refer [keyword str presence]]
+    cheshire.core
     [clojure.walk :refer [keywordize-keys]]
     [clojure.string :as string]
     [leihs.procurement.utils.url.shared :as shared]

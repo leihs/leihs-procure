@@ -3,6 +3,7 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
+    [leihs.procurement.auth.core :as auth]
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
@@ -166,14 +167,21 @@
     (handler (assoc request :secret-ba (.getBytes secret)))))
 
 (defn init [secret]
-  (I> wrap-handler-with-logging
+  (-> ; wrap-handler-with-logging
       dispatch-to-handler
       ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
-      mock/wrap-set-authenticated-user ; auth/wrap-authenticate
+      mock/wrap-set-authenticated-user
+      ; ========================================================================================
+      ; THROWABLE: java.lang.IllegalArgumentException: No implementation of method:
+      ; :compute-sha2561282 of protocol: #'pandect.algo.sha256/G__1285 found for class:
+      ; nil[("leihs.procurement.auth.session$session_cookie_value.invokeStatic (session.clj:69)"
+      ;
+      ; auth/wrap-authenticate
+      ; ========================================================================================
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       ring-exception/wrap ; why two times???
@@ -196,10 +204,11 @@
       ;             :enabled? (= env/env :prod)})
       wrap-content-type
       ring-exception/wrap ; why two times???
+      wrap-handler-with-logging
       ))
 
 ;#### debug ###################################################################
-; (logging-config/set-logger! :level :debug)
+(logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)
