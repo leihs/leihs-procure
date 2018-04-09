@@ -26,6 +26,7 @@
     [ring.middleware.cookies]
     [ring.middleware.json]
     [ring.middleware.params]
+    [ring.middleware.reload :refer [wrap-reload]]
     [ring.util.response :refer [redirect]]
     [ring-graphql-ui.core :refer [wrap-graphiql]]
 
@@ -166,9 +167,11 @@
   (fn [request]
     (handler (assoc request :secret-ba (.getBytes secret)))))
 
+(defn wrap-reload-if-dev-env [handler]
+  (cond-> handler (= env/env :dev) (wrap-reload {:dirs ["src" "resources"]})))
+
 (defn init [secret]
-  (-> ; wrap-handler-with-logging
-      dispatch-to-handler
+  (-> dispatch-to-handler
       ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
@@ -204,6 +207,7 @@
       ;             :enabled? (= env/env :prod)})
       wrap-content-type
       ring-exception/wrap ; why two times???
+      wrap-reload-if-dev-env
       ))
 
 ;#### debug ###################################################################
