@@ -10,10 +10,9 @@
     ))
 
 (defn get-current-user [{request :request} _ _]
-  (logging/debug "TEST")
-  (let [user (debug/identity-with-logging (-> request :authenticated-entity))
+  (let [user (-> request :authenticated-entity)
         saved-filters (saved-filters/get-saved-filters-by-user-id (:tx request) (:id user))]
-    {:user user, :saved_filters saved-filters}))
+    {:user user, :saved_filters (:filter saved-filters)}))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

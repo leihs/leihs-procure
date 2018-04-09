@@ -204,11 +204,10 @@
       ;             :enabled? (= env/env :prod)})
       wrap-content-type
       ring-exception/wrap ; why two times???
-      wrap-handler-with-logging
       ))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

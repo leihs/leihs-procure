@@ -42,7 +42,8 @@
           (logging/warn m)
           (graphql-resolve/resolve-as value {:message m}))))))
 
-(def resolver-map
+; a function for debugging convenience. will be a var later.
+(defn resolver-map []
   {:attachments attachments/get-attachments
    :budget-limits budget-limits/get-budget-limits
    :budget-period budget-period/get-budget-period
@@ -70,7 +71,7 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (graphql-util/attach-resolvers (wrap-map-with-error resolver-map))
+      (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
       graphql-schema/compile))
 
 ;#### debug ###################################################################
