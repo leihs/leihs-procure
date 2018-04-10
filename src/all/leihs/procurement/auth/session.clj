@@ -32,7 +32,8 @@
 
 (defn user-with-valid-session-query [token]
   (-> (sql/select [:users.id :user_id]
-                  :is_admin :sign_in_enabled :firstname :lastname :email
+                  :is_admin :sign_in_enabled
+                  :firstname :lastname :email
                   [:user_sessions.id :user_session_id]
                   [:user_sessions.created_at :user_session_created_at])
       (sql/from :users)
@@ -46,7 +47,7 @@
       (sql/merge-where
         (sql/raw (str "now() < user_sessions.created_at + "
                       " settings.sessions_max_lifetime_secs * interval '1 second'")))
-      (sql/merge-where [:= :sign_in_enabled true])
+      ; (sql/merge-where [:= :sign_in_enabled true])
       sql/format))
 
 (defn user-auth-entity! [token]
@@ -61,6 +62,7 @@
     (throw (IllegalStateException. (str "No valid user session found!")))))
 
 (defn session-cookie-value [request]
+  (logging/debug (-> request :cookies))
   (when-let [cookie (-> request :cookies
                         (get USER_SESSION_COOKIE_NAME nil) :value)]
     (decrypt (-> request :secret-ba String.) cookie)))
@@ -106,7 +108,7 @@
     (authenticate request handler)))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns 'cider-ci.open-session.encryptor)

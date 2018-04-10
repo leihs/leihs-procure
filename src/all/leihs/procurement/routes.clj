@@ -177,14 +177,13 @@
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
-      mock/wrap-set-authenticated-user
-      ; ========================================================================================
-      ; THROWABLE: java.lang.IllegalArgumentException: No implementation of method:
-      ; :compute-sha2561282 of protocol: #'pandect.algo.sha256/G__1285 found for class:
-      ; nil[("leihs.procurement.auth.session$session_cookie_value.invokeStatic (session.clj:69)"
-      ;
+      ; ====================================================
+      ; NOTE: should work after merge of leihs-admin
       ; auth/wrap-authenticate
-      ; ========================================================================================
+      ;
+      ; for the time being:
+      mock/wrap-set-authenticated-user
+      ; ====================================================
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       ring-exception/wrap ; why two times???

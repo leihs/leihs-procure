@@ -1,6 +1,6 @@
 (ns leihs.procurement.constants)
 
-(def USER_SESSION_COOKIE_NAME "_leihs_session")
+(def USER_SESSION_COOKIE_NAME "leihs-user-session")
 (def ANTI_CRSF_TOKEN_COOKIE_NAME "leihs-anti-csrf-token")
 
 (def HTTP_UNSAVE_METHODS #{:delete :patch :post :put})
