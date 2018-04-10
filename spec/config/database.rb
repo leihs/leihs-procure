@@ -21,10 +21,10 @@ def clean_db
 end
 
 RSpec.configure do |config|
-  config.before :each  do
+  config.before(:example)  do
     clean_db
   end
-  config.after :suite do
+  config.after(:suite) do
     clean_db
   end
 end
