@@ -8,6 +8,7 @@
 
     [clojure.java.jdbc :as jdbc]
     [clojure.walk :refer [keywordize-keys]]
+    [pandect.core]
 
     [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
