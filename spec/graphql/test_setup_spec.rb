@@ -10,5 +10,7 @@ describe 'test setup' do
         }
       }
     GRAPHQL
+    request = FactoryBot.create(:request)
+    binding.pry
   end
 end
