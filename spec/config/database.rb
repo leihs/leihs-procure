@@ -1,7 +1,5 @@
-module Config
-  module Database
-    def database
-      Sequel.postgres(host: 'localhost', database: 'leihs_test')
-    end
-  end
+require 'sequel'
+
+def database
+  Sequel.postgres(host: 'localhost', database: 'leihs_test')
 end
