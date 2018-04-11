@@ -2,7 +2,7 @@ require 'graphlient'
 
 RSpec.shared_context 'graphql client' do
   let(:graphql_client) do
-    Graphlient::Client.new('http://localhost:3333/procure/graphql')
+    Graphlient::Client.new(ENV['LEIHS_HTTP_BASE_URL'])
   end
 end
 
