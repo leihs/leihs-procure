@@ -12,6 +12,7 @@
     [leihs.procurement.mock :as mock]
     ; ===============================
     [leihs.procurement.paths :refer [path paths]]
+    [leihs.procurement.status :as status]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
     [leihs.procurement.utils.json-protocol]
@@ -53,8 +54,8 @@
     :auth-shib-sign-in})
 
 (def handler-resolve-table
-  {
-   :graphql graphql/handler
+  {:graphql graphql/handler
+   :status status/routes
 
    ; :auth auth/routes
    ; :auth-password-sign-in auth/routes

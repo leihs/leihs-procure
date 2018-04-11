@@ -18,21 +18,22 @@
     [logbug.thrown :as thrown]
     ))
 
-(defn include-site-css []
-  (hiccup.page/include-css
-    (cache-buster/cache-busted-path "/procurement/css/site.css")))
+; (defn include-site-css []
+;   (hiccup.page/include-css
+;     (cache-buster/cache-busted-path "/procurement/css/site.css")))
 
-(defn include-font-css []
-  (hiccup.page/include-css
-    "/procurement/css/fontawesome-free-5.0.1//css/fontawesome-all.css"))
+; (defn include-font-css []
+;   (hiccup.page/include-css
+;     "/procurement/css/fontawesome-free-5.0.1//css/fontawesome-all.css"))
 
 (defn head []
   [:head
    [:meta {:charset "utf-8"}]
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1, shrink-to-fit=no"}]
-   (include-site-css)
-   (include-font-css)])
+   ; (include-site-css)
+   ; (include-font-css)
+   ])
 
 (defn user-data [request]
   (url/encode
@@ -70,10 +71,11 @@
              :data-settings (settings-data request)}
             [:div#app.container-fluid
              [:div.alert.alert-warning
-              [:h1 "Leihs Procurement2"]
-              [:p "This application requires Javascript."]]]
-            (hiccup.page/include-js
-              (cache-buster/cache-busted-path "/procurement/js/app.js"))])})
+              [:h1 "Leihs Procurement 2"]
+              [:p "OK"]]]
+            ; (hiccup.page/include-js
+            ;   (cache-buster/cache-busted-path "/procurement/js/app.js"))
+            ])})
 
 
 ;#### debug ###################################################################

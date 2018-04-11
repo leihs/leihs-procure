@@ -16,7 +16,8 @@
 (def paths
   (branch ""
           (branch "/procure"
-                  (leaf "/graphql" :graphql))
+                  (leaf "/graphql" :graphql)
+                  (leaf "/status" :status))
           ; (leaf "/" :leihs)
           ; (branch "/auth"
           ;         (leaf "" :auth)
