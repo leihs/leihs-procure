@@ -1,3 +1,4 @@
+require 'addressable'
 require 'sequel'
 
 def database
@@ -13,7 +14,7 @@ def database
         + '/' + ( http_uri.path.presence.try(:gsub,/^\//,'') || ENV['PGDATABASE'].presence || 'leihs') \
         + '?pool=5'
     else
-      'postgresql://localhost:5432/leihs_test?pool=5'
+      'postgresql://leihs:leihs@localhost:5432/leihs?pool=5'
     end
   )
 end
