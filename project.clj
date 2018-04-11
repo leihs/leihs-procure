@@ -64,5 +64,8 @@
   :profiles {:dev {:source-paths ["src/all" "src/dev"]
                    :resource-paths ["resources/all" "resources/dev"]
                    :env {:dev true}
-                   }}
+             :uberjar {:source-paths ["src/all" "src/prod"]
+                       :resource-paths ["resources/all" "resources/prod"]
+                       :aot [#"leihs\..*"]
+                       :uberjar-name "leihs-procurement.jar"}}}
   )
