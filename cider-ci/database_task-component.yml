@@ -19,6 +19,6 @@ scripts:
       set -eux
       dropdb "$DATABASE_NAME"
     start_when:
-      test is terminal:
-        script_key: test
+      shutdown server is in terminal state:
+        script_key: shutdown-server
         states: [aborted, defective, passed, failed, skipped]

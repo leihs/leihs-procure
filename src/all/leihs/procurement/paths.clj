@@ -17,6 +17,7 @@
   (branch ""
           (branch "/procure"
                   (leaf "/graphql" :graphql)
+                  (leaf "/shutdown" :shutdown)
                   (leaf "/status" :status))
           ; (leaf "/" :leihs)
           ; (branch "/auth"

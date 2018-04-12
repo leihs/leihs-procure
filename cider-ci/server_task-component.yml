@@ -23,3 +23,14 @@ scripts:
     start_when:
       server is running:
         script_key: server-is-running
+
+  shutdown-server:
+    body: |
+      # TODO: -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
+      until curl --silent --fail -X POST -I http://localhost:${LEIHS_PROCUREMENT_HTTP_PORT}/procure/shutdown;
+        do sleep 1;
+      done
+    start_when:
+      test is terminal:
+        script_key: test
+        states: [aborted, defective, passed, failed, skipped]

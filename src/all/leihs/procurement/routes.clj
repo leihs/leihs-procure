@@ -12,6 +12,7 @@
     [leihs.procurement.mock :as mock]
     ; ===============================
     [leihs.procurement.paths :refer [path paths]]
+    [leihs.procurement.shutdown :as shutdown]
     [leihs.procurement.status :as status]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
@@ -55,6 +56,7 @@
 
 (def handler-resolve-table
   {:graphql graphql/handler
+   :shutdown shutdown/routes
    :status status/routes
 
    ; :auth auth/routes
