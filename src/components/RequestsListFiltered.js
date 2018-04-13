@@ -21,7 +21,10 @@ const FilterBar = ({
       </div>
     )
 
-  const available = { budgetPeriods: data.budget_periods }
+  const available = {
+    budgetPeriods: data.budget_periods,
+    categories: data.categories
+  }
 
   return (
     <div className="pt-2">
@@ -32,15 +35,26 @@ const FilterBar = ({
         onChange={onFilterChange}
         render={({ formPropsFor }) => {
           return (
-            <FormField label={'Budgetperioden'}>
-              <Select
-                {...formPropsFor('budgetPeriods')}
-                emptyOption={false}
-                options={f
-                  .sortBy(available.budgetPeriods, 'name')
-                  .map(({ id, name }) => ({ value: id, label: name }))}
-              />
-            </FormField>
+            <F>
+              <FormField label={'Budgetperioden'}>
+                <Select
+                  {...formPropsFor('budgetPeriods')}
+                  emptyOption={false}
+                  options={f
+                    .sortBy(available.budgetPeriods, 'name')
+                    .map(({ id, name }) => ({ value: id, label: name }))}
+                />
+              </FormField>
+              <FormField label={'Kategorien'}>
+                <Select
+                  {...formPropsFor('categories')}
+                  emptyOption={false}
+                  options={f
+                    .sortBy(available.categories, 'name')
+                    .map(({ id, name }) => ({ value: id, label: name }))}
+                />
+              </FormField>
+            </F>
           )
         }}
       />

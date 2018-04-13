@@ -43,13 +43,18 @@ const FILTERS_QUERY = gql`
       id
       name
     }
+    categories {
+      id
+      name
+      # TODO: main_category
+    }
   }
 `
 
 const REQUESTS_QUERY = gql`
-  query RequestsIndexFiltered($budgetPeriods: [ID]) {
+  query RequestsIndexFiltered($budgetPeriods: [ID], $categories: [ID]) {
     # main index:
-    requests(budget_period_id: $budgetPeriods) {
+    requests(budget_period_id: $budgetPeriods, category_id: $categories) {
       ...RequestFieldsForIndex
     }
   }
@@ -61,7 +66,8 @@ class RequestsIndexPage extends React.Component {
     super()
     this.state = {
       currentFilters: {
-        budgetPeriods: ['2292d02b-44cc-4342-8c76-0cc29ff7a92b']
+        budgetPeriods: [],
+        categories: []
       }
     }
     this.onFilterChange = this.onFilterChange.bind(this)
