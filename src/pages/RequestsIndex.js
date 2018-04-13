@@ -3,7 +3,7 @@ import React from 'react'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import * as Fragments from '../GraphQlFragments'
+import * as Fragments from '../queries/fragments'
 import RequestsListFiltered from '../components/RequestsListFiltered'
 
 // NOTE: there are 2 separate queries for filterbar and request list.
@@ -11,6 +11,50 @@ import RequestsListFiltered from '../components/RequestsListFiltered'
 // will revisit when setup is complete – could be a non-problem in the end,
 // if, like in v1, the user's filter settings are persisted in DB
 // (bc the first query can get everything in 1 fetch)
+
+export const CURRENT_USER_QUERY = gql`
+  query CurrentUser {
+    CurrentUser {
+      user {
+        id
+        login
+        firstname
+        lastname
+      }
+      savedFilters {
+        sort_by
+        sort_dir
+        search
+        category_ids
+        categories_with_requests
+        organization_ids
+        priorities
+        inspector_priorities
+        states
+        budget_period_ids
+      }
+    }
+  }
+`
+
+const FILTERS_QUERY = gql`
+  query RequestFilters {
+    budget_periods {
+      id
+      name
+    }
+  }
+`
+
+const REQUESTS_QUERY = gql`
+  query RequestsIndexFiltered($budgetPeriods: [ID]) {
+    # main index:
+    requests(budget_period_id: $budgetPeriods) {
+      ...RequestFieldsForIndex
+    }
+  }
+  ${Fragments.RequestFieldsForIndex}
+`
 
 class RequestsIndexPage extends React.Component {
   constructor() {
@@ -28,30 +72,11 @@ class RequestsIndexPage extends React.Component {
     }))
   }
   render({ state } = this) {
-    const filtersQuery = gql`
-      query RequestFilters {
-        budget_periods {
-          id
-          name
-        }
-      }
-    `
-
-    const requestsQuery = gql`
-      query RequestsIndexFiltered($budgetPeriods: [ID]) {
-        # main index:
-        requests(budget_period_id: $budgetPeriods) {
-          ...RequestFieldsForIndex
-        }
-      }
-      ${Fragments.RequestFieldsForIndex}
-    `
-
     return (
-      <Query query={filtersQuery}>
+      <Query query={FILTERS_QUERY}>
         {filtersData => {
           return (
-            <Query query={requestsQuery} variables={state.currentFilters}>
+            <Query query={REQUESTS_QUERY} variables={state.currentFilters}>
               {requestsData => {
                 return (
                   <RequestsListFiltered
