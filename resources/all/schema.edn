@@ -49,7 +49,8 @@
                               :article_number {:type String}
                               :attachments {:type (list :Attachment)
                                             :resolve :attachments}
-                              :budget_period_id {:type ID}
+                              :budget_period {:type :BudgetPeriod
+                                              :resolve :budget-period}
                               :category {:type :Category
                                          :resolve :category}
                               :inspection_comment {:type String}
