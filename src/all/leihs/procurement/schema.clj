@@ -18,6 +18,7 @@
     [leihs.procurement.resources.main-category :as main-category]
     [leihs.procurement.resources.main-categories :as main-categories]
     [leihs.procurement.resources.model :as model]
+    [leihs.procurement.resources.organization :as organization]
     [leihs.procurement.resources.organizations :as organizations]
     [leihs.procurement.resources.request :as request]
     [leihs.procurement.resources.request-fields :as request-fields]
@@ -55,6 +56,7 @@
    :main-category main-category/get-main-category
    :main-categories main-categories/get-main-categories
    :model model/get-model
+   :organization organization/get-organization
    :organizations organizations/get-organizations
    :request-by-id request/get-request
    :requests requests/get-requests

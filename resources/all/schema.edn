@@ -59,7 +59,8 @@
                                       :resolve :model}
                               :motivation {:type String}
                               :order_quantity {:type Int}
-                              :organization_id {:type ID}
+                              :organization {:type :Organization
+                                             :resolve :organization}
                               :priority {:type String}
                               :receiver {:type String}
                               :price_cents {:type (non-null Int)}
