@@ -58,6 +58,8 @@
    :model model/get-model
    :organization organization/get-organization
    :organizations organizations/get-organizations
+   :priorities (fn [_ _ _] [0 1])
+   :priorities_inspector (fn [_ _ _] [0 1 2 3])
    :request-by-id request/get-request
    :requests requests/get-requests
    :request-fields-by-id request-fields/get-request-fields

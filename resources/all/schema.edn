@@ -61,7 +61,8 @@
                               :order_quantity {:type Int}
                               :organization {:type :Organization
                                              :resolve :organization}
-                              :priority {:type String}
+                              :priority {:type Int}
+                              :priority_inspector {:type Int}
                               :receiver {:type String}
                               :price_cents {:type (non-null Int)}
                               :price_currency {:type String}
@@ -99,44 +100,50 @@
                            :lastname {:type String}
                            :login {:type String}}}}
 
- :queries {:budget_limits {:type (list :BudgetLimit)
-                           :resolve :budget-limits}
-           
-           :budget_periods {:type (list :BudgetPeriod)
-                            :resolve :budget-periods}
-           
-           :categories {:type (list :Category)
-                        :args {:inspected_by_auth_user {:type Boolean}}
-                        :resolve :categories}
+:queries {:budget_limits {:type (list :BudgetLimit)
+                          :resolve :budget-limits}
 
-           :current_user {:type :CurrentUser
-                          :resolve :current-user}
-           
-           :main_categories {:type (list :MainCategory)
-                             :resolve :main-categories}
+          :budget_periods {:type (list :BudgetPeriod)
+                           :resolve :budget-periods}
 
-           :organizations {:type (list :Organization)
-                           :resolve :organizations}
+          :categories {:type (list :Category)
+                       :args {:inspected_by_auth_user {:type Boolean}}
+                       :resolve :categories}
 
-           :request_by_id {:type :Request
-                           :args {:id {:type ID}}
-                           :resolve :request-by-id}
+          :current_user {:type :CurrentUser
+                         :resolve :current-user}
 
-           :requests {:type (list :Request)
-                      :args {:requested_by_auth_user {:type Boolean}
-                             :from_categories_of_auth_user {:type Boolean}
-                             :category_id {:type (list ID)}
-                             :budget_period_id {:type (list ID)}
-                             :organization_id {:type (list ID)}
-                             :priority {:type (list String)}
-                             :inspectory_priority {:type (list String)}
-                             :state {:type (list String)}}
-                      :resolve :requests}
+          :main_categories {:type (list :MainCategory)
+                            :resolve :main-categories}
 
-           :request_fields_by_id {:type (list :RequestField)
-                                  :args {:request_id {:type ID}}
-                                  :resolve :request-fields-by-id}
-           
-           :rooms {:type (list :Room)
-                   :args {:building_id {:type ID}}
-                   :resolve :rooms}}}
+          :organizations {:type (list :Organization)
+                          :resolve :organizations}
+
+          :priorities {:type (list Int)
+                       :resolve :priorities}
+
+          :priorities_inspector {:type (list Int)
+                                 :resolve :priorities_inspector}
+
+          :request_by_id {:type :Request
+                          :args {:id {:type ID}}
+                          :resolve :request-by-id}
+
+          :requests {:type (list :Request)
+                     :args {:requested_by_auth_user {:type Boolean}
+                            :from_categories_of_auth_user {:type Boolean}
+                            :category_id {:type (list ID)}
+                            :budget_period_id {:type (list ID)}
+                            :organization_id {:type (list ID)}
+                            :priority {:type (list String)}
+                            :inspectory_priority {:type (list String)}
+                            :state {:type (list String)}}
+                     :resolve :requests}
+
+          :request_fields_by_id {:type (list :RequestField)
+                                 :args {:request_id {:type ID}}
+                                 :resolve :request-fields-by-id}
+
+          :rooms {:type (list :Room)
+                  :args {:building_id {:type ID}}
+                  :resolve :rooms}}}
