@@ -8,8 +8,7 @@ feature 'Sign in via shibboleth routes' do
 
   before :each do
     @user = FactoryBot.create :admin
-    http_client.get "/" # causes the settings to be created with defaults
-    database[:settings].update(shibboleth_enabled: true)
+    database[:settings].insert(shibboleth_enabled: true)
   end
 
   let :sign_in_response do

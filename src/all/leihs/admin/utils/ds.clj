@@ -103,14 +103,20 @@
                (or (:max-idle-time-exess-connections db-conf) (* 10 60)))
              )}))
 
-
 (defn wrap-tx [handler]
   (fn [request]
     (jdbc/with-db-transaction [tx @ds]
-      (handler (assoc request :tx tx))
-      ;TODO insert important request properties, tx id, and user id to
-      ; `requests` for mutating requests
-      )))
+      (try 
+        (let [resp (handler (assoc request :tx tx))]
+          (when-let [status (:status resp)]
+            (when (>= status 400 )
+              (logging/warn "Rolling back transaction because error status " status)
+              (jdbc/db-set-rollback-only! tx)))
+          resp)
+        (catch Throwable th
+          (logging/warn "Rolling back transaction because of " th)
+          (jdbc/db-set-rollback-only! tx)
+          (throw th))))))
 
 (defn init [params]
   (when @ds

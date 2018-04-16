@@ -203,15 +203,15 @@
       auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
       wrap-empty
-      ring-exception/wrap
       (wrap-secret-byte-array secret)
       initial-admin/wrap
       settings/wrap
-      ds/wrap-tx
       wrap-accept
       wrap-resolve-handler
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
+      wrap-content-type
+      ds/wrap-tx
       (wrap-resource
         "public" {:allow-symlinks? true
                   :cache-bust-paths ["/admin/css/site.css"
@@ -220,7 +220,6 @@
                   :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
                   :enabled? (= env/env :prod)})
-      wrap-content-type
       ring-exception/wrap))
 
 ;#### debug ###################################################################
