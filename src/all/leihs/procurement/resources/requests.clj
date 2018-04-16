@@ -3,24 +3,12 @@
     [clj-logging-config.log4j :as logging-config]
     [clojure.java.jdbc :as jdbc]
     [clojure.tools.logging :as logging]
+    [leihs.procurement.resources.request :as request]
     [leihs.procurement.utils.sql :as sql]
     [logbug.debug :as debug]))
 
-(def state-sql
-  (sql/call :case
-            [:= :procurement_requests.approved_quantity nil]
-            "new"
-            [:= :procurement_requests.approved_quantity 0]
-            "denied"
-            [:and
-             [:< 0 :procurement_requests.approved_quantity]
-             [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity]]
-            "partially_approved"
-            [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity]
-            "approved"))
-
 (def requests-base-query
-  (-> (sql/select :procurement_requests.* [state-sql :state])
+  (-> (sql/select :procurement_requests.* [request/state-sql :state])
       (sql/from :procurement_requests)))
 
 (defn requests-query [context arguments _]
@@ -55,7 +43,7 @@
           [:in :procurement_requests.inspector_priority inspector-priority])
 
         (not (empty? state))
-        (sql/merge-where [:in state-sql state])
+        (sql/merge-where [:in request/state-sql state])
 
         requested-by-auth-user
         (sql/merge-where
@@ -79,7 +67,8 @@
             [:budget_period_id :category_id :organization_id :user_id])
     []
     (jdbc/query (-> context :request :tx)
-                (requests-query context arguments value))))
+                (requests-query context arguments value)
+                {:row-fn request/row-fn})))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
