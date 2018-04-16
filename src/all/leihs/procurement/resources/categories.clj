@@ -8,10 +8,15 @@
   (-> (sql/select :procurement_categories.*)
       (sql/from :procurement_categories)))
 
-(defn categories-query [context arguments _]
-  (let [inspected-by-auth-user (:inspected_by_auth_user arguments)]
+(defn categories-query [context arguments value]
+  (let [inspected-by-auth-user (:inspected_by_auth_user arguments)
+        main-category-id (:main_category_id value)]
     (sql/format
       (cond-> categories-base-query
+        main-category-id
+        (sql/merge-where [:=
+                          :procurement_categories.main_category_id
+                          main-category-id])
         inspected-by-auth-user
         (->
           (sql/merge-join :procurement_category_inspectors
