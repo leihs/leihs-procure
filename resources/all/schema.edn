@@ -37,7 +37,9 @@
            :Organization {:fields {:id {:type ID}
                                    :name {:type String}
                                    :shortname {:type String}
-                                   :parent_id {:type ID}}}
+                                   :parent_id {:type ID}
+                                   :organizations {:type (list :Organization)
+                                                   :resolve :organizations}}}
 
            :RequestField {:fields {:name {:type String}
                                    :value {:type String}
@@ -119,6 +121,7 @@
                             :resolve :main-categories}
 
           :organizations {:type (list :Organization)
+                          :args {:root_only {:type Boolean}}
                           :resolve :organizations}
 
           :priorities {:type (list Int)
