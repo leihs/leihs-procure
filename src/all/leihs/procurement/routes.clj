@@ -189,7 +189,6 @@
       ; ====================================================
       ring.middleware.cookies/wrap-cookies
       wrap-empty
-      ring-exception/wrap ; why two times???
       (wrap-secret-byte-array secret)
       ; initial-admin/wrap
       ; settings/wrap
@@ -199,6 +198,8 @@
       (wrap-graphiql {:path "/procure/graphiql" :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
+      wrap-content-type
+      ds/wrap-tx
       ; (wrap-resource
       ;   "public" {:allow-symlinks? true
       ;             :cache-bust-paths ["/admin/css/site.css"
@@ -207,8 +208,7 @@
       ;             :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
       ;                                  #".+_[0-9a-f]{40}\..+"]
       ;             :enabled? (= env/env :prod)})
-      wrap-content-type
-      ring-exception/wrap ; why two times???
+      ring-exception/wrap
       wrap-reload-if-dev-env
       ))
 
