@@ -11,6 +11,25 @@
   (-> (sql/select :procurement_requests.* [request/state-sql :state])
       (sql/from :procurement_requests)))
 
+(defn search-query [sql-query term]
+  (let [term-percent (str "%" term "%")]
+    (-> sql-query
+        (sql/merge-join :rooms [:= :procurement_requests.room_id :rooms.id])
+        (sql/merge-join :buildings [:= :rooms.building_id :buildings.id])
+        (sql/merge-join :users [:= :procurement_requests.user_id :users.id])
+        (sql/merge-where [:or
+                          ["~~*" :buildings.name term-percent]
+                          ["~~*" :procurement_requests.article_name term-percent]
+                          ["~~*" :procurement_requests.article_number term-percent]
+                          ["~~*" :procurement_requests.inspection_comment term-percent]
+                          ["~~*" :procurement_requests.motivation term-percent]
+                          ["~~*" :procurement_requests.receiver term-percent]
+                          ["~~*" :procurement_requests.supplier_name term-percent]
+                          ["~~*" :rooms.name term-percent]
+                          ["~~*" :users.firstname term-percent]
+                          ["~~*" :users.lastname term-percent]
+                          ]))))
+
 (defn requests-query [context arguments _]
   (let [category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
@@ -19,7 +38,8 @@
         inspector-priority (:inspector_priority arguments)
         requested-by-auth-user (:requested_by_auth_user arguments)
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
-        state (:state arguments)]
+        state (:state arguments)
+        search-term (:search arguments)]
     (sql/format
       (cond-> requests-base-query
         (not (empty? category-id))
@@ -60,6 +80,9 @@
                (sql/merge-where [:=
                                  :procurement_category_inspectors.user_id
                                  (-> context :request :authenticated-entity :id)]))])
+
+        search-term
+        (search-query search-term)
         ))))
 
 (defn get-requests [context arguments value]

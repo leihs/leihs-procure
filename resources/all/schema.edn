@@ -76,6 +76,7 @@
                               :state {:type String}
                               :supplier {:type :Supplier
                                          :resolve :supplier}
+                              :supplier_name {:type String}
                               :user {:type :User
                                      :resolve :user}}}
 
@@ -142,6 +143,7 @@
                             :organization_id {:type (list ID)}
                             :priority {:type (list String)}
                             :inspectory_priority {:type (list String)}
+                            :search {:type String}
                             :state {:type (list String)}}
                      :resolve :requests}
 
