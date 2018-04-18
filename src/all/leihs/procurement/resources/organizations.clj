@@ -28,6 +28,36 @@
   (jdbc/query (-> context :request :tx)
               (organizations-query context args value)))
 
+(defn delete-unused [tx]
+  "first delete organizations (parent_id IS NOT NULL) without requesters
+  and requests, then delete departments (parent_id IS NULL) without children"
+  (jdbc/execute!
+    tx (-> (sql/delete-from [:procurement_organizations :po])
+           (sql/merge-where [:<> :po.parent_id nil])
+           (sql/merge-where
+             [:not (sql/call
+                     :exists
+                     (-> (sql/select 1)
+                         (sql/from [:procurement_requesters_organizations :pro])
+                         (sql/where [:= :pro.organization_id :po.id])))])
+           (sql/merge-where
+             [:not (sql/call
+                     :exists
+                     (-> (sql/select 1)
+                         (sql/from [:procurement_requests :pr])
+                         (sql/where [:= :pr.organization_id :po.id])))])
+           sql/format))
+  (jdbc/execute!
+    tx (-> (sql/delete-from [:procurement_organizations :po1])
+	   (sql/merge-where [:= :po1.parent_id nil])
+	   (sql/merge-where
+	     [:not (sql/call
+		     :exists
+		     (-> (sql/select 1)
+			 (sql/from [:procurement_organizations :po2])
+			 (sql/where [:= :po2.parent_id :po1.id])))])
+	   sql/format)))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

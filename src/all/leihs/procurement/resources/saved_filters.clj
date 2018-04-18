@@ -19,6 +19,19 @@
 (defn get-saved-filters-by-user-id [tx user-id]
   (first (jdbc/query tx (saved-filters-query user-id))))
 
+(defn delete-unused [tx]
+  (jdbc/execute!
+    tx
+    (-> (sql/delete-from [:procurement_users_filters :puf])
+        (sql/merge-where
+          [:not
+           (sql/call
+             :exists
+             (-> (sql/select 1)
+                 (sql/from [:procurement_requesters_organizations :pro])
+                 (sql/merge-where [:= :pro.user_id :puf.user_id])))])
+        sql/format)))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

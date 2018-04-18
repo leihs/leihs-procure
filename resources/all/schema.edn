@@ -112,6 +112,10 @@
                            :lastname {:type String}
                            :login {:type String}}}}
 
+:input-objects {:RequesterOrganizationInput {:fields {:user_id {:type ID}
+                                                      :department {:type String}
+                                                      :organization {:type String}}}}
+
 :queries {:admins {:type (list :User)
                    :resolve :admins}
           
@@ -166,4 +170,8 @@
 
           :rooms {:type (list :Room)
                   :args {:building_id {:type ID}}
-                  :resolve :rooms}}}
+                  :resolve :rooms}}
+
+:mutations {:requesters_organizations {:type (list :RequesterOrganization)
+                                       :args {:input_data {:type (list :RequesterOrganizationInput)}}
+                                       :resolve :update_requesters_organizations}}}

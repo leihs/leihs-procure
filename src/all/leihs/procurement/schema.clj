@@ -71,6 +71,7 @@
    :room room/get-room
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
+   :update_requesters_organizations requesters-organizations/update-requesters-organizations
    :user user/get-user})
 
 (defn- wrap-map-with-error [arg]
