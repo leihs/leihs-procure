@@ -105,7 +105,10 @@
                            :lastname {:type String}
                            :login {:type String}}}}
 
-:queries {:budget_limits {:type (list :BudgetLimit)
+:queries {:admins {:type (list :User)
+                   :resolve :admins}
+          
+          :budget_limits {:type (list :BudgetLimit)
                           :resolve :budget-limits}
 
           :budget_periods {:type (list :BudgetPeriod)

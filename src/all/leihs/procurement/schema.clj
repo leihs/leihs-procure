@@ -7,6 +7,7 @@
     [com.walmartlabs.lacinia.util :as graphql-util]
     [com.walmartlabs.lacinia.resolve :as graphql-resolve]
     [com.walmartlabs.lacinia.schema :as graphql-schema]
+    [leihs.procurement.resources.admins :as admins]  
     [leihs.procurement.resources.attachments :as attachments]  
     [leihs.procurement.resources.budget-limits :as budget-limits]
     [leihs.procurement.resources.budget-period :as budget-period]
@@ -45,7 +46,8 @@
 
 ; a function for debugging convenience. will be a var later.
 (defn resolver-map []
-  {:attachments attachments/get-attachments
+  {:admins admins/get-admins
+   :attachments attachments/get-attachments
    :budget-limits budget-limits/get-budget-limits
    :budget-period budget-period/get-budget-period
    :budget-periods budget-periods/get-budget-periods

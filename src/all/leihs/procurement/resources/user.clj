@@ -2,6 +2,7 @@
   (:require
     [clj-logging-config.log4j :as logging-config]
     [clojure.java.jdbc :as jdbc]
+    [clojure.tools.logging :as logging]
     [leihs.procurement.utils.sql :as sql]
     [leihs.procurement.utils.ds :refer [get-ds]]
     [logbug.debug :as debug]
