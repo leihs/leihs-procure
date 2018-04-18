@@ -80,6 +80,13 @@
                               :user {:type :User
                                      :resolve :user}}}
 
+           :RequesterOrganization {:fields {:user {:type :User
+                                                   :resolve :user}
+                                            :organization {:type :Organization
+                                                           :resolve :organization}
+                                            :department {:type :Organization
+                                                         :resolve :department}}}
+
            :Room {:fields {:id {:type ID}
                            :building {:type :Building
                                       :resolve :building}
@@ -149,6 +156,9 @@
                             :search {:type String}
                             :state {:type (list String)}}
                      :resolve :requests}
+
+          :requesters_organizations {:type (list :RequesterOrganization)
+                                     :resolve :requesters_organizations}
 
           :request_fields_by_id {:type (list :RequestField)
                                  :args {:request_id {:type ID}}

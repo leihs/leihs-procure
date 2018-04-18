@@ -24,6 +24,7 @@
     [leihs.procurement.resources.request :as request]
     [leihs.procurement.resources.request-fields :as request-fields]
     [leihs.procurement.resources.requests :as requests]
+    [leihs.procurement.resources.requesters-organizations :as requesters-organizations]
     [leihs.procurement.resources.room :as room]
     [leihs.procurement.resources.rooms :as rooms]
     [leihs.procurement.resources.supplier :as supplier]
@@ -55,6 +56,7 @@
    :category category/get-category
    :categories categories/get-categories
    :current-user current-user/get-current-user
+   :department organization/get-department
    :main-category main-category/get-main-category
    :main-categories main-categories/get-main-categories
    :model model/get-model
@@ -65,6 +67,7 @@
    :request-by-id request/get-request
    :requests requests/get-requests
    :request-fields-by-id request-fields/get-request-fields
+   :requesters_organizations requesters-organizations/get-requesters-organizations
    :room room/get-room
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
