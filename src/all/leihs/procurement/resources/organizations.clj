@@ -37,13 +37,13 @@
            (sql/merge-where
              [:not (sql/call
                      :exists
-                     (-> (sql/select 1)
+                     (-> (sql/select true)
                          (sql/from [:procurement_requesters_organizations :pro])
                          (sql/where [:= :pro.organization_id :po.id])))])
            (sql/merge-where
              [:not (sql/call
                      :exists
-                     (-> (sql/select 1)
+                     (-> (sql/select true)
                          (sql/from [:procurement_requests :pr])
                          (sql/where [:= :pr.organization_id :po.id])))])
            sql/format))
@@ -53,7 +53,7 @@
 	   (sql/merge-where
 	     [:not (sql/call
 		     :exists
-		     (-> (sql/select 1)
+		     (-> (sql/select true)
 			 (sql/from [:procurement_organizations :po2])
 			 (sql/where [:= :po2.parent_id :po1.id])))])
 	   sql/format)))

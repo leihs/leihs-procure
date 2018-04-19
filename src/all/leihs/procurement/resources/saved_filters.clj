@@ -27,7 +27,7 @@
           [:not
            (sql/call
              :exists
-             (-> (sql/select 1)
+             (-> (sql/select true)
                  (sql/from [:procurement_requesters_organizations :pro])
                  (sql/merge-where [:= :pro.user_id :puf.user_id])))])
         sql/format)))

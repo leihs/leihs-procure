@@ -4,109 +4,109 @@ require_relative 'graphql_helper'
 describe 'requesters organizations' do
   context 'mutation' do
     it 'recreates all and does the necessary cleanup' do
-      # o1 & d1 to re retained due to r1
-      d1 = FactoryBot.create(:department)
-      o1 = FactoryBot.create(:organization, parent_id: d1.id)
-      r1 = FactoryBot.create(:request, organization_id: o1.id)
-      # o2 & d2 to be retained due to ro2
-      d2 = FactoryBot.create(:department)
-      o2 = FactoryBot.create(:organization, parent_id: d2.id)
-      # unused o3 & d3, to be deleted both
-      d3 = FactoryBot.create(:department)
-      o3 = FactoryBot.create(:organization)
 
-      # ro1 to be deleted
-      ro1 = FactoryBot.create(:requester_organization)
-      # ro2 to be retained
-      ro2 = FactoryBot.create(:requester_organization, organization_id: o2.id)
-      # ro3, department to be modified
-      ro3_dep_new_name = Faker::Commerce.department
-      ro3 = FactoryBot.create(:requester_organization)
-      # ro4, organization to be modified
-      ro4_org_new_name = Faker::Commerce.department
-      ro4 = FactoryBot.create(:requester_organization)
-      # ro5, organization & department to be modified
-      ro5_dep_new_name = Faker::Commerce.department
-      ro5_org_new_name = Faker::Commerce.department
-      ro5 = FactoryBot.create(:requester_organization)
+      users_before = [
+        { firstname: 'user_1' },
+        { firstname: 'user_2' },
+        { firstname: 'user_3' },
+        { firstname: 'user_4' },
+        { firstname: 'user_5' },
+        { firstname: 'user_6' },
+        { firstname: 'user_7' }
+      ]
+      users_before.each do |data|
+        FactoryBot.create(:user, data)
+      end
 
-      # uf1 to be deleted with ro1
-      uf1 = FactoryBot.create(:user_filter, user_id: ro1.user_id)
-      # uf2 to be retained with ro2
-      uf2 = FactoryBot.create(:user_filter, user_id: ro2.user_id)
-      # uf3 to be retained with ro3
-      uf3 = FactoryBot.create(:user_filter, user_id: ro3.user_id)
-      # uf4 to be retained with ro4
-      uf4 = FactoryBot.create(:user_filter, user_id: ro4.user_id)
-      # uf5 to be retained with ro5
-      uf5 = FactoryBot.create(:user_filter, user_id: ro5.user_id)
+      #############################################################################
 
-      # TEST DATA BEFORE
-      #
-      # procurement_requesters_organizations:
-      # +----------+------------------+
-      # | user     | organization     |
-      # +----------+------------------+
-      # | ro1.user | ro1.organization |
-      # | ro2.user | o2.id            |
-      # | ro3.user | ro3.organization |
-      # | ro4.user | ro4.organization |
-      # | ro5.user | ro5.organization |
-      # +----------+------------------+
-      #
-      # procurement_organizations:
-      # +---------+-----------+
-      # | name    | parent_id |
-      # +---------+-----------+
-      # | d1.name |           |
-      # | o1.name | d1.id     |
-      # | d2.name |           |
-      # | o2.name | d2.id     |
-      # | d3.name |           |
-      # | o3.name | d3.id     |
-      # +---------+-----------+
-      #
-      # procurement_requests:
-      # +-------+-----------------+
-      # | id    | organization_id |
-      # +-------+-----------------+
-      # | r1.id | o1.id           |
-      # +-------+-----------------+
-      #
-      # procurement_users_filters:
-      # +--------+-------------+
-      # | id     | user_id     |
-      # +--------+-------------+
-      # | uf1.id | ro1.user_id |
-      # +--------+-------------+
-      # | uf2.id | ro2.user_id |
-      # +--------+-------------+
-      # | uf3.id | ro3.user_id |
-      # +--------+-------------+
-      # | uf4.id | ro4.user_id |
-      # +--------+-------------+
-      # | uf5.id | ro5.user_id |
-      # +--------+-------------+
-      
-      response = graphql_client.query <<-GRAPHQL
+      organizations_before = [
+        { name: 'dep_I' },
+        { name: 'dep_II' },
+        { name: 'dep_III' },
+        { name: 'dep_IV' },
+        { name: 'dep_V' },
+        { name: 'dep_VI' },
+        { name: 'org_A', parent: { name: 'dep_I' } },
+        { name: 'org_B', parent: { name: 'dep_II' } },
+        { name: 'org_C', parent: { name: 'dep_III' } },
+        { name: 'org_D', parent: { name: 'dep_IV' } },
+        { name: 'org_E', parent: { name: 'dep_V' } },
+        { name: 'org_F', parent: { name: 'dep_VI' } }
+      ]
+      organizations_before.each do |data|
+        parent = data[:parent] && Organization.find(data[:parent])
+        FactoryBot.create(:organization, name: data[:name], parent: parent)
+      end
+
+      #############################################################################
+
+      requesters_organizations_before = [
+        { user: { firstname: 'user_1' }, organization: { name: 'org_A' } },
+        { user: { firstname: 'user_2' }, organization: { name: 'org_B' } },
+        { user: { firstname: 'user_3' }, organization: { name: 'org_C' } },
+        { user: { firstname: 'user_4' }, organization: { name: 'org_D' } },
+        { user: { firstname: 'user_5' }, organization: { name: 'org_E' } },
+        { user: { firstname: 'user_6' }, organization: { name: 'org_E' } }
+      ]
+      requesters_organizations_before.each do |data|
+        FactoryBot.create(
+          :requester_organization,
+          user: User.find(data[:user]),
+          organization: Organization.find(data[:organization])
+        )
+      end
+
+      #############################################################################
+
+      requests_before = [
+        { organization: { name: 'org_F' } }
+      ]
+      requests_before.each do |data|
+        FactoryBot.create(
+          :request,
+          organization_id: Organization.find(data[:organization]).id
+        )
+      end
+
+      #############################################################################
+
+      users_filters_before = [
+        { user: { firstname: 'user_1' } },
+        { user: { firstname: 'user_2' } },
+        { user: { firstname: 'user_3' } },
+        { user: { firstname: 'user_4' } },
+        { user: { firstname: 'user_5' } }
+      ]
+      users_filters_before.each do |data|
+        FactoryBot.create(:user_filter, user_id: User.find(data[:user]).id)
+      end
+
+      #############################################################################
+
+      query = <<-GRAPHQL
         mutation {
           requesters_organizations (
             input_data: [
-              { user_id: "#{ro2.user_id}",
-                department: "#{d2.name}",
-                organization: "#{o2.name}" },
+              { user_id: "#{User.find(firstname: 'user_2').id}",
+                department: "dep_II",
+                organization: "org_B" },
 
-              { user_id: "#{ro3.user_id}",
-                department: "#{ro3_dep_new_name}",
-                organization: "#{ro3.organization.name}" },
+              { user_id: "#{User.find(firstname: 'user_3').id}",
+                department: "dep_X",
+                organization: "org_C" },
 
-              { user_id: "#{ro4.user_id}",
-                department: "#{ro4.organization.parent.name}",
-                organization: "#{ro4_org_new_name}" },
+              { user_id: "#{User.find(firstname: 'user_4').id}",
+                department: "dep_IV",
+                organization: "org_X" },
 
-              { user_id: "#{ro5.user_id}",
-                department: "#{ro5_dep_new_name}",
-                organization: "#{ro5_org_new_name}" }
+              { user_id: "#{User.find(firstname: 'user_5').id}",
+                department: "dep_XI",
+                organization: "org_Y" },
+
+              { user_id: "#{User.find(firstname: 'user_7').id}",
+                department: "dep_V",
+                organization: "org_E" }
             ]
           ) {
             user {
@@ -122,28 +122,81 @@ describe 'requesters organizations' do
         }
       GRAPHQL
 
+      response = graphql_client.query(query)
+
       expect(response.to_h).to be == {
         'data' => {
           'requesters_organizations' => [
-            { 'user' => { 'id' => ro2.user.id },
-              'organization' => { 'name' => o2.name },
-              'department' => { 'name' => o2.parent.name }},
+            { 'user' => { 'id' => "#{User.find(firstname: 'user_2').id}" },
+              'organization' => { 'name' => 'org_B' },
+              'department' => { 'name' => 'dep_II' }},
 
-            { 'user' => { 'id' => ro3.user.id },
-              'organization' => { 'name' => ro3.organization.name },
-              'department' => { 'name' => ro3_dep_new_name }},
+            { 'user' => { 'id' => "#{User.find(firstname: 'user_3').id}" },
+              'organization' => { 'name' => 'org_C' },
+              'department' => { 'name' => 'dep_X' }},
 
-            { 'user' => { 'id' => ro4.user.id },
-              'organization' => { 'name' => ro4_org_new_name },
-              'department' => { 'name' => ro4.organization.parent.name }},
+            { 'user' => { 'id' => "#{User.find(firstname: 'user_4').id}" },
+              'organization' => { 'name' => 'org_X' },
+              'department' => { 'name' => 'dep_IV' }},
 
-            { 'user' => { 'id' => ro5.user.id },
-              'organization' => { 'name' => ro5_org_new_name },
-              'department' => { 'name' => ro5_dep_new_name }}
+            { 'user' => { 'id' => "#{User.find(firstname: 'user_5').id}" },
+              'organization' => { 'name' => 'org_Y' },
+              'department' => { 'name' => 'dep_XI' }},
+
+            { 'user' => { 'id' => "#{User.find(firstname: 'user_7').id}" },
+              'organization' => { 'name' => 'org_E' },
+              'department' => { 'name' => 'dep_V' }}
           ]
         }
       }
+
+      #############################################################################
+
+      organizations_after = [
+        { name: 'org_B', parent: { name: 'dep_II' } },
+        { name: 'org_C', parent: { name: 'dep_X' } },
+        { name: 'org_X', parent: { name: 'dep_IV' } },
+        { name: 'org_Y', parent: { name: 'dep_XI' } },
+        { name: 'org_E', parent: { name: 'dep_V' } },
+        { name: 'org_F', parent: { name: 'dep_VI' } }
+      ]
+      expect(Organization.count).to be == organizations_after.count * 2
+      organizations_after.each do |data|
+        parent = Organization.find(data[:parent])
+        expect(Organization.find(name: data[:name], parent: parent)).to be
+      end
+
+      #############################################################################
+
+      requesters_organizations_after = [
+        { user: { firstname: 'user_2' }, organization: { name: 'org_B' } },
+        { user: { firstname: 'user_3' }, organization: { name: 'org_C' } },
+        { user: { firstname: 'user_4' }, organization: { name: 'org_X' } },
+        { user: { firstname: 'user_5' }, organization: { name: 'org_Y' } },
+        { user: { firstname: 'user_7' }, organization: { name: 'org_E' } }
+      ]
+      expect(RequesterOrganization.count)
+        .to be == requesters_organizations_after.count
+      requesters_organizations_after.each do |data|
+        user = User.find(data[:user])
+        organization = Organization.find(data[:organization])
+        expect(RequesterOrganization.find(user: user, organization: organization))
+          .to be
+      end
+
+      #############################################################################
+
+      users_filters_after = [
+        { user: { firstname: 'user_2' } },
+        { user: { firstname: 'user_3' } },
+        { user: { firstname: 'user_4' } },
+        { user: { firstname: 'user_5' } }
+      ]
+      expect(UserFilter.count).to be == users_filters_after.count
+      users_filters_after.each do |data|
+        user = User.find(data[:user])
+        expect(UserFilter.find(user_id: user.id)).to be
+      end
     end
   end
 end
-

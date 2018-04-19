@@ -33,10 +33,10 @@
                                               :procurement_organizations
                                               {:name org-name
                                                :parent_id (:id department)})))]
-    (debug/identity-with-logging (jdbc/insert! tx
+    (jdbc/insert! tx
                   :procurement_requesters_organizations
                   {:user_id (:user_id data)
-                   :organization_id (:id organization)}))))
+                   :organization_id (:id organization)})))
 
 (defn delete-all [tx]
   (jdbc/delete! tx :procurement_requesters_organizations []))
