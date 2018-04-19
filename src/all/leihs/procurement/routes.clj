@@ -208,7 +208,7 @@
       ;             :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
       ;                                  #".+_[0-9a-f]{40}\..+"]
       ;             :enabled? (= env/env :prod)})
-      ring-exception/wrap
+      ; ring-exception/wrap
       wrap-reload-if-dev-env
       ))
 

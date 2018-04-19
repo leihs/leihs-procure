@@ -81,7 +81,8 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
+      ; (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
+      (graphql-util/attach-resolvers (resolver-map))
       graphql-schema/compile))
 
 ;#### debug ###################################################################
