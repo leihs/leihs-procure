@@ -41,4 +41,4 @@ jobs:
               set -eux
               export PATH=~/.rubies/$RUBY/bin:$PATH
               mkdir -p log
-              bundle exec rspec $CIDER_CI_TASK_FILE
+              bundle exec rspec --backtrace $CIDER_CI_TASK_FILE
