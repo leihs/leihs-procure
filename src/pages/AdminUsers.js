@@ -1,11 +1,44 @@
 import React, { Fragement as F } from 'react'
 import f from 'lodash'
+
+import { Query, Mutation } from 'react-apollo'
+import gql from 'graphql-tag'
+
 import ControlledForm from '../components/ControlledForm'
 import Icon from '../components/Icons'
-import { Row, Col, FormField } from '../components/Bootstrap'
+import { Row, Col } from '../components/Bootstrap'
 
-import { Query } from 'react-apollo'
-import gql from 'graphql-tag'
+const UPDATE_ADMINS_MUTATION = gql`
+  mutation updateAdmins($adminUserList: [AdminInput]) {
+    admins(input_data: $adminUserList) {
+      id
+      firstname
+      lastname
+    }
+  }
+`
+
+const UpdateAdmins = ({ admins }) => (
+  <Mutation mutation={UPDATE_ADMINS_MUTATION}>
+    {(updateAdmins, res) => (
+      <div>
+        <button
+          type="submit"
+          className="btn m-1 btn-primary"
+          onClick={e => {
+            e.preventDefault()
+            updateAdmins({
+              variables: { adminUserList: admins.map(id => ({ user_id: id })) }
+            })
+          }}>
+          <Icon.Checkmark /> <span>Speichern</span>
+        </button>
+        <h4>results:</h4>
+        <pre>{JSON.stringify(res, 0, 2)}</pre>
+      </div>
+    )}
+  </Mutation>
+)
 
 const AdminUsers = ({ data: { admins } }) => (
   <div className="pt-2 pb-3">
@@ -30,7 +63,7 @@ const AdminUsers = ({ data: { admins } }) => (
                 className="XXXwas-validated"
                 onSubmit={e => {
                   e.preventDefault()
-                  alert(JSON.stringify(fields, 0, 2))
+                  // alert(JSON.stringify(fields, 0, 2))
                 }}>
                 {/* <FormField label={'Administratoren'}> */}
                 <Row>
@@ -61,9 +94,10 @@ const AdminUsers = ({ data: { admins } }) => (
                     })}
                   </Col>
                 </Row>
-                <button type="submit" className="btn m-1 btn-primary">
+                <UpdateAdmins admins={fields.admins} />
+                {/* <button type="submit" className="btn m-1 btn-primary">
                   <Icon.Checkmark /> <span>Speichern</span>
-                </button>
+                </button> */}
               </form>
             )
           }}
