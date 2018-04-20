@@ -20,7 +20,7 @@ function titleBySelection(selected, values) {
     .join(', ')
 }
 
-class MultiSelect extends React.Component {
+class MultiSelect extends React.PureComponent {
   constructor() {
     super()
     this.state = { dropdownOpen: false, selected: [] }
@@ -44,12 +44,18 @@ class MultiSelect extends React.Component {
   onCheckboxChange(event) {
     const isSelected = event.target.checked
     const item = event.target.name
-    this.setState(prev => {
-      const selected = prev.selected
-        .concat(item)
-        .filter(id => (id === item ? isSelected : true))
-      return { selected }
-    })
+    this.setState(
+      prev => {
+        const selected = prev.selected
+          .concat(item)
+          .filter(id => (id === item ? isSelected : true))
+        return { selected }
+      },
+      () =>
+        this.onChange({
+          target: { name: this.props.name, value: this.state.selected }
+        })
+    )
   }
 
   onSelectAllChange(event) {
@@ -60,7 +66,7 @@ class MultiSelect extends React.Component {
   }
 
   render({ props, state } = this) {
-    const { values, ...restProps } = props
+    const { values, name, ...restProps } = props
     const allSelected = values.length === state.selected.length
 
     return (
@@ -68,7 +74,7 @@ class MultiSelect extends React.Component {
         {...restProps}
         isOpen={this.state.dropdownOpen}
         toggle={() => this.toggleDropdown()}>
-        <DropdownToggle caret>
+        <DropdownToggle caret outline>
           {titleBySelection(state.selected, values)}
         </DropdownToggle>
         <DropdownMenu className="multiselect-container">
@@ -79,6 +85,7 @@ class MultiSelect extends React.Component {
                 <input
                   type="checkbox"
                   checked={allSelected}
+                  name={name}
                   onChange={this.onSelectAllChange}
                 />
                 {'Alle ausw\xE4hlen'}{' '}
@@ -93,7 +100,7 @@ class MultiSelect extends React.Component {
                   <label className="checkbox">
                     <input
                       type="checkbox"
-                      name={id}
+                      name={name}
                       checked={isSelected}
                       onChange={this.onCheckboxChange}
                     />

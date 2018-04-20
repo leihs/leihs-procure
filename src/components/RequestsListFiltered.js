@@ -3,6 +3,7 @@ import f from 'lodash'
 
 import { FormField, Select } from './Bootstrap'
 import ControlledForm from './ControlledForm'
+import MultiSelect from './MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Loading from './Loading'
 import RequestLine from './RequestLine'
@@ -23,11 +24,12 @@ const FilterBar = ({
 
   const available = {
     budgetPeriods: data.budget_periods,
-    categories: data.categories
+    categories: data.categories,
+    organizations: data.organizations
   }
 
   return (
-    <div className="pt-2">
+    <div className="pt-2 pb-3">
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"
@@ -37,23 +39,34 @@ const FilterBar = ({
           return (
             <F>
               <FormField label={'Budgetperioden'}>
-                <Select
+                <MultiSelect
                   {...formPropsFor('budgetPeriods')}
-                  emptyOption={false}
-                  options={f
+                  values={f
                     .sortBy(available.budgetPeriods, 'name')
-                    .map(({ id, name }) => ({ value: id, label: name }))}
+                    .map(({ id, name }) => ({ id, label: name }))}
                 />
               </FormField>
               <FormField label={'Kategorien'}>
-                <Select
+                <MultiSelect
                   {...formPropsFor('categories')}
-                  emptyOption={false}
-                  options={f
+                  values={f
                     .sortBy(available.categories, 'name')
                     .map(({ id, name }) => ({ value: id, label: name }))}
                 />
               </FormField>
+              <FormField label={'Organisationen'}>
+                <MultiSelect
+                  {...formPropsFor('organizations')}
+                  values={f
+                    .sortBy(available.organizations, 'name')
+                    .map(({ id, name }) => ({ value: id, label: name }))}
+                />
+              </FormField>
+              {/* <MultiSelect
+                id="foo"
+                name="foo"
+                values={[{ id: '1', label: 'one' }]}
+              /> */}
             </F>
           )
         }}
