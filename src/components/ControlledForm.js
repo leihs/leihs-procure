@@ -44,7 +44,7 @@ export default class ControlledForm extends React.Component {
   updateField({ name, value }, callback) {
     this.setState(
       state => ({ fields: { ...state.fields, [name]: value } }),
-      () => callback(this.state.fields)
+      () => callback && callback(this.state.fields)
     )
   }
 
@@ -58,7 +58,8 @@ export default class ControlledForm extends React.Component {
           name,
           id: !idPrefix ? name : `${idPrefix}.${name}`,
           value: fields[name],
-          onChange: this.handleInputChange
+          onChange: this.handleInputChange,
+          updateValue: value => this.updateField({ name, value })
         })
       }
     }
