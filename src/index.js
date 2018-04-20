@@ -14,6 +14,7 @@ import App from './components/App'
 
 // no router, just 1 page:
 import RequestsIndex from './pages/RequestsIndex'
+import AdminUsers from './pages/AdminUsers'
 
 const client = new ApolloClient({
   uri: '/procure/graphql'
@@ -26,6 +27,7 @@ const Root = () => (
       <App>
         <Switch>
           <Route exact path="/" component={RequestsIndex} />
+          <Route exact path="/admin/users" component={AdminUsers} />
           <Route component={() => '404'} />
         </Switch>
       </App>

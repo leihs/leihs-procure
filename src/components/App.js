@@ -20,6 +20,9 @@ const Navbar = () => (
       <Link to="/" className="">
         home
       </Link>
+      <Link to="/admin/users" className="">
+        admin
+      </Link>
     </span>
   </nav>
 )
