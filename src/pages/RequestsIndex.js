@@ -4,6 +4,7 @@ import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import * as Fragments from '../queries/fragments'
+import { FILTERS_QUERY } from '../queries/RequestFilters'
 import RequestsListFiltered from '../components/RequestsListFiltered'
 
 // NOTE: there are 2 separate queries for filterbar and request list.
@@ -12,49 +13,42 @@ import RequestsListFiltered from '../components/RequestsListFiltered'
 // if, like in v1, the user's filter settings are persisted in DB
 // (bc the first query can get everything in 1 fetch)
 
-export const CURRENT_USER_QUERY = gql`
-  query CurrentUser {
-    CurrentUser {
-      user {
-        id
-        login
-        firstname
-        lastname
-      }
-      savedFilters {
-        sort_by
-        sort_dir
-        search
-        category_ids
-        categories_with_requests
-        organization_ids
-        priorities
-        inspector_priorities
-        states
-        budget_period_ids
-      }
-    }
-  }
-`
-
-const FILTERS_QUERY = gql`
-  query RequestFilters {
-    budget_periods {
-      id
-      name
-    }
-    categories {
-      id
-      name
-      # TODO: main_category
-    }
-  }
-`
+// const CURRENT_USER_QUERY = gql`
+//   query CurrentUser {
+//     CurrentUser {
+//       user {
+//         id
+//         login
+//         firstname
+//         lastname
+//       }
+//       savedFilters {
+//         sort_by
+//         sort_dir
+//         search
+//         category_ids
+//         categories_with_requests
+//         organization_ids
+//         priorities
+//         inspector_priorities
+//         states
+//         budget_period_ids
+//       }
+//     }
+//   }
+// `
 
 const REQUESTS_QUERY = gql`
-  query RequestsIndexFiltered($budgetPeriods: [ID], $categories: [ID]) {
-    # main index:
-    requests(budget_period_id: $budgetPeriods, category_id: $categories) {
+  query RequestsIndexFiltered(
+    $budgetPeriods: [ID]
+    $categories: [ID]
+    $organizations: [ID]
+  ) {
+    requests(
+      budget_period_id: $budgetPeriods
+      category_id: $categories
+      organization_id: $organizations
+    ) {
       ...RequestFieldsForIndex
     }
   }
@@ -67,7 +61,8 @@ class RequestsIndexPage extends React.Component {
     this.state = {
       currentFilters: {
         budgetPeriods: [],
-        categories: []
+        categories: [],
+        organizations: []
       }
     }
     this.onFilterChange = this.onFilterChange.bind(this)
