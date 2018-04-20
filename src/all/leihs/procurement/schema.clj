@@ -7,6 +7,7 @@
     [com.walmartlabs.lacinia.util :as graphql-util]
     [com.walmartlabs.lacinia.resolve :as graphql-resolve]
     [com.walmartlabs.lacinia.schema :as graphql-schema]
+    [leihs.procurement.env :as env]  
     [leihs.procurement.resources.admins :as admins]  
     [leihs.procurement.resources.attachments :as attachments]  
     [leihs.procurement.resources.budget-limits :as budget-limits]
@@ -38,11 +39,9 @@
       (resolver context args value)
       (catch Throwable _e
         (let [e (get-cause _e)
-              m (if (or (instance? clojure.lang.ExceptionInfo e)
-                        (instance? org.postgresql.util.PSQLException e))
-                  (.getMessage e)
-                  "Unclassified error, see the server logs for details.")]
+              m (.getMessage e)]
           (logging/warn m)
+          (if (= env/env :dev) (logging/debug e))
           (graphql-resolve/resolve-as value {:message m}))))))
 
 ; a function for debugging convenience. will be a var later.
@@ -71,6 +70,7 @@
    :room room/get-room
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
+   :update_admins admins/update-admins
    :update_requesters_organizations requesters-organizations/update-requesters-organizations
    :user user/get-user})
 
@@ -81,8 +81,7 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      ; (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
-      (graphql-util/attach-resolvers (resolver-map))
+      (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
       graphql-schema/compile))
 
 ;#### debug ###################################################################
