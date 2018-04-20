@@ -51,7 +51,10 @@ export const Col = ({ order, cls, ...props }) => {
   const breakpoint = f.first(
     f.intersection(f.keys(props), BOOTSTRAP_BREAKPOINTS)
   )
-  const colCls = breakpoint ? `col-${breakpoint}` : 'col'
+  const breakpointVal = props[breakpoint]
+  const colCls = breakpoint
+    ? breakpointVal ? `col-${breakpoint}-${breakpointVal}` : `col-${breakpoint}`
+    : 'col'
   const orderCls =
     order && (breakpoint ? `order-${breakpoint}-${order}` : `order-${order}`)
   return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
