@@ -9,7 +9,6 @@
       (sql/from :procurement_budget_limits)))
 
 (defn get-budget-limits [context _ value]
-  (logging/debug value)
   (let [main_category_id (:id value)]
     (jdbc/query (-> context :request :tx)
                 (-> budget-limits-base-query

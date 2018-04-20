@@ -18,7 +18,11 @@
                                :name {:type String}}}
 
            :Category {:fields {:id {:type ID}
-                               :name {:type String}}}
+                               :name {:type String}
+                               :general_ledger_account {:type String}
+                               :cost_center {:type String}
+                               :inspectors {:type (list :User)
+                                            :resolve :inspectors}}}
 
            :CurrentUser {:fields {:user {:type :User}
                                   :saved_filters {:type :SavedFilters}}}

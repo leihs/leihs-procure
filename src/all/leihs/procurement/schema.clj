@@ -17,6 +17,7 @@
     [leihs.procurement.resources.category :as category]
     [leihs.procurement.resources.categories :as categories]
     [leihs.procurement.resources.current-user :as current-user]
+    [leihs.procurement.resources.inspectors :as inspectors]
     [leihs.procurement.resources.main-category :as main-category]
     [leihs.procurement.resources.main-categories :as main-categories]
     [leihs.procurement.resources.model :as model]
@@ -56,6 +57,7 @@
    :categories categories/get-categories
    :current-user current-user/get-current-user
    :department organization/get-department
+   :inspectors inspectors/get-inspectors
    :main-category main-category/get-main-category
    :main-categories main-categories/get-main-categories
    :model model/get-model

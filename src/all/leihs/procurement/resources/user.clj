@@ -8,18 +8,20 @@
     [logbug.debug :as debug]
     ))
 
-(defn user-query [id]
-  (-> (sql/select :*)
-      (sql/from :users)
-      (sql/where [:= :users.id id])
-      sql/format))
+(def user-base-query
+  (-> (sql/select :users.*)
+      (sql/from :users)))
 
 (defn get-user [context _ value]
   (first (jdbc/query (-> context :request :tx)
-                     (user-query (:user_id value)))))
+                     (-> user-base-query
+                         (sql/where [:= :users.id (:user_id value)])
+                         sql/format))))
 
 (defn get-user-by-id [tx id]
-  (first (jdbc/query tx (user-query id))))
+  (first (jdbc/query tx (-> user-base-query
+                            (sql/where [:= :users.id id])
+                            sql/format))))
 
 (defn procurement-inspector? [tx user]
   (:result
