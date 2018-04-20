@@ -1,7 +1,7 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 
-import { FormField, Select } from './Bootstrap'
+import { FormField } from './Bootstrap'
 import ControlledForm from './ControlledForm'
 import MultiSelect from './MultiSelect'
 import { MainWithSidebar } from './Layout'
