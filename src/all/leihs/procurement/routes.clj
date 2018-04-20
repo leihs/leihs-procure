@@ -12,6 +12,7 @@
     [leihs.procurement.mock :as mock]
     ; ===============================
     [leihs.procurement.paths :refer [path paths]]
+    [leihs.procurement.resources.image :as image]
     [leihs.procurement.shutdown :as shutdown]
     [leihs.procurement.status :as status]
     [leihs.procurement.utils.ds :as ds]
@@ -58,7 +59,7 @@
   {:graphql graphql/handler
    :shutdown shutdown/routes
    :status status/routes
-
+   :image image/routes
    ; :auth auth/routes
    ; :auth-password-sign-in auth/routes
    ; :auth-shib-sign-in auth/routes
@@ -66,8 +67,6 @@
    ; :not-found html/not-found-handler
    ; :redirect-to-root redirect-to-root-handler
    })
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -208,7 +207,7 @@
       ;             :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
       ;                                  #".+_[0-9a-f]{40}\..+"]
       ;             :enabled? (= env/env :prod)})
-      ; ring-exception/wrap
+      ring-exception/wrap
       wrap-reload-if-dev-env
       ))
 
