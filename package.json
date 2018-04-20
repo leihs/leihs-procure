@@ -47,7 +47,7 @@
     "semi": false,
     "trailingComma": "none",
     "bracketSpacing": true,
-    "jsxBracketSameLine": true
+    "jsxBracketSameLine": false
   },
   "eslintConfig": {
     "env": {
