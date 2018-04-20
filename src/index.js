@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
+import { Switch, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 
@@ -19,11 +21,16 @@ const client = new ApolloClient({
 
 const Root = () => (
   <ApolloProvider client={client}>
-    {/* <React.StrictMode> */}
-    <App>
-      <RequestsIndex />
-    </App>
-    {/* </React.StrictMode> */}
+    <BrowserRouter>
+      {/* <React.StrictMode> */}
+      <App>
+        <Switch>
+          <Route exact path="/" component={RequestsIndex} />
+          <Route component={() => '404'} />
+        </Switch>
+      </App>
+      {/* </React.StrictMode> */}
+    </BrowserRouter>
   </ApolloProvider>
 )
 ReactDOM.render(<Root />, document.getElementById('root'))
