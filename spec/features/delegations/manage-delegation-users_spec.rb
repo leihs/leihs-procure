@@ -7,6 +7,7 @@ feature 'Manage delegation users ', type: :feature do
 
     let :sign_in_as_admin do
       visit '/'
+      click_on 'Sign in with password'
       fill_in 'email', with: @admin.email
       fill_in 'password', with: @admin.password
       click_on 'Sign in'

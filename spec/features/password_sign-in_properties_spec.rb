@@ -11,6 +11,7 @@ feature 'Passwords sign-in, sign-out properties ' do
 
       visit '/'
 
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
@@ -27,6 +28,7 @@ feature 'Passwords sign-in, sign-out properties ' do
       # sign in with the new password does work
       click_on 'Sign out'
       visit '/'
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: new_password
       click_on 'Sign in'
@@ -38,6 +40,7 @@ feature 'Passwords sign-in, sign-out properties ' do
 
       visit '/'
 
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
@@ -56,13 +59,12 @@ feature 'Passwords sign-in, sign-out properties ' do
       expect(page).not_to have_content @user.email
 
       # we can not sign in
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
 
       expect(page).not_to have_content @user.email
-      expect(page).to have_content \
-        'contact your leihs administrator if sign-in fails persistently'
 
     end
 
@@ -70,6 +72,7 @@ feature 'Passwords sign-in, sign-out properties ' do
 
       visit '/'
 
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
@@ -91,13 +94,12 @@ feature 'Passwords sign-in, sign-out properties ' do
       expect(page).not_to have_content @user.email
 
       # we can not sign in
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
 
       expect(page).not_to have_content @user.email
-      expect(page).to have_content \
-        'contact your leihs administrator if sign-in fails persistently'
 
     end
 

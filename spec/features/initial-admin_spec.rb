@@ -14,6 +14,7 @@ feature 'Initial admin', type: :feature do
     click_on 'Create'
 
     # we sign-in as the admin
+    click_on 'Sign in with password'
     fill_in 'email', with: 'admin@example.com'
     fill_in 'password', with: 'password'
     click_on 'Sign in'

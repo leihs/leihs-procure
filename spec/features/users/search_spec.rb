@@ -7,6 +7,7 @@ feature 'Manage users', type: :feature do
 
     let :sign_in_as_admin do
       visit '/'
+      click_on 'Sign in with password'
       fill_in 'email', with: @admin.email
       fill_in 'password', with: @admin.password
       click_on 'Sign in'
@@ -31,7 +32,7 @@ feature 'Manage users', type: :feature do
     describe 'searching and filtering users' do
 
       before :each do
-        click_on 'Admin'
+        click_on_first 'Admin'
         click_on 'Users'
 
         # set 100 per page so we see all

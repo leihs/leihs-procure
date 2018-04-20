@@ -102,5 +102,8 @@
       [:h3 "@routing-state*"]
       [:pre (with-out-str (pprint @routing-state*))]]
      [:div
+      [:h3 "@settings*"]
+      [:pre (with-out-str (pprint @settings*))]]
+     [:div
       [:h3 "@user*"]
       [:pre (with-out-str (pprint @user*))]]]))

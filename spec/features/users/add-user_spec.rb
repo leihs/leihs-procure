@@ -7,6 +7,7 @@ feature 'Manage users', type: :feature do
 
     let :sign_in_as_admin do
       visit '/'
+      click_on 'Sign in with password'
       fill_in 'email', with: @admin.email
       fill_in 'password', with: @admin.password
       click_on 'Sign in'
@@ -46,6 +47,7 @@ feature 'Manage users', type: :feature do
       # sign out and sign in as the new user
       visit '/'
       click_on 'Sign out'
+      click_on 'Sign in with password'
       fill_in 'email', with: 'test@example.com' 
       fill_in 'password', with: 'password'
       click_on 'Sign in'

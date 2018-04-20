@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.auth.core
+(ns leihs.admin.resources.auth.back
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.admin.utils.core :refer [keyword str presence]])
   (:require
@@ -25,6 +25,12 @@
     )
   )
 
+(defn redirect-target [{{query-target :target} :query-params}]
+  (or (presence query-target)
+      (path :home)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn user-sign-in-base-query [email]
   (-> (sql/select :users.id :is_admin :sign_in_enabled :firstname :lastname :email)
       (sql/from :users)
@@ -48,15 +54,16 @@
       sql/format))
 
 (defn password-sign-in
-  ([{{email :email password :password url :url} :form-params tx :tx sba :secret-ba}]
-   (password-sign-in email password url (String. sba) tx))
-  ([email password url secret tx]
+  ([{{email :email 
+      password :password} :form-params 
+     tx :tx sba :secret-ba :as request}]
+   (password-sign-in email password request (String. sba) tx))
+  ([email password request secret tx]
    (if-let [user (->> (password-sign-in-query email password secret)
                       (jdbc/query tx) first)]
      (session/create-user-session
-       user secret (redirect (or (-> url presence)
-                                 (path :admin)) :see-other) tx)
-     (redirect (path :admin {} {:sign-in-warning true})
+       user secret (redirect (redirect-target request) :see-other) tx)
+     (redirect (path :admin {} {})
                :see-other))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -79,9 +86,13 @@
       sql/format))
 
 (defn shib-sign-in
-  ([{headers :headers tx :tx sba :secret-ba settings :settings}]
-   (shib-sign-in headers (String. sba) tx settings))
-  ([headers secret tx settings]
+  ([{headers :headers 
+     tx :tx 
+     sba :secret-ba 
+     settings :settings
+     :as request}]
+   (shib-sign-in headers (String. sba) tx settings request))
+  ([headers secret tx settings request]
    (when-not (:shibboleth_enabled settings)
      (throw (ex-info "Shibboleth sign-in is disabled." {:status 403})))
    (let [user-params (shib-params->user-params headers)
@@ -89,8 +100,9 @@
      (if-let [user (->> (shib-sign-in-query user-params)
                         (jdbc/query tx) first)]
        (session/create-user-session
-         user secret (redirect (path :admin) :see-other)  tx)
-       (redirect (path :admin {} {:sign-in-warning true})
+         user secret (redirect (redirect-target request)
+                               :see-other) tx)
+       (redirect (path :home {} {})
                  :see-other)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -102,8 +114,7 @@
        first))
 
 (defn sign-out [request]
-  (-> (redirect (or (-> request :form-params :url presence)
-                    (path :admin)) :see-other)
+  (-> (redirect (path :home {} {:target (redirect-target request)}) :see-other)
       (assoc-in [:cookies (str USER_SESSION_COOKIE_NAME)]
                 {:value ""
                  :http-only true
@@ -132,6 +143,8 @@
     (cpj/GET (path :auth) [] #'get-auth)
     (cpj/GET (path :auth-shib-sign-in) [] #'shib-sign-in)
     (cpj/POST (path :auth-password-sign-in) [] #'password-sign-in)
+    ; TODO to be removed with legacy (which uses GET to sign out)
+    (cpj/GET (path :auth-sign-out) [] #'sign-out)
     (cpj/POST (path :auth-sign-out) [] #'sign-out)))
 
 

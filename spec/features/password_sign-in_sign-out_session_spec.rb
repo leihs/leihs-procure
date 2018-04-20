@@ -8,21 +8,16 @@ feature 'Passwords sign-in, sign-out, session' do
       @user = FactoryBot.create :admin
     end
 
-    scenario 'signing in with the wrong password '\
-      ' does not work and shows an sing-in warning 'do
+    scenario 'signing in with the wrong password does not work' do
 
       visit '/'
-
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: 'bogus'
       click_on 'Sign in'
 
-      expect(page).to have_content \
-        "Make sure that you use the correct email-address and the correct password"
-
       # we are not signed-in
       expect(page).not_to have_content @user.email
-
 
     end
 
@@ -30,7 +25,7 @@ feature 'Passwords sign-in, sign-out, session' do
       'and we can see that we use session authentication ' do
 
       visit '/'
-
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'
@@ -48,6 +43,7 @@ feature 'Passwords sign-in, sign-out, session' do
     scenario 'signing out after signing in does work 'do
 
       visit '/'
+      click_on 'Sign in with password'
 
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password

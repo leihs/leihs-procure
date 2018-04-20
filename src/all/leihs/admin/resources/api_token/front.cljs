@@ -7,7 +7,6 @@
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.state :as state :refer [routing-state*]]
     [leihs.admin.paths :as paths]
-    [leihs.admin.resources.auth.core :as auth]
     [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.front.shared :refer [humanize-datetime-component]]
     [leihs.admin.front.requests.core :as requests]

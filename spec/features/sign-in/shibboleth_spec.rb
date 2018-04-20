@@ -32,7 +32,7 @@ feature 'Sign in via shibboleth routes' do
       database[:settings].update(shibboleth_enabled: false)
     end
 
-    scenario 'sign-in even wwith expected headers is forbidden' do
+    scenario 'sign-in even with expected headers is forbidden' do
       expect(sign_in_response.status).to be== 403
     end
 

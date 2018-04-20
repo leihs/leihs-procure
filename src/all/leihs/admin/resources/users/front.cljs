@@ -38,7 +38,7 @@
   after 1/5 second timeout if query-params have not changed in the meanwhile 
   yet and stores the result in the map data* under this url."
   (let [url @current-url*
-        normalize-query-params @current-query-paramerters-normalized*]
+        normalized-query-params @current-query-paramerters-normalized*]
     (go (<! (timeout 200))
         (when (= url @current-url*)
           (let [resp-chan (async/chan)
@@ -55,10 +55,10 @@
                              (= id @fetch-users-id*) ;still the most recent request
                              (= url @current-url*)) ;query-params have still not changed yet
                     (let [body (-> resp :body)
-                          page (:page normalize-query-params)
-                          per-page (:per-page normalize-query-params)
-                          offet (* per-page (- page 1))
-                          body-with-indexed-users (update-in body [:users] (partial with-index offet))]
+                          page (:page normalized-query-params)
+                          per-page (:per-page normalized-query-params)
+                          offset (* per-page (- page 1))
+                          body-with-indexed-users (update-in body [:users] (partial with-index offset))]
                       (swap! data* assoc url body-with-indexed-users))))))))))
 
 (defn escalate-query-paramas-update [_]
@@ -213,7 +213,7 @@
            [:i.fas.fa-envelope] " " (:email user)]])
    (for [{td :td} (:customcols colconfig)]
      [td user])])
-
+ 
 (defn users-table-component [colconfig]
   (if-not (contains? @data* @current-url*)
     [:div.text-center
@@ -250,6 +250,9 @@
     [:section.debug
      [:hr]
      [:h2 "Page Debug"]
+     [:div
+      [:h3 "@current-query-paramerters-normalized*"]
+      [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
      [:div
       [:h3 "@current-url*"]
       [:pre (with-out-str (pprint @current-url*))]]

@@ -9,7 +9,7 @@
     [leihs.admin.paths :refer [path paths]]
     [leihs.admin.resources.api-token.back :as api-token]
     [leihs.admin.resources.api-tokens.back :as api-tokens]
-    [leihs.admin.resources.auth.core :as auth]
+    [leihs.admin.resources.auth.back :as auth]
     [leihs.admin.resources.delegation.back :as delegation]
     [leihs.admin.resources.delegations.back :as delegations]
     [leihs.admin.resources.delegation.users.back :as delegation-users]

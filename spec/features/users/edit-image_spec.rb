@@ -13,6 +13,7 @@ feature 'Manage users', type: :feature do
     scenario 'setting, seeing and then removing the user image works' do
 
       visit '/'
+      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
       fill_in 'password', with: @user.password
       click_on 'Sign in'

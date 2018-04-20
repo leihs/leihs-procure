@@ -14,6 +14,21 @@
           [logbug.thrown :as thrown]
           ])))
 
+(def external-handlers
+  #{:admin-audits-legacy
+    :admin-buildings
+    :admin-fields
+    :admin-inventory-pools
+    :admin-languages
+    :admin-mail-templates
+    :admin-rooms
+    :admin-settings
+    :admin-statistics
+    :admin-suppliers
+    :borrow
+    :lending
+    :procurement
+    })
 
 (def delegation-paths
   (branch "/delegations"
@@ -35,16 +50,38 @@
                                   (param :user-id)
                                   (leaf "" :delegation-user))))))
 
+(def users-paths 
+  (branch "/users"
+          (branch "/"
+                  (leaf "" :users)
+                  (leaf "new" :user-new))
+          (branch "/" 
+                  (param :user-id)
+                  (leaf "" :user)
+                  (leaf "/delete" :user-delete)
+                  (leaf "/edit" :user-edit)
+                  (branch "/api-tokens/"
+                          (leaf "" :api-tokens)
+                          (leaf "new" :api-token-new)
+                          (branch ""
+                                  (param :api-token-id)
+                                  (leaf "" :api-token)
+                                  (leaf "/delete" :api-token-delete)
+                                  (leaf "/edit" :api-token-edit)))
+                  (branch "/transfer/"
+                          (param :target-user-id)
+                          (leaf "" :user-transfer-data)))))
+
 (def paths
   (branch ""
-          (leaf "/" :leihs)
+          (leaf "/" :home)
           (branch "/auth"
                   (leaf "" :auth)
                   (leaf "/shib-sign-in" :auth-shib-sign-in)
                   (leaf "/password-sign-in" :auth-password-sign-in)
                   (leaf "/sign-out" :auth-sign-out))
-          (leaf "/procure" :procure)
-          (leaf "/manage" :lend)
+          (leaf "/procurement" :procurement)
+          (leaf "/manage" :lending)
           (leaf "/borrow" :borrow)
           (branch "/admin"
                   (leaf "/status" :status)
@@ -58,25 +95,18 @@
                                           (leaf "" :request))))
                   (leaf "/" :admin)
                   delegation-paths
-                  (leaf "/users/new" :user-new)
-                  (leaf "/users/" :users)
-                  (branch "/users/"
-                          (param :user-id)
-                          (leaf "" :user)
-                          (leaf "/delete" :user-delete)
-                          (leaf "/edit" :user-edit)
-                          (branch "/api-tokens/"
-                                  (leaf "" :api-tokens)
-                                  (leaf "new" :api-token-new)
-                                  (branch ""
-                                          (param :api-token-id)
-                                          (leaf "" :api-token)
-                                          (leaf "/delete" :api-token-delete)
-                                          (leaf "/edit" :api-token-edit)))
-                          (branch "/transfer/"
-                                  (param :target-user-id)
-                                  (leaf "" :user-transfer-data))))
-          (leaf "/" :redirect-to-root)))
+                  users-paths
+                  (leaf "/audits" :admin-audits-legacy)
+                  (leaf "/buildings" :admin-buildings)
+                  (leaf "/fields_editor" :admin-fields)
+                  (leaf "/inventory_pools" :admin-inventory-pools)
+                  (leaf "/languages" :admin-languages)
+                  (leaf "/mail_templates" :admin-mail-templates)
+                  (leaf "/rooms" :admin-rooms)
+                  (leaf "/settings" :admin-settings)
+                  (leaf "/statistics" :adming-statistics)
+                  (leaf "/suppliers" :admin-suppliers)
+                  )))
 
 ;(path-for (paths) :user :user-id "{user-id}")
 ;(match-route (paths) "/users/512")

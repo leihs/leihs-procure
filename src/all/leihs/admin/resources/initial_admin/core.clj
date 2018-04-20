@@ -40,7 +40,7 @@
      {:status 403
       :body "A admin user already exists!"}
      (when-let [user (-> data prepare-data (insert-user tx))]
-       (redirect (path :admin) :see-other)))))
+       (redirect (path :home) :see-other)))))
 
 (def routes
   (cpj/routes

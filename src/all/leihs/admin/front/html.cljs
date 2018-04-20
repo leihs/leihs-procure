@@ -4,13 +4,14 @@
     [reagent.ratom :as ratom :refer [reaction]]
     )
   (:require
+    [leihs.admin.resources.auth.front :as auth]
     [leihs.admin.anti-csrf.core :as anti-csrf]
     [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.requests.modal]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state :refer [routing-state*]]
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.admin.core :as admin :refer [page] :rename {page home-page}]
+    [leihs.admin.resources.admin.front :as admin :refer [page] :rename {page home-page}]
     [leihs.admin.utils.core :refer [keyword str presence]]
 
     [clojure.pprint :refer [pprint]]
@@ -30,11 +31,11 @@
                     (re-matches #"^/admin.*$" current-path)))]
     [:li.nav-item
      {:class (if active? "active" "")}
-     [:a.nav-link {:href (path :admin)} "administriers"]]))
+     [:a.nav-link {:href (path :admin)} "Admin"]]))
 
 (defn sign-out-nav-component []
   [:form.form-inline.ml-2
-   {:action (path :auth-sign-out)
+   {:action (path :auth-sign-out {} {:target (-> @state/routing-state* :url)})
     :method :post}
    [:div.form-group
     [:input
@@ -64,19 +65,23 @@
                    (gravatar-url (:email user)))}]
         [:span.sr-only (:email user)]]]]
      [sign-out-nav-component]]
-    [:div.navbar-nav]))
+    [:div.navbar-nav
+     [auth/nav-sign-in-component]
+     ]))
 
 (defn nav-bar []
-  [:nav.navbar.navbar-expand.navbar-dark.justify-content-between
-   {:class (if (= (-> @state/routing-state* :handler-key) :leihs)
-             "bg-primary" "bg-admin")}
-   [:a.navbar-brand {:href (path :leihs)} "leihs"]
+  [:nav.navbar.navbar-expand.justify-content-between
+   {:class (if (= (-> @state/routing-state* :handler-key) :home)
+             "navbar-light bg-light" "navbar-dark bg-admin")}
+   [:a.navbar-brand {:href (path :home)} "leihs"]
    [:div
-    [:ul.navbar-nav
-     [li-navitem :borrow "borgs"]
-     [li-navitem :lend "verleihs"]
-     [li-navitem :procure "beschaffs"]
-     [li-admin-navitem]]]
+    (when @state/user*
+      [:ul.navbar-nav
+       [li-admin-navitem]
+       [li-navitem :borrow "Borrow"]
+       [li-navitem :lending "Lending"]
+       [li-navitem :procure "Procurement"]
+       ])]
    [navbar-user-nav]])
 
 (defn current-page []
@@ -84,13 +89,10 @@
    [leihs.admin.front.requests.modal/modal-component]
    [nav-bar]
    [:div
-    (if-not (or @state/user*
-                (= :initial-admin (:handler-key @state/routing-state*)))
-      [home-page]
-      (if-let [page (:page @routing-state*)]
-        [page]
-        [:div.page
-         [:h1.text-danger "Application error: the current path can not be resolved!"]]))]
+    (if-let [page (:page @routing-state*)]
+      [page]
+      [:div.page
+       [:h1.text-danger "Application error: the current path can not be resolved!"]])]
    [state/debug-component]
    [:nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col
     {:style {:margin-top "3em"}}

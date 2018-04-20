@@ -5,18 +5,18 @@
     )
   (:require
     [leihs.admin.front.pages.debug]
-    [leihs.admin.front.pages.leihs]
     [leihs.admin.front.requests.pages.request]
     [leihs.admin.front.requests.pages.requests]
     [leihs.admin.front.state :refer [routing-state*]]
-    [leihs.admin.paths :refer [path paths]]
-    [leihs.admin.resources.admin.core :as admin]
+    [leihs.admin.paths :as paths :refer [path paths]]
+    [leihs.admin.resources.admin.front :as admin]
     [leihs.admin.resources.api-token.front :as api-token]
     [leihs.admin.resources.api-tokens.front :as api-tokens]
-    [leihs.admin.resources.auth.core :as auth]
+    [leihs.admin.resources.auth.front :as auth]
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
+    [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.initial-admin.core :as initial-admin]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
@@ -50,7 +50,7 @@
    :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
    :delegations #'delegations/page
    :initial-admin #'initial-admin/page
-   :leihs #'leihs.admin.front.pages.leihs/page
+   :home #'home/page
    :request #'leihs.admin.front.requests.pages.request/page
    :requests #'leihs.admin.front.requests.pages.requests/page
    :user #'user/show-page
@@ -84,7 +84,9 @@
                       ))
      :path-exists? (fn [path]
                      (js/console.log (with-out-str (pprint (match-path path))))
-                     (boolean (match-path path)))}))
+                     (boolean (when-let [handler-key (:handler (match-path path))]
+                                (when-not (handler-key paths/external-handlers)
+                                  handler-key))))}))
 
 (defn init []
   (init-navigation)

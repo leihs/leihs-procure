@@ -49,9 +49,9 @@
 
 (defn email-li [address] [:li.breadcrumb-item {:key (str "mailto:" address )} [:a {:href (str "mailto:" address )} [:i.fas.fa-envelope] " Email "]])
 (defn initial-admin-li [] (li :initial-admin "Initial-Admin"))
-(defn leihs-li [] (li :leihs "Home"))
-(defn lend-li [] (li :lend "Lend"))
-(defn procure-li [] (li :procure "Procure"))
+(defn leihs-li [] (li :home [:span icons/home " Home "]))
+(defn lending-li [] (li :lending "Lending"))
+(defn procurement-li [] (li :procurement "Procurement"))
 (defn request-li [id] (li :request "Request" {:id id} {}))
 (defn requests-li [] (li :requests "Requests"))
 
@@ -62,7 +62,7 @@
 (defn users-li [] (li :users [:span icons/users " Users "] {} {}))
 
 (defn nav-component [left right]
-  [:div.row
+  [:div.row.nav-component.mt-3 
    [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
     (when (seq left)
       [:ol.breadcrumb
