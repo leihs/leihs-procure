@@ -136,7 +136,7 @@
     handler
     {:mime
      ["application/json" :qs 1 :as :json
-      "image/apng" :qs 0.8 :as :apng
+      "image/*" :qs 1 :as :image
       "text/html" :qs 1 :as :html ]}))
 
 (defn canonicalize-params-map [params]

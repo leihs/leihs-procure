@@ -9,8 +9,9 @@
     [leihs.procurement.paths :refer [path]]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug])
+  (:import
+    [java.util Base64]))
 
 (defn image-query [id]
   (-> (sql/select :procurement_images.*)
@@ -22,19 +23,19 @@
   (let [i (->> image-id image-query (jdbc/query tx) first)]
     (->> i 
          :content
-         .getBytes
-         base64/decode
-         io/input-stream
+         (.decode (Base64/getMimeDecoder))
          (hash-map :body)
          (merge {:headers {"Content-Type" (:content_type i)
-                           "Content-Disposition" "inline"}}))))
+                           "Content-Disposition" (str "inline; filename=\""
+                                                      (:filename i)
+                                                      "\"")
+                           "Content-Transfer-Encoding" "binary"}}))))
 
 (def image-path (path :image {:image-id ":image-id"}))
 
 (def routes
   (cpj/routes
     (cpj/GET image-path [] #'image)))
-
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
