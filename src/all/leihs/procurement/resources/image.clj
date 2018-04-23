@@ -13,14 +13,20 @@
   (:import
     [java.util Base64]))
 
-(defn image-query [id]
+(def image-base-query
   (-> (sql/select :procurement_images.*)
-      (sql/from :procurement_images)
-      (sql/where [:= :procurement_images.id id])
-      sql/format))
+      (sql/from :procurement_images)))
+
+(defn image-query [id]
+  (-> image-base-query
+      (sql/where [:= :procurement_images.id id])))
+
+(defn image-query-for-main-category [id]
+  (-> image-base-query
+      (sql/where [:= :procurement_images.main_category_id id])))
 
 (defn image [{tx :tx {image-id :image-id} :route-params}]
-  (let [i (->> image-id image-query (jdbc/query tx) first)]
+  (let [i (->> image-id image-query sql/format (jdbc/query tx) first)]
     (->> i 
          :content
          (.decode (Base64/getMimeDecoder))

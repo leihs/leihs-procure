@@ -29,6 +29,7 @@
 
            :MainCategory {:fields {:id {:type ID}
                                    :name {:type String}
+                                   :image_url {:type String}
                                    :budget_limits {:type (list :BudgetLimit)
                                                    :resolve :budget-limits}
                                    :categories {:type (list :Category)
