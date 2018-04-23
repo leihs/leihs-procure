@@ -18,10 +18,10 @@
           (branch "/procure"
                   (leaf "/graphql" :graphql)
                   (leaf "/shutdown" :shutdown)
-                  (leaf "/status" :status))
-          (branch "/images/"
-                  (param :image-id)
-                  (leaf "" :image))
+                  (leaf "/status" :status)
+                  (branch "/images/"
+                          (param :image-id)
+                          (leaf "" :image)))
           ; (leaf "/" :leihs)
           ; (branch "/auth"
           ;         (leaf "" :auth)

@@ -39,8 +39,9 @@
   (url/encode
     (to-json
       (when-let [user-id (-> request :authenticated-entity :user_id)]
-        (->> (user/user-query user-id)
-             (jdbc/query (:tx request)) first)))))
+        (->> (user/user-base-query user-id)
+             (jdbc/query (:tx request)) 
+             first)))))
 
 (defn settings-data [request]
   (url/encode

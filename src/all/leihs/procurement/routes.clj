@@ -50,8 +50,7 @@
     :status})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
-  #{
-    :redirect-to-root 
+  #{:redirect-to-root 
     :not-found 
     :auth-shib-sign-in})
 
@@ -136,8 +135,8 @@
   (ring.middleware.accept/wrap-accept
     handler
     {:mime
-     ["application/json-roa+json" :qs 1 :as :json-roa
-      "application/json" :qs 1 :as :json
+     ["application/json" :qs 1 :as :json
+      "image/apng" :qs 0.8 :as :apng
       "text/html" :qs 1 :as :html ]}))
 
 (defn canonicalize-params-map [params]

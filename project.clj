@@ -28,6 +28,7 @@
    [io.forward/yaml "1.0.7"]
    [log4j/log4j "1.2.17" :exclusions [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
    [logbug "4.2.2"]
+   [org.clojure/data.codec "0.1.1"]
    [org.clojure/clojure "1.9.0"]
    [org.clojure/clojurescript "1.10.217" :scope "provided"]
    [org.clojure/java.jdbc "0.7.5"]
