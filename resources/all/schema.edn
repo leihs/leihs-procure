@@ -118,6 +118,16 @@
                            :login {:type String}}}}
 
 :input-objects {:AdminInput {:fields {:user_id {:type ID}}}
+                :BudgetLimitInput {:fields {:budget_period_id {:type ID}
+                                            :amount_cents {:type Int}}}
+                :CategoryInspectorsInput {:fields {:id {:type ID}
+                                                   :general_ledger_accout {:type String}
+                                                   :cost_center {:type String}
+                                                   :inspectors {:type (list ID)}}}
+                :MainCategoryInput {:fields {:id {:type ID}
+                                             :name {:type (non-null String)}
+                                             :budget_limits {:type (list :BudgetLimitInput)}
+                                             :categories_inspectors {:type (list :CategoryInspectorsInput)}}}
                 :RequesterOrganizationInput {:fields {:user_id {:type ID}
                                                       :department {:type String}
                                                       :organization {:type String}}}}
@@ -149,7 +159,7 @@
                        :resolve :priorities}
 
           :priorities_inspector {:type (list Int)
-                                 :resolve :priorities_inspector}
+                                 :resolve :priorities-inspector}
 
           :request_by_id {:type :Request
                           :args {:id {:type ID}}
@@ -168,7 +178,7 @@
                      :resolve :requests}
 
           :requesters_organizations {:type (list :RequesterOrganization)
-                                     :resolve :requesters_organizations}
+                                     :resolve :requesters-organizations}
 
           :request_fields_by_id {:type (list :RequestField)
                                  :args {:request_id {:type ID}}
@@ -178,9 +188,12 @@
                   :args {:building_id {:type ID}}
                   :resolve :rooms}}
 
-:mutations {:requesters_organizations {:type (list :RequesterOrganization)
-                                       :args {:input_data {:type (list :RequesterOrganizationInput)}}
-                                       :resolve :update_requesters_organizations}
-            :admins {:type (list :User)
+:mutations {:admins {:type (list :User)
                      :args {:input_data {:type (list :AdminInput)}}
-                     :resolve :update_admins}}}
+                     :resolve :update-admins} 
+            :main_categories {:type (list :MainCategory)
+                              :args {:input_data {:type (list :MainCategoryInput)}}
+                              :resolve :update-main-categories}
+            :requesters_organizations {:type (list :RequesterOrganization)
+                                       :args {:input_data {:type (list :RequesterOrganizationInput)}}
+                                       :resolve :update-requesters-organizations}}}

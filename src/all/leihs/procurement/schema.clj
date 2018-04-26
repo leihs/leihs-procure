@@ -64,16 +64,17 @@
    :organization organization/get-organization
    :organizations organizations/get-organizations
    :priorities (fn [_ _ _] [0 1])
-   :priorities_inspector (fn [_ _ _] [0 1 2 3])
+   :priorities-inspector (fn [_ _ _] [0 1 2 3])
    :request-by-id request/get-request
    :requests requests/get-requests
    :request-fields-by-id request-fields/get-request-fields
-   :requesters_organizations requesters-organizations/get-requesters-organizations
+   :requesters-organizations requesters-organizations/get-requesters-organizations
    :room room/get-room
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
-   :update_admins admins/update-admins
-   :update_requesters_organizations requesters-organizations/update-requesters-organizations
+   :update-admins admins/update-admins
+   :update-main-categories main-categories/update-main-categories!
+   :update-requesters-organizations requesters-organizations/update-requesters-organizations
    :user user/get-user})
 
 (defn- wrap-map-with-error [arg]
@@ -87,7 +88,7 @@
       graphql-schema/compile))
 
 ;#### debug ###################################################################
-; (logging-config/set-logger! :level :debug)
+(logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

@@ -1,5 +1,5 @@
 (ns leihs.procurement.utils.sql
-  (:refer-clojure :exclude [format])
+  (:refer-clojure :exclude [format update])
   (:require
     [honeysql.format :as format]
     [honeysql.helpers :as helpers :refer [build-clause]]
@@ -39,6 +39,7 @@
 (defalias delete-from helpers/delete-from)
 (defalias from helpers/from)
 (defalias group helpers/group)
+(defalias insert-into helpers/insert-into)
 (defalias join helpers/join)
 (defalias limit helpers/limit)
 (defalias merge-join helpers/merge-join)
@@ -48,7 +49,10 @@
 (defalias order-by helpers/order-by)
 ;(defalias returning helpers/returning)
 (defalias select helpers/select)
+(defalias sset helpers/sset)
 ;(defalias using helpers/using)
+(defalias update helpers/update)
+(defalias values helpers/values)
 (defalias where helpers/where)
 
 ;#### debug ###################################################################

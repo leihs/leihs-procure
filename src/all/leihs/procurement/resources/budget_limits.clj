@@ -16,6 +16,25 @@
                     [:= :procurement_budget_limits.main_category_id main_category_id])
                   sql/format))))
 
+(defn insert-budget-limit! [tx bl]
+  (jdbc/execute! tx
+                 (-> (sql/insert-into :procurement_budget_limits)
+                     (sql/values [bl])
+                     sql/format)))
+
+(defn delete-budget-limit! [tx bl]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from [:procurement_budget_limits :pbl])
+                     (sql/where [:and
+                                 [:= :pbl.main_category_id (:main_category_id bl)]
+                                 [:= :pbl.budget_period_id (:budget_period_id bl)]])
+                     sql/format)))
+
+(defn update-budget-limits! [tx bls]
+  (doseq [bl bls]
+    (delete-budget-limit! tx bl)
+    (insert-budget-limit! tx bl)))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
