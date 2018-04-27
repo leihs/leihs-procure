@@ -61,7 +61,9 @@
        {:href (path :user {:user-id (:id user)} {})}
        [:span
         [:img.user-img-32
-         {:src (or (:img32_data_url user)
+         {:width 32
+          :height 32
+          :src (or (:img32_url user)
                    (gravatar-url (:email user)))}]
         [:span.sr-only (:email user)]]]]
      [sign-out-nav-component]]

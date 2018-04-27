@@ -197,7 +197,10 @@
   [:tr {:key (:id user)}
    [:td (:index user)]
    [:td [:a {:href (path :user {:user-id (:id user)})}
-         [:img {:src (or (:img32_data_url user)
+         [:img 
+          {:height 32
+           :width 32
+           :src (or (:img32_url user)
                          (gravatar-url (:email user)))}]]]
    (when (:id colconfig)
      [:td [:a {:href (path :user {:user-id (:id user)})}

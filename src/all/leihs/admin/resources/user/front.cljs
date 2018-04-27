@@ -67,13 +67,26 @@
    (let [opts (merge {:type :text} opts)]
      [:div.form-group.row
       [:label.col.col-form-label.col-sm-2 {:for kw} kw]
-      [:div.col
-       [:input.form-control
-        {:id kw
-         :type (:type opts)
-         :value (or (kw @user-data*) "")
-         :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
-         :disabled (not @edit-mode?*)}]]])))
+      [:div.col.col-sm-10
+       [:div.input-group
+        (if @edit-mode?*
+          [:input.form-control
+           {:id kw
+            :type (:type opts)
+            :value (or (kw @user-data*) " ")
+            :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
+            :disabled (not @edit-mode?*)}]
+          [:input-group.form-control
+           (if-let [value (-> @user-data* kw presence)]
+             [:span.input-group-text.text-truncate
+              {:style {:overflow :scroll
+                       :max-width "50em"
+                       :flex "1 1 auto"}}
+              (case (:type opts)
+                :email [:a {:href (str "mailto:" value)}
+                        [:i.fas.fa-envelope] " " value]
+                :url [:a {:href value} value]
+                value)])])]]])))
 
 (defn checkbox-component [kw]
   [:div.form-check.form-check-inline
@@ -125,19 +138,20 @@
     (.readAsArrayBuffer reader f)))
 
 (defn img-handler [data]
-  (js/Jimp.read
-    data (fn [err img]
-           (when err
-             (swap! img-processing* assoc :error err)
-             (throw err))
-           (doto img
-             (.resize 512 512)
-             (.quality 100))
-           (.getBase64 img "image/jpeg"
-                       (fn [err b64]
-                         (if err
-                           (swap! img-processing* assoc :error err)
-                           (swap! user-data* assoc :img256_data_url b64)))))))
+  (doseq [res [256 32]]
+    (js/Jimp.read
+      data (fn [err img]
+             (when err
+               (swap! img-processing* assoc :error err)
+               (throw err))
+             (doto img
+               (.resize res res)
+               (.quality 80))
+             (.getBase64 img "image/jpeg"
+                         (fn [err b64]
+                           (if err
+                             (swap! img-processing* assoc :error err)
+                             (swap! user-data* assoc (keyword (str "img" res "_url")) b64))))))))
 
 (defn handle-img-drop [evt]
   (reset! img-processing* {})
@@ -149,7 +163,6 @@
         (get-file-data data-transfer img-handler)
         (get-img-data data-transfer img-handler)))))
 
-
 (defn handle-img-chosen [evt]
   (reset! img-processing* {})
   (js/console.log evt)
@@ -157,7 +170,7 @@
   (get-file-data (-> evt .-target) img-handler))
 
 (defn file-upload []
-  [:div.box
+  [:div.box.mb-2
    {:style {:position :relative}
     :on-drag-over #(allow-drop %)
     :on-drop #(handle-img-drop %)
@@ -180,13 +193,15 @@
               :bottom 0
               :width "100%"}}
      [:div
-      (when (:img256_data_url @user-data*)
+      (when (:img256_url @user-data*)
         [:p {:style {:margin-top "1em"}}
          [:button.btn.btn-sm.btn-dark
-          {:on-click #(swap! user-data* assoc :img256_data_url nil :img32_data_url nil)}
+          {:on-click #(swap! user-data* assoc :img256_url nil :img32_url nil)}
           [:i.fas.fa-times] " Remove image "]])]]]
-   (if-let [img-data (:img256_data_url @user-data*)]
-           [:img {:src img-data
+   (if-let [img-data (:img256_url @user-data*)]
+           [:img {:width 256
+                  :height 256
+                  :src img-data
                   :style {:position :absolute
                           :left 0
                           :top 0
@@ -203,30 +218,36 @@
                      :z-index -1 }}])])
 
 (defn image-component []
-  (if-not @edit-mode?*
-    [:img.bg-light.user-image-256
-     {:src (if-let [data (:img256_data_url @user-data*)]
-             data
-             (gravatar-url (:email @user-data*) 256))
-      :width 256
-      :height 256}]
-    [file-upload]))
+  [:div.clearfix
+   [:h3 "User-Image"]
+   (if-not @edit-mode?*
+     [:img.bg-light.user-image-256.mb-2
+      {:src (if-let [data (:img256_url @user-data*)]
+              data
+              (gravatar-url (:email @user-data*) 256))
+       :width 256
+       :height 256}]
+     [file-upload])
+   [field-component :img256_url {:type :url}]
+   [field-component :img32_url {:type :url}]])
 
 
 ;; user components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn basic-component []
   [:div.form.mt-2
+   [:h3 "Basic properties"]
    [checkbox-component :is_admin]
    [checkbox-component :sign_in_enabled]
    [checkbox-component :password_sign_in_enabled]
    [field-component :firstname]
    [field-component :lastname]
    [field-component :phone]
-   [field-component :email]])
+   [field-component :email {:type :email}]])
 
 (defn address-component []
   [:div.form.mt-2
+   [:h3 "Address"]
    [field-component :address]
    [field-component :zip]
    [field-component :city]
@@ -235,6 +256,7 @@
 
 (defn rest-component []
   [:div.form.mt-2
+   [:h3 "Other"]
    [field-component :login]
    [field-component :org_id]
    [field-component :password {:type :password}]])
@@ -256,12 +278,10 @@
       [:i.fas.fa-spinner.fa-spin.fa-5x]
       [:span.sr-only "Please wait"]]
      [:div
-      [:div.row.mt-4
-       [:div.col-lg-4 [image-component]]
-       [:div.col-lg-8.mt-2 [basic-component]]]
-      [:div.row.mt-4
-       [:div.col-md [address-component]]
-       [:div.col-md [rest-component]]]
+      [basic-component]
+      [image-component]
+      [address-component]
+      [rest-component]
       (when-not @edit-mode?*
         [additional-properties-component])])])
 

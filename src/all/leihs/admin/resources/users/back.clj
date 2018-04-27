@@ -16,7 +16,7 @@
 
 
 (def users-base-query
-  (-> (sql/select :id, :login, :firstname, :lastname, :email, :img32_data_url, :org_id)
+  (-> (sql/select :id, :login, :firstname, :lastname, :email, :img32_url, :org_id)
       (sql/from :users)
       (sql/order-by :lastname :firstname)
       (sql/merge-where [:= nil :delegator_user_id])

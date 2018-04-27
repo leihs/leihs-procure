@@ -31,8 +31,8 @@
    :email
    :firstname
    :id
-   :img256_data_url
-   :img32_data_url
+   :img256_url
+   :img32_url
    :is_admin
    :lastname
    :login
@@ -54,8 +54,8 @@
    :country
    :email
    :firstname
-   :img256_data_url
-   :img32_data_url
+   :img256_url
+   :img32_url
    :img_upload_id
    :is_admin
    :lastname
@@ -120,7 +120,7 @@
   (when-not (= IMG-DATA-URL-PREFIX prefix)
     (throw (ex-info "Image is not of expected type 'data:image/jpeg;base64'!"
                     {:status 422
-                     :body (str "The first chars of img256_data_url must be equal to data:image/jpeg;base64. "
+                     :body (str "The first chars of img256_url must be equal to data:image/jpeg;base64. "
                                 "See also https://tools.ietf.org/html/rfc2397.")}))))
 
 (defn data-url-img->buffered-image ^BufferedImage [data-url-img]
@@ -146,22 +146,22 @@
 
 (defn remove-images [data]
   (assoc data
-         :img256_data_url nil
-         :img32_data_url nil))
+         :img256_url nil
+         :img32_url nil))
 
 (defn set-images [data img-data-url]
   (let [img (data-url-img->buffered-image img-data-url)
         img256-data-url (-> img (resized-img 256) buffered-image->data-url-img)
         img32-data-url (-> img (resized-img 32) buffered-image->data-url-img)]
     (assoc data
-           :img256_data_url img256-data-url
-           :img32_data_url img32-data-url)))
+           :img256_url img256-data-url
+           :img32_url img32-data-url)))
 
-(defn insert-images [data]
-  (if-let [img-data-url (-> data :img256_data_url presence)]
+(defn process-images [data]
+  (if-let [img-data-url (-> data :img256_url presence)]
     (set-images data img-data-url)
-    (if (and (contains? data :img256_data_url)
-             (not (-> data :img256_data_url presence)))
+    (if (and (contains? data :img256_url)
+             (not (-> data :img256_url presence)))
       (remove-images data)
       data)))
 
@@ -186,7 +186,7 @@
   (catcher/with-logging
     {}
     (-> data
-        insert-images
+        ;process-images
         (insert-pw-hash tx)
         (select-keys user-write-keys)
         (rename-keys user-write-keymap))))
