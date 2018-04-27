@@ -110,7 +110,7 @@
       (breadcrumbs/users-li)
       (breadcrumbs/user-li @user-id*)
       (breadcrumbs/api-tokens-li @user-id*)]
-     [(breadcrumbs/api-token-new-li @user-id*)])
+     [(breadcrumbs/api-token-add-li @user-id*)])
    [:div
     [state/hidden-routing-state-component {:did-update fetch-tokens
                                            :did-mount fetch-tokens}]

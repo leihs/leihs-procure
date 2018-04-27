@@ -34,7 +34,7 @@ feature 'Passwords sign-in, sign-out, session' do
 
 
       # the authentication method is session
-      visit '/auth'
+      visit '/auth/info'
 
       wait_until {page.has_content? /authentication-method.+session/}
 

@@ -62,7 +62,7 @@
                   (leaf "/edit" :user-edit)
                   (branch "/api-tokens/"
                           (leaf "" :api-tokens)
-                          (leaf "new" :api-token-new)
+                          (leaf "add " :api-token-add)
                           (branch ""
                                   (param :api-token-id)
                                   (leaf "" :api-token)
@@ -76,7 +76,8 @@
   (branch ""
           (leaf "/" :home)
           (branch "/auth"
-                  (leaf "" :auth)
+                  (leaf "/" :auth)
+                  (leaf "/info" :auth-info)
                   (leaf "/shib-sign-in" :auth-shib-sign-in)
                   (leaf "/password-sign-in" :auth-password-sign-in)
                   (leaf "/sign-out" :auth-sign-out))

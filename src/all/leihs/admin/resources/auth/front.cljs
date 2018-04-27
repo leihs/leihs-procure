@@ -138,7 +138,6 @@
        [:div.password-sign-in
         (breadcrumbs/nav-component
           [(breadcrumbs/leihs-li)
-           (breadcrumbs/admin-li)
            (breadcrumbs/auth-li)
            (breadcrumbs/auth-password-sign-in-li)
            ][])
@@ -154,7 +153,7 @@
 (defn fetch-auth []
   (reset! auth-data* nil)
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :auth)
+        id (requests/send-off {:url (path :auth-info)
                                :method :get
                                :query-params {}}
                               {:modal false
@@ -169,6 +168,24 @@
             (reset! auth-data* (:body resp)))))))
 
 
+(defn info-page []
+  (reagent/create-class
+    {:component-did-mount #(fetch-auth)
+     :reagent-render
+     (fn [_]
+       [:div.session
+        (breadcrumbs/nav-component
+          [(breadcrumbs/leihs-li)
+           (breadcrumbs/auth-li)
+           (breadcrumbs/auth-info-li)]
+          [])
+        [:h1 "Authentication-Info"]
+        [:p "The data shown below is mostly of interest for exploring the API or for debugging."]
+        (when-let [auth-data @auth-data*]
+          [:pre.bg-light
+           (with-out-str (pprint auth-data))])])}))
+
+
 (defn auth-page []
   (reagent/create-class
     {:component-did-mount #(fetch-auth)
@@ -177,13 +194,6 @@
        [:div.session
         (breadcrumbs/nav-component
           [(breadcrumbs/leihs-li)
-           (breadcrumbs/admin-li)
            (breadcrumbs/auth-li)]
-          [(breadcrumbs/auth-password-sign-in-li)])
-        [:h1 "Authentication"]
-        [:p "The data shown below is mostly of interest for exploring the API or for debugging."]
-        (when-let [auth-data @auth-data*]
-          [:pre.bg-light
-           (with-out-str (pprint auth-data))])])}))
-
-
+          [(breadcrumbs/auth-info-li)])
+        [:h1 "Authentication"]])}))

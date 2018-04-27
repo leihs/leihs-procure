@@ -29,7 +29,7 @@
 (defonce mode?*
   (reaction
     (case (:handler-key @state/routing-state*)
-      :api-token-new :new
+      :api-token-add :add
       (:api-token :api-token-delete) :show
       :api-token-edit :edit
       nil
@@ -39,7 +39,7 @@
 (defonce edit-mode?*
   (reaction
     (and (map? @api-token-data*)
-         (boolean ((set '(:api-token-edit :api-token-new))
+         (boolean ((set '(:api-token-edit :api-token-add))
                    (:handler-key @state/routing-state*))))))
 
 (defn valid-iso8601? [iso]
@@ -62,6 +62,8 @@
            :scope_admin_write false
            :expires_at (.format (.add (js/moment) 1, "year"))
            }))
+
+(declare add patch delete)
 
 ;;; form scopes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -125,7 +127,7 @@
      :on-change #(swap! api-token-data* assoc :description (-> % .-target .-value presence))
      :value (-> @api-token-data* :description)
      :disabled (= @mode?* :show)}]
-   (when (#{:new :edit} @mode?*)
+   (when (#{:add :edit} @mode?*)
      [:small.form-text
       {:class (if (not @description-valid*?) "text-danger" "text-muted")}
       "The description may not be empty!" ])])
@@ -150,7 +152,7 @@
 
 (defn expires-at-form-component []
   [:div.form-group {:class (when (not @expires-at-valid*?) "has-error")}
-   [:label [:b "Expires" ":" ]]
+   [:label {:for :expires_at} [:b "Expires" ":" ]]
    [:input#expires_at.form-control
     {:class (when (not @expires-at-valid*?) "is-invalid")
      :type :datetime-local
@@ -186,7 +188,7 @@
 
 ;;; submit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(declare create-button-component
+(declare add-button-component
          delete-button-component
          edit-button-component)
 
@@ -194,7 +196,7 @@
   [:div
    [:div.float-right
     (case (:handler-key @state/routing-state*)
-      :api-token-new [create-button-component]
+      :api-token-add [add-button-component]
       :api-token-delete [delete-button-component]
       :api-token-edit [edit-button-component]
       nil)]
@@ -203,37 +205,41 @@
 ;;; form main ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn form-component []
-  [:div.form
+  [:form.form
+   {:on-submit (fn [e]
+                 (.preventDefault e)
+                 (case (:handler-key @state/routing-state*)
+                   :api-token-add (add)
+                   :api-token-edit (patch)
+                   :api-token-delete (delete)
+                   ))}
    [description-form-component]
    [scopes-form-component]
    [expires-at-form-component]
    [form-timestamps-component]
-   [submit-component]
-   ])
+   [submit-component]])
 
 ;;; new page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def token-secret* (reaction (-> @api-token-data* :token_secret)))
 
-(defn create [& args]
+(defn add [& args]
   (let [resp-chan (async/chan)
         id (requests/send-off {:url (path :api-tokens {:user-id @user-id*})
                                :method :post
                                :json-params  @api-token-data*}
                               {:modal true
-                               :title "Create API-Token"
-                               :handler-key :api-token-new
-                               :retry-fn #'create}
+                               :title "Add API-Token"
+                               :retry-fn #'add}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
           (when (= (:status resp) 200)
             (reset! api-token-data* (-> resp :body)))))))
 
-(defn create-button-component []
+(defn add-button-component []
   [:button.btn.btn-primary
-   {:disabled (not @form-valid*?)
-    :on-click create}
-   " Create "])
+   {:disabled (not @form-valid*?)}
+   " Add "])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -270,11 +276,11 @@
        [:div.modal-content
         [:div.modal-header.text-success
          [:h4 "The New API-Token "
-          [:code (:token_part @api-token-data*) ]
-          " Has Been Created"]]
+          [:code.token_part (:token_part @api-token-data*)]
+          " has been added"]]
         [:div.modal-body.bg-warning
          [:h4.text-center
-          [:code @token-secret*]]
+          [:code.token_secret @token-secret*]]
          [:p
           "The full token-secret is shown here once and only once. "
           "Only the 5 letters will be stored and shown as a identifier. " ]]
@@ -285,7 +291,7 @@
           " Continue "]]]]]
      [:div.modal-backdrop {:style {:opacity "0.5"}}]]))
 
-(defn new-page []
+(defn add-page []
   [:div.new-api-token
    [new-token-secret-modal]
    [state/hidden-routing-state-component
@@ -297,12 +303,12 @@
       (breadcrumbs/users-li)
       (breadcrumbs/user-li @user-id*)
       (breadcrumbs/api-tokens-li @user-id*)
-      (breadcrumbs/api-token-new-li @user-id*)]
+      (breadcrumbs/api-token-add-li @user-id*)]
      [])
    [:div.row
     [:div.col-lg
      [:h1
-      [:span " New API-Token "]]
+      [:span " Add API-Token "]]
      [form-component]
      [debug-component]]]])
 
@@ -376,8 +382,7 @@
 
 (defn edit-button-component []
   [:button.btn.btn-warning
-   {:disabled (not @form-valid*?)
-    :on-click patch}
+   {:disabled (not @form-valid*?)}
    [:i.fas.fa-save]
    " Save "])
 
@@ -410,7 +415,7 @@
 
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn delete [_]
+(defn delete [& args]
   (let [resp-chan (async/chan)
         id (requests/send-off {:url (path :api-token
                                           {:user-id @user-id*
@@ -429,8 +434,7 @@
 
 (defn delete-button-component []
   [:button.btn.btn-danger
-   {:disabled (not @form-valid*?)
-    :on-click delete}
+   {:disabled (not @form-valid*?)}
    [:i.fas.fa-times]
    " Delete "])
 

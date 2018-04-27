@@ -16,7 +16,7 @@
     [logbug.thrown :as thrown]
     )
   (:import
-    [java.util UUID]
+    [java.util Base64]
     ))
 
 (defn token-error-page [exception request]
@@ -57,11 +57,21 @@
              (str "No valid API-Token / User combination found! "
                   "Is the token present, not expired, and the user permitted to sign-in?"){}))))
 
+(defn- decode-base64
+  [^String string]
+  (apply str (map char (.decode (Base64/getDecoder) (.getBytes string)))))
+
 (defn extract-token-value [request]
   (when-let [auth-header (-> request :headers :authorization)]
-    (->> auth-header
-         (re-find #"(?i)^token\s+(.*)$")
-         last presence)))
+    (or (some->> auth-header 
+                (re-find #"(?i)^token\s+(.*)$") 
+                last presence)
+        (some->> auth-header 
+                 (re-find #"(?i)^basic\s+(.*)$")
+                 last presence decode-base64
+                 (#(clojure.string/split % #":" 2))
+                 (map presence) (filter identity)
+                 last))))
 
 (defn authenticate [request _handler]
   (catcher/snatch
@@ -82,4 +92,4 @@
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns 'cider-ci.open-session.encryptor)
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

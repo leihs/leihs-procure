@@ -15,23 +15,24 @@
         [:a {:href (path handler-key route-params query-params)} inner])])))
 
 (defn api-token-li [user-id api-token-id]
-  (li :api-token [:span " API-Token "] {:user-id user-id :api-token-id api-token-id} {}))
+  (li :api-token [:span icons/api-token " API-Token "] {:user-id user-id :api-token-id api-token-id} {}))
 (defn api-tokens-li [id]
-  (li :api-tokens [:span " API-Tokens "] {:user-id id} {}))
-(defn api-token-new-li [id]
+  (li :api-tokens [:span icons/api-token " API-Tokens "] {:user-id id} {}))
+(defn api-token-add-li [id]
   (when (= id (:id @state/user*))
-    (li :api-token-new [:span [:i.fas.fa-plus-circle] " New API-Token "] {:user-id id} {})))
+    (li :api-token-add [:span icons/add " Add API-Token "] {:user-id id} {})))
 (defn api-token-edit-li [user-id api-token-id]
   (when (= user-id (:id @state/user*))
-    (li :api-token-edit [:span [:i.fas.fa-edit] " Edit API-Token "]
+    (li :api-token-edit [:span icons/edit " Edit API-Token "]
         {:user-id user-id :api-token-id api-token-id} {})))
 (defn api-token-delete-li [user-id api-token-id]
   (when (= user-id (:id @state/user*))
-    (li :api-token-delete [:span [:i.fas.fa-times] " Delete API-Token "]
+    (li :api-token-delete [:span icons/delete " Delete API-Token "]
         {:user-id user-id :api-token-id api-token-id} {})))
 
 (defn admin-li [] (li :admin [:span icons/admin " Admin "]))
 (defn auth-li [] (li :auth "Authentication"))
+(defn auth-info-li [] (li :auth-info "Info"))
 (defn auth-password-sign-in-li [] (li :auth-password-sign-in "Password sign-in"))
 (defn borrow-li [] (li :borrow "Borrow"))
 (defn debug-li [] (li :debug "Debug"))

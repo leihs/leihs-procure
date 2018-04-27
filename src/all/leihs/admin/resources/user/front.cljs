@@ -73,7 +73,7 @@
           [:input.form-control
            {:id kw
             :type (:type opts)
-            :value (or (kw @user-data*) " ")
+            :value (or (kw @user-data*) "")
             :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
             :disabled (not @edit-mode?*)}]
           [:input-group.form-control

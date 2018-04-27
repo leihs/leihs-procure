@@ -59,7 +59,7 @@
 (def handler-resolve-table
   {:api-token api-token/routes
    :api-tokens api-tokens/routes
-   :auth auth/routes
+   :auth-info auth/routes
    :auth-password-sign-in auth/routes
    :auth-shib-sign-in auth/routes
    :auth-sign-out auth/routes

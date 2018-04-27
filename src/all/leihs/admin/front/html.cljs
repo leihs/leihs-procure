@@ -96,11 +96,13 @@
       [:div.page
        [:h1.text-danger "Application error: the current path can not be resolved!"]])]
    [state/debug-component]
-   [:nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col
-    {:style {:margin-top "3em"}}
+   [:nav.footer.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col.mt-4
     [:div.col
      [:a.navbar-brand {:href (path :admin {})} "leihs-admin"]
      [:span.navbar-text "Version 0.0.0 Alpha"]]
+    [:div.col
+     [:a.navbar-text 
+      {:href (path :auth-info)} "Auth-Info"]]
     [state/debug-toggle-navbar-component]
     [:form.form-inline {:style {:margin-left "0.5em"
                                 :margin-right "0.5em"}}

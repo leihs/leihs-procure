@@ -23,7 +23,7 @@ feature 'Initial admin', type: :feature do
     expect(page).to have_content 'admin@example.com'
 
     # the authentication method is session
-    visit '/auth'
+    visit '/auth/info'
 
     wait_until {page.has_content? /authentication-method.+session/}
 

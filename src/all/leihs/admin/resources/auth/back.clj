@@ -131,7 +131,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn get-auth [request]
+(defn auth-info [request]
   (when (= :json (-> request :accept :mime))
     (when-let [auth-ent (:authenticated-entity request)]
       {:body auth-ent})))
@@ -140,7 +140,7 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET (path :auth) [] #'get-auth)
+    (cpj/GET (path :auth-info) [] #'auth-info)
     (cpj/GET (path :auth-shib-sign-in) [] #'shib-sign-in)
     (cpj/POST (path :auth-password-sign-in) [] #'password-sign-in)
     ; TODO to be removed with legacy (which uses GET to sign out)

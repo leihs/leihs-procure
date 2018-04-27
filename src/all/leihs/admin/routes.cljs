@@ -36,9 +36,10 @@
    :api-token #'api-token/show-page
    :api-token-delete #'api-token/delete-page
    :api-token-edit #'api-token/edit-page
-   :api-token-new #'api-token/new-page
+   :api-token-add #'api-token/add-page
    :api-tokens #'api-tokens/page
    :auth #'auth/auth-page
+   :auth-info #'auth/info-page
    :auth-password-sign-in #'auth/password-sign-in-page
    :debug #'leihs.admin.front.pages.debug/page
    :delegation #'delegation/show-page
