@@ -13,8 +13,8 @@ import './styles/index.css'
 import App from './components/App'
 
 // no router, just 1 page:
-import RequestsIndex from './pages/RequestsIndex'
-import AdminUsers from './pages/AdminUsers'
+import RequestsIndex from './pages/RequestsIndexPage'
+import AdminUsers from './pages/AdminUsersPage'
 
 const client = new ApolloClient({
   uri: '/procure/graphql'

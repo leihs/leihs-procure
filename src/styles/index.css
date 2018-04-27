@@ -1,5 +1,12 @@
 @import '~bootstrap/dist/css/bootstrap.css';
 
+/* bootstrap extensions */
+
+.list-group-compact > .list-group-item,
+.list-group-item-compact {
+  padding: 0.3rem 0.6rem;
+}
+
 /* app styles */
 
 /* ??? action buttons ??? */

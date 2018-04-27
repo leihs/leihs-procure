@@ -4,6 +4,8 @@ import f from 'lodash'
 
 import Icon from './Icons'
 
+import { Button as BsButton } from 'reactstrap'
+
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
 const BOOTSTRAP_MODIFIERS = [
   'primary',
@@ -60,6 +62,10 @@ export const Col = ({ order, cls, ...props }) => {
   return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
 }
 
+export const Button = ({ flat, className, ...props }) => (
+  <BsButton {...props} className={cx(className, { 'btn-flat': flat })} />
+)
+
 export const Badge = props => {
   const restProps = f.omit(props, BOOTSTRAP_MODIFIERS)
   const mod =
@@ -91,7 +97,7 @@ export const FormGroup = ({
   return (
     <Node {...props} cls="form-group" tag="fieldset">
       <label htmlFor={id}>{labelContent} </label>
-      <Div>{children} </Div>
+      {!!children && <Div>{children} </Div>}
       {helpText && (
         <small id={`${id}--Help`} className="form-text text-muted">
           {f.trim(helpText)}{' '}
@@ -245,7 +251,8 @@ export class ButtonRadio extends React.PureComponent {
       <div
         {...restProps}
         className="btn-group btn-group-block"
-        role="radiogroup">
+        role="radiogroup"
+      >
         {options.map(({ label, value, ...item }, n) => {
           const inputID = `${id}_radio_${n}`
           const isSelected = value === selectedValue
@@ -260,7 +267,8 @@ export class ButtonRadio extends React.PureComponent {
                   }
                 )}
                 htmlFor={inputID}
-                tabIndex="-1">
+                tabIndex="-1"
+              >
                 <input
                   {...item}
                   id={inputID}
