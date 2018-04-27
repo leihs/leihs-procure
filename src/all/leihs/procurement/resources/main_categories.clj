@@ -36,16 +36,27 @@
                   (sql/order-by [:procurement_main_categories.name :asc])
                   sql/format)))
 
+(defn delete-main-categories-not-in! [tx ids]
+  (budget-limits/delete-budget-limits-not-in-main-category-ids! tx ids)
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_main_categories)
+                     (sql/where [:not-in :procurement_main_categories.id ids])
+                     sql/format)))
+
 (defn update-main-categories! [context args _]
   (let [tx (-> context :request :tx)
         mcs (:input_data args)]
-    (doseq [mc mcs]
-      (let [mc-id (or (:id mc)
-                      (let [mc-name (:name mc)]
-                        (main-category/insert-main-category! tx {:name mc-name})
-                        (->> mc-name (main-category/get-main-category-by-name tx) :id)))
-            budget-limits (->> mc :budget_limits (map #(merge % {:main_category_id mc-id})))]
-        (budget-limits/update-budget-limits! tx budget-limits)))
+    (loop [[mc & rest-mcs] mcs mc-ids []]
+      (if mc
+        (let [mc-id (or (:id mc)
+                        (let [mc-name (:name mc)]
+                          (main-category/insert-main-category! tx {:name mc-name})
+                          (->> mc-name (main-category/get-main-category-by-name tx) :id)))
+              budget-limits (->> mc :budget_limits (map #(merge % {:main_category_id mc-id})))]
+          (budget-limits/update-budget-limits! tx budget-limits)
+          (recur rest-mcs (conj mc-ids mc-id)))
+        (delete-main-categories-not-in! tx mc-ids)))
+        ; (categories/update-categories! tx categories)
     (get-main-categories-by-names tx (map :name mcs))))
 
 ;#### debug ###################################################################

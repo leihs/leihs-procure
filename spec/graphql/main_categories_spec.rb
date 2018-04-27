@@ -30,7 +30,8 @@ describe 'main categories' do
 
       #############################################################################
       main_categories_before = [
-        { name: 'main_cat_1' }
+        { name: 'main_cat_1' },
+        { name: 'main_cat_to_delete' }
       ]
       main_categories_before.each do |data|
         FactoryBot.create(:main_category, name: data[:name])
@@ -43,6 +44,12 @@ describe 'main categories' do
           budget_period: { name: 'budget_period_1' },
           amount_cents: 50 },
         { main_category: { name: 'main_cat_1' },
+          budget_period: { name: 'budget_period_2' },
+          amount_cents: 100 },
+        { main_category: { name: 'main_cat_to_delete' },
+          budget_period: { name: 'budget_period_1' },
+          amount_cents: 50 },
+        { main_category: { name: 'main_cat_to_delete' },
           budget_period: { name: 'budget_period_2' },
           amount_cents: 100 }
       ]

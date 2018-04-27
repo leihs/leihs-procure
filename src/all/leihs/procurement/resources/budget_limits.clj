@@ -30,6 +30,12 @@
                                  [:= :pbl.budget_period_id (:budget_period_id bl)]])
                      sql/format)))
 
+(defn delete-budget-limits-not-in-main-category-ids! [tx ids]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_budget_limits)
+                     (sql/where [:not-in :procurement_budget_limits.main_category_id ids])
+                     sql/format)))
+
 (defn update-budget-limits! [tx bls]
   (doseq [bl bls]
     (delete-budget-limit! tx bl)

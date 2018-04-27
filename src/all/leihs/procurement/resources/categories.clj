@@ -32,6 +32,8 @@
   (jdbc/query (-> context :request :tx)
               (categories-query context arguments _)))
 
+(defn update-categories! [tx categories])
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

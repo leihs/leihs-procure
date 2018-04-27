@@ -121,7 +121,7 @@
                 :BudgetLimitInput {:fields {:budget_period_id {:type ID}
                                             :amount_cents {:type Int}}}
                 :CategoryInspectorsInput {:fields {:id {:type ID}
-                                                   :general_ledger_accout {:type String}
+                                                   :general_ledger_account {:type String}
                                                    :cost_center {:type String}
                                                    :inspectors {:type (list ID)}}}
                 :MainCategoryInput {:fields {:id {:type ID}
