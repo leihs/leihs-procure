@@ -31,6 +31,7 @@
     [leihs.procurement.resources.rooms :as rooms]
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
+    [leihs.procurement.resources.users :as users]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
     [logbug.debug :as debug]))
 
@@ -75,7 +76,8 @@
    :update-admins admins/update-admins
    :update-main-categories main-categories/update-main-categories!
    :update-requesters-organizations requesters-organizations/update-requesters-organizations
-   :user user/get-user})
+   :user user/get-user
+   :users users/get-users})
 
 (defn- wrap-map-with-error [arg]
   (into {} (for [[k v] arg] [k (wrap-resolver-with-error v)])))
