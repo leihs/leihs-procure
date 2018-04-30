@@ -170,7 +170,7 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
       <FormField label="add new admin">
         <UserAutocomplete
           excludeIds={f.isEmpty(admins) ? null : admins.map(({ id }) => id)}
-          onSelect={id => doAddAdmin(id)}
+          onSelect={user => doAddAdmin(user.id)}
         />
       </FormField>
     </Col>
@@ -179,7 +179,7 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
 
 const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
   <Div cls="mt-2">
-    <Row form cls="pb-2">
+    <Row form cls="d-none d-sm-flex">
       <Col>
         <b>Name</b>
       </Col>
@@ -189,57 +189,65 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
       <Col>
         <b>Organisation</b>
       </Col>
-      <Col />
+      <Col sm="1" />
     </Row>
 
     <ControlledForm
-      idPrefix={id}
+      idPrefn={id}
       values={requesters}
-      render={({ fields, formPropsFor }) => {
+      render={({ fields, formPropsFor, getValue, setValue }) => {
         return (
           <form
             id={id}
-            className="XXXwas-validated"
             onSubmit={e => {
               e.preventDefault()
               alert(JSON.stringify(fields, 0, 2))
             }}
           >
-            {f.toArray(fields).map(({ user, department, organization }, ix) => (
-              <Row form key={user.id + department.id + organization.id}>
-                <Col>
+            {f.toArray(fields).map(({ user }, n) => (
+              <Row form key={n}>
+                <Col sm cls="bg-light">
                   <FormField
-                    {...formPropsFor(`requester[${ix}][user]`)}
+                    readOnly
+                    cls="bg-light"
+                    value={DisplayName(user)}
                     label={'user'}
                     hideLabel
-                    readOnly={false}
                   />
                 </Col>
-                <Col>
+                <Col sm>
                   <FormField
-                    {...formPropsFor(`requester[${ix}][department]`)}
+                    value={getValue(`${n}.department.name`)}
+                    onChange={e => {
+                      const val = e.target.value
+                      setValue(`${n}.department.name`, val)
+                    }}
                     label={'department'}
                     hideLabel
                   />
                 </Col>
-                <Col>
+                <Col sm>
                   <FormField
-                    {...formPropsFor(`requester[${ix}][organization]`)}
+                    value={getValue(`${n}.organization.name`)}
+                    onChange={e => {
+                      const val = e.target.value
+                      setValue(`${n}.organization.name`, val)
+                    }}
                     label={'organization'}
                     hideLabel
                   />
                 </Col>
-                <Col>
+                <Col sm="1">
                   <FormGroup>
                     <div className="form-check mt-2">
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        {...formPropsFor(`requester[${ix}][_delete]`)}
+                        {...formPropsFor(`[${n}][_delete]`)}
                       />
                       <label
                         className="form-check-label"
-                        htmlFor={formPropsFor(`requester[${ix}][_delete]`).id}
+                        htmlFor={formPropsFor(`[${n}][_delete]`).id}
                       >
                         {'remove'}
                       </label>
@@ -252,7 +260,11 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
             <FormField label="add new requester" cls="mt-2">
               <Row form>
                 <Col>
-                  <UserAutocomplete onSelect={id => alert(id)} />
+                  <UserAutocomplete
+                    onSelect={user =>
+                      setValue(`[${fields.length}][user]`, user)
+                    }
+                  />
                 </Col>
                 <Col>
                   <FormField label={'department'} hideLabel />
@@ -260,6 +272,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                 <Col>
                   <FormField label={'organization'} hideLabel />
                 </Col>
+                <Col sm="1">[ok]</Col>
               </Row>
             </FormField>
           </form>

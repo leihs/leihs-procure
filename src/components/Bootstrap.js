@@ -62,7 +62,9 @@ export const Col = ({ order, cls, ...props }) => {
   )
   const breakpointVal = props[breakpoint]
   const colCls = breakpoint
-    ? breakpointVal ? `col-${breakpoint}-${breakpointVal}` : `col-${breakpoint}`
+    ? f.isString(breakpointVal) || f.isNumber(breakpointVal)
+      ? `col-${breakpoint}-${breakpointVal}`
+      : `col-${breakpoint}`
     : 'col'
   const orderCls =
     order && (breakpoint ? `order-${breakpoint}-${order}` : `order-${order}`)

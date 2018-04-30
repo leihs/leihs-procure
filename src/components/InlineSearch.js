@@ -99,7 +99,7 @@ const ItemsList = ({
       {items.length === 0 && <div {...resultsItemVisualProps}>No results!</div>}
       {items.map((item, index) => (
         <div
-          {...getItemProps({ item: idFromItem(item) })}
+          {...getItemProps({ item: item })}
           key={idFromItem(item)}
           {...resultsItemVisualProps}
           className={cx(resultsItemVisualProps.className, {
