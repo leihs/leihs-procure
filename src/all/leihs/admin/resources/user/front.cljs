@@ -238,7 +238,7 @@
   [:div.form.mt-2
    [:h3 "Basic properties"]
    [checkbox-component :is_admin]
-   [checkbox-component :sign_in_enabled]
+   [checkbox-component :account_enabled]
    [checkbox-component :password_sign_in_enabled]
    [field-component :firstname]
    [field-component :lastname]
@@ -257,7 +257,7 @@
 (defn rest-component []
   [:div.form.mt-2
    [:h3 "Other"]
-   [field-component :login]
+   [field-component :url {:type :url}]
    [field-component :org_id]
    [field-component :password {:type :password}]])
 
@@ -397,7 +397,7 @@
 (defn new-page []
   [:div.new-user
    [state/hidden-routing-state-component
-    {:will-mount #(reset! user-data* {:sign_in_enabled true
+    {:will-mount #(reset! user-data* {:account_enabled true
                                       :password_sign_in_enabled true})}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)

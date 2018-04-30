@@ -35,7 +35,7 @@ feature 'Manage users', type: :feature do
       click_on 'Users'
       click_on 'Add user'
       uncheck 'is_admin'
-      check 'sign_in_enabled'
+      check 'account_enabled'
       check 'password_sign_in_enabled'
       fill_in 'email', with: 'test@example.com'
       fill_in 'password', with: 'password'

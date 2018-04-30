@@ -30,7 +30,7 @@
 
 (defn user-with-valid-session-query [token]
   (-> (sql/select [:users.id :user_id]
-                  :is_admin :sign_in_enabled :firstname :lastname :email
+                  :is_admin :account_enabled :firstname :lastname :email
                   [:user_sessions.id :user_session_id]
                   [:user_sessions.created_at :user_session_created_at])
       (sql/from :users)
@@ -44,7 +44,7 @@
       (sql/merge-where
         (sql/raw (str "now() < user_sessions.created_at + "
                       " settings.sessions_max_lifetime_secs * interval '1 second'")))
-      (sql/merge-where [:= :sign_in_enabled true])
+      (sql/merge-where [:= :account_enabled true])
       sql/format))
 
 (defn user-auth-entity! [token]

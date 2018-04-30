@@ -91,7 +91,7 @@ DONE
 changes so far:
 
 * `is_admin` user property, needs minor roles refactoring in legacy
-* `sign_in_enabled` see auth system refactoring
+* `account_enabled` see auth system refactoring
 * set and use user image, needs adjustments in legacy
 * delete user incl. data transfer
 

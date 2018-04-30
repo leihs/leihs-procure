@@ -26,6 +26,7 @@
 (def user-selects
   [:address
    :city
+   :account_enabled
    :country
    :created_at
    :email
@@ -35,13 +36,12 @@
    :img32_url
    :is_admin
    :lastname
-   :login
-   :phone
-   :sign_in_enabled
-   :password_sign_in_enabled
-   :updated_at
-   :zip
    :org_id
+   :password_sign_in_enabled
+   :phone
+   :updated_at
+   :url
+   :zip
    [(-> (sql/select :%count.*)
         (sql/from :contracts)
         (sql/merge-where [:= :contracts.user_id :users.id]))
@@ -50,6 +50,7 @@
 
 (def user-write-keys
   [:address
+   :account_enabled
    :city
    :country
    :email
@@ -59,12 +60,11 @@
    :img_upload_id
    :is_admin
    :lastname
-   :login
    :org_id
-   :phone
-   :sign_in_enabled
    :password_sign_in_enabled
+   :phone
    :pw_hash
+   :url
    :zip])
 
 (def user-write-keymap

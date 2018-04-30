@@ -36,13 +36,13 @@
         :scope_admin_read
         :scope_admin_write
         [:users.id :user_id]
-        :is_admin :sign_in_enabled :firstname :lastname :email
+        :is_admin :account_enabled :firstname :lastname :email
         [:api_tokens.id :api_token_id]
         [:api_tokens.created_at :api_token_created_at])
       (sql/from :users)
       (sql/merge-join :api_tokens [:= :users.id :user_id])
       (sql/merge-where (token-matches-clause token-secret))
-      (sql/merge-where [:= :sign_in_enabled true])
+      (sql/merge-where [:= :account_enabled true])
       (sql/merge-where (sql/raw (str "now() < api_tokens.expires_at")))
       sql/format))
 

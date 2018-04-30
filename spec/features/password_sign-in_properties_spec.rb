@@ -48,7 +48,7 @@ feature 'Passwords sign-in, sign-out properties ' do
       # set a new password in the user's edit page
       click_on @user.email
       click_on 'Edit'
-      uncheck 'sign_in_enabled'
+      uncheck 'account_enabled'
       click_on 'Save'
       wait_until { first('.modal', text: 'OK') }
 

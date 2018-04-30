@@ -32,10 +32,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn user-sign-in-base-query [email]
-  (-> (sql/select :users.id :is_admin :sign_in_enabled :firstname :lastname :email)
+  (-> (sql/select :users.id :is_admin :account_enabled :firstname :lastname :email)
       (sql/from :users)
       (sql/merge-where [:= (sql/call :lower :users.email) (sql/call :lower email)])
-      (sql/merge-where [:= :users.sign_in_enabled true])))
+      (sql/merge-where [:= :users.account_enabled true])))
 
 (defn pw-matches-clause [pw]
   (sql/call
