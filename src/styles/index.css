@@ -1,5 +1,17 @@
 @import '~bootstrap/dist/css/bootstrap.css';
 
+/* variables (used in React inline styles, needs browser support)
+   vars used but not defined here come from bootstrap.
+*/
+:root {
+  --content-color: var(--black);
+  --content-bg-color: var(--white);
+}
+
+body {
+  background: var(--content-bg-color);
+}
+
 /* bootstrap extensions */
 
 .list-group-compact > .list-group-item,

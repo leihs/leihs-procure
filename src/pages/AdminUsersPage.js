@@ -120,14 +120,31 @@ export default AdminUsersPage
 
 // # VIEW PARTIALS
 //
+const AdminUsers = ({ data, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
+  <MainWithSidebar>
+    <h2>Users</h2>
+
+    <h5 className="pt-4">Procurement Admins</h5>
+    <ListOfAdmins
+      admins={data.admins}
+      doRemoveAdmin={doRemoveAdmin}
+      doAddAdmin={doAddAdmin}
+      updatingInfo={updatingInfo}
+    />
+
+    <h3 className="pt-4">Requesters</h3>
+    <ListOfRequestersAndOrgs requesters={data.requesters_organizations} />
+  </MainWithSidebar>
+)
+
 const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
   <Row cls="mt-2">
     <Col sm="6">
       <FormField label="current admins">
         <ul className="list-group list-group-compact">
-          {admins.map(({ id, ...user }) => (
+          {admins.map(user => (
             <li
-              key={id}
+              key={user.id}
               className="list-group-item d-flex justify-content-between align-items-center"
             >
               <span>
@@ -140,7 +157,7 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
                 flat
                 size="sm"
                 disabled={updatingInfo.loading}
-                onClick={() => doRemoveAdmin({ id })}
+                onClick={() => doRemoveAdmin({ id: user.id })}
               >
                 <Icon.Cross />
               </Button>
@@ -151,7 +168,10 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
     </Col>
     <Col sm="6">
       <FormField label="add new admin">
-        <UserAutocomplete onSelect={id => doAddAdmin(id)} />
+        <UserAutocomplete
+          excludeIds={admins.map(({ id }) => id)}
+          onSelect={id => doAddAdmin(id)}
+        />
       </FormField>
     </Col>
   </Row>
@@ -246,21 +266,4 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
       }}
     />
   </Div>
-)
-
-const AdminUsers = ({ data, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
-  <MainWithSidebar>
-    <h2>Users</h2>
-
-    <h5 className="pt-4">Procurement Admins</h5>
-    <ListOfAdmins
-      admins={data.admins}
-      doRemoveAdmin={doRemoveAdmin}
-      doAddAdmin={doAddAdmin}
-      updatingInfo={updatingInfo}
-    />
-
-    <h3 className="pt-4">Requesters</h3>
-    <ListOfRequestersAndOrgs requesters={data.requesters_organizations} />
-  </MainWithSidebar>
 )

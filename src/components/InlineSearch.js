@@ -3,6 +3,33 @@ import cx from 'classnames'
 import Downshift from 'downshift'
 import { Query } from 'react-apollo'
 
+// # STYLES
+const itemHeight = 2 // em, min. height (line can wrap currently!)
+const resultsItemVisualProps = { className: 'px-2 py-1' }
+
+// // non-compact variant:
+// const itemHeight = 2.5 // em, min. height (line can wrap currently!)
+// const resultsItemVisualProps = { className: 'px-3 py-2' }
+
+const resultsWrapperVisualProps = {
+  style: {
+    position: 'relative',
+    zIndex: 2
+  }
+}
+const resultsBoxVisualProps = {
+  className: 'border rounded w-100 mt-1',
+  style: {
+    position: 'absolute',
+    left: 0,
+    zIndex: 2,
+    maxHeight: 5.5 * itemHeight + 'em',
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+    background: 'var(--content-bg-color)'
+  }
+}
+
 const defaultProps = {
   itemToString: item => String(item)
 }
@@ -61,24 +88,15 @@ const ItemsList = ({
   itemToString,
   idFromItem = ({ id }) => id
 }) => {
-  const itemHeight = 2.5 // em, min. height (name can wrap line currently!)
-  const resultsBoxVisual = {
-    className: 'border rounded w-100 mt-1',
-    style: {
-      position: 'relative',
-      maxHeight: 5.5 * itemHeight + 'em',
-      overflowX: 'hidden',
-      overflowY: 'scroll'
-    }
-  }
   return (
-    <div {...resultsBoxVisual}>
-      {items.length === 0 && <div className="px-3 py-2">No results!</div>}
+    <div {...resultsBoxVisualProps}>
+      {items.length === 0 && <div {...resultsItemVisualProps}>No results!</div>}
       {items.map((item, index) => (
         <div
           {...getItemProps({ item: idFromItem(item) })}
           key={idFromItem(item)}
-          className={cx('px-3 py-2', {
+          {...resultsItemVisualProps}
+          className={cx(resultsItemVisualProps.className, {
             'rounded-top': index === 0,
             'bg-dark text-light': highlightedIndex === index
           })}
@@ -90,24 +108,9 @@ const ItemsList = ({
   )
 }
 
-const FetchItemsList = ({ searchQuery, searchTerm, ...props }) => (
-  <Query query={searchQuery} variables={{ searchTerm }}>
-    {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>
-      if (error)
-        return (
-          <p>
-            Error :( <code>{error.toString()}</code>
-          </p>
-        )
-
-      return <ItemsList items={data.users} searchTerm={searchTerm} {...props} />
-    }}
-  </Query>
-)
-
 const InlineSearch = ({
   searchQuery,
+  queryVariables,
   itemToString,
   idFromItem,
   onSelect,
@@ -115,6 +118,7 @@ const InlineSearch = ({
 }) => (
   <Downshift
     {...props}
+    isOpen
     onSelect={(selectedItem, instance) => {
       if (!selectedItem) return
       onSelect && onSelect(selectedItem)
@@ -129,21 +133,39 @@ const InlineSearch = ({
       selectedItem,
       highlightedIndex
     }) => (
-      <div>
+      <div className="ui-inline-search" {...resultsWrapperVisualProps}>
         <input
           {...getInputProps({ placeholder: 'Search' })}
           className="form-control"
         />
         {isOpen ? (
-          <FetchItemsList
-            searchQuery={searchQuery}
-            searchTerm={inputValue}
-            itemToString={itemToString}
-            idFromItem={idFromItem}
-            selectedItem={selectedItem}
-            highlightedIndex={highlightedIndex}
-            getItemProps={getItemProps}
-          />
+          <Query
+            query={searchQuery}
+            variables={{ ...queryVariables, searchTerm: inputValue }}
+          >
+            {({ loading, error, data }) => {
+              if (loading) return <p>Loading...</p>
+              if (error)
+                return (
+                  <p>
+                    Error :( <code>{error.toString()}</code>
+                  </p>
+                )
+
+              return (
+                <ItemsList
+                  items={data.users}
+                  searchTerm={inputValue}
+                  itemToString={itemToString}
+                  idFromItem={idFromItem}
+                  selectedItem={selectedItem}
+                  highlightedIndex={highlightedIndex}
+                  getItemProps={getItemProps}
+                  {...props}
+                />
+              )
+            }}
+          </Query>
         ) : null}
       </div>
     )}
