@@ -169,7 +169,8 @@
                :type (list :Request)},
     :rooms
       {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
-    :users {:args {:limit {:type Int},
+    :users {:args {:exclude_ids {:type (list ID)},
+                   :limit {:type Int},
                    :offset {:type Int},
                    :search_term {:type String}},
             :resolve :users,

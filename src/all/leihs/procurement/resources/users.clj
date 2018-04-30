@@ -18,6 +18,7 @@
         :tx)
     (let [search-term (:search_term args)
           term-percent (and search-term (str "%" search-term "%"))
+          exclude-ids (:exclude_ids args)
           offset (:offset args)
           limit (:limit args)]
       (log/spy (sql/format
@@ -30,6 +31,7 @@
                                                   :users.lastname)
                                         (sql/call :unaccent))
                                    (sql/call :unaccent term-percent)])
+                   exclude-ids (sql/merge-where [:not-in :users.id exclude-ids])
                    offset (sql/offset offset)
                    limit (sql/limit limit)))))))
 
