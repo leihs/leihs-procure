@@ -1,4 +1,6 @@
 import React from 'react'
+import f from 'lodash'
+// import qs from 'qs'
 
 // deal with differences in finding the
 // current value of input fields
@@ -11,6 +13,12 @@ function getFieldFromEvent({ target }) {
         ? target.selected
         : // text, number, etc:
           target.value
+
+  // // test nested stuff
+  // const parsed = qs.parse(`${name}=${encodeURIComponent(value)}`, {
+  //   parseArrays: false
+  // })
+
   return { name, value: value || null }
 }
 
@@ -44,7 +52,7 @@ export default class ControlledForm extends React.Component {
   updateField({ name, value }, callback) {
     this.setState(
       state => ({ fields: { ...state.fields, [name]: value } }),
-      () => callback && callback(this.state.fields)
+      () => f.isFunction(callback) && callback(this.state.fields)
     )
   }
 
@@ -57,10 +65,10 @@ export default class ControlledForm extends React.Component {
         formPropsFor: name => ({
           name,
           id: !idPrefix ? name : `${idPrefix}.${name}`,
-          value: fields[name],
-          onChange: this.handleInputChange,
-          updateValue: value => this.updateField({ name, value })
-        })
+          value: fields[name] || '',
+          onChange: this.handleInputChange
+        }),
+        updateValue: ({ name, value }) => this.updateField({ name, value })
       }
     }
     const connected = connectFormProps(state.fields)

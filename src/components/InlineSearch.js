@@ -3,11 +3,12 @@ import cx from 'classnames'
 import Downshift from 'downshift'
 import { Query } from 'react-apollo'
 
-const defaultProps = {}
+const defaultProps = {
+  itemToString: item => String(item)
+}
 
 const highlightTextParts = (highlight, text) => {
   // TODO: remove non-letter characters (replace with dot match in regex)
-  // TODO: split term by whitespace and mark all the parts
   const part = highlight
 
   // match parts case insensitive!
@@ -21,31 +22,33 @@ const highlightTextParts = (highlight, text) => {
     { position: -part.length, parts: [] }
   )['parts']
 
-  const matcher = new RegExp(part, 'i')
-  let txt = text
-  const res = []
-  // debugger
-  while (txt) {
-    const matched = matcher.exec(txt)
-    if (!matched) {
-      res.push(txt)
-      txt = ''
-      break
-    }
-    const start = text.slice(0, matched.index)
-    res.push(start, matched[0])
-    const rest = text.slice(matched[0].length + matched.index)
-    txt = rest
-    console.log(txt)
-  }
+  // // TODO: split term by whitespace and mark all the parts
+  // const matcher = new RegExp(part, 'i')
+  // let txt = text
+  // const res = []
+  // // debugger
+  // let i = 0
+  // while (txt && i < 1000) {
+  //   const matched = matcher.exec(txt)
+  //   if (!matched) {
+  //     res.push(txt)
+  //     txt = ''
+  //     break
+  //   }
+  //   const start = txt.slice(0, matched.index)
+  //   res.push(start, matched[0])
+  //   const rest = txt.slice(matched[0].length + matched.index)
+  //   txt = rest
+  //   i++
+  //   console.log({ txt, rest, i, matched })
+  // }
 
   return (
     <React.Fragment>
-      {textParts.map(
-        (str, ix) =>
-          // every even element is an higlight!
-          ix % 2 ? <b>{str}</b> : str
-      )}
+      {textParts.map((str, ix) => (
+        // every even element is an higlight!
+        <React.Fragment key={ix}>{ix % 2 ? <b>{str}</b> : str}</React.Fragment>
+      ))}
     </React.Fragment>
   )
 }
@@ -58,8 +61,19 @@ const ItemsList = ({
   itemToString,
   idFromItem = ({ id }) => id
 }) => {
+  const itemHeight = 2.5 // em, min. height (name can wrap line currently!)
+  const resultsBoxVisual = {
+    className: 'border rounded w-100 mt-1',
+    style: {
+      position: 'relative',
+      maxHeight: 5.5 * itemHeight + 'em',
+      overflowX: 'hidden',
+      overflowY: 'scroll'
+    }
+  }
   return (
-    <div className="border rounded w-100 mt-1">
+    <div {...resultsBoxVisual}>
+      {items.length === 0 && <div className="px-3 py-2">No results!</div>}
       {items.map((item, index) => (
         <div
           {...getItemProps({ item: idFromItem(item) })}
@@ -135,5 +149,7 @@ const InlineSearch = ({
     )}
   </Downshift>
 )
+
+InlineSearch.defaultProps = defaultProps
 
 export default InlineSearch

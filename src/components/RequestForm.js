@@ -19,18 +19,19 @@ import { RequestTotalAmount as TotalAmount } from './decorators'
 // import ROOMS_JSON from 'rooms.json'
 const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
 
-const RequestForm = () => (
+const RequestForm = ({ id = 'request_form' }) => (
   <ControlledForm
-    idPrefix="request_form"
+    idPrefix={id}
     render={({ fields, formPropsFor }) => {
       return (
         <form
-          id="request_form"
+          id={id}
           className="XXXwas-validated"
           onSubmit={e => {
             e.preventDefault()
             alert(JSON.stringify(fields, 0, 2))
-          }}>
+          }}
+        >
           <Row>
             <Col lg>
               <FormField {...formPropsFor('article')} />

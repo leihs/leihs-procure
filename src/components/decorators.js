@@ -1,5 +1,14 @@
 import f from 'lodash'
 
+export const DisplayName = o => {
+  switch (o.__typename) {
+    case 'User':
+      return `${o.firstname} ${o.lastname}`
+    default:
+      throw new Error(`DisplayName: unknown type '${o.__typename}'!`)
+  }
+}
+
 export const RequestTotalAmount = fields => {
   const quantity = f.last(
     f.filter(

@@ -45,8 +45,15 @@ export const Pre = props => Node({ ...props, tag: 'span' })
 export const Span = props => Node({ ...props, tag: 'span' })
 export const Code = props => Node({ ...props, tag: 'span' })
 export const Hr = props => Node({ ...props, tag: 'span' })
+export const Main = props => Node({ ...props, tag: 'main' })
+export const Label = props => Node({ ...props, tag: 'label' })
+export const Small = props => Node({ ...props, tag: 'small' })
 
-export const Row = props => Node({ ...props, cls: ['row', props.cls] })
+export const Container = ({ fluid, ...props }) =>
+  Node({ ...props, cls: [fluid ? 'container-fluid' : 'container', props.cls] })
+
+export const Row = ({ form, ...props }) =>
+  Node({ ...props, cls: [form ? 'form-row' : 'row', props.cls] })
 
 export const Col = ({ order, cls, ...props }) => {
   const restProps = f.omit(props, BOOTSTRAP_BREAKPOINTS)
@@ -77,18 +84,19 @@ export const Badge = props => {
 export const FormGroup = ({
   id,
   label,
+  hideLabel,
   labelSmall,
   helpText,
   children,
   ...props
 }) => {
-  const labelContent = (
+  const labelContent = !!(label || labelSmall) && (
     <F>
       {label}
-      {labelSmall && (
+      {!!labelSmall && (
         <F>
           {' '}
-          <small>{labelSmall}</small>
+          <Small>{labelSmall}</Small>
         </F>
       )}
     </F>
@@ -96,12 +104,16 @@ export const FormGroup = ({
 
   return (
     <Node {...props} cls="form-group" tag="fieldset">
-      <label htmlFor={id}>{labelContent} </label>
+      {labelContent && (
+        <Label htmlFor={id} cls={{ 'sr-only': hideLabel }}>
+          {labelContent}{' '}
+        </Label>
+      )}
       {!!children && <Div>{children} </Div>}
       {helpText && (
-        <small id={`${id}--Help`} className="form-text text-muted">
+        <Small id={`${id}--Help`} cls="form-text text-muted">
           {f.trim(helpText)}{' '}
-        </small>
+        </Small>
       )}
     </Node>
   )
@@ -113,11 +125,12 @@ export const FormField = ({
   id,
   children,
   label,
+  hideLabel,
   labelSmall,
   name,
   placeholder,
   type = 'text',
-  value = '',
+  value,
   ...inputProps
 }) => {
   const supportedTypes = [
@@ -125,7 +138,8 @@ export const FormField = ({
     'text-static',
     'textarea',
     'number',
-    'number-integer'
+    'number-integer',
+    'checkbox'
   ]
   let tag = 'input'
   if (!f.includes(supportedTypes, type)) {
@@ -181,7 +195,12 @@ export const FormField = ({
     )
 
   return (
-    <FormGroup label={label} labelSmall={labelSmall} helpText={helpText}>
+    <FormGroup
+      label={label}
+      hideLabel={hideLabel}
+      labelSmall={labelSmall}
+      helpText={helpText}
+    >
       {beforeInput}
       {inputNode}
     </FormGroup>
@@ -264,14 +283,14 @@ export class ButtonRadio extends React.PureComponent {
           const isSelected = value === selectedValue
           return (
             <F key={n}>
-              <label
-                className={cx(
-                  'btn btn-block btn-flat btn-outline-secondary m-0 text-left font-weight-bold',
+              <Label
+                cls={
+                  ('btn btn-block btn-flat btn-outline-secondary m-0 text-left font-weight-bold',
                   {
                     'border-left-0': n !== 0,
                     active: isSelected
-                  }
-                )}
+                  })
+                }
                 htmlFor={inputID}
                 tabIndex="-1"
               >
@@ -298,7 +317,7 @@ export class ButtonRadio extends React.PureComponent {
                     <Icon.RadioCheckedOff className="mr-2" />
                   ))}
                 {label}
-              </label>
+              </Label>
             </F>
           )
         })}

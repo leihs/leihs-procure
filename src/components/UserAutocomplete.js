@@ -1,6 +1,7 @@
 import React from 'react'
 import gql from 'graphql-tag'
 
+import { DisplayName } from './decorators'
 import InlineSearch from './InlineSearch'
 
 const SEARCH_USERS_QUERY = gql`
@@ -16,7 +17,7 @@ const SEARCH_USERS_QUERY = gql`
 const UserAutocomplete = ({ onSelect }) => (
   <InlineSearch
     searchQuery={SEARCH_USERS_QUERY}
-    itemToString={({ firstname, lastname }) => `${firstname} ${lastname}`}
+    itemToString={DisplayName}
     onSelect={onSelect}
   />
 )

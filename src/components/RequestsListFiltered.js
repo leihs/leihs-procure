@@ -29,7 +29,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="pt-2 pb-3">
+    <div className="p-3 bg-light">
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"
@@ -95,7 +95,8 @@ const RequestsIndex = props => (
         currentFilters={props.currentFilters}
         onFilterChange={props.onFilterChange}
       />
-    }>
+    }
+  >
     <RequestsList requests={props.requests} />
   </MainWithSidebar>
 )

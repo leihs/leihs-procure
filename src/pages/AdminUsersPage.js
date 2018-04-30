@@ -6,26 +6,27 @@ import gql from 'graphql-tag'
 
 // import ControlledForm from '../components/ControlledForm'
 import Icon from '../components/Icons'
-import { Row, Col, Button, FormField } from '../components/Bootstrap'
+import {
+  Row,
+  Div,
+  Col,
+  Button,
+  FormGroup,
+  FormField
+} from '../components/Bootstrap'
+import { MainWithSidebar } from '../components/Layout'
+import { DisplayName } from '../components/decorators'
+import ControlledForm from '../components/ControlledForm'
 import UserAutocomplete from '../components/UserAutocomplete'
 
 const mutationErrorHandler = err => {
   // not much we can do on backend error
-  window.confirm('Error! ' + err, () => window.location.reload())
+  window.confirm('Error! ' + err)
+  window.location.reload()
 }
 
 // # DATA
 //
-const UPDATE_ADMINS_MUTATION = gql`
-  mutation updateAdmins($adminUserList: [AdminInput]) {
-    admins(input_data: $adminUserList) {
-      id
-      firstname
-      lastname
-    }
-  }
-`
-
 const ADMIN_USERS_QUERY = gql`
   query AdminUsersPage {
     admins {
@@ -51,74 +52,15 @@ const ADMIN_USERS_QUERY = gql`
   }
 `
 
-// # VIEW
-//
-const AdminUsers = ({
-  data: { admins },
-  doRemoveAdmin,
-  doAddAdmin,
-  updatingInfo
-}) => (
-  <div className="pt-2 pb-3">
-    <Row>
-      <Col lg="2" />
-      <Col lg="10">
-        <h2>Users</h2>
-        <h5>Procurement Admins</h5>
-        <Row>
-          <Col sm="6">
-            <FormField label="current admins">
-              <ul className="list-group list-group-compact">
-                {admins.map(({ id, firstname, lastname }) => (
-                  <li
-                    key={id}
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                  >
-                    <span>
-                      <Icon.User spaced className="mr-1" /> {firstname}{' '}
-                      {lastname}
-                    </span>
-                    <Button
-                      title="remove as admin"
-                      color="link"
-                      outline
-                      flat
-                      size="sm"
-                      disabled={updatingInfo.loading}
-                      onClick={() => doRemoveAdmin({ id })}
-                    >
-                      <Icon.Cross />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </FormField>
-          </Col>
-          <Col sm="6">
-            <div className="pr-3">
-              <FormField label="add new admin">
-                <UserAutocomplete onSelect={id => doAddAdmin(id)} />
-              </FormField>
-            </div>
-          </Col>
-        </Row>
-        <hr />
-        [TODO Users]
-      </Col>
-    </Row>
-
-    {/* <h3>Antragsteller/innen</h3>
-    {[{ name: 'Adrian Brazerol', dep: 'Services', org: 'PZ' }].map(
-      ({ name, dep, org }, i) => (
-        <div key={i}>
-          <FormField label={'name'} value={name} />
-          <FormField label={'dep'} value={dep} />
-          <FormField label={'org'} value={org} />
-        </div>
-      )
-    )} */}
-  </div>
-)
+const UPDATE_ADMINS_MUTATION = gql`
+  mutation updateAdmins($adminUserList: [AdminInput]) {
+    admins(input_data: $adminUserList) {
+      id
+      firstname
+      lastname
+    }
+  }
+`
 
 // # PAGE
 //
@@ -175,3 +117,150 @@ const AdminUsersPage = () => (
 )
 
 export default AdminUsersPage
+
+// # VIEW PARTIALS
+//
+const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
+  <Row cls="mt-2">
+    <Col sm="6">
+      <FormField label="current admins">
+        <ul className="list-group list-group-compact">
+          {admins.map(({ id, ...user }) => (
+            <li
+              key={id}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>
+                <Icon.User spaced className="mr-1" /> {DisplayName(user)}
+              </span>
+              <Button
+                title="remove as admin"
+                color="link"
+                outline
+                flat
+                size="sm"
+                disabled={updatingInfo.loading}
+                onClick={() => doRemoveAdmin({ id })}
+              >
+                <Icon.Cross />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </FormField>
+    </Col>
+    <Col sm="6">
+      <FormField label="add new admin">
+        <UserAutocomplete onSelect={id => doAddAdmin(id)} />
+      </FormField>
+    </Col>
+  </Row>
+)
+
+const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
+  <Div cls="mt-2">
+    <Row form cls="pb-2">
+      <Col>
+        <b>Name</b>
+      </Col>
+      <Col>
+        <b>Departement</b>
+      </Col>
+      <Col>
+        <b>Organisation</b>
+      </Col>
+    </Row>
+
+    <ControlledForm
+      idPrefix={id}
+      values={requesters}
+      render={({ fields, formPropsFor }) => {
+        return (
+          <form
+            id={id}
+            className="XXXwas-validated"
+            onSubmit={e => {
+              e.preventDefault()
+              alert(JSON.stringify(fields, 0, 2))
+            }}
+          >
+            {requesters.map(({ user, department, organization }, ix) => (
+              <Row form key={user.id + department.id + organization.id}>
+                <Col>
+                  <FormField
+                    {...formPropsFor(`requester[${ix}][user]`)}
+                    label={'user'}
+                    hideLabel
+                    readOnly={false}
+                  />
+                </Col>
+                <Col>
+                  <FormField
+                    {...formPropsFor(`requester[${ix}][department]`)}
+                    label={'department'}
+                    hideLabel
+                  />
+                </Col>
+                <Col>
+                  <FormField
+                    {...formPropsFor(`requester[${ix}][organization]`)}
+                    label={'organization'}
+                    hideLabel
+                  />
+                </Col>
+                <Col>
+                  <FormGroup>
+                    <div className="form-check mt-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        {...formPropsFor(`requester[${ix}][_delete]`)}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor={formPropsFor(`requester[${ix}][_delete]`).id}
+                      >
+                        {'remove'}
+                      </label>
+                    </div>
+                  </FormGroup>
+                </Col>
+              </Row>
+            ))}
+
+            <FormField label="add new requester" cls="mt-2">
+              <Row form>
+                <Col>
+                  <UserAutocomplete onSelect={id => alert(id)} />
+                </Col>
+                <Col>
+                  <FormField label={'department'} hideLabel />
+                </Col>
+                <Col>
+                  <FormField label={'organization'} hideLabel />
+                </Col>
+              </Row>
+            </FormField>
+          </form>
+        )
+      }}
+    />
+  </Div>
+)
+
+const AdminUsers = ({ data, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
+  <MainWithSidebar>
+    <h2>Users</h2>
+
+    <h5 className="pt-4">Procurement Admins</h5>
+    <ListOfAdmins
+      admins={data.admins}
+      doRemoveAdmin={doRemoveAdmin}
+      doAddAdmin={doAddAdmin}
+      updatingInfo={updatingInfo}
+    />
+
+    <h3 className="pt-4">Requesters</h3>
+    <ListOfRequestersAndOrgs requesters={data.requesters_organizations} />
+  </MainWithSidebar>
+)
