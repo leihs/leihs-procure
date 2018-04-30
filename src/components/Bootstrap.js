@@ -153,26 +153,32 @@ export const FormField = ({
     }
   }
 
-  const inputNode = children ? (
-    // even if input node was given, merge in extra props.
-    // this is important when `value` and `onChange` are connected
-    React.cloneElement(children, inputProps, children.children || value)
-  ) : type === 'text-static' ? (
-    <Span cls="form-control-plaintext">{value}</Span>
-  ) : (
-    <Node
-      tag={tag}
-      autoComplete="off"
-      {...inputProps}
-      type={type}
-      id={id}
-      name={name}
-      value={value}
-      placeholder={placeholder}
-      aria-describedby={helpText ? `${id}--Help` : null}
-      className="form-control"
-    />
-  )
+  const inputNode =
+    // if a node was given as children, use it.
+    // if it is an input node, merge in extra props
+    // – this is important in case `value` and `onChange` are only given to parent.
+    React.isValidElement(children) ? (
+      f.includes(children.type, ['input', 'textarea']) ? (
+        React.cloneElement(children, inputProps, children.children || value)
+      ) : (
+        children
+      )
+    ) : type === 'text-static' ? (
+      <Span cls="form-control-plaintext">{value}</Span>
+    ) : (
+      <Node
+        tag={tag}
+        autoComplete="off"
+        {...inputProps}
+        type={type}
+        id={id}
+        name={name}
+        value={value}
+        placeholder={placeholder}
+        aria-describedby={helpText ? `${id}--Help` : null}
+        className="form-control"
+      />
+    )
 
   return (
     <FormGroup label={label} labelSmall={labelSmall} helpText={helpText}>
