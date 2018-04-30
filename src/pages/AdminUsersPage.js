@@ -1,5 +1,5 @@
 import React from 'react'
-// import f from 'lodash'
+import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -169,7 +169,7 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
     <Col sm="6">
       <FormField label="add new admin">
         <UserAutocomplete
-          excludeIds={admins.map(({ id }) => id)}
+          excludeIds={f.isEmpty(admins) ? null : admins.map(({ id }) => id)}
           onSelect={id => doAddAdmin(id)}
         />
       </FormField>
@@ -189,6 +189,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
       <Col>
         <b>Organisation</b>
       </Col>
+      <Col />
     </Row>
 
     <ControlledForm
@@ -204,7 +205,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
               alert(JSON.stringify(fields, 0, 2))
             }}
           >
-            {requesters.map(({ user, department, organization }, ix) => (
+            {f.toArray(fields).map(({ user, department, organization }, ix) => (
               <Row form key={user.id + department.id + organization.id}>
                 <Col>
                   <FormField

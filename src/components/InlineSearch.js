@@ -17,16 +17,22 @@ const resultsWrapperVisualProps = {
     zIndex: 2
   }
 }
+const inputNodeVisualProps = {
+  className: 'form-control',
+  style: { position: 'relative', zIndex: 2 }
+}
 const resultsBoxVisualProps = {
   className: 'border rounded w-100 mt-1',
   style: {
     position: 'absolute',
     left: 0,
-    zIndex: 2,
+    zIndex: 1,
     maxHeight: 5.5 * itemHeight + 'em',
     overflowX: 'hidden',
     overflowY: 'scroll',
-    background: 'var(--content-bg-color)'
+    background: 'var(--content-bg-color)',
+    boxShadow: '0 0.4rem 0.8rem rgba(0,0,0,.125)',
+    'margin-top': '-1px !important'
   }
 }
 
@@ -118,7 +124,6 @@ const InlineSearch = ({
 }) => (
   <Downshift
     {...props}
-    isOpen
     onSelect={(selectedItem, instance) => {
       if (!selectedItem) return
       onSelect && onSelect(selectedItem)
@@ -136,7 +141,7 @@ const InlineSearch = ({
       <div className="ui-inline-search" {...resultsWrapperVisualProps}>
         <input
           {...getInputProps({ placeholder: 'Search' })}
-          className="form-control"
+          {...inputNodeVisualProps}
         />
         {isOpen ? (
           <Query
