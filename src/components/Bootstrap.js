@@ -2,9 +2,9 @@ import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
-import Icon from './Icons'
-
 import { Button as BsButton } from 'reactstrap'
+import Icon from './Icons'
+import { ControlledInput } from './ControlledForm'
 
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
 const BOOTSTRAP_MODIFIERS = [
@@ -120,6 +120,19 @@ export const FormGroup = ({
     </Node>
   )
 }
+
+export const InputText = props => (
+  <ControlledInput {...props}>
+    {inputProps => (
+      <Node
+        tag="input"
+        {...inputProps}
+        type="text"
+        cls={['form-control', inputProps.cls]}
+      />
+    )}
+  </ControlledInput>
+)
 
 export const FormField = ({
   beforeInput,
@@ -253,7 +266,7 @@ export const Select = ({
 export class ButtonRadio extends React.PureComponent {
   getSelectedValueProp(value, selected) {
     // `value` or `selected` is accepted, depending on consistency
-    // with DOM or between coomponents is desired.
+    // with DOM or between components is desired.
     if (value && selected) {
       throw new Error(
         'Props `value` and `selected` were given, please only use 1 of them!'

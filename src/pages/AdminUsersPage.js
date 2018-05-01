@@ -12,7 +12,8 @@ import {
   Col,
   Button,
   FormGroup,
-  FormField
+  FormField,
+  InputText
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
@@ -227,15 +228,14 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                   />
                 </Col>
                 <Col sm>
-                  <FormField
-                    value={getValue(`${n}.organization.name`)}
-                    onChange={e => {
-                      const val = e.target.value
-                      setValue(`${n}.organization.name`, val)
-                    }}
-                    label={'organization'}
-                    hideLabel
-                  />
+                  <FormField label={'organization'} hideLabel>
+                    <InputText
+                      value={getValue(`${n}.organization.name`)}
+                      onChange={e => {
+                        setValue(`${n}.organization.name`, e.target.value)
+                      }}
+                    />
+                  </FormField>
                 </Col>
                 <Col sm="1">
                   <FormGroup>

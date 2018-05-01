@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import f from 'lodash'
 import fpSet from 'lodash/fp/set'
 // import qs from 'qs'
@@ -20,8 +21,10 @@ function getFieldFromEvent({ target }) {
 
 // state container to handle a flat form like in plain HTML.
 // input fields use `name`, `value` and `onChange`.
+//
 // 'name' is interpreted as a object key path in case nested data is nedded
 // (`user.name=ann` == {user:{name: 'ann'}})
+//
 // actual form is rendered by consumer using the `render` prop,
 // which will be called with the fields, a callback, and helper.
 // helper `formPropsFor` is recommended for normal usage,
@@ -79,6 +82,53 @@ export default class ControlledForm extends React.Component {
       fields: state.fields,
       connectFormProps: connectFormProps,
       onChange: this.handleInputChange
+    })
+  }
+}
+
+// its more performant to keep the state in the field,
+// and only "proxy" the change events with a slight debounce
+export class ControlledInput extends React.PureComponent {
+  static defaultProps = { value: '', onChange: () => {} }
+  static propTypes = {
+    value: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    children: PropTypes.func.isRequired
+  }
+
+  constructor(props) {
+    super()
+    this.state = { value: '' }
+    this.onChange = this.onChange.bind(this)
+    this.onChangeCallbackDebounced = f.debounce(props.onChange, 100)
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.value === prevState.value) return false
+    return { value: nextProps.value }
+  }
+
+  onChange(event) {
+    const callback = this.onChangeCallbackDebounced
+    const { value } = event.target
+    this.setState(
+      state => (state.value === value ? false : { value }),
+      () =>
+        f.isFunction(callback) &&
+        callback({ target: { name: this.props.name, value: this.state.value } })
+    )
+  }
+
+  render({ props: { children, ...restProps }, state } = this) {
+    if (!f.isFunction(children)) {
+      throw new Error(
+        'ControlledInput needs a single render function as `children`!'
+      )
+    }
+    return children({
+      ...restProps,
+      value: state.value,
+      onChange: this.onChange
     })
   }
 }
