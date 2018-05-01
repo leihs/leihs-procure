@@ -4,7 +4,7 @@ import f from 'lodash'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
-// import ControlledForm from '../components/ControlledForm'
+import t from '../locale/translate'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -36,6 +36,7 @@ const ADMIN_USERS_QUERY = gql`
       lastname
     }
     requesters_organizations {
+      id
       user {
         id
         firstname
@@ -180,7 +181,7 @@ const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
 
 const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
   <Div cls="mt-2">
-    <Row form cls="d-none d-sm-flex">
+    <Row form cls="d-none d-sm-flex pb-2">
       <Col>
         <b>Name</b>
       </Col>
@@ -194,7 +195,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
     </Row>
 
     <ControlledForm
-      idPrefn={id}
+      idPrefix={id}
       values={requesters}
       render={({ fields, formPropsFor, getValue, setValue }) => {
         return (
@@ -202,79 +203,111 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
             id={id}
             onSubmit={e => {
               e.preventDefault()
-              alert(JSON.stringify(fields, 0, 2))
+              // eslint-disable-next-line no-console
+              console.log(fields)
+              alert('fields (also see console): ' + JSON.stringify(fields, 0, 2))
             }}
           >
-            {f.toArray(fields).map(({ user }, n) => (
-              <Row form key={n}>
-                <Col sm cls="bg-light">
-                  <FormField
-                    readOnly
-                    cls="bg-light"
-                    value={DisplayName(user)}
-                    label={'user'}
-                    hideLabel
-                  />
-                </Col>
-                <Col sm>
-                  <FormField
-                    value={getValue(`${n}.department.name`)}
-                    onChange={e => {
-                      const val = e.target.value
-                      setValue(`${n}.department.name`, val)
+            {f
+              .toArray(fields)
+              .map(
+                (
+                  { id, user, department, organization, toDelete = false },
+                  n
+                ) => (
+                  <Row
+                    form
+                    key={id || n}
+                    cls={{
+                      'text-strike': toDelete,
+                      // new lines should show form validation styles
+                      'was-validated': !id
                     }}
-                    label={'department'}
-                    hideLabel
-                  />
-                </Col>
-                <Col sm>
-                  <FormField label={'organization'} hideLabel>
-                    <InputText
-                      value={getValue(`${n}.organization.name`)}
-                      onChange={e => {
-                        setValue(`${n}.organization.name`, e.target.value)
-                      }}
-                    />
-                  </FormField>
-                </Col>
-                <Col sm="1">
-                  <FormGroup>
-                    <div className="form-check mt-2">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        {...formPropsFor(`[${n}][_delete]`)}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor={formPropsFor(`[${n}][_delete]`).id}
-                      >
-                        {'remove'}
-                      </label>
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-            ))}
+                  >
+                    <Col sm>
+                      <FormGroup label={'user'} hideLabel>
+                        {/* TODO: make and use autocomplete-style version of InlineSearch */}
+                        <InputText
+                          readOnly
+                          required
+                          cls={toDelete ? 'bg-danger' : 'bg-light'}
+                          value={DisplayName(user)}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm>
+                      <FormGroup label={'department'} hideLabel>
+                        <InputText
+                          readOnly={toDelete}
+                          required
+                          cls={toDelete && 'bg-danger'}
+                          value={department && department.name}
+                          onChange={e => {
+                            setValue(`${n}.department.name`, e.target.value)
+                          }}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm>
+                      <FormGroup label={'organization'} hideLabel>
+                        <InputText
+                          readOnly={toDelete}
+                          required
+                          cls={toDelete && 'bg-danger'}
+                          value={organization && organization.name}
+                          onChange={e => {
+                            setValue(`${n}.organization`, {
+                              name: e.target.value
+                            })
+                          }}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm="1">
+                      <FormGroup>
+                        <div className="form-check mt-2">
+                          <label className="form-check-label">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={toDelete}
+                              onChange={e => {
+                                setValue(`${n}.toDelete`, !!e.target.checked)
+                              }}
+                            />
+                            {'remove'}
+                          </label>
+                        </div>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                )
+              )}
 
             <FormField label="add new requester" cls="mt-2">
               <Row form>
                 <Col>
                   <UserAutocomplete
                     onSelect={user =>
-                      setValue(`[${fields.length}][user]`, user)
+                      // adds a line to the form
+                      setValue(`${Object.keys(fields).length}.user`, user)
                     }
                   />
                 </Col>
+                <Col>{/* <FormField label={'department'} hideLabel /> */}</Col>
                 <Col>
-                  <FormField label={'department'} hideLabel />
+                  {/* <FormField label={'organization'} hideLabel /> */}
                 </Col>
-                <Col>
-                  <FormField label={'organization'} hideLabel />
-                </Col>
-                <Col sm="1">[ok]</Col>
+                <Col sm="1" />
               </Row>
             </FormField>
+
+            <button type="submit" className="btn m-1 btn-primary">
+              <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+            </button>
+            {/* <button type="button" className="btn m-1 btn-outline-secondary">
+              {t('form_btn_cancel')}
+            </button> */}
           </form>
         )
       }}

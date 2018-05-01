@@ -13,6 +13,9 @@ body {
 }
 
 /* bootstrap extensions */
+.text-strike {
+  text-decoration: line-through !important;
+}
 
 .list-group-compact > .list-group-item,
 .list-group-item-compact {
