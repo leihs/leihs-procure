@@ -73,13 +73,15 @@ class MultiSelect extends React.PureComponent {
       <ButtonDropdown
         {...restProps}
         isOpen={this.state.dropdownOpen}
-        toggle={() => this.toggleDropdown()}>
+        toggle={() => this.toggleDropdown()}
+      >
         <DropdownToggle caret outline>
           {titleBySelection(state.selected, values)}
         </DropdownToggle>
         <DropdownMenu className="multiselect-container">
           <DropdownItem
-            className={'multiselect-all ' + (allSelected ? 'active' : '')}>
+            className={'multiselect-all ' + (allSelected ? 'active' : '')}
+          >
             <a tabIndex="0" className="multiselect-all">
               <label className="checkbox">
                 <input

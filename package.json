@@ -27,6 +27,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "lint": "eslint --fix src/{,**/}*.js",
+    "ci:lint": "eslint src/{,**/}*.js",
     "test": "react-scripts test --env=jsdom"
   },
   "proxy": {
@@ -51,25 +53,12 @@
     "jsxBracketSameLine": false
   },
   "eslintConfig": {
-    "env": {
-      "es6": true,
-      "browser": true,
-      "commonjs": true
-    },
-    "parserOptions": {
-      "ecmaVersion": 2016,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "impliedStrict": true,
-        "jsx": true,
-        "experimentalObjectRestSpread": true
-      }
-    },
     "plugins": [
       "prettier",
       "react"
     ],
     "extends": [
+      "react-app",
       "eslint:recommended",
       "prettier",
       "prettier/react",
