@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import f from 'lodash'
 import fpSet from 'lodash/fp/set'
 // import qs from 'qs'
+import logger from 'debug'
+const log = logger('app:ControlledForm')
 
 // deal with differences in finding the
 // current value of input fields
@@ -18,6 +20,8 @@ function getFieldFromEvent({ target }) {
 
   return { name, value: value || null }
 }
+
+// FIXME: only support `children` as render prop!
 
 // state container to handle a flat form like in plain HTML.
 // input fields use `name`, `value` and `onChange`.
@@ -51,6 +55,7 @@ export default class ControlledForm extends React.Component {
   }
 
   updateField({ name, value }, callback) {
+    log('updateField', { name, value })
     this.setState(state => {
       return {
         ...state,
@@ -65,6 +70,7 @@ export default class ControlledForm extends React.Component {
       const conf = { ...defaultConf, ...opts }
       const { idPrefix } = conf
       const getValue = name => f.get(fields, name) || ''
+      const setValue = (name, value) => this.updateField({ name, value })
       return {
         formPropsFor: name => ({
           name,
@@ -72,8 +78,8 @@ export default class ControlledForm extends React.Component {
           value: getValue(name),
           onChange: this.handleInputChange
         }),
-        getValue: name => getValue(name),
-        setValue: (name, value) => this.updateField({ name, value })
+        getValue,
+        setValue
       }
     }
     const connected = connectFormProps(state.fields)

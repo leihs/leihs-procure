@@ -83,6 +83,10 @@ export const Badge = props => {
   return <Span {...restProps} cls={[props.cls, 'badge', `badge-${mod}`]} />
 }
 
+// FIXME: separate FormGroup/FormField again.
+// FormGroup takes only children (e.g. input node),
+// while FormField is a FormGroup with an input (but doesn take children)
+
 export const FormGroup = ({
   id,
   label,

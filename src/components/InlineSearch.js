@@ -2,6 +2,8 @@ import React from 'react'
 import cx from 'classnames'
 import Downshift from 'downshift'
 import { Query } from 'react-apollo'
+import logger from 'debug'
+const log = logger('app:InlineSearch')
 
 // # STYLES
 const itemHeight = 2 // em, min. height (line can wrap currently!)
@@ -32,7 +34,7 @@ const resultsBoxVisualProps = {
     overflowY: 'scroll',
     background: 'var(--content-bg-color)',
     boxShadow: '0 0.4rem 0.8rem rgba(0,0,0,.125)',
-    'margin-top': '-1px !important'
+    marginTop: '-1px !important'
   }
 }
 
@@ -121,61 +123,67 @@ const InlineSearch = ({
   idFromItem,
   onSelect,
   ...props
-}) => (
-  <Downshift
-    {...props}
-    onSelect={(selectedItem, instance) => {
-      if (!selectedItem) return
-      onSelect && onSelect(selectedItem)
-      instance.clearSelection()
-    }}
-  >
-    {({
-      getInputProps,
-      getItemProps,
-      isOpen,
-      inputValue,
-      selectedItem,
-      highlightedIndex
-    }) => (
-      <div className="ui-inline-search" {...resultsWrapperVisualProps}>
-        <input
-          {...getInputProps({ placeholder: 'Search' })}
-          {...inputNodeVisualProps}
-        />
-        {isOpen ? (
-          <Query
-            query={searchQuery}
-            variables={{ ...queryVariables, searchTerm: inputValue }}
-          >
-            {({ loading, error, data }) => {
-              if (loading) return <p>Loading...</p>
-              if (error)
-                return (
-                  <p>
-                    Error :( <code>{error.toString()}</code>
-                  </p>
-                )
+}) => {
+  log('render', props)
+  return (
+    <Downshift
+      {...props}
+      itemToString={i => itemToString(i) || ''}
+      onSelect={(selectedItem, instance) => {
+        if (!selectedItem) return
+        onSelect && onSelect(selectedItem)
+        instance.clearSelection()
+      }}
+    >
+      {({
+        getInputProps,
+        getItemProps,
+        isOpen,
+        inputValue,
+        selectedItem,
+        highlightedIndex
+      }) => (
+        <div className="ui-inline-search" {...resultsWrapperVisualProps}>
+          <input
+            value=""
+            onChange={() => {}}
+            {...getInputProps({ placeholder: 'Search' })}
+            {...inputNodeVisualProps}
+          />
+          {isOpen ? (
+            <Query
+              query={searchQuery}
+              variables={{ ...queryVariables, searchTerm: inputValue }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) return <p>Loading...</p>
+                if (error)
+                  return (
+                    <p>
+                      Error :( <code>{error.toString()}</code>
+                    </p>
+                  )
 
-              return (
-                <ItemsList
-                  items={data.users}
-                  searchTerm={inputValue}
-                  itemToString={itemToString}
-                  idFromItem={idFromItem}
-                  selectedItem={selectedItem}
-                  highlightedIndex={highlightedIndex}
-                  getItemProps={getItemProps}
-                  {...props}
-                />
-              )
-            }}
-          </Query>
-        ) : null}
-      </div>
-    )}
-  </Downshift>
-)
+                return (
+                  <ItemsList
+                    items={data.users}
+                    searchTerm={inputValue}
+                    itemToString={itemToString}
+                    idFromItem={idFromItem}
+                    selectedItem={selectedItem}
+                    highlightedIndex={highlightedIndex}
+                    getItemProps={getItemProps}
+                    {...props}
+                  />
+                )
+              }}
+            </Query>
+          ) : null}
+        </div>
+      )}
+    </Downshift>
+  )
+}
 
 InlineSearch.defaultProps = defaultProps
 
