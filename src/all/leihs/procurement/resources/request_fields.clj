@@ -11,8 +11,6 @@
 (defn get-request-fields [context arguments value]
   (let [request (request/get-request context arguments value)
         rf-perms (rf-perms/all-for-user-and-request context arguments value)]
-    (logging/debug request)
-    (logging/debug rf-perms)
     (map (fn [[k v]] (merge v {:name k, :value (k request)}))
          (seq rf-perms))))
 

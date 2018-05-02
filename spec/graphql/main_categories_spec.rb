@@ -29,13 +29,44 @@ describe 'main categories' do
       end
 
       #############################################################################
+      
       main_categories_before = [
         { name: 'main_cat_1' },
+        { name: 'main_cat_2' },
         { name: 'main_cat_to_delete' }
       ]
       main_categories_before.each do |data|
         FactoryBot.create(:main_category, name: data[:name])
       end
+
+      #############################################################################
+      
+      categories_before = [
+        { name: 'cat_1_for_main_cat_1',
+          parent: { name: 'main_cat_1' },
+          general_ledger_account: 'LEDG_ACC_OLD', 
+          cost_center: 'CC_OLD' },
+        { name: 'cat_to_delete',
+          parent: { name: 'main_cat_1' } }
+      ]
+      categories_before.each do |data|
+        FactoryBot.create(
+          :category,
+          name: data[:name],
+          main_category_id: MainCategory.find(data[:parent]).id
+        )
+      end
+
+      #############################################################################
+
+      category_inspectors_before = [
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_3').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id }
+      ]
 
       #############################################################################
 
@@ -75,6 +106,12 @@ describe 'main categories' do
                     amount_cents: 111 },
                   { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
                     amount_cents: 222 }
+                ],
+                categories: [
+                  { id: null,
+                    name: "new_cat_for_new_main_cat",
+                    inspectors: ["#{User.find(firstname: 'user_1').id}",
+                                 "#{User.find(firstname: 'user_2').id}"] }
                 ]
               },
               { id: "#{MainCategory.find(name: 'main_cat_1').id}",
@@ -84,8 +121,19 @@ describe 'main categories' do
                     amount_cents: 333 },
                   { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
                     amount_cents: 444 }
+                ],
+                categories: [
+                  { id: "#{Category.find(name: 'cat_1_for_main_cat_1',
+                                         main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
+                    name: "cat_1_for_main_cat_1",
+                    general_ledger_account: "LEDG_ACC_NEW",
+                    cost_center: "CC_NEW",
+                    inspectors: ["#{User.find(firstname: 'user_3').id}",
+                                 "#{User.find(firstname: 'user_4').id}"] }
                 ]
-              }
+              },
+              { id: "#{MainCategory.find(name: 'main_cat_2').id}",
+                name: "main_cat_2_new_name" }
             ]
           ) {
             name
@@ -99,6 +147,7 @@ describe 'main categories' do
         'data' => {
           'main_categories' => [
             { "name" => 'main_cat_1' },
+            { "name" => 'main_cat_2_new_name' },
             { "name" => 'new_main_cat' }
           ]
         }
@@ -113,7 +162,8 @@ describe 'main categories' do
 
       main_categories_after = [
         { name: 'new_main_cat' },
-        { name: 'main_cat_1' }
+        { name: 'main_cat_1' },
+        { name: 'main_cat_2_new_name' }
       ]
       expect(MainCategory.count).to be == main_categories_after.count
       main_categories_after.each do |data|
@@ -142,6 +192,40 @@ describe 'main categories' do
           amount_cents: data[:amount_cents]
         )
         expect(bl).to be
+      end
+
+      categories_after = [
+        { name: 'cat_1_for_main_cat_1',
+          parent: { name: 'main_cat_1' },
+          general_ledger_account: 'LEDG_ACC_NEW',
+          cost_center: 'CC_NEW' },
+        { name: 'new_cat_for_new_main_cat',
+          parent: { name: 'new_main_cat' } }
+      ]
+      expect(Category.count).to be == categories_after.count
+      categories_after.each do |data|
+        parent = MainCategory.find(data[:parent])
+        c = Category.find(
+          data
+          .reject { |k, _| k == :parent }
+          .merge(main_category_id: parent.id)
+        )
+        expect(c).to be
+      end
+
+      category_inspectors_after = [
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'new_cat_for_new_main_cat').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'new_cat_for_new_main_cat').id },
+        { user_id: User.find(firstname: 'user_3').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_4').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id }
+      ]
+      expect(CategoryInspector.count).to be == category_inspectors_after.count
+      category_inspectors_after.each do |data|
+        expect(CategoryInspector.find(data)).to be
       end
     end
   end

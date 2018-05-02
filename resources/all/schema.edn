@@ -120,14 +120,15 @@
 :input-objects {:AdminInput {:fields {:user_id {:type ID}}}
                 :BudgetLimitInput {:fields {:budget_period_id {:type ID}
                                             :amount_cents {:type Int}}}
-                :CategoryInspectorsInput {:fields {:id {:type ID}
-                                                   :general_ledger_account {:type String}
-                                                   :cost_center {:type String}
-                                                   :inspectors {:type (list ID)}}}
+                :CategoryInput {:fields {:id {:type ID}
+                                         :name {:type (non-null String)}
+                                         :general_ledger_account {:type String}
+                                         :cost_center {:type String}
+                                         :inspectors {:type (list ID)}}}
                 :MainCategoryInput {:fields {:id {:type ID}
                                              :name {:type (non-null String)}
                                              :budget_limits {:type (list :BudgetLimitInput)}
-                                             :categories_inspectors {:type (list :CategoryInspectorsInput)}}}
+                                             :categories {:type (list :CategoryInput)}}}
                 :RequesterOrganizationInput {:fields {:user_id {:type ID}
                                                       :department {:type String}
                                                       :organization {:type String}}}}

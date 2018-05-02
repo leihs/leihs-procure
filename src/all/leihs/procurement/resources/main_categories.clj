@@ -4,6 +4,7 @@
             [clojure.tools.logging :as logging]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.budget-limits :as budget-limits]
+            [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.image :as image]
             [leihs.procurement.resources.main-category :as main-category]
             [leihs.procurement.utils.sql :as sql]
@@ -24,7 +25,7 @@
                                  sql/format
                                  (jdbc/query tx)
                                  first)]
-                  (if-let [image-id (debug/identity-with-logging (:id image))]
+                  (if-let [image-id (:id image)]
                     (merge mc {:image_url (path :image {:image-id image-id})})
                     ""))))
          )))
@@ -37,6 +38,7 @@
                   sql/format)))
 
 (defn delete-main-categories-not-in! [tx ids]
+  (categories/delete-categories-not-in-main-category-ids! tx ids)
   (budget-limits/delete-budget-limits-not-in-main-category-ids! tx ids)
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)
@@ -48,19 +50,22 @@
         mcs (:input_data args)]
     (loop [[mc & rest-mcs] mcs mc-ids []]
       (if mc
-        (let [mc-id (or (:id mc)
-                        (let [mc-name (:name mc)]
-                          (main-category/insert-main-category! tx {:name mc-name})
-                          (->> mc-name (main-category/get-main-category-by-name tx) :id)))
-              budget-limits (->> mc :budget_limits (map #(merge % {:main_category_id mc-id})))]
-          (budget-limits/update-budget-limits! tx budget-limits)
-          (recur rest-mcs (conj mc-ids mc-id)))
+        (let [mc-name (:name mc)]
+          (do (if (:id mc)
+                (main-category/update-main-category! tx (select-keys mc [:id :name]))
+                (main-category/insert-main-category! tx {:name mc-name}))
+              (let [mc-id (or (:id mc)
+                              (->> mc-name (main-category/get-main-category-by-name tx) :id))
+                    budget-limits (->> mc :budget_limits (map #(merge % {:main_category_id mc-id})))
+                    categories (->> mc :categories (map #(merge % {:main_category_id mc-id})))]
+                (budget-limits/update-budget-limits! tx budget-limits)
+                (categories/update-categories! tx mc-id categories)
+                (recur rest-mcs (conj mc-ids mc-id)))))
         (delete-main-categories-not-in! tx mc-ids)))
-        ; (categories/update-categories! tx categories)
     (get-main-categories-by-names tx (map :name mcs))))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

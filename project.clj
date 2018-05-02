@@ -58,6 +58,8 @@
 
   ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
 
+  :aot [#"leihs.procurement.*"]
+
   :target-path "target/%s"
   :main leihs.procurement.backend.main
   :profiles {:dev {:source-paths ["src/all" "src/dev"]

@@ -1,6 +1,9 @@
 (ns leihs.procurement.resources.main-category
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as logging]
             [leihs.procurement.utils.sql :as sql]
+            [logbug.debug :as debug]
             ))
 
 (def main-category-base-query
@@ -29,3 +32,18 @@
                  (-> (sql/insert-into :procurement_main_categories)
                      (sql/values [mc])
                      sql/format)))
+
+(defn update-main-category! [tx mc]
+  (jdbc/execute! tx
+                 (-> (sql/update :procurement_main_categories)
+                     (sql/sset mc)
+                     (sql/where [:= :procurement_main_categories.id (:id mc)])
+                     sql/format
+                     )))
+
+;#### debug ###################################################################
+(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :info)
+; (debug/debug-ns 'cider-ci.utils.shutdown)
+; (debug/debug-ns *ns*)
+; (debug/undebug-ns *ns*)

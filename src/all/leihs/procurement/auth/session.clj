@@ -62,7 +62,6 @@
     (throw (IllegalStateException. (str "No valid user session found!")))))
 
 (defn session-cookie-value [request]
-  (logging/debug (-> request :cookies))
   (when-let [cookie (-> request :cookies
                         (get USER_SESSION_COOKIE_NAME nil) :value)]
     (decrypt (-> request :secret-ba String.) cookie)))

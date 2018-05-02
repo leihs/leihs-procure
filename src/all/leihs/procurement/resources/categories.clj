@@ -1,6 +1,9 @@
 (ns leihs.procurement.resources.categories
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.resources.category :as category]
+            [leihs.procurement.resources.inspectors :as inspectors]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
 
@@ -32,7 +35,35 @@
   (jdbc/query (-> context :request :tx)
               (categories-query context arguments _)))
 
-(defn update-categories! [tx categories])
+(defn delete-categories-not-in-main-category-ids! [tx ids]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_categories)
+                     (sql/where [:not-in :procurement_categories.main_category_id ids])
+                     sql/format)))
+
+(defn delete-categories-for-main-category-id-and-not-in-ids! [tx mc-id ids]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_categories)
+                     (sql/merge-where [:= :procurement_categories.main_category_id mc-id])
+                     (cond-> (not (empty? ids))
+                       (sql/merge-where [:not-in :procurement_categories.id ids]))
+                     sql/format
+                     )))
+
+(defn update-categories! [tx mc-id cs]
+  (loop [[c & rest-cs] cs c-ids []]
+    (if c 
+      (do (if (:id c)
+            (category/update-category! tx (dissoc c :inspectors))
+            (category/insert-category! tx (dissoc c :id :inspectors)))
+          (let [c-id (or (:id c)
+                         (as-> c <>
+                           (select-keys <> [:name :main_category_id])
+                           (category/get-category tx <>)
+                           (:id <>)))]
+            (inspectors/update-inspectors! tx c-id (:inspectors c))
+            (recur rest-cs (conj c-ids c-id))))
+      (delete-categories-for-main-category-id-and-not-in-ids! tx mc-id c-ids))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
