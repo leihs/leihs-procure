@@ -76,12 +76,11 @@
             :value (or (kw @user-data*) "")
             :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
             :disabled (not @edit-mode?*)}]
-          [:input-group.form-control
+          [:div
            (if-let [value (-> @user-data* kw presence)]
-             [:span.input-group-text.text-truncate
-              {:style {:overflow :scroll
-                       :max-width "50em"
-                       :flex "1 1 auto"}}
+             [:span.form-control-plaintext.text-truncate
+              {:style
+               {:max-width "20em"}}
               (case (:type opts)
                 :email [:a {:href (str "mailto:" value)}
                         [:i.fas.fa-envelope] " " value]
