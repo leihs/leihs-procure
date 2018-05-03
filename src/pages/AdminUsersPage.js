@@ -243,7 +243,9 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                   }))
                   // eslint-disable-next-line no-console
                   console.log({ fields, data })
-                  updateRequestersOrgs({ variables: { input_data: data } })
+                  updateRequestersOrgs({
+                    variables: { requestersOrgsList: data }
+                  })
                 }}
               >
                 {f
