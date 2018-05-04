@@ -2,7 +2,7 @@
   (:require
     [clj-logging-config.log4j :as logging-config]
     [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
+    [clojure.tools.logging :as log]
     [leihs.procurement.utils.sql :as sql]
     [leihs.procurement.utils.ds :refer [get-ds]]
     [logbug.debug :as debug]
@@ -19,16 +19,21 @@
                                       (str "%" search-term "%"))
                     offset (:offset args)
                     limit (:limit args)]
-                (sql/format
+                (log/spy (sql/format
                   (cond-> users-base-query
                     term-percent
-                    (sql/merge-where [:or
-                                      ["~~*" :users.firstname term-percent]
-                                      ["~~*" :users.lastname term-percent]])
+                    (sql/merge-where
+                      ["~~*"
+                       (->> (sql/call :concat
+                                      :users.firstname
+                                      (sql/call :cast " " :varchar)
+                                      :users.lastname)
+                            (sql/call :unaccent))
+                       (sql/call :unaccent term-percent)])
                     offset
                     (sql/offset offset)
                     limit
-                    (sql/limit limit))))))
+                    (sql/limit limit)))))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
