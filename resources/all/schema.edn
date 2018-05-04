@@ -33,7 +33,9 @@
                                    :budget_limits {:type (list :BudgetLimit)
                                                    :resolve :budget-limits}
                                    :categories {:type (list :Category)
-                                                :resolve :categories}}}
+                                                :resolve :categories}
+                                   :can_delete {:type (non-null Boolean)
+                                                :resolve :can-delete-main-category?}}}
 
            :Model {:fields {:id {:type ID}
                             :product {:type String}

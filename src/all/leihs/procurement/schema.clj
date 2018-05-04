@@ -54,6 +54,7 @@
    :budget-period budget-period/get-budget-period
    :budget-periods budget-periods/get-budget-periods
    :building building/get-building
+   :can-delete-main-category? main-category/can-delete?
    :category category/get-category
    :categories categories/get-categories
    :current-user current-user/get-current-user
