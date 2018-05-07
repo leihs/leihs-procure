@@ -77,6 +77,8 @@
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
    :total-price-cents-requested-quantities requests/total-price-cents-requested-quantities
+   :total-price-cents-approved-quantities requests/total-price-cents-approved-quantities
+   :total-price-cents-order-quantities requests/total-price-cents-order-quantities
    :update-admins admins/update-admins
    :update-main-categories main-categories/update-main-categories!
    :update-requesters-organizations requesters-organizations/update-requesters-organizations

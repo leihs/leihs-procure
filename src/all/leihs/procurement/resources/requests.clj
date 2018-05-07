@@ -2,6 +2,7 @@
   (:require 
     [clj-logging-config.log4j :as logging-config]
     [clojure.java.jdbc :as jdbc]
+    [clojure.math.numeric-tower :refer [round]]
     [clojure.tools.logging :as log]
     [leihs.procurement.resources.request :as request]
     [leihs.procurement.utils.sql :as sql]
@@ -93,26 +94,44 @@
                 (requests-query context arguments value)
                 {:row-fn request/row-fn})))
 
+(defn total-price-query [qty-type bp-id]
+  (-> (sql/select
+        :pr.budget_period_id
+        [(sql/call :sum
+                   (sql/call :*
+                             :pr.price_cents
+                             (->> qty-type
+                                  name
+                                  (str "pr.")
+                                  keyword)))
+         :result])
+      (sql/from [:procurement_requests :pr])
+      (sql/merge-where [:= :pr.budget_period_id bp-id])
+      (sql/group :pr.budget_period_id)
+      sql/format))
+
+(defn get-total-price-cents [tx qty-type bp-id]
+  (some-> (total-price-query qty-type bp-id)
+          (->> (jdbc/query tx))
+          first
+          :result
+          (/ 100)
+          round))
+
 (defn total-price-cents-requested-quantities [context _ value]
-  (let [query (-> (sql/select
-                    :pr.budget_period_id
-                    [(sql/call :sum
-                               (sql/call :*
-                                         :pr.price_cents
-                                         :pr.requested_quantity))
-                     :result])
-                  (sql/from [:procurement_requests :pr])
-                  (sql/join [:procurement_budget_periods :pbp]
-                            [:= :pbp.id :pr.budget_period_id])
-                  (sql/merge-where [:= :pr.budget_period_id (:id value)])
-                  (sql/merge-where [:= :pr.approved_quantity nil])
-                  (sql/group :pr.budget_period_id)
-                  sql/format
-                  log/spy)]
-    (->> query
-         (jdbc/query (-> context :request :tx))
-         first
-         :result)))
+  (get-total-price-cents (-> context :request :tx)
+                         :requested_quantity
+                         (:id value)))
+
+(defn total-price-cents-approved-quantities [context _ value]
+  (get-total-price-cents (-> context :request :tx)
+                         :approved_quantity
+                         (:id value)))
+
+(defn total-price-cents-order-quantities [context _ value]
+  (get-total-price-cents (-> context :request :tx)
+                         :order_quantity
+                         (:id value)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

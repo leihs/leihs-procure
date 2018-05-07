@@ -8,7 +8,12 @@
                                    :can_delete {:type Boolean
                                                 :resolve :can-delete-budget-period?}
                                    :total_price_cents_requested_quantities {:type Int
-                                                                            :resolve :total-price-cents-requested-quantities}}}
+                                                                            :resolve :total-price-cents-requested-quantities}
+                                   :total_price_cents_approved_quantities {:type Int
+                                                                           :resolve :total-price-cents-approved-quantities}
+                                   :total_price_cents_order_quantities {:type Int
+                                                                        :resolve :total-price-cents-order-quantities}
+                                   }}
 
            :BudgetLimit {:fields {:id {:type ID}
                                   :budget_period {:type :BudgetPeriod
