@@ -54,6 +54,7 @@
    :budget-period budget-period/get-budget-period
    :budget-periods budget-periods/get-budget-periods
    :building building/get-building
+   :can-delete-budget-period? budget-period/can-delete?
    :can-delete-category? category/can-delete?
    :can-delete-main-category? main-category/can-delete?
    :category category/get-category
@@ -75,6 +76,7 @@
    :room room/get-room
    :rooms rooms/get-rooms
    :supplier supplier/get-supplier
+   :total-price-cents-requested-quantities requests/total-price-cents-requested-quantities
    :update-admins admins/update-admins
    :update-main-categories main-categories/update-main-categories!
    :update-requesters-organizations requesters-organizations/update-requesters-organizations
@@ -92,7 +94,7 @@
       graphql-schema/compile))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

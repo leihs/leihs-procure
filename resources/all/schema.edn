@@ -4,7 +4,11 @@
            :BudgetPeriod {:fields {:id {:type ID}
                                    :name {:type String}
                                    :inspection_start_date {:type String}
-                                   :end_date {:type String}}}
+                                   :end_date {:type String}
+                                   :can_delete {:type Boolean
+                                                :resolve :can-delete-budget-period?}
+                                   :total_price_cents_requested_quantities {:type Int
+                                                                            :resolve :total-price-cents-requested-quantities}}}
 
            :BudgetLimit {:fields {:id {:type ID}
                                   :budget_period {:type :BudgetPeriod
@@ -96,30 +100,30 @@
                                             :department {:type :Organization
                                                          :resolve :department}}}
 
-           :Room {:fields {:id {:type ID}
-                           :building {:type :Building
-                                      :resolve :building}
-                           :name {:type String}}}
+:Room {:fields {:id {:type ID}
+                :building {:type :Building
+                           :resolve :building}
+                :name {:type String}}}
 
-           :SavedFilters {:fields {:sort_by {:type String}
-                                   :sort_dir {:type String}
-                                   :search {:type String}
-                                   :category_ids {:type (list ID)}
-                                   :categories_with_requests {:type Boolean}
-                                   :organization_ids {:type (list ID)}
-                                   :priorities {:type (list String)}
-                                   :inspector_priorities {:type (list String)}
-                                   :states {:type (list String)}
-                                   :budget_period_ids {:type (list ID)}}}
+:SavedFilters {:fields {:sort_by {:type String}
+                        :sort_dir {:type String}
+                        :search {:type String}
+                        :category_ids {:type (list ID)}
+                        :categories_with_requests {:type Boolean}
+                        :organization_ids {:type (list ID)}
+                        :priorities {:type (list String)}
+                        :inspector_priorities {:type (list String)}
+                        :states {:type (list String)}
+                        :budget_period_ids {:type (list ID)}}}
 
-           :Supplier {:fields {:id {:type ID}
-                               :name {:type String}}}
+:Supplier {:fields {:id {:type ID}
+                    :name {:type String}}}
 
-           :User {:fields {:id {:type ID}
-                           :email {:type String}
-                           :firstname {:type String}
-                           :lastname {:type String}
-                           :login {:type String}}}}
+:User {:fields {:id {:type ID}
+                :email {:type String}
+                :firstname {:type String}
+                :lastname {:type String}
+                :login {:type String}}}}
 
 :input-objects {:AdminInput {:fields {:user_id {:type ID}}}
                 :BudgetLimitInput {:fields {:budget_period_id {:type ID}
@@ -139,7 +143,7 @@
 
 :queries {:admins {:type (list :User)
                    :resolve :admins}
-          
+
           :budget_limits {:type (list :BudgetLimit)
                           :resolve :budget-limits}
 

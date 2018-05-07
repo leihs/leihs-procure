@@ -39,3 +39,29 @@
                          (sql/call :cast (:end_date budget-period) :date))
                :result])
             sql/format)))))
+
+(defn can-delete? [context _ value]
+  (-> (jdbc/query
+        (-> context :request :tx)
+        (-> (sql/call
+              :and
+              (sql/call
+                :not
+                (sql/call
+                  :exists
+                  (-> (sql/select true)
+                      (sql/from [:procurement_requests :pr])
+                      (sql/merge-where [:= :pr.budget_period_id (:id value)]))))
+              (sql/call
+                :not
+                (sql/call
+                  :exists
+                  (-> (sql/select true)
+                      (sql/from [:procurement_budget_limits :pbl])
+                      (sql/merge-where [:= :pbl.budget_period_id (:id value)]))))) 
+            (vector :result)
+            sql/select
+            sql/format
+            ))
+      first
+      :result))

@@ -2,7 +2,7 @@
   (:require 
     [clj-logging-config.log4j :as logging-config]
     [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
+    [clojure.tools.logging :as log]
     [leihs.procurement.resources.request :as request]
     [leihs.procurement.utils.sql :as sql]
     [logbug.debug :as debug]))
@@ -92,6 +92,27 @@
     (jdbc/query (-> context :request :tx)
                 (requests-query context arguments value)
                 {:row-fn request/row-fn})))
+
+(defn total-price-cents-requested-quantities [context _ value]
+  (let [query (-> (sql/select
+                    :pr.budget_period_id
+                    [(sql/call :sum
+                               (sql/call :*
+                                         :pr.price_cents
+                                         :pr.requested_quantity))
+                     :result])
+                  (sql/from [:procurement_requests :pr])
+                  (sql/join [:procurement_budget_periods :pbp]
+                            [:= :pbp.id :pr.budget_period_id])
+                  (sql/merge-where [:= :pr.budget_period_id (:id value)])
+                  (sql/merge-where [:= :pr.approved_quantity nil])
+                  (sql/group :pr.budget_period_id)
+                  sql/format
+                  log/spy)]
+    (->> query
+         (jdbc/query (-> context :request :tx))
+         first
+         :result)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
