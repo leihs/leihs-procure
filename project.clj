@@ -52,6 +52,9 @@
    [ring/ring-core "1.6.3"]
    ]
 
+  ; lint/formating/"prettier"
+  :plugins [[lein-zprint "0.3.8"]]
+  :zprint {:width 80, :old? false}
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
   :jvm-opts #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
                       ["--add-modules" "java.xml.bind"]
