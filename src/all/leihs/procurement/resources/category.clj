@@ -49,6 +49,32 @@
              :result])
           sql/format))))
 
+(defn can-delete? [context _ value]
+  (-> (jdbc/query
+        (-> context :request :tx)
+        (-> (sql/call
+              :and
+              (sql/call
+                :not
+                (sql/call
+                  :exists
+                  (-> (sql/select true)
+                      (sql/from [:procurement_requests :pr])
+                      (sql/merge-where [:= :pr.category_id (:id value)]))))
+              (sql/call
+                :not
+                (sql/call
+                  :exists
+                  (-> (sql/select true)
+                      (sql/from [:procurement_templates :pt])
+                      (sql/merge-where [:= :pt.category_id (:id value)]))))) 
+            (vector :result)
+            sql/select
+            sql/format
+            ))
+      first
+      :result))
+
 (defn update-category! [tx c]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_categories)

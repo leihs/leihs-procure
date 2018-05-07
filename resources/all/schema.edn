@@ -22,7 +22,9 @@
                                :general_ledger_account {:type String}
                                :cost_center {:type String}
                                :inspectors {:type (list :User)
-                                            :resolve :inspectors}}}
+                                            :resolve :inspectors}
+                               :can_delete {:type Boolean
+                                            :resolve :can-delete-category?}}}
 
            :CurrentUser {:fields {:user {:type :User}
                                   :saved_filters {:type :SavedFilters}}}
