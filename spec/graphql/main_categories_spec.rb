@@ -10,9 +10,6 @@ describe 'main categories' do
         { firstname: 'user_2' },
         { firstname: 'user_3' },
         { firstname: 'user_4' },
-        { firstname: 'user_5' },
-        { firstname: 'user_6' },
-        { firstname: 'user_7' }
       ]
       users_before.each do |data|
         FactoryBot.create(:user, data)
@@ -47,7 +44,9 @@ describe 'main categories' do
           general_ledger_account: 'LEDG_ACC_OLD', 
           cost_center: 'CC_OLD' },
         { name: 'cat_to_delete',
-          parent: { name: 'main_cat_1' } }
+          parent: { name: 'main_cat_1' } },
+        { name: 'cat_1_for_main_cat_to_delete',
+          parent: { name: 'main_cat_to_delete' } }
       ]
       categories_before.each do |data|
         FactoryBot.create(
@@ -65,7 +64,9 @@ describe 'main categories' do
         { user_id: User.find(firstname: 'user_2').id,
           category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
         { user_id: User.find(firstname: 'user_3').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id }
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
       ]
 
       #############################################################################
