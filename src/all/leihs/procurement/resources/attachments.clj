@@ -8,12 +8,14 @@
   (-> (sql/select :procurement_attachments.*)
       (sql/from :procurement_attachments)))
 
-(defn get-attachments [context _ value]
-  (jdbc/query (-> context :request :tx)
-              (sql/format
-                (-> attachments-base-query
-                    (sql/merge-where [:=
-                                      :procurement_attachments.request_id
+(defn get-attachments
+  [context _ value]
+  (jdbc/query
+    (-> context
+        :request
+        :tx)
+    (sql/format (-> attachments-base-query
+                    (sql/merge-where [:= :procurement_attachments.request_id
                                       (:id value)])))))
 
 ;#### debug ###################################################################

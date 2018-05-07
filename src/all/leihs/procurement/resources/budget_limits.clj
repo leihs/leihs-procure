@@ -8,35 +8,44 @@
   (-> (sql/select :procurement_budget_limits.*)
       (sql/from :procurement_budget_limits)))
 
-(defn get-budget-limits [context _ value]
+(defn get-budget-limits
+  [context _ value]
   (let [main_category_id (:id value)]
-    (jdbc/query (-> context :request :tx)
-                (-> budget-limits-base-query
-                  (sql/merge-where
-                    [:= :procurement_budget_limits.main_category_id main_category_id])
-                  sql/format))))
+    (jdbc/query
+      (-> context
+          :request
+          :tx)
+      (-> budget-limits-base-query
+          (sql/merge-where [:= :procurement_budget_limits.main_category_id
+                            main_category_id])
+          sql/format))))
 
-(defn insert-budget-limit! [tx bl]
+(defn insert-budget-limit!
+  [tx bl]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_budget_limits)
                      (sql/values [bl])
                      sql/format)))
 
-(defn delete-budget-limit! [tx bl]
-  (jdbc/execute! tx
-                 (-> (sql/delete-from [:procurement_budget_limits :pbl])
-                     (sql/where [:and
-                                 [:= :pbl.main_category_id (:main_category_id bl)]
-                                 [:= :pbl.budget_period_id (:budget_period_id bl)]])
-                     sql/format)))
+(defn delete-budget-limit!
+  [tx bl]
+  (jdbc/execute!
+    tx
+    (-> (sql/delete-from [:procurement_budget_limits :pbl])
+        (sql/where [:and [:= :pbl.main_category_id (:main_category_id bl)]
+                    [:= :pbl.budget_period_id (:budget_period_id bl)]])
+        sql/format)))
 
-(defn delete-budget-limits-not-in-main-category-ids! [tx ids]
-  (jdbc/execute! tx
-                 (-> (sql/delete-from :procurement_budget_limits)
-                     (sql/where [:not-in :procurement_budget_limits.main_category_id ids])
-                     sql/format)))
+(defn delete-budget-limits-not-in-main-category-ids!
+  [tx ids]
+  (jdbc/execute!
+    tx
+    (-> (sql/delete-from :procurement_budget_limits)
+        (sql/where [:not-in :procurement_budget_limits.main_category_id ids])
+        sql/format)))
 
-(defn update-budget-limits! [tx bls]
+(defn update-budget-limits!
+  [tx bls]
   (doseq [bl bls]
     (delete-budget-limit! tx bl)
     (insert-budget-limit! tx bl)))

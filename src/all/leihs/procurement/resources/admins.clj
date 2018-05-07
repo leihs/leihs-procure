@@ -9,26 +9,32 @@
 (def admins-base-query
   (-> (sql/select :users.*)
       (sql/from :users)
-      (sql/merge-where [:in
-                        :users.id
+      (sql/merge-where [:in :users.id
                         (-> (sql/select :procurement_admins.user_id)
                             (sql/from :procurement_admins))])))
 
-(defn get-admins [context _ _]
-  (jdbc/query (-> context :request :tx)
+(defn get-admins
+  [context _ _]
+  (jdbc/query (-> context
+                  :request
+                  :tx)
               (sql/format admins-base-query)))
 
-(defn delete-all [tx]
-  (jdbc/delete! tx :procurement_admins []))
+(defn delete-all [tx] (jdbc/delete! tx :procurement_admins []))
 
-(defn update-admins [context args value]
-  (let [tx (-> context :request :tx)]
+(defn update-admins
+  [context args value]
+  (let [tx (-> context
+               :request
+               :tx)]
     (delete-all tx)
     (doseq [d (:input_data args)] (jdbc/insert! tx :procurement_admins d))
     (let [admins (get-admins context args value)]
       (map #(conj %
-                  {:user (->> % :user_id (user/get-user-by-id tx))})
-           admins))))
+                  {:user (->> %
+                              :user_id
+                              (user/get-user-by-id tx))})
+        admins))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

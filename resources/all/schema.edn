@@ -1,226 +1,176 @@
-{:objects {:Attachment {:fields {:id {:type ID}
-                                 :filename {:type String}}}
-
-           :BudgetPeriod {:fields {:id {:type ID}
-                                   :name {:type String}
-                                   :inspection_start_date {:type String}
-                                   :end_date {:type String}
-                                   :can_delete {:type Boolean
-                                                :resolve :can-delete-budget-period?}
-                                   :total_price_cents_requested_quantities {:type Int
-                                                                            :resolve :total-price-cents-requested-quantities}
-                                   :total_price_cents_approved_quantities {:type Int
-                                                                           :resolve :total-price-cents-approved-quantities}
-                                   :total_price_cents_order_quantities {:type Int
-                                                                        :resolve :total-price-cents-order-quantities}
-                                   }}
-
-           :BudgetLimit {:fields {:id {:type ID}
-                                  :budget_period {:type :BudgetPeriod
-                                                  :resolve :budget-period}
-                                  :main_category {:type :MainCategory
-                                                  :resolve :main-category}
-                                  :amount_cents {:type (non-null Int)}
-                                  :amount_currency {:type String}}}
-
-           :Building {:fields {:id {:type ID}
-                               :name {:type String}}}
-
-           :Category {:fields {:id {:type ID}
-                               :name {:type String}
-                               :general_ledger_account {:type String}
-                               :cost_center {:type String}
-                               :inspectors {:type (list :User)
-                                            :resolve :inspectors}
-                               :can_delete {:type Boolean
-                                            :resolve :can-delete-category?}}}
-
-           :CurrentUser {:fields {:user {:type :User}
-                                  :saved_filters {:type :SavedFilters}}}
-
-           :MainCategory {:fields {:id {:type ID}
-                                   :name {:type String}
-                                   :image_url {:type String}
-                                   :budget_limits {:type (list :BudgetLimit)
-                                                   :resolve :budget-limits}
-                                   :categories {:type (list :Category)
-                                                :resolve :categories}
-                                   :can_delete {:type (non-null Boolean)
-                                                :resolve :can-delete-main-category?}}}
-
-           :Model {:fields {:id {:type ID}
-                            :product {:type String}
-                            :version {:type String}}}
-
-           :Organization {:fields {:id {:type ID}
-                                   :name {:type String}
-                                   :shortname {:type String}
-                                   :parent_id {:type ID}
-                                   :organizations {:type (list :Organization)
-                                                   :resolve :organizations}}}
-
-           :RequestField {:fields {:name {:type String}
-                                   :value {:type String}
-                                   :read {:type Boolean}
-                                   :write {:type Boolean}}}
-
-           :Request {:fields {:id {:type ID}
-                              :accounting_type {:type (non-null String)}
-                              :approved_quantity {:type Int}
-                              :article_name {:type (non-null String)}
-                              :article_number {:type String}
-                              :attachments {:type (list :Attachment)
-                                            :resolve :attachments}
-                              :budget_period {:type :BudgetPeriod
-                                              :resolve :budget-period}
-                              :category {:type :Category
-                                         :resolve :category}
-                              :inspection_comment {:type String}
-                              :internal_order_id {:type String}
-                              :model {:type :Model
-                                      :resolve :model}
-                              :motivation {:type String}
-                              :order_quantity {:type Int}
-                              :organization {:type :Organization
-                                             :resolve :organization}
-                              :priority {:type Int}
-                              :priority_inspector {:type Int}
-                              :receiver {:type String}
-                              :price_cents {:type (non-null Int)}
-                              :price_currency {:type String}
-                              :requested_quantity {:type (non-null Int)}
-                              :room {:type :Room
-                                     :resolve :room}
-                              :state {:type String}
-                              :supplier {:type :Supplier
-                                         :resolve :supplier}
-                              :supplier_name {:type String}
-                              :user {:type :User
-                                     :resolve :user}}}
-
-           :RequesterOrganization {:fields {:user {:type :User
-                                                   :resolve :user}
-                                            :organization {:type :Organization
-                                                           :resolve :organization}
-                                            :department {:type :Organization
-                                                         :resolve :department}}}
-
-:Room {:fields {:id {:type ID}
-                :building {:type :Building
-                           :resolve :building}
-                :name {:type String}}}
-
-:SavedFilters {:fields {:sort_by {:type String}
-                        :sort_dir {:type String}
-                        :search {:type String}
-                        :category_ids {:type (list ID)}
-                        :categories_with_requests {:type Boolean}
-                        :organization_ids {:type (list ID)}
-                        :priorities {:type (list String)}
-                        :inspector_priorities {:type (list String)}
-                        :states {:type (list String)}
-                        :budget_period_ids {:type (list ID)}}}
-
-:Supplier {:fields {:id {:type ID}
-                    :name {:type String}}}
-
-:User {:fields {:id {:type ID}
-                :email {:type String}
-                :firstname {:type String}
-                :lastname {:type String}
-                :login {:type String}}}}
-
-:input-objects {:AdminInput {:fields {:user_id {:type ID}}}
-                :BudgetLimitInput {:fields {:budget_period_id {:type ID}
-                                            :amount_cents {:type Int}}}
-                :BudgetPeriodInput {:fields {:id {:type ID}
-                                             :name {:type String}
-                                             :inspection_start_date {:type String}
-                                             :end_date {:type String}}}
-                :CategoryInput {:fields {:id {:type ID}
-                                         :name {:type (non-null String)}
-                                         :general_ledger_account {:type String}
-                                         :cost_center {:type String}
-                                         :inspectors {:type (list ID)}}}
-                :MainCategoryInput {:fields {:id {:type ID}
-                                             :name {:type (non-null String)}
-                                             :budget_limits {:type (list :BudgetLimitInput)}
-                                             :categories {:type (list :CategoryInput)}}}
-                :RequesterOrganizationInput {:fields {:user_id {:type ID}
-                                                      :department {:type String}
-                                                      :organization {:type String}}}}
-
-:queries {:admins {:type (list :User)
-                   :resolve :admins}
-
-          :budget_limits {:type (list :BudgetLimit)
-                          :resolve :budget-limits}
-
-          :budget_periods {:type (list :BudgetPeriod)
-                           :resolve :budget-periods}
-
-          :categories {:type (list :Category)
-                       :args {:inspected_by_auth_user {:type Boolean}}
-                       :resolve :categories}
-
-          :current_user {:type :CurrentUser
-                         :resolve :current-user}
-
-          :main_categories {:type (list :MainCategory)
-                            :resolve :main-categories}
-
-          :organizations {:type (list :Organization)
-                          :args {:root_only {:type Boolean}}
-                          :resolve :organizations}
-
-          :priorities {:type (list Int)
-                       :resolve :priorities}
-
-          :priorities_inspector {:type (list Int)
-                                 :resolve :priorities-inspector}
-
-          :request_by_id {:type :Request
-                          :args {:id {:type ID}}
-                          :resolve :request-by-id}
-
-          :requests {:type (list :Request)
-                     :args {:requested_by_auth_user {:type Boolean}
-                            :from_categories_of_auth_user {:type Boolean}
-                            :category_id {:type (list ID)}
-                            :budget_period_id {:type (list ID)}
-                            :organization_id {:type (list ID)}
-                            :priority {:type (list String)}
-                            :inspectory_priority {:type (list String)}
-                            :search {:type String}
-                            :state {:type (list String)}}
-                     :resolve :requests}
-
-          :requesters_organizations {:type (list :RequesterOrganization)
-                                     :resolve :requesters-organizations}
-
-          :request_fields_by_id {:type (list :RequestField)
-                                 :args {:request_id {:type ID}}
-                                 :resolve :request-fields-by-id}
-
-          :rooms {:type (list :Room)
-                  :args {:building_id {:type ID}}
-                  :resolve :rooms}
-
-          :users {:type (list :User)
-                  :args {:search_term {:type String}
-                         :offset {:type Int}
-                         :limit {:type Int}}
-                  :resolve :users}}
-
-:mutations {:admins {:type (list :User)
-                     :args {:input_data {:type (list :AdminInput)}}
-                     :resolve :update-admins}
-            :budget_periods {:type (list :BudgetPeriod)
-                             :args {:input_data {:type (list :BudgetPeriodInput)}}
-                             :resolve :update-budget-periods} 
-            :main_categories {:type (list :MainCategory)
-                              :args {:input_data {:type (list :MainCategoryInput)}}
-                              :resolve :update-main-categories}
-            :requesters_organizations {:type (list :RequesterOrganization)
-                                       :args {:input_data {:type (list :RequesterOrganizationInput)}}
-                                       :resolve :update-requesters-organizations}}}
+{:input-objects
+   {:AdminInput {:fields {:user_id {:type ID}}},
+    :BudgetLimitInput {:fields {:amount_cents {:type Int},
+                                :budget_period_id {:type ID}}},
+    :BudgetPeriodInput {:fields {:end_date {:type String},
+                                 :id {:type ID},
+                                 :inspection_start_date {:type String},
+                                 :name {:type String}}},
+    :CategoryInput {:fields {:cost_center {:type String},
+                             :general_ledger_account {:type String},
+                             :id {:type ID},
+                             :inspectors {:type (list ID)},
+                             :name {:type (non-null String)}}},
+    :MainCategoryInput {:fields {:budget_limits {:type (list
+                                                         :BudgetLimitInput)},
+                                 :categories {:type (list :CategoryInput)},
+                                 :id {:type ID},
+                                 :name {:type (non-null String)}}},
+    :RequesterOrganizationInput {:fields {:department {:type String},
+                                          :organization {:type String},
+                                          :user_id {:type ID}}}},
+ :mutations
+   {:admins {:args {:input_data {:type (list :AdminInput)}},
+             :resolve :update-admins,
+             :type (list :User)},
+    :budget_periods {:args {:input_data {:type (list :BudgetPeriodInput)}},
+                     :resolve :update-budget-periods,
+                     :type (list :BudgetPeriod)},
+    :main_categories {:args {:input_data {:type (list :MainCategoryInput)}},
+                      :resolve :update-main-categories,
+                      :type (list :MainCategory)},
+    :requesters_organizations
+      {:args {:input_data {:type (list :RequesterOrganizationInput)}},
+       :resolve :update-requesters-organizations,
+       :type (list :RequesterOrganization)}},
+ :objects
+   {:Attachment {:fields {:filename {:type String}, :id {:type ID}}},
+    :BudgetLimit
+      {:fields {:amount_cents {:type (non-null Int)},
+                :amount_currency {:type String},
+                :budget_period {:resolve :budget-period, :type :BudgetPeriod},
+                :id {:type ID},
+                :main_category {:resolve :main-category, :type :MainCategory}}},
+    :BudgetPeriod
+      {:fields
+         {:can_delete {:resolve :can-delete-budget-period?, :type Boolean},
+          :end_date {:type String},
+          :id {:type ID},
+          :inspection_start_date {:type String},
+          :name {:type String},
+          :total_price_cents_approved_quantities
+            {:resolve :total-price-cents-approved-quantities, :type Int},
+          :total_price_cents_order_quantities
+            {:resolve :total-price-cents-order-quantities, :type Int},
+          :total_price_cents_requested_quantities
+            {:resolve :total-price-cents-requested-quantities, :type Int}}},
+    :Building {:fields {:id {:type ID}, :name {:type String}}},
+    :Category {:fields {:can_delete {:resolve :can-delete-category?,
+                                     :type Boolean},
+                        :cost_center {:type String},
+                        :general_ledger_account {:type String},
+                        :id {:type ID},
+                        :inspectors {:resolve :inspectors, :type (list :User)},
+                        :name {:type String}}},
+    :CurrentUser {:fields {:saved_filters {:type :SavedFilters},
+                           :user {:type :User}}},
+    :MainCategory {:fields {:budget_limits {:resolve :budget-limits,
+                                            :type (list :BudgetLimit)},
+                            :can_delete {:resolve :can-delete-main-category?,
+                                         :type (non-null Boolean)},
+                            :categories {:resolve :categories,
+                                         :type (list :Category)},
+                            :id {:type ID},
+                            :image_url {:type String},
+                            :name {:type String}}},
+    :Model {:fields {:id {:type ID},
+                     :product {:type String},
+                     :version {:type String}}},
+    :Organization {:fields {:id {:type ID},
+                            :name {:type String},
+                            :organizations {:resolve :organizations,
+                                            :type (list :Organization)},
+                            :parent_id {:type ID},
+                            :shortname {:type String}}},
+    :Request {:fields
+                {:accounting_type {:type (non-null String)},
+                 :approved_quantity {:type Int},
+                 :article_name {:type (non-null String)},
+                 :article_number {:type String},
+                 :attachments {:resolve :attachments, :type (list :Attachment)},
+                 :budget_period {:resolve :budget-period, :type :BudgetPeriod},
+                 :category {:resolve :category, :type :Category},
+                 :id {:type ID},
+                 :inspection_comment {:type String},
+                 :internal_order_id {:type String},
+                 :model {:resolve :model, :type :Model},
+                 :motivation {:type String},
+                 :order_quantity {:type Int},
+                 :organization {:resolve :organization, :type :Organization},
+                 :price_cents {:type (non-null Int)},
+                 :price_currency {:type String},
+                 :priority {:type Int},
+                 :priority_inspector {:type Int},
+                 :receiver {:type String},
+                 :requested_quantity {:type (non-null Int)},
+                 :room {:resolve :room, :type :Room},
+                 :state {:type String},
+                 :supplier {:resolve :supplier, :type :Supplier},
+                 :supplier_name {:type String},
+                 :user {:resolve :user, :type :User}}},
+    :RequestField {:fields {:name {:type String},
+                            :read {:type Boolean},
+                            :value {:type String},
+                            :write {:type Boolean}}},
+    :RequesterOrganization
+      {:fields {:department {:resolve :department, :type :Organization},
+                :organization {:resolve :organization, :type :Organization},
+                :user {:resolve :user, :type :User}}},
+    :Room {:fields {:building {:resolve :building, :type :Building},
+                    :id {:type ID},
+                    :name {:type String}}},
+    :SavedFilters {:fields {:budget_period_ids {:type (list ID)},
+                            :categories_with_requests {:type Boolean},
+                            :category_ids {:type (list ID)},
+                            :inspector_priorities {:type (list String)},
+                            :organization_ids {:type (list ID)},
+                            :priorities {:type (list String)},
+                            :search {:type String},
+                            :sort_by {:type String},
+                            :sort_dir {:type String},
+                            :states {:type (list String)}}},
+    :Supplier {:fields {:id {:type ID}, :name {:type String}}},
+    :User {:fields {:email {:type String},
+                    :firstname {:type String},
+                    :id {:type ID},
+                    :lastname {:type String},
+                    :login {:type String}}}},
+ :queries
+   {:admins {:resolve :admins, :type (list :User)},
+    :budget_limits {:resolve :budget-limits, :type (list :BudgetLimit)},
+    :budget_periods {:resolve :budget-periods, :type (list :BudgetPeriod)},
+    :categories {:args {:inspected_by_auth_user {:type Boolean}},
+                 :resolve :categories,
+                 :type (list :Category)},
+    :current_user {:resolve :current-user, :type :CurrentUser},
+    :main_categories {:resolve :main-categories, :type (list :MainCategory)},
+    :organizations {:args {:root_only {:type Boolean}},
+                    :resolve :organizations,
+                    :type (list :Organization)},
+    :priorities {:resolve :priorities, :type (list Int)},
+    :priorities_inspector {:resolve :priorities-inspector, :type (list Int)},
+    :request_by_id
+      {:args {:id {:type ID}}, :resolve :request-by-id, :type :Request},
+    :request_fields_by_id {:args {:request_id {:type ID}},
+                           :resolve :request-fields-by-id,
+                           :type (list :RequestField)},
+    :requesters_organizations {:resolve :requesters-organizations,
+                               :type (list :RequesterOrganization)},
+    :requests {:args {:budget_period_id {:type (list ID)},
+                      :category_id {:type (list ID)},
+                      :from_categories_of_auth_user {:type Boolean},
+                      :inspectory_priority {:type (list String)},
+                      :organization_id {:type (list ID)},
+                      :priority {:type (list String)},
+                      :requested_by_auth_user {:type Boolean},
+                      :search {:type String},
+                      :state {:type (list String)}},
+               :resolve :requests,
+               :type (list :Request)},
+    :rooms
+      {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
+    :users {:args {:limit {:type Int},
+                   :offset {:type Int},
+                   :search_term {:type String}},
+            :resolve :users,
+            :type (list :User)}}}

@@ -1,16 +1,12 @@
 (ns leihs.procurement.status
-  (:require
-    [leihs.procurement.paths :refer [path]]
-    [compojure.core :as cpj]
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]))
+  (:require [leihs.procurement.paths :refer [path]]
+            [compojure.core :as cpj]
+            [clojure.tools.logging :as logging]
+            [logbug.debug :as debug]))
 
-(defn status [request]
-  {:body {}})
+(defn status [request] {:body {}})
 
-(def routes
-  (cpj/routes
-    (cpj/GET (path :status) [] #'status)))
+(def routes (cpj/routes (cpj/GET (path :status) [] #'status)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
