@@ -146,9 +146,9 @@ describe 'main categories' do
       expect(response.to_h).to be == {
         'data' => {
           'main_categories' => [
-            { "name" => 'main_cat_1' },
-            { "name" => 'main_cat_2_new_name' },
-            { "name" => 'new_main_cat' }
+            { 'name' => 'main_cat_1' },
+            { 'name' => 'main_cat_2_new_name' },
+            { 'name' => 'new_main_cat' }
           ]
         }
       }
