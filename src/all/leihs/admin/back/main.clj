@@ -21,9 +21,9 @@
    ])
 
 (defn main-usage [options-summary & more]
-  (->> ["Leihs PERM"
+  (->> ["Leihs Admin"
         ""
-        "usage: leihs-perm [<opts>] SCOPE [<scope-opts>] [<args>]"
+        "usage: leihs-admin [<opts>] SCOPE [<scope-opts>] [<args>]"
         ""
         "Options:"
         options-summary

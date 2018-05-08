@@ -8,6 +8,7 @@
     [leihs.admin.resources.users.shared :as shared]
 
     [clojure.java.jdbc :as jdbc]
+    [clojure.set]
     [compojure.core :as cpj]
 
     [clojure.tools.logging :as logging]
@@ -16,11 +17,16 @@
 
 
 (def users-base-query
-  (-> (sql/select :id, :login, :firstname, :lastname, :email, :img32_url, :org_id)
+  (-> (apply sql/select shared/default-fields)
       (sql/from :users)
       (sql/order-by :lastname :firstname)
       (sql/merge-where [:= nil :delegator_user_id])
       ))
+
+(-> 
+  (apply sql/select 
+         (apply sql/select shared/default-fields)       
+         shared/available-fields))
 
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]
@@ -75,6 +81,13 @@
       ("true" true) (sql/merge-where query [:= :is_admin true])
       query)))
 
+(defn select-fields [query request]
+  (if-let [fields (some->> request :query-params :fields 
+                           (map keyword) set 
+                           (clojure.set/intersection shared/available-fields))]
+    (apply sql/select query fields)
+    query))
+
 (defn users-query [request]
   (let [query-params (-> request :query-params 
                          shared/normalized-query-parameters)]
@@ -83,13 +96,13 @@
         (term-fitler request)
         (type-filter request)
         (role-filter request)
-        (admins-filter request))))
+        (admins-filter request)
+        (select-fields request))))
 
 (defn users-formated-query [request]
   (-> request
       users-query
       sql/format))
-
 
 (defn users [request]
   (when (= :json (-> request :accept :mime))
@@ -106,4 +119,4 @@
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

@@ -57,7 +57,7 @@
    :firstname
    :img256_url
    :img32_url
-   :img_upload_id
+   :img_digest
    :is_admin
    :lastname
    :org_id
