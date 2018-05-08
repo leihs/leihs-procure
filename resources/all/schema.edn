@@ -133,6 +133,10 @@
 :input-objects {:AdminInput {:fields {:user_id {:type ID}}}
                 :BudgetLimitInput {:fields {:budget_period_id {:type ID}
                                             :amount_cents {:type Int}}}
+                :BudgetPeriodInput {:fields {:id {:type ID}
+                                             :name {:type String}
+                                             :inspection_start_date {:type String}
+                                             :end_date {:type String}}}
                 :CategoryInput {:fields {:id {:type ID}
                                          :name {:type (non-null String)}
                                          :general_ledger_account {:type String}
@@ -210,7 +214,10 @@
 
 :mutations {:admins {:type (list :User)
                      :args {:input_data {:type (list :AdminInput)}}
-                     :resolve :update-admins} 
+                     :resolve :update-admins}
+            :budget_periods {:type (list :BudgetPeriod)
+                             :args {:input_data {:type (list :BudgetPeriodInput)}}
+                             :resolve :update-budget-periods} 
             :main_categories {:type (list :MainCategory)
                               :args {:input_data {:type (list :MainCategoryInput)}}
                               :resolve :update-main-categories}

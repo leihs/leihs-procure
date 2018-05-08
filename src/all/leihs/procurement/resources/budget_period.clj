@@ -1,20 +1,33 @@
 (ns leihs.procurement.resources.budget-period
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clj-time.format :as time-format]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.utils.ds :refer [get-ds]]
             [leihs.procurement.utils.sql :as sql]
             ))
 
-(defn budget-period-query [id]
+(def budget-period-base-query
   (-> (sql/select :*)
-      (sql/from :procurement_budget_periods)
-      (sql/where [:= :procurement_budget_periods.id id])
-      sql/format))
-
-(defn get-budget-period [context _ value]
-  (first (jdbc/query (-> context :request :tx)
-                     (budget-period-query (:budget_period_id value)))))
+      (sql/from :procurement_budget_periods)))
 
 (defn get-budget-period-by-id [tx id]
-  (first (jdbc/query tx (budget-period-query id))))
+  (first (jdbc/query tx (-> budget-period-base-query
+                            (sql/where [:= :procurement_budget_periods.id id])
+                            sql/format))))
+
+(defn get-budget-period 
+  ([context _ value]
+   (get-budget-period-by-id (-> context :request :tx)
+                            (:budget_period_id value)))
+  ([tx bp-map]
+   (let [bp-map-2 (-> bp-map
+                      (update :inspection_start_date time-format/parse)
+                      (update :end_date time-format/parse)) 
+         where-clause
+         (sql/map->where-clause :procurement_budget_periods bp-map-2)]
+     (first (jdbc/query tx (-> budget-period-base-query
+                               (sql/merge-where where-clause)
+                               sql/format))))))
 
 (defn in-requesting-phase? [tx budget-period]
   (:result
@@ -65,3 +78,27 @@
             ))
       first
       :result))
+
+(defn get-category [tx bp-map]
+  (let [where-clause
+        (sql/map->where-clause :procurement_budget_periods bp-map)]
+    (first (jdbc/query tx (-> budget-period-base-query
+                              (sql/merge-where where-clause)
+                              sql/format)))))
+
+(defn update-budget-period! [tx bp]
+  (jdbc/execute! tx
+                 (-> (sql/update :procurement_budget_periods)
+                     (sql/sset bp)
+                     (sql/where [:= :procurement_budget_periods.id (:id bp)])
+                     sql/format)))
+
+(defn insert-budget-period! [tx bp]
+  (jdbc/execute!
+    tx
+    (let [row-map (-> bp
+                      (update :inspection_start_date time-format/parse)
+                      (update :end_date time-format/parse))]
+      (-> (sql/insert-into :procurement_budget_periods)
+          (sql/values [row-map])
+          sql/format))))
