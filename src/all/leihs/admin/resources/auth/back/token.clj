@@ -9,6 +9,7 @@
 
     [clojure.java.jdbc :as jdbc]
     [clojure.walk :refer [keywordize-keys]]
+    [clj-time.core :as time]
 
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
@@ -46,9 +47,26 @@
       (sql/merge-where (sql/raw (str "now() < api_tokens.expires_at")))
       sql/format))
 
-(defn user-auth-entity! [token-secret]
-  (if-let [uae (->> (user-with-valid-token-query token-secret)
-                    (jdbc/query (ds/get-ds)) first)]
+(defn system-admin-authenticated-entity-properties []
+  {:scope_read true
+   :scope_write true
+   :scope_admin_read true
+   :scope_admin_write true
+   :user_id nil
+   :is_admin true 
+   :account_enabled true 
+   :firstname ""
+   :lastname "system-admin"
+   :email "system-admin@leihs"
+   :api_token_id nil
+   :api_token_created_at (time/now)})
+
+(defn user-auth-entity! [token-secret server-secret settings tx]
+  (if-let [uae (or (->> (user-with-valid-token-query token-secret)
+                        (jdbc/query (ds/get-ds)) first)
+                   (when (and (= token-secret server-secret)
+                              (-> settings :accept_server_secret_as_universal_password))
+                     (system-admin-authenticated-entity-properties)))]
     (assoc uae
            :authentication-method :token
            :scope_admin_read (and (:scope_admin_read uae) (:is_admin uae))
@@ -73,13 +91,18 @@
                  (map presence) (filter identity)
                  last))))
 
-(defn authenticate [request _handler]
+(defn authenticate [{tx :tx
+                     sba :secret-ba 
+                     :as request}
+                    _handler]
   (catcher/snatch
     {:level :warn
      :return-fn (fn [e] (token-error-page e request))}
     (let [handler (ring-exception/wrap _handler)]
       (if-let [token-secret (extract-token-value request)]
-        (let [user-auth-entity (user-auth-entity! token-secret)]
+                 (let [user-auth-entity (user-auth-entity! 
+                                          token-secret (String. sba) 
+                                                           (:settings request) tx)]
           (handler (assoc request :authenticated-entity user-auth-entity)))
         (handler request)))))
 
