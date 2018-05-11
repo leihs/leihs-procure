@@ -11,6 +11,17 @@ describe 'budget periods' do
       FactoryBot.create(:budget_period, data)
     end
 
+    budget_limits_before = [
+      { budget_period: { name: 'bp_to_delete' } },
+      { budget_period: { name: 'bp_1' } }
+    ]
+    budget_limits_before.each do |data|
+      FactoryBot.create(
+        :budget_limit,
+        budget_period_id: BudgetPeriod.find(data[:budget_period]).id
+      )
+    end
+
     #############################################################################
     
     now = DateTime.now
@@ -61,6 +72,16 @@ describe 'budget periods' do
     expect(BudgetPeriod.count).to be == budget_periods_after.count
     budget_periods_after.each do |data|
       expect(BudgetPeriod.find(data)).to be
+    end
+
+    budget_limits_after = [
+      { budget_period: { name: 'bp_1_new_name' } }
+    ]
+    budget_limits_after.each do |data|
+      FactoryBot.create(
+        :budget_limit,
+        budget_period_id: BudgetPeriod.find(data[:budget_period]).id
+      )
     end
   end
 end

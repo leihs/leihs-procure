@@ -19,7 +19,7 @@
                                       (str "%" search-term "%"))
                     offset (:offset args)
                     limit (:limit args)]
-                (log/spy (sql/format
+                (sql/format
                   (cond-> users-base-query
                     term-percent
                     (sql/merge-where
@@ -33,7 +33,7 @@
                     offset
                     (sql/offset offset)
                     limit
-                    (sql/limit limit)))))))
+                    (sql/limit limit))))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

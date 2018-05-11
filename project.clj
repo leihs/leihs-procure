@@ -59,15 +59,21 @@
 
   ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
 
+  :java-source-paths ["java"]
+  :source-paths ["src/all"]
+  :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
-
   :target-path "target/%s"
   :main leihs.procurement.backend.main
-  :profiles {:dev {:source-paths ["src/all" "src/dev"]
-                   :resource-paths ["resources/all" "resources/dev"]
+  :profiles {:dev {:source-paths ["src/dev" "src/dev+test"]
+                   :resource-paths ["resources/dev"]
                    :env {:dev true}}
-             :uberjar {:source-paths ["src/all" "src/prod"]
-                       :resource-paths ["resources/all" "resources/prod"]
+             :test {:source-paths ["src/test" "src/dev+test"]
+                    :resource-paths ["resources/test"]
+                    :aot [#"leihs\..*"]
+                    :uberjar-name "leihs-procurement.jar"} 
+             :uberjar {:source-paths ["src/prod"]
+                       :resource-paths ["resources/prod"]
                        :aot [#"leihs\..*"]
                        :uberjar-name "leihs-procurement.jar"}}
   )

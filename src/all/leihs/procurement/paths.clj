@@ -22,16 +22,7 @@
                   (branch "/images/"
                           (param :image-id)
                           (leaf "" :image)))
-          ; (leaf "/" :leihs)
-          ; (branch "/auth"
-          ;         (leaf "" :auth)
-          ;         (leaf "/password-sign-in" :auth-password-sign-in)
-          ;         (leaf "/sign-out" :auth-sign-out))
-          ; (leaf "/manage" :lend)
-          ; (leaf "/borrow" :borrow)
-          ; (leaf "/" :redirect-to-root)
-          (leaf true :not-found)
-          ))
+          (leaf true :not-found)))
 
 ;(path-for (paths) :user :user-id "{user-id}")
 ;(match-route (paths) "/users/512")

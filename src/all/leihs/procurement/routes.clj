@@ -3,14 +3,13 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.auth.core :as auth]
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
     [leihs.procurement.graphql :as graphql]
-    ; ONLY DEV MODE =================
+    ; ONLY IN DEV+TEST MODE =================
     [leihs.procurement.mock :as mock]
-    ; ===============================
+    ; =======================================
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.resources.image :as image]
     [leihs.procurement.shutdown :as shutdown]
@@ -44,10 +43,7 @@
 (declare redirect-to-root-handler)
 
 (def skip-authorization-handler-keys
-  #{:auth-shib-sign-in
-    :auth-password-sign-in
-    :initial-admin
-    :status})
+  #{:status})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
   #{:redirect-to-root 
@@ -58,14 +54,7 @@
   {:graphql graphql/handler
    :shutdown shutdown/routes
    :status status/routes
-   :image image/routes
-   ; :auth auth/routes
-   ; :auth-password-sign-in auth/routes
-   ; :auth-shib-sign-in auth/routes
-   ; :auth-sign-out auth/routes
-   ; :not-found html/not-found-handler
-   ; :redirect-to-root redirect-to-root-handler
-   })
+   :image image/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -137,7 +126,7 @@
     {:mime
      ["application/json" :qs 1 :as :json
       "image/*" :qs 1 :as :image
-      "text/html" :qs 1 :as :html ]}))
+      "text/html" :qs 1 :as :html]}))
 
 (defn canonicalize-params-map [params]
   (if-not (map? params)
@@ -169,7 +158,9 @@
     (handler (assoc request :secret-ba (.getBytes secret)))))
 
 (defn wrap-reload-if-dev-env [handler]
-  (cond-> handler (= env/env :dev) (wrap-reload {:dirs ["src" "resources"]})))
+  (cond-> handler
+    (= env/env :dev)
+    (wrap-reload {:dirs ["src" "resources"]})))
 
 (defn init [secret]
   (-> dispatch-to-handler
@@ -180,7 +171,7 @@
       anti-csrf/wrap
       ; ====================================================
       ; NOTE: should work after merge of leihs-admin
-      ; auth/wrap-authenticate
+      ; session/wrap
       ;
       ; for the time being:
       mock/wrap-set-authenticated-user

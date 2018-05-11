@@ -38,7 +38,7 @@
       (-> (sql/select
             [(sql/call
                :exists
-               (-> (sql/select 1)
+               (-> (sql/select true)
                    (sql/from :procurement_category_inspectors)
                    (sql/where [:=
                                :procurement_category_inspectors.user_id

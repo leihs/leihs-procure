@@ -3,6 +3,6 @@ end
 
 FactoryBot.define do
   factory :admin do
-    user_id { FactoryGirl.create(:user).id }
+    user_id { FactoryBot.create(:user).id }
   end
 end

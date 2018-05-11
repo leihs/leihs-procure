@@ -32,6 +32,8 @@
                                :cost_center {:type String}
                                :inspectors {:type (list :User)
                                             :resolve :inspectors}
+                               :viewers {:type (list :User)
+                                         :resolve :viewers}
                                :can_delete {:type Boolean
                                             :resolve :can-delete-category?}}}
 
@@ -141,7 +143,8 @@
                                          :name {:type (non-null String)}
                                          :general_ledger_account {:type String}
                                          :cost_center {:type String}
-                                         :inspectors {:type (list ID)}}}
+                                         :inspectors {:type (list ID)}
+                                         :viewers {:type (list ID)}}}  
                 :MainCategoryInput {:fields {:id {:type ID}
                                              :name {:type (non-null String)}
                                              :budget_limits {:type (list :BudgetLimitInput)}

@@ -7,6 +7,7 @@
     [com.walmartlabs.lacinia.util :as graphql-util]
     [com.walmartlabs.lacinia.resolve :as graphql-resolve]
     [com.walmartlabs.lacinia.schema :as graphql-schema]
+    [leihs.procurement.authorization :as authorization]
     [leihs.procurement.env :as env]  
     [leihs.procurement.resources.admins :as admins]  
     [leihs.procurement.resources.attachments :as attachments]  
@@ -32,6 +33,7 @@
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
     [leihs.procurement.resources.users :as users]
+    [leihs.procurement.resources.viewers :as viewers]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
     [logbug.debug :as debug]))
 
@@ -41,14 +43,16 @@
       (resolver context args value)
       (catch Throwable _e
         (let [e (get-cause _e)
-              m (.getMessage e)]
+              m (.getMessage e)
+              n (-> _e .getClass .getSimpleName)]
           (logging/warn m)
-          (if (= env/env :dev) (logging/debug e))
-          (graphql-resolve/resolve-as value {:message m}))))))
+          (if (env/env #{:dev :test}) (logging/debug e))
+          (graphql-resolve/resolve-as value {:message m, :exception n}))))))
 
 ; a function for debugging convenience. will be a var later.
 (defn resolver-map []
-  {:admins admins/get-admins
+  {:admins (-> admins/get-admins
+               (authorization/ensure-one-of [user/admin?]))
    :attachments attachments/get-attachments
    :budget-limits budget-limits/get-budget-limits
    :budget-period budget-period/get-budget-period
@@ -79,15 +83,20 @@
    :total-price-cents-requested-quantities requests/total-price-cents-requested-quantities
    :total-price-cents-approved-quantities requests/total-price-cents-approved-quantities
    :total-price-cents-order-quantities requests/total-price-cents-order-quantities
-   :update-admins admins/update-admins
+   :update-admins (-> admins/update-admins!
+                      (authorization/ensure-one-of [user/admin?]))
    :update-budget-periods budget-periods/update-budget-periods!
    :update-main-categories main-categories/update-main-categories!
    :update-requesters-organizations requesters-organizations/update-requesters-organizations
    :user user/get-user
-   :users users/get-users})
+   :users users/get-users
+   :viewers viewers/get-viewers
+   })
 
 (defn- wrap-map-with-error [arg]
-  (into {} (for [[k v] arg] [k (wrap-resolver-with-error v)])))
+  (into {}
+        (for [[k v] arg]
+          [k (wrap-resolver-with-error v)])))
 
 (defn load-schema []
   (-> (io/resource "schema.edn")

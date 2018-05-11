@@ -4,6 +4,7 @@
   (:require
     [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
+    [leihs.procurement.env :as env]  
     [logbug.catcher :as catcher]
     [logbug.debug :as debug :refer [I>]]
     [logbug.ring :refer [wrap-handler-with-logging]]

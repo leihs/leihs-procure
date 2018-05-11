@@ -21,7 +21,7 @@
 (defn delete-all [tx]
   (jdbc/delete! tx :procurement_admins []))
 
-(defn update-admins [context args value]
+(defn update-admins! [context args value]
   (let [tx (-> context :request :tx)]
     (delete-all tx)
     (doseq [d (:input_data args)] (jdbc/insert! tx :procurement_admins d))

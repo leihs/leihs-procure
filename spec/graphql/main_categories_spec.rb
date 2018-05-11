@@ -3,7 +3,7 @@ require_relative 'graphql_helper'
 
 describe 'main categories' do
   context 'mutation' do
-    it 'updates all together with budget limits, sub-categories and their inspectors' do
+    it 'updates all together with budget limits, sub-categories, their inspectors and viewers' do
 
       users_before = [
         { firstname: 'user_1' },
@@ -68,6 +68,25 @@ describe 'main categories' do
         { user_id: User.find(firstname: 'user_1').id,
           category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
       ]
+      category_inspectors_before.each do |data|
+        FactoryBot.create(:category_inspector, data)
+      end
+
+      #############################################################################
+
+      category_viewers_before = [
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_3').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
+      ]
+      category_viewers_before.each do |data|
+        FactoryBot.create(:category_viewer, data)
+      end
 
       #############################################################################
 
@@ -112,7 +131,9 @@ describe 'main categories' do
                   { id: null,
                     name: "new_cat_for_new_main_cat",
                     inspectors: ["#{User.find(firstname: 'user_1').id}",
-                                 "#{User.find(firstname: 'user_2').id}"] }
+                                 "#{User.find(firstname: 'user_2').id}"], 
+                    viewers: ["#{User.find(firstname: 'user_1').id}",
+                              "#{User.find(firstname: 'user_2').id}"] }
                 ]
               },
               { id: "#{MainCategory.find(name: 'main_cat_1').id}",
@@ -130,7 +151,9 @@ describe 'main categories' do
                     general_ledger_account: "LEDG_ACC_NEW",
                     cost_center: "CC_NEW",
                     inspectors: ["#{User.find(firstname: 'user_3').id}",
-                                 "#{User.find(firstname: 'user_4').id}"] }
+                                 "#{User.find(firstname: 'user_4').id}"],
+                    viewers: ["#{User.find(firstname: 'user_3').id}",
+                              "#{User.find(firstname: 'user_4').id}"] }
                 ]
               },
               { id: "#{MainCategory.find(name: 'main_cat_2').id}",
@@ -227,6 +250,21 @@ describe 'main categories' do
       expect(CategoryInspector.count).to be == category_inspectors_after.count
       category_inspectors_after.each do |data|
         expect(CategoryInspector.find(data)).to be
+      end
+
+      category_viewers_after = [
+        { user_id: User.find(firstname: 'user_1').id,
+          category_id: Category.find(name: 'new_cat_for_new_main_cat').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'new_cat_for_new_main_cat').id },
+        { user_id: User.find(firstname: 'user_3').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_4').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id }
+      ]
+      expect(CategoryViewer.count).to be == category_viewers_after.count
+      category_viewers_after.each do |data|
+        expect(CategoryViewer.find(data)).to be
       end
     end
   end

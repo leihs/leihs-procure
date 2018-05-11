@@ -37,5 +37,5 @@
                                   (->> (budget-period/get-budget-period tx))
                                   :id))]
                 (recur rest-bps (conj bp-ids bp-id)))))
-        (do (delete-budget-periods-not-in! tx (log/spy bp-ids))
+        (do (delete-budget-periods-not-in! tx bp-ids)
             (get-budget-periods context args value))))))
