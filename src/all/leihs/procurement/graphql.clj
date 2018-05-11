@@ -9,6 +9,10 @@
 
 (defn exec-query
   [query-string request]
+  (logging/debug "graphql query" query-string
+                 "with variables" (-> request
+                                      :body
+                                      :variables))
   (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
                    query-string
                    (-> request

@@ -114,6 +114,7 @@
                             :write {:type Boolean}}},
     :RequesterOrganization
       {:fields {:department {:resolve :department, :type :Organization},
+                :id {:type (non-null ID)},
                 :organization {:resolve :organization, :type :Organization},
                 :user {:resolve :user, :type :User}}},
     :Room {:fields {:building {:resolve :building, :type :Building},
@@ -169,7 +170,8 @@
                :type (list :Request)},
     :rooms
       {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
-    :users {:args {:limit {:type Int},
+    :users {:args {:exclude_ids {:type (list ID)},
+                   :limit {:type Int},
                    :offset {:type Int},
                    :search_term {:type String}},
             :resolve :users,
