@@ -1,21 +1,23 @@
 (ns leihs.procurement.graphql
-  (:require
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as logging]
-    [com.walmartlabs.lacinia :as lacinia]  
-    [leihs.procurement.schema :as schema]
-    [logbug.debug :as debug]
-    ))
+  (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.tools.logging :as logging]
+            [com.walmartlabs.lacinia :as lacinia]
+            [leihs.procurement.schema :as schema]
+            [logbug.debug :as debug]))
 
 ; (def schema (schema/load-schema))
 
-(defn exec-query [query-string request]
+(defn exec-query
+  [query-string request]
   (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
                    query-string
-                   (-> request :body :variables)
+                   (-> request
+                       :body
+                       :variables)
                    {:request request}))
 
-(defn handler [{{query :query} :body, :as request}]
+(defn handler
+  [{{query :query} :body, :as request}]
   {:body (exec-query query request)})
 
 ;#### debug ###################################################################

@@ -1,42 +1,46 @@
 (ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format update])
-  (:require
-    [honeysql.format :as format]
-    [honeysql.helpers :as helpers :refer [build-clause]]
-    [honeysql.types :as types]
-    [honeysql.util :as util :refer [defalias]]
-    [logbug.debug :as debug]
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as logging]
-    ))
+  (:require [honeysql.format :as format]
+            [honeysql.helpers :as helpers :refer [build-clause]]
+            [honeysql.types :as types]
+            [honeysql.util :as util :refer [defalias]]
+            [logbug.debug :as debug]
+            [clj-logging-config.log4j :as logging-config]
+            [clojure.tools.logging :as logging]))
 
 ; regex
-(defmethod format/fn-handler "~*" [_ field value]
+(defmethod format/fn-handler "~*"
+  [_ field value]
   (str (format/to-sql field) " ~* " (format/to-sql value)))
 
 ; ilike
-(defmethod format/fn-handler "~~*" [_ field value]
+(defmethod format/fn-handler "~~*"
+  [_ field value]
   (str (format/to-sql field) " ~~* " (format/to-sql value)))
 
-(defn dedup-join [honeymap]
-  (assoc honeymap :join
-         (reduce #(let [[k v] %2] (conj %1 k v)) []
-                 (clojure.core/distinct (partition 2 (:join honeymap))))))
+(defn dedup-join
+  [honeymap]
+  (assoc honeymap
+    :join (reduce #(let [[k v] %2] (conj %1 k v))
+            []
+            (clojure.core/distinct (partition 2 (:join honeymap))))))
 
 (defn format
   "Calls honeysql.format/format with removed join duplications in sql-map."
   [sql-map & params-or-opts]
   (apply format/format [(dedup-join sql-map) params-or-opts]))
 
-(defn map->where-clause [table m]
+(defn map->where-clause
+  [table m]
   "transforms {:foo 1, :bar 2} of table :baz into
   [:and [:= baz.foo 1] [:= :baz.bar 2]]"
   (cons :and
-        (map (fn [[k v]]
-               [:=
-                (-> table name (str "." (name k)) keyword)
-                v])
-             m)))
+        (map (fn [[k v]] [:=
+                          (-> table
+                              name
+                              (str "." (name k))
+                              keyword) v])
+          m)))
 
 (map->where-clause :procurement_categories {:name "foo", :cost_center 123})
 

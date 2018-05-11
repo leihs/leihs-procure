@@ -1,19 +1,21 @@
 (ns leihs.procurement.resources.room
-  (:require
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.java.jdbc :as jdbc]
-    [leihs.procurement.utils.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+  (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]
+            [logbug.debug :as debug]))
 
-(defn room-query [id]
+(defn room-query
+  [id]
   (-> (sql/select :rooms.*)
       (sql/from :rooms)
       (sql/where [:= :rooms.id id])
       sql/format))
 
-(defn get-room [context _ value]
-  (first (jdbc/query (-> context :request :tx)
+(defn get-room
+  [context _ value]
+  (first (jdbc/query (-> context
+                         :request
+                         :tx)
                      (room-query (:room_id value)))))
 
 ;#### debug ###################################################################

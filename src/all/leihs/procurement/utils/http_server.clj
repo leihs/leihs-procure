@@ -1,22 +1,21 @@
 (ns leihs.procurement.utils.http-server
-  (:require
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as logging]
-    [aleph.http :as http-server]
-    ))
+  (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.tools.logging :as logging]
+            [aleph.http :as http-server]))
 
 (defonce _server (atom nil))
 
-(defn stop []
+(defn stop
+  []
   (when-let [server @_server]
     (logging/info stop)
     (.close server)
     (reset! _server nil)))
 
-(defn start [conf main-handler]
+(defn start
+  [conf main-handler]
   "Starts (or stops and then starts) the webserver"
-  (let [server-conf (conj {:ssl? false
-                           :join? false}
+  (let [server-conf (conj {:ssl? false, :join? false}
                           (select-keys conf [:port :host]))]
     (stop)
     (logging/info "starting server " server-conf)

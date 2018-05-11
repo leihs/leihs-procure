@@ -7,36 +7,39 @@
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
 
-(defn get-viewers [context _ value]
-  (jdbc/query (-> context :request :tx)
+(defn get-viewers
+  [context _ value]
+  (jdbc/query (-> context
+                  :request
+                  :tx)
               (-> user/user-base-query
                   (sql/merge-where
-                    [:in :users.id 
+                    [:in :users.id
                      (-> (sql/select :pcv.user_id)
                          (sql/from [:procurement_category_viewers :pcv])
                          (sql/merge-where [:= :pcv.category_id (:id value)]))])
                   sql/format)))
 
-(defn delete-viewers-for-category-id! [tx c-id]
+(defn delete-viewers-for-category-id!
+  [tx c-id]
   (jdbc/execute! tx
                  (-> (sql/delete-from [:procurement_category_viewers :pcv])
                      (sql/merge-where [:= :pcv.category_id c-id])
                      sql/format)))
 
-(defn insert-viewers! [tx row-maps]
+(defn insert-viewers!
+  [tx row-maps]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_category_viewers)
                      (sql/values row-maps)
                      sql/format)))
 
-(defn update-viewers! [tx c-id u-ids]
+(defn update-viewers!
+  [tx c-id u-ids]
   (delete-viewers-for-category-id! tx c-id)
   (if (not (empty? u-ids))
-    (insert-viewers! tx
-                     (map #(hash-map :user_id %,
-                                     :category_id c-id)
-                          u-ids))))
-              
+    (insert-viewers! tx (map #(hash-map :user_id % :category_id c-id) u-ids))))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
