@@ -10,7 +10,7 @@ scripts:
       if [ -f "${LEIN_UBERJAR_FILE}" ];then
         echo " ${LEIN_UBERJAR_FILE} exists"
       else
-        lein uberjar
+        lein with-profile test uberjar
         mv "target/uberjar/leihs-procurement.jar" "${LEIN_UBERJAR_FILE}"
       fi
       mkdir -p target

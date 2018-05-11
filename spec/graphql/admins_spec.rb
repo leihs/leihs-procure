@@ -2,6 +2,17 @@ require 'spec_helper'
 require_relative 'graphql_helper'
 
 describe 'admins' do
+  context 'query' do
+    context 'authorization' do 
+      context 'unauthorized user' do
+        it 'returns empty data and an error' do
+          user = FactoryBot.create(:user)
+          FactoryBot.create(:admin)
+        end
+      end
+    end
+  end
+
   context 'mutation' do
     it 'recreates all' do
 
@@ -14,7 +25,7 @@ describe 'admins' do
 
       admins_before = [
         { firstname: 'admin_1' },
-        { firstname: 'admin_2' },
+        { firstname: 'admin_2' }
       ]
       admins_before.each do |data|
         FactoryBot.create(:admin, user_id: FactoryBot.create(:user, data).id)
@@ -33,7 +44,7 @@ describe 'admins' do
         }
       GRAPHQL
 
-      response = graphql_client.query(query)
+      response = graphql_client(User.find(firstname: 'admin_2').id).query(query)
 
       expect(response.to_h).to be == {
         'data' => {

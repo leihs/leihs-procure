@@ -22,7 +22,7 @@
 
 (defn delete-all [tx] (jdbc/delete! tx :procurement_admins []))
 
-(defn update-admins
+(defn update-admins!
   [context args value]
   (let [tx (-> context
                :request

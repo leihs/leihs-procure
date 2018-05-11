@@ -4,6 +4,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.category :as category]
             [leihs.procurement.resources.inspectors :as inspectors]
+            [leihs.procurement.resources.viewers :as viewers]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
 
@@ -61,14 +62,15 @@
          c-ids []]
     (if c
       (do (if (:id c)
-            (category/update-category! tx (dissoc c :inspectors))
-            (category/insert-category! tx (dissoc c :id :inspectors)))
+            (category/update-category! tx (dissoc c :inspectors :viewers))
+            (category/insert-category! tx (dissoc c :id :inspectors :viewers)))
           (let [c-id (or (:id c)
                          (as-> c <>
                            (select-keys <> [:name :main_category_id])
                            (category/get-category tx <>)
                            (:id <>)))]
             (inspectors/update-inspectors! tx c-id (:inspectors c))
+            (viewers/update-viewers! tx c-id (:viewers c))
             (recur rest-cs (conj c-ids c-id))))
       (delete-categories-for-main-category-id-and-not-in-ids! tx mc-id c-ids))))
 

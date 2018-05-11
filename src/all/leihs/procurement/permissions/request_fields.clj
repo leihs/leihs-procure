@@ -20,7 +20,7 @@
         request-without-template (not (:template_id proc-request))
         requested-by-user (= (:user_id proc-request) (:id user))
         user-is-requester (:is_procurement_requester user)
-        user-is-inspector (user/procurement-inspector? tx user)
+        user-is-inspector (user/inspector? tx user)
         user-is-admin (:is_procurement_admin user)
         budget-period-is-past (budget-period/past? tx budget-period)
         budget-period-in-requesting-phase

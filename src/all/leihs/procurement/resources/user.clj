@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.user
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
             [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.ds :refer [get-ds]]
             [logbug.debug :as debug]))
@@ -26,14 +26,27 @@
                          (sql/where [:= :users.id id])
                          sql/format))))
 
-(defn procurement-inspector?
+(defn admin?
   [tx user]
   (:result
     (first (jdbc/query
              tx
              (-> (sql/select
                    [(sql/call :exists
-                              (-> (sql/select 1)
+                              (-> (sql/select true)
+                                  (sql/from :procurement_admins)
+                                  (sql/where [:= :procurement_admins.user_id
+                                              (:id user)]))) :result])
+                 sql/format)))))
+
+(defn inspector?
+  [tx user]
+  (:result
+    (first (jdbc/query
+             tx
+             (-> (sql/select
+                   [(sql/call :exists
+                              (-> (sql/select true)
                                   (sql/from :procurement_category_inspectors)
                                   (sql/where
                                     [:= :procurement_category_inspectors.user_id

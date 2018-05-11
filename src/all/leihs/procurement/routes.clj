@@ -3,14 +3,13 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.auth.core :as auth]
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
     [leihs.procurement.graphql :as graphql]
-    ; ONLY DEV MODE =================
+    ; ONLY IN DEV+TEST MODE =================
     [leihs.procurement.mock :as mock]
-    ; ===============================
+    ; =======================================
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.resources.image :as image]
     [leihs.procurement.shutdown :as shutdown]
@@ -41,8 +40,7 @@
 
 (declare redirect-to-root-handler)
 
-(def skip-authorization-handler-keys
-  #{:auth-shib-sign-in :auth-password-sign-in :initial-admin :status})
+(def skip-authorization-handler-keys #{:status})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
   #{:redirect-to-root :not-found :auth-shib-sign-in})
@@ -51,14 +49,7 @@
   {:graphql graphql/handler,
    :shutdown shutdown/routes,
    :status status/routes,
-   :image image/routes,
-   ; :auth auth/routes
-   ; :auth-password-sign-in auth/routes
-   ; :auth-shib-sign-in auth/routes
-   ; :auth-sign-out auth/routes
-   ; :not-found html/not-found-handler
-   ; :redirect-to-root redirect-to-root-handler
-   })
+   :image image/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -184,7 +175,7 @@
       anti-csrf/wrap
       ; ====================================================
       ; NOTE: should work after merge of leihs-admin
-      ; auth/wrap-authenticate
+      ; session/wrap
       ;
       ; for the time being:
       mock/wrap-set-authenticated-user

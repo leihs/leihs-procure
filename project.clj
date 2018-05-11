@@ -24,11 +24,8 @@
      [pg-types "2.3.0"] [reagent "0.7.0"] [ring "1.6.3"]
      [ring-middleware-accept "2.0.3"] [ring/ring-json "0.4.0"]
      [timothypratley/patchin "0.3.5"] [threatgrid/ring-graphql-ui "0.1.1"]
-     [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"] ; force transitive
-     ; dependency
-     ; resolution
+     [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
      [ring/ring-core "1.6.3"]]
-  ; lint/formating/"prettier"
   :plugins [[lein-zprint "0.3.8"]]
   :zprint {:width 80, :old? false}
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
@@ -37,13 +34,20 @@
                       ["--add-modules" "java.xml.bind"]
                       []))
   ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
+  :java-source-paths ["java"]
+  :source-paths ["src/all"]
+  :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
   :target-path "target/%s"
   :main leihs.procurement.backend.main
-  :profiles {:dev {:source-paths ["src/all" "src/dev"],
-                   :resource-paths ["resources/all" "resources/dev"],
+  :profiles {:dev {:source-paths ["src/dev" "src/dev+test"],
+                   :resource-paths ["resources/dev"],
                    :env {:dev true}},
-             :uberjar {:source-paths ["src/all" "src/prod"],
-                       :resource-paths ["resources/all" "resources/prod"],
+             :test {:source-paths ["src/test" "src/dev+test"],
+                    :resource-paths ["resources/test"],
+                    :aot [#"leihs\..*"],
+                    :uberjar-name "leihs-procurement.jar"},
+             :uberjar {:source-paths ["src/prod"],
+                       :resource-paths ["resources/prod"],
                        :aot [#"leihs\..*"],
                        :uberjar-name "leihs-procurement.jar"}})

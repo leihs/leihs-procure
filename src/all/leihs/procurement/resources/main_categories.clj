@@ -30,7 +30,7 @@
                                  first)]
                   (if-let [image-id (:id image)]
                     (merge mc {:image_url (path :image {:image-id image-id})})
-                    "")))))))
+                    mc)))))))
 
 (defn get-main-categories-by-names
   [tx names]
