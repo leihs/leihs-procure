@@ -3,6 +3,7 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
+    [leihs.procurement.authorization :as authorization]
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
@@ -40,7 +41,10 @@
 
 (declare redirect-to-root-handler)
 
-(def skip-authorization-handler-keys #{:status})
+; ========================================================
+; TODO: remove shutdown!!!
+(def skip-authorization-handler-keys #{:status :shutdown})
+; ========================================================
 
 (def do-not-dispatch-to-std-frontend-handler-keys
   #{:redirect-to-root :not-found :auth-shib-sign-in})
@@ -168,11 +172,11 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      ; (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
+      (authorization/wrap-authorize skip-authorization-handler-keys)
       ; ====================================================
       ; NOTE: should work after merge of leihs-admin
       ; session/wrap
@@ -183,8 +187,6 @@
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
-      ; initial-admin/wrap
-      ; settings/wrap
       ds/wrap-tx
       wrap-accept
       wrap-resolve-handler
@@ -193,14 +195,6 @@
       ring.middleware.params/wrap-params
       wrap-content-type
       ds/wrap-tx
-      ; (wrap-resource
-      ;   "public" {:allow-symlinks? true
-      ;             :cache-bust-paths ["/admin/css/site.css"
-      ;                                "/admin/css/site.min.css"
-      ;                                "/admin/js/app.js"]
-      ;             :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
-      ;                                  #".+_[0-9a-f]{40}\..+"]
-      ;             :enabled? (= env/env :prod)})
       ring-exception/wrap
       wrap-reload-if-dev-env))
 

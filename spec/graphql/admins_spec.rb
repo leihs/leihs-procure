@@ -7,13 +7,57 @@ describe 'admins' do
       context 'unauthorized user' do
         it 'returns empty data and an error' do
           user = FactoryBot.create(:user)
+          FactoryBot.create(:category_inspector, user_id: user.id)
           FactoryBot.create(:admin)
+
+          q = <<-GRAPHQL
+            query {
+              admins { 
+                id
+              }
+            }
+          GRAPHQL
+
+          result = query(q, user.id)
+          expect(result['data']['admins']).to be_empty
+          expect(result['errors'].first['exception'])
+            .to be == 'UnauthorizedException'
         end
       end
     end
   end
 
   context 'mutation' do
+    context 'authorization' do 
+      context 'unauthorized user' do
+        it 'returns empty data and an error' do
+          user_1 = FactoryBot.create(:user)
+          FactoryBot.create(:category_inspector, user_id: user_1.id)
+          user_2 = FactoryBot.create(:user)
+          admin_1 = FactoryBot.create(:user)
+          FactoryBot.create(:admin, user_id: admin_1.id)
+
+          q = <<-GRAPHQL
+            mutation {
+              admins (
+                input_data: [
+                  { user_id: "#{user_2.id}" }
+                ]
+              ) { id } 
+            }
+          GRAPHQL
+
+          result = query(q, user_1.id)
+          expect(result['data']['admins']).to be_empty
+          expect(result['errors'].first['exception'])
+            .to be == 'UnauthorizedException'
+
+          expect(Admin.count).to be == 1
+          expect(Admin.first.user_id).to be == admin_1.id
+        end
+      end
+    end
+
     it 'recreates all' do
 
       users_before = [
@@ -33,7 +77,7 @@ describe 'admins' do
 
       #############################################################################
 
-      query = <<-GRAPHQL
+      q = <<-GRAPHQL
         mutation {
           admins (
             input_data: [
@@ -44,9 +88,9 @@ describe 'admins' do
         }
       GRAPHQL
 
-      response = graphql_client(User.find(firstname: 'admin_2').id).query(query)
+      result = query(q, User.find(firstname: 'admin_2').id)
 
-      expect(response.to_h).to be == {
+      expect(result).to be == {
         'data' => {
           'admins' => [
             { 'id' => "#{User.find(firstname: 'admin_2').id}" },
@@ -68,4 +112,3 @@ describe 'admins' do
     end
   end
 end
-

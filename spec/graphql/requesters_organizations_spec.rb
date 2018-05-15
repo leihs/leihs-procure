@@ -3,8 +3,7 @@ require_relative 'graphql_helper'
 
 describe 'requesters organizations' do
   context 'mutation' do
-    it 'recreates all and does the necessary cleanup' do
-
+    before :example do
       users_before = [
         { firstname: 'user_1' },
         { firstname: 'user_2' },
@@ -41,7 +40,7 @@ describe 'requesters organizations' do
 
       #############################################################################
 
-      requesters_organizations_before = [
+      @requesters_organizations_before = [
         { user: { firstname: 'user_1' }, organization: { name: 'org_A' } },
         { user: { firstname: 'user_2' }, organization: { name: 'org_B' } },
         { user: { firstname: 'user_3' }, organization: { name: 'org_C' } },
@@ -49,7 +48,7 @@ describe 'requesters organizations' do
         { user: { firstname: 'user_5' }, organization: { name: 'org_E' } },
         { user: { firstname: 'user_6' }, organization: { name: 'org_E' } }
       ]
-      requesters_organizations_before.each do |data|
+      @requesters_organizations_before.each do |data|
         FactoryBot.create(
           :requester_organization,
           user: User.find(data[:user]),
@@ -84,7 +83,7 @@ describe 'requesters organizations' do
 
       #############################################################################
 
-      query = <<-GRAPHQL
+      @q = <<-GRAPHQL
         mutation {
           requesters_organizations (
             input_data: [
@@ -121,10 +120,36 @@ describe 'requesters organizations' do
           } 
         }
       GRAPHQL
+    end
 
-      response = graphql_client.query(query)
+    it 'returns error for unauthorized user' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:category_inspector,
+                        user_id: user.id)
+      result = query(@q, user.id)
 
-      expect(response.to_h).to be == {
+      expect(result['data']['requesters_organizations']).to be_empty
+      expect(result['errors'].first['exception'])
+        .to be == 'UnauthorizedException'
+
+      RequesterOrganization
+        .all
+        .zip(@requesters_organizations_before)
+        .each do |ro1, ro2|
+          expect(User.find(id: ro1.user_id).firstname)
+            .to be == ro2[:user][:firstname]
+          expect(Organization.find(id: ro1.organization_id).name)
+            .to be == ro2[:organization][:name]
+        end
+    end
+
+    it 'recreates all and does the necessary cleanup' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: user.id)
+
+      result = query(@q, user.id)
+
+      expect(result).to be == {
         'data' => {
           'requesters_organizations' => [
             { 'user' => { 'id' => "#{User.find(firstname: 'user_2').id}" },

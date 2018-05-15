@@ -47,7 +47,7 @@
   [tx]
   (jdbc/delete! tx :procurement_requesters_organizations []))
 
-(defn update-requesters-organizations
+(defn update-requesters-organizations!
   [context args value]
   (let [tx (-> context
                :request

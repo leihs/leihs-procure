@@ -1,4 +1,6 @@
 class BudgetLimit < Sequel::Model(:procurement_budget_limits)
+  many_to_one :main_category
+  many_to_one :budget_period
 end
 
 FactoryBot.define do

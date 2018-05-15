@@ -46,8 +46,4 @@
              :test {:source-paths ["src/test" "src/dev+test"],
                     :resource-paths ["resources/test"],
                     :aot [#"leihs\..*"],
-                    :uberjar-name "leihs-procurement.jar"},
-             :uberjar {:source-paths ["src/prod"],
-                       :resource-paths ["resources/prod"],
-                       :aot [#"leihs\..*"],
-                       :uberjar-name "leihs-procurement.jar"}})
+                    :uberjar-name "leihs-procurement.jar"}})

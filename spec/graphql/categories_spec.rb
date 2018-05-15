@@ -7,8 +7,13 @@ describe 'categories' do
       context 'can_delete' do
         it 'false if referenced by requests' do
           cat = FactoryBot.create(:category)
+          user = FactoryBot.create(:user)
+          FactoryBot.create(:category_inspector,
+                            category_id: cat.id,
+                            user_id: user.id)
+
           FactoryBot.create(:request, category_id: cat.id)
-          query = <<-GRAPHQL
+          q = <<-GRAPHQL
             query {
               categories {
                 id
@@ -16,8 +21,8 @@ describe 'categories' do
               }
             }
           GRAPHQL
-          response = graphql_client.query(query)
-          expect(response.to_h).to be == {
+          result = query(q, user.id)
+          expect(result).to be == {
             'data' => {
               'categories' => [
                 { 'id' => cat.id,
@@ -29,8 +34,12 @@ describe 'categories' do
 
         it 'false if referenced by templates' do
           cat = FactoryBot.create(:category)
+          user = FactoryBot.create(:user)
+          FactoryBot.create(:category_inspector,
+                            category_id: cat.id,
+                            user_id: user.id)
           FactoryBot.create(:template, category_id: cat.id)
-          query = <<-GRAPHQL
+          q = <<-GRAPHQL
             query {
               categories {
                 id
@@ -38,8 +47,8 @@ describe 'categories' do
               }
             }
           GRAPHQL
-          response = graphql_client.query(query)
-          expect(response.to_h).to be == {
+          result = query(q, user.id)
+          expect(result).to be == {
             'data' => {
               'categories' => [
                 { 'id' => cat.id,

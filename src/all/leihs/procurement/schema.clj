@@ -93,10 +93,13 @@
      requests/total-price-cents-order-quantities,
    :update-admins (-> admins/update-admins!
                       (authorization/ensure-one-of [user/admin?])),
-   :update-budget-periods budget-periods/update-budget-periods!,
-   :update-main-categories main-categories/update-main-categories!,
+   :update-budget-periods (-> budget-periods/update-budget-periods!
+                              (authorization/ensure-one-of [user/admin?])),
+   :update-main-categories (-> main-categories/update-main-categories!
+                               (authorization/ensure-one-of [user/admin?])),
    :update-requesters-organizations
-     requesters-organizations/update-requesters-organizations,
+     (-> requesters-organizations/update-requesters-organizations!
+         (authorization/ensure-one-of [user/admin?])),
    :user user/get-user,
    :users users/get-users,
    :viewers viewers/get-viewers})

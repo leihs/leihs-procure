@@ -53,6 +53,35 @@
                                      (:id user)]))) :result])
                  sql/format)))))
 
+(defn viewer?
+  [tx user]
+  (:result
+    (first (jdbc/query
+             tx
+             (-> (sql/select
+                   [(sql/call
+                      :exists
+                      (-> (sql/select true)
+                          (sql/from :procurement_category_viewers)
+                          (sql/where [:= :procurement_category_viewers.user_id
+                                      (:id user)]))) :result])
+                 sql/format)))))
+
+(defn requester?
+  [tx user]
+  (:result
+    (first
+      (jdbc/query
+        tx
+        (-> (sql/select
+              [(sql/call :exists
+                         (-> (sql/select true)
+                             (sql/from :procurement_requesters_organizations)
+                             (sql/where
+                               [:= :procurement_requesters_organizations.user_id
+                                (:id user)]))) :result])
+            sql/format)))))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
