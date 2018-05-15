@@ -5,16 +5,17 @@ WIP
 ## for devs
 
 1. clone this repo
-2. `export LEIHS_DATABASE_URL=...`
-   * default is `jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5`
-3. `export LEIHS_HTTP_BASE_URL=...`
-   * default is `http://localhost:3211`
+2. copy `profiles_template.clj` to `profiles.clj`
+3. adjust the `LEIHS_DATABASE_URL` and `LEIHS_HTTP_BASE_URL` in this file according to your local needs
 4. `lein run "run"`
-5. `graphiql` is now available at `http://localhost:3211/procure/graphiql/index.html`
+5. `graphiql` is now available at `http://LEIHS_HTTP_BASE_URL/procure/graphiql/index.html`
 
-In `src/dev/leihs/procurement/mock.clj` you can change the authenticated `user-id`.
+You can mock the authenticated user by setting request's header: `Authorization: user_id`.
 
 ### for running tests locally
 
-1. `./dev/start-test-server.sh`
-2. in another terminal window: `bundle exec rspec`
+1. run the server by `lein with-profile +test run "run"`
+2. bundle exec rspec path-to-file
+
+You can also work with environmental variables instead of `profiles.clj` if prefered. If used both, the
+environmental variables take precedence.

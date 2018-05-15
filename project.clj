@@ -26,13 +26,13 @@
      [timothypratley/patchin "0.3.5"] [threatgrid/ring-graphql-ui "0.1.1"]
      [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
      [ring/ring-core "1.6.3"]]
-  :plugins [[lein-zprint "0.3.8"]]
-  :zprint {:width 80, :old? false}
+  :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]]
+  :zprint {:width 80, :old? false, :map {:lift-ns? false}}
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
   :jvm-opts
     #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
-                      ["--add-modules" "java.xml.bind"]
-                      []))
+            ["--add-modules" "java.xml.bind"]
+            []))
   ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
   :java-source-paths ["java"]
   :source-paths ["src/all"]
@@ -40,10 +40,18 @@
   :aot [#"leihs.procurement.*"]
   :target-path "target/%s"
   :main leihs.procurement.backend.main
-  :profiles {:dev {:source-paths ["src/dev" "src/dev+test"],
-                   :resource-paths ["resources/dev"],
-                   :env {:dev true}},
-             :test {:source-paths ["src/test" "src/dev+test"],
-                    :resource-paths ["resources/test"],
-                    :aot [#"leihs\..*"],
-                    :uberjar-name "leihs-procurement.jar"}})
+  :profiles {:dev [:project/dev :profiles/dev],
+             :test [:project/test :profiles/test],
+             ;; -----------------------------------------------------------------
+             ;; for local specific settings only edit :profiles/* in
+             ;; profiles.clj
+             :profiles/dev {},
+             :profiles/test {},
+             ;; -----------------------------------------------------------------
+             :project/dev {:source-paths ["src/dev" "src/dev+test"],
+                           :resource-paths ["resources/dev"]},
+             :project/test {:source-paths ["src/test" "src/dev+test"],
+                            :resource-paths ["resources/test"],
+                            :aot [#"leihs\..*"],
+                            :uberjar-name "leihs-procurement.jar",
+                            :env {:leihs-secret "secret"}}})

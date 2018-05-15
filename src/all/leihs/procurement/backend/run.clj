@@ -1,7 +1,8 @@
 (ns leihs.procurement.backend.run
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require [leihs.procurement.routes :as routes]
+  (:require [environ.core :as environ]
+            [leihs.procurement.routes :as routes]
             [leihs.procurement.env]
             [leihs.procurement.paths]
             [leihs.procurement.utils.ds :as ds]
@@ -17,9 +18,9 @@
             [logbug.thrown :as thrown]))
 
 (def defaults
-  {:LEIHS_HTTP_BASE_URL "http://localhost:3211",
-   :LEIHS_SECRET (when (= leihs.procurement.env/env :dev) "secret"),
-   :LEIHS_DATABASE_URL
+  {:leihs-http-base-url "http://localhost:3211",
+   :leihs-secret (when (= leihs.procurement.env/env :dev) "secret"),
+   :leihs-database-url
      "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"})
 
 (defn run
@@ -38,36 +39,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn env-or-default
-  [kw]
-  (or (-> (System/getenv)
-          (get (str kw) nil)
-          presence)
-      (get defaults kw nil)))
+(defn env-or-default [kw] (or (environ/env kw) (get defaults kw nil)))
 
 (defn extend-pg-params
   [params]
   (assoc params
-    :password (or (:password params) (System/getenv "PGPASSWORD"))
-    :username (or (:username params) (System/getenv "PGUSER"))
-    :port (or (:port params) (System/getenv "PGPORT"))))
+    :password (or (:password params) (environ/env :pgpassword))
+    :username (or (:username params) (environ/env :pguser))
+    :port (or (:port params) (environ/env :pgport))))
 
 (def cli-options
   [["-h" "--help"]
    ["-b" "--http-base-url LEIHS_HTTP_BASE_URL"
-    (str "default: " (:LEIHS_HTTP_BASE_URL defaults)) :default
-    (http-url/parse-base-url (env-or-default :LEIHS_HTTP_BASE_URL)) :parse-fn
+    (str "default: " (:leihs-http-base-url defaults)) :default
+    (http-url/parse-base-url (env-or-default :leihs-http-base-url)) :parse-fn
     http-url/parse-base-url]
    ["-d" "--database-url LEIHS_DATABASE_URL"
-    (str "default: " (:LEIHS_DATABASE_URL defaults)) :default
-    (-> (env-or-default :LEIHS_DATABASE_URL)
+    (str "default: " (:leihs-database-url defaults)) :default
+    (-> (env-or-default :leihs-database-url)
         jdbc-url/dissect
         extend-pg-params) :parse-fn
     #(-> %
          jdbc-url/dissect
          extend-pg-params)]
-   ["-s" "--secret LEIHS_SECRET" (str "default: " (:LEIHS_SECRET defaults))
-    :default (env-or-default :LEIHS_SECRET)]])
+   ["-s" "--secret LEIHS_SECRET" (str "default: " (:leihs-secret defaults))
+    :default (env-or-default :leihs-secret)]])
 
 (defn main-usage
   [options-summary & more]

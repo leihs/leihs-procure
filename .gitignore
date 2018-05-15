@@ -6,3 +6,4 @@
 /log
 /target
 figwheel_server.log
+profiles.clj

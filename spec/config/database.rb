@@ -2,10 +2,13 @@ require 'addressable'
 require 'sequel'
 
 def database
-  Sequel.connect(
-    if (db_env = ENV['LEIHS_DATABASE_URL'].presence)
+  @database ||= \
+    begin
       # trick Addressable to parse db urls
-      http_uri = Addressable::URI.parse db_env.gsub(/^jdbc:postgresql/,'http').gsub(/^postgres/,'http')
+      http_uri = \
+        Addressable::URI.parse(
+          Constants::LEIHS_DATABASE_URL.gsub(/^jdbc:postgresql/,'http').gsub(/^postgres/,'http')
+        )
       db_url = 'postgres://' \
         + (http_uri.user.presence || ENV['PGUSER'].presence || 'postgres') \
         + ((pw = (http_uri.password.presence || ENV['PGPASSWORD'].presence)) ? ":#{pw}" : "") \
@@ -13,10 +16,9 @@ def database
         + ':' + (http_uri.port.presence || ENV['PGPORT'].presence || 5432).to_s \
         + '/' + ( http_uri.path.presence.try(:gsub,/^\//,'') || ENV['PGDATABASE'].presence || 'leihs') \
         + '?pool=5'
-    else
-      'postgresql://leihs:leihs@localhost:5432/leihs?pool=5'
+
+      Sequel.connect(db_url)
     end
-  )
 end
 
 def clean_db

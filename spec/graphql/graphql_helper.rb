@@ -1,7 +1,8 @@
+require 'edn'
 require 'faraday'
 
 class GraphqlQuery
-  URL = "#{ENV['LEIHS_HTTP_BASE_URL']}/procure/graphql"
+  URL = "#{Constants::LEIHS_HTTP_BASE_URL}/procure/graphql"
   CONN = Faraday.new(url: URL)
 
   def initialize(query, user_id = nil)
