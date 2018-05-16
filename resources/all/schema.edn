@@ -12,6 +12,8 @@
                              :inspectors {:type (list ID)},
                              :name {:type (non-null String)},
                              :viewers {:type (list ID)}}},
+    :CategoryViewersInput {:fields {:id {:type (non-null ID)},
+                                    :viewers {:type (list ID)}}},
     :MainCategoryInput {:fields {:budget_limits {:type (list
                                                          :BudgetLimitInput)},
                                  :categories {:type (list :CategoryInput)},
@@ -27,6 +29,10 @@
     :budget_periods {:args {:input_data {:type (list :BudgetPeriodInput)}},
                      :resolve :update-budget-periods,
                      :type (list :BudgetPeriod)},
+    :categories_viewers {:args {:input_data {:type (list
+                                                     :CategoryViewersInput)}},
+                         :resolve :update-categories-viewers,
+                         :type (list :Category)},
     :main_categories {:args {:input_data {:type (list :MainCategoryInput)}},
                       :resolve :update-main-categories,
                       :type (list :MainCategory)},

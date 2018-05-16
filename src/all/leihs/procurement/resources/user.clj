@@ -40,18 +40,24 @@
                  sql/format)))))
 
 (defn inspector?
-  [tx user]
-  (:result
-    (first (jdbc/query
-             tx
-             (-> (sql/select
-                   [(sql/call :exists
-                              (-> (sql/select true)
-                                  (sql/from :procurement_category_inspectors)
-                                  (sql/where
-                                    [:= :procurement_category_inspectors.user_id
-                                     (:id user)]))) :result])
-                 sql/format)))))
+  ([tx user] (inspector? tx user nil))
+  ([tx user c-id]
+   (:result
+     (first
+       (jdbc/query
+         tx
+         (-> (sql/select
+               [(sql/call
+                  :exists
+                  (cond-> (-> (sql/select true)
+                              (sql/from :procurement_category_inspectors)
+                              (sql/merge-where
+                                [:= :procurement_category_inspectors.user_id
+                                 (:id user)]))
+                    c-id (sql/merge-where
+                           [:= :procurement_category_inspectors.category_id
+                            c-id]))) :result])
+             sql/format))))))
 
 (defn viewer?
   [tx user]

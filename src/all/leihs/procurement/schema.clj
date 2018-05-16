@@ -101,6 +101,9 @@
                       (authorization/ensure-one-of [user/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!
                               (authorization/ensure-one-of [user/admin?])),
+   :update-categories-viewers (-> categories/update-categories-viewers!
+                                  (authorization/ensure-one-of
+                                    [user/admin? user/inspector?])),
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/ensure-one-of [user/admin?])),
    :update-requesters-organizations

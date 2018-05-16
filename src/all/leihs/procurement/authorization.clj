@@ -21,18 +21,21 @@
                                        {}))))))
 
 (defn authorize-and-apply
-  [tx func auth-user & {:keys [only any all], :or {only nil, any nil, all nil}}]
-  {:pre [(= (count (filter nil? [only any all])) 2)]} ; one and only one of
-  ; keyword params must be
-  ; provided
-  (let [auth-func (cond only #(only tx auth-user)
+  [func & {:keys [only any all], :or {only nil, any nil, all nil}}]
+  {:pre [(if only (ifn? only) true)
+         (if-let [preds (or any all)]
+           (->> preds
+                (map ifn?)
+                (every? true?))
+           true) (= (count (filter nil? [only any all])) 2)]}
+  (let [auth-func (cond only only
                         any (fn []
                               (->> any
-                                   (map #(% tx auth-user))
+                                   (map #(%))
                                    (some true?)))
                         all (fn []
                               (->> all
-                                   (map #(% tx auth-user))
+                                   (map #(%))
                                    (every? true?))))]
     (if (auth-func)
       (func)

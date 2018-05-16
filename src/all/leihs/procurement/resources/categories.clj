@@ -2,8 +2,10 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.authorization :as authorization]
             [leihs.procurement.resources.category :as category]
             [leihs.procurement.resources.inspectors :as inspectors]
+            [leihs.procurement.resources.user :as user]
             [leihs.procurement.resources.viewers :as viewers]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
@@ -73,6 +75,26 @@
             (viewers/update-viewers! tx c-id (:viewers c))
             (recur rest-cs (conj c-ids c-id))))
       (delete-categories-for-main-category-id-and-not-in-ids! tx mc-id c-ids))))
+
+(defn update-categories-viewers!
+  [context args value]
+  (let [request (:request context)
+        tx (:tx request)
+        auth-user (:authenticated-entity request)
+        categories (:input_data args)]
+    (loop [[c & rest-cs] categories]
+      (if-let [c-id (:id c)]
+        (do
+          (authorization/authorize-and-apply
+            #(viewers/update-viewers! tx c-id (:viewers c))
+            :any
+            [#(user/admin? tx auth-user) #(user/inspector? tx auth-user c-id)])
+          (recur rest-cs))
+        (jdbc/query tx
+                    (-> categories-base-query
+                        (sql/merge-where [:in :procurement_categories.id
+                                          (map :id categories)])
+                        sql/format))))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
