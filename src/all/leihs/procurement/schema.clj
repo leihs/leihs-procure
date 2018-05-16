@@ -53,7 +53,7 @@
              (graphql-resolve/resolve-as value {:message m, :exception n}))))))
 
 ; a function for debugging convenience. will be a var later.
-(defn resolver-map
+(defn query-resolver-map
   []
   {:admins (-> admins/get-admins
                (authorization/ensure-one-of [user/admin?])),
@@ -91,7 +91,13 @@
      requests/total-price-cents-approved-quantities,
    :total-price-cents-order-quantities
      requests/total-price-cents-order-quantities,
-   :update-admins (-> admins/update-admins!
+   :user user/get-user,
+   :users users/get-users,
+   :viewers viewers/get-viewers})
+
+(defn mutation-resolver-map
+  []
+  {:update-admins (-> admins/update-admins!
                       (authorization/ensure-one-of [user/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!
                               (authorization/ensure-one-of [user/admin?])),
@@ -99,10 +105,7 @@
                                (authorization/ensure-one-of [user/admin?])),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
-         (authorization/ensure-one-of [user/admin?])),
-   :user user/get-user,
-   :users users/get-users,
-   :viewers viewers/get-viewers})
+         (authorization/ensure-one-of [user/admin?]))})
 
 (defn- wrap-map-with-error
   [arg]
@@ -113,7 +116,9 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (graphql-util/attach-resolvers (wrap-map-with-error (resolver-map)))
+      (graphql-util/attach-resolvers (-> (query-resolver-map)
+                                         (merge (mutation-resolver-map))
+                                         wrap-map-with-error))
       graphql-schema/compile))
 
 ;#### debug ###################################################################
