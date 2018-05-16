@@ -11,6 +11,7 @@
     [clojure.set]
     [compojure.core :as cpj]
 
+    [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     ))
@@ -116,7 +117,9 @@
     (cpj/POST (path :users) [] #'user/routes)))
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
+
+;(logging-config/set-logger! :level :debug)
+;(debug/wrap-with-log-debug #'users-formated-query)

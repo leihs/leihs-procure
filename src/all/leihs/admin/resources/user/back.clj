@@ -24,9 +24,10 @@
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def user-selects
-  [:address
+  [:account_enabled
+   :address
+   :badge_id
    :city
-   :account_enabled
    :country
    :created_at
    :email
@@ -51,6 +52,7 @@
 (def user-write-keys
   [:address
    :account_enabled
+   :badge_id
    :city
    :country
    :email
@@ -86,6 +88,7 @@
 ;;; delete user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-user [{tx :tx {user-id :user-id} :route-params}]
+  (assert user-id)
   (if (= [1] (jdbc/delete! tx :users ["id = ?" user-id]))
     {:status 204}
     {:status 404 :body "Delete user failed without error."}))

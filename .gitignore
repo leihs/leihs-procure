@@ -5,4 +5,5 @@
 /.sass-cache
 /log
 /target
+/tmp
 figwheel_server.log
