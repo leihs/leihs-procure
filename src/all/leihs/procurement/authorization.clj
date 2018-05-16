@@ -45,10 +45,9 @@
 (defn wrap-authorize
   [handler skip-authorization-handler-keys]
   (fn [request]
-    (if (or (log/spy (skip-authorization-handler-keys (:handler-key request)))
-            (log/spy
-              (->> [user/admin? user/inspector? user/viewer? user/requester?]
-                   (map #(% (:tx request) (:authenticated-entity request)))
-                   (some true?))))
+    (if (or (skip-authorization-handler-keys (:handler-key request))
+            (->> [user/admin? user/inspector? user/viewer? user/requester?]
+                 (map #(% (:tx request) (:authenticated-entity request)))
+                 (some true?)))
       (handler request)
       {:status 403, :body "Not authorized to access procurement!"})))
