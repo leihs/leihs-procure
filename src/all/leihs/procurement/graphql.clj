@@ -1,6 +1,6 @@
 (ns leihs.procurement.graphql
   (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
             [com.walmartlabs.lacinia :as lacinia]
             [leihs.procurement.schema :as schema]
             [logbug.debug :as debug]))
@@ -9,10 +9,10 @@
 
 (defn exec-query
   [query-string request]
-  (logging/debug "graphql query" query-string
-                 "with variables" (-> request
-                                      :body
-                                      :variables))
+  (log/debug "graphql query" query-string
+             "with variables" (-> request
+                                  :body
+                                  :variables))
   (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
                    query-string
                    (-> request
@@ -22,7 +22,8 @@
 
 (defn handler
   [{{query :query} :body, :as request}]
-  {:body (exec-query query request)})
+  (let [result (exec-query query request)]
+    (cond-> {:body result} (:errors result) (assoc :graphql-error true))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

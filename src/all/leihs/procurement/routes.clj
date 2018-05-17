@@ -165,9 +165,10 @@
   [handler secret]
   (fn [request] (handler (assoc request :secret-ba (.getBytes secret)))))
 
-(defn wrap-reload-if-dev-env
+(defn wrap-reload-if-dev-or-test
   [handler]
-  (cond-> handler (= env/env :dev) (wrap-reload {:dirs ["src" "resources"]})))
+  (cond-> handler
+    (#{:dev :test} env/env) (wrap-reload {:dirs ["src" "resources"]})))
 
 (defn init
   [secret]
@@ -187,7 +188,6 @@
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
-      ds/wrap-tx
       wrap-accept
       wrap-resolve-handler
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
@@ -196,7 +196,7 @@
       wrap-content-type
       ds/wrap-tx
       ring-exception/wrap
-      wrap-reload-if-dev-env))
+      wrap-reload-if-dev-or-test))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

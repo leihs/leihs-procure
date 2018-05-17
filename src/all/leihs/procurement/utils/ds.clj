@@ -3,11 +3,10 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require [logbug.catcher :as catcher]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
             [ring.util.codec]
             [pg-types.all]
             [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
             [logbug.catcher :as catcher]
             [logbug.debug :as debug :refer [I> I>> identity-with-logging]]
             [logbug.ring :refer [wrap-handler-with-logging]]
@@ -44,7 +43,7 @@
 
 (defn reset
   []
-  (logging/info "resetting c3p0 datasource")
+  (log/info "resetting c3p0 datasource")
   (when @ds (.hardReset (:datasource @ds)))
   (reset! ds nil))
 
@@ -94,7 +93,7 @@
 
 (defn- create-c3p0-datasources
   [db-conf]
-  (logging/info create-c3p0-datasources [db-conf])
+  (log/info create-c3p0-datasources [db-conf])
   (reset!
     ds
     {:datasource
@@ -115,28 +114,33 @@
   (fn [request]
     (jdbc/with-db-transaction
       [tx @ds]
-      (try (let [resp (handler (assoc request :tx tx))]
-             (when-let [status (:status resp)]
-               (when (>= status 400)
-                 (logging/warn "Rolling back transaction because error status "
-                               status)
-                 (jdbc/db-set-rollback-only! tx)))
-             resp)
-           (catch Throwable th
-             (logging/warn "Rolling back transaction because of " th)
-             (jdbc/db-set-rollback-only! tx)
-             (throw th))))))
+      (try
+        (let [resp (handler (assoc request :tx tx))
+              status (:status resp)]
+          (cond (and status (>= status 400))
+                  (do (log/warn "Rolling back transaction because error status "
+                                status)
+                      (jdbc/db-set-rollback-only! tx))
+                (:graphql-error resp)
+                  (do (log/warn
+                        "Rolling back transaction because of graphql error")
+                      (jdbc/db-set-rollback-only! tx)))
+          resp)
+        (catch Throwable th
+          (log/warn "Rolling back transaction because of " th)
+          (jdbc/db-set-rollback-only! tx)
+          (throw th))))))
 
 (defn init
   [params]
   (when @ds
-    (do (logging/info "Closing db pool ...")
+    (do (log/info "Closing db pool ...")
         (-> @ds
             :datasource
             .close)
         (reset! ds nil)
-        (logging/info "Closing db pool done.")))
-  (logging/info "Initializing db pool " params " ...")
+        (log/info "Closing db pool done.")))
+  (log/info "Initializing db pool " params " ...")
   (let [url (str "jdbc:postgresql://"
                  (:host params)
                  (when-let [port (-> params
@@ -145,7 +149,7 @@
                    (str ":" port))
                  "/"
                  (:database params))]
-    (logging/info {:url url})
+    (log/info {:url url})
     (reset!
       ds
       {:datasource (doto (ComboPooledDataSource.)
@@ -157,7 +161,7 @@
                      (.setMinPoolSize 3)
                      (.setMaxConnectionAge (* 3 60 60))
                      (.setMaxIdleTimeExcessConnections (* 10 60)))}))
-  (logging/info "Initializing db pool done.")
+  (log/info "Initializing db pool done.")
   @ds)
 
 ;;### Debug

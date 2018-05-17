@@ -94,6 +94,7 @@
                     (-> categories-base-query
                         (sql/merge-where [:in :procurement_categories.id
                                           (map :id categories)])
+                        (sql/order-by [:procurement_categories.name :asc])
                         sql/format))))))
 
 ;#### debug ###################################################################
