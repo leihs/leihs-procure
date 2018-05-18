@@ -71,7 +71,6 @@
    :inspectors inspectors/get-inspectors,
    :main-category main-category/get-main-category,
    :main-categories main-categories/get-main-categories,
-   :model model/get-model,
    :organization organization/get-organization,
    :organizations organizations/get-organizations,
    :priorities (fn [_ _ _] [0 1]),
@@ -79,7 +78,6 @@
    :requests requests/get-requests,
    :requesters-organizations
      requesters-organizations/get-requesters-organizations,
-   :room room/get-room,
    :rooms rooms/get-rooms,
    :supplier supplier/get-supplier,
    :total-price-cents-requested-quantities

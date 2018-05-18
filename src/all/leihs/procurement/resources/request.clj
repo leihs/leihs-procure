@@ -76,13 +76,11 @@
                              auth-user
                              proc-request)]
     (into {}
-          (map (fn [[attr {read-perm :read, :as rw-perms}]]
-                 (->> proc-request
-                      attr
-                      (and read-perm)
-                      (assoc rw-perms :value)
-                      (hash-map attr)))
-            proc-request-perms))))
+          (map (fn [[attr value]]
+                 {attr (if-let [p-spec (attr proc-request-perms)]
+                         (and (:read p-spec) (assoc p-spec :value value))
+                         value)})
+            proc-request))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
