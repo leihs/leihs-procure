@@ -68,6 +68,13 @@
                                  budget-period-in-requesting-phase)
                             category-inspectable-by-user
                             user-is-admin))},
+     :model {:read true,
+             :write (and (not budget-period-is-past)
+                         (or (and user-is-requester
+                                  requested-by-user
+                                  budget-period-in-requesting-phase)
+                             category-inspectable-by-user
+                             user-is-admin))},
      :motivation {:read true,
                   :write (and (not budget-period-is-past)
                               (or (and user-is-requester

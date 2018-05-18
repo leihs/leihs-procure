@@ -3,6 +3,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request-fields :as
              request-fields-perms]
+            [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.sql :as sql]
@@ -46,16 +47,24 @@
        (room/get-room-by-id tx)
        (assoc row :room)))
 
+(defn embed-model
+  [tx row]
+  (->> row
+       :model_id
+       (model/get-model-by-id tx)
+       (assoc row :model)))
+
 (defn row-fn
   [tx]
   (comp add-priority-inspector
+        #(embed-model tx %)
         #(embed-room tx %)
         remap-priority
         remap-inspector-priority))
 
 (defn request-base-query
   [id]
-  (-> (sql/select :* [state-sql :state])
+  (-> (sql/select :procurement_requests* [state-sql :state])
       (sql/from :procurement_requests)
       (sql/where [:= :procurement_requests.id id])
       sql/format))
