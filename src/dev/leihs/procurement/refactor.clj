@@ -1,15 +1,15 @@
 (ns leihs.procurement.refactor
   (:require [clojure.tools.logging :as log]))
 
-(defmacro thread-first-macro
-  [[f x & r]]
-  (loop [x x
-         result `((~f ~@r))]
-    (if (seq? x)
-      (let [[f2 x2 & r2] x] (recur x2 (cons (cons f2 r2) result)))
-      (->> result
-           (cons x)
-           (cons '->)))))
+(defn thread-first-h
+  ([f-app] (thread-first-h f-app []))
+  ([[f first-arg & rst] result]
+   (let [f-without-first (if (nil? rst) f `(~f ~@rst))]
+     (if (seq? first-arg)
+       (thread-first-h first-arg (cons f-without-first result))
+       (cons first-arg (cons f-without-first result))))))
+
+(defmacro thread-first-macro [f-app] (cons '-> (thread-first-h f-app)))
 
 (defn thread-first [form] (macroexpand-1 `(thread-first-macro ~form)))
 
@@ -18,7 +18,6 @@
   ([[f & rst] result]
    (let [[last-arg & rev-rst] (reverse rst)
          f-without-last (if (nil? rev-rst) f `(~f ~@(reverse rev-rst)))]
-     (log/spy f-without-last)
      (if (seq? last-arg)
        (thread-last-h last-arg (cons f-without-last result))
        (cons last-arg (cons f-without-last result))))))
