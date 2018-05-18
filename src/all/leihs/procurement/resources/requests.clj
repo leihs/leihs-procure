@@ -87,7 +87,7 @@
           auth-user (:authenticated-entity request)
           proc-requests (jdbc/query tx
                                     (requests-query context arguments value)
-                                    {:row-fn request/row-fn})]
+                                    {:row-fn (request/row-fn tx)})]
       (map #(request/apply-permissions tx auth-user %) proc-requests))))
 
 (defn total-price-query
