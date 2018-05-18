@@ -1,6 +1,9 @@
 (ns leihs.procurement.resources.request
   (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.permissions.request-fields :as
+             request-fields-perms]
+            [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [logbug.debug :as debug]))
@@ -45,13 +48,20 @@
       (sql/where [:= :procurement_requests.id id])
       sql/format))
 
-(defn get-request
-  [context args _]
-  (first (jdbc/query (-> context
-                         :request
-                         :tx)
-                     (request-base-query (:request_id args))
-                     {:row-fn row-fn})))
+(defn apply-permissions
+  [tx auth-user proc-request]
+  (let [proc-request-perms (request-fields-perms/get-for-user-and-request
+                             tx
+                             auth-user
+                             proc-request)]
+    (into {}
+          (map (fn [[attr {read-perm :read, :as rw-perms}]]
+                 (->> proc-request
+                      attr
+                      (and read-perm)
+                      (assoc rw-perms :value)
+                      (hash-map attr)))
+            proc-request-perms))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

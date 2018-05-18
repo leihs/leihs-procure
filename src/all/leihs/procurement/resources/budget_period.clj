@@ -2,11 +2,11 @@
   (:require [clj-time.format :as time-format]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
-            [leihs.procurement.utils.ds :refer [get-ds]]
+            [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.sql :as sql]))
 
 (def budget-period-base-query
-  (-> (sql/select :*)
+  (-> (sql/select :procurement_budget_periods.*)
       (sql/from :procurement_budget_periods)))
 
 (defn get-budget-period-by-id
@@ -33,27 +33,22 @@
 (defn in-requesting-phase?
   [tx budget-period]
   (:result
-    (first (jdbc/query
-             tx
-             (-> (sql/select
-                   [(sql/call :<
-                              (sql/call :cast (sql/call :now) :date)
-                              (sql/call :cast
-                                        (:inspection_start_date budget-period)
-                                        :date)) :result])
-                 sql/format)))))
+    (first (jdbc/query tx
+                       (-> (sql/select [(sql/call :<
+                                                  (sql/call :now)
+                                                  (:inspection_start_date
+                                                    budget-period)) :result])
+                           sql/format)))))
 
 (defn past?
   [tx budget-period]
   (:result
-    (first (jdbc/query
-             tx
-             (-> (sql/select
-                   [(sql/call :>
-                              (sql/call :cast (sql/call :now) :date)
-                              (sql/call :cast (:end_date budget-period) :date))
-                    :result])
-                 sql/format)))))
+    (first
+      (jdbc/query tx
+                  (-> (sql/select
+                        [(sql/call :> (sql/call :now) (:end_date budget-period))
+                         :result])
+                      sql/format)))))
 
 (defn can-delete?
   [context _ value]
@@ -104,3 +99,9 @@
                  (-> (sql/insert-into :procurement_budget_periods)
                      (sql/values [bp])
                      sql/format)))
+
+; (->> budget-period-base-query
+;      sql/format
+;      (jdbc/query (ds/get-ds))
+;      first
+;      (in-requesting-phase? (ds/get-ds)))

@@ -1,19 +1,14 @@
 (ns leihs.procurement.permissions.request-fields
-  (:require [leihs.procurement.resources.user :as user]
-            [leihs.procurement.resources.request :as request]
+  (:require [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.category :as category]
-            [leihs.procurement.resources.budget-period :as budget-period]))
+            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.utils.ds :as ds]))
 
-(defn all-for-user-and-request
-  [context _ _]
-  (let [proc-request (:proc-request context)
-        request (:request context)
-        tx (:tx request)
-        user (user/get-user-by-id tx
-                                  (-> request
-                                      :authenticated-entity
-                                      :id))
-        budget-period (budget-period/get-budget-period-by-id tx
+(defn get-for-user-and-request
+  [tx user proc-request]
+  (let [budget-period (budget-period/get-budget-period-by-id tx
                                                              (:budget_period_id
                                                                proc-request))
         category (category/get-category-by-id tx (:category_id proc-request))
@@ -27,7 +22,8 @@
           (budget-period/in-requesting-phase? tx budget-period)
         category-inspectable-by-user
           (category/inspectable-by? tx user category)]
-    {:article_name {:read true,
+    {:id {:read true, :write false},
+     :article_name {:read true,
                     :write (and request-without-template
                                 (not budget-period-is-past)
                                 (or (and user-is-requester

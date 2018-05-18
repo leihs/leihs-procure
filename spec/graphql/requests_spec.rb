@@ -9,7 +9,9 @@ describe 'requests' do
     q = <<-GRAPHQL
       query {
         requests {
-          id
+          id {
+            value
+          }
         }
       }
     GRAPHQL
@@ -17,7 +19,10 @@ describe 'requests' do
     expect(result).to be == {
       'data' => {
         'requests' => [
-          { 'id' => request.id }
+          { 'id' => {
+              'value' => request.id
+            }
+          }
         ]
       }
     }

@@ -1,8 +1,7 @@
 (ns leihs.procurement.refactor
-  (:refer-clojure :exclude [->])
   (:require [clojure.tools.logging :as log]))
 
-(defmacro ->macro
+(defmacro thread-first-macro
   [[f x & r]]
   (loop [x x
          result `((~f ~@r))]
@@ -12,4 +11,18 @@
            (cons x)
            (cons '->)))))
 
-(defn -> [form] (macroexpand-1 (seq ['->macro form])))
+(defn thread-first [form] (macroexpand-1 `(thread-first-macro ~form)))
+
+(defn thread-last-h
+  ([f-app] (thread-last-h f-app []))
+  ([[f & rst] result]
+   (let [[last-arg & rev-rst] (reverse rst)
+         f-without-last (if (nil? rev-rst) f `(~f ~@(reverse rev-rst)))]
+     (log/spy f-without-last)
+     (if (seq? last-arg)
+       (thread-last-h last-arg (cons f-without-last result))
+       (cons last-arg (cons f-without-last result))))))
+
+(defmacro thread-last-macro [f-app] (cons '->> (thread-last-h f-app)))
+
+(defn thread-last [form] (macroexpand-1 `(thread-last-macro ~form)))

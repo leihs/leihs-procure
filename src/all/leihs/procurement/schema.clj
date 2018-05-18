@@ -25,7 +25,6 @@
     [leihs.procurement.resources.organization :as organization]
     [leihs.procurement.resources.organizations :as organizations]
     [leihs.procurement.resources.request :as request]
-    [leihs.procurement.resources.request-fields :as request-fields]
     [leihs.procurement.resources.requests :as requests]
     [leihs.procurement.resources.requesters-organizations :as
      requesters-organizations]
@@ -77,9 +76,7 @@
    :organizations organizations/get-organizations,
    :priorities (fn [_ _ _] [0 1]),
    :priorities-inspector (fn [_ _ _] [0 1 2 3]),
-   :request-by-id request/get-request,
    :requests requests/get-requests,
-   :request-fields-by-id request-fields/get-request-fields,
    :requesters-organizations
      requesters-organizations/get-requesters-organizations,
    :room room/get-room,

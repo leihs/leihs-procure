@@ -32,7 +32,8 @@
 
 (defn requests-query
   [context arguments _]
-  (let [category-id (:category_id arguments)
+  (let [id (:id arguments)
+        category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
         priority (:priority arguments)
@@ -43,6 +44,7 @@
         search-term (:search arguments)]
     (sql/format
       (cond-> requests-base-query
+        (not (empty? id)) (sql/merge-where [:in :procurement_requests.id id])
         (not (empty? category-id))
           (sql/merge-where [:in :procurement_requests.category_id category-id])
         (not (empty? budget-period-id))
@@ -78,13 +80,15 @@
 (defn get-requests
   [context arguments value]
   (if (some #(= (% arguments) [])
-            [:budget_period_id :category_id :organization_id :user_id])
+            [:id :budget_period_id :category_id :organization_id :user_id])
     []
-    (jdbc/query (-> context
-                    :request
-                    :tx)
-                (requests-query context arguments value)
-                {:row-fn request/row-fn})))
+    (let [request (:request context)
+          tx (:tx request)
+          auth-user (:authenticated-entity request)
+          proc-requests (jdbc/query tx
+                                    (requests-query context arguments value)
+                                    {:row-fn request/row-fn})]
+      (map #(request/apply-permissions tx auth-user %) proc-requests))))
 
 (defn total-price-query
   [qty-type bp-id]
