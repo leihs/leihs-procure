@@ -5,6 +5,7 @@
              request-fields-perms]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
+            [leihs.procurement.resources.supplier :as supplier]
             [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
@@ -54,11 +55,19 @@
        (model/get-model-by-id tx)
        (assoc row :model)))
 
+(defn embed-supplier
+  [tx row]
+  (->> row
+       :supplier_id
+       (supplier/get-supplier-by-id tx)
+       (assoc row :supplier)))
+
 (defn row-fn
   [tx]
   (comp add-priority-inspector
         #(embed-model tx %)
         #(embed-room tx %)
+        #(embed-supplier tx %)
         remap-priority
         remap-inspector-priority))
 

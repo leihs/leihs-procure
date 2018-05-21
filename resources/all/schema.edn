@@ -124,7 +124,7 @@
                        :requested_quantity {:type :RequestFieldInt},
                        :room {:type :RequestFieldRoom},
                        :state {:type :RequestFieldString},
-                       ; :supplier {:resolve :supplier, :type :Supplier},
+                       :supplier {:type :RequestFieldSupplier},
                        :supplier_name {:type :RequestFieldString},
                        :user {:resolve :user, :type (non-null :User)}}},
     :RequestFieldBoolean {:fields {:read {:type (non-null Boolean)},
@@ -145,6 +145,9 @@
     :RequestFieldString {:fields {:read {:type (non-null Boolean)},
                                   :value {:type String},
                                   :write {:type (non-null Boolean)}}},
+    :RequestFieldSupplier {:fields {:read {:type (non-null Boolean)},
+                                    :value {:type :Supplier},
+                                    :write {:type (non-null Boolean)}}},
     :RequesterOrganization {:fields
                               {:department {:resolve :department,
                                             :type (non-null :Organization)},

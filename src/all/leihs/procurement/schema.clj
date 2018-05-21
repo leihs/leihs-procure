@@ -79,7 +79,6 @@
    :requesters-organizations
      requesters-organizations/get-requesters-organizations,
    :rooms rooms/get-rooms,
-   :supplier supplier/get-supplier,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,
    :total-price-cents-approved-quantities

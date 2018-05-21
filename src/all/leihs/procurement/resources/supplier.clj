@@ -11,12 +11,7 @@
       (sql/where [:= :suppliers.id id])
       sql/format))
 
-(defn get-supplier
-  [context _ value]
-  (first (jdbc/query (-> context
-                         :request
-                         :tx)
-                     (supplier-query (:supplier_id value)))))
+(defn get-supplier-by-id [tx id] (first (jdbc/query tx (supplier-query id))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
