@@ -5,8 +5,11 @@
 (defn wrap-set-authenticated-user
   [handler]
   (fn [request]
-    (let [user-auth-entity (u/get-user-by-id (:tx request)
-                                             (-> request
-                                                 :headers
-                                                 :Authorization))]
+    (let [user-id (or (-> request
+                          :query-params
+                          :user_id)
+                      (-> request
+                          :headers
+                          :Authorization))
+          user-auth-entity (u/get-user-by-id (:tx request) (log/spy user-id))]
       (handler (assoc request :authenticated-entity user-auth-entity)))))

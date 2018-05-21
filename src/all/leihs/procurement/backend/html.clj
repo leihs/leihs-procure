@@ -52,28 +52,19 @@
   [request]
   {:status 404,
    :headers {"Content-Type" "text/html"},
-   :body (html5
-           (head)
-           [:body
-            {:data-user (user-data request),
-             :data-settings (settings-data request)}
-            [:div.container-fluid [:h1.text-danger "Error 404 - Not Found"]]])})
+   :body (html5 (head)
+                [:body
+                 [:div.container-fluid
+                  [:h1.text-danger "Error 404 - Not Found"]]])})
 
 (defn html-handler
   [request]
   {:headers {"Content-Type" "text/html"},
-   :body (html5
-           (head)
-           [:body
-            {:data-user (user-data request),
-             :data-settings (settings-data request)}
-            [:div#app.container-fluid
-             [:div.alert.alert-warning [:h1 "Leihs Procurement 2"] [:p "OK"]
-              [:img
-               {:src "/procure/images/b33f4c7d-409e-4486-8484-a91b766d436d"}]]] ; (hiccup.page/include-js
-            ;   (cache-buster/cache-busted-path "/procurement/js/app.js"))
-           ])})
-
+   :body (html5 (head)
+                [:body
+                 [:div#app.container-fluid
+                  [:div.alert.alert-warning [:h1 "Leihs Procurement 2"]
+                   [:p "OK"]]]])})
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

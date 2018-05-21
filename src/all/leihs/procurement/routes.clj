@@ -13,6 +13,7 @@
     ; =======================================
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.resources.image :as image]
+    [leihs.procurement.scratch :as scratch]
     [leihs.procurement.shutdown :as shutdown]
     [leihs.procurement.status :as status]
     [leihs.procurement.utils.ds :as ds]
@@ -33,7 +34,7 @@
     [ring.util.response :refer [redirect]]
     [ring-graphql-ui.core :refer [wrap-graphiql]]
     [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as logging]
+    [clojure.tools.logging :as log]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug :refer [I>]]
     [logbug.ring :refer [wrap-handler-with-logging]]
@@ -42,18 +43,17 @@
 (declare redirect-to-root-handler)
 
 ; ========================================================
-; TODO: remove shutdown!!!
-(def skip-authorization-handler-keys #{:status :shutdown})
+; TODO: remove shutdown!!! (and possible others)
+(def skip-authorization-handler-keys #{:scratch :shutdown :status :image})
 ; ========================================================
-
-(def do-not-dispatch-to-std-frontend-handler-keys
-  #{:redirect-to-root :not-found :auth-shib-sign-in})
 
 (def handler-resolve-table
   {:graphql graphql/handler,
+   :image image/routes,
+   :not-found html/not-found-handler,
+   :scratch scratch/routes,
    :shutdown shutdown/routes,
-   :status status/routes,
-   :image image/routes})
+   :status status/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -74,44 +74,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn wrap-dispatch-content-type
-  ([handler] (fn [request] (wrap-dispatch-content-type handler request)))
-  ([handler request]
-   (cond
-     ; accept json always goes to the backend handlers, i.e. the normal routing
-     (= (-> request
-            :accept
-            :mime)
-        :json)
-       (or (handler request)
-           (throw (ex-info "This resource does not provide a json response."
-                           {:status 406})))
-     ; accept HTML and GET (or HEAD) wants allmost always the frontend
-     (and (= (-> request
-                 :accept
-                 :mime)
-             :html)
-          (#{:get :head} (:request-method request))
-          (not (do-not-dispatch-to-std-frontend-handler-keys (:handler-key
-                                                               request))))
-       (html/html-handler request)
-     ; other request might need to go the backend and return frontend
-     ; nevertheless
-     :else
-       (let [response (handler request)]
-         (if (and (nil? response)
-                  ; TODO we might not need the following after we check (?nil
-                  ; response)
-                  (not (do-not-dispatch-to-std-frontend-handler-keys
-                         (:handler-key request)))
-                  (not (#{:post :put :patch :delete} (:request-method request)))
-                  (= (-> request
-                         :accept
-                         :mime)
-                     :html))
-           (html/html-handler request)
-           response)))))
 
 (defn wrap-resolve-handler
   ([handler] (fn [request] (wrap-resolve-handler handler request)))
@@ -173,7 +135,6 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      wrap-dispatch-content-type
       ring.middleware.json/wrap-json-response
       (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
@@ -188,12 +149,10 @@
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
-      wrap-accept
       wrap-resolve-handler
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
-      wrap-content-type
       ds/wrap-tx
       ring-exception/wrap
       wrap-reload-if-dev-or-test))
