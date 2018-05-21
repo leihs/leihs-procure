@@ -12,6 +12,7 @@
     [leihs.procurement.mock :as mock]
     ; =======================================
     [leihs.procurement.paths :refer [path paths]]
+    [leihs.procurement.resources.attachment :as attachment]
     [leihs.procurement.resources.image :as image]
     [leihs.procurement.scratch :as scratch]
     [leihs.procurement.shutdown :as shutdown]
@@ -44,11 +45,13 @@
 
 ; ========================================================
 ; TODO: remove shutdown!!! (and possible others)
-(def skip-authorization-handler-keys #{:scratch :shutdown :status :image})
+(def skip-authorization-handler-keys
+  #{:attachment :image :scratch :shutdown :status})
 ; ========================================================
 
 (def handler-resolve-table
-  {:graphql graphql/handler,
+  {:attachment attachment/routes,
+   :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,
    :scratch scratch/routes,
@@ -93,13 +96,6 @@
                 :handler handler-fn)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn wrap-accept
-  [handler]
-  (ring.middleware.accept/wrap-accept handler
-                                      {:mime ["application/json" :qs 1 :as :json
-                                              "image/*" :qs 1 :as :image
-                                              "text/html" :qs 1 :as :html]}))
 
 (defn canonicalize-params-map
   [params]

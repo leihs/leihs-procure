@@ -3,6 +3,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request-fields :as
              request-fields-perms]
+            [leihs.procurement.resources.attachments :as attachments]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.resources.supplier :as supplier]
@@ -62,9 +63,17 @@
        (supplier/get-supplier-by-id tx)
        (assoc row :supplier)))
 
+(defn embed-attachments
+  [tx row]
+  (->> row
+       :id
+       (attachments/get-attachments-for-request-id tx)
+       (assoc row :attachments)))
+
 (defn row-fn
   [tx]
   (comp add-priority-inspector
+        #(embed-attachments tx %)
         #(embed-model tx %)
         #(embed-room tx %)
         #(embed-supplier tx %)

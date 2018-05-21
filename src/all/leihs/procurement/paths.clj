@@ -13,14 +13,17 @@
 
 
 (def paths
-  (branch ""
-          (branch "/procure"
-                  (leaf "/graphql" :graphql)
-                  (leaf "/scratch" :scratch)
-                  (leaf "/shutdown" :shutdown)
-                  (leaf "/status" :status)
-                  (branch "/images/" (param :image-id) (leaf "" :image)))
-          (leaf true :not-found)))
+  (branch
+    ""
+    (branch
+      "/procure"
+      (leaf "/graphql" :graphql)
+      (leaf "/scratch" :scratch)
+      (leaf "/shutdown" :shutdown)
+      (leaf "/status" :status)
+      (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))
+      (branch "/images/" (param :image-id) (leaf "" :image)))
+    (leaf true :not-found)))
 
 ;(path-for (paths) :user :user-id "{user-id}")
 ;(match-route (paths) "/users/512")

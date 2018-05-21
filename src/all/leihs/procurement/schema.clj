@@ -1,41 +1,36 @@
 (ns leihs.procurement.schema
-  (:require
-    [clojure.java.io :as io]
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.edn :as edn]
-    [clojure.tools.logging :as logging]
-    [com.walmartlabs.lacinia.util :as graphql-util]
-    [com.walmartlabs.lacinia.resolve :as graphql-resolve]
-    [com.walmartlabs.lacinia.schema :as graphql-schema]
-    [leihs.procurement.authorization :as authorization]
-    [leihs.procurement.env :as env]
-    [leihs.procurement.resources.admins :as admins]
-    [leihs.procurement.resources.attachments :as attachments]
-    [leihs.procurement.resources.budget-limits :as budget-limits]
-    [leihs.procurement.resources.budget-period :as budget-period]
-    [leihs.procurement.resources.budget-periods :as budget-periods]
-    [leihs.procurement.resources.building :as building]
-    [leihs.procurement.resources.category :as category]
-    [leihs.procurement.resources.categories :as categories]
-    [leihs.procurement.resources.current-user :as current-user]
-    [leihs.procurement.resources.inspectors :as inspectors]
-    [leihs.procurement.resources.main-category :as main-category]
-    [leihs.procurement.resources.main-categories :as main-categories]
-    [leihs.procurement.resources.model :as model]
-    [leihs.procurement.resources.organization :as organization]
-    [leihs.procurement.resources.organizations :as organizations]
-    [leihs.procurement.resources.request :as request]
-    [leihs.procurement.resources.requests :as requests]
-    [leihs.procurement.resources.requesters-organizations :as
-     requesters-organizations]
-    [leihs.procurement.resources.room :as room]
-    [leihs.procurement.resources.rooms :as rooms]
-    [leihs.procurement.resources.supplier :as supplier]
-    [leihs.procurement.resources.user :as user]
-    [leihs.procurement.resources.users :as users]
-    [leihs.procurement.resources.viewers :as viewers]
-    [leihs.procurement.utils.ring-exception :refer [get-cause]]
-    [logbug.debug :as debug]))
+  (:require [clojure.java.io :as io]
+            [clj-logging-config.log4j :as logging-config]
+            [clojure.edn :as edn]
+            [clojure.tools.logging :as logging]
+            [com.walmartlabs.lacinia.util :as graphql-util]
+            [com.walmartlabs.lacinia.resolve :as graphql-resolve]
+            [com.walmartlabs.lacinia.schema :as graphql-schema]
+            [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.env :as env]
+            [leihs.procurement.resources.admins :as admins]
+            [leihs.procurement.resources.building :as building]
+            [leihs.procurement.resources.budget-limits :as budget-limits]
+            [leihs.procurement.resources.budget-period :as budget-period]
+            [leihs.procurement.resources.budget-periods :as budget-periods]
+            [leihs.procurement.resources.category :as category]
+            [leihs.procurement.resources.categories :as categories]
+            [leihs.procurement.resources.current-user :as current-user]
+            [leihs.procurement.resources.inspectors :as inspectors]
+            [leihs.procurement.resources.main-category :as main-category]
+            [leihs.procurement.resources.main-categories :as main-categories]
+            [leihs.procurement.resources.organization :as organization]
+            [leihs.procurement.resources.organizations :as organizations]
+            [leihs.procurement.resources.request :as request]
+            [leihs.procurement.resources.requests :as requests]
+            [leihs.procurement.resources.requesters-organizations :as
+             requesters-organizations]
+            [leihs.procurement.resources.rooms :as rooms]
+            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.resources.users :as users]
+            [leihs.procurement.resources.viewers :as viewers]
+            [leihs.procurement.utils.ring-exception :refer [get-cause]]
+            [logbug.debug :as debug]))
 
 (defn wrap-resolver-with-error
   [resolver]
@@ -56,7 +51,6 @@
   []
   {:admins (-> admins/get-admins
                (authorization/ensure-one-of [user/admin?])),
-   :attachments attachments/get-attachments,
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,
    :budget-periods budget-periods/get-budget-periods,
