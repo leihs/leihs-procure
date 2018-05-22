@@ -2,6 +2,7 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.resources.request :as request]
             [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.ds :refer [get-ds]]
             [logbug.debug :as debug]))
@@ -52,21 +53,6 @@
                           (sql/where [:= :procurement_category_viewers.user_id
                                       (:id user)]))) :result])
                  sql/format)))))
-
-(defn requester?
-  [tx user]
-  (:result
-    (first
-      (jdbc/query
-        tx
-        (-> (sql/select
-              [(sql/call :exists
-                         (-> (sql/select true)
-                             (sql/from :procurement_requesters_organizations)
-                             (sql/where
-                               [:= :procurement_requesters_organizations.user_id
-                                (:id user)]))) :result])
-            sql/format)))))
 
 (defn requester?
   [tx user]

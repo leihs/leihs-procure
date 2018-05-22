@@ -6,6 +6,7 @@ describe 'requests' do
     user = FactoryBot.create(:user)
     FactoryBot.create(:requester_organization, user_id: user.id)
     request = FactoryBot.create(:request, user_id: user.id)
+
     q = <<-GRAPHQL
       query {
         requests {

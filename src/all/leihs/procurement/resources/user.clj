@@ -27,15 +27,6 @@
                          (sql/where [:= :users.id id])
                          sql/format))))
 
-(defn requested?
-  [tx user r-id]
-  (= (:id user)
-     (->> r-id
-          request/request-base-query
-          (jdbc/query tx)
-          first
-          :user_id)))
-
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

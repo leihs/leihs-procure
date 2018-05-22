@@ -2,7 +2,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.resources.category :as category]
+            [leihs.procurement.resources.request :as request]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.ds :as ds]))
 
@@ -11,9 +11,8 @@
   (let [budget-period (budget-period/get-budget-period-by-id tx
                                                              (:budget_period_id
                                                                proc-request))
-        category (category/get-category-by-id tx (:category_id proc-request))
         request-without-template (not (:template_id proc-request))
-        requested-by-user (= (:user_id proc-request) (:id user))
+        requested-by-user (request/requested-by? tx proc-request user)
         user-is-requester (user-perms/requester? tx user)
         user-is-inspector (user-perms/inspector? tx user)
         user-is-admin (user-perms/admin? tx user)
@@ -21,7 +20,7 @@
         budget-period-in-requesting-phase
           (budget-period/in-requesting-phase? tx budget-period)
         category-inspectable-by-user
-          (category/inspectable-by? tx user category)]
+          (user-perms/inspector? tx user (:category_id proc-request))]
     {:id {:read true, :write false},
      :article_name {:read true,
                     :write (and request-without-template

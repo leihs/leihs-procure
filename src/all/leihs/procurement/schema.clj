@@ -97,19 +97,16 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/ensure-one-of
                                  [user-perms/admin?])),
-   :update-request #((-> request/update-request!
-                         (authorization/ensure-one-of
-                           [user-perms/admin? user-perms/inspector?
-                            (fn [tx auth-user]
-                              (and (user-perms/requester? tx auth-user)
-                                   (user/requested? tx
-                                                    auth-user
-                                                    (-> %2
-                                                        :input_data
-                                                        :id))))]))
-                      %1
-                      %2
-                      %3),
+   :update-request
+     #((-> request/update-request!
+           (authorization/ensure-one-of
+             [user-perms/admin? user-perms/inspector?
+              (fn [tx auth-user]
+                (and (user-perms/requester? tx auth-user)
+                     (request/requested-by? tx (:input_data %2) auth-user)))]))
+        %1
+        %2
+        %3),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/ensure-one-of [user-perms/admin?]))})

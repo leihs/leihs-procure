@@ -116,6 +116,16 @@
       #(request-perms/authorized-to-write-all-fields? tx auth-user req-data))
     (get-request tx auth-user req-id)))
 
+(defn requested-by?
+  [tx request user]
+  (= (:id user)
+     (->> request
+          :id
+          request-base-query
+          (jdbc/query tx)
+          first
+          :user_id)))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
