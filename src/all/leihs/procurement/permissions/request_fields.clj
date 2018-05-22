@@ -3,7 +3,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.category :as category]
-            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.ds :as ds]))
 
 (defn get-for-user-and-request
@@ -14,9 +14,9 @@
         category (category/get-category-by-id tx (:category_id proc-request))
         request-without-template (not (:template_id proc-request))
         requested-by-user (= (:user_id proc-request) (:id user))
-        user-is-requester (:is_procurement_requester user)
-        user-is-inspector (user/inspector? tx user)
-        user-is-admin (:is_procurement_admin user)
+        user-is-requester (user-perms/requester? tx user)
+        user-is-inspector (user-perms/inspector? tx user)
+        user-is-admin (user-perms/admin? tx user)
         budget-period-is-past (budget-period/past? tx budget-period)
         budget-period-in-requesting-phase
           (budget-period/in-requesting-phase? tx budget-period)

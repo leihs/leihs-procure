@@ -3,6 +3,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.math.numeric-tower :refer [round]]
             [clojure.tools.logging :as log]
+            [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
@@ -88,7 +89,7 @@
           proc-requests (jdbc/query tx
                                     (requests-query context arguments value)
                                     {:row-fn (request/row-fn tx)})]
-      (map #(request/apply-permissions tx auth-user %) proc-requests))))
+      (map #(request-perms/apply-permissions tx auth-user %) proc-requests))))
 
 (defn total-price-query
   [qty-type bp-id]

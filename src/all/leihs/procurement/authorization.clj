@@ -2,7 +2,7 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
-            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug])
   (:import [leihs.procurement UnauthorizedException]))
@@ -21,22 +21,23 @@
                                        {}))))))
 
 (defn authorize-and-apply
-  [func & {:keys [only any all], :or {only nil, any nil, all nil}}]
-  {:pre [(if only (ifn? only) true)
-         (if-let [preds (or any all)]
+  [func &
+   {:keys [if-only if-any if-all], :or {if-only nil, if-any nil, if-all nil}}]
+  {:pre [(if if-only (ifn? if-only) true)
+         (if-let [preds (or if-any if-all)]
            (->> preds
                 (map ifn?)
                 (every? true?))
-           true) (= (count (filter nil? [only any all])) 2)]}
-  (let [auth-func (cond only only
-                        any (fn []
-                              (->> any
-                                   (map #(%))
-                                   (some true?)))
-                        all (fn []
-                              (->> all
-                                   (map #(%))
-                                   (every? true?))))]
+           true) (= (count (filter nil? [if-only if-any if-all])) 2)]}
+  (let [auth-func (cond if-only if-only
+                        if-any (fn []
+                                 (->> if-any
+                                      (map #(%))
+                                      (some true?)))
+                        if-all (fn []
+                                 (->> if-all
+                                      (map #(%))
+                                      (every? true?))))]
     (if (auth-func)
       (func)
       (throw (UnauthorizedException. "Not authorized for this query path."
@@ -46,7 +47,8 @@
   [handler skip-authorization-handler-keys]
   (fn [request]
     (if (or (skip-authorization-handler-keys (:handler-key request))
-            (->> [user/admin? user/inspector? user/viewer? user/requester?]
+            (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+                  user-perms/requester?]
                  (map #(% (:tx request) (:authenticated-entity request)))
                  (some true?)))
       (handler request)

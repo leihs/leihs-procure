@@ -1,8 +1,8 @@
 (ns leihs.procurement.resources.request
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.tools.logging :as log]
-            [leihs.procurement.permissions.request-fields :as
-             request-fields-perms]
+            [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.resources.attachments :as attachments]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
@@ -82,23 +82,39 @@
 
 (defn request-base-query
   [id]
-  (-> (sql/select :procurement_requests* [state-sql :state])
+  (-> (sql/select :procurement_requests.* [state-sql :state])
       (sql/from :procurement_requests)
       (sql/where [:= :procurement_requests.id id])
       sql/format))
 
-(defn apply-permissions
-  [tx auth-user proc-request]
-  (let [proc-request-perms (request-fields-perms/get-for-user-and-request
-                             tx
-                             auth-user
-                             proc-request)]
-    (into {}
-          (map (fn [[attr value]]
-                 {attr (if-let [p-spec (attr proc-request-perms)]
-                         (and (:read p-spec) (assoc p-spec :value value))
-                         value)})
-            proc-request))))
+(defn get-request
+  [tx auth-user id]
+  (->> id
+       request-base-query
+       (jdbc/query tx)
+       first
+       (request-perms/apply-permissions tx auth-user)))
+
+(defn update-request!
+  [context args _]
+  (let [input-data (:input_data args)
+        req-id (:id input-data)
+        req-data (as-> input-data <>
+                   (merge <> {:priority_inspector (:inspector_priority <>)})
+                   (dissoc <> :priority_inspector)
+                   (dissoc <> :id))
+        ring-req (:request context)
+        tx (:tx ring-req)
+        auth-user (:authenticated-entity ring-req)]
+    (authorization/authorize-and-apply
+      #(jdbc/execute! tx
+                      (-> (sql/update :procurement_requests)
+                          (sql/sset req-data)
+                          (sql/where [:= :procurement_requests.id req-id])
+                          sql/format))
+      :if-only
+      #(request-perms/authorized-to-write-all-fields? tx auth-user req-data))
+    (get-request tx auth-user req-id)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

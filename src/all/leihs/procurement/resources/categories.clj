@@ -3,9 +3,9 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.category :as category]
             [leihs.procurement.resources.inspectors :as inspectors]
-            [leihs.procurement.resources.user :as user]
             [leihs.procurement.resources.viewers :as viewers]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
@@ -84,12 +84,12 @@
         categories (:input_data args)]
     (loop [[c & rest-cs] categories]
       (if-let [c-id (:id c)]
-        (do
-          (authorization/authorize-and-apply
-            #(viewers/update-viewers! tx c-id (:viewers c))
-            :any
-            [#(user/admin? tx auth-user) #(user/inspector? tx auth-user c-id)])
-          (recur rest-cs))
+        (do (authorization/authorize-and-apply
+              #(viewers/update-viewers! tx c-id (:viewers c))
+              :if-any
+              [#(user-perms/admin? tx auth-user)
+               #(user-perms/inspector? tx auth-user c-id)])
+            (recur rest-cs))
         (jdbc/query tx
                     (-> categories-base-query
                         (sql/merge-where [:in :procurement_categories.id

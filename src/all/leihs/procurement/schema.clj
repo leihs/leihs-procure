@@ -8,6 +8,7 @@
             [com.walmartlabs.lacinia.schema :as graphql-schema]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.env :as env]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.admins :as admins]
             [leihs.procurement.resources.building :as building]
             [leihs.procurement.resources.budget-limits :as budget-limits]
@@ -50,7 +51,7 @@
 (defn query-resolver-map
   []
   {:admins (-> admins/get-admins
-               (authorization/ensure-one-of [user/admin?])),
+               (authorization/ensure-one-of [user-perms/admin?])),
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,
    :budget-periods budget-periods/get-budget-periods,
@@ -86,17 +87,32 @@
 (defn mutation-resolver-map
   []
   {:update-admins (-> admins/update-admins!
-                      (authorization/ensure-one-of [user/admin?])),
+                      (authorization/ensure-one-of [user-perms/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!
-                              (authorization/ensure-one-of [user/admin?])),
+                              (authorization/ensure-one-of
+                                [user-perms/admin?])),
    :update-categories-viewers (-> categories/update-categories-viewers!
                                   (authorization/ensure-one-of
-                                    [user/admin? user/inspector?])),
+                                    [user-perms/admin? user-perms/inspector?])),
    :update-main-categories (-> main-categories/update-main-categories!
-                               (authorization/ensure-one-of [user/admin?])),
+                               (authorization/ensure-one-of
+                                 [user-perms/admin?])),
+   :update-request #((-> request/update-request!
+                         (authorization/ensure-one-of
+                           [user-perms/admin? user-perms/inspector?
+                            (fn [tx auth-user]
+                              (and (user-perms/requester? tx auth-user)
+                                   (user/requested? tx
+                                                    auth-user
+                                                    (-> %2
+                                                        :input_data
+                                                        :id))))]))
+                      %1
+                      %2
+                      %3),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
-         (authorization/ensure-one-of [user/admin?]))})
+         (authorization/ensure-one-of [user-perms/admin?]))})
 
 (defn- wrap-map-with-error
   [arg]

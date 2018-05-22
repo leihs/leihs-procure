@@ -11,7 +11,7 @@
 
 (defmacro thread-first-macro [f-app] (cons '-> (thread-first-h f-app)))
 
-(defn thread-first [form] (macroexpand-1 `(thread-first-macro ~form)))
+(defmacro thread-first [form] `(macroexpand-1 '(thread-first-macro ~form)))
 
 (defn thread-last-h
   ([f-app] (thread-last-h f-app []))
@@ -24,4 +24,4 @@
 
 (defmacro thread-last-macro [f-app] (cons '->> (thread-last-h f-app)))
 
-(defn thread-last [form] (macroexpand-1 `(thread-last-macro ~form)))
+(defmacro thread-last [form] `(macroexpand-1 '(thread-last-macro ~form)))

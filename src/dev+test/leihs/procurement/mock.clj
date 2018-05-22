@@ -11,5 +11,5 @@
                       (-> request
                           :headers
                           :Authorization))
-          user-auth-entity (u/get-user-by-id (:tx request) (log/spy user-id))]
+          user-auth-entity (u/get-user-by-id (:tx request) user-id)]
       (handler (assoc request :authenticated-entity user-auth-entity)))))
