@@ -88,33 +88,38 @@
       sql/format))
 
 (defn get-request
-  [tx auth-user id]
+  [tx id]
   (->> id
        request-base-query
        (jdbc/query tx)
-       first
-       (request-perms/apply-permissions tx auth-user)))
+       first))
 
 (defn update-request!
   [context args _]
-  (let [input-data (:input_data args)
-        req-id (:id input-data)
-        req-data (as-> input-data <>
-                   (merge <> {:priority_inspector (:inspector_priority <>)})
-                   (dissoc <> :priority_inspector)
-                   (dissoc <> :id))
-        ring-req (:request context)
+  (let [ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)]
+        auth-user (:authenticated-entity ring-req)
+        input-data (:input_data args)
+        req-id (:id input-data)
+        proc-request (get-request tx req-id)
+        write-data (as-> input-data <>
+                     (merge <> {:priority_inspector (:inspector_priority <>)})
+                     (dissoc <> :priority_inspector)
+                     (dissoc <> :id))]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/sset req-data)
+                          (sql/sset write-data)
                           (sql/where [:= :procurement_requests.id req-id])
                           sql/format))
       :if-only
-      #(request-perms/authorized-to-write-all-fields? tx auth-user req-data))
-    (get-request tx auth-user req-id)))
+      #(request-perms/authorized-to-write-all-fields? tx
+                                                      auth-user
+                                                      proc-request
+                                                      write-data))
+    (->> req-id
+         (get-request tx)
+         (request-perms/apply-permissions tx auth-user))))
 
 (defn requested-by?
   [tx request user]

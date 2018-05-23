@@ -54,8 +54,7 @@ describe 'request' do
                                   user_id: requester.id,
                                   category_id: category.id)
 
-      ['requester'].each do |user_name|
-      # ['admin', 'inspector', 'requester'].each do |user_name|
+      ['admin', 'inspector', 'requester'].each do |user_name|
         user = binding.local_variable_get(user_name)
 
         q = <<-GRAPHQL

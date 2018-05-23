@@ -2,7 +2,6 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.resources.request :as request]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.ds :as ds]))
 
@@ -12,7 +11,7 @@
                                                              (:budget_period_id
                                                                proc-request))
         request-without-template (not (:template_id proc-request))
-        requested-by-user (request/requested-by? tx proc-request user)
+        requested-by-user (user-perms/requester-of? tx user proc-request)
         user-is-requester (user-perms/requester? tx user)
         user-is-inspector (user-perms/inspector? tx user)
         user-is-admin (user-perms/admin? tx user)
