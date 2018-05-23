@@ -7,7 +7,7 @@
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.resources.supplier :as supplier]
-            [leihs.procurement.utils.ds :as ds]
+            [leihs.procurement.utils.ds :refer [get-ds]]
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [logbug.debug :as debug]))
@@ -41,6 +41,10 @@
 (defn add-priority-inspector
   [row]
   (assoc row :priority_inspector (:inspector_priority row)))
+
+(defn add-inspector-priority
+  [row]
+  (assoc row :inspector_priority (:priority_inspector row)))
 
 (defn embed-room
   [tx row]
@@ -80,19 +84,49 @@
         remap-priority
         remap-inspector-priority))
 
-(defn request-base-query
-  [id]
+(def request-base-query
   (-> (sql/select :procurement_requests.* [state-sql :state])
-      (sql/from :procurement_requests)
-      (sql/where [:= :procurement_requests.id id])
-      sql/format))
+      (sql/from :procurement_requests)))
 
-(defn get-request
+(defn get-request-by-id
   [tx id]
-  (->> id
-       request-base-query
-       (jdbc/query tx)
-       first))
+  (-> request-base-query
+      (sql/where [:= :procurement_requests.id id])
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
+(defn get-request-by-attrs
+  [tx attrs]
+  (-> request-base-query
+      (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
+; (get-request-by-attrs (get-ds) {:article_name "Mikrofonstative"})
+
+(defn create-request!
+  [context args _]
+  (let [input-data (:input_data args)
+        ring-req (:request context)
+        tx (:tx ring-req)
+        auth-user (:authenticated-entity ring-req)
+        write-data (or (and (:priority_inspector input-data)
+                            (-> input-data
+                                add-inspector-priority
+                                (dissoc :priority_inspector)))
+                       input-data)]
+    (authorization/authorize-and-apply
+      #(jdbc/execute! tx
+                      (-> (sql/insert-into :procurement_requests)
+                          (sql/values [input-data])
+                          sql/format))
+      :if-only
+      #(request-perms/authorized-to-write-all-fields? tx auth-user write-data))
+    (->> write-data
+         (get-request-by-attrs tx)
+         (request-perms/apply-permissions tx auth-user))))
 
 (defn update-request!
   [context args _]
@@ -101,11 +135,13 @@
         auth-user (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
-        proc-request (get-request tx req-id)
-        write-data (as-> input-data <>
-                     (merge <> {:priority_inspector (:inspector_priority <>)})
-                     (dissoc <> :priority_inspector)
-                     (dissoc <> :id))]
+        proc-request (get-request-by-id tx req-id)
+        write-data (let [input-data-without-id (dissoc input-data :id)]
+                     (or (and (:priority_inspector input-data-without-id)
+                              (-> input-data-without-id
+                                  add-inspector-priority
+                                  (dissoc :priority_inspector)))
+                         input-data-without-id))]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
@@ -118,18 +154,18 @@
                                                       proc-request
                                                       write-data))
     (->> req-id
-         (get-request tx)
+         (get-request-by-id tx)
          (request-perms/apply-permissions tx auth-user))))
 
 (defn requested-by?
   [tx request user]
   (= (:id user)
-     (->> request
-          :id
-          request-base-query
-          (jdbc/query tx)
-          first
-          :user_id)))
+     (-> request-base-query
+         (sql/merge-where [:= :procurement_requests.id (:id request)])
+         sql/format
+         (->> (jdbc/query tx))
+         first
+         :user_id)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

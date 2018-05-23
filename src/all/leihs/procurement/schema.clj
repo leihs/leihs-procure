@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io]
             [clj-logging-config.log4j :as logging-config]
             [clojure.edn :as edn]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
             [com.walmartlabs.lacinia.util :as graphql-util]
             [com.walmartlabs.lacinia.resolve :as graphql-resolve]
             [com.walmartlabs.lacinia.schema :as graphql-schema]
@@ -43,8 +43,8 @@
                  n (-> _e
                        .getClass
                        .getSimpleName)]
-             (logging/warn m)
-             (if (env/env #{:dev :test}) (logging/debug e))
+             (log/warn m)
+             (if (env/env #{:dev :test}) (log/debug e))
              (graphql-resolve/resolve-as value {:message m, :exception n}))))))
 
 ; a function for debugging convenience. will be a var later.
@@ -97,6 +97,10 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/ensure-one-of
                                  [user-perms/admin?])),
+   :create-request (-> request/create-request!
+                       (authorization/ensure-one-of [user-perms/admin?
+                                                     user-perms/inspector?
+                                                     user-perms/requester?])),
    :update-request
      #((-> request/update-request!
            (authorization/ensure-one-of
