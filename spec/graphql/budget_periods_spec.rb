@@ -70,14 +70,14 @@ describe 'budget periods' do
       result = query(@q, user.id)
 
       # sorted after `inspection_start_date DESC`
-      expect(result).to be == {
+      expect(result).to eq({
         'data' => {
           'budget_periods' => [
             { 'name' => 'new_bp' },
             { 'name' => 'bp_1_new_name' }
           ]
         }
-      }
+      })
 
       budget_periods_after = [
         { name: 'new_bp',

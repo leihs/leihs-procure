@@ -162,7 +162,7 @@ describe 'request' do
         GRAPHQL
 
         result = query(q, user.id)
-        expect(result).to be == {
+        expect(result).to eq({
           'data' => {
             'request' => {
               'id' => {
@@ -170,7 +170,7 @@ describe 'request' do
               }
             }
           }
-        }
+        })
         expect(request.reload.article_name).to be == user_name
       end
     end

@@ -113,14 +113,14 @@ describe 'categories viewers' do
 
       result = query(@q, User.find(firstname: 'inspector').id)
 
-      expect(result).to be == {
+      expect(result).to eq({
         'data' => {
           'categories_viewers' => [
             { 'id' => Category.find(name: 'cat_1').id },
             { 'id' => Category.find(name: 'cat_2').id }
           ]
         }
-      }
+      })
 
       categories_viewers_after = [
         { user: { firstname: 'user_1' }, category: { name: 'cat_1' } },

@@ -226,7 +226,7 @@ describe 'main categories' do
         FactoryBot.create(:admin, user_id: user.id)
         result = query(@q, user.id)
 
-        expect(result).to be == {
+        expect(result).to eq({
           'data' => {
             'main_categories' => [
               { 'name' => 'main_cat_1' },
@@ -234,7 +234,7 @@ describe 'main categories' do
               { 'name' => 'new_main_cat' }
             ]
           }
-        }
+        })
 
         #############################################################################
 

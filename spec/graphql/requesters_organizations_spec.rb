@@ -149,7 +149,7 @@ describe 'requesters organizations' do
 
       result = query(@q, user.id)
 
-      expect(result).to be == {
+      expect(result).to eq({
         'data' => {
           'requesters_organizations' => [
             { 'user' => { 'id' => "#{User.find(firstname: 'user_2').id}" },
@@ -173,7 +173,7 @@ describe 'requesters organizations' do
               'department' => { 'name' => 'dep_V' }}
           ]
         }
-      }
+      })
 
       #############################################################################
 

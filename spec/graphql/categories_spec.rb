@@ -22,14 +22,14 @@ describe 'categories' do
             }
           GRAPHQL
           result = query(q, user.id)
-          expect(result).to be == {
+          expect(result).to eq({
             'data' => {
               'categories' => [
                 { 'id' => cat.id,
                   'can_delete' => false }
               ]
             }
-          }
+          })
         end
 
         it 'false if referenced by templates' do
@@ -48,14 +48,14 @@ describe 'categories' do
             }
           GRAPHQL
           result = query(q, user.id)
-          expect(result).to be == {
-            'data' => {
+          expect(result).to eq({
+            'datas' => {
               'categories' => [
                 { 'id' => cat.id,
                   'can_delete' => false }
               ]
             }
-          }
+          })
         end
       end
     end

@@ -90,14 +90,14 @@ describe 'admins' do
 
       result = query(q, User.find(firstname: 'admin_2').id)
 
-      expect(result).to be == {
+      expect(result).to eq({
         'data' => {
           'admins' => [
             { 'id' => "#{User.find(firstname: 'admin_2').id}" },
             { 'id' => "#{User.find(firstname: 'user_1').id}" },
           ]
         }
-      }
+      })
 
       #############################################################################
 

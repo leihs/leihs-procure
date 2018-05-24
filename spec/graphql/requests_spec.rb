@@ -17,7 +17,7 @@ describe 'requests' do
       }
     GRAPHQL
     result = query(q, user.id)
-    expect(result).to be == {
+    expect(result).to eq({
       'data' => {
         'requests' => [
           { 'id' => {
@@ -26,6 +26,6 @@ describe 'requests' do
           }
         ]
       }
-    }
+    })
   end
 end
