@@ -15,7 +15,8 @@
             [clojure.tools.logging :as logging]
             [logbug.catcher :as catcher]
             [logbug.debug :as debug]
-            [logbug.thrown :as thrown]))
+            [logbug.thrown :as thrown]
+            [clj-pid.core :as pid]))
 
 (def defaults
   {:leihs-http-base-url "http://localhost:3211",
@@ -23,18 +24,26 @@
    :leihs-database-url
      "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"})
 
+(defn handle-pidfile
+  []
+  (let [pid-file "./tmp/server_pid"]
+    (.mkdirs (java.io.File. "./tmp"))
+    (pid/save pid-file)
+    (pid/delete-on-shutdown! pid-file)))
+
 (defn run
   [options]
-  (catcher/snatch
-    {:return-fn (fn [e] (System/exit -1))}
-    (logging/info "Invoking run with options: " options)
-    (when (nil? (:secret options))
-      (throw (IllegalStateException.
-               "LEIHS_SECRET resp. secret must be present!")))
-    (let [ds (ds/init (:database-url options)) secret
-          (-> options
-              :secret) app-handler (routes/init secret) http-server
-          (http-server/start (:http-base-url options) app-handler)])))
+  (catcher/snatch {:return-fn (fn [e] (System/exit -1))}
+                  (logging/info "Invoking run with options: " options)
+                  (when (nil? (:secret options))
+                    (throw (IllegalStateException.
+                             "LEIHS_SECRET resp. secret must be present!")))
+                  (let
+                    [ds (ds/init (:database-url options)) secret
+                     (-> options
+                         :secret) app-handler (routes/init secret) http-server
+                     (http-server/start (:http-base-url options) app-handler)])
+                  (handle-pidfile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
