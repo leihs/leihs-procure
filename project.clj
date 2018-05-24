@@ -41,7 +41,9 @@
   :target-path "target/%s"
   :main leihs.procurement.backend.main
   :profiles {:dev [:project/dev :profiles/dev],
-             :test [:project/test :profiles/test],
+             ;; including :base
+             ;; (https://github.com/technomancy/leiningen/issues/1329)
+             :test [:base :project/test :profiles/test],
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj
