@@ -2,7 +2,7 @@
 
 WIP
 
-## for devs
+## For devs
 
 1. clone this repo
 2. copy `profiles_template.clj` to `profiles.clj`
@@ -13,7 +13,14 @@ WIP
 You can mock the authenticated user by setting request's header: `Authorization: user_id` for POST or
 `user_id` query param for GET requests.
 
-### for running tests locally
+### Let changes apply on next http request
+
+1. There is a ring middleware which is active with `dev` and `test` profiles. It reloads the code in the changed files. However, this applies only to definitions outside of the main ring handler function. 
+2. If you change something on a middleware, then normally rerun of `(-main "run")` is necessary, which among others also recreates the main ring handler function along with the implied middlewares. Precondition is that you have `lein repl` running.
+3. Depending on the whole project setup, sometimes a restart of the lein process (`repl` or `run`) is necessary.
+4. As a last resort one can also try `lein clean`.
+
+### Running tests locally
 
 1. run the server by `lein with-profile test run "run"`
 2. bundle exec rspec path-to-file
