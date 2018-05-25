@@ -327,7 +327,7 @@ export class ButtonRadio extends React.PureComponent {
                     })
                   }}
                   className="sr-only"
-                  autoComplete="off"
+                  autoComplete="off-even-in-chrome"
                 />
                 {withIcons &&
                   (isSelected ? (
