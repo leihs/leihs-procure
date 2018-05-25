@@ -10,7 +10,6 @@ import { apolloClient } from './apollo-client'
 // webpack: inject styles
 import './styles/index.css'
 
-// import registerServiceWorker from './registerServiceWorker'
 import App from './components/App'
 
 // no router, just 1 page:
@@ -33,8 +32,6 @@ const Root = () => (
   </ApolloProvider>
 )
 ReactDOM.render(<Root />, document.getElementById('root'))
-
-// registerServiceWorker() // not yet…
 
 // dev helpers
 window.f = f
