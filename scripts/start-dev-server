@@ -1,8 +1,12 @@
 #!/bin/sh
 
-echo 'starting dev server with following config'
-echo ' - - - 8< - - - '
-cat ./profiles.clj
-echo ' - - - 8< - - - '
+# NOTE: profiles.cljs config broken for some reason, using ENV for now
+# echo 'starting dev server with following config'
+# echo ' - - - 8< - - - '
+# cat ./profiles.clj
+# echo ' - - - 8< - - - '
+
+export LEIHS_HTTP_BASE_URL="http://localhost:3003"
+export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_procure2?max-pool-size=5"
 
 lein with-profile dev run "run"

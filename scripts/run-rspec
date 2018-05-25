@@ -5,11 +5,12 @@ source ./scripts/.helpers.sh
 
 SPEC_FILE="$1"
 
-# run server
+# config server
 export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
+export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_test_procure2?max-pool-size=5"
 
 # run server & wait
-lein with-profile specs run "run" &
+lein with-profile test run "run" &
 until curl -s "${LEIHS_HTTP_BASE_URL}/procure/status"; do sleep 1 ;done
 
 # run test

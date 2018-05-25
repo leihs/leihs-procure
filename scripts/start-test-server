@@ -1,5 +1,9 @@
 #!/bin/sh -eu
 source ./scripts/.helpers.sh
 
+# NOTE: profiles.cljs config broken for some reason, using ENV for now
+export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_test_procure2?max-pool-size=5"
+# auto find some open port
 export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
+
 lein with-profile specs run "run"
