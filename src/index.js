@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom'
 import f from 'lodash'
 import { Switch, Route } from 'react-router-dom'
 import { BrowserRouter } from 'react-router-dom'
-import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
+
+import { apolloClient } from './apollo-client'
 
 // webpack: inject styles
 import './styles/index.css'
@@ -16,12 +17,8 @@ import App from './components/App'
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
 
-const client = new ApolloClient({
-  uri: '/procure/graphql'
-})
-
 const Root = () => (
-  <ApolloProvider client={client}>
+  <ApolloProvider client={apolloClient}>
     <BrowserRouter>
       {/* <React.StrictMode> */}
       <App>
