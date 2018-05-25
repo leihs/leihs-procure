@@ -1,4 +1,5 @@
 import React, { Fragment as F } from 'react'
+import PropTypes from 'prop-types'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -39,6 +40,9 @@ const Node = ({ tag = 'div', ...props }) => {
   const [bsClasses, restProps] = bsSizeUtils(props)
   return <Tag {...restProps} className={bsClasses} />
 }
+Node.propTypes = {
+  tag: PropTypes.string
+}
 
 export const Div = props => Node(props)
 export const Pre = props => Node({ ...props, tag: 'span' })
@@ -74,6 +78,10 @@ export const Col = ({ order, cls, ...props }) => {
 export const Button = ({ flat, className, ...props }) => (
   <BsButton {...props} className={cx(className, { 'btn-flat': flat })} />
 )
+Button.propTypes = {
+  className: PropTypes.string,
+  flat: PropTypes.bool
+}
 
 export const Badge = props => {
   const restProps = f.omit(props, BOOTSTRAP_MODIFIERS)
@@ -81,6 +89,9 @@ export const Badge = props => {
     f.first(f.intersection(f.keys(props), BOOTSTRAP_MODIFIERS)) ||
     BOOTSTRAP_MODIFIERS[0]
   return <Span {...restProps} cls={[props.cls, 'badge', `badge-${mod}`]} />
+}
+Badge.propTypes = {
+  cls: PropTypes.any // todo: classnames.proptypes
 }
 
 // FIXME: separate FormGroup/FormField again.
@@ -124,22 +135,46 @@ export const FormGroup = ({
     </Node>
   )
 }
+FormGroup.propTypes = {
+  id: PropTypes.string,
+  label: PropTypes.node,
+  hideLabel: PropTypes.bool,
+  labelSmall: PropTypes.node,
+  helpText: PropTypes.node,
+  children: PropTypes.node
+}
 
 export const InputText = props => (
   <ControlledInput {...props}>
     {inputProps => (
       <Node
-        tag="input"
+        autoComplete="off-even-in-chrome"
         {...inputProps}
         type="text"
+        tag="input"
         cls={['form-control', inputProps.cls]}
       />
     )}
   </ControlledInput>
 )
 
+const FormFieldPropTypes = {
+  beforeInput: PropTypes.node,
+  afterInput: PropTypes.node,
+  helpText: PropTypes.node,
+  id: PropTypes.string,
+  children: PropTypes.null,
+  label: PropTypes.node.isRequired,
+  hideLabel: PropTypes.bool,
+  labelSmall: PropTypes.node,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  type: PropTypes.string, // enum, already checked at runtime
+  value: PropTypes.string
+}
 export const FormField = ({
   beforeInput,
+  afterInput,
   helpText,
   id,
   children,
@@ -160,11 +195,16 @@ export const FormField = ({
     'number-integer',
     'checkbox'
   ]
-  let tag = 'input'
+  if (children) {
+    throw new Error('`children` not supported! Use `FormGroup` instead.')
+  }
+
   if (!f.includes(supportedTypes, type)) {
     throw new Error('Unsupported Input Type!')
   }
 
+  let tag = 'input'
+  let mainClass = 'form-control'
   if (!id) id = name
   if (!name) name = id
 
@@ -186,32 +226,25 @@ export const FormField = ({
     }
   }
 
-  const inputNode =
-    // if a node was given as children, use it.
-    // if it is an input node, merge in extra props
-    // – this is important in case `value` and `onChange` are only given to parent.
-    React.isValidElement(children) ? (
-      f.includes(children.type, ['input', 'textarea']) ? (
-        React.cloneElement(children, inputProps, children.children || value)
-      ) : (
-        children
-      )
-    ) : type === 'text-static' ? (
-      <Span cls="form-control-plaintext">{value}</Span>
-    ) : (
-      <Node
-        tag={tag}
-        autoComplete="off"
-        {...inputProps}
-        type={type}
-        id={id}
-        name={name}
-        value={value}
-        placeholder={placeholder}
-        aria-describedby={helpText ? `${id}--Help` : null}
-        className="form-control"
-      />
-    )
+  if (type === 'text-static') {
+    tag = 'span'
+    mainClass = 'form-control-plaintext'
+  }
+
+  const inputNode = (
+    <Node
+      tag={tag}
+      cls={mainClass}
+      type={type}
+      {...inputProps}
+      id={id}
+      name={name}
+      value={value}
+      placeholder={placeholder}
+      autoComplete="off-even-in-chrome"
+      aria-describedby={helpText ? `${id}--Help` : null}
+    />
+  )
 
   return (
     <FormGroup
@@ -222,9 +255,11 @@ export const FormField = ({
     >
       {beforeInput}
       {inputNode}
+      {afterInput}
     </FormGroup>
   )
 }
+FormField.propTypes = FormFieldPropTypes
 
 // like bootstrap docs
 // export const FilePicker = ({ id, name }) => (
@@ -244,6 +279,11 @@ export const FilePicker = ({ id, name, label }) => (
     </label>
   </div>
 )
+FilePicker.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string,
+  label: PropTypes.node
+}
 
 export const Select = ({
   options,
@@ -260,6 +300,17 @@ export const Select = ({
       ))}
     </Node>
   )
+}
+Select.propTypes = {
+  id: PropTypes.string,
+  options: PropTypes.arrayOf(PropTypes.string),
+  emptyOption: PropTypes.oneOf([
+    false,
+    PropTypes.shape({
+      children: PropTypes.string.isRequired,
+      value: PropTypes.string
+    })
+  ])
 }
 
 // TODO: responsive when long labels (e.g. btn-group-vertical)

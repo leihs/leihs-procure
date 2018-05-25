@@ -72,6 +72,16 @@
         "error"
       ],
       "react/prop-types": "off"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/components/Bootstrap.js"
+        ],
+        "rules": {
+          "react/prop-types": "error"
+        }
+      }
+    ]
   }
 }
