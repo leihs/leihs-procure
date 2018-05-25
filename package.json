@@ -29,12 +29,15 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "lint": "eslint --fix src/{,**/}*.js",
-    "ci:lint": "eslint src/{,**/}*.js",
+    "lint": "eslint --fix src/{,**/}*.js{x,on}",
+    "ci:lint": "eslint src/{,**/}*.js{x,on}",
     "test": "react-scripts test --env=jsdom"
   },
   "proxy": {
     "/graphql": {
+      "target": "http://localhost:3003"
+    },
+    "/images": {
       "target": "http://localhost:3003"
     }
   },

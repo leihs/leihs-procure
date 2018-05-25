@@ -12,7 +12,7 @@ import './styles/index.css'
 
 import App from './components/App'
 
-// no router, just 1 page:
+// all the pages
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
@@ -20,7 +20,6 @@ import AdminCategories from './pages/AdminCategoriesPage'
 const Root = () => (
   <ApolloProvider client={apolloClient}>
     <BrowserRouter>
-      {/* <React.StrictMode> */}
       <App>
         <Switch>
           <Route exact path="/" component={RequestsIndex} />
@@ -29,7 +28,6 @@ const Root = () => (
           <Route component={() => '404'} />
         </Switch>
       </App>
-      {/* </React.StrictMode> */}
     </BrowserRouter>
   </ApolloProvider>
 )

@@ -1,3 +1,9 @@
+TODO:
+
+* categories page, only render 1 cat per sub-route
+
+---
+
 dirs
 
 ```
