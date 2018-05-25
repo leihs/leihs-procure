@@ -86,7 +86,21 @@
 
 (defn mutation-resolver-map
   []
-  {:update-admins (-> admins/update-admins!
+  {:create-request (-> request/create-request!
+                       (authorization/ensure-one-of [user-perms/admin?
+                                                     user-perms/inspector?
+                                                     user-perms/requester?])),
+   :delete-request
+     #((-> request/delete-request!
+           (authorization/ensure-one-of
+             [user-perms/admin? user-perms/inspector?
+              (fn [tx auth-user]
+                (and (user-perms/requester? tx auth-user)
+                     (request/requested-by? tx (:input_data %2) auth-user)))]))
+        %1
+        %2
+        %3),
+   :update-admins (-> admins/update-admins!
                       (authorization/ensure-one-of [user-perms/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!
                               (authorization/ensure-one-of
@@ -97,10 +111,6 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/ensure-one-of
                                  [user-perms/admin?])),
-   :create-request (-> request/create-request!
-                       (authorization/ensure-one-of [user-perms/admin?
-                                                     user-perms/inspector?
-                                                     user-perms/requester?])),
    :update-request
      #((-> request/update-request!
            (authorization/ensure-one-of

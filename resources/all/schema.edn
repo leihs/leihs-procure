@@ -15,6 +15,7 @@
                              :viewers {:type (list ID)}}},
     :CategoryViewersInput {:fields {:id {:type (non-null ID)},
                                     :viewers {:type (list ID)}}},
+    :DeleteRequestInput {:fields {:id {:type (non-null ID)}}},
     :MainCategoryInput {:fields {:budget_limits {:type (list
                                                          :BudgetLimitInput)},
                                  :categories {:type (list :CategoryInput)},
@@ -86,6 +87,9 @@
                                                      :CategoryViewersInput)}},
                          :resolve :update-categories-viewers,
                          :type (list :Category)},
+    :delete_request {:args {:input_data {:type :DeleteRequestInput}},
+                     :resolve :delete-request,
+                     :type Boolean},
     :main_categories {:args {:input_data {:type (list :MainCategoryInput)}},
                       :resolve :update-main-categories,
                       :type (list :MainCategory)},

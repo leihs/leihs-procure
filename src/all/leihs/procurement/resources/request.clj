@@ -104,8 +104,6 @@
       (->> (jdbc/query tx))
       first))
 
-; (get-request-by-attrs (get-ds) {:article_name "Mikrofonstative"})
-
 (defn create-request!
   [context args _]
   (let [input-data (:input_data args)
@@ -156,6 +154,20 @@
     (->> req-id
          (get-request-by-id tx)
          (request-perms/apply-permissions tx auth-user))))
+
+(defn delete-request!
+  [context args _]
+  (let [result (jdbc/execute! (-> context
+                                  :request
+                                  :tx)
+                              (-> (sql/delete-from :procurement_requests)
+                                  (sql/where [:= :procurement_requests.id
+                                              (-> args
+                                                  :input_data
+                                                  :id
+                                                  log/spy)])
+                                  sql/format))]
+    (= result '(1))))
 
 (defn requested-by?
   [tx request user]
