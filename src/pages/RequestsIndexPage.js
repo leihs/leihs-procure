@@ -49,10 +49,12 @@ const REQUESTS_QUERY = gql`
       category_id: $categories
       organization_id: $organizations
     ) {
-      ...RequestFieldsForIndex
+      ...RequestFieldsForShow
+      # ...RequestFieldsForIndex
     }
   }
-  ${Fragments.RequestFieldsForIndex}
+  ${Fragments.RequestFieldsForShow}
+  #${Fragments.RequestFieldsForIndex}
 `
 
 class RequestsIndexPage extends React.Component {

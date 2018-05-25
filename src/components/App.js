@@ -28,7 +28,7 @@ const Navbar = () => (
     </span>
     <div className="navbar-nav">
       <Link className="nav-link" to="/">
-        home
+        requests
       </Link>
       <span className="navbar-text">admin</span>
       <Link className="nav-link" to="/admin/users">
