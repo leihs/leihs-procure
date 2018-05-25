@@ -22,16 +22,22 @@ const Brand = () => (
 )
 
 const Navbar = () => (
-  <nav className="navbar navbar-dark bg-dark">
+  <nav className="navbar navbar-dark bg-dark navbar-expand-sm">
     <span className="navbar-brand h1 mb-0" href="#">
       <Brand />
-      <Link to="/" className="">
+    </span>
+    <div className="navbar-nav">
+      <Link className="nav-link" to="/">
         home
       </Link>
-      <Link to="/admin/users" className="">
-        admin
+      <span className="navbar-text">admin</span>
+      <Link className="nav-link" to="/admin/users">
+        users
       </Link>
-    </span>
+      <Link className="nav-link" to="/admin/categories">
+        categories
+      </Link>
+    </div>
   </nav>
 )
 

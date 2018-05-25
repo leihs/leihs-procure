@@ -150,8 +150,8 @@ export const InputText = props => (
       <Node
         autoComplete="off-even-in-chrome"
         {...inputProps}
-        type="text"
         tag="input"
+        type="text"
         cls={['form-control', inputProps.cls]}
       />
     )}
@@ -163,7 +163,7 @@ const FormFieldPropTypes = {
   afterInput: PropTypes.node,
   helpText: PropTypes.node,
   id: PropTypes.string,
-  children: PropTypes.null,
+  children: PropTypes.oneOf([null, undefined]),
   label: PropTypes.node.isRequired,
   hideLabel: PropTypes.bool,
   labelSmall: PropTypes.node,
@@ -239,7 +239,7 @@ export const FormField = ({
       {...inputProps}
       id={id}
       name={name}
-      value={value}
+      value={value === null ? '' : value}
       placeholder={placeholder}
       autoComplete="off-even-in-chrome"
       aria-describedby={helpText ? `${id}--Help` : null}

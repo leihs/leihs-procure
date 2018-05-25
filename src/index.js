@@ -15,6 +15,7 @@ import App from './components/App'
 // no router, just 1 page:
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
+import AdminCategories from './pages/AdminCategoriesPage'
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>
@@ -24,6 +25,7 @@ const Root = () => (
         <Switch>
           <Route exact path="/" component={RequestsIndex} />
           <Route exact path="/admin/users" component={AdminUsers} />
+          <Route exact path="/admin/categories" component={AdminCategories} />
           <Route component={() => '404'} />
         </Switch>
       </App>

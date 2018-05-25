@@ -44,3 +44,22 @@ export const RequestFieldsForShow = gql`
   }
   ${RequestFieldsForIndex}
 `
+
+export const RequesterOrg = gql`
+  fragment RequesterOrg on RequesterOrganization {
+    id
+    user {
+      id
+      firstname
+      lastname
+    }
+    organization {
+      id
+      name
+    }
+    department {
+      id
+      name
+    }
+  }
+`

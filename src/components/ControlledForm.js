@@ -4,7 +4,7 @@ import f from 'lodash'
 import fpSet from 'lodash/fp/set'
 // import qs from 'qs'
 import logger from 'debug'
-const log = logger('app:ControlledForm')
+const log = logger('app:ui:ControlledForm')
 
 // deal with differences in finding the
 // current value of input fields
@@ -41,9 +41,10 @@ export default class ControlledForm extends React.Component {
     this.updateField = this.updateField.bind(this)
   }
 
+  // if new values given via props, reset internal fields state
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.values === prevState.fields) return null
-    return { fields: { ...prevState.fields, ...nextProps.values } }
+    return { fields: nextProps.values }
   }
 
   handleInputChange(event) {
@@ -97,7 +98,7 @@ export default class ControlledForm extends React.Component {
 export class ControlledInput extends React.PureComponent {
   static defaultProps = { value: '', onChange: () => {} }
   static propTypes = {
-    value: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onChange: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired
   }
