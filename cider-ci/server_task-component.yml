@@ -27,7 +27,7 @@ scripts:
 
   shutdown-server:
     body: |
-      ./dev/kill-server.sh
+      ./scripts/kill-server
     start_when:
       test is terminal:
         script_key: test

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo 'starting dev server with following config'
+echo ' - - - 8< - - - '
+cat ./profiles.clj
+echo ' - - - 8< - - - '
+
+lein with-profile dev run "run"

@@ -1,5 +1,5 @@
 #!/bin/sh -eu
-source ./dev/.helpers.sh
+source ./scripts/.helpers.sh
 
 # locally run 1 or more specs with rspec, wrapped to work like in rails
 
