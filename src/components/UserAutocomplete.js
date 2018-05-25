@@ -5,8 +5,13 @@ import { DisplayName } from './decorators'
 import InlineSearch from './InlineSearch'
 
 const SEARCH_USERS_QUERY = gql`
-  query searchUsers($searchTerm: String!, $excludeIds: [ID]) {
-    users(search_term: $searchTerm, limit: 25, exclude_ids: $excludeIds) {
+  query searchUsers($searchTerm: String! = "", $excludeIds: [ID]) {
+    users(
+      search_term: $searchTerm
+      limit: 25
+      offset: 0
+      exclude_ids: $excludeIds
+    ) {
       id
       firstname
       lastname

@@ -1,10 +1,12 @@
 import React from 'react'
+import cx from 'classnames'
 import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import t from '../locale/translate'
+import * as fragments from '../queries/fragments'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -12,11 +14,11 @@ import {
   Col,
   Button,
   FormGroup,
-  FormField,
   InputText
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
+import { ErrorPanel } from '../components/Error'
 import ControlledForm from '../components/ControlledForm'
 import UserAutocomplete from '../components/UserAutocomplete'
 
@@ -28,26 +30,7 @@ const mutationErrorHandler = err => {
 
 // # DATA
 //
-const FRAGMENTS = gql`
-  fragment RequesterOrg on RequesterOrganization {
-    id
-    user {
-      id
-      firstname
-      lastname
-    }
-    organization {
-      id
-      name
-    }
-    department {
-      id
-      name
-    }
-  }
-`
-
-const ADMIN_USERS_QUERY = gql`
+const ADMIN_USERS_PAGE_QUERY = gql`
   query AdminUsersPage {
     admins {
       id
@@ -58,7 +41,7 @@ const ADMIN_USERS_QUERY = gql`
       ...RequesterOrg
     }
   }
-  ${FRAGMENTS}
+  ${fragments.RequesterOrg}
 `
 
 const UPDATE_ADMINS_MUTATION = gql`
@@ -79,58 +62,86 @@ const UPDATE_REQUESTERS_MUTATION = gql`
       ...RequesterOrg
     }
   }
-  ${FRAGMENTS}
+  ${fragments.RequesterOrg}
 `
 
 // # PAGE
 //
 const AdminUsersPage = () => (
-  <Query query={ADMIN_USERS_QUERY}>
+  <Query query={ADMIN_USERS_PAGE_QUERY}>
     {({ loading, error, data }) => {
       if (loading) return <p>Loading...</p>
-      if (error)
-        return (
-          <p>
-            Error :( <code>{error.toString()}</code>
-          </p>
-        )
+      if (error) return <ErrorPanel error={error} />
 
-      return (
-        <Mutation
-          mutation={UPDATE_ADMINS_MUTATION}
-          onError={mutationErrorHandler}
-          update={(cache, { data: { admins } }) => {
+      // actions for admins list
+      const updateAdmins = {
+        mutation: {
+          mutation: UPDATE_ADMINS_MUTATION,
+          onError: mutationErrorHandler,
+          update: (cache, { data: { admins } }) => {
             // update the internal cache with the new data we received.
             // manual because apollo can't know by itself that the
             // mutation returns the same list as our query.
-            cache.writeQuery({ query: ADMIN_USERS_QUERY, data: { admins } })
-          }}
-        >
-          {(updateAdmins, updatingInfo) => (
-            <AdminUsers
-              data={data}
-              updatingInfo={updatingInfo}
-              doRemoveAdmin={({ id }) => {
-                updateAdmins({
-                  variables: {
-                    adminUserList: data.admins
-                      .filter(u => id !== u.id)
-                      .map(({ id }) => ({ user_id: id }))
-                  }
-                })
-              }}
-              doAddAdmin={id => {
-                updateAdmins({
-                  variables: {
-                    adminUserList: data.admins
-                      .concat([{ id }])
-                      .map(({ id }) => ({ user_id: id }))
-                  }
-                })
-              }}
-            />
-          )}
-        </Mutation>
+            cache.writeQuery({
+              query: ADMIN_USERS_PAGE_QUERY,
+              data: { ...data, admins }
+            })
+          }
+        },
+        doRemoveAdmin: (mutate, { id }) => {
+          mutate({
+            variables: {
+              adminUserList: data.admins
+                .filter(u => id !== u.id)
+                .map(({ id }) => ({ user_id: id }))
+            }
+          })
+        },
+        doAddAdmin: (mutate, id) => {
+          mutate({
+            variables: {
+              adminUserList: data.admins
+                .concat([{ id }])
+                .map(({ id }) => ({ user_id: id }))
+            }
+          })
+        }
+      }
+
+      // actions for requester/orgs list
+      const updateRequestersOrgs = {
+        mutation: {
+          mutation: UPDATE_REQUESTERS_MUTATION,
+          onError: mutationErrorHandler,
+          update: (cache, { data: { requesters_organizations } }) => {
+            console.log({old: data, new: { ...data, requesters_organizations }, requesters_organizations});
+            cache.writeQuery({
+              query: ADMIN_USERS_PAGE_QUERY,
+              data: { ...data, requesters_organizations }
+            })
+          }
+        },
+        doUpdate: (mutate, fields) => {
+          const data = f
+            .toArray(fields)
+            .filter(f => !f.toDelete)
+            .map(f => ({
+              user_id: f.user.id,
+              department: f.department.name,
+              organization: f.organization.name
+            }))
+          mutate({
+            variables: { requestersOrgsList: data }
+          })
+        }
+      }
+
+      return (
+        <AdminUsers
+          data={data}
+          updateAdmins={updateAdmins}
+          updateRequestersOrgs={updateRequestersOrgs}
+        />
       )
     }}
   </Query>
@@ -140,81 +151,81 @@ export default AdminUsersPage
 
 // # VIEW PARTIALS
 //
-const AdminUsers = ({ data, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
+const AdminUsers = ({ data, updateAdmins, updateRequestersOrgs }) => (
   <MainWithSidebar>
     <h2>Users</h2>
 
     <h5 className="pt-4">Procurement Admins</h5>
-    <ListOfAdmins
-      admins={data.admins}
-      doRemoveAdmin={doRemoveAdmin}
-      doAddAdmin={doAddAdmin}
-      updatingInfo={updatingInfo}
-    />
+    <ListOfAdmins admins={data.admins} updateAdmins={updateAdmins} />
 
     <h3 className="pt-4">Requesters</h3>
-    <ListOfRequestersAndOrgs requesters={data.requesters_organizations} />
+    <ListOfRequestersAndOrgs
+      requesters={data.requesters_organizations}
+      updateRequestersOrgs={updateRequestersOrgs}
+    />
   </MainWithSidebar>
 )
 
-const ListOfAdmins = ({ admins, doRemoveAdmin, doAddAdmin, updatingInfo }) => (
-  <Row cls="mt-2">
-    <Col sm="6">
-      <FormField label="current admins">
-        <ul className="list-group list-group-compact">
-          {admins.map(user => (
-            <li
-              key={user.id}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <span>
-                <Icon.User spaced className="mr-1" /> {DisplayName(user)}
-              </span>
-              <Button
-                title="remove as admin"
-                color="link"
-                outline
-                flat
-                size="sm"
-                disabled={updatingInfo.loading}
-                onClick={() => doRemoveAdmin({ id: user.id })}
-              >
-                <Icon.Cross />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </FormField>
-    </Col>
-    <Col sm="6">
-      <FormField label="add new admin">
-        <UserAutocomplete
-          excludeIds={f.isEmpty(admins) ? null : admins.map(({ id }) => id)}
-          onSelect={user => doAddAdmin(user.id)}
-        />
-      </FormField>
-    </Col>
-  </Row>
+const ListOfAdmins = ({ admins, updateAdmins }) => (
+  <Mutation {...updateAdmins.mutation}>
+    {(mutate, { loading }) => (
+      <div className="form-shade-wrapper">
+        <div className={cx('form-shade', { 'form-shade-blocked': loading })} />
+        <Row cls="mt-2">
+          <Col sm="6">
+            <FormGroup label="current admins">
+              <ul className="list-group list-group-compact">
+                {admins.map(user => (
+                  <li
+                    key={user.id}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span>
+                      <Icon.User spaced className="mr-1" /> {DisplayName(user)}
+                    </span>
+                    <Button
+                      title="remove as admin"
+                      color="link"
+                      outline
+                      flat
+                      size="sm"
+                      disabled={loading}
+                      onClick={() =>
+                        updateAdmins.doRemoveAdmin(mutate, { id: user.id })
+                      }
+                    >
+                      <Icon.Cross />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </FormGroup>
+          </Col>
+          <Col sm="6">
+            <FormGroup label="add new admin">
+              <UserAutocomplete
+                excludeIds={
+                  f.isEmpty(admins) ? null : admins.map(({ id }) => id)
+                }
+                onSelect={user => updateAdmins.doAddAdmin(mutate, user.id)}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+      </div>
+    )}
+  </Mutation>
 )
 
-// NOTE: Query+Mutation+Form could be combined into component
-const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
-  <Mutation
-    mutation={UPDATE_REQUESTERS_MUTATION}
-    onError={mutationErrorHandler}
-    update={(cache, { data: { requesters_organizations } }) => {
-      // update the internal cache with the new data we received.
-      // manual because apollo can't know by itself that the
-      // mutation returns the same list as our query.
-      cache.writeQuery({
-        query: ADMIN_USERS_QUERY,
-        data: { requesters_organizations }
-      })
-    }}
-  >
-    {(updateRequestersOrgs, updatingInfo) => (
-      <Div cls="mt-2">
-        <Row form cls="d-none d-sm-flex pb-2">
+const ListOfRequestersAndOrgs = ({
+  requesters,
+  id = 'requesters_orgs',
+  updateRequestersOrgs
+}) => (
+  <Mutation {...updateRequestersOrgs.mutation}>
+    {(mutate, updatingInfo) => (
+      <Div cls="mt-2 form-group-lines">
+        <Row form cls="d-none d-sm-flex">
           <Col>
             <b>Name</b>
           </Col>
@@ -224,7 +235,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
           <Col>
             <b>Organisation</b>
           </Col>
-          <Col sm="1" />
+          <Col sm="2" />
         </Row>
 
         <ControlledForm
@@ -236,16 +247,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                 id={id}
                 onSubmit={e => {
                   e.preventDefault()
-                  const data = f.toArray(fields).map(f => ({
-                    user_id: f.user.id,
-                    department: f.department.name,
-                    organization: f.organization.name
-                  }))
-                  // eslint-disable-next-line no-console
-                  console.log({ fields, data })
-                  updateRequestersOrgs({
-                    variables: { requestersOrgsList: data }
-                  })
+                  updateRequestersOrgs.doUpdate(mutate, fields)
                 }}
               >
                 {f
@@ -258,11 +260,14 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                       <Row
                         form
                         key={id || n}
-                        cls={{
-                          'text-strike': toDelete,
-                          // new lines should show form validation styles
-                          'was-validated': !id
-                        }}
+                        cls={[
+                          'rounded',
+                          {
+                            'text-strike bg-danger-light': toDelete,
+                            // new lines are marked and should show form validation styles
+                            'was-validated bg-info-light': !id
+                          }
+                        ]}
                       >
                         <Col sm>
                           <FormGroup label={'user'} hideLabel>
@@ -272,7 +277,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                             <InputText
                               readOnly
                               required
-                              cls={toDelete ? 'bg-danger' : 'bg-light'}
+                              cls="bg-light"
                               value={DisplayName(user)}
                             />
                           </FormGroup>
@@ -282,7 +287,6 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                             <InputText
                               readOnly={toDelete}
                               required
-                              cls={toDelete && 'bg-danger'}
                               value={department && department.name}
                               onChange={e => {
                                 setValue(`${n}.department.name`, e.target.value)
@@ -295,7 +299,6 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                             <InputText
                               readOnly={toDelete}
                               required
-                              cls={toDelete && 'bg-danger'}
                               value={organization && organization.name}
                               onChange={e => {
                                 setValue(`${n}.organization`, {
@@ -305,7 +308,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                             />
                           </FormGroup>
                         </Col>
-                        <Col sm="1">
+                        <Col sm="2">
                           <FormGroup>
                             <div className="form-check mt-2">
                               <label className="form-check-label">
@@ -329,7 +332,7 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                     )
                   )}
 
-                <FormField label="add new requester" cls="mt-2">
+                <FormGroup label="add new requester" cls="mt-2">
                   <Row form>
                     <Col>
                       <UserAutocomplete
@@ -345,9 +348,9 @@ const ListOfRequestersAndOrgs = ({ requesters, id = 'requesters_orgs' }) => (
                     <Col>
                       {/* <FormField label={'organization'} hideLabel /> */}
                     </Col>
-                    <Col sm="1" />
+                    <Col sm="2" />
                   </Row>
-                </FormField>
+                </FormGroup>
 
                 <button type="submit" className="btn m-1 btn-primary">
                   <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
