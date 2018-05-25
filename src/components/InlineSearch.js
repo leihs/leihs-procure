@@ -1,30 +1,36 @@
 import React from 'react'
 import cx from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 import Downshift from 'downshift'
 import { Query } from 'react-apollo'
+import Highlighter from 'react-highlight-words'
+// TODO: pgUnaccent
+// import pgUnaccent from 'postgres-unaccent'
+import pgUnaccent from 'lodash/deburr'
 import logger from 'debug'
-const log = logger('app:InlineSearch')
+const log = logger('app:ui:InlineSearch')
 
 // # STYLES
+const UICLASS = 'ui-interactive-text-field'
 const itemHeight = 2 // em, min. height (line can wrap currently!)
 const resultsItemVisualProps = { className: 'px-2 py-1' }
 
-// // non-compact variant:
+// // TODO: non-compact variant:
 // const itemHeight = 2.5 // em, min. height (line can wrap currently!)
 // const resultsItemVisualProps = { className: 'px-3 py-2' }
 
+const inputNodeVisualProps = {
+  className: cx(UICLASS, `${UICLASS}-inputnode`, 'form-control'),
+  style: { position: 'relative', zIndex: 2 }
+}
 const resultsWrapperVisualProps = {
   style: {
     position: 'relative',
     zIndex: 2
   }
 }
-const inputNodeVisualProps = {
-  className: 'form-control',
-  style: { position: 'relative', zIndex: 2 }
-}
 const resultsBoxVisualProps = {
-  className: 'border rounded w-100 mt-1',
+  className: cx(UICLASS, `${UICLASS}-results`, 'border rounded w-100 mt-1'),
   style: {
     position: 'absolute',
     left: 0,
@@ -38,56 +44,29 @@ const resultsBoxVisualProps = {
   }
 }
 
-const defaultProps = {
-  itemToString: item => String(item)
-}
+// # HELPERS
 
 const highlightTextParts = (highlight, text) => {
-  // TODO: remove non-letter characters (replace with dot match in regex)
-  const part = highlight
-
-  // match parts case insensitive!
-  const textParts = text.split(new RegExp(part, 'i')).reduce(
-    (m, i) => {
-      // preserve case, get match back from original text!
-      const position = m.position + i.length + part.length
-      const origMatch = text.slice(position).slice(0, part.length)
-      return { position, parts: m.parts.concat([i, origMatch]) }
-    },
-    { position: -part.length, parts: [] }
-  )['parts']
-
-  // // TODO: split term by whitespace and mark all the parts
-  // const matcher = new RegExp(part, 'i')
-  // let txt = text
-  // const res = []
-  // // debugger
-  // let i = 0
-  // while (txt && i < 1000) {
-  //   const matched = matcher.exec(txt)
-  //   if (!matched) {
-  //     res.push(txt)
-  //     txt = ''
-  //     break
-  //   }
-  //   const start = txt.slice(0, matched.index)
-  //   res.push(start, matched[0])
-  //   const rest = txt.slice(matched[0].length + matched.index)
-  //   txt = rest
-  //   i++
-  //   console.log({ txt, rest, i, matched })
-  // }
-
   return (
-    <React.Fragment>
-      {textParts.map((str, ix) => (
-        // every even element is an higlight!
-        <React.Fragment key={ix}>{ix % 2 ? <b>{str}</b> : str}</React.Fragment>
-      ))}
-    </React.Fragment>
+    <Highlighter
+      textToHighlight={text}
+      searchWords={highlight.split(/\s+/g)}
+      sanitize={s => pgUnaccent(s).toLowerCase()}
+      highlightTag="mark"
+      highlightClass={cx(UICLASS, `${UICLASS}-result-item-highlight`)}
+      highlightStyle={{
+        margin: 0,
+        padding: 0,
+        background: 'inherit',
+        color: 'inherit',
+        fontWeight: 'bold'
+      }}
+      autoEscape={true}
+    />
   )
 }
 
+// # UI PARTIALS
 const ItemsList = ({
   items,
   searchTerm,
@@ -114,6 +93,11 @@ const ItemsList = ({
       ))}
     </div>
   )
+}
+
+// # COMPONENT
+const defaultProps = {
+  itemToString: item => String(item)
 }
 
 const InlineSearch = ({
@@ -143,42 +127,51 @@ const InlineSearch = ({
         selectedItem,
         highlightedIndex
       }) => (
-        <div className="ui-inline-search" {...resultsWrapperVisualProps}>
+        <div
+          className={cx(UICLASS, 'ui-inline-search')}
+          {...resultsWrapperVisualProps}
+        >
           <input
             value=""
             onChange={() => {}}
             {...getInputProps({ placeholder: 'Search' })}
             {...inputNodeVisualProps}
           />
-          {isOpen ? (
-            <Query
-              query={searchQuery}
-              variables={{ ...queryVariables, searchTerm: inputValue }}
-            >
-              {({ loading, error, data }) => {
-                if (loading) return <p>Loading...</p>
-                if (error)
-                  return (
-                    <p>
-                      Error :( <code>{error.toString()}</code>
-                    </p>
-                  )
-
+          <Query
+            skip={!isOpen || isEmpty(inputValue)}
+            query={searchQuery}
+            variables={{ ...queryVariables, searchTerm: inputValue }}
+          >
+            {({ loading, error, data }) => {
+              if (!isOpen) return false
+              if (loading) return <p>Loading...</p>
+              if (error) {
+                log(error)
+                const errMsg =
+                  !error || isEmpty(error.graphQLErrors)
+                    ? error.toString()
+                    : JSON.stringify(error.graphQLErrors, 0, 2)
                 return (
-                  <ItemsList
-                    items={data.users}
-                    searchTerm={inputValue}
-                    itemToString={itemToString}
-                    idFromItem={idFromItem}
-                    selectedItem={selectedItem}
-                    highlightedIndex={highlightedIndex}
-                    getItemProps={getItemProps}
-                    {...props}
-                  />
+                  <p>
+                    Error :( <code>{errMsg}</code>
+                  </p>
                 )
-              }}
-            </Query>
-          ) : null}
+              }
+
+              return (
+                <ItemsList
+                  items={data.users}
+                  searchTerm={inputValue}
+                  itemToString={itemToString}
+                  idFromItem={idFromItem}
+                  selectedItem={selectedItem}
+                  highlightedIndex={highlightedIndex}
+                  getItemProps={getItemProps}
+                  {...props}
+                />
+              )
+            }}
+          </Query>
         </div>
       )}
     </Downshift>
