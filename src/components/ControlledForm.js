@@ -2,27 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import f from 'lodash'
 import fpSet from 'lodash/fp/set'
-// import qs from 'qs'
 import logger from 'debug'
 const log = logger('app:ui:ControlledForm')
 
-// deal with differences in finding the
-// current value of input fields
-function getFieldFromEvent({ target }) {
-  const name = target.name
-  const value =
-    target.type === 'checkbox'
-      ? target.checked
-      : target.type === 'radio'
-        ? target.selected
-        : // text, number, etc:
-          target.value
+// NOTE: handling of getDerivedStateFromProps is dependent on keeping the
+//       given props in state as well!
+//       explanations: <https://github.com/reactjs/reactjs.org/issues/721>
 
-  return { name, value: value || null }
-}
-
-// FIXME: only support `children` as render prop!
-
+// # ControlledForm ############################################################
 // state container to handle a flat form like in plain HTML.
 // input fields use `name`, `value` and `onChange`.
 //
@@ -33,18 +20,27 @@ function getFieldFromEvent({ target }) {
 // which will be called with the fields, a callback, and helper.
 // helper `formPropsFor` is recommended for normal usage,
 // `fields`, `connectFormProps`, `onChange` are given as well for customizations.
-export default class ControlledForm extends React.Component {
-  constructor() {
+export default class ControlledForm extends React.PureComponent {
+  static defaultProps = { children: () => {}, onChange: () => {} }
+  static propTypes = {
+    values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    onChange: PropTypes.func.isRequired,
+    children: PropTypes.func.isRequired
+  }
+
+  constructor(props) {
     super()
-    this.state = { fields: {} }
+    this.state = { fields: props.values, originalValues: props.values }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)
   }
 
   // if new values given via props, reset internal fields state
   static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.values === prevState.originalValues) return null
     if (nextProps.values === prevState.fields) return null
-    return { fields: nextProps.values }
+    return { fields: nextProps.values, originalValues: nextProps.values }
   }
 
   handleInputChange(event) {
@@ -72,6 +68,7 @@ export default class ControlledForm extends React.Component {
       const { idPrefix } = conf
       const getValue = name => f.get(fields, name) || ''
       const setValue = (name, value) => this.updateField({ name, value })
+
       return {
         formPropsFor: name => ({
           name,
@@ -84,7 +81,7 @@ export default class ControlledForm extends React.Component {
       }
     }
     const connected = connectFormProps(state.fields)
-    return props.render({
+    return props.children({
       ...connected,
       fields: state.fields,
       connectFormProps: connectFormProps,
@@ -93,6 +90,7 @@ export default class ControlledForm extends React.Component {
   }
 }
 
+// # ControlledInput ###########################################################
 // its more performant to keep the state in the field,
 // and only "proxy" the change events with a slight debounce
 export class ControlledInput extends React.PureComponent {
@@ -105,14 +103,16 @@ export class ControlledInput extends React.PureComponent {
 
   constructor(props) {
     super()
-    this.state = { value: '' }
+    this.state = { value: props.value, originalValue: props.value }
     this.onChange = this.onChange.bind(this)
     this.onChangeCallbackDebounced = f.debounce(props.onChange, 100)
   }
 
+  // if new value given via props, reset internal state
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.value === prevState.value) return false
-    return { value: nextProps.value }
+    if (nextProps.values === prevState.originalValues) return null
+    if (nextProps.values === prevState.fields) return null
+    return { value: nextProps.value, originalValue: nextProps.value }
   }
 
   onChange(event) {
@@ -138,4 +138,21 @@ export class ControlledInput extends React.PureComponent {
       onChange: this.onChange
     })
   }
+}
+
+// ## helpers ##################################################################
+
+// deal with differences in finding the
+// current value of input fields
+function getFieldFromEvent({ target }) {
+  const name = target.name
+  const value =
+    target.type === 'checkbox'
+      ? target.checked
+      : target.type === 'radio'
+        ? target.selected
+        : // text, number, etc:
+          target.value
+
+  return { name, value: value || null }
 }

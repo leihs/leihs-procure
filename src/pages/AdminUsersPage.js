@@ -114,7 +114,6 @@ const AdminUsersPage = () => (
           mutation: UPDATE_REQUESTERS_MUTATION,
           onError: mutationErrorHandler,
           update: (cache, { data: { requesters_organizations } }) => {
-            console.log({old: data, new: { ...data, requesters_organizations }, requesters_organizations});
             cache.writeQuery({
               query: ADMIN_USERS_PAGE_QUERY,
               data: { ...data, requesters_organizations }
@@ -238,130 +237,123 @@ const ListOfRequestersAndOrgs = ({
           <Col sm="2" />
         </Row>
 
-        <ControlledForm
-          idPrefix={id}
-          values={requesters}
-          render={({ fields, formPropsFor, getValue, setValue }) => {
-            return (
-              <form
-                id={id}
-                onSubmit={e => {
-                  e.preventDefault()
-                  updateRequestersOrgs.doUpdate(mutate, fields)
-                }}
-              >
-                {f
-                  .toArray(fields)
-                  .map(
-                    (
-                      { id, user, department, organization, toDelete = false },
-                      n
-                    ) => (
-                      <Row
-                        form
-                        key={id || n}
-                        cls={[
-                          'rounded',
-                          {
-                            'text-strike bg-danger-light': toDelete,
-                            // new lines are marked and should show form validation styles
-                            'was-validated bg-info-light': !id
-                          }
-                        ]}
-                      >
-                        <Col sm>
-                          <FormGroup label={'user'} hideLabel>
-                            {/* TODO: make and use autocomplete-style version of InlineSearch
+        <ControlledForm idPrefix={id} values={requesters}>
+          {({ fields, formPropsFor, getValue, setValue }) => (
+            <form
+              id={id}
+              onSubmit={e => {
+                e.preventDefault()
+                updateRequestersOrgs.doUpdate(mutate, fields)
+              }}
+            >
+              {f
+                .toArray(fields)
+                .map(
+                  (
+                    { id, user, department, organization, toDelete = false },
+                    n
+                  ) => (
+                    <Row
+                      form
+                      key={id || n}
+                      cls={[
+                        'rounded',
+                        {
+                          'text-strike bg-danger-light': toDelete,
+                          // new lines are marked and should show form validation styles
+                          'was-validated bg-info-light': !id
+                        }
+                      ]}
+                    >
+                      <Col sm>
+                        <FormGroup label={'user'} hideLabel>
+                          {/* TODO: make and use autocomplete-style version of InlineSearch
                             - field will get 'invalid' styles if no user id present
                         */}
-                            <InputText
-                              readOnly
-                              required
-                              cls="bg-light"
-                              value={DisplayName(user)}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col sm>
-                          <FormGroup label={'department'} hideLabel>
-                            <InputText
-                              readOnly={toDelete}
-                              required
-                              value={department && department.name}
-                              onChange={e => {
-                                setValue(`${n}.department.name`, e.target.value)
-                              }}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col sm>
-                          <FormGroup label={'organization'} hideLabel>
-                            <InputText
-                              readOnly={toDelete}
-                              required
-                              value={organization && organization.name}
-                              onChange={e => {
-                                setValue(`${n}.organization`, {
-                                  name: e.target.value
-                                })
-                              }}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col sm="2">
-                          <FormGroup>
-                            <div className="form-check mt-2">
-                              <label className="form-check-label">
-                                <input
-                                  className="form-check-input"
-                                  type="checkbox"
-                                  checked={toDelete}
-                                  onChange={e => {
-                                    setValue(
-                                      `${n}.toDelete`,
-                                      !!e.target.checked
-                                    )
-                                  }}
-                                />
-                                {'remove'}
-                              </label>
-                            </div>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    )
-                  )}
+                          <InputText
+                            readOnly
+                            required
+                            cls="bg-light"
+                            value={DisplayName(user)}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col sm>
+                        <FormGroup label={'department'} hideLabel>
+                          <InputText
+                            readOnly={toDelete}
+                            required
+                            value={department && department.name}
+                            onChange={e => {
+                              setValue(`${n}.department.name`, e.target.value)
+                            }}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col sm>
+                        <FormGroup label={'organization'} hideLabel>
+                          <InputText
+                            readOnly={toDelete}
+                            required
+                            value={organization && organization.name}
+                            onChange={e => {
+                              setValue(`${n}.organization`, {
+                                name: e.target.value
+                              })
+                            }}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col sm="2">
+                        <FormGroup>
+                          <div className="form-check mt-2">
+                            <label className="form-check-label">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={toDelete}
+                                onChange={e => {
+                                  setValue(`${n}.toDelete`, !!e.target.checked)
+                                }}
+                              />
+                              {'remove'}
+                            </label>
+                          </div>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                  )
+                )}
 
-                <FormGroup label="add new requester" cls="mt-2">
-                  <Row form>
-                    <Col>
-                      <UserAutocomplete
-                        onSelect={user =>
-                          // adds a line to the form
-                          setValue(`${Object.keys(fields).length}.user`, user)
-                        }
-                      />
-                    </Col>
-                    <Col>
-                      {/* <FormField label={'department'} hideLabel /> */}
-                    </Col>
-                    <Col>
-                      {/* <FormField label={'organization'} hideLabel /> */}
-                    </Col>
-                    <Col sm="2" />
-                  </Row>
-                </FormGroup>
+              <FormGroup label="add new requester" cls="mt-2">
+                <Row form>
+                  <Col>
+                    <UserAutocomplete
+                      onSelect={user =>
+                        // adds a line to the form
+                        setValue(`${Object.keys(fields).length}.user`, user)
+                      }
+                    />
+                  </Col>
+                  <Col>
+                    {/* <FormField label={'department'} hideLabel /> */}
+                  </Col>
+                  <Col>
+                    {/* <FormField label={'organization'} hideLabel /> */}
+                  </Col>
+                  <Col sm="2" />
+                </Row>
+              </FormGroup>
 
-                <button type="submit" className="btn m-1 btn-primary">
-                  <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-                </button>
-                {/* <button type="button" className="btn m-1 btn-outline-secondary">
+              <button type="submit" className="btn m-1 btn-primary">
+                <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+              </button>
+              {/* <button type="button" className="btn m-1 btn-outline-secondary">
               {t('form_btn_cancel')}
             </button> */}
-              </form>
-            )
-          }}
-        />
+            </form>
+          )}
+        </ControlledForm>
       </Div>
     )}
   </Mutation>
