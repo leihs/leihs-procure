@@ -20,9 +20,8 @@ import { RequestTotalAmount as TotalAmount } from './decorators'
 const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
 
 const RequestForm = ({ id = 'request_form' }) => (
-  <ControlledForm
-    idPrefix={id}
-    render={({ fields, formPropsFor }) => {
+  <ControlledForm idPrefix={id}>
+    {({ fields, formPropsFor }) => {
       return (
         <form
           id={id}
@@ -216,7 +215,7 @@ const RequestForm = ({ id = 'request_form' }) => (
         </form>
       )
     }}
-  />
+  </ControlledForm>
 )
 
 export default RequestForm

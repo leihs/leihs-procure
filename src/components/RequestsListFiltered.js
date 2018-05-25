@@ -1,12 +1,13 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 
-import { FormField } from './Bootstrap'
+import { FormGroup } from './Bootstrap'
 import ControlledForm from './ControlledForm'
 import MultiSelect from './MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Loading from './Loading'
 import RequestLine from './RequestLine'
+import { ErrorPanel } from './Error'
 
 const FilterBar = ({
   filters: { loading, error, data },
@@ -14,13 +15,7 @@ const FilterBar = ({
   onFilterChange
 }) => {
   if (loading) return <Loading />
-  if (error)
-    return (
-      <div>
-        <p>Error :(</p>
-        <pre>{error.toString()}</pre>
-      </div>
-    )
+  if (error) return <ErrorPanel error={error} />
 
   const available = {
     budgetPeriods: data.budget_periods,
@@ -35,33 +30,34 @@ const FilterBar = ({
         idPrefix="requests_filter"
         values={currentFilters}
         onChange={onFilterChange}
-        render={({ formPropsFor }) => {
+      >
+        {({ formPropsFor }) => {
           return (
             <F>
-              <FormField label={'Budgetperioden'}>
+              <FormGroup label={'Budgetperioden'}>
                 <MultiSelect
                   {...formPropsFor('budgetPeriods')}
                   values={f
                     .sortBy(available.budgetPeriods, 'name')
                     .map(({ id, name }) => ({ id, label: name }))}
                 />
-              </FormField>
-              <FormField label={'Kategorien'}>
+              </FormGroup>
+              <FormGroup label={'Kategorien'}>
                 <MultiSelect
                   {...formPropsFor('categories')}
                   values={f
                     .sortBy(available.categories, 'name')
                     .map(({ id, name }) => ({ value: id, label: name }))}
                 />
-              </FormField>
-              <FormField label={'Organisationen'}>
+              </FormGroup>
+              <FormGroup label={'Organisationen'}>
                 <MultiSelect
                   {...formPropsFor('organizations')}
                   values={f
                     .sortBy(available.organizations, 'name')
                     .map(({ id, name }) => ({ value: id, label: name }))}
                 />
-              </FormField>
+              </FormGroup>
               {/* <MultiSelect
                 id="foo"
                 name="foo"
@@ -70,14 +66,14 @@ const FilterBar = ({
             </F>
           )
         }}
-      />
+      </ControlledForm>
     </div>
   )
 }
 
 const RequestsList = ({ requests: { loading, error, data } }) => {
   if (loading) return <Loading />
-  if (error) return <p>Error :(</p>
+  if (error) return <ErrorPanel error={error} />
   const requests = data && data.requests ? data.requests : []
   return (
     <F>
