@@ -31,6 +31,7 @@
     "build": "react-scripts build",
     "lint": "eslint --fix src/{,**/}*.js{x,on}",
     "ci:lint": "eslint src/{,**/}*.js{x,on}",
+    "dev:getSchema": "graphql get-schema",
     "test": "react-scripts test --env=jsdom"
   },
   "proxy": {
