@@ -15,9 +15,12 @@ function titleBySelection(selected, values) {
   if (count > 3) {
     return `${count} selektiert`
   }
-  return selected
-    .map(item => values.filter(({ id }) => id === item)[0].label)
+  const selectedStr = selected
+    .map(item => values.filter(({ value }) => value === item)[0])
+    .map(item => item && item.label)
     .join(', ')
+  console.log({ values, selected, selectedStr })
+  return selectedStr
 }
 
 class MultiSelect extends React.PureComponent {
@@ -31,7 +34,7 @@ class MultiSelect extends React.PureComponent {
   componentDidMount() {
     const inititalSelected = this.props.values
       .filter(i => i.selected)
-      .map(i => i.id)
+      .map(i => i.value)
     this.setState(() => ({ selected: inititalSelected }))
   }
 
@@ -41,20 +44,17 @@ class MultiSelect extends React.PureComponent {
     }))
   }
 
-  onCheckboxChange(event) {
+  onCheckboxChange(event, value) {
     const isSelected = event.target.checked
-    const item = event.target.name
+    const item = value || event.target.name
     this.setState(
       prev => {
         const selected = prev.selected
           .concat(item)
-          .filter(id => (id === item ? isSelected : true))
+          .filter(val => (val === item ? isSelected : true))
         return { selected }
       },
-      () =>
-        this.onChange({
-          target: { name: this.props.name, value: this.state.selected }
-        })
+      () => this.props.onChange(this.state.selected)
     )
   }
 
@@ -87,29 +87,32 @@ class MultiSelect extends React.PureComponent {
                 <input
                   type="checkbox"
                   checked={allSelected}
-                  name={name}
                   onChange={this.onSelectAllChange}
                 />
                 {'Alle ausw\xE4hlen'}{' '}
               </label>
             </a>
           </DropdownItem>
-          {values.map(({ id, label }) => {
-            const isSelected = state.selected.indexOf(id) !== -1
+          {values.map(({ value, label }, ix) => {
+            const isSelected = state.selected.indexOf(value) !== -1
             return (
-              <DropdownItem key={id} className={isSelected ? 'active' : ''}>
-                <a tabIndex="0">
-                  <label className="checkbox">
-                    <input
-                      type="checkbox"
-                      name={name}
-                      checked={isSelected}
-                      onChange={this.onCheckboxChange}
-                    />
-                    {label}{' '}
-                  </label>
-                </a>
-              </DropdownItem>
+              // <DropdownItem key={ix} className={isSelected ? 'active' : ''}>
+              <label
+                key={ix}
+                className="checkbox"
+                data-htmlFor={`${value}-checkbox`}
+              >
+                <input
+                  id={`${value}-checkbox`}
+                  type="checkbox"
+                  value={value}
+                  checked={isSelected}
+                  onChange={e => this.onCheckboxChange(e, value)}
+                />
+                {label}
+                {' X '}
+              </label>
+              // {/* </DropdownItem> */}
             )
           })}
         </DropdownMenu>
@@ -118,13 +121,20 @@ class MultiSelect extends React.PureComponent {
   }
 }
 
-MultiSelect.defaultProps = { name: '', values: [] }
+MultiSelect.defaultProps = {
+  name: '',
+  values: [],
+  onChange: selected => {
+    // eslint-disable-next-line no-console
+    console.log('MultiSelect', { selected })
+  }
+}
 
 MultiSelect.propTypes = {
   name: PropTypes.string.isRequired,
   values: PropTypes.arrayOf(
-    PropTypes.objectOf({
-      id: PropTypes.string.isRequired,
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
       label: PropTypes.node.isRequired
     })
   ).isRequired

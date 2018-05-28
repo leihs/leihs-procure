@@ -123,6 +123,7 @@ export class Collapse extends React.Component {
       }
     })
   }
+}
 
 export const FormGroup = ({
   id,
@@ -311,25 +312,50 @@ FilePicker.propTypes = {
   label: PropTypes.node
 }
 
-export const Select = ({
-  options,
-  emptyOption = { children: '---', value: '' },
-  ...props
-}) => {
+export const Select = ({ options, multiple, emptyOption, value, ...props }) => {
+  const selectedValue =
+    typeof value === 'object'
+      ? multiple
+        ? value
+        : value[0]
+      : multiple
+        ? [value]
+        : value
   return (
-    <Node tag="select" className="custom-select" {...props}>
+    <Node
+      tag="select"
+      {...props}
+      className={cx('custom-select', props.className)}
+      multiple={multiple}
+      value={selectedValue}
+    >
       {emptyOption && <option {...emptyOption} />}
-      {options.map(({ label, children, ...props }, i) => (
-        <option key={props.id || i} {...props}>
+      {options.map(({ label, children, ...props }, ix) => (
+        <option key={ix} {...props}>
           {children || label}
         </option>
       ))}
     </Node>
   )
 }
+Select.defaultProps = {
+  multiple: false,
+  emptyOption: { children: '---', value: '' }
+}
 Select.propTypes = {
   id: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.string),
+  className: PropTypes.string,
+  multiple: PropTypes.bool,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string)
+  ]),
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      label: PropTypes.node.isRequired
+    })
+  ),
   emptyOption: PropTypes.oneOf([
     false,
     PropTypes.shape({
