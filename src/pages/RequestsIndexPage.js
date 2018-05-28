@@ -49,12 +49,10 @@ const REQUESTS_QUERY = gql`
       category_id: $categories
       organization_id: $organizations
     ) {
-      ...RequestFieldsForShow
-      # ...RequestFieldsForIndex
+      ...RequestFieldsForIndex
     }
   }
-  ${Fragments.RequestFieldsForShow}
-  #${Fragments.RequestFieldsForIndex}
+  ${Fragments.RequestFieldsForIndex}
 `
 
 class RequestsIndexPage extends React.Component {
@@ -79,7 +77,11 @@ class RequestsIndexPage extends React.Component {
       <Query query={FILTERS_QUERY}>
         {filtersData => {
           return (
-            <Query query={REQUESTS_QUERY} variables={state.currentFilters}>
+            <Query
+              query={REQUESTS_QUERY}
+              // TODO: variables={state.currentFilters}
+              variables={{}}
+            >
               {requestsData => {
                 return (
                   <RequestsListFiltered

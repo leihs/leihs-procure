@@ -10,7 +10,8 @@ export const FILTERS_QUERY = gql`
       id
       name
     }
-    organizations {
+    # FIXME: should be 'root_only: false' when UI ready
+    organizations(root_only: true) {
       id
       name
       shortname

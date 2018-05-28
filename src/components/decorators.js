@@ -15,7 +15,11 @@ export const DisplayName = o => {
 export const RequestTotalAmount = fields => {
   const quantity = f.last(
     f.filter(
-      ['requested', 'approved', 'ordered'].map(k => fields[`quantity_${k}`])
+      ['requested', 'approved', 'ordered'].map(
+        k =>
+          f.get(fields, [`quantity_${k}`, 'value']) ||
+          f.get(fields, [`quantity_${k}`])
+      )
     )
   )
   const price = (parseInt(fields.price_cents, 10) || 0) / 100

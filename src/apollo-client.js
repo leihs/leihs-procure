@@ -1,4 +1,4 @@
-import f from 'lodash'
+// import f from 'lodash'
 import { ApolloClient } from 'apollo-boost'
 import { InMemoryCache } from 'apollo-boost'
 import { HttpLink } from 'apollo-boost'
@@ -15,15 +15,28 @@ export const apolloClient = new ApolloClient({
     }
   }),
   cache: new InMemoryCache({
-    dataIdFromObject: getIdFromObject
+    // dataIdFromObject: getIdFromObject
   })
 })
 
-// support `{id: id}` or `{id: { value: id }}`
-function getIdFromObject(object) {
-  const nestedID = f.get(object, 'id.value')
-  if (!f.isEmpty(nestedID)) return nestedID
-  const directId = f.get(object, 'id')
-  if (!f.isEmpty(directId)) return directId
-  throw new Error('Could not find ID!', object)
-}
+// // support `{id: id}` or `{id: { value: id }}`
+// function getIdFromObject(object) {
+//   // console.log('getIdFromObject', { object })
+//
+//   const id = idPerType(object)
+//   // if (!id) {
+//   //   throw new Error('Could not find ID! \n\n' + JSON.stringify(object, 0, 2))
+//   // }
+//   return id
+// }
+//
+// function idPerType(object) {
+//   switch (object.__typename) {
+//     case 'Request':
+//       return object.id.value
+//     case 'RequestFieldID':
+//       return object.value
+//     default:
+//       return object.id
+//   }
+// }

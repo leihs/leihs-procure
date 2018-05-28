@@ -12,9 +12,8 @@ export const RequestField = {
 
 export const RequestFieldsForIndex = gql`
   fragment RequestFieldsForIndex on Request {
-    id {
-      value
-    }
+    id
+
     category {
       id
       name
@@ -47,6 +46,10 @@ export const RequestFieldsForIndex = gql`
       value
     }
     order_quantity {
+      value
+    }
+
+    replacement {
       value
     }
 
@@ -110,6 +113,10 @@ export const RequestFieldsForShow = gql`
     }
     motivation {
       ...RequestFieldString
+    }
+
+    replacement {
+      ...RequestFieldBoolean
     }
 
     room {
