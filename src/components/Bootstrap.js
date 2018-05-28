@@ -94,9 +94,35 @@ Badge.propTypes = {
   cls: PropTypes.any // todo: classnames.proptypes
 }
 
-// FIXME: separate FormGroup/FormField again.
-// FormGroup takes only children (e.g. input node),
-// while FormField is a FormGroup with an input (but doesn take children)
+export class Collapse extends React.Component {
+  static defaultProps = { startOpen: false, canToggle: true }
+  static propTypes = { id: PropTypes.string.isRequired }
+
+  state = { open: false }
+  onToggleOpen(event) {
+    event.preventDefault()
+    this.setState(s => ({ open: !s.open }))
+  }
+
+  render({ props: { id, children, canToggle }, state } = this) {
+    const toggleOpen = e => this.onToggleOpen(e)
+    return children({
+      canToggle,
+      toggleOpen,
+      isOpen: state.open,
+      Caret: state.open ? Icon.CaretDown : Icon.CaretRight,
+      togglerProps: {
+        onClick: toggleOpen,
+        id: `${id}-toggle`,
+        'aria-expanded': state.open ? 'true' : 'false',
+        'aria-controls': `${id}-content`
+      },
+      collapsedProps: {
+        id: `${id}-content`,
+        'aria-labelledby': id ? `${id}-toggle` : false
+      }
+    })
+  }
 
 export const FormGroup = ({
   id,

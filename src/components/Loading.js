@@ -1,5 +1,5 @@
 import React from 'react'
-import Icon from '../components/Icons'
+import Icon from './Icons'
 
 const Loading = () => (
   <div className="w-100 p-3 h1 text-center">

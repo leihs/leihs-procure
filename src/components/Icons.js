@@ -18,8 +18,24 @@ import faQuestion from '@fortawesome/fontawesome-free-solid/faQuestion'
 import faShoppingCart from '@fortawesome/fontawesome-free-solid/faShoppingCart'
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
+import faCaretUp from '@fortawesome/fontawesome-free-solid/faCaretUp'
+import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown'
+import faCaretLeft from '@fortawesome/fontawesome-free-solid/faCaretLeft'
+import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight'
 
 const ICONS = {
+  CaretUp: {
+    src: faCaretUp
+  },
+  CaretDown: {
+    src: faCaretDown
+  },
+  CaretLeft: {
+    src: faCaretLeft
+  },
+  CaretRight: {
+    src: faCaretRight
+  },
   Checkmark: {
     src: faCheck,
     description: 'Save Buttons and other kinds of confirmations'

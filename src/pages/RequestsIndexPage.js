@@ -5,6 +5,8 @@ import gql from 'graphql-tag'
 
 import * as Fragments from '../queries/fragments'
 import { FILTERS_QUERY } from '../queries/RequestFilters'
+// import Loading from '../components/Loading'
+// import { ErrorPanel } from '../components/Error'
 import RequestsListFiltered from '../components/RequestsListFiltered'
 
 // NOTE: there are 2 separate queries for filterbar and request list.
@@ -44,6 +46,22 @@ const REQUESTS_QUERY = gql`
     $categories: [ID]
     $organizations: [ID]
   ) {
+    budget_periods {
+      id
+      name
+      inspection_start_date
+      end_date
+    }
+    main_categories {
+      id
+      name
+      image_url
+
+      categories {
+        id
+        name
+      }
+    }
     requests(
       budget_period_id: $budgetPeriods
       category_id: $categories
@@ -82,13 +100,13 @@ class RequestsIndexPage extends React.Component {
               // TODO: variables={state.currentFilters}
               variables={{}}
             >
-              {requestsData => {
+              {requestsQuery => {
                 return (
                   <RequestsListFiltered
-                    requests={requestsData}
-                    filters={filtersData}
                     currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
+                    filters={filtersData}
+                    requestsQuery={requestsQuery}
                   />
                 )
               }}
