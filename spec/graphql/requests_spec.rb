@@ -10,9 +10,7 @@ describe 'requests' do
     q = <<-GRAPHQL
       query {
         requests {
-          id {
-            value
-          }
+          id
         }
       }
     GRAPHQL
@@ -20,9 +18,7 @@ describe 'requests' do
     expect(result).to eq({
       'data' => {
         'requests' => [
-          { 'id' => {
-              'value' => request.id
-            }
+          { 'id' => request.id
           }
         ]
       }

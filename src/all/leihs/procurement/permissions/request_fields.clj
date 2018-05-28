@@ -28,8 +28,7 @@
           (budget-period/in-requesting-phase? tx budget-period)
         category-inspectable-by-user
           (user-perms/inspector? tx user (:category_id proc-request))]
-    {:id {:read true, :write false},
-     :article_name {:read true,
+    {:article_name {:read true,
                     :write (and request-without-template
                                 (not budget-period-is-past)
                                 (or (and user-is-requester

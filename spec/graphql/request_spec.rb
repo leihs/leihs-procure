@@ -155,9 +155,7 @@ describe 'request' do
             id: "#{request.id}",
             article_name: "#{user_name}"
           }) {
-            id {
-              value
-            }
+            id
           }
         }
         GRAPHQL
@@ -166,9 +164,7 @@ describe 'request' do
         expect(result).to eq({
           'data' => {
             'request' => {
-              'id' => {
-                'value' => request.id
-              }
+              'id' => request.id
             }
           }
         })

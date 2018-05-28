@@ -168,7 +168,7 @@
                                        :type (non-null :BudgetPeriod)},
                        :category {:resolve :category,
                                   :type (non-null :Category)},
-                       :id {:type :RequestFieldID},
+                       :id {:type (non-null ID)},
                        :inspection_comment {:type :RequestFieldString},
                        :internal_order_number {:type :RequestFieldString},
                        :location_name {:type :RequestFieldString},
