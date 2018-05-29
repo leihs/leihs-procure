@@ -23,8 +23,8 @@ const log = logger('app:ui:ControlledForm')
 export default class ControlledForm extends React.PureComponent {
   static defaultProps = { children: () => {}, onChange: () => {} }
   static propTypes = {
-    values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
+    // values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    //   .isRequired,
     onChange: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired
   }

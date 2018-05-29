@@ -4,8 +4,11 @@ import cx from 'classnames'
 import f from 'lodash'
 
 import { Button as BsButton } from 'reactstrap'
-import Icon from './Icons'
+import Icon from '../Icons'
 import { ControlledInput } from './ControlledForm'
+
+export { default as ControlledForm } from './ControlledForm'
+export { ControlledInput }
 
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
 const BOOTSTRAP_MODIFIERS = [

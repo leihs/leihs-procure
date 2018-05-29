@@ -14,12 +14,12 @@ import {
   Col,
   Button,
   FormGroup,
-  InputText
+  InputText,
+  ControlledForm
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
 import { ErrorPanel } from '../components/Error'
-import ControlledForm from '../components/ControlledForm'
 import UserAutocomplete from '../components/UserAutocomplete'
 
 const mutationErrorHandler = err => {

@@ -9,10 +9,10 @@ import {
   FormGroup,
   FormField,
   Select,
-  ButtonRadio
+  ButtonRadio,
+  ControlledForm
 } from './Bootstrap'
 
-import ControlledForm from './ControlledForm'
 import { RequestTotalAmount as TotalAmount } from './decorators'
 
 // dev

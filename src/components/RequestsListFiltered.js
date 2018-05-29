@@ -1,9 +1,9 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 
-import { Collapse, FormGroup, Select } from './Bootstrap'
-import ControlledForm from './ControlledForm'
-// import MultiSelect from './MultiSelect'
+import { Collapse, FormGroup, Select, ControlledForm } from './Bootstrap'
+
+// import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 // import Icon from './Icons'
 import Loading from './Loading'
