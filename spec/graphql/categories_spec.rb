@@ -49,7 +49,7 @@ describe 'categories' do
           GRAPHQL
           result = query(q, user.id)
           expect(result).to eq({
-            'datas' => {
+            'data' => {
               'categories' => [
                 { 'id' => cat.id,
                   'can_delete' => false }
