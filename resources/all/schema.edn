@@ -131,14 +131,21 @@
                                :type (non-null Int)}}},
     :Building {:fields {:id {:type (non-null ID)},
                         :name {:type (non-null String)}}},
-    :Category {:fields {:can_delete {:resolve :can-delete-category?,
-                                     :type (non-null Boolean)},
-                        :cost_center {:type String},
-                        :general_ledger_account {:type String},
-                        :id {:type (non-null ID)},
-                        :inspectors {:resolve :inspectors, :type (list :User)},
-                        :name {:type (non-null String)},
-                        :viewers {:resolve :viewers, :type (list :User)}}},
+    :Category
+      {:fields
+         {:can_delete {:resolve :can-delete-category?,
+                       :type (non-null Boolean)},
+          :cost_center {:type String},
+          :general_ledger_account {:type String},
+          :id {:type (non-null ID)},
+          :inspectors {:resolve :inspectors, :type (list :User)},
+          ; FIXME: remove when MainCategory.categories scope fixed
+          :main_category_id
+            {:deprecated
+               "only used temporarly to manually scope the sub-categories to their main-categories",
+             :type (non-null ID)},
+          :name {:type (non-null String)},
+          :viewers {:resolve :viewers, :type (list :User)}}},
     :CurrentUser {:fields {:saved_filters {:type :SavedFilters},
                            :user {:type (non-null :User)}}},
     :MainCategory {:fields {:budget_limits {:resolve :budget-limits,
