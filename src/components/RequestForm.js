@@ -1,4 +1,6 @@
 import React from 'react'
+import cx from 'classnames'
+import f from 'lodash'
 
 import t from '../locale/translate'
 import Icon from './Icons'
@@ -19,203 +21,224 @@ import { RequestTotalAmount as TotalAmount } from './decorators'
 // import ROOMS_JSON from 'rooms.json'
 const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
 
-const RequestForm = ({ id = 'request_form' }) => (
-  <ControlledForm idPrefix={id}>
-    {({ fields, formPropsFor }) => {
-      return (
-        <form
-          id={id}
-          className="XXXwas-validated"
-          onSubmit={e => {
-            e.preventDefault()
-            alert(JSON.stringify(fields, 0, 2))
-          }}
-        >
-          <Row>
-            <Col lg>
-              <FormField {...formPropsFor('article')} />
+const RequestForm = ({ request, className, onClose }) => {
+  const fields = f.mapValues(request, field => {
+    if (f.isObject(field)) {
+      return field.value
+    }
+    return field
+  })
+  return (
+    <ControlledForm idPrefix={`request_form_${request.id}`} values={fields}>
+      {({ fields, ...formHelper }) => {
+        // add auto-translated labels:
+        const formPropsFor = k => ({
+          ...formHelper.formPropsFor(k),
+          label: t(`request_form_field.${k}`)
+        })
 
-              <FormField {...formPropsFor('article_nr')} />
+        return (
+          <form
+            id={request.id}
+            className={cx(className)}
+            onSubmit={e => {
+              e.preventDefault()
+              alert(JSON.stringify(fields, 0, 2))
+            }}
+          >
+            <Row>
+              <Col lg>
+                <FormField {...formPropsFor('article_name')} />
 
-              <FormField {...formPropsFor('supplier')} />
+                <FormField {...formPropsFor('article_number')} />
 
-              <FormField
-                {...formPropsFor('receiver_name')}
-                autoComplete="name"
-              />
+                <FormField {...formPropsFor('supplier')} />
 
-              <FormField {...formPropsFor('building')} />
+                <FormField {...formPropsFor('receiver')} autoComplete="name" />
 
-              <FormField>
-                <Select
-                  {...formPropsFor('room')}
-                  options={ROOMS_JSON.slice(0, 100).map(({ id, name }) => ({
-                    value: id,
-                    label: name
-                  }))}
-                />
-              </FormField>
+                <FormField {...formPropsFor('building')} />
 
-              <FormField {...formPropsFor('purpose')} />
-
-              <Row>
-                <Col sm>
-                  <FormField>
-                    <Select
-                      {...formPropsFor('priority_requester')}
-                      options={[0, 1, 2, 3].map(n => ({
-                        value: n,
-                        label: t(`field.request_priority_inspector_labels.${n}`)
-                      }))}
-                    />
-                  </FormField>
-                </Col>
-                <Col sm>
-                  <FormField>
-                    <Select
-                      {...formPropsFor('priority_inspector')}
-                      options={[0, 1, 2, 3].map(n => ({
-                        value: n,
-                        label: t(`field.request_priority_inspector_labels.${n}`)
-                      }))}
-                    />
-                  </FormField>
-                </Col>
-              </Row>
-
-              <FormField>
-                <ButtonRadio
-                  {...formPropsFor('replacement')}
-                  options={['replacement', 'new'].map(k => ({
-                    value: k,
-                    label: t(`field.request_replacement_labels_${k}`)
-                  }))}
-                />
-              </FormField>
-            </Col>
-
-            <Col lg>
-              <Row>
-                <Col sm>
-                  <FormField
-                    {...formPropsFor('price')}
-                    type="number-integer"
-                    labelSmall={t('field.price_help')}
-                    helpText="Bitte nur ganze Zahlen eingeben"
-                  />
-                </Col>
-                <Col sm>
-                  <FormField
-                    type="text-static"
-                    name="price_total"
-                    value={TotalAmount(fields)}
-                    label={t('field.price_total')}
-                    labelSmall={t('field.price_help')}
-                  />
-                </Col>
-              </Row>
-
-              <Row>
-                <Col sm>
-                  <FormField
-                    {...formPropsFor('quantity_requested')}
-                    type="number-integer"
-                  />
-                </Col>
-                <Col sm>
-                  <FormField
-                    {...formPropsFor('quantity_approved')}
-                    type="number-integer"
-                    max={fields.quantity_requested}
-                  />
-                </Col>
-                <Col sm>
-                  <FormField
-                    {...formPropsFor('quantity_ordered')}
-                    type="number-integer"
-                    max={fields.quantity_approved}
-                  />
-                </Col>
-              </Row>
-
-              <FormField
-                {...formPropsFor('comment_inspector')}
-                type="textarea"
-                beforeInput={
+                <FormGroup>
                   <Select
-                    id="priority_requester"
-                    m="b-3"
-                    cls="form-control-sm"
-                    options={['foo', 'bar', 'baz'].map(s => ({
-                      value: s,
-                      label: s
+                    {...formPropsFor('room')}
+                    options={ROOMS_JSON.slice(0, 100).map(({ id, name }) => ({
+                      value: id,
+                      label: name
                     }))}
                   />
-                }
-              />
+                </FormGroup>
 
-              <FormGroup label={t('field.attachments')}>
-                <FilePicker id="attachments" name="attachments" />
-              </FormGroup>
+                <FormField type="textarea" {...formPropsFor('motivation')} />
 
-              <FormField>
-                <ButtonRadio
-                  {...formPropsFor('accounting_type')}
-                  options={['aquisition', 'investment'].map(k => ({
-                    value: k,
-                    label: t(`field.accounting_type_label_${k}`)
-                  }))}
-                />
-              </FormField>
-
-              {fields.accounting_type !== 'investment' ? (
-                <FormField {...formPropsFor('cost_center')} />
-              ) : (
                 <Row>
                   <Col sm>
-                    <FormField {...formPropsFor('internal_order_number')} />
+                    <FormGroup>
+                      <Select
+                        {...formPropsFor('priority_requester')}
+                        options={[0, 1, 2, 3].map(n => ({
+                          value: n,
+                          label: t(
+                            `request_form_field.request_priority_inspector_labels.${n}`
+                          )
+                        }))}
+                      />
+                    </FormGroup>
                   </Col>
-
                   <Col sm>
+                    <FormGroup>
+                      <Select
+                        {...formPropsFor('priority_inspector')}
+                        options={[0, 1, 2, 3].map(n => ({
+                          value: n,
+                          label: t(
+                            `request_form_field.request_priority_inspector_labels.${n}`
+                          )
+                        }))}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+
+                <FormGroup>
+                  <ButtonRadio
+                    {...formPropsFor('replacement')}
+                    options={['replacement', 'new'].map(k => ({
+                      value: k,
+                      label: t(
+                        `request_form_field.request_replacement_labels_${k}`
+                      )
+                    }))}
+                  />
+                </FormGroup>
+              </Col>
+
+              <Col lg>
+                <Row>
+                  <Col sm="8">
+                    <FormField
+                      {...formPropsFor('price')}
+                      type="number-integer"
+                      labelSmall={t('request_form_field.price_help')}
+                      helpText="Bitte nur ganze Zahlen eingeben"
+                    />
+                  </Col>
+                  <Col sm="4">
                     <FormField
                       type="text-static"
-                      value="123456789"
-                      name="general_ledger_account"
+                      name="price_total"
+                      value={TotalAmount(fields)}
+                      label={t('request_form_field.price_total')}
+                      labelSmall={t('request_form_field.price_help')}
                     />
                   </Col>
                 </Row>
-              )}
-            </Col>
-          </Row>
 
-          <hr m="mt-0" />
+                <Row>
+                  <Col sm>
+                    <FormField
+                      {...formPropsFor('quantity_requested')}
+                      type="number-integer"
+                    />
+                  </Col>
+                  <Col sm>
+                    <FormField
+                      {...formPropsFor('quantity_approved')}
+                      type="number-integer"
+                      max={fields.quantity_requested}
+                    />
+                  </Col>
+                  <Col sm>
+                    <FormField
+                      {...formPropsFor('quantity_ordered')}
+                      type="number-integer"
+                      max={fields.quantity_approved}
+                    />
+                  </Col>
+                </Row>
 
-          <Row m="t-5">
-            <Col lg>
-              <button type="submit" className="btn m-1 btn-outline-dark">
-                <Icon.Exchange /> {t('form_btn_move_category')}
-              </button>
-              <button type="submit" className="btn m-1 btn-outline-dark">
-                <Icon.Calendar /> {t('form_btn_change_budget_period')}
-              </button>
-              <button type="submit" className="btn m-1 btn-outline-danger">
-                <Icon.Trash /> {t('form_btn_delete')}
-              </button>
-            </Col>
-            <Col lg order="first" className="mt-3 mt-lg-0">
-              <button type="submit" className="btn m-1 btn-primary">
-                <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-              </button>
-              <button type="submit" className="btn m-1 btn-outline-secondary">
-                {t('form_btn_cancel')}
-              </button>
-            </Col>
-          </Row>
-          <pre>{JSON.stringify({ fields }, 0, 2)}</pre>
-        </form>
-      )
-    }}
-  </ControlledForm>
-)
+                <FormField
+                  {...formPropsFor('inspection_comment')}
+                  type="textarea"
+                  beforeInput={
+                    <Select
+                      id="priority_requester"
+                      m="b-3"
+                      cls="form-control-sm"
+                      options={['foo', 'bar', 'baz'].map(s => ({
+                        value: s,
+                        label: s
+                      }))}
+                    />
+                  }
+                />
+
+                <FormGroup label={t('request_form_field.attachments')}>
+                  <FilePicker id="attachments" name="attachments" />
+                </FormGroup>
+
+                <FormGroup>
+                  <ButtonRadio
+                    {...formPropsFor('accounting_type')}
+                    options={['aquisition', 'investment'].map(k => ({
+                      value: k,
+                      label: t(`request_form_field.accounting_type_label_${k}`)
+                    }))}
+                  />
+                </FormGroup>
+
+                {fields.accounting_type !== 'investment' ? (
+                  <FormField {...formPropsFor('cost_center')} />
+                ) : (
+                  <Row>
+                    <Col sm>
+                      <FormField {...formPropsFor('internal_order_number')} />
+                    </Col>
+
+                    <Col sm>
+                      <FormField
+                        type="text-static"
+                        value="123456789"
+                        name="general_ledger_account"
+                      />
+                    </Col>
+                  </Row>
+                )}
+              </Col>
+            </Row>
+
+            <hr m="mt-0" />
+
+            <Row m="t-5">
+              <Col lg>
+                <button type="submit" className="btn m-1 btn-outline-dark">
+                  <Icon.Exchange /> {t('form_btn_move_category')}
+                </button>
+                <button type="submit" className="btn m-1 btn-outline-dark">
+                  <Icon.Calendar /> {t('form_btn_change_budget_period')}
+                </button>
+                <button type="submit" className="btn m-1 btn-outline-danger">
+                  <Icon.Trash /> {t('form_btn_delete')}
+                </button>
+              </Col>
+              <Col lg order="first" className="mt-3 mt-lg-0">
+                <button type="submit" className="btn m-1 btn-primary">
+                  <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn m-1 btn-outline-secondary"
+                  onClick={onClose}
+                >
+                  {t('form_btn_cancel')}
+                </button>
+              </Col>
+            </Row>
+            <pre>{JSON.stringify({ fields }, 0, 2)}</pre>
+          </form>
+        )
+      }}
+    </ControlledForm>
+  )
+}
 
 export default RequestForm

@@ -14,7 +14,17 @@ export const ErrorPanel = ({ error }) => {
         <b>Error </b>
         <samp>:</samp>(
       </p>
+
       <pre>{error.toString()}</pre>
+
+      {error &&
+        !f.isEmpty(error.graphQLErrors) && (
+          <details>
+            <summary>Error Details:</summary>
+            <pre>{JSON.stringify(error.graphQLErrors, 0, 2)}</pre>
+          </details>
+        )}
+
       <p className="text-muted mb-0">
         <small>
           <samp>

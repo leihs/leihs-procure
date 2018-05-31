@@ -8,8 +8,8 @@ import { Collapse, FormGroup, Select, ControlledForm } from './Bootstrap'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
 import Loading from './Loading'
-import RequestLine from './RequestLine'
 import { ErrorPanel } from './Error'
+import RequestLine from './RequestLine'
 import ImageThumbnail from './ImageThumbnail'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
@@ -24,7 +24,11 @@ const RequestsIndex = props => (
       />
     }
   >
-    <RequestsList requestsQuery={props.requestsQuery} />
+    <RequestsList
+      requestsQuery={props.requestsQuery}
+      editQuery={props.editQuery} //tmp?
+      filters={props.currentFilters} // tmp
+    />
   </MainWithSidebar>
 )
 
@@ -34,7 +38,7 @@ const FilterBar = ({
   filters: { loading, error, data, ...restFilters },
   currentFilters,
   onFilterChange,
-  ...restArgs
+  ...rest
 }) => {
   if (loading) return <Loading />
   if (error) {
@@ -48,7 +52,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="h-100 p-3 bg-light">
+    <div className="h-100 p-3 bg-light o-50 pointer-events-none">
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"
@@ -118,33 +122,43 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   } = budgetPeriodDates(budgetPeriod)
 
   return (
-    <Collapse id={'bp' + budgetPeriod.id}>
+    <Collapse id={'bp' + budgetPeriod.id} startOpen>
       {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
         <div className={cx('card mb-3')}>
           <div
-            className={cx('card-header pl-2', {
+            className={cx('card-header cursor-pointer pl-2', {
               'border-bottom-0': !isOpen,
               'bg-transparent': !isPast,
-              'text-muted': isPast,
-              'text-success': isRequesting,
-              'text-warning': isInspecting
+              'text-muted': isPast
             })}
             {...togglerProps}
           >
-            <h4 className="mb-0 mr-2 d-inline-block">
+            <h2 className="mb-0 mr-3 h3 d-inline-block">
               <Caret spaced />
               {budgetPeriod.name}
-            </h4>
-            <Icon.InspectionDate className="mr-2" />
-            {inspectStartDate.toLocaleString()}
-            <Icon.BudgetPeriod className="mr-2 ml-2" />
-            {endDate.toLocaleString()}
+            </h2>
+            <span
+              title="Antragsphase bis"
+              className={cx('mr-3', { 'text-success': isRequesting })}
+            >
+              <Icon.RequestingPhase className="mr-2" />
+              {inspectStartDate.toLocaleString()}
+            </span>
+
+            <span
+              title="Inspectionsphase bis"
+              className={cx({ 'text-success': isInspecting })}
+            >
+              <Icon.InspectionPhase className="mr-2" />
+              {endDate.toLocaleString()}
+            </span>
           </div>
-          {isOpen && (
-            <ul className="list-group list-group-flush" {...collapsedProps}>
-              {props.children}
-            </ul>
-          )}
+          {isOpen &&
+            props.children && (
+              <ul className="list-group list-group-flush" {...collapsedProps}>
+                {props.children}
+              </ul>
+            )}
         </div>
       )}
     </Collapse>
@@ -152,7 +166,7 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
 }
 
 const CategoryList = ({ category, canToggle, ...props }) => (
-  <Collapse id={'bp' + category.id} canToggle={canToggle}>
+  <Collapse id={'bp' + category.id} canToggle={canToggle} startOpen>
     {({
       isOpen,
       canToggle,
@@ -163,7 +177,10 @@ const CategoryList = ({ category, canToggle, ...props }) => (
     }) => (
       <F>
         <li
-          className={cx('list-group-item', { disabled: !canToggle })}
+          className={cx('list-group-item ', {
+            disabled: !canToggle,
+            'cursor-pointer': canToggle
+          })}
           {...togglerProps}
         >
           <h5 className="mb-0">
@@ -172,45 +189,57 @@ const CategoryList = ({ category, canToggle, ...props }) => (
             {category.name}
           </h5>
         </li>
-        {isOpen && (
-          <li className="list-group-item p-0" {...collapsedProps}>
-            <ul className="list-group list-group-flush">{props.children}</ul>
-          </li>
-        )}
+        {isOpen &&
+          props.children && (
+            <li className="list-group-item p-0" {...collapsedProps}>
+              <ul className="list-group list-group-flush">{props.children}</ul>
+            </li>
+          )}
       </F>
     )}
   </Collapse>
 )
 
-const SubCategoryList = ({ category, requestCount, ...props }) => (
-  <Collapse id={'bp' + category.id} canToggle={requestCount > 0}>
-    {({
-      isOpen,
-      canToggle,
-      toggleOpen,
-      togglerProps,
-      collapsedProps,
-      Caret
-    }) => (
-      <F>
-        <li
-          className={cx('list-group-item', { disabled: !canToggle })}
-          {...togglerProps}
-        >
-          <h6 className="mb-0">
-            <Caret spaced />
-            {category.name} <span>({requestCount})</span>
-          </h6>
-        </li>
-        {isOpen && (
-          <li className="list-group-item p-0" {...collapsedProps}>
-            {props.children}
+const SubCategoryList = ({ category, requestCount, ...props }) => {
+  const showChildren = (isOpen, children) =>
+    !!isOpen && React.Children.count(children) > 0
+
+  return (
+    <Collapse id={'bp' + category.id} canToggle={requestCount > 0} startOpen>
+      {({
+        isOpen,
+        canToggle,
+        toggleOpen,
+        togglerProps,
+        collapsedProps,
+        Caret
+      }) => (
+        <F>
+          <li
+            className={cx('list-group-item', {
+              disabled: !canToggle,
+              'cursor-pointer': canToggle
+            })}
+            {...togglerProps}
+          >
+            <h6 className="mb-0">
+              <Caret spaced />
+              {category.name} <span>({requestCount})</span>
+            </h6>
           </li>
-        )}
-      </F>
-    )}
-  </Collapse>
-)
+          {showChildren(isOpen, props.children) && (
+            <li
+              className="list-group-item p-0 ui-subcat-items"
+              {...collapsedProps}
+            >
+              {props.children}
+            </li>
+          )}
+        </F>
+      )}
+    </Collapse>
+  )
+}
 
 // FIXME: remove this when MainCategory.categories scope is fixed
 function tmpCleanupCategories(mainCategories) {
@@ -222,12 +251,30 @@ function tmpCleanupCategories(mainCategories) {
   }))
 }
 
-const RequestsList = ({ requestsQuery: { loading, error, data } }) => {
+// FIXME: remove this budgetperiods query can be filtered by id
+function tmpFilterBudgetPeriods(periods, filters) {
+  if (!filters.budgetPeriods) return periods
+  return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
+}
+
+// FIXME: remove this main_categories query can be filtered by id
+function tmpFilterMainCategories(categories, filters) {
+  if (!filters.categories) return categories
+  return categories.filter(c => filters.categories.indexOf(c.id) !== -1)
+}
+
+const RequestsList = ({
+  requestsQuery: { loading, error, data },
+  editQuery,
+  filters
+}) => {
   if (loading) return <Loading />
   if (error) return <ErrorPanel error={error} />
 
-  const budgetPeriods = data.budget_periods
-  const categories = tmpCleanupCategories(data.main_categories)
+  const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
+  const categories = tmpCleanupCategories(
+    tmpFilterMainCategories(data.main_categories, filters)
+  )
   const requests = data.requests
   const groupedRequests = f.groupBy(
     requests,
@@ -252,13 +299,15 @@ const RequestsList = ({ requestsQuery: { loading, error, data } }) => {
                     requestCount={reqs.length}
                   >
                     {f.map(reqs, (r, i) => (
-                      <RequestLine
-                        key={r.id}
-                        fields={r}
-                        className={cx('row mx-0 py-2', {
-                          'border-bottom': i + 1 < reqs.length
-                        })}
-                      />
+                      <F key={r.id}>
+                        <div
+                          className={cx({
+                            'border-bottom': i + 1 < reqs.length // not if last
+                          })}
+                        >
+                          <RequestLine request={r} editQuery={editQuery} />
+                        </div>
+                      </F>
                     ))}
                   </SubCategoryList>
                 )

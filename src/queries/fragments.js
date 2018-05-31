@@ -32,12 +32,13 @@ export const RequestFieldsForIndex = gql`
       id
     }
 
-    price_cents {
-      value
-    }
-    price_currency {
-      value
-    }
+    # FIXME: price fields
+    # price_cents {
+    #   value
+    # }
+    # price_currency {
+    #   value
+    # }
 
     requested_quantity {
       value
@@ -53,12 +54,15 @@ export const RequestFieldsForIndex = gql`
       value
     }
 
-    priority {
-      value
-    }
-    state {
-      value
-    }
+    # FIXME: priority
+    # priority {
+    #   value
+    # }
+
+    # FIXME: state
+    # state {
+    #   value
+    # }
   }
 `
 
@@ -84,12 +88,13 @@ export const RequestFieldsForShow = gql`
       id
     }
 
-    price_cents {
-      ...RequestFieldString
-    }
-    price_currency {
-      ...RequestFieldString
-    }
+    # FIXME: price fields
+    # price_cents {
+    #   ...RequestFieldString
+    # }
+    # price_currency {
+    #   ...RequestFieldString
+    # }
 
     requested_quantity {
       ...RequestFieldInt
@@ -101,12 +106,14 @@ export const RequestFieldsForShow = gql`
       ...RequestFieldInt
     }
 
-    priority {
-      ...RequestFieldString
-    }
-    state {
-      ...RequestFieldString
-    }
+    # FIXME: priority
+    # priority {
+    #   ...RequestFieldString
+    # }
+    # FIXME: state
+    # state {
+    #   ...RequestFieldString
+    # }
 
     article_number {
       ...RequestFieldString
@@ -115,9 +122,10 @@ export const RequestFieldsForShow = gql`
       ...RequestFieldString
     }
 
-    replacement {
-      ...RequestFieldBoolean
-    }
+    # FIXME: replacement
+    # replacement {
+    #   ...RequestFieldBoolean
+    # }
 
     room {
       read
@@ -147,6 +155,7 @@ export const RequestFieldsForShow = gql`
   ${RequestFieldsForIndex}
   ${RequestField.String}
   ${RequestField.Int}
+  #{RequestField.Boolean}
 `
 
 export const RequesterOrg = gql`

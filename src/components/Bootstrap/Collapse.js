@@ -6,7 +6,10 @@ export class Collapse extends React.Component {
   static defaultProps = { startOpen: false, canToggle: true }
   static propTypes = { id: PropTypes.string.isRequired }
 
-  state = { open: false }
+  constructor(props) {
+    super()
+    this.state = { isOpen: props.canToggle === false || props.startOpen }
+  }
 
   onToggleOpen(event) {
     event.preventDefault()

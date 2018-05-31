@@ -21,7 +21,7 @@ const log = logger('app:ui:ControlledForm')
 // helper `formPropsFor` is recommended for normal usage,
 // `fields`, `connectFormProps`, `onChange` are given as well for customizations.
 export default class ControlledForm extends React.PureComponent {
-  static defaultProps = { children: () => {}, onChange: () => {} }
+  static defaultProps = { values: {}, children: () => {}, onChange: () => {} }
   static propTypes = {
     // values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     //   .isRequired,

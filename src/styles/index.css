@@ -22,6 +22,33 @@ body {
   padding: 0.3rem 0.6rem;
 }
 
+.o-30 {
+  opacity: 0.3;
+}
+.o-50 {
+  opacity: 0.5;
+}
+.o-70 {
+  opacity: 0.7;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+.cursor-progress {
+  cursor: progress;
+}
+.cursor-wait {
+  cursor: wait;
+}
+.cursor-s-resize {
+  cursor: s-resize;
+}
+
 /* thumbnail is fixed size container */
 .img-thumbnail-wrapper {
   width: 5rem;
@@ -85,8 +112,22 @@ body {
 
 /* app styles */
 
+/* auto-break words */
+body {
+  hyphens: auto;
+}
+
 /* ??? action buttons ??? */
 .btn:not(.btn-flat) {
   /* box-shadow: 0 0.2rem 0 0 rgba(52, 58, 64, 0.25); */
   border-bottom-width: 0.2rem;
+}
+
+/* FIXES & HACKS */
+
+/* https://getbootstrap.com/docs/4.1/getting-started/browsers-devices/#printing */
+@media print {
+  .container {
+    width: auto;
+  }
 }

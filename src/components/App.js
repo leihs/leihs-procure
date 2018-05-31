@@ -38,10 +38,11 @@ const NavbarWithRouter = withRouter(Navbar)
 class App extends Component {
   render({ props: { children } } = this) {
     return (
-      <F>
+      // TODO: set lang to instance default language
+      <div className="ui-app" lang="de">
         <NavbarWithRouter />
         {children}
-      </F>
+      </div>
     )
   }
 }

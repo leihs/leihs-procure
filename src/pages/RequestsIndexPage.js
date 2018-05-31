@@ -49,12 +49,14 @@ const REQUESTS_QUERY = gql`
     $categories: [ID]
     $organizations: [ID]
   ) {
+    # TODO: filter arg (id: $budgetPeriods)
     budget_periods {
       id
       name
       inspection_start_date
       end_date
     }
+    # TODO: filter arg (id: $mainCategories)
     main_categories {
       id
       name
@@ -78,6 +80,15 @@ const REQUESTS_QUERY = gql`
   ${Fragments.RequestFieldsForIndex}
 `
 
+const REQUEST_EDIT_QUERY = gql`
+  query RequestForEdit($id: [ID!]!) {
+    requests(id: $id) {
+      ...RequestFieldsForShow
+    }
+  }
+  ${Fragments.RequestFieldsForShow}
+`
+
 class RequestsIndexPage extends React.Component {
   constructor() {
     super()
@@ -96,6 +107,9 @@ class RequestsIndexPage extends React.Component {
     }))
   }
   render({ state } = this) {
+    const fakeFilters = {
+      budgetPeriods: ['9fb023db-725d-5881-8838-bae3e970ffd0']
+    }
     return (
       <Query query={FILTERS_QUERY}>
         {filtersData => {
@@ -103,15 +117,17 @@ class RequestsIndexPage extends React.Component {
             <Query
               query={REQUESTS_QUERY}
               // TODO: variables={state.currentFilters}
-              variables={{}}
+              variables={fakeFilters}
             >
               {requestsQuery => {
                 return (
                   <RequestsListFiltered
-                    currentFilters={state.currentFilters}
+                    currentFilters={fakeFilters} // tmp
+                    // currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
                     filters={filtersData}
                     requestsQuery={requestsQuery}
+                    editQuery={REQUEST_EDIT_QUERY}
                   />
                 )
               }}

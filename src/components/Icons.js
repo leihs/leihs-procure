@@ -9,6 +9,7 @@ import faExchange from '@fortawesome/fontawesome-free-solid/faExchangeAlt'
 import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
 import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck'
 import faCalendarAlt from '@fortawesome/fontawesome-free-solid/faCalendarAlt'
+import faCalendarPlus from '@fortawesome/fontawesome-free-solid/faCalendarPlus'
 import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt'
 import faChartPie from '@fortawesome/fontawesome-free-solid/faChartPie'
 import faPaperclip from '@fortawesome/fontawesome-free-solid/faPaperclip'
@@ -52,11 +53,17 @@ const ICONS = {
   Exchange: {
     src: faExchange
   },
-  InspectionDate: {
-    src: faCalendarCheck
+  RequestingPhase: {
+    src: faCalendarPlus,
+    extraProps: { transform: 'up-1' }
+  },
+  InspectionPhase: {
+    src: faCalendarCheck,
+    extraProps: { transform: 'up-1' }
   },
   BudgetPeriod: {
-    src: faCalendar
+    src: faCalendar,
+    extraProps: { transform: 'up-1' }
   },
   Calendar: {
     src: faCalendarAlt
