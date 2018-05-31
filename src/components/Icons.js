@@ -6,6 +6,8 @@ import cx from 'classnames'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
 import faExchange from '@fortawesome/fontawesome-free-solid/faExchangeAlt'
+import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
+import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck'
 import faCalendarAlt from '@fortawesome/fontawesome-free-solid/faCalendarAlt'
 import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt'
 import faChartPie from '@fortawesome/fontawesome-free-solid/faChartPie'
@@ -25,16 +27,20 @@ import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight'
 
 const ICONS = {
   CaretUp: {
-    src: faCaretUp
+    src: faCaretUp,
+    extraProps: { fixedWidth: true }
   },
   CaretDown: {
-    src: faCaretDown
+    src: faCaretDown,
+    extraProps: { fixedWidth: true }
   },
   CaretLeft: {
-    src: faCaretLeft
+    src: faCaretLeft,
+    extraProps: { fixedWidth: true }
   },
   CaretRight: {
-    src: faCaretRight
+    src: faCaretRight,
+    extraProps: { fixedWidth: true }
   },
   Checkmark: {
     src: faCheck,
@@ -45,6 +51,12 @@ const ICONS = {
   },
   Exchange: {
     src: faExchange
+  },
+  InspectionDate: {
+    src: faCalendarCheck
+  },
+  BudgetPeriod: {
+    src: faCalendar
   },
   Calendar: {
     src: faCalendarAlt

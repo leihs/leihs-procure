@@ -6,14 +6,6 @@ import Icon from './Icons'
 
 const TITLE = 'Bedarfsermittlung'
 
-const FooterSpacer = () => (
-  // spacing on bottom minimizes scrollbar-flickering and helps in "edge" cases (like popups)
-  <F>
-    <div className="p-5" />
-    <div className="p-5" />
-  </F>
-)
-
 const Brand = () => (
   <F>
     <Icon.ProcurementLogo className="mr-2" />
@@ -49,7 +41,6 @@ class App extends Component {
       <F>
         <NavbarWithRouter />
         {children}
-        <FooterSpacer />
       </F>
     )
   }

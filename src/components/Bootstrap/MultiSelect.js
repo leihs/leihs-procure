@@ -15,12 +15,10 @@ function titleBySelection(selected, values) {
   if (count > 3) {
     return `${count} selektiert`
   }
-  const selectedStr = selected
+  return selected
     .map(item => values.filter(({ value }) => value === item)[0])
     .map(item => item && item.label)
     .join(', ')
-  console.log({ values, selected, selectedStr })
-  return selectedStr
 }
 
 class MultiSelect extends React.PureComponent {

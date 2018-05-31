@@ -1,15 +1,17 @@
 import React, { Fragment as F } from 'react'
+import cx from 'classnames'
 import f from 'lodash'
-
+import { DateTime } from 'luxon'
 import { Collapse, FormGroup, Select, ControlledForm } from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
-// import Icon from './Icons'
+import Icon from './Icons'
 import Loading from './Loading'
 import RequestLine from './RequestLine'
 import { ErrorPanel } from './Error'
-import logger from 'debug'
+import ImageThumbnail from './ImageThumbnail'
+// import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
 
 const RequestsIndex = props => (
@@ -46,7 +48,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="p-3 bg-light">
+    <div className="h-100 p-3 bg-light">
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"
@@ -96,23 +98,60 @@ const FilterBar = ({
   )
 }
 
-const BudgetPeriodCard = ({ budgetPeriod, ...props }) => (
-  <Collapse id={'bp' + budgetPeriod.id}>
-    {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
-      <div className="card mb-3">
-        <div className="card-header" {...togglerProps}>
-          <h4>
-            <Caret className="mr-2" />
-            {budgetPeriod.name}
-          </h4>
-        </div>
-        {isOpen && <div {...collapsedProps}>{props.children}</div>}
-      </div>
-    )}
-  </Collapse>
-)
+const budgetPeriodDates = bp => {
+  const now = DateTime.local()
+  const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
+  const endDate = DateTime.fromISO(bp.end_date)
+  const isPast = endDate <= now
+  const isRequesting = !isPast && now <= inspectStartDate
+  const isInspecting = !isPast && !isRequesting
+  return { inspectStartDate, endDate, isPast, isRequesting, isInspecting }
+}
 
-const CategoryListGroup = ({ category, canToggle, ...props }) => (
+const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
+  const {
+    inspectStartDate,
+    endDate,
+    isPast,
+    isRequesting,
+    isInspecting
+  } = budgetPeriodDates(budgetPeriod)
+
+  return (
+    <Collapse id={'bp' + budgetPeriod.id}>
+      {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
+        <div className={cx('card mb-3')}>
+          <div
+            className={cx('card-header pl-2', {
+              'border-bottom-0': !isOpen,
+              'bg-transparent': !isPast,
+              'text-muted': isPast,
+              'text-success': isRequesting,
+              'text-warning': isInspecting
+            })}
+            {...togglerProps}
+          >
+            <h4 className="mb-0 mr-2 d-inline-block">
+              <Caret spaced />
+              {budgetPeriod.name}
+            </h4>
+            <Icon.InspectionDate className="mr-2" />
+            {inspectStartDate.toLocaleString()}
+            <Icon.BudgetPeriod className="mr-2 ml-2" />
+            {endDate.toLocaleString()}
+          </div>
+          {isOpen && (
+            <ul className="list-group list-group-flush" {...collapsedProps}>
+              {props.children}
+            </ul>
+          )}
+        </div>
+      )}
+    </Collapse>
+  )
+}
+
+const CategoryList = ({ category, canToggle, ...props }) => (
   <Collapse id={'bp' + category.id} canToggle={canToggle}>
     {({
       isOpen,
@@ -123,18 +162,50 @@ const CategoryListGroup = ({ category, canToggle, ...props }) => (
       Caret
     }) => (
       <F>
-        <div className="card-header" {...togglerProps}>
-          <h5>
-            {canToggle && <Caret className="mr-2" />}
+        <li
+          className={cx('list-group-item', { disabled: !canToggle })}
+          {...togglerProps}
+        >
+          <h5 className="mb-0">
+            <Caret spaced />
+            <ImageThumbnail imageUrl={category.image_url} />
             {category.name}
           </h5>
-        </div>
+        </li>
         {isOpen && (
-          <ul className="list-group list-group-flush">
-            <li className="list-group-item" {...collapsedProps}>
-              {props.children}
-            </li>
-          </ul>
+          <li className="list-group-item p-0" {...collapsedProps}>
+            <ul className="list-group list-group-flush">{props.children}</ul>
+          </li>
+        )}
+      </F>
+    )}
+  </Collapse>
+)
+
+const SubCategoryList = ({ category, requestCount, ...props }) => (
+  <Collapse id={'bp' + category.id} canToggle={requestCount > 0}>
+    {({
+      isOpen,
+      canToggle,
+      toggleOpen,
+      togglerProps,
+      collapsedProps,
+      Caret
+    }) => (
+      <F>
+        <li
+          className={cx('list-group-item', { disabled: !canToggle })}
+          {...togglerProps}
+        >
+          <h6 className="mb-0">
+            <Caret spaced />
+            {category.name} <span>({requestCount})</span>
+          </h6>
+        </li>
+        {isOpen && (
+          <li className="list-group-item p-0" {...collapsedProps}>
+            {props.children}
+          </li>
         )}
       </F>
     )}
@@ -171,20 +242,28 @@ const RequestsList = ({ requestsQuery: { loading, error, data } }) => {
       {budgetPeriods.map(b => (
         <BudgetPeriodCard key={b.id} budgetPeriod={b}>
           {categories.map(cat => (
-            <CategoryListGroup key={cat.id} category={cat}>
+            <CategoryList key={cat.id} category={cat}>
               {cat.categories.map(sc => {
-                const reqs = groupedRequests[`${b.id}|${sc.id}`]
+                const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
                 return (
-                  <CategoryListGroup
+                  <SubCategoryList
                     key={sc.id}
                     category={sc}
-                    canToggle={!f.isEmpty(reqs)}
+                    requestCount={reqs.length}
                   >
-                    {f.map(reqs, r => <RequestLine key={r.id} fields={r} />)}
-                  </CategoryListGroup>
+                    {f.map(reqs, (r, i) => (
+                      <RequestLine
+                        key={r.id}
+                        fields={r}
+                        className={cx('row mx-0 py-2', {
+                          'border-bottom': i + 1 < reqs.length
+                        })}
+                      />
+                    ))}
+                  </SubCategoryList>
                 )
               })}
-            </CategoryListGroup>
+            </CategoryList>
           ))}
         </BudgetPeriodCard>
       ))}
