@@ -41,6 +41,9 @@ import RequestsListFiltered from '../components/RequestsListFiltered'
 // `
 
 const REQUESTS_QUERY = gql`
+  # NOTE: requests only shown grouped by period > main cat > sub cat > request.
+  # Query using distinct entry points bc also empty "groups" are shown,
+  # also it makes iterating over them much simpler.
   query RequestsIndexFiltered(
     $budgetPeriods: [ID]
     $categories: [ID]
@@ -60,6 +63,8 @@ const REQUESTS_QUERY = gql`
       categories {
         id
         name
+        # FIXME: remove this when MainCategory.categories scope is fixed
+        main_category_id
       }
     }
     requests(

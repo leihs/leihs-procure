@@ -141,12 +141,22 @@ const CategoryListGroup = ({ category, canToggle, ...props }) => (
   </Collapse>
 )
 
+// FIXME: remove this when MainCategory.categories scope is fixed
+function tmpCleanupCategories(mainCategories) {
+  return mainCategories.map(mainCat => ({
+    ...mainCat,
+    categories: mainCat.categories.filter(
+      subCat => subCat.main_category_id === mainCat.id
+    )
+  }))
+}
+
 const RequestsList = ({ requestsQuery: { loading, error, data } }) => {
   if (loading) return <Loading />
   if (error) return <ErrorPanel error={error} />
 
   const budgetPeriods = data.budget_periods
-  const categories = data.main_categories
+  const categories = tmpCleanupCategories(data.main_categories)
   const requests = data.requests
   const groupedRequests = f.groupBy(
     requests,
