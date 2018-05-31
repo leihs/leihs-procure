@@ -15,13 +15,11 @@
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "lodash": "^4.17.10",
-    "node-sass-chokidar": "^1.3.0",
     "luxon": "^1.2.1",
     "prop-types": "^15.6.1",
     "react": "^16.4.0",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.4.0",
-    "react-icons": "^2.2.7",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "^1.1.4",
@@ -30,6 +28,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "analyze": "source-map-explorer build/static/js/main.*",
     "lint": "eslint --fix src/{,**/}*.js{x,on}",
     "ci:lint": "eslint src/{,**/}*.js{x,on}",
     "dev:getSchema": "graphql get-schema",
@@ -48,8 +47,10 @@
     "eslint-config-prettier": "^2.7.0",
     "eslint-plugin-prettier": "^2.3.1",
     "eslint-plugin-react": "^7.8.2",
+    "node-sass-chokidar": "^1.3.0",
     "prettier": "^1.12.1",
-    "prettier-eslint": "^8.2.1"
+    "prettier-eslint": "^8.2.1",
+    "source-map-explorer": "^1.5.0"
   },
   "prettier": {
     "printWidth": 80,
@@ -60,10 +61,7 @@
     "jsxBracketSameLine": false
   },
   "eslintConfig": {
-    "plugins": [
-      "prettier",
-      "react"
-    ],
+    "plugins": ["prettier", "react"],
     "extends": [
       "react-app",
       "eslint:recommended",
@@ -73,16 +71,12 @@
       "plugin:react/recommended"
     ],
     "rules": {
-      "prettier/prettier": [
-        "error"
-      ],
+      "prettier/prettier": ["error"],
       "react/prop-types": "off"
     },
     "overrides": [
       {
-        "files": [
-          "src/components/Bootstrap.js"
-        ],
+        "files": ["src/components/Bootstrap.js"],
         "rules": {
           "react/prop-types": "error"
         }
