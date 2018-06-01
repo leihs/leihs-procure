@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import cx from 'classnames'
 import f from 'lodash'
 
-import { Button as BsButton } from 'reactstrap'
+import BsButton from 'reactstrap/lib/Button'
+
 import Icon from '../Icons'
 import { ControlledInput } from './ControlledForm'
 
