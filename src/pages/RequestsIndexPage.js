@@ -85,16 +85,6 @@ const REQUEST_EDIT_QUERY = gql`
     requests(id: $id) {
       ...RequestFieldsForShow
     }
-    # TODO: get buildings->rooms, use request.building as filter…
-    # or, for perf, include this query in the autoCompleter itself???
-    rooms {
-      id
-      name
-      building {
-        id
-        name
-      }
-    }
   }
   ${Fragments.RequestFieldsForShow}
 `

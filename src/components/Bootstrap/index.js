@@ -1,6 +1,8 @@
 export * from './Bootstrap'
 export const __Node = null // don't export this into rest of app
 
+export * from './helpers'
+
 export { Collapse } from './Collapse'
 
 export { default as ControlledForm, ControlledInput } from './ControlledForm'

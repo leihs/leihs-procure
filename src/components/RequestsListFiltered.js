@@ -166,7 +166,7 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
 }
 
 const CategoryList = ({ category, canToggle, ...props }) => (
-  <Collapse id={'bp' + category.id} canToggle={canToggle} startOpen>
+  <Collapse id={'bp' + category.id} canToggle={canToggle}>
     {({
       isOpen,
       canToggle,
@@ -205,7 +205,7 @@ const SubCategoryList = ({ category, requestCount, ...props }) => {
     !!isOpen && React.Children.count(children) > 0
 
   return (
-    <Collapse id={'bp' + category.id} canToggle={requestCount > 0} startOpen>
+    <Collapse id={'bp' + category.id} canToggle={requestCount > 0}>
       {({
         isOpen,
         canToggle,

@@ -1,11 +1,16 @@
 import f from 'lodash'
 
-export const DisplayName = o => {
+export const DisplayName = (o, short = false) => {
   if (!o) return
 
   switch (o.__typename) {
     case 'User':
       return `${o.firstname} ${o.lastname}`
+
+    case 'Room':
+      return short || !o.description
+        ? `${o.name}`
+        : `${o.name} (${o.description})`
 
     default:
       throw new Error(`DisplayName: unknown type '${o.__typename}'!`)

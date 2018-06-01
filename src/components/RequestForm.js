@@ -16,11 +16,8 @@ import {
 } from './Bootstrap'
 
 import { RequestTotalAmount as TotalAmount } from './decorators'
-
-const optionFromObject = (obj, path, valueKey = 'id', labelKey = 'name') => {
-  const item = path ? f.get(obj.path) : obj
-  return { label: f.get(item, labelKey), value: f.get(item, valueKey) }
-}
+import BuildingAutocomplete from './BuildingAutocomplete'
+import RoomAutocomplete from './RoomAutocomplete'
 
 const prepareFormValues = request => {
   const fields = f.mapValues(f.omit(request, ['room', 'building']), field => {
@@ -34,16 +31,10 @@ const prepareFormValues = request => {
   return fields
 }
 
-const prepareBuildingsRooms = ({ requests, rooms }) => {
-  const roomsByBuildingId = f.groupBy(rooms, 'building.id')
-  const buildings = f.uniqById(f.map(rooms, 'building'))
-  return { buildings, roomsByBuildingId }
-}
-
 const RequestForm = ({ data, className, onClose }) => {
   const request = f.first(data.requests)
   const fields = prepareFormValues(request)
-  const { buildings, roomsByBuildingId } = prepareBuildingsRooms(data)
+
   return (
     <ControlledForm idPrefix={`request_form_${request.id}`} values={fields}>
       {({ fields, ...formHelper }) => {
@@ -72,19 +63,14 @@ const RequestForm = ({ data, className, onClose }) => {
 
                 <FormField {...formPropsFor('receiver')} autoComplete="name" />
 
-                <FormGroup>
-                  <Select
-                    {...formPropsFor('building')}
-                    options={buildings.map(b => optionFromObject(b))}
-                  />
+                <FormGroup label={formPropsFor('building').label}>
+                  <BuildingAutocomplete {...formPropsFor('building')} />
                 </FormGroup>
 
-                <FormGroup>
-                  <Select
+                <FormGroup label={formPropsFor('room').label}>
+                  <RoomAutocomplete
                     {...formPropsFor('room')}
-                    options={f.map(roomsByBuildingId[fields.building], r =>
-                      optionFromObject(r)
-                    )}
+                    buildingId={fields.building}
                   />
                 </FormGroup>
 
