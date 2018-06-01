@@ -234,6 +234,7 @@
     :Room {:fields {:building {:resolve :building, :type (non-null :Building)},
                     ; FIXME: remove when Building.rooms scope fixed
                     :building_id {:type (non-null String)},
+                    :description {:type String},
                     :id {:type (non-null ID)},
                     :name {:type (non-null String)}}},
     :SavedFilters {:fields {:budget_period_ids {:type (list ID)},
