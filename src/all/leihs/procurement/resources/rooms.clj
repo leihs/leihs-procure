@@ -18,3 +18,12 @@
                   :request
                   :tx)
               (sql/format (rooms-query args))))
+
+(defn get-building-rooms
+  [context _ value]
+  (jdbc/query (-> context
+                  :request
+                  :tx)
+              (sql/format (rooms-query (-> value
+                                           :building
+                                           :id)))))

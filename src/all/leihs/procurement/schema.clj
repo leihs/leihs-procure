@@ -11,6 +11,7 @@
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.admins :as admins]
             [leihs.procurement.resources.building :as building]
+            [leihs.procurement.resources.buildings :as buildings]
             [leihs.procurement.resources.budget-limits :as budget-limits]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.budget-periods :as budget-periods]
@@ -55,7 +56,9 @@
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,
    :budget-periods budget-periods/get-budget-periods,
+   :buildings buildings/get-buildings,
    :building building/get-building,
+   :building-rooms rooms/get-building-rooms,
    :can-delete-budget-period? budget-period/can-delete?,
    :can-delete-category? category/can-delete?,
    :can-delete-main-category? main-category/can-delete?,

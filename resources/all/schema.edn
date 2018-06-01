@@ -129,8 +129,10 @@
                             :total_price_cents_requested_quantities
                               {:resolve :total-price-cents-requested-quantities,
                                :type (non-null Int)}}},
-    :Building {:fields {:id {:type (non-null ID)},
-                        :name {:type (non-null String)}}},
+    :Building {:fields {:code {:type String},
+                        :id {:type (non-null ID)},
+                        :name {:type (non-null String)},
+                        :rooms {:resolve :building-rooms, :type (list :Room)}}},
     :Category
       {:fields
          {:can_delete {:resolve :can-delete-category?,
@@ -230,6 +232,8 @@
                                               :type (non-null :Organization)},
                                :user {:resolve :user, :type (non-null :User)}}},
     :Room {:fields {:building {:resolve :building, :type (non-null :Building)},
+                    ; FIXME: remove when Building.rooms scope fixed
+                    :building_id {:type (non-null String)},
                     :id {:type (non-null ID)},
                     :name {:type (non-null String)}}},
     :SavedFilters {:fields {:budget_period_ids {:type (list ID)},
@@ -253,6 +257,7 @@
    {:admins {:resolve :admins, :type (list :User)},
     :budget_limits {:resolve :budget-limits, :type (list :BudgetLimit)},
     :budget_periods {:resolve :budget-periods, :type (list :BudgetPeriod)},
+    :buildings {:resolve :buildings, :type (list :Building)},
     :categories {:args {:inspected_by_auth_user {:type Boolean}},
                  :resolve :categories,
                  :type (list :Category)},
@@ -277,9 +282,8 @@
                       :state {:type (list String)}},
                :resolve :requests,
                :type (list :Request)},
-    :rooms {:args {:building_id {:type (non-null ID)}},
-            :resolve :rooms,
-            :type (list :Room)},
+    :rooms
+      {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
     :users {:args {:exclude_ids {:type (list ID)},
                    :limit {:type (non-null Int)},
                    :offset {:type (non-null Int)},
