@@ -29,6 +29,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "analyze": "source-map-explorer build/static/js/main.*",
+    "analyze-build": "npm run -s build && npm run -s analyze",
     "lint": "eslint --fix src/{,**/}*.js{x,on}",
     "ci:lint": "eslint src/{,**/}*.js{x,on}",
     "dev:getSchema": "graphql get-schema",
@@ -49,7 +50,7 @@
     "eslint-plugin-react": "^7.8.2",
     "prettier": "^1.13.3",
     "prettier-eslint": "^8.2.1",
-    "source-map-explorer": "^1.5.0"
+    "source-map-explorer": "git+https://github.com/danvk/source-map-explorer.git#b74f718"
   },
   "prettier": {
     "printWidth": 80,
