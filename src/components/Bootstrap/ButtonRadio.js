@@ -36,13 +36,19 @@ class ButtonRadio extends React.PureComponent {
     const selectedValue = this.getSelectedValueProp(value, selected)
     return (
       <div
-        {...restProps}
         className="btn-group btn-group-block"
         role="radiogroup"
+        {...restProps}
       >
         {options.map(({ label, value, ...item }, n) => {
           const inputID = `${id}_radio_${n}`
           const isSelected = value === selectedValue
+          const onRadioClick = () => {
+            // if already selected, a click de-selects!
+            onChange({
+              target: { name: name, value: isSelected ? null : value }
+            })
+          }
           return (
             <F key={n}>
               <Label
@@ -64,13 +70,9 @@ class ButtonRadio extends React.PureComponent {
                   type="radio"
                   aria-checked={isSelected}
                   tabIndex={n === 0 ? 0 : -1}
-                  onChange={() => {
-                    onChange({
-                      target: { name: name, value: value }
-                    })
-                  }}
+                  onClick={onRadioClick}
                   className="sr-only"
-                  autoComplete="off-even-in-chrome"
+                  // autoComplete="off-even-in-chrome"
                 />
                 {withIcons &&
                   (isSelected ? (

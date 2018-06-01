@@ -19,16 +19,16 @@ export class Collapse extends React.Component {
 
   render({ props: { id, children, canToggle }, state: { isOpen } } = this) {
     const toggleOpen = e => this.onToggleOpen(e)
-    const collapsedProps = {
-      id: `${id}-content`,
-      'aria-labelledby': id ? `${id}-toggle` : false
-    }
+
     return children({
       canToggle,
       toggleOpen,
       isOpen,
       Caret: isOpen ? Icon.CaretDown : Icon.CaretRight,
-      collapsedProps,
+      collapsedProps: {
+        id: `${id}-content`,
+        'aria-labelledby': id ? `${id}-toggle` : false
+      },
       togglerProps: {
         onClick: toggleOpen,
         id: `${id}-toggle`,

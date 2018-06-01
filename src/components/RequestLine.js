@@ -1,5 +1,5 @@
 import React from 'react'
-import f from 'lodash'
+// import f from 'lodash'
 import { Query } from 'react-apollo'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
@@ -63,7 +63,7 @@ class RequestLine extends React.Component {
           return (
             <RequestForm
               className="p-3"
-              request={f.first(data.requests)}
+              data={data}
               onClose={() => this.setState({ open: false })}
             />
           )

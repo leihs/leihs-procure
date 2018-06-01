@@ -17,17 +17,33 @@ import {
 
 import { RequestTotalAmount as TotalAmount } from './decorators'
 
-// dev
-// import ROOMS_JSON from 'rooms.json'
-const ROOMS_JSON = [{ id: 1, name: 'Raum 1' }, { id: 2, name: 'Raum 2' }]
+const optionFromObject = (obj, path, valueKey = 'id', labelKey = 'name') => {
+  const item = path ? f.get(obj.path) : obj
+  return { label: f.get(item, labelKey), value: f.get(item, valueKey) }
+}
 
-const RequestForm = ({ request, className, onClose }) => {
-  const fields = f.mapValues(request, field => {
+const prepareFormValues = request => {
+  const fields = f.mapValues(f.omit(request, ['room', 'building']), field => {
     if (f.isObject(field)) {
       return field.value
     }
     return field
   })
+  fields.room = f.get(request, 'room.value.id')
+  fields.building = f.get(request, 'room.value.building.id')
+  return fields
+}
+
+const prepareBuildingsRooms = ({ requests, rooms }) => {
+  const roomsByBuildingId = f.groupBy(rooms, 'building.id')
+  const buildings = f.uniqById(f.map(rooms, 'building'))
+  return { buildings, roomsByBuildingId }
+}
+
+const RequestForm = ({ data, className, onClose }) => {
+  const request = f.first(data.requests)
+  const fields = prepareFormValues(request)
+  const { buildings, roomsByBuildingId } = prepareBuildingsRooms(data)
   return (
     <ControlledForm idPrefix={`request_form_${request.id}`} values={fields}>
       {({ fields, ...formHelper }) => {
@@ -56,15 +72,19 @@ const RequestForm = ({ request, className, onClose }) => {
 
                 <FormField {...formPropsFor('receiver')} autoComplete="name" />
 
-                <FormField {...formPropsFor('building')} />
+                <FormGroup>
+                  <Select
+                    {...formPropsFor('building')}
+                    options={buildings.map(b => optionFromObject(b))}
+                  />
+                </FormGroup>
 
                 <FormGroup>
                   <Select
                     {...formPropsFor('room')}
-                    options={ROOMS_JSON.slice(0, 100).map(({ id, name }) => ({
-                      value: id,
-                      label: name
-                    }))}
+                    options={f.map(roomsByBuildingId[fields.building], r =>
+                      optionFromObject(r)
+                    )}
                   />
                 </FormGroup>
 
@@ -233,7 +253,7 @@ const RequestForm = ({ request, className, onClose }) => {
                 </button>
               </Col>
             </Row>
-            <pre>{JSON.stringify({ fields }, 0, 2)}</pre>
+            {/* <pre>{JSON.stringify({ fields }, 0, 2)}</pre> */}
           </form>
         )
       }}

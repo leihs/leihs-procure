@@ -5,17 +5,20 @@ import { Switch, Route } from 'react-router-dom'
 import { BrowserRouter } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
+import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
-
-// webpack: inject styles
-import './styles/index.css'
-
 import App from './components/App'
 
 // all the pages
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
+
+// webpack: inject styles
+import './styles/index.css'
+
+// lodash setup
+f.mixin(lodashMixins)
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>

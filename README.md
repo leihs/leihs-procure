@@ -1,6 +1,8 @@
 TODO:
 
 * categories page, only render 1 cat per sub-route
+* routing for edit-request (id param)
+* autocompleters for Building + Room
 
 ---
 

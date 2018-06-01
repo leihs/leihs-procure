@@ -44,6 +44,8 @@ Node.propTypes = {
   tag: PropTypes.string
 }
 
+export { Node as __Node }
+
 export const Div = props => Node(props)
 export const Pre = props => Node({ ...props, tag: 'span' })
 export const Span = props => Node({ ...props, tag: 'span' })
@@ -279,61 +281,4 @@ FilePicker.propTypes = {
   id: PropTypes.string,
   name: PropTypes.string,
   label: PropTypes.node
-}
-
-export const Select = ({ options, multiple, emptyOption, value, ...props }) => {
-  const selectedValue =
-    typeof value === 'object'
-      ? multiple
-        ? value
-        : value[0]
-      : multiple
-        ? [value]
-        : value
-  if (emptyOption === true) emptyOption = Select.defaultProps.emptyOption
-  return (
-    <Node
-      tag="select"
-      {...props}
-      className={cx('custom-select', props.className)}
-      multiple={multiple}
-      value={selectedValue}
-    >
-      {emptyOption && <option {...emptyOption} />}
-      {options.map(({ label, children, ...props }, ix) => (
-        <option key={ix} {...props}>
-          {children || label}
-        </option>
-      ))}
-    </Node>
-  )
-}
-Select.defaultProps = {
-  multiple: false,
-  emptyOption: { children: '---', value: '' }
-}
-Select.propTypes = {
-  id: PropTypes.string,
-  className: PropTypes.string,
-  multiple: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.arrayOf(PropTypes.string),
-    PropTypes.arrayOf(PropTypes.number)
-  ]),
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
-      label: PropTypes.node.isRequired
-    })
-  ),
-  emptyOption: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.shape({
-      children: PropTypes.string.isRequired,
-      value: PropTypes.string
-    })
-  ])
 }
