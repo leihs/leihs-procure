@@ -163,6 +163,12 @@
       "text/css" :qs 1 :as :css 
       "text/html" :qs 1 :as :html]}))
 
+(defn wrap-add-vary-header [handler]
+  "should be used if content varies based on `Accept` header, e.g. if using `ring.middleware.accept`"
+  (fn [request]
+    (let [response (handler request)]
+      (assoc-in response [:headers "Vary"] "Accept"))))
+
 (defn canonicalize-params-map [params]
   (if-not (map? params)
     params
@@ -207,6 +213,7 @@
       initial-admin/wrap
       settings/wrap
       wrap-accept
+      wrap-add-vary-header
       wrap-resolve-handler
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
