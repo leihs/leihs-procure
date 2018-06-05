@@ -31,7 +31,7 @@
   [token]
   (-> (sql/select [:users.id :user_id]
                   :is_admin
-                  :sign_in_enabled
+                  :account_enabled
                   :firstname
                   :lastname
                   :email
@@ -48,7 +48,7 @@
         (sql/raw
           (str "now() < user_sessions.created_at + "
                " settings.sessions_max_lifetime_secs * interval '1 second'")))
-      ; (sql/merge-where [:= :sign_in_enabled true])
+      (sql/merge-where [:= :account_enabled true])
       sql/format))
 
 (defn user-auth-entity!
