@@ -4,15 +4,24 @@ import cx from 'classnames'
 
 import { __Node as Node } from './Bootstrap'
 
+const getSelectedValueFromProps = (value, multiple) =>
+  typeof value === 'object'
+    ? multiple
+      ? value
+      : value[0]
+    : multiple
+      ? [value]
+      : value
+
+const getSelectedValueFromEvent = ({ target }, multiple) =>
+  !multiple
+    ? target.value
+    : [...target.options]
+        .filter(({ selected }) => selected)
+        .map(({ value }) => value)
+
 const Select = ({ options, multiple, emptyOption, value, ...props }) => {
-  const selectedValue =
-    typeof value === 'object'
-      ? multiple
-        ? value
-        : value[0]
-      : multiple
-        ? [value]
-        : value
+  const selectedValue = getSelectedValueFromProps(value, multiple)
   if (emptyOption === true) emptyOption = Select.defaultProps.emptyOption
   return (
     <Node
@@ -21,6 +30,14 @@ const Select = ({ options, multiple, emptyOption, value, ...props }) => {
       className={cx('custom-select', props.className)}
       multiple={multiple}
       value={selectedValue}
+      onChange={e => {
+        props.onChange({
+          target: {
+            name: props.name,
+            value: getSelectedValueFromEvent(e, multiple)
+          }
+        })
+      }}
     >
       {emptyOption && <option {...emptyOption} />}
       {options.map(({ label, children, ...props }, ix) => (
