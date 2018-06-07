@@ -3,6 +3,9 @@ TODO:
 * categories page, only render 1 cat per sub-route
 * routing for edit-request (id param)
 * autocompleters for Building + Room
+* request filters:
+  * build sane defaults server-side if none saved?
+  * when filter arg is [] = no result; when null = no filter!
 
 ---
 

@@ -2,8 +2,13 @@ import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 import { DateTime } from 'luxon'
-import { Collapse, FormGroup, Select, ControlledForm } from './Bootstrap'
 
+import {
+  Collapse,
+  FormGroup,
+  ControlledForm,
+  Select
+} from './Bootstrap'
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
@@ -26,6 +31,7 @@ const RequestsIndex = props => (
   >
     <RequestsList
       requestsQuery={props.requestsQuery}
+      refetchAllData={props.refetchAllData}
       editQuery={props.editQuery} //tmp?
       filters={props.currentFilters} // tmp
     />
@@ -52,7 +58,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="h-100 p-3 bg-light o-50 pointer-events-none">
+    <div className="h-100 p-3 bg-light">
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"
@@ -65,6 +71,7 @@ const FilterBar = ({
               <FormGroup label={'Budgetperioden'}>
                 <Select
                   {...formPropsFor('budgetPeriods')}
+                  multiple
                   emptyOption={false}
                   options={f
                     .sortBy(available.budgetPeriods, 'name')
@@ -74,6 +81,7 @@ const FilterBar = ({
               <FormGroup label={'Kategorien'}>
                 <Select
                   {...formPropsFor('categories')}
+                  multiple
                   emptyOption={false}
                   options={f
                     .sortBy(available.categories, 'name')
@@ -83,6 +91,7 @@ const FilterBar = ({
               <FormGroup label={'Organisationen'}>
                 <Select
                   {...formPropsFor('organizations')}
+                  multiple
                   emptyOption={false}
                   options={f
                     .sortBy(available.organizations, 'name')
@@ -99,6 +108,87 @@ const FilterBar = ({
         }}
       </ControlledForm>
     </div>
+  )
+}
+
+// FIXME: remove this when MainCategory.categories scope is fixed
+function tmpCleanupCategories(mainCategories) {
+  return mainCategories.map(mainCat => ({
+    ...mainCat,
+    categories: mainCat.categories.filter(
+      subCat => subCat.main_category_id === mainCat.id
+    )
+  }))
+}
+
+// FIXME: remove this budgetperiods query can be filtered by id
+function tmpFilterBudgetPeriods(periods, filters) {
+  if (!filters.budgetPeriods) return periods
+  return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
+}
+
+// // FIXME: remove this main_categories query can be filtered by id
+// function tmpFilterMainCategories(categories, filters) {
+//   if (!filters.categories) return categories
+//   return categories.filter(c => filters.categories.indexOf(c.id) !== -1)
+// }
+
+const RequestsList = ({
+  requestsQuery: { loading, error, data },
+  editQuery,
+  filters,
+  refetchAllData
+}) => {
+  if (loading) return <Loading />
+  if (error) return <ErrorPanel error={error} />
+
+  const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
+  const categories = tmpCleanupCategories(
+    // tmpFilterMainCategories(data.main_categories, filters)
+    data.main_categories,
+    filters
+  )
+  const requests = data.requests
+  const groupedRequests = f.groupBy(
+    requests,
+    // custom key to quickly find later, where we map using those groups:
+    r => `${r.budget_period.id}|${r.category.id}`
+  )
+
+  return (
+    <F>
+          <h4>{requests.length} Requests</h4>
+      {budgetPeriods.map(b => (
+        <BudgetPeriodCard key={b.id} budgetPeriod={b}>
+          {categories.map(cat => (
+            <CategoryList key={cat.id} category={cat}>
+              {cat.categories.map(sc => {
+                const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
+                return (
+                  <SubCategoryList
+                    key={sc.id}
+                    category={sc}
+                    requestCount={reqs.length}
+                  >
+                    {f.map(reqs, (r, i) => (
+                      <F key={r.id}>
+                        <div
+                          className={cx({
+                            'border-bottom': i + 1 < reqs.length // not if last
+                          })}
+                        >
+                          <RequestLine request={r} editQuery={editQuery} />
+                        </div>
+                      </F>
+                    ))}
+                  </SubCategoryList>
+                )
+              })}
+            </CategoryList>
+          ))}
+        </BudgetPeriodCard>
+      ))}
+    </F>
   )
 }
 
@@ -238,84 +328,5 @@ const SubCategoryList = ({ category, requestCount, ...props }) => {
         </F>
       )}
     </Collapse>
-  )
-}
-
-// FIXME: remove this when MainCategory.categories scope is fixed
-function tmpCleanupCategories(mainCategories) {
-  return mainCategories.map(mainCat => ({
-    ...mainCat,
-    categories: mainCat.categories.filter(
-      subCat => subCat.main_category_id === mainCat.id
-    )
-  }))
-}
-
-// FIXME: remove this budgetperiods query can be filtered by id
-function tmpFilterBudgetPeriods(periods, filters) {
-  if (!filters.budgetPeriods) return periods
-  return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
-}
-
-// FIXME: remove this main_categories query can be filtered by id
-function tmpFilterMainCategories(categories, filters) {
-  if (!filters.categories) return categories
-  return categories.filter(c => filters.categories.indexOf(c.id) !== -1)
-}
-
-const RequestsList = ({
-  requestsQuery: { loading, error, data },
-  editQuery,
-  filters
-}) => {
-  if (loading) return <Loading />
-  if (error) return <ErrorPanel error={error} />
-
-  const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
-  const categories = tmpCleanupCategories(
-    tmpFilterMainCategories(data.main_categories, filters)
-  )
-  const requests = data.requests
-  const groupedRequests = f.groupBy(
-    requests,
-    // custom key to quickly find later, where we map using those groups:
-    r => `${r.budget_period.id}|${r.category.id}`
-  )
-
-  return (
-    <F>
-      <h4>{requests.length} Requests</h4>
-
-      {budgetPeriods.map(b => (
-        <BudgetPeriodCard key={b.id} budgetPeriod={b}>
-          {categories.map(cat => (
-            <CategoryList key={cat.id} category={cat}>
-              {cat.categories.map(sc => {
-                const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
-                return (
-                  <SubCategoryList
-                    key={sc.id}
-                    category={sc}
-                    requestCount={reqs.length}
-                  >
-                    {f.map(reqs, (r, i) => (
-                      <F key={r.id}>
-                        <div
-                          className={cx({
-                            'border-bottom': i + 1 < reqs.length // not if last
-                          })}
-                        >
-                          <RequestLine request={r} editQuery={editQuery} />
-                        </div>
-                      </F>
-                    ))}
-                  </SubCategoryList>
-                )
-              })}
-            </CategoryList>
-          ))}
-        </BudgetPeriodCard>
-      ))}
-    </F>
   )
 }

@@ -5,26 +5,13 @@ import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
 
-function titleBySelection(selected, values) {
-  const count = selected.length
-  if (count === 0) {
-    return 'Keine Ausgew\xE4hlt'
-  }
-  if (count > 3) {
-    return `${count} selektiert`
-  }
-  return selected
-    .map(item => values.filter(({ value }) => value === item)[0])
-    .map(item => item && item.label)
-    .join(', ')
-}
-
 class MultiSelect extends React.PureComponent {
   constructor() {
     super()
     this.state = { dropdownOpen: false, selected: [] }
     this.onCheckboxChange = this.onCheckboxChange.bind(this)
     this.onSelectAllChange = this.onSelectAllChange.bind(this)
+    this.handleOnChangeCallback = this.handleOnChangeCallback.bind(this)
   }
 
   componentDidMount() {
@@ -50,15 +37,24 @@ class MultiSelect extends React.PureComponent {
           .filter(val => (val === item ? isSelected : true))
         return { selected }
       },
-      () => this.props.onChange(this.state.selected)
+      () => this.handleOnChangeCallback()
     )
   }
 
   onSelectAllChange(event) {
     const isSelected = event.target.checked
-    this.setState((prev, props) => ({
-      selected: !isSelected ? [] : props.values.map(({ id }) => id)
-    }))
+    this.setState(
+      (prev, props) => ({
+        selected: !isSelected ? [] : props.values.map(({ id }) => id)
+      }),
+      () => this.handleOnChangeCallback()
+    )
+  }
+
+  handleOnChangeCallback() {
+    this.props.onChange({
+      target: { name: this.props.name, value: this.state.selected }
+    })
   }
 
   render({ props, state } = this) {
@@ -137,3 +133,21 @@ MultiSelect.propTypes = {
 }
 
 export default MultiSelect
+
+function titleBySelection(selected, values) {
+  const count = selected.length
+  const valuesCount = values.length
+  if (count === valuesCount) {
+    return 'Alle ausgew\xE4hlt'
+  }
+  if (count === 0) {
+    return 'Keine ausgew\xE4hlt'
+  }
+  if (count > 3) {
+    return `${count} selektiert`
+  }
+  return selected
+    .map(item => values.filter(({ value }) => value === item)[0])
+    .map(item => item && item.label)
+    .join(', ')
+}

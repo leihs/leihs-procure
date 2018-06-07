@@ -71,8 +71,7 @@ const REQUESTS_QUERY = gql`
     }
     requests(
       budget_period_id: $budgetPeriods
-      category_id: $categories
-      organization_id: $organizations
+      category_id: $categories # organization_id: $organizations
     ) {
       ...RequestFieldsForIndex
     }
@@ -106,24 +105,23 @@ class RequestsIndexPage extends React.Component {
       currentFilters: { ...state.filters, ...filters }
     }))
   }
+  onDataRefresh(client) {
+    client.resetStore()
+  }
   render({ state } = this) {
-    const fakeFilters = {
-      budgetPeriods: ['9fb023db-725d-5881-8838-bae3e970ffd0']
-    }
     return (
-      <Query query={FILTERS_QUERY}>
+      <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
         {filtersData => {
           return (
             <Query
               query={REQUESTS_QUERY}
-              // TODO: variables={state.currentFilters}
-              variables={fakeFilters}
+              variables={state.currentFilters}
+              notifyOnNetworkStatusChange
             >
               {requestsQuery => {
                 return (
                   <RequestsListFiltered
-                    currentFilters={fakeFilters} // tmp
-                    // currentFilters={state.currentFilters}
+                    currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
                     filters={filtersData}
                     requestsQuery={requestsQuery}
