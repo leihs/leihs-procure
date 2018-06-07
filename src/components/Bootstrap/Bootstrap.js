@@ -78,8 +78,8 @@ export const Col = ({ order, cls, ...props }) => {
   return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
 }
 
-export const Button = ({ flat, className, ...props }) => (
-  <BsButton {...props} className={cx(className, { 'btn-flat': flat })} />
+export const Button = ({ flat, className, cls, ...props }) => (
+  <BsButton {...props} className={cx(className, cls, { 'btn-flat': flat })} />
 )
 Button.propTypes = {
   className: PropTypes.string,

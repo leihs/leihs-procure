@@ -55,9 +55,15 @@ const FilterBar = ({
   }
 
   const available = {
-    budgetPeriods: data.budget_periods,
-    categories: data.categories,
-    organizations: data.organizations
+    budgetPeriods: f
+      .sortBy(data.budget_periods, 'name')
+      .map(({ id, name }) => ({ value: id, label: name })),
+    categories: f
+      .sortBy(data.categories, 'name')
+      .map(({ id, name }) => ({ value: id, label: name })),
+    organizations: f
+      .sortBy(data.organizations, 'name')
+      .map(({ id, name }) => ({ value: id, label: name }))
   }
 
   return (
@@ -68,17 +74,31 @@ const FilterBar = ({
         values={currentFilters}
         onChange={onFilterChange}
       >
-        {({ formPropsFor }) => {
+        {({ formPropsFor, setValue }) => {
+          const selectAllFilters = () => {
+            Object.keys(available).forEach(k =>
+              setValue(k, f.map(available[k], 'value'))
+            )
+          }
+
           return (
             <F>
+              <FormGroup>
+                <Button
+                  size="sm"
+                  color="link"
+                  cls="pl-0"
+                  onClick={selectAllFilters}
+                >
+                  select all
+                </Button>
+              </FormGroup>
               <FormGroup label={'Budgetperioden'}>
                 <Select
                   {...formPropsFor('budgetPeriods')}
                   multiple
                   emptyOption={false}
-                  options={f
-                    .sortBy(available.budgetPeriods, 'name')
-                    .map(({ id, name }) => ({ value: id, label: name }))}
+                  options={available.budgetPeriods}
                 />
               </FormGroup>
               <FormGroup label={'Kategorien'}>
@@ -86,9 +106,7 @@ const FilterBar = ({
                   {...formPropsFor('categories')}
                   multiple
                   emptyOption={false}
-                  options={f
-                    .sortBy(available.categories, 'name')
-                    .map(({ id, name }) => ({ value: id, label: name }))}
+                  options={available.categories}
                 />
               </FormGroup>
               <FormGroup label={'Organisationen'}>
@@ -96,9 +114,7 @@ const FilterBar = ({
                   {...formPropsFor('organizations')}
                   multiple
                   emptyOption={false}
-                  options={f
-                    .sortBy(available.organizations, 'name')
-                    .map(({ id, name }) => ({ value: id, label: name }))}
+                  options={available.organizations}
                 />
               </FormGroup>
               {/* <MultiSelect

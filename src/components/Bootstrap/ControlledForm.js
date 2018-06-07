@@ -67,7 +67,8 @@ export default class ControlledForm extends React.PureComponent {
       const conf = { ...defaultConf, ...opts }
       const { idPrefix } = conf
       const getValue = name => f.get(fields, name) || ''
-      const setValue = (name, value) => this.updateField({ name, value })
+      const setValue = (name, value) =>
+        this.updateField({ name, value }, props.onChange)
 
       return {
         formPropsFor: name => ({
