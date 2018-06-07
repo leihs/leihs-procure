@@ -1,5 +1,6 @@
 import React from 'react'
 // import cx from 'classnames'
+import { Route, Switch, NavLink } from 'react-router-dom'
 import f from 'lodash'
 
 import { Query } from 'react-apollo'
@@ -19,10 +20,24 @@ import {
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
+import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 // import ControlledForm from '../components/ControlledForm'
 import UserAutocomplete from '../components/UserAutocomplete'
 
+const CATEGORIES_INDEX_QUERY = gql`
+  query MainCategoriesIndex {
+    main_categories {
+      id
+      name
+      image_url
+    }
+  }
+`
+
+// TODO: get singe MainCat by id!
+// Currently not too bad, rendering is more expensive than fetching,
+// also due to caching it only fetches once anyhow!
 const CATEGORIES_QUERY = gql`
   query MainCategories {
     main_categories {
@@ -40,6 +55,7 @@ const CATEGORIES_QUERY = gql`
       }
       categories {
         id
+        name
         cost_center
         general_ledger_account
         inspectors {
@@ -48,21 +64,62 @@ const CATEGORIES_QUERY = gql`
           firstname
           lastname
         }
-        name
+        # FIXME: remove this when MainCategory.categories scope is fixed
+        main_category_id
       }
     }
   }
 `
 
+// FIXME: remove this when MainCategory.categories scope is fixed
+function tmpCleanupCategory(mainCat) {
+  return {
+    ...mainCat,
+    categories: mainCat.categories.filter(
+      subCat => subCat.main_category_id === mainCat.id
+    )
+  }
+}
+
 // # PAGE
 //
-const AdminCategoriesPage = () => (
-  <Query query={CATEGORIES_QUERY}>
+const AdminCategoriesPage = ({ match }) => (
+  <Query query={CATEGORIES_INDEX_QUERY}>
     {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>
+      if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} />
 
-      return <AdminCategories categories={data.main_categories} />
+      // FIXME: remove filtering when backend fixed
+      const categories = data.main_categories.filter(({ id }) => id)
+
+      return (
+        <MainWithSidebar
+          sidebar={
+            <TableOfContents categories={categories} baseUrl={match.url} />
+          }
+        >
+          <Switch>
+            <Route
+              exact
+              path={`${match.url}/:mainCatId`}
+              component={CategoryPage}
+            />
+            {/* show "index" with all content if no mainCat selected */}
+            <Route exact path={match.url}>
+              <Query query={CATEGORIES_QUERY}>
+                {({ loading, error, data }) => {
+                  if (loading) return <Loading />
+                  if (error) return <ErrorPanel error={error} />
+
+                  return data.main_categories
+                    .map(tmpCleanupCategory)
+                    .map(c => <CategoryCard key={c.id} {...c} />)
+                }}
+              </Query>
+            </Route>
+          </Switch>
+        </MainWithSidebar>
+      )
     }}
   </Query>
 )
@@ -71,12 +128,21 @@ export default AdminCategoriesPage
 
 // # VIEW PARTIALS
 //
-const AdminCategories = ({ categories }) => (
-  <MainWithSidebar sidebar={<TableOfContents categories={categories} />}>
-    {categories
-      .filter(({ id }) => id) // FIXME: remove when backend fixed
-      .map(c => <CategoryCard {...c} key={c.id} />)}
-  </MainWithSidebar>
+
+const CategoryPage = ({ match }) => (
+  <Query query={CATEGORIES_QUERY}>
+    {({ loading, error, data }) => {
+      if (loading) return <Loading />
+      if (error) return <ErrorPanel error={error} />
+
+      const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+      const mainCat = tmpCleanupCategory(
+        f.find(data.main_categories, { id: mainCatId })
+      )
+
+      return <CategoryCard {...mainCat} />
+    }}
+  </Query>
 )
 
 const CategoryCard = ({ id, name, image_url, budget_limits, categories }) => (
@@ -154,17 +220,25 @@ const CategoryCard = ({ id, name, image_url, budget_limits, categories }) => (
   </div>
 )
 
-const TableOfContents = ({ categories }) => (
-  <nav>
-    <h5 className="px-3 pt-3">Categories</h5>
+const TableOfContents = ({ categories, baseUrl }) => (
+  <nav className="pt-3">
+    <h5>
+      <NavLink className="nav-link text-dark" to={baseUrl}>
+        Categories
+      </NavLink>
+    </h5>
     <ul className="nav flex-column">
       {categories
         .filter(({ id }) => id) // FIXME: remove when backend fixed
         .map(c => (
           <li key={c.id} className="nav-item">
-            <a className="nav-link active" href={`#cat-${c.id}`}>
+            <NavLink
+              className="nav-link"
+              activeClassName="disabled text-dark"
+              to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
+            >
               {c.name}
-            </a>
+            </NavLink>
             {/* NOTE: dont show subcats for now */}
             {/* <ul className="list-unstyled text-muted">
               {c.categories.map(subcat => (
