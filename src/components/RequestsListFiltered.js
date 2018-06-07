@@ -4,6 +4,9 @@ import f from 'lodash'
 import { DateTime } from 'luxon'
 
 import {
+  Row,
+  Col,
+  Button,
   Collapse,
   FormGroup,
   ControlledForm,
@@ -157,7 +160,17 @@ const RequestsList = ({
 
   return (
     <F>
+      <Row>
+        <Col sm>
           <h4>{requests.length} Requests</h4>
+        </Col>
+        <Col sm="1" cls="h4 text-right">
+          <Button title="refresh data" onClick={refetchAllData}>
+            <Icon.Reload />
+          </Button>
+        </Col>
+      </Row>
+
       {budgetPeriods.map(b => (
         <BudgetPeriodCard key={b.id} budgetPeriod={b}>
           {categories.map(cat => (

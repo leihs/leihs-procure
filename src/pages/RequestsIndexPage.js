@@ -119,6 +119,10 @@ class RequestsIndexPage extends React.Component {
               notifyOnNetworkStatusChange
             >
               {requestsQuery => {
+                const refetchAllData = () => {
+                  filtersData.refetch()
+                  requestsQuery.refetch()
+                }
                 return (
                   <RequestsListFiltered
                     currentFilters={state.currentFilters}
@@ -126,6 +130,7 @@ class RequestsIndexPage extends React.Component {
                     filters={filtersData}
                     requestsQuery={requestsQuery}
                     editQuery={REQUEST_EDIT_QUERY}
+                    refetchAllData={refetchAllData}
                   />
                 )
               }}

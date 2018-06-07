@@ -25,6 +25,7 @@ import faCaretUp from '@fortawesome/fontawesome-free-solid/faCaretUp'
 import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown'
 import faCaretLeft from '@fortawesome/fontawesome-free-solid/faCaretLeft'
 import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight'
+import faSyncAlt from '@fortawesome/fontawesome-free-solid/faSyncAlt'
 
 const ICONS = {
   CaretUp: {
@@ -98,6 +99,9 @@ const ICONS = {
   },
   User: {
     src: faUserCircle
+  },
+  Reload: {
+    src: faSyncAlt
   }
 }
 
