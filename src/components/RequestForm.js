@@ -31,14 +31,13 @@ const prepareFormValues = request => {
   return fields
 }
 
-const RequestForm = ({ data, className, onClose }) => {
-  const request = f.first(data.requests)
+const RequestForm = ({ request, className, onClose, onSubmit }) => {
   const fields = prepareFormValues(request)
 
   return (
     <ControlledForm idPrefix={`request_form_${request.id}`} values={fields}>
       {({ fields, ...formHelper }) => {
-        // add auto-translated labels:
+        // add translated labels:
         const formPropsFor = k => ({
           ...formHelper.formPropsFor(k),
           label: t(`request_form_field.${k}`)
@@ -50,7 +49,7 @@ const RequestForm = ({ data, className, onClose }) => {
             className={cx(className)}
             onSubmit={e => {
               e.preventDefault()
-              alert(JSON.stringify(fields, 0, 2))
+              onSubmit(fields)
             }}
           >
             <Row>
@@ -74,7 +73,11 @@ const RequestForm = ({ data, className, onClose }) => {
                   />
                 </FormGroup>
 
-                <FormField type="textarea" {...formPropsFor('motivation')} />
+                {request.motivation.write ? (
+                  <FormField type="textarea" {...formPropsFor('motivation')} />
+                ) : (
+                  fields.motivation
+                )}
 
                 <Row>
                   <Col sm>
@@ -182,6 +185,7 @@ const RequestForm = ({ data, className, onClose }) => {
                   <FilePicker id="attachments" name="attachments" />
                 </FormGroup>
 
+                {/* FIXME: accounting_type
                 <FormGroup>
                   <ButtonRadio
                     {...formPropsFor('accounting_type')}
@@ -208,7 +212,7 @@ const RequestForm = ({ data, className, onClose }) => {
                       />
                     </Col>
                   </Row>
-                )}
+                )} */}
               </Col>
             </Row>
 
@@ -216,13 +220,25 @@ const RequestForm = ({ data, className, onClose }) => {
 
             <Row m="t-5">
               <Col lg>
-                <button type="submit" className="btn m-1 btn-outline-dark">
+                <button
+                  type="button"
+                  className="btn m-1 btn-outline-dark"
+                  onClick={() => window.alert('TODO!')}
+                >
                   <Icon.Exchange /> {t('form_btn_move_category')}
                 </button>
-                <button type="submit" className="btn m-1 btn-outline-dark">
+                <button
+                  type="button"
+                  className="btn m-1 btn-outline-dark"
+                  onClick={() => window.alert('TODO!')}
+                >
                   <Icon.Calendar /> {t('form_btn_change_budget_period')}
                 </button>
-                <button type="submit" className="btn m-1 btn-outline-danger">
+                <button
+                  type="button"
+                  className="btn m-1 btn-outline-danger"
+                  onClick={() => window.alert('TODO!')}
+                >
                   <Icon.Trash /> {t('form_btn_delete')}
                 </button>
               </Col>

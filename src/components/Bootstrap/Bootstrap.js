@@ -79,7 +79,11 @@ export const Col = ({ order, cls, ...props }) => {
 }
 
 export const Button = ({ flat, className, cls, ...props }) => (
-  <BsButton {...props} className={cx(className, cls, { 'btn-flat': flat })} />
+  <BsButton
+    type="button" // default in case not given, otherwise its 'submit'
+    {...props}
+    className={cx(className, cls, { 'btn-flat': flat })}
+  />
 )
 Button.propTypes = {
   className: PropTypes.string,

@@ -147,9 +147,10 @@ export const RequestFieldsForShow = gql`
 
     # TODO: attachments
 
-    accounting_type {
-      ...RequestFieldString
-    }
+    # FIXME: accounting_type
+    # accounting_type {
+    #   ...RequestFieldString
+    # }
     # internal_order_id
   }
   ${RequestFieldsForIndex}

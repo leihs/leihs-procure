@@ -177,11 +177,11 @@ const RequestsList = ({
   return (
     <F>
       <Row>
-        <Col sm>
+        <Col>
           <h4>{requests.length} Requests</h4>
         </Col>
-        <Col sm="1" cls="h4 text-right">
-          <Button title="refresh data" onClick={refetchAllData}>
+        <Col xs="1" cls="text-right">
+          <Button color="link" title="refresh data" onClick={refetchAllData}>
             <Icon.Reload />
           </Button>
         </Col>
