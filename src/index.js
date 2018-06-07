@@ -13,6 +13,7 @@ import App from './components/App'
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
+import UiPlayground from './pages/_UiPlayground'
 
 // webpack: inject styles
 import './styles/index.css'
@@ -20,14 +21,20 @@ import './styles/index.css'
 // lodash setup
 f.mixin(lodashMixins)
 
+const supportsHistory = 'pushState' in window.history
+const withPlayground = process.env.NODE_ENV === 'development'
+
 const Root = () => (
   <ApolloProvider client={apolloClient}>
-    <BrowserRouter>
-      <App>
+    <BrowserRouter forceRefresh={!supportsHistory}>
+      <App withPlayground={withPlayground}>
         <Switch>
           <Route exact path="/" component={RequestsIndex} />
           <Route exact path="/admin/users" component={AdminUsers} />
-          <Route exact path="/admin/categories" component={AdminCategories} />
+          <Route path="/admin/categories" component={AdminCategories} />
+          {!!withPlayground && (
+            <Route strict path="/playground" component={UiPlayground} />
+          )}
           <Route component={() => '404'} />
         </Switch>
       </App>

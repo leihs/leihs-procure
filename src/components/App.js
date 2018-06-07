@@ -13,7 +13,7 @@ const Brand = () => (
   </F>
 )
 
-const Navbar = () => (
+const Navbar = ({ withPlayground }) => (
   <nav className="navbar navbar-dark bg-dark navbar-expand-sm">
     <span className="navbar-brand h1 mb-0" href="#">
       <Brand />
@@ -29,6 +29,11 @@ const Navbar = () => (
       <Link className="nav-link" to="/admin/categories">
         categories
       </Link>
+      {!!withPlayground && (
+        <Link className="nav-link" to="/playground">
+          [PLAYGROUND]
+        </Link>
+      )}
     </div>
   </nav>
 )
@@ -36,11 +41,11 @@ const Navbar = () => (
 const NavbarWithRouter = withRouter(Navbar)
 
 class App extends Component {
-  render({ props: { children } } = this) {
+  render({ props: { children, withPlayground } } = this) {
     return (
       // TODO: set lang to instance default language
       <div className="ui-app" lang="de">
-        <NavbarWithRouter />
+        <NavbarWithRouter withPlayground={withPlayground} />
         {children}
       </div>
     )
