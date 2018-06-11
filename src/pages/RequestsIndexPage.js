@@ -1,5 +1,5 @@
 import React from 'react'
-// import f from 'lodash'
+import f from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -88,6 +88,13 @@ const REQUEST_EDIT_QUERY = gql`
   ${Fragments.RequestFieldsForShow}
 `
 
+const LOCAL_STORE_KEY = 'leihs-procure'
+const STORE_KEY_FILTERS = `${LOCAL_STORE_KEY}.filters`
+const getSavedFilters = () =>
+  f.try(() => JSON.parse(window.localStorage.getItem(STORE_KEY_FILTERS)))
+const setSavedFilters = o =>
+  f.try(() => window.localStorage.setItem(STORE_KEY_FILTERS, JSON.stringify(o)))
+
 class RequestsIndexPage extends React.Component {
   constructor() {
     super()
@@ -95,15 +102,19 @@ class RequestsIndexPage extends React.Component {
       currentFilters: {
         budgetPeriods: [],
         categories: [],
-        organizations: []
+        organizations: [],
+        ...getSavedFilters()
       }
     }
     this.onFilterChange = this.onFilterChange.bind(this)
   }
   onFilterChange(filters) {
-    this.setState(state => ({
-      currentFilters: { ...state.filters, ...filters }
-    }))
+    this.setState(
+      state => ({
+        currentFilters: { ...state.filters, ...filters }
+      }),
+      () => setSavedFilters(this.state.currentFilters)
+    )
   }
   onDataRefresh(client) {
     client.resetStore()

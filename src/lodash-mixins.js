@@ -1,6 +1,14 @@
 import f from 'lodash'
 import assert from 'assert'
 
+const lodash_try = fn => {
+  try {
+    return fn()
+  } catch (e) {
+    // ignore errors
+  }
+}
+
 const present = val => {
   return (
     // do what the coffeescript `?` operator compiles to
@@ -37,7 +45,8 @@ const enhyphenUUID = s => {
       .join('-')
 }
 
-export default {
+const mixins = {
+  try: lodash_try,
   present,
   presence,
   uniqBy,
@@ -46,8 +55,18 @@ export default {
   enhyphenUUID
 }
 
+export default mixins
+// FOR USAGE IN CONSOLE: f.mixin(mixins)
+
 // docs & tests…
 if (process.env.NODE_ENV !== 'production') {
+  const THROWING_FN = () => {
+    throw new Error('WTF')
+  }
+  assert.equal(lodash_try(() => 23), 23)
+  assert.strictEqual((() => lodash_try(THROWING_FN))(), undefined)
+  assert.doesNotThrow(() => lodash_try(THROWING_FN))
+
   assert.equal(present({ a: 1 }), true)
   assert.equal(present([1]), true)
   assert.equal(present(true), true)
