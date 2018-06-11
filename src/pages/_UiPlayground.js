@@ -16,10 +16,37 @@ import {
 } from '../components/Bootstrap'
 import ControlledForm from '../components/Bootstrap/ControlledForm'
 import { MainWithSidebar } from '../components/Layout'
+import Loading from '../components/Loading'
 
 // # DATA
 
 const PAGES = [
+  {
+    id: 'loading-indicator',
+    title: 'Loading indicator',
+    content: (
+      <F>
+        <p>default size</p>
+        <hr />
+        <Loading />
+        <hr />
+        <p>sizes 1, 2, 3, 4, 5, 6</p>
+        <hr />
+        <Loading size="1" />
+        <hr />
+        <Loading size="2" />
+        <hr />
+        <Loading size="3" />
+        <hr />
+        <Loading size="4" />
+        <hr />
+        <Loading size="5" />
+        <hr />
+        <Loading size="6" />
+        <hr />
+      </F>
+    )
+  },
   {
     id: 'controlled-form',
     title: 'Controlled Form',
