@@ -35,6 +35,8 @@ const RequestsIndex = props => (
     <RequestsList
       requestsQuery={props.requestsQuery}
       refetchAllData={props.refetchAllData}
+      openPanels={props.openPanels}
+      onPanelToggle={props.onPanelToggle}
       editQuery={props.editQuery} //tmp?
       filters={props.currentFilters} // tmp
     />
@@ -162,7 +164,9 @@ const RequestsList = ({
   requestsQuery: { loading, error, data },
   editQuery,
   filters,
-  refetchAllData
+  refetchAllData,
+  openPanels,
+  onPanelToggle
 }) => {
   const pageHeader = (
     <Row>
@@ -206,14 +210,21 @@ const RequestsList = ({
       {budgetPeriods.map(b => (
         <BudgetPeriodCard key={b.id} budgetPeriod={b}>
           {categories.map(cat => (
-            <CategoryList key={cat.id} category={cat}>
+            <CategoryLine
+              key={cat.id}
+              category={cat}
+              isOpen={openPanels.cats.includes(cat.id)}
+              onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
+            >
               {cat.categories.map(sc => {
                 const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
                 return (
-                  <SubCategoryList
+                  <SubCategoryLine
                     key={sc.id}
                     category={sc}
                     requestCount={reqs.length}
+                    isOpen={openPanels.cats.includes(sc.id)}
+                    onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
                   >
                     {f.map(reqs, (r, i) => (
                       <F key={r.id}>
@@ -226,10 +237,10 @@ const RequestsList = ({
                         </div>
                       </F>
                     ))}
-                  </SubCategoryList>
+                  </SubCategoryLine>
                 )
               })}
-            </CategoryList>
+            </CategoryLine>
           ))}
         </BudgetPeriodCard>
       ))}
@@ -300,8 +311,13 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   )
 }
 
-const CategoryList = ({ category, canToggle, ...props }) => (
-  <Collapse id={'bp' + category.id} canToggle={canToggle}>
+const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
+  <Collapse
+    id={'bp' + category.id}
+    canToggle={canToggle}
+    startOpen={isOpen}
+    onChange={({ isOpen }) => onToggle(isOpen)}
+  >
     {({
       isOpen,
       canToggle,
@@ -335,12 +351,23 @@ const CategoryList = ({ category, canToggle, ...props }) => (
   </Collapse>
 )
 
-const SubCategoryList = ({ category, requestCount, ...props }) => {
+const SubCategoryLine = ({
+  category,
+  requestCount,
+  isOpen,
+  onToggle,
+  ...props
+}) => {
   const showChildren = (isOpen, children) =>
     !!isOpen && React.Children.count(children) > 0
 
   return (
-    <Collapse id={'bp' + category.id} canToggle={requestCount > 0}>
+    <Collapse
+      id={'bp' + category.id}
+      canToggle={requestCount > 0}
+      startOpen={isOpen}
+      onChange={({ isOpen }) => onToggle(isOpen)}
+    >
       {({
         isOpen,
         canToggle,

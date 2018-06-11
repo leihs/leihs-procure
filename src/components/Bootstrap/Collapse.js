@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import f from 'lodash'
 import Icon from '../Icons'
 
 export class Collapse extends React.Component {
@@ -14,7 +15,13 @@ export class Collapse extends React.Component {
   onToggleOpen(event) {
     event.preventDefault()
     if (!this.props.canToggle) return
-    this.setState(s => ({ isOpen: !s.isOpen }))
+    this.setState(s => ({ isOpen: !s.isOpen }), () => this.handleCallback())
+  }
+
+  handleCallback() {
+    if (f.isFunction(this.props.onChange)) {
+      this.props.onChange(this.state)
+    }
   }
 
   render({ props: { id, children, canToggle }, state: { isOpen } } = this) {

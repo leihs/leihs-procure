@@ -89,31 +89,49 @@ const REQUEST_EDIT_QUERY = gql`
 `
 
 const LOCAL_STORE_KEY = 'leihs-procure'
-const STORE_KEY_FILTERS = `${LOCAL_STORE_KEY}.filters`
-const getSavedFilters = () =>
-  f.try(() => JSON.parse(window.localStorage.getItem(STORE_KEY_FILTERS)))
-const setSavedFilters = o =>
-  f.try(() => window.localStorage.setItem(STORE_KEY_FILTERS, JSON.stringify(o)))
+const storageFactory = ({ KEY }) => {
+  return {
+    get: () => f.try(() => JSON.parse(window.localStorage.getItem(KEY))),
+    set: o => f.try(() => window.localStorage.setItem(KEY, JSON.stringify(o)))
+  }
+}
+const userSavedFilters = storageFactory({ KEY: `${LOCAL_STORE_KEY}.filters` })
+const savedPanelTree = storageFactory({ KEY: `${LOCAL_STORE_KEY}.panelTree` })
 
 class RequestsIndexPage extends React.Component {
   constructor() {
     super()
     this.state = {
+      openPanels: {
+        cats: [],
+        ...savedPanelTree.get()
+      },
       currentFilters: {
         budgetPeriods: [],
         categories: [],
         organizations: [],
-        ...getSavedFilters()
+        ...userSavedFilters.get()
       }
     }
     this.onFilterChange = this.onFilterChange.bind(this)
+    this.onPanelToggle = this.onPanelToggle.bind(this)
+  }
+  onPanelToggle(isOpen, id, key = 'cats') {
+    const current = this.state.openPanels[key]
+    const list = isOpen ? current.concat(id) : current.filter(i => i !== id)
+    this.setState(
+      state => ({
+        openPanels: { ...state.openPanels, [key]: list }
+      }),
+      () => savedPanelTree.set(this.state.openPanels)
+    )
   }
   onFilterChange(filters) {
     this.setState(
       state => ({
         currentFilters: { ...state.filters, ...filters }
       }),
-      () => setSavedFilters(this.state.currentFilters)
+      () => userSavedFilters.set(this.state.currentFilters)
     )
   }
   onDataRefresh(client) {
@@ -142,6 +160,8 @@ class RequestsIndexPage extends React.Component {
                     requestsQuery={requestsQuery}
                     editQuery={REQUEST_EDIT_QUERY}
                     refetchAllData={refetchAllData}
+                    openPanels={state.openPanels}
+                    onPanelToggle={this.onPanelToggle}
                   />
                 )
               }}
