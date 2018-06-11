@@ -1,5 +1,5 @@
 import React, { Component, Fragment as F } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { withRouter } from 'react-router'
 
 import Icon from './Icons'
@@ -13,27 +13,23 @@ const Brand = () => (
   </F>
 )
 
+const NavItem = p => (
+  <NavLink className="nav-link" activeClassName="text-light" {...p} />
+)
+
 const Navbar = ({ withPlayground }) => (
   <nav className="navbar navbar-dark bg-dark navbar-expand-sm">
     <span className="navbar-brand h1 mb-0" href="#">
       <Brand />
     </span>
     <div className="navbar-nav">
-      <Link className="nav-link" to="/">
+      <NavItem exact to="/">
         requests
-      </Link>
+      </NavItem>
       <span className="navbar-text">admin</span>
-      <Link className="nav-link" to="/admin/users">
-        users
-      </Link>
-      <Link className="nav-link" to="/admin/categories">
-        categories
-      </Link>
-      {!!withPlayground && (
-        <Link className="nav-link" to="/playground">
-          [PLAYGROUND]
-        </Link>
-      )}
+      <NavItem to="/admin/users">users</NavItem>
+      <NavItem to="/admin/categories">categories</NavItem>
+      {!!withPlayground && <NavItem to="/playground">[PLAYGROUND]</NavItem>}
     </div>
   </nav>
 )

@@ -1,5 +1,5 @@
 import React, { Fragment as F } from 'react'
-import { Route, Switch, Redirect, Link } from 'react-router-dom'
+import { Route, Switch, Redirect, NavLink } from 'react-router-dom'
 // import cx from 'classnames'
 import f from 'lodash'
 
@@ -123,14 +123,21 @@ export default UiPlayground
 
 const titleOrById = (title, id) => title || String(id).toUpperCase()
 
+const NavItem = p => (
+  <li className="nav-item">
+    <NavLink className="nav-link" activeClassName="text-dark" {...p} />
+  </li>
+)
+
 const TableofContents = ({ baseUrl }) => (
   <ul className="p-2 nav flex-md-column">
+    <NavItem to={baseUrl}>
+      <h5>Playground</h5>
+    </NavItem>
     {PAGES.map(({ id, title }) => (
-      <li key={id} className="nav-item">
-        <Link className="nav-link " key={id} to={`${baseUrl}/${id}`}>
-          {titleOrById(title, id)}
-        </Link>
-      </li>
+      <NavItem key={id} to={id ? `${baseUrl}/${id}` : baseUrl}>
+        {titleOrById(title, id)}
+      </NavItem>
     ))}
   </ul>
 )
