@@ -32,15 +32,18 @@ const prepareFormValues = request => {
 }
 
 const RequestForm = ({ request, className, onClose, onSubmit }) => {
-  const fields = prepareFormValues(request)
-
   return (
-    <ControlledForm idPrefix={`request_form_${request.id}`} values={fields}>
+    <ControlledForm
+      idPrefix={`request_form_${request.id}`}
+      values={prepareFormValues(request)}
+    >
       {({ fields, ...formHelper }) => {
-        // add translated labels:
-        const formPropsFor = k => ({
-          ...formHelper.formPropsFor(k),
-          label: t(`request_form_field.${k}`)
+        const formPropsFor = key => ({
+          ...formHelper.formPropsFor(key),
+          // add translated labels:
+          label: t(`request_form_field.${key}`),
+          // add readonly by field permissions
+          readOnly: request[key] ? !request[key].write : null
         })
 
         return (
@@ -54,7 +57,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
           >
             <Row>
               <Col lg>
-                <FormField {...formPropsFor('article_name')} />
+                <FormField readOnly {...formPropsFor('article_name')} />
 
                 <FormField {...formPropsFor('article_number')} />
 
@@ -63,21 +66,22 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                 <FormField {...formPropsFor('receiver')} />
 
                 <FormGroup label={formPropsFor('building').label}>
-                  <BuildingAutocomplete {...formPropsFor('building')} />
+                  <BuildingAutocomplete
+                    {...formPropsFor('building')}
+                    disabled={formPropsFor('room').readOnly}
+                    readOnly={formPropsFor('room').readOnly}
+                  />
                 </FormGroup>
 
                 <FormGroup label={formPropsFor('room').label}>
                   <RoomAutocomplete
                     {...formPropsFor('room')}
+                    disabled={formPropsFor('room').readOnly}
                     buildingId={fields.building}
                   />
                 </FormGroup>
 
-                {request.motivation.write ? (
-                  <FormField type="textarea" {...formPropsFor('motivation')} />
-                ) : (
-                  fields.motivation
-                )}
+                <FormField type="textarea" {...formPropsFor('motivation')} />
 
                 <Row>
                   <Col sm>
@@ -177,6 +181,18 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                         value: s,
                         label: s
                       }))}
+                      disabled={formPropsFor('inspection_comment').readOnly}
+                      // NOTE: we dont want to keep the selected value and ust use it once.
+                      // Always setting empty value makes it controlled and React resets it for us!
+                      value={''}
+                      onChange={({ target: { value } }) => {
+                        formHelper.setValue(
+                          'inspection_comment',
+                          value +
+                            '\n' +
+                            formHelper.getValue('inspection_comment')
+                        )
+                      }}
                     />
                   }
                 />

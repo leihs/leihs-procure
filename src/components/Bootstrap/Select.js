@@ -31,6 +31,7 @@ const Select = ({ options, multiple, emptyOption, value, ...props }) => {
       multiple={multiple}
       value={selectedValue}
       onChange={e => {
+        if (props.readOnly) return e.preventDefault()
         props.onChange({
           target: {
             name: props.name,
@@ -52,13 +53,15 @@ const Select = ({ options, multiple, emptyOption, value, ...props }) => {
 Select.defaultProps = {
   multiple: false,
   options: [],
-  emptyOption: { children: '---', value: '' }
+  emptyOption: { children: '---', value: '' },
+  onChange: () => {}
 }
 
 Select.propTypes = {
   id: PropTypes.string,
   className: PropTypes.string,
   multiple: PropTypes.bool,
+  onChange: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,

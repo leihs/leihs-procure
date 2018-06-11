@@ -81,6 +81,9 @@ export const RequestFieldsForShow = gql`
     article_name {
       ...RequestFieldString
     }
+    supplier {
+      ...RequestFieldString
+    }
     receiver {
       ...RequestFieldString
     }

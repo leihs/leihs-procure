@@ -36,14 +36,25 @@ export default class ControlledForm extends React.PureComponent {
     this.updateField = this.updateField.bind(this)
   }
 
-  // if new values given via props, reset internal fields state
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.values === prevState.originalValues) return null
-    if (nextProps.values === prevState.fields) return null
-    return { fields: nextProps.values, originalValues: nextProps.values }
-  }
+  //
+  // NOTE: not needed, form state always wins, otherwise reset from outside!
+  //
+  // // if new values given via props, reset internal fields state
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   log('getDerivedStateFromProps', { nextProps, prevState })
+  //   if (nextProps.values === prevState.originalValues) {
+  //     log('getDerivedStateFromProps', 'no update, values === originalValues')
+  //     return null
+  //   }
+  //   if (nextProps.values === prevState.fields) {
+  //     log('getDerivedStateFromProps', 'no update, values === fields')
+  //     return null
+  //   }
+  //   return { fields: nextProps.values, originalValues: nextProps.values }
+  // }
 
   handleInputChange(event) {
+    log('handleInputChange', { event })
     this.updateField(getFieldFromEvent(event), fields => {
       if (this.props.onChange) {
         this.props.onChange(fields)
@@ -62,6 +73,7 @@ export default class ControlledForm extends React.PureComponent {
   }
 
   render({ props, state } = this) {
+    log('render', { props, state })
     const connectFormProps = (fields, opts = {}) => {
       const defaultConf = { idPrefix: this.props.idPrefix }
       const conf = { ...defaultConf, ...opts }
