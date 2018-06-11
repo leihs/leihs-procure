@@ -49,26 +49,25 @@ const FilterBar = ({
   onFilterChange,
   ...rest
 }) => {
-  if (loading) return <Loading />
-  if (error) {
-    return <ErrorPanel error={error} />
-  }
+  const content = () => {
+    if (loading) return <Loading />
+    if (error) {
+      return <ErrorPanel error={error} />
+    }
 
-  const available = {
-    budgetPeriods: f
-      .sortBy(data.budget_periods, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
-    categories: f
-      .sortBy(data.categories, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
-    organizations: f
-      .sortBy(data.organizations, 'name')
-      .map(({ id, name }) => ({ value: id, label: name }))
-  }
+    const available = {
+      budgetPeriods: f
+        .sortBy(data.budget_periods, 'name')
+        .map(({ id, name }) => ({ value: id, label: name })),
+      categories: f
+        .sortBy(data.categories, 'name')
+        .map(({ id, name }) => ({ value: id, label: name })),
+      organizations: f
+        .sortBy(data.organizations, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    }
 
-  return (
-    <div className="h-100 p-3 bg-light" style={{ minHeight: '100vh' }}>
-      <h5>Filters</h5>
+    return (
       <ControlledForm
         idPrefix="requests_filter"
         values={currentFilters}
@@ -118,14 +117,21 @@ const FilterBar = ({
                 />
               </FormGroup>
               {/* <MultiSelect
-                id="foo"
-                name="foo"
-                values={[{ value: '1', label: 'one' }]}
-              /> */}
+              id="foo"
+              name="foo"
+              values={[{ value: '1', label: 'one' }]}
+            /> */}
             </F>
           )
         }}
       </ControlledForm>
+    )
+  }
+
+  return (
+    <div className="h-100 p-3 bg-light" style={{ minHeight: '100vh' }}>
+      <h5>Filters</h5>
+      {content()}
     </div>
   )
 }
@@ -158,7 +164,26 @@ const RequestsList = ({
   filters,
   refetchAllData
 }) => {
-  if (loading) return <Loading />
+  const pageHeader = (
+    <Row>
+      <Col>
+        <h4>{f.get(data, 'requests.length') || 0} Requests</h4>
+      </Col>
+      <Col xs="1" cls="text-right">
+        <Button color="link" title="refresh data" onClick={refetchAllData}>
+          <Icon.Reload spin={loading} />
+        </Button>
+      </Col>
+    </Row>
+  )
+
+  if (loading)
+    return (
+      <F>
+        {pageHeader}
+        <Loading size="1" />
+      </F>
+    )
   if (error) return <ErrorPanel error={error} />
 
   const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
@@ -176,16 +201,7 @@ const RequestsList = ({
 
   return (
     <F>
-      <Row>
-        <Col>
-          <h4>{requests.length} Requests</h4>
-        </Col>
-        <Col xs="1" cls="text-right">
-          <Button color="link" title="refresh data" onClick={refetchAllData}>
-            <Icon.Reload />
-          </Button>
-        </Col>
-      </Row>
+      {pageHeader}
 
       {budgetPeriods.map(b => (
         <BudgetPeriodCard key={b.id} budgetPeriod={b}>

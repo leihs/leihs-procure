@@ -111,7 +111,7 @@ class RequestsIndexPage extends React.Component {
   render({ state } = this) {
     return (
       <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
-        {filtersData => {
+        {filtersQuery => {
           return (
             <Query
               query={REQUESTS_QUERY}
@@ -119,15 +119,15 @@ class RequestsIndexPage extends React.Component {
               notifyOnNetworkStatusChange
             >
               {requestsQuery => {
-                const refetchAllData = () => {
-                  filtersData.refetch()
-                  requestsQuery.refetch()
+                const refetchAllData = async () => {
+                  await filtersQuery.refetch()
+                  await requestsQuery.refetch()
                 }
                 return (
                   <RequestsListFiltered
                     currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
-                    filters={filtersData}
+                    filters={filtersQuery}
                     requestsQuery={requestsQuery}
                     editQuery={REQUEST_EDIT_QUERY}
                     refetchAllData={refetchAllData}
