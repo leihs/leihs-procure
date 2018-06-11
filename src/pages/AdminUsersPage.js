@@ -186,7 +186,6 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
                       title="remove as admin"
                       color="link"
                       outline
-                      flat
                       size="sm"
                       disabled={loading}
                       onClick={() =>
@@ -345,10 +344,10 @@ const ListOfRequestersAndOrgs = ({
                 </Row>
               </FormGroup>
 
-              <button type="submit" className="btn m-1 btn-primary">
+              <button type="submit" className="btn m-1 btn-primary btn-massive">
                 <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
               </button>
-              {/* <button type="button" className="btn m-1 btn-outline-secondary">
+              {/* <button type="button" className="btn m-1 btn-outline-secondary btn-massive">
               {t('form_btn_cancel')}
             </button> */}
             </form>

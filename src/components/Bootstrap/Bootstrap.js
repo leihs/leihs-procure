@@ -78,16 +78,16 @@ export const Col = ({ order, cls, ...props }) => {
   return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
 }
 
-export const Button = ({ flat, className, cls, ...props }) => (
+export const Button = ({ massive, className, cls, ...props }) => (
   <BsButton
     type="button" // default in case not given, otherwise its 'submit'
     {...props}
-    className={cx(className, cls, { 'btn-flat': flat })}
+    className={cx(className, cls, { 'btn-massive': massive })}
   />
 )
 Button.propTypes = {
   className: PropTypes.string,
-  flat: PropTypes.bool
+  massive: PropTypes.bool
 }
 
 export const Badge = props => {
@@ -276,7 +276,7 @@ FormField.propTypes = FormFieldPropTypes
 
 export const FilePicker = ({ id, name, label }) => (
   <div>
-    <label className="btn btn-sm btn-block btn-flat btn-outline-secondary text-left">
+    <label className="btn btn-sm btn-block  btn-outline-secondary text-left">
       <Icon.Paperclip /> {label}
       <input id={id} name={name} type="file" style={{ opacity: 0, width: 0 }} />
     </label>

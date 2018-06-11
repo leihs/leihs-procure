@@ -222,33 +222,36 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
               <Col lg>
                 <button
                   type="button"
-                  className="btn m-1 btn-outline-dark"
+                  className="btn m-1 btn-outline-dark btn-massive"
                   onClick={() => window.alert('TODO!')}
                 >
                   <Icon.Exchange /> {t('form_btn_move_category')}
                 </button>
                 <button
                   type="button"
-                  className="btn m-1 btn-outline-dark"
+                  className="btn m-1 btn-outline-dark btn-massive"
                   onClick={() => window.alert('TODO!')}
                 >
                   <Icon.Calendar /> {t('form_btn_change_budget_period')}
                 </button>
                 <button
                   type="button"
-                  className="btn m-1 btn-outline-danger"
+                  className="btn m-1 btn-outline-danger btn-massive"
                   onClick={() => window.alert('TODO!')}
                 >
                   <Icon.Trash /> {t('form_btn_delete')}
                 </button>
               </Col>
               <Col lg order="first" className="mt-3 mt-lg-0">
-                <button type="submit" className="btn m-1 btn-primary">
+                <button
+                  type="submit"
+                  className="btn m-1 btn-primary btn-massive"
+                >
                   <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                 </button>
                 <button
                   type="button"
-                  className="btn m-1 btn-outline-secondary"
+                  className="btn m-1 btn-outline-secondary btn-massive"
                   onClick={onClose}
                 >
                   {t('form_btn_cancel')}

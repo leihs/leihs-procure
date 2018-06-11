@@ -10,7 +10,9 @@ export const MainWithSidebar = ({ sidebar, children }) => (
       <Col className="col-md-3 col-lg-2">{sidebar}</Col>
 
       <Main role="main" className="col-md-9 col-lg-10 pt-3">
-        <Container fluid>{children}</Container>
+        <Container fluid cls="h-100">
+          {children}
+        </Container>
       </Main>
     </Row>
   </div>

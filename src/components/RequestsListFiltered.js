@@ -67,7 +67,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="h-100 p-3 bg-light">
+    <div className="h-100 p-3 bg-light" style={{ minHeight: '100vh' }}>
       <h5>Filters</h5>
       <ControlledForm
         idPrefix="requests_filter"

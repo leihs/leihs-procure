@@ -53,7 +53,7 @@ class ButtonRadio extends React.PureComponent {
             <F key={n}>
               <Label
                 cls={cx(
-                  'btn btn-block btn-flat btn-outline-secondary m-0 text-left font-weight-bold',
+                  'btn btn-block  btn-outline-secondary m-0 text-left font-weight-bold',
                   {
                     'border-left-0': n !== 0,
                     active: isSelected

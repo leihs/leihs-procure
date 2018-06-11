@@ -268,7 +268,6 @@ const ListOfUsers = ({ users }) => (
                 title="remove as admin"
                 color="link"
                 outline
-                flat
                 size="sm"
                 disabled={false}
                 onClick={() => alert({ id: user.id })}
