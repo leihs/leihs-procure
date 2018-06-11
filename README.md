@@ -1,20 +1,22 @@
 Testing Notes
 
-* FilterBar: not all filters in UI yet
-* FilterBar: no MultiSelect UI component yet
-* FilterBar: no persistance yet, temporary button 'select all' to make it faster
+- FilterBar: not all filters in UI yet
+- FilterBar: no MultiSelect UI component yet
+- FilterBar: no persistance yet, temporary button 'select all' to make it faster
 
 ---
 
 TODO:
 
-* categories page, only render 1 cat per sub-route
-* routing for edit-request (id param)
-* autocompleters for Building + Room
-* router: block navigation when editing
-* request filters:
-  * build sane defaults server-side if none saved?
-  * when filter arg is [] = no result; when null = no filter!
+- categories page, only render 1 cat per sub-route
+- prefetch request-edit data when hovering request line <https://www.apollographql.com/docs/react/features/performance.html>
+- try out batched requests <https://www.apollographql.com/docs/react/features/performance.html>
+- routing for edit-request (id param)
+- autocompleters for Building + Room
+- router: block navigation when editing
+- request filters:
+  - build sane defaults server-side if none saved? (all orgs, all cats, only current period…)
+  - when filter arg is [] = no result; when null = no filter!
 
 ---
 
