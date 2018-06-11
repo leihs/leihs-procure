@@ -1,25 +1,90 @@
 import f from 'lodash'
+import assert from 'assert'
+
+const present = val => {
+  return (
+    // do what the coffeescript `?` operator compiles to
+    typeof val !== 'undefined' &&
+    val !== null &&
+    // AND (not "isEmpty" OR a primitive type)
+    (!f.isEmpty(val) ||
+      f.isNumber(val) ||
+      f.isBoolean(val) ||
+      f.isFunction(val))
+  )
+}
+
+const presence = val => {
+  if (present(val)) {
+    return val
+  }
+}
 
 const uniqBy = (arr, key) =>
   f.uniqWith(arr, (a, b) => f.isEqual(f.get(a, key), f.get(b, key)))
+
+const uniqById = arr => uniqBy(arr, 'id')
 
 const dehyphenUUID = uuid =>
   String(uuid)
     .split('-')
     .join('')
 
-const enhyphenUUID = s =>
-  [
-    s.slice(0, 8),
-    s.slice(8, 12),
-    s.slice(12, 16),
-    s.slice(16, 20),
-    s.slice(20)
-  ].join('-')
+const enhyphenUUID = s => {
+  if (f.isString(s))
+    return [8, 12, 16, 20, 32]
+      .reduce((m, i, n, a) => [...m, s.slice(a[n - 1], a[n])], [])
+      .join('-')
+}
 
 export default {
+  present,
+  presence,
   uniqBy,
-  uniqById: arr => uniqBy(arr, 'id'),
+  uniqById,
   dehyphenUUID,
   enhyphenUUID
+}
+
+// docs & tests…
+if (process.env.NODE_ENV !== 'production') {
+  assert.equal(present({ a: 1 }), true)
+  assert.equal(present([1]), true)
+  assert.equal(present(true), true)
+  assert.equal(present(false), true)
+  assert.equal(present(function() {}), true)
+  assert.equal(present({}), false)
+  assert.equal(present([]), false)
+  assert.equal(present(undefined), false)
+  assert.equal(present(null), false)
+
+  assert.equal(presence(23) || 42, 23)
+  assert.equal(presence(null) || 42, 42)
+
+  assert.deepEqual(
+    uniqBy(
+      [{ n: 1, name: 'one' }, { n: 2, name: 'two' }, { n: 1, name: 'eins' }],
+      'n'
+    ),
+    [{ n: 1, name: 'one' }, { n: 2, name: 'two' }]
+  )
+
+  assert.deepEqual(
+    uniqById([
+      { id: 1, name: 'one' },
+      { id: 2, name: 'two' },
+      { id: 1, name: 'eins' }
+    ]),
+    [{ id: 1, name: 'one' }, { id: 2, name: 'two' }]
+  )
+
+  assert.equal(
+    dehyphenUUID('2ea39047-e663-50d5-9080-838b75883704'),
+    '2ea39047e66350d59080838b75883704'
+  )
+
+  assert.equal(
+    enhyphenUUID('2ea39047e66350d59080838b75883704'),
+    '2ea39047-e663-50d5-9080-838b75883704'
+  )
 }
