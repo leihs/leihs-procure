@@ -63,16 +63,16 @@ class ButtonRadio extends React.PureComponent {
                 tabIndex="-1"
               >
                 <input
+                  className="sr-only"
+                  tabIndex={n === 0 ? 0 : -1}
                   {...item}
+                  type="radio"
                   id={inputID}
                   name={name}
                   value={value}
-                  type="radio"
+                  autoComplete="off"
                   aria-checked={isSelected}
-                  tabIndex={n === 0 ? 0 : -1}
                   onClick={onRadioClick}
-                  className="sr-only"
-                  // autoComplete="off-even-in-chrome"
                 />
                 {withIcons &&
                   (isSelected ? (

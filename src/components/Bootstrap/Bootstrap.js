@@ -151,11 +151,15 @@ export const InputText = props => (
   <ControlledInput {...props}>
     {inputProps => (
       <Node
-        autoComplete="off-even-in-chrome"
         {...inputProps}
         tag="input"
         type="text"
         cls={['form-control', inputProps.cls]}
+        autoComplete={
+          props.autoComplete === true // let the browser decide if true, or
+            ? null // pass through given prop or turn off if falsy/nothing
+            : props.autoComplete || 'off'
+        }
       />
     )}
   </ControlledInput>
@@ -188,6 +192,7 @@ export const FormField = ({
   placeholder,
   type = 'text',
   value,
+  autoComplete,
   ...inputProps
 }) => {
   const supportedTypes = [
@@ -234,18 +239,23 @@ export const FormField = ({
     mainClass = 'form-control-plaintext'
   }
 
+  const inputAutoComplete =
+    autoComplete === true // let the browser decide if true, or
+      ? null // pass through given prop or turn off if falsy/nothing
+      : autoComplete || 'off'
+
   const inputNode = (
     <Node
+      aria-describedby={helpText ? `${id}--Help` : null}
+      {...inputProps}
       tag={tag}
       cls={mainClass}
       type={type}
-      {...inputProps}
       id={id}
       name={name}
       value={value === null ? '' : value}
+      autoComplete={inputAutoComplete}
       placeholder={placeholder}
-      autoComplete="off-even-in-chrome"
-      aria-describedby={helpText ? `${id}--Help` : null}
     />
   )
 

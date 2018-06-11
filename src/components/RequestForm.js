@@ -60,7 +60,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
 
                 <FormField {...formPropsFor('supplier')} />
 
-                <FormField {...formPropsFor('receiver')} autoComplete="name" />
+                <FormField {...formPropsFor('receiver')} />
 
                 <FormGroup label={formPropsFor('building').label}>
                   <BuildingAutocomplete {...formPropsFor('building')} />
