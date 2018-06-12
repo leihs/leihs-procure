@@ -45,9 +45,9 @@ const REQUESTS_QUERY = gql`
   # Query using distinct entry points bc also empty "groups" are shown,
   # also it makes iterating over them much simpler.
   query RequestsIndexFiltered(
+    $search: String
     $budgetPeriods: [ID]
-    $categories: [ID]
-    $organizations: [ID]
+    $categories: [ID] # $organizations: [ID]
   ) {
     # TODO: filter arg (id: $budgetPeriods)
     budget_periods {
@@ -70,6 +70,7 @@ const REQUESTS_QUERY = gql`
       }
     }
     requests(
+      search: $search
       budget_period_id: $budgetPeriods
       category_id: $categories # organization_id: $organizations
     ) {
@@ -107,6 +108,7 @@ class RequestsIndexPage extends React.Component {
         ...savedPanelTree.get()
       },
       currentFilters: {
+        search: '',
         budgetPeriods: [],
         categories: [],
         organizations: [],

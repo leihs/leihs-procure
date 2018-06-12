@@ -74,6 +74,7 @@ const Filters = ({ data, current, onChange }) => {
                 select all
               </Button>
             </FormGroup>
+            <FormField label="Suche" {...formPropsFor('search')} />
             <FormGroup label={'Budgetperioden'}>
               <Select
                 {...formPropsFor('budgetPeriods')}
@@ -90,14 +91,15 @@ const Filters = ({ data, current, onChange }) => {
                 options={available.categories}
               />
             </FormGroup>
-            <FormGroup label={'Organisationen'}>
+            {/* FIXME: wait for MultiSelect (can only select non-root!)
+              <FormGroup label={'Organisationen'}>
               <Select
                 {...formPropsFor('organizations')}
                 multiple
                 emptyOption={false}
                 options={available.organizations}
               />
-            </FormGroup>
+            </FormGroup> */}
             {/* <MultiSelect
           id="foo"
           name="foo"
