@@ -27,7 +27,7 @@ const FilterBar = ({
   }
 
   return (
-    <div className="h-100 p-3 bg-light" style={{ minHeight: '100vh' }}>
+    <div className="h-100 p-3 bg-light mh-md-100vh">
       <h5>Filters</h5>
       {content()}
     </div>

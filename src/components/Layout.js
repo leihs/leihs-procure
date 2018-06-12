@@ -5,7 +5,7 @@ import { Container, Main, Row, Col } from './Bootstrap'
 export const MainWithSidebar = ({ sidebar, children }) => (
   // NOTE: full-page height wrapper cant also be a Row,
   //       it interferes with flexbox…
-  <div style={{ minHeight: '100vh' }}>
+  <div className="mh-100vh">
     <Row cls="no-gutters">
       <Col className="col-md-3 col-lg-2">{sidebar}</Col>
 
