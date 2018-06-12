@@ -7,7 +7,7 @@ import * as Fragments from '../queries/fragments'
 import { FILTERS_QUERY } from '../queries/RequestFilters'
 // import Loading from '../components/Loading'
 // import { ErrorPanel } from '../components/Error'
-import RequestsListFiltered from '../components/RequestsListFiltered'
+import RequestsDashboard from '../components/RequestsDashboard'
 
 // NOTE: there are 2 separate queries for filterbar and request list.
 // they are not coordinated in any way (yet), so for now its a 2-step loading UI.
@@ -153,7 +153,7 @@ class RequestsIndexPage extends React.Component {
                   await requestsQuery.refetch()
                 }
                 return (
-                  <RequestsListFiltered
+                  <RequestsDashboard
                     currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
                     filters={filtersQuery}
