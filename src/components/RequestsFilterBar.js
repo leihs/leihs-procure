@@ -46,7 +46,17 @@ const Filters = ({ data, current, onChange }) => {
       .map(({ id, name }) => ({ value: id, label: name })),
     organizations: f
       .sortBy(data.organizations, 'name')
-      .map(({ id, name }) => ({ value: id, label: name }))
+      .map(({ id, name }) => ({ value: id, label: name })),
+    priority: [
+      { label: 'Normal', value: 'normal' },
+      { label: 'Hoch', value: 'high' }
+    ],
+    inspectory_priority: [
+      { label: 'Zwingend', value: 'mandatory' },
+      { label: 'Hoch', value: 'high' },
+      { label: 'Mittel', value: 'medium' },
+      { label: 'Tief', value: 'low' }
+    ]
   }
 
   return (
@@ -98,6 +108,23 @@ const Filters = ({ data, current, onChange }) => {
                 multiple
                 emptyOption={false}
                 options={available.organizations}
+              />
+            </FormGroup> */}
+            <FormGroup label={'Priorität'}>
+              <Select
+                {...formPropsFor('priority')}
+                multiple
+                emptyOption={false}
+                options={available.priority}
+              />
+            </FormGroup>
+            {/* FIXME: backend doesnt work?
+              <FormGroup label={'Priorität des Prüfers'}>
+              <Select
+                {...formPropsFor('inspectory_priority')}
+                multiple
+                emptyOption={false}
+                options={available.inspectory_priority}
               />
             </FormGroup> */}
             {/* <MultiSelect

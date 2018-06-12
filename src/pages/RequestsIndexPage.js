@@ -47,6 +47,8 @@ const REQUESTS_QUERY = gql`
   query RequestsIndexFiltered(
     $search: String
     $budgetPeriods: [ID]
+    $priority: [String]
+    $inspectory_priority: [String]
     $categories: [ID] # $organizations: [ID]
   ) {
     # TODO: filter arg (id: $budgetPeriods)
@@ -73,6 +75,8 @@ const REQUESTS_QUERY = gql`
       search: $search
       budget_period_id: $budgetPeriods
       category_id: $categories # organization_id: $organizations
+      priority: $priority
+      inspectory_priority: $inspectory_priority
     ) {
       ...RequestFieldsForIndex
     }
@@ -112,6 +116,8 @@ class RequestsIndexPage extends React.Component {
         budgetPeriods: [],
         categories: [],
         organizations: [],
+        priority: [],
+        inspectory_priority: [],
         ...userSavedFilters.get()
       }
     }

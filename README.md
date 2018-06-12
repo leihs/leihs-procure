@@ -17,6 +17,7 @@ TODO:
 - request filters:
   - build sane defaults server-side if none saved? (all orgs, all cats, only current period…)
   - when filter arg is [] = no result; when null = no filter!
+- API: typify all the strings, e.g. priority
 
 ---
 
