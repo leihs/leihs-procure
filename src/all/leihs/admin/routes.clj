@@ -11,8 +11,11 @@
     [leihs.admin.resources.api-tokens.back :as api-tokens]
     [leihs.admin.resources.auth.back :as auth]
     [leihs.admin.resources.delegation.back :as delegation]
-    [leihs.admin.resources.delegations.back :as delegations]
     [leihs.admin.resources.delegation.users.back :as delegation-users]
+    [leihs.admin.resources.delegations.back :as delegations]
+    [leihs.admin.resources.group.back :as group]
+    [leihs.admin.resources.group.users.back :as group-users]
+    [leihs.admin.resources.groups.back :as groups]
     [leihs.admin.resources.initial-admin.core :as initial-admin]
     [leihs.admin.resources.settings.back :as settings]
     [leihs.admin.resources.shutdown.back :as shutdown]
@@ -69,6 +72,10 @@
    :delegation-user delegation-users/routes
    :delegation-users delegation-users/routes
    :delegations delegations/routes
+   :groups groups/routes
+   :group group/routes
+   :group-users group-users/routes
+   :group-user group-users/routes
    :initial-admin initial-admin/routes
    :not-found html/not-found-handler
    :redirect-to-root redirect-to-root-handler

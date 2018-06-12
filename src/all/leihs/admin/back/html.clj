@@ -24,7 +24,7 @@
 
 (defn include-font-css []
   (hiccup.page/include-css
-    "/admin/css/fontawesome-free-5.0.9/css/fontawesome-all.css"))
+    "/admin/css/fontawesome-free-5.0.13/css/fontawesome-all.css"))
 
 (defn head []
   [:head

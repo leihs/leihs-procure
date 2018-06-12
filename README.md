@@ -135,9 +135,6 @@ Last two, can come later. The other have interdependencies in some way.
 * on sign-in: delete expired user_sessions; otherwise they will hang
     around for ever if concurrent sessions are allowed
 
-* protect and redirect initial-admin resource
-
-* on sign-out: also delete shibboleth cookie
 
 ##### Possible Tickets
 
@@ -189,5 +186,35 @@ GNB8P4tPxD8VEtZ1Hx4sK/RJb7fN5tRtrGjYNv0p6+W1y0IYN21yq+FrbLopxPEp
 WIDbg6hFVPYzghyDUi4tH1jk03AIgt1TpuBbsO84ydPPsKoPiFXqMAg/
 =Lftp
 -----END PGP MESSAGE-----
+
+
+
+
+
+# Authentication
+
+## LDAP
+
+### Security 
+
+Writing a secure LDAP authentication is not simple!
+
+OWASP Recommendation
+
+> Properties of Safe LDAP Client APIs
+
+> Many developers (perhaps the majority) using LDAP client libraries are trying
+> to accomplish a simple task: authenticate users to their application by
+> leveraging the directory server's password store. An effective way to do this
+> can be to simply attempt an LDAP bind as the user that is trying to
+> authenticate, using the password provided by the user. This process often
+> does not require the use of LDAP filter expressions and avoids the risk of
+> search filter injection. 
+
+https://www.owasp.org/index.php/Projects/OWASP_Framework_Security_Project/Secure_LDAP_API_Standard#Documents_LDAP_Bind_Authentication_Without_Filter_Queries
+
+
+## E-Mail
+
 
 

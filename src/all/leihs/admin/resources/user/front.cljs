@@ -438,9 +438,8 @@
    [:div.card-header.bg-warning
     [:h2 "Delete User"]]
    [:div.card-body
-    [:p.text-warning
-     "This variant is relatively save. "
-     "If the to be deleted user is associated to contracts or other entities "
+    [:p
+     "Deleting this user is not possible if the user is associated with contracts or other entities "
      "the delete operation will just fail without destroying data. "]
     [:div.float-right
      [:button.btn.btn-warning.btn-lg
@@ -471,9 +470,9 @@
    [:div.card-header.bg-danger
     [:h2 "Transfer Data and Delete User"]]
    [:div.card-body
-    [:p.text-warning
-     "Related data of the to be deleted user will "
-     "transfered, respectively re-associated with the specified user. "
+    [:p
+     "Related data of this user will be "
+     "transfered, respectively re-associated with the user entered below."
      "Leihs itself will be consistent after this operation. "]
     [:p.text-danger
      "Audits will still contain references to the removed user! "]

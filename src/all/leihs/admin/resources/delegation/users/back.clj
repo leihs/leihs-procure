@@ -5,6 +5,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.delegation.users.shared :refer [delegation-users-filter-value]]
     [leihs.admin.resources.users.back :as users]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
@@ -51,16 +52,13 @@
     :users (->> (users-formated-query request)
                 (jdbc/query tx))}})
 
-; TODO this is not idempotent 
-(defn add-user [{tx :tx :as request
-                    {delegation-id :delegation-id 
-                     user-id :user-id} :route-params}]
-  (if (= 1 (->> {:delegation_id delegation-id
-                 :user_id user-id}
-                (jdbc/insert! tx :delegations_users )
-                count))
-    {:status 204}
-    (throw (ex-info "Add delegation-user failed" {:request request}))))
+(defn put-user [{tx :tx :as request
+                 {delegation-id :delegation-id 
+                  user-id :user-id} :route-params}]
+  (utils.jdbc/insert-or-update!
+    tx :delegations_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
+    {:delegation_id delegation-id :user_id user-id})
+  {:status 204})
 
 (defn remove-user [{tx :tx :as request
                     {delegation-id :delegation-id 
@@ -76,7 +74,7 @@
 
 (def routes
   (cpj/routes
-    (cpj/PUT delegation-user-path [] #'add-user)
+    (cpj/PUT delegation-user-path [] #'put-user)
     (cpj/DELETE delegation-user-path [] #'remove-user)
     (cpj/GET (path :delegation-users {:delegation-id ":delegation-id"}) [] #'users)))
 

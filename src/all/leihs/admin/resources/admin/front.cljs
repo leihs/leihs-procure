@@ -21,6 +21,7 @@
         (breadcrumbs/li :admin-buildings " Buildings ")
         (breadcrumbs/delegations-li)
         (breadcrumbs/li :admin-fields " Fields ")
+        (breadcrumbs/groups-li)
         (breadcrumbs/li :admin-inventory-pools " Inventory Pools ")
         (breadcrumbs/li :admin-languages " Languages ")
         (breadcrumbs/li :admin-mail-templates " Mail templates ")
@@ -31,8 +32,7 @@
         (breadcrumbs/users-li)]))
    [:div
     [:h1 "Admin"]
-    [:p "The application with programming interface to "
-     "administrate this instance of "
+    [:p "The application to administrate this instance of "
      [:em " leihs"]"."]]
 
    (when-not @state/user*

@@ -4,7 +4,7 @@
   #{
     :email 
     :firstname 
-    :id 
+    :users.id 
     :img32_url 
     :lastname 
     :login 
@@ -21,7 +21,7 @@
     :created_at
     :email
     :firstname
-    :id
+    :users.id
     :img256_url
     :img32_url
     :img_digest

@@ -72,6 +72,22 @@
                           (param :target-user-id)
                           (leaf "" :user-transfer-data)))))
 
+(def groups-paths 
+  (branch "/groups"
+          (branch "/"
+                  (leaf "" :groups)
+                  (leaf "add" :group-add))
+          (branch "/" 
+                  (param :group-id)
+                  (leaf "" :group)
+                  (leaf "/delete" :group-delete)
+                  (leaf "/edit" :group-edit)
+                  (branch "/users"
+                          (leaf "/" :group-users)
+                          (branch "/"
+                                  (param :user-id)
+                                  (leaf "" :group-user))))))
+
 (def paths
   (branch ""
           (leaf "/" :home)
@@ -97,6 +113,7 @@
                   (leaf "/" :admin)
                   delegation-paths
                   users-paths
+                  groups-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)

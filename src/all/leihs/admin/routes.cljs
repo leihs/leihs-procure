@@ -16,6 +16,9 @@
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
+    [leihs.admin.resources.groups.front :as groups]
+    [leihs.admin.resources.group.front :as group]
+    [leihs.admin.resources.group.users.front :as group-users]
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.initial-admin.core :as initial-admin]
     [leihs.admin.resources.user.front :as user]
@@ -50,6 +53,12 @@
    :delegation-users #'delegation-users/index-page
    :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
    :delegations #'delegations/page
+   :group #'group/show-page
+   :group-add #'group/add-page
+   :group-delete #'group/delete-page
+   :group-edit #'group/edit-page
+   :group-users #'group-users/index-page
+   :groups #'groups/page
    :initial-admin #'initial-admin/page
    :home #'home/page
    :request #'leihs.admin.front.requests.pages.request/page

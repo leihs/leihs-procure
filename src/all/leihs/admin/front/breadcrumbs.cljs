@@ -45,8 +45,19 @@
   (li :delegation-users  
       [:span icons/users " Users "] 
       {:delegation-id delegation-id} {}))
-
 (defn delegations-li [] (li :delegations [:span icons/delegations " Delegations "]))
+
+
+(defn group-delete-li [id] (li :group-delete [:span [:i.fas.fa-times] " Delete "] {:group-id id} {}))
+(defn group-edit-li [id] (li :group-edit [:span [:i.fas.fa-edit] " Edit "] {:group-id id} {}))
+(defn group-li [id] (li :group [:span icons/group " Group "] {:group-id id} {}))
+(defn group-add-li [] (li :group-add [:span [:i.fas.fa-plus-circle] " Add group "]))
+(defn groups-li [] (li :groups [:span icons/groups " Groups "] {} {}))
+(defn group-users-li [group-id] 
+  (li :group-users  
+      [:span icons/users " Users "] 
+      {:group-id group-id} {}))
+
 
 (defn email-li [address] [:li.breadcrumb-item {:key (str "mailto:" address )} [:a {:href (str "mailto:" address )} [:i.fas.fa-envelope] " Email "]])
 (defn initial-admin-li [] (li :initial-admin "Initial-Admin"))
