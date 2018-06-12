@@ -12,7 +12,7 @@ import {
   FormField,
   Select,
   ButtonRadio,
-  ControlledForm
+  StatefulForm
 } from './Bootstrap'
 
 import { RequestTotalAmount as TotalAmount } from './decorators'
@@ -33,7 +33,7 @@ const prepareFormValues = request => {
 
 const RequestForm = ({ request, className, onClose, onSubmit }) => {
   return (
-    <ControlledForm
+    <StatefulForm
       idPrefix={`request_form_${request.id}`}
       values={prepareFormValues(request)}
     >
@@ -278,7 +278,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
           </form>
         )
       }}
-    </ControlledForm>
+    </StatefulForm>
   )
 }
 

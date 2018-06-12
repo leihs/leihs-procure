@@ -5,7 +5,7 @@ export * from './helpers'
 
 export { Collapse } from './Collapse'
 
-export { default as ControlledForm, ControlledInput } from './ControlledForm'
+export { default as StatefulForm, StatefulInput } from './StatefulForm'
 
 export { default as Select } from './Select'
 export { default as ButtonRadio } from './ButtonRadio'

@@ -4,7 +4,7 @@ import React from 'react'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
-// import ControlledForm from '../components/ControlledForm'
+// import StatefulForm from '../components/StatefulForm'
 // import Icon from '../components/Icons'
 import { Div } from '../components/Bootstrap'
 

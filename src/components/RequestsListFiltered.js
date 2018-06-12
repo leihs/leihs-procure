@@ -9,7 +9,7 @@ import {
   Button,
   Collapse,
   FormGroup,
-  ControlledForm,
+  StatefulForm,
   Select
 } from './Bootstrap'
 // import MultiSelect from './Bootstrap/MultiSelect'
@@ -70,7 +70,7 @@ const FilterBar = ({
     }
 
     return (
-      <ControlledForm
+      <StatefulForm
         idPrefix="requests_filter"
         values={currentFilters}
         onChange={onFilterChange}
@@ -126,7 +126,7 @@ const FilterBar = ({
             </F>
           )
         }}
-      </ControlledForm>
+      </StatefulForm>
     )
   }
 

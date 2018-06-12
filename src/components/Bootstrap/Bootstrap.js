@@ -6,7 +6,7 @@ import f from 'lodash'
 import BsButton from 'reactstrap/lib/Button'
 
 import Icon from '../Icons'
-import { ControlledInput } from './ControlledForm'
+import { StatefulInput } from './StatefulForm'
 
 const BOOTSTRAP_BREAKPOINTS = ['sm', 'md', 'lg', 'xl']
 const BOOTSTRAP_MODIFIERS = [
@@ -148,7 +148,7 @@ FormGroup.propTypes = {
 }
 
 export const InputText = props => (
-  <ControlledInput {...props}>
+  <StatefulInput {...props}>
     {inputProps => (
       <Node
         {...inputProps}
@@ -162,7 +162,7 @@ export const InputText = props => (
         }
       />
     )}
-  </ControlledInput>
+  </StatefulInput>
 )
 
 const FormFieldPropTypes = {

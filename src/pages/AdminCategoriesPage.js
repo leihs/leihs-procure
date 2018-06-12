@@ -22,7 +22,7 @@ import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
-// import ControlledForm from '../components/ControlledForm'
+// import StatefulForm from '../components/StatefulForm'
 import UserAutocomplete from '../components/UserAutocomplete'
 
 const CATEGORIES_INDEX_QUERY = gql`

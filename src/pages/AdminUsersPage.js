@@ -15,7 +15,7 @@ import {
   Button,
   FormGroup,
   InputText,
-  ControlledForm
+  StatefulForm
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
@@ -236,7 +236,7 @@ const ListOfRequestersAndOrgs = ({
           <Col sm="2" />
         </Row>
 
-        <ControlledForm idPrefix={id} values={requesters}>
+        <StatefulForm idPrefix={id} values={requesters}>
           {({ fields, formPropsFor, getValue, setValue }) => (
             <form
               id={id}
@@ -352,7 +352,7 @@ const ListOfRequestersAndOrgs = ({
             </button> */}
             </form>
           )}
-        </ControlledForm>
+        </StatefulForm>
       </Div>
     )}
   </Mutation>

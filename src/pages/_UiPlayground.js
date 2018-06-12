@@ -14,7 +14,7 @@ import {
   // InputText,
   FormField
 } from '../components/Bootstrap'
-import ControlledForm from '../components/Bootstrap/ControlledForm'
+import StatefulForm from '../components/Bootstrap/StatefulForm'
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 
@@ -52,9 +52,9 @@ const PAGES = [
     title: 'Controlled Form',
     content: (
       <F>
-        <code>{'<ControlledForm/>'}</code>
+        <code>{'<StatefulForm/>'}</code>
         <hr />
-        <ControlledForm idPrefix="mock-form" values={{ foo: '', bar: '' }}>
+        <StatefulForm idPrefix="mock-form" values={{ foo: '', bar: '' }}>
           {({ fields, formPropsFor }) => {
             return (
               <F>
@@ -78,7 +78,7 @@ const PAGES = [
               </F>
             )
           }}
-        </ControlledForm>
+        </StatefulForm>
       </F>
     )
   },

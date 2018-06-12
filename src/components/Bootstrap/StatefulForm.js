@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 import f from 'lodash'
 import fpSet from 'lodash/fp/set'
 import logger from 'debug'
-const log = logger('app:ui:ControlledForm')
+const log = logger('app:ui:StatefulForm')
 
 // NOTE: handling of getDerivedStateFromProps is dependent on keeping the
 //       given props in state as well!
 //       explanations: <https://github.com/reactjs/reactjs.org/issues/721>
 
-// # ControlledForm ############################################################
+// # StatefulForm ############################################################
 // state container to handle a flat form like in plain HTML.
 // input fields use `name`, `value` and `onChange`.
 //
@@ -20,7 +20,7 @@ const log = logger('app:ui:ControlledForm')
 // which will be called with the fields, a callback, and helper.
 // helper `formPropsFor` is recommended for normal usage,
 // `fields`, `connectFormProps`, `onChange` are given as well for customizations.
-export default class ControlledForm extends React.PureComponent {
+export default class StatefulForm extends React.PureComponent {
   static defaultProps = { values: {}, children: () => {}, onChange: () => {} }
   static propTypes = {
     // values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -103,10 +103,10 @@ export default class ControlledForm extends React.PureComponent {
   }
 }
 
-// # ControlledInput ###########################################################
+// # StatefulInput ###########################################################
 // its more performant to keep the state in the field,
 // and only "proxy" the change events with a slight debounce
-export class ControlledInput extends React.PureComponent {
+export class StatefulInput extends React.PureComponent {
   static defaultProps = { value: '', onChange: () => {} }
   static propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -142,7 +142,7 @@ export class ControlledInput extends React.PureComponent {
   render({ props: { children, ...restProps }, state } = this) {
     if (!f.isFunction(children)) {
       throw new Error(
-        'ControlledInput needs a single render function as `children`!'
+        'StatefulInput needs a single render function as `children`!'
       )
     }
     return children({
