@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
+import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
 import Icon from './Icons'
 import {
@@ -85,28 +86,32 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
 
                 <Row>
                   <Col sm>
-                    <FormGroup>
+                    <FormGroup label={t('request_form_field.request_priority')}>
                       <Select
                         {...formPropsFor('priority_requester')}
-                        options={[0, 1, 2, 3].map(n => ({
-                          value: n,
+                        options={CONSTANTS.requestPriorities.map(v => ({
+                          value: v,
                           label: t(
-                            `request_form_field.request_priority_inspector_labels.${n}`
+                            `request_form_field.request_priority_label_${v}`
                           )
                         }))}
                       />
                     </FormGroup>
                   </Col>
                   <Col sm>
-                    <FormGroup>
+                    <FormGroup
+                      label={t('request_form_field.request_priority_inspector')}
+                    >
                       <Select
                         {...formPropsFor('priority_inspector')}
-                        options={[0, 1, 2, 3].map(n => ({
-                          value: n,
-                          label: t(
-                            `request_form_field.request_priority_inspector_labels.${n}`
-                          )
-                        }))}
+                        options={CONSTANTS.requestInspectoryPriorities.map(
+                          v => ({
+                            value: v,
+                            label: t(
+                              `request_form_field.request_priority_inspector_label_${v}`
+                            )
+                          })
+                        )}
                       />
                     </FormGroup>
                   </Col>
@@ -115,10 +120,10 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                 <FormGroup>
                   <ButtonRadio
                     {...formPropsFor('replacement')}
-                    options={['replacement', 'new'].map(k => ({
-                      value: k,
+                    options={CONSTANTS.requestReplacementValues.map(v => ({
+                      value: v,
                       label: t(
-                        `request_form_field.request_replacement_labels_${k}`
+                        `request_form_field.request_replacement_labels_${v}`
                       )
                     }))}
                   />
