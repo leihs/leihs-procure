@@ -4,6 +4,7 @@ import cx from 'classnames'
 import f from 'lodash'
 
 import BsButton from 'reactstrap/lib/Button'
+import BsButtonGroup from 'reactstrap/lib/ButtonGroup'
 
 import Icon from '../Icons'
 import { StatefulInput } from './StatefulForm'
@@ -89,6 +90,8 @@ Button.propTypes = {
   className: PropTypes.string,
   massive: PropTypes.bool
 }
+
+export { BsButtonGroup as ButtonGroup }
 
 export const Badge = props => {
   const restProps = f.omit(props, BOOTSTRAP_MODIFIERS)

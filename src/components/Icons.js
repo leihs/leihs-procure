@@ -2,8 +2,8 @@ import React from 'react'
 import f from 'lodash'
 import cx from 'classnames'
 
-// pick & choose what we use, name & describe it, then export all in one object of components
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+// pick & choose what we use, name & describe it, then export all in one object of components
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
 import faExchange from '@fortawesome/fontawesome-free-solid/faExchangeAlt'
 import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'

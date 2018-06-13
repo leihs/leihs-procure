@@ -102,7 +102,8 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Spezialfilter'}>
-              <code>TBD: Nur eigene Anträge / Nur Kategorien mit Anträgen</code>
+              <code>TBD</code>
+              {/* Nur eigene Anträge / Nur Kategorien mit Anträgen */}
             </FormGroup>
             <FormGroup label={'Organisationen'}>
               <code>TBD</code>

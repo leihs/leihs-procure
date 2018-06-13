@@ -3,7 +3,7 @@ import cx from 'classnames'
 import f from 'lodash'
 import { DateTime } from 'luxon'
 
-import { Row, Col, Button, Collapse } from './Bootstrap'
+import { Row, Col, Button, ButtonGroup, Collapse } from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
@@ -15,7 +15,7 @@ import ImageThumbnail from './ImageThumbnail'
 
 import FilterBar from './RequestsFilterBar'
 // import logger from 'debug'
-// const log = logger('app:ui:RequestsListFiltered')
+// const log = logger('app:ui:RequestsTreeFiltered')
 
 const RequestsDashboard = props => (
   <MainWithSidebar
@@ -27,14 +27,37 @@ const RequestsDashboard = props => (
       />
     }
   >
-    <RequestsList
-      requestsQuery={props.requestsQuery}
-      refetchAllData={props.refetchAllData}
-      openPanels={props.openPanels}
-      onPanelToggle={props.onPanelToggle}
-      editQuery={props.editQuery} //tmp?
-      filters={props.currentFilters} // tmp
-    />
+    <ButtonGroup size="sm">
+      {['tree', 'table'].map(m => (
+        <Button
+          key={m}
+          size="sm"
+          outline
+          color="secondary"
+          active={props.viewMode === m}
+          onClick={e => props.onSetViewMode(m)}
+        >
+          {m}
+        </Button>
+      ))}
+    </ButtonGroup>
+
+    {props.viewMode === 'table' ? (
+      <RequestsTable
+        requestsQuery={props.requestsQuery}
+        refetchAllData={props.refetchAllData}
+        editQuery={props.editQuery} //tmp?
+      />
+    ) : (
+      <RequestsTree
+        requestsQuery={props.requestsQuery}
+        refetchAllData={props.refetchAllData}
+        openPanels={props.openPanels}
+        onPanelToggle={props.onPanelToggle}
+        editQuery={props.editQuery} //tmp?
+        filters={props.currentFilters} // tmp
+      />
+    )}
   </MainWithSidebar>
 )
 
@@ -62,7 +85,7 @@ function tmpFilterBudgetPeriods(periods, filters) {
 //   return categories.filter(c => filters.categories.indexOf(c.id) !== -1)
 // }
 
-const RequestsList = ({
+const RequestsTree = ({
   requestsQuery: { loading, error, data },
   editQuery,
   filters,
@@ -302,5 +325,58 @@ const SubCategoryLine = ({
         </F>
       )}
     </Collapse>
+  )
+}
+
+const RequestsTable = ({
+  requestsQuery: { loading, error, data },
+  editQuery,
+  filters,
+  refetchAllData,
+  openPanels,
+  onPanelToggle
+}) => {
+  const pageHeader = (
+    <Row>
+      <Col>
+        <h4>{f.get(data, 'requests.length') || 0} Requests</h4>
+      </Col>
+      <Col xs="1" cls="text-right">
+        <Button color="link" title="refresh data" onClick={refetchAllData}>
+          <Icon.Reload spin={loading} />
+        </Button>
+      </Col>
+    </Row>
+  )
+
+  if (loading)
+    return (
+      <F>
+        {pageHeader}
+        <Loading size="1" />
+      </F>
+    )
+  if (error) return <ErrorPanel error={error} />
+
+  const requests = f.sortBy(data.requests, r =>
+    [r.budget_period, r.category_id].join('.')
+  )
+
+  return (
+    <F>
+      {pageHeader}
+
+      {f.map(requests, (r, i) => (
+        <F key={r.id}>
+          <div
+            className={cx('border-top', {
+              'border-bottom': i + 1 === requests.length // only last
+            })}
+          >
+            <RequestLine request={r} editQuery={editQuery} />
+          </div>
+        </F>
+      ))}
+    </F>
   )
 }

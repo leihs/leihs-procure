@@ -103,10 +103,13 @@ const storageFactory = ({ KEY }) => {
 const userSavedFilters = storageFactory({ KEY: `${LOCAL_STORE_KEY}.filters` })
 const savedPanelTree = storageFactory({ KEY: `${LOCAL_STORE_KEY}.panelTree` })
 
+const viewModes = ['tree', 'table']
+
 class RequestsIndexPage extends React.Component {
   constructor() {
     super()
     this.state = {
+      viewMode: viewModes[0],
       openPanels: {
         cats: [],
         ...savedPanelTree.get()
@@ -123,6 +126,7 @@ class RequestsIndexPage extends React.Component {
     }
     this.onFilterChange = this.onFilterChange.bind(this)
     this.onPanelToggle = this.onPanelToggle.bind(this)
+    this.onSetViewMode = this.onSetViewMode.bind(this)
   }
   onPanelToggle(isOpen, id, key = 'cats') {
     const current = this.state.openPanels[key]
@@ -133,6 +137,12 @@ class RequestsIndexPage extends React.Component {
       }),
       () => savedPanelTree.set(this.state.openPanels)
     )
+  }
+  onSetViewMode(viewMode) {
+    if (f.includes([], viewMode)) {
+      throw new Error(`Invalid viewMode! '${viewMode}'`)
+    }
+    this.setState({ viewMode })
   }
   onFilterChange(filters) {
     this.setState(
@@ -162,6 +172,7 @@ class RequestsIndexPage extends React.Component {
                 }
                 return (
                   <RequestsDashboard
+                    viewMode={state.viewMode}
                     currentFilters={state.currentFilters}
                     onFilterChange={this.onFilterChange}
                     filters={filtersQuery}
@@ -170,6 +181,7 @@ class RequestsIndexPage extends React.Component {
                     refetchAllData={refetchAllData}
                     openPanels={state.openPanels}
                     onPanelToggle={this.onPanelToggle}
+                    onSetViewMode={this.onSetViewMode}
                   />
                 )
               }}
