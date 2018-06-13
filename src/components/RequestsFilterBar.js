@@ -101,15 +101,20 @@ const Filters = ({ data, current, onChange }) => {
                 options={available.categories}
               />
             </FormGroup>
-            {/* FIXME: wait for MultiSelect (can only select non-root!)
-              <FormGroup label={'Organisationen'}>
+            <FormGroup label={'Spezialfilter'}>
+              <code>TBD: Nur eigene Anträge / Nur Kategorien mit Anträgen</code>
+            </FormGroup>
+            <FormGroup label={'Organisationen'}>
+              <code>TBD</code>
+              {/* FIXME: wait for MultiSelect (can only select non-root!)
               <Select
                 {...formPropsFor('organizations')}
                 multiple
                 emptyOption={false}
                 options={available.organizations}
               />
-            </FormGroup> */}
+              */}
+            </FormGroup>
             <FormGroup label={'Priorität'}>
               <Select
                 {...formPropsFor('priority')}
@@ -118,20 +123,21 @@ const Filters = ({ data, current, onChange }) => {
                 options={available.priority}
               />
             </FormGroup>
-            {/* FIXME: backend doesnt work?
-              <FormGroup label={'Priorität des Prüfers'}>
+            <FormGroup label={'Priorität des Prüfers'}>
+              <code>TBD</code>
+
+              {/* FIXME: backend doesnt work?
               <Select
                 {...formPropsFor('inspectory_priority')}
                 multiple
                 emptyOption={false}
                 options={available.inspectory_priority}
               />
-            </FormGroup> */}
-            {/* <MultiSelect
-          id="foo"
-          name="foo"
-          values={[{ value: '1', label: 'one' }]}
-        /> */}
+              */}
+            </FormGroup>
+            <FormGroup label={'Status Antrag'}>
+              <code>TBD</code>
+            </FormGroup>
           </F>
         )
       }}
