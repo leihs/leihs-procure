@@ -1,8 +1,15 @@
 import f from 'lodash'
 
 const translate = key => {
-  return f.get(translations, key) || `⟪${key}⟫`
+  const fallback = `⟪${key}⟫`
+  // 'foo.bar.baz' => [ 'foo.bar.baz', 'bar.baz', 'baz' ]
+  const paths = key.split('.').map((i, n, a) => a.slice(n).join('.'))
+  const results = paths
+    .map(k => f.get(translations, k))
+    .filter(r => f.isString(r) || f.isNumber(r))
+  return f.first(results) || fallback
 }
+export default translate
 
 const translations = {
   form_btn_save: 'Speichern',
@@ -12,6 +19,17 @@ const translations = {
   form_btn_delete: 'Löschen',
   form_filepicker_label: 'Datei auswählen',
   request_state: 'Status',
+
+  request_priority: 'Priorität',
+  request_priority_label_normal: 'Normal',
+  request_priority_label_high: 'Hoch',
+
+  request_priority_inspector: 'Priorität des Prüfers',
+  request_priority_inspector_label_low: 'Tief',
+  request_priority_inspector_label_medium: 'Mittel',
+  request_priority_inspector_label_high: 'Hoch',
+  request_priority_inspector_label_mandatory: 'Zwingend',
+
   request_form_field: {
     article_name: 'Artikel oder Projekt',
     article_number: 'Artikelnr. oder Herstellernr.',
@@ -20,10 +38,7 @@ const translations = {
     building: 'Gebäude',
     room: 'Raum',
     motivation: 'Begründung',
-    priority_requester: 'Priorität',
-    request_priority_requester_labels: ['Tief', 'Mittel', 'Hoch', 'Zwingend'],
-    priority_inspector: 'Priorität des Prüfers',
-    request_priority_inspector_labels: ['Tief', 'Mittel', 'Hoch', 'Zwingend'],
+
     replacement: 'Ersatz / Neu',
     request_replacement_labels_new: 'Neu',
     request_replacement_labels_replacement: 'Ersatz',
@@ -46,5 +61,3 @@ const translations = {
   accounting_type_investment: 'Investition',
   accounting_type_aquisition: 'Beschaffung'
 }
-
-export default translate
