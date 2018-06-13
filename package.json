@@ -51,6 +51,7 @@
     "eslint-plugin-react": "^7.9.1",
     "prettier": "^1.13.5",
     "prettier-eslint": "^8.2.1",
+    "react-test-renderer": "^16.4.0",
     "source-map-explorer": "git+https://github.com/danvk/source-map-explorer.git#b74f718"
   },
   "prettier": {
