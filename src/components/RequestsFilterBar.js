@@ -2,7 +2,7 @@ import React, { Fragment as F } from 'react'
 // import cx from 'classnames'
 import f from 'lodash'
 
-import { Button, FormField, FormGroup, StatefulForm, Select } from './Bootstrap'
+import { Button, InputText, FormGroup, StatefulForm, Select } from './Bootstrap'
 
 // import Icon from './Icons'
 import Loading from './Loading'
@@ -84,7 +84,11 @@ const Filters = ({ data, current, onChange }) => {
                 select all
               </Button>
             </FormGroup>
-            <FormField label="Suche" {...formPropsFor('search')} />
+
+            <FormGroup label="Suche">
+              <InputText {...formPropsFor('search')} />
+            </FormGroup>
+
             <FormGroup label={'Budgetperioden'}>
               <Select
                 {...formPropsFor('budgetPeriods')}
