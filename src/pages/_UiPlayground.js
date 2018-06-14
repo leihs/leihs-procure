@@ -18,9 +18,21 @@ import StatefulForm from '../components/Bootstrap/StatefulForm'
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 
+import { examples as BootstrapExamples } from '../components/Bootstrap/Bootstrap.examples'
 // # DATA
 
 const PAGES = [
+  {
+    id: 'bootstrap',
+    title: 'Bootstrap',
+    content: BootstrapExamples.map(({ name, content }, i) => (
+      <F key={i}>
+        <h4>{name}</h4>
+        {content}
+        <hr />
+      </F>
+    ))
+  },
   {
     id: 'loading-indicator',
     title: 'Loading indicator',

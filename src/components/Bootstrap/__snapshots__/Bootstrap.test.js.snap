@@ -9,6 +9,7 @@ Array [
 >
     Button
 </button>,
+  " ",
   <button
     className="btn btn-primary"
     onClick={[Function]}
@@ -17,6 +18,15 @@ Array [
 >
     Button
 </button>,
+  " ",
+  <button
+    className="btn btn-secondary"
+    onClick={[Function]}
+    type="button"
+>
+    Button
+</button>,
+  " ",
   <button
     className="my-class btn btn-link"
     onClick={[Function]}

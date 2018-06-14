@@ -1,19 +1,10 @@
-import React from 'react'
+// import React from 'react'
 import renderer from 'react-test-renderer'
 
-import { Button } from './Bootstrap'
+import { examples } from './Bootstrap.examples'
 
-it('Button: renders correctly', () => {
-  const tree = renderer.create(
-    <React.Fragment>
-      <Button>Button</Button>
-      <Button color="primary" title="test title">
-        Button
-      </Button>
-      <Button color="link" title="test title" className="my-class">
-        Button
-      </Button>
-    </React.Fragment>
-  )
-  expect(tree.toJSON()).toMatchSnapshot()
+examples.forEach(({ name, content }) => {
+  it(`${name}: renders correctly`, () => {
+    expect(renderer.create(content).toJSON()).toMatchSnapshot()
+  })
 })
