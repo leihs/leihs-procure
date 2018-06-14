@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route } from 'react-router-dom'
-import { BrowserRouter } from 'react-router-dom'
+import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
@@ -29,7 +28,8 @@ const Root = () => (
     <BrowserRouter forceRefresh={!supportsHistory}>
       <App withPlayground={withPlayground}>
         <Switch>
-          <Route exact path="/" component={RequestsIndex} />
+          <Route exact path="/" render={() => <Redirect to="/requests" />} />
+          <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/admin/users" component={AdminUsers} />
           <Route path="/admin/categories" component={AdminCategories} />
           {!!withPlayground && (

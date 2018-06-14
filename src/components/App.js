@@ -23,7 +23,7 @@ const Navbar = ({ withPlayground }) => (
       <Brand />
     </span>
     <div className="navbar-nav">
-      <NavItem exact to="/">
+      <NavItem exact to="/requests">
         requests
       </NavItem>
       <span className="navbar-text">admin</span>
