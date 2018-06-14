@@ -1,5 +1,5 @@
 export * from './Bootstrap'
-export const __Node = null // don't export this into rest of app
+// export const __Node = null // don't export this into rest of app
 
 export * from './helpers'
 

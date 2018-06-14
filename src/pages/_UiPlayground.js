@@ -19,6 +19,8 @@ import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 
 import { examples as BootstrapExamples } from '../components/Bootstrap/Bootstrap.examples'
+import { examples as MultiSelectExamples } from '../components/Bootstrap/DownshiftMultiSelect.examples'
+
 // # DATA
 
 const PAGES = [
@@ -97,7 +99,13 @@ const PAGES = [
   {
     id: 'multiselect',
     title: 'MultiSelect',
-    content: ''
+    content: MultiSelectExamples.map(({ title, content }, i) => (
+      <F key={i}>
+        <h4>{title}</h4>
+        {content}
+        <hr />
+      </F>
+    ))
   }
 ]
 
