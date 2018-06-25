@@ -17,7 +17,7 @@
 (defn categories-query
   [context arguments value]
   (let [inspected-by-auth-user (:inspected_by_auth_user arguments)
-        main-category-id (:main_category_id value)]
+        main-category-id (:id value)]
     (sql/format
       (cond-> categories-base-query
         main-category-id (sql/merge-where
@@ -34,11 +34,11 @@
                                     :id)]))))))
 
 (defn get-categories
-  [context arguments _]
+  [context arguments value]
   (jdbc/query (-> context
                   :request
                   :tx)
-              (categories-query context arguments _)))
+              (categories-query context arguments value)))
 
 (defn delete-categories-not-in-main-category-ids!
   [tx ids]
