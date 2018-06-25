@@ -43,10 +43,13 @@ export const ErrorPanel = ({ error }) => {
 }
 
 function BrowserLine(browserInfo) {
-  const env = { os: 'Unknown', ...BrowserInfo() }
-  const osName = env.os.replace('OS X', 'macOS').replace(/^Linux/, 'GNU/Linux')
+  const fallback = { os: 'Unknown' }
+  const env = { ...fallback, ...BrowserInfo() }
+  const osName = (env.os || fallback.os)
+    .replace('OS X', 'macOS')
+    .replace(/^Linux/, 'GNU/Linux')
 
   return !(env.name && env.version)
-    ? f.get(window, 'navigator.userAgent') || 'Unknown'
+    ? f.get(window, 'navigator.userAgent') || fallback.os
     : `${env.name} ${env.version} on ${osName}`
 }
