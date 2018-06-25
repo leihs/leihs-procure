@@ -109,9 +109,7 @@ describe 'request' do
               id: "#{request.id}",
               article_name: "test"
             }) {
-              id {
-                value
-              }
+              id
             }
           }
         GRAPHQL
@@ -120,7 +118,7 @@ describe 'request' do
           result = query(q, user.id)
 
           expect(result['data']['request']).not_to be
-          expect(result['errors'].length to be 1)
+          expect(result['errors'].length). to be 1
           expect(result['errors'].first['exception'])
             .to be == 'UnauthorizedException'
 

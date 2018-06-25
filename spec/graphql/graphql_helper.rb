@@ -5,8 +5,9 @@ class GraphqlQuery
   URL = "#{Constants::LEIHS_HTTP_BASE_URL}/procure/graphql"
   CONN = Faraday.new(url: URL)
 
-  def initialize(query, user_id = nil)
+  def initialize(query, user_id, variables)
     @query = query
+    @variables = variables
     @user_id = user_id
   end
 
@@ -16,7 +17,7 @@ class GraphqlQuery
         req.headers['Authorization'] = @user_id
       end
       req.headers['Content-Type'] = 'application/json'
-      req.body = { query: @query }.to_json
+      req.body = { query: @query, variables: @variables }.to_json
     end
     self
   end
@@ -27,8 +28,8 @@ class GraphqlQuery
 end
 
 RSpec.shared_context 'graphql client' do
-  def query(q, user_id = nil)
-    GraphqlQuery.new(q, user_id).perform.result
+  def query(q, user_id = nil, variables = {})
+    GraphqlQuery.new(q, user_id, variables).perform.result
   end
 
   def map_type_to_gql(rb)
