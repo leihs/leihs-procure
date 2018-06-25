@@ -14,7 +14,7 @@
     (into {}
           (map (fn [[attr value]]
                  {attr (if-let [p-spec (attr field-perms)]
-                         (and (:read p-spec) (assoc p-spec :value value))
+                         (assoc p-spec :value (if (:read p-spec) value))
                          value)})
             proc-request))))
 
