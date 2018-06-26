@@ -66,26 +66,20 @@
                                         budget-period-in-requesting-phase)
                                    category-inspectable-by-user
                                    user-is-admin))},
-     ;; ==================================================================
-     ;; TODO: temporary excluded from permissions check. Question is:
-     ;; how to best reuse `room` / `room_id` which are used for reading
-     ;; and writing respectively.
-     ;
-     ; :room {:read true,
-     ;        :write (and (not budget-period-is-past)
-     ;                    (or (and user-is-requester
-     ;                             requested-by-user
-     ;                             budget-period-in-requesting-phase)
-     ;                        category-inspectable-by-user
-     ;                        user-is-admin))},
-     ; :model {:read true,
-     ;         :write (and (not budget-period-is-past)
-     ;                     (or (and user-is-requester
-     ;                              requested-by-user
-     ;                              budget-period-in-requesting-phase)
-     ;                         category-inspectable-by-user
-     ;                         user-is-admin))},
-     ;; ==================================================================
+     :room {:read true,
+            :write (and (not budget-period-is-past)
+                        (or (and user-is-requester
+                                 requested-by-user
+                                 budget-period-in-requesting-phase)
+                            category-inspectable-by-user
+                            user-is-admin))},
+     :model {:read true,
+             :write (and (not budget-period-is-past)
+                         (or (and user-is-requester
+                                  requested-by-user
+                                  budget-period-in-requesting-phase)
+                             category-inspectable-by-user
+                             user-is-admin))},
      :motivation {:read true,
                   :write (and (not budget-period-is-past)
                               (or (and user-is-requester

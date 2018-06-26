@@ -23,9 +23,7 @@ describe 'request' do
         q = <<-GRAPHQL
           mutation {
             request(input_data: #{hash_to_graphql attrs}) {
-              id {
-                value
-              }
+              id
             }
           }
         GRAPHQL
@@ -69,9 +67,7 @@ describe 'request' do
           q = <<-GRAPHQL
             mutation {
               new_request(input_data: #{hash_to_graphql attrs2}) {
-                id {
-                  value
-                }
+                id
               }
             }
           GRAPHQL
@@ -82,9 +78,7 @@ describe 'request' do
           expect(result).to be == {
             'data' => {
               'new_request' => {
-                'id' => {
-                  'value' => request.id
-                }
+                'id' => request.id
               }
             }
           }
