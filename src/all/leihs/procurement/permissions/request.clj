@@ -25,7 +25,6 @@
    (let [request-data-with-perms (apply-permissions tx auth-user request)]
      (->> write-data
           (map first)
-          (filter #(not (% request-fields-perms/field-exceptions)))
           (map #(% request-data-with-perms))
           (map :write)
           (every? true?)))))

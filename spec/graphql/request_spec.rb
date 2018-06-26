@@ -12,12 +12,12 @@ describe 'request' do
                           category_id: category.id)
 
         attrs = {
-          budget_period_id: FactoryBot.create(:budget_period).id,
-          category_id: category.id,
-          organization_id: FactoryBot.create(:organization).id,
+          budget_period: FactoryBot.create(:budget_period).id,
+          category: category.id,
+          organization: FactoryBot.create(:organization).id,
           requested_quantity: 1,
-          room_id: FactoryBot.create(:room).id,
-          user_id: viewer.id
+          room: FactoryBot.create(:room).id,
+          user: viewer.id
         }
 
         q = <<-GRAPHQL
@@ -51,11 +51,11 @@ describe 'request' do
         FactoryBot.create(:requester_organization, user_id: requester.id)
 
         attrs = {
-          budget_period_id: FactoryBot.create(:budget_period).id,
-          category_id: category.id,
-          organization_id: FactoryBot.create(:organization).id,
+          budget_period: FactoryBot.create(:budget_period).id,
+          category: category.id,
+          organization: FactoryBot.create(:organization).id,
           requested_quantity: 1,
-          room_id: FactoryBot.create(:room).id
+          room: FactoryBot.create(:room).id
         }
 
         ['admin', 'inspector', 'requester'].each do |user_name|

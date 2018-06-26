@@ -5,14 +5,6 @@
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.ds :as ds]))
 
-;; ==================================================================
-;; TODO: this is temporary. The r/w permissions for theses attributes
-;; need to be revisited and defined.
-(def field-exceptions
-  #{:budget_period_id :category_id :model_id :organization_id :room_id
-    :user_id})
-;; ==================================================================
-
 (defn get-for-user-and-request
   [tx user proc-request]
   (let [budget-period (budget-period/get-budget-period-by-id tx
