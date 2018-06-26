@@ -92,27 +92,6 @@
        (jdbc/query tx)
        first))
 
-(defn create-user-session
-  [user secret response tx]
-  (let [settings (sessions-settings tx)
-        token (str (UUID/randomUUID))
-        token_hash (pandect.core/sha256 token)
-        cvalue (encryptor/encrypt secret {:token token})]
-    (when (:sessions_force_uniqueness settings)
-      (jdbc/delete! tx :user_sessions ["user_id = ?" (:id user)]))
-    (or (->> {:user_id (:id user), :token_hash token_hash}
-             (jdbc/insert! tx :user_sessions)
-             first)
-        (throw (ex-info "Creation of the user_session failed." {:status 500})))
-    (-> response
-        (assoc-in [:cookies (str USER_SESSION_COOKIE_NAME)]
-                  {:value cvalue,
-                   :http-only true,
-                   ; for now session only because of shibboleth
-                   ;:max-age (* 10 356 24 60 60)
-                   :path "/",
-                   :secure (:sessions_force_secure settings)}))))
-
 (defn wrap [handler] (fn [request] (authenticate request handler)))
 
 ;#### debug ###################################################################

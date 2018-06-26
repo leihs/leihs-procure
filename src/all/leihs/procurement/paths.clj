@@ -18,7 +18,6 @@
     (branch
       "/procure"
       (leaf "/graphql" :graphql)
-      (leaf "/scratch" :scratch)
       (leaf "/shutdown" :shutdown)
       (leaf "/status" :status)
       (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))

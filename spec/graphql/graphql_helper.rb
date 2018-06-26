@@ -14,7 +14,7 @@ class GraphqlQuery
   def perform
     @response = CONN.post do |req|
       if @user_id 
-        req.headers['Authorization'] = @user_id
+        req.headers['X-Fake-Token-Authorization'] = @user_id
       end
       req.headers['Content-Type'] = 'application/json'
       req.body = { query: @query, variables: @variables }.to_json

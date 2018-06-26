@@ -2,8 +2,8 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require [environ.core :as environ]
-            [leihs.procurement.routes :as routes]
             [leihs.procurement.env]
+            [leihs.procurement.handler :as handler]
             [leihs.procurement.paths]
             [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.http-server :as http-server]
@@ -41,7 +41,7 @@
                   (let
                     [ds (ds/init (:database-url options)) secret
                      (-> options
-                         :secret) app-handler (routes/init secret) http-server
+                         :secret) app-handler (handler/init secret) http-server
                      (http-server/start (:http-base-url options) app-handler)])
                   (handle-pidfile)))
 
