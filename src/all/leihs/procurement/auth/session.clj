@@ -7,8 +7,6 @@
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [clojure.walk :refer [keywordize-keys]]
-            [pandect.core]
-            [clj-logging-config.log4j :as logging-config]
             [clojure.tools.logging :as logging]
             [logbug.catcher :as catcher]
             [logbug.debug :as debug]
@@ -88,11 +86,38 @@
           (handler (assoc request :authenticated-entity user-auth-entity)))
         (handler request)))))
 
+(defn sessions-settings
+  [tx]
+  (->> "SELECT sessions_force_uniqueness, sessions_force_secure FROM SETTINGS"
+       (jdbc/query tx)
+       first))
+
+(defn create-user-session
+  [user secret response tx]
+  (let [settings (sessions-settings tx)
+        token (str (UUID/randomUUID))
+        token_hash (pandect.core/sha256 token)
+        cvalue (encryptor/encrypt secret {:token token})]
+    (when (:sessions_force_uniqueness settings)
+      (jdbc/delete! tx :user_sessions ["user_id = ?" (:id user)]))
+    (or (->> {:user_id (:id user), :token_hash token_hash}
+             (jdbc/insert! tx :user_sessions)
+             first)
+        (throw (ex-info "Creation of the user_session failed." {:status 500})))
+    (-> response
+        (assoc-in [:cookies (str USER_SESSION_COOKIE_NAME)]
+                  {:value cvalue,
+                   :http-only true,
+                   ; for now session only because of shibboleth
+                   ;:max-age (* 10 356 24 60 60)
+                   :path "/",
+                   :secure (:sessions_force_secure settings)}))))
+
 (defn wrap [handler] (fn [request] (authenticate request handler)))
 
 ;#### debug ###################################################################
-; (logging-config/set-logger! :level :debug)
-; (logging-config/set-logger! :level :info)
-; (debug/debug-ns 'cider-ci.utils.shutdown)
-; (debug/debug-ns 'cider-ci.open-session.encryptor)
-; (debug/debug-ns *ns*)
+;(logging-config/set-logger! :level :debug)
+;(logging-config/set-logger! :level :info)
+;(debug/debug-ns 'cider-ci.utils.shutdown)
+;(debug/debug-ns 'cider-ci.open-session.encryptor)
+;(debug/debug-ns *ns*)

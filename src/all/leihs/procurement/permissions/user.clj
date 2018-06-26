@@ -16,7 +16,7 @@
                               (-> (sql/select true)
                                   (sql/from :procurement_admins)
                                   (sql/where [:= :procurement_admins.user_id
-                                              (:id user)]))) :result])
+                                              (:user_id user)]))) :result])
                  sql/format)))))
 
 (defn inspector?
@@ -33,7 +33,7 @@
                               (sql/from :procurement_category_inspectors)
                               (sql/merge-where
                                 [:= :procurement_category_inspectors.user_id
-                                 (:id user)]))
+                                 (:user_id user)]))
                     c-id (sql/merge-where
                            [:= :procurement_category_inspectors.category_id
                             c-id]))) :result])
@@ -50,7 +50,7 @@
                       (-> (sql/select true)
                           (sql/from :procurement_category_viewers)
                           (sql/where [:= :procurement_category_viewers.user_id
-                                      (:id user)]))) :result])
+                                      (:user_id user)]))) :result])
                  sql/format)))))
 
 (defn requester?
@@ -65,9 +65,9 @@
                              (sql/from :procurement_requesters_organizations)
                              (sql/where
                                [:= :procurement_requesters_organizations.user_id
-                                (:id user)]))) :result])
+                                (:user_id user)]))) :result])
             sql/format)))))
 
 (defn requester-of?
   [tx user request]
-  (= (str (:id user)) (str (:user_id request))))
+  (= (str (:user_id user)) (str (:user_id request))))

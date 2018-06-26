@@ -40,10 +40,14 @@
   :aot [#"leihs.procurement.*"]
   :target-path "target/%s"
   :main leihs.procurement.backend.main
+  :uberjar-name "leihs-procurement.jar"
   :profiles {:dev [:project/dev :profiles/dev],
              ;; including :base
              ;; (https://github.com/technomancy/leiningen/issues/1329)
              :test [:base :project/test :profiles/test],
+             :prod {:source-paths ["src/prod"],
+                    :resource-paths ["resources/prod"],
+                    :aot [#"leihs\..*"]},
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj
@@ -55,5 +59,4 @@
              :project/test {:source-paths ["src/test" "src/dev+test"],
                             :resource-paths ["resources/test"],
                             :aot [#"leihs\..*"],
-                            :uberjar-name "leihs-procurement.jar",
                             :env {:leihs-secret "secret"}}})

@@ -1,45 +1,45 @@
 (ns leihs.procurement.routes
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require
-    [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.authorization :as authorization]
-    [leihs.procurement.backend.html :as html]
-    [leihs.procurement.constants :as constants]
-    [leihs.procurement.env :as env]
-    [leihs.procurement.graphql :as graphql]
-    ; ONLY IN DEV+TEST MODE =================
-    [leihs.procurement.mock :as mock]
-    ; =======================================
-    [leihs.procurement.paths :refer [path paths]]
-    [leihs.procurement.resources.attachment :as attachment]
-    [leihs.procurement.resources.image :as image]
-    [leihs.procurement.scratch :as scratch]
-    [leihs.procurement.shutdown :as shutdown]
-    [leihs.procurement.status :as status]
-    [leihs.procurement.utils.ds :as ds]
-    [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer
-     [wrap-resource]]
-    [leihs.procurement.utils.json-protocol]
-    [leihs.procurement.utils.ring-exception :as ring-exception]
-    [bidi.bidi :as bidi]
-    [bidi.ring :refer [make-handler]]
-    [cheshire.core :as json]
-    [compojure.core :as cpj]
-    [ring.middleware.accept]
-    [ring.middleware.content-type :refer [wrap-content-type]]
-    [ring.middleware.cookies]
-    [ring.middleware.json]
-    [ring.middleware.params]
-    [ring.middleware.reload :refer [wrap-reload]]
-    [ring.util.response :refer [redirect]]
-    [ring-graphql-ui.core :refer [wrap-graphiql]]
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as log]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug :refer [I>]]
-    [logbug.ring :refer [wrap-handler-with-logging]]
-    [logbug.thrown :as thrown]))
+  (:require [leihs.procurement.anti-csrf.core :as anti-csrf]
+            [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.backend.html :as html]
+            [leihs.procurement.constants :as constants]
+            [leihs.procurement.env :as env]
+            [leihs.procurement.graphql :as graphql]
+            ; ; ONLY IN DEV+TEST MODE =================
+            ; [leihs.procurement.mock :as mock]
+            [leihs.procurement.auth.session :as session]
+            ; =======================================
+            [leihs.procurement.paths :refer [path paths]]
+            [leihs.procurement.resources.attachment :as attachment]
+            [leihs.procurement.resources.image :as image]
+            [leihs.procurement.scratch :as scratch]
+            [leihs.procurement.shutdown :as shutdown]
+            [leihs.procurement.status :as status]
+            [leihs.procurement.utils.ds :as ds]
+            [leihs.procurement.utils.http-resources-cache-buster :as
+             cache-buster :refer [wrap-resource]]
+            [leihs.procurement.utils.json-protocol]
+            [leihs.procurement.utils.ring-exception :as ring-exception]
+            [bidi.bidi :as bidi]
+            [bidi.ring :refer [make-handler]]
+            [cheshire.core :as json]
+            [compojure.core :as cpj]
+            [ring.middleware.accept]
+            [ring.middleware.content-type :refer [wrap-content-type]]
+            [ring.middleware.cookies]
+            [ring.middleware.json]
+            [ring.middleware.params]
+            [ring.middleware.reload :refer [wrap-reload]]
+            [ring.util.response :refer [redirect]]
+            [ring-graphql-ui.core :refer [wrap-graphiql]]
+            [clj-logging-config.log4j :as logging-config]
+            [clojure.tools.logging :as log]
+            [logbug.catcher :as catcher]
+            [logbug.debug :as debug :refer [I>]]
+            [logbug.ring :refer [wrap-handler-with-logging]]
+            [logbug.thrown :as thrown]))
 
 (declare redirect-to-root-handler)
 
@@ -136,11 +136,7 @@
       anti-csrf/wrap
       (authorization/wrap-authorize skip-authorization-handler-keys)
       ; ====================================================
-      ; NOTE: should work after merge of leihs-admin
-      ; session/wrap
-      ;
-      ; for the time being:
-      mock/wrap-set-authenticated-user
+      session/wrap
       ; ====================================================
       ring.middleware.cookies/wrap-cookies
       wrap-empty
