@@ -1,5 +1,6 @@
 require 'spec_helper'
 require_relative 'graphql_helper'
+require_relative 'request_helper'
 
 describe 'request' do
   context 'create' do
@@ -22,7 +23,7 @@ describe 'request' do
 
         q = <<-GRAPHQL
           mutation {
-            request(input_data: #{hash_to_graphql attrs}) {
+            new_request(input_data: #{hash_to_graphql attrs}) {
               id
             }
           }
@@ -34,7 +35,7 @@ describe 'request' do
         expect(result['errors'].first['exception'])
           .to be == 'UnauthorizedException'
 
-        expect(Request.find(attrs)).not_to be
+        expect(Request.find(transform_uuid_attrs attrs)).not_to be
       end
 
       it 'creates if required general permission exist' do
@@ -62,7 +63,7 @@ describe 'request' do
           user = binding.local_variable_get(user_name)
 
           attrs2 = attrs.merge(article_name: user_name,
-                               user_id: user.id)
+                               user: user.id)
 
           q = <<-GRAPHQL
             mutation {
@@ -74,7 +75,7 @@ describe 'request' do
 
           result = query(q, user.id)
 
-          request = Request.find(attrs2)
+          request = Request.find(transform_uuid_attrs attrs2)
           expect(result).to be == {
             'data' => {
               'new_request' => {

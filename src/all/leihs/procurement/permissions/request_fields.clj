@@ -7,10 +7,13 @@
 
 (defn get-for-user-and-request
   [tx user proc-request]
-  (let [budget-period (budget-period/get-budget-period-by-id tx
-                                                             (:budget_period_id
+  "Read permissions always apply only to an existing request.
+  Write permissions apply either to a new or an existing request."
+  (let [request-exists (not (nil? (:id proc-request)))
+        budget-period (budget-period/get-budget-period-by-id tx
+                                                             (:budget_period
                                                                proc-request))
-        request-without-template (not (:template_id proc-request))
+        request-without-template (not (:template proc-request))
         requested-by-user (user-perms/requester-of? tx user proc-request)
         user-is-requester (user-perms/requester? tx user)
         user-is-inspector (user-perms/inspector? tx user)
@@ -19,74 +22,82 @@
         budget-period-in-requesting-phase
           (budget-period/in-requesting-phase? tx budget-period)
         category-inspectable-by-user
-          (user-perms/inspector? tx user (:category_id proc-request))]
-    {:article_name {:read true,
-                    :write (and request-without-template
-                                (not budget-period-is-past)
-                                (or (and user-is-requester
-                                         requested-by-user
-                                         budget-period-in-requesting-phase)
-                                    category-inspectable-by-user
-                                    user-is-admin))},
-     :article_number {:read true,
-                      :write (and request-without-template
-                                  (not budget-period-is-past)
-                                  (or (and user-is-requester
-                                           requested-by-user
-                                           budget-period-in-requesting-phase)
-                                      category-inspectable-by-user
-                                      user-is-admin))},
+          (user-perms/inspector? tx user (:category proc-request))]
+    {:article_name
+       {:read true,
+        :write (and request-without-template
+                    (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
+     :article_number
+       {:read true,
+        :write (and request-without-template
+                    (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
      :supplier {:read true,
                 :write (and request-without-template
                             (not budget-period-is-past)
                             (or (and user-is-requester
-                                     requested-by-user
+                                     (or (and request-exists requested-by-user)
+                                         true)
                                      budget-period-in-requesting-phase)
                                 category-inspectable-by-user
                                 user-is-admin))},
      :receiver {:read true,
                 :write (and (not budget-period-is-past)
                             (or (and user-is-requester
-                                     requested-by-user
+                                     (or (and request-exists requested-by-user)
+                                         true)
                                      budget-period-in-requesting-phase)
                                 category-inspectable-by-user
                                 user-is-admin))},
-     :building_id {:read true,
-                   :write (and (not budget-period-is-past)
-                               (or (and user-is-requester
-                                        requested-by-user
-                                        budget-period-in-requesting-phase)
-                                   category-inspectable-by-user
-                                   user-is-admin))},
+     :building_id
+       {:read true,
+        :write (and (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
      :room {:read true,
-            :write (and (not budget-period-is-past)
-                        (or (and user-is-requester
-                                 requested-by-user
-                                 budget-period-in-requesting-phase)
-                            category-inspectable-by-user
-                            user-is-admin))},
+            :write (and
+                     (not budget-period-is-past)
+                     (or (and user-is-requester
+                              (or (and request-exists requested-by-user) true)
+                              budget-period-in-requesting-phase)
+                         category-inspectable-by-user
+                         user-is-admin))},
      :model {:read true,
-             :write (and (not budget-period-is-past)
-                         (or (and user-is-requester
-                                  requested-by-user
-                                  budget-period-in-requesting-phase)
-                             category-inspectable-by-user
-                             user-is-admin))},
-     :motivation {:read true,
-                  :write (and (not budget-period-is-past)
-                              (or (and user-is-requester
-                                       requested-by-user
-                                       budget-period-in-requesting-phase)
-                                  category-inspectable-by-user
-                                  user-is-admin))},
-     :requested_quantity {:read true,
-                          :write (and
-                                   (not budget-period-is-past)
-                                   (or (and user-is-requester
-                                            requested-by-user
-                                            budget-period-in-requesting-phase)
-                                       category-inspectable-by-user
-                                       user-is-admin))},
+             :write (and
+                      (not budget-period-is-past)
+                      (or (and user-is-requester
+                               (or (and request-exists requested-by-user) true)
+                               budget-period-in-requesting-phase)
+                          category-inspectable-by-user
+                          user-is-admin))},
+     :motivation
+       {:read true,
+        :write (and (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
+     :requested_quantity
+       {:read true,
+        :write (and (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
      :approved_quantity
        {:read
           (or (and user-is-requester requested-by-user budget-period-is-past)
@@ -105,13 +116,14 @@
               user-is-admin),
         :write (and (not budget-period-is-past)
                     (or category-inspectable-by-user user-is-admin))},
-     :attachments {:read true,
-                   :write (and (not budget-period-is-past)
-                               (or (and user-is-requester
-                                        requested-by-user
-                                        budget-period-in-requesting-phase)
-                                   category-inspectable-by-user
-                                   user-is-admin))},
+     :attachments
+       {:read true,
+        :write (and (not budget-period-is-past)
+                    (or (and user-is-requester
+                             (or (and request-exists requested-by-user) true)
+                             budget-period-in-requesting-phase)
+                        category-inspectable-by-user
+                        user-is-admin))},
      :accounting_type {:read user-is-inspector,
                        :write (and (not budget-period-is-past)
                                    (or category-inspectable-by-user

@@ -1,4 +1,13 @@
 class Request < Sequel::Model(:procurement_requests)
+  UUID_ATTRS = Set[
+    :budget_period,
+    :category,
+    :model,
+    :organization,
+    :room,
+    :supplier,
+    :user
+  ]
 end
 
 FactoryBot.define do

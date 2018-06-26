@@ -1,6 +1,7 @@
 (ns leihs.procurement.resources.request
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.tools.logging :as log]
+            [clojure.set :refer [map-invert]]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.resources.attachments :as attachments]
@@ -11,6 +12,30 @@
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
             [logbug.debug :as debug]))
+
+(def attrs-mapping
+  {:budget_period :budget_period_id,
+   :category :category_id,
+   :organization :organization_id,
+   :room :room_id,
+   :supplier :supplier_id,
+   :user :user_id})
+
+(defn exchange-attrs
+  ([req] (exchange-attrs req attrs-mapping))
+  ([req mapping]
+   (reduce (fn [mem [attr1 attr2]]
+             (if-let [value (attr1 mem)]
+               (-> mem
+                   (assoc attr2 value)
+                   (dissoc attr1))
+               mem))
+     req
+     mapping)))
+
+(defn reverse-exchange-attrs
+  [req]
+  (exchange-attrs req (map-invert attrs-mapping)))
 
 (def state-sql
   (sql/call :case
@@ -114,16 +139,18 @@
                             (-> input-data
                                 add-inspector-priority
                                 (dissoc :priority_inspector)))
-                       input-data)]
+                       input-data)
+        write-data-with-exchanged-attrs (exchange-attrs write-data)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/insert-into :procurement_requests)
-                          (sql/values [input-data])
+                          (sql/values [write-data-with-exchanged-attrs])
                           sql/format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx auth-user write-data))
-    (->> write-data
+    (->> write-data-with-exchanged-attrs
          (get-request-by-attrs tx)
+         reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
 (defn update-request!
@@ -149,10 +176,12 @@
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-user
-                                                      proc-request
+                                                      (reverse-exchange-attrs
+                                                        proc-request)
                                                       write-data))
     (->> req-id
          (get-request-by-id tx)
+         reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
 (defn delete-request!
@@ -164,8 +193,7 @@
                                   (sql/where [:= :procurement_requests.id
                                               (-> args
                                                   :input_data
-                                                  :id
-                                                  log/spy)])
+                                                  :id)])
                                   sql/format))]
     (= result '(1))))
 
