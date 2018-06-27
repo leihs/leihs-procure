@@ -13,6 +13,14 @@
 
 (defn get-supplier-by-id [tx id] (first (jdbc/query tx (supplier-query id))))
 
+(defn get-supplier
+  [context _ value]
+  (get-supplier-by-id (-> context
+                          :request
+                          :tx)
+                      (:value value) ; for RequestFieldSupplier
+    ))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

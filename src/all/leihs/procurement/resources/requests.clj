@@ -89,7 +89,9 @@
           proc-requests (jdbc/query tx
                                     (requests-query context arguments value)
                                     {:row-fn (request/row-fn tx)})]
-      (map #(request-perms/apply-permissions tx auth-user %) proc-requests))))
+      (->> proc-requests
+           (map #(request-perms/apply-permissions tx auth-user %))
+           (map request/reverse-exchange-attrs)))))
 
 (defn total-price-query
   [qty-type bp-id]

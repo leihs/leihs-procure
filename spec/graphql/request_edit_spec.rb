@@ -13,36 +13,35 @@ describe 'requests' do
 
         fragment RequestFieldsForShow on Request {
           ...RequestFieldsForIndex
-
           category {
-            id
-            name
+            value {
+              id
+              name
+            }
           }
           budget_period {
-            id
+            value {
+              id
+            }
           }
-
           article_name {
             ...RequestFieldString
           }
           supplier {
-            ...RequestFieldString
+            value {
+              id
+              name
+            }
+            read
           }
           receiver {
             ...RequestFieldString
           }
           organization {
-            id
+            value {
+              id
+            }
           }
-
-          # FIXME: price fields
-          # price_cents {
-          #   ...RequestFieldString
-          # }
-          # price_currency {
-          #   ...RequestFieldString
-          # }
-
           requested_quantity {
             ...RequestFieldInt
           }
@@ -52,28 +51,12 @@ describe 'requests' do
           order_quantity {
             ...RequestFieldInt
           }
-
-          # FIXME: priority
-          # priority {
-          #   ...RequestFieldString
-          # }
-          # FIXME: state
-          # state {
-          #   ...RequestFieldString
-          # }
-
           article_number {
             ...RequestFieldString
           }
           motivation {
             ...RequestFieldString
           }
-
-          # FIXME: replacement
-          # replacement {
-          #   ...RequestFieldBoolean
-          # }
-
           room {
             read
             write
@@ -86,32 +69,24 @@ describe 'requests' do
               }
             }
           }
-
           inspection_comment {
             ...RequestFieldString
           }
-          # TODO: priority_inspector
-
-          # TODO: attachments
-
-          # FIXME: accounting_type
-          # accounting_type {
-          #   ...RequestFieldString
-          # }
-          # internal_order_id
         }
 
         fragment RequestFieldsForIndex on Request {
           id
-
           category {
-            id
-            name
+            value {
+              id
+              name
+            }
           }
           budget_period {
-            id
+            value {
+              id
+            }
           }
-
           article_name {
             value
           }
@@ -119,17 +94,10 @@ describe 'requests' do
             value
           }
           organization {
-            id
+            value {
+              id
+            }
           }
-
-          # FIXME: price fields
-          # price_cents {
-          #   value
-          # }
-          # price_currency {
-          #   value
-          # }
-
           requested_quantity {
             value
           }
@@ -139,20 +107,21 @@ describe 'requests' do
           order_quantity {
             value
           }
-
           replacement {
             value
           }
+        }
 
-          # FIXME: priority
-          # priority {
-          #   value
-          # }
+        fragment RequestFieldString on RequestFieldString {
+          value
+          read
+          write
+        }
 
-          # FIXME: state
-          # state {
-          #   value
-          # }
+        fragment RequestFieldInt on RequestFieldInt {
+          value
+          read
+          write
         }
 
         fragment RequestFieldString on RequestFieldString { value, read, write }

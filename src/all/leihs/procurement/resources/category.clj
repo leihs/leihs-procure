@@ -21,7 +21,8 @@
    (first (jdbc/query (-> context
                           :request
                           :tx)
-                      (category-query (:category_id value)))))
+                      (category-query (:value value) ; for RequestFieldCategory
+                        ))))
   ([tx catmap]
    (let [where-clause (sql/map->where-clause :procurement_categories catmap)]
      (first (jdbc/query tx

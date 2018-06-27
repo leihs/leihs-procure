@@ -34,7 +34,11 @@
                          :tx)
                      (-> organization-base-query
                          (sql/merge-where [:= :procurement_organizations.id
-                                           (:organization_id value)])
+                                           (or (:organization_id value) ; for
+                                                                        ; RequesterOrganization
+                                               (:value value) ; for
+                                                              ; RequestFieldOrganization
+                                             )])
                          sql/format))))
 
 (defn get-organization-by-name-and-dep-id

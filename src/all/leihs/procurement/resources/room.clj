@@ -13,6 +13,14 @@
 
 (defn get-room-by-id [tx id] (first (jdbc/query tx (room-query id))))
 
+(defn get-room
+  [context _ value]
+  (get-room-by-id (-> context
+                      :request
+                      :tx)
+                  (:value value) ; for RequestFieldRoom
+    ))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

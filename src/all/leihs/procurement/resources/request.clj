@@ -71,43 +71,9 @@
   [row]
   (assoc row :inspector_priority (:priority_inspector row)))
 
-(defn embed-room
-  [tx row]
-  (->> row
-       :room_id
-       (room/get-room-by-id tx)
-       (assoc row :room)))
-
-(defn embed-model
-  [tx row]
-  (->> row
-       :model_id
-       (model/get-model-by-id tx)
-       (assoc row :model)))
-
-(defn embed-supplier
-  [tx row]
-  (->> row
-       :supplier_id
-       (supplier/get-supplier-by-id tx)
-       (assoc row :supplier)))
-
-(defn embed-attachments
-  [tx row]
-  (->> row
-       :id
-       (attachments/get-attachments-for-request-id tx)
-       (assoc row :attachments)))
-
 (defn row-fn
   [tx]
-  (comp add-priority-inspector
-        #(embed-attachments tx %)
-        #(embed-model tx %)
-        #(embed-room tx %)
-        #(embed-supplier tx %)
-        remap-priority
-        remap-inspector-priority))
+  (comp add-priority-inspector remap-priority remap-inspector-priority))
 
 (def request-base-query
   (-> (sql/select :procurement_requests.* [state-sql :state])

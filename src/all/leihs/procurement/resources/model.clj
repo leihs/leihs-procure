@@ -13,6 +13,14 @@
 
 (defn get-model-by-id [tx id] (first (jdbc/query tx (model-query id))))
 
+(defn get-model
+  [context _ value]
+  (get-model-by-id (-> context
+                       :request
+                       :tx)
+                   (:value value) ; for RequestFieldModel
+    ))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)

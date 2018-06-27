@@ -21,7 +21,9 @@
    (get-budget-period-by-id (-> context
                                 :request
                                 :tx)
-                            (:budget_period_id value)))
+                            (or (:budget_period_id value) ; for BudgetLimit
+                                (:value value) ; for RequestFieldBudgetPeriod
+                              )))
   ([tx bp-map]
    (let [where-clause (sql/map->where-clause :procurement_budget_periods
                                              bp-map)]
@@ -76,14 +78,6 @@
           sql/format))
     first
     :result))
-
-(defn get-category
-  [tx bp-map]
-  (let [where-clause (sql/map->where-clause :procurement_budget_periods bp-map)]
-    (first (jdbc/query tx
-                       (-> budget-period-base-query
-                           (sql/merge-where where-clause)
-                           sql/format)))))
 
 (defn update-budget-period!
   [tx bp]
