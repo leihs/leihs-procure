@@ -63,16 +63,6 @@ const RequestsDashboard = props => (
 
 export default RequestsDashboard
 
-// FIXME: remove this when MainCategory.categories scope is fixed
-function tmpCleanupCategories(mainCategories) {
-  return mainCategories.map(mainCat => ({
-    ...mainCat,
-    categories: mainCat.categories.filter(
-      subCat => subCat.main_category_id === mainCat.id
-    )
-  }))
-}
-
 // FIXME: remove this budgetperiods query can be filtered by id
 function tmpFilterBudgetPeriods(periods, filters) {
   if (!filters.budgetPeriods) return periods
@@ -116,11 +106,7 @@ const RequestsTree = ({
   if (error) return <ErrorPanel error={error} />
 
   const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
-  const categories = tmpCleanupCategories(
-    // tmpFilterMainCategories(data.main_categories, filters)
-    data.main_categories,
-    filters
-  )
+  const categories = data.main_categories
   const requests = data.requests
   const groupedRequests = f.groupBy(
     requests,

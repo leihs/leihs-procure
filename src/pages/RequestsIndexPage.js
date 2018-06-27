@@ -58,25 +58,24 @@ const REQUESTS_QUERY = gql`
       inspection_start_date
       end_date
     }
+
     # TODO: filter arg (id: $mainCategories)
     main_categories {
       id
       name
       image_url
-
       categories {
         id
         name
-        # FIXME: remove this when MainCategory.categories scope is fixed
-        main_category_id
       }
     }
+
     requests(
       search: $search
       budget_period_id: $budgetPeriods
-      category_id: $categories # organization_id: $organizations
+      category_id: $categories
       priority: $priority
-      inspectory_priority: $inspectory_priority
+      inspectory_priority: $inspectory_priority # organization_id: $organizations
     ) {
       ...RequestFieldsForIndex
     }

@@ -115,11 +115,6 @@ const updateRequestFromFields = (mutate, request, fields) => {
     // building_id: fields.building, -- no building, just room!
     // room_id: fields.room,
     ...valueIfWritable(fields, request, 'room', 'room_id'),
-    // // FIXME: those should not be required, can't change with this mutation!
-    // budget_period_id: request.budget_period.id,
-    // category_id: request.category.id,
-    // organization_id: request.organization.id,
-    // user_id: window.CURRENT_USER_ID,
     // NOTE: this must be sent (to identify request) but still cant be changed!
     id: request.id
   }

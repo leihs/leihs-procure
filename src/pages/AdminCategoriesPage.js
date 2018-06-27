@@ -64,22 +64,10 @@ const CATEGORIES_QUERY = gql`
           firstname
           lastname
         }
-        # FIXME: remove this when MainCategory.categories scope is fixed
-        main_category_id
       }
     }
   }
 `
-
-// FIXME: remove this when MainCategory.categories scope is fixed
-function tmpCleanupCategory(mainCat) {
-  return {
-    ...mainCat,
-    categories: mainCat.categories.filter(
-      subCat => subCat.main_category_id === mainCat.id
-    )
-  }
-}
 
 // # PAGE
 //
@@ -89,8 +77,7 @@ const AdminCategoriesPage = ({ match }) => (
       if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} />
 
-      // FIXME: remove filtering when backend fixed
-      const categories = data.main_categories.filter(({ id }) => id)
+      const categories = data.main_categories
 
       return (
         <MainWithSidebar
@@ -111,9 +98,7 @@ const AdminCategoriesPage = ({ match }) => (
                   if (loading) return <Loading />
                   if (error) return <ErrorPanel error={error} />
 
-                  return data.main_categories
-                    .map(tmpCleanupCategory)
-                    .map(c => <CategoryCard key={c.id} {...c} />)
+                  return categories.map(c => <CategoryCard key={c.id} {...c} />)
                 }}
               </Query>
             </Route>
@@ -136,9 +121,7 @@ const CategoryPage = ({ match }) => (
       if (error) return <ErrorPanel error={error} />
 
       const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-      const mainCat = tmpCleanupCategory(
-        f.find(data.main_categories, { id: mainCatId })
-      )
+      const mainCat = f.find(data.main_categories, { id: mainCatId })
 
       return <CategoryCard {...mainCat} />
     }}
@@ -228,25 +211,23 @@ const TableOfContents = ({ categories, baseUrl }) => (
       </NavLink>
     </h5>
     <ul className="nav flex-column">
-      {categories
-        .filter(({ id }) => id) // FIXME: remove when backend fixed
-        .map(c => (
-          <li key={c.id} className="nav-item">
-            <NavLink
-              className="nav-link"
-              activeClassName="disabled text-dark"
-              to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
-            >
-              {c.name}
-            </NavLink>
-            {/* NOTE: dont show subcats for now */}
-            {/* <ul className="list-unstyled text-muted">
+      {categories.map(c => (
+        <li key={c.id} className="nav-item">
+          <NavLink
+            className="nav-link"
+            activeClassName="disabled text-dark"
+            to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
+          >
+            {c.name}
+          </NavLink>
+          {/* NOTE: dont show subcats for now */}
+          {/* <ul className="list-unstyled text-muted">
               {c.categories.map(subcat => (
                 <li key={subcat.id}>{subcat.name}</li>
               ))}
             </ul> */}
-          </li>
-        ))}
+        </li>
+      ))}
     </ul>
   </nav>
 )
