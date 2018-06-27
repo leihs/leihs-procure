@@ -20,12 +20,13 @@ import './styles/index.css'
 // lodash setup
 f.mixin(lodashMixins)
 
+const baseName = process.env.PUBLIC_URL // set in package.json/homepage
 const supportsHistory = 'pushState' in window.history
 const withPlayground = process.env.NODE_ENV === 'development'
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>
-    <BrowserRouter forceRefresh={!supportsHistory}>
+    <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
       <App withPlayground={withPlayground}>
         <Switch>
           <Route exact path="/" render={() => <Redirect to="/requests" />} />
