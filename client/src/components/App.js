@@ -29,6 +29,7 @@ const Navbar = ({ withPlayground }) => (
       <span className="navbar-text">admin</span>
       <NavItem to="/admin/users">users</NavItem>
       <NavItem to="/admin/categories">categories</NavItem>
+      <NavItem to="/admin/organizations">organizations</NavItem>
       {!!withPlayground && <NavItem to="/playground">[PLAYGROUND]</NavItem>}
     </div>
   </nav>

@@ -12,6 +12,7 @@ import App from './components/App'
 import RequestsIndex from './pages/RequestsIndexPage'
 import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
+import AdminOrgs from './pages/AdminOrgsPage'
 import UiPlayground from './pages/_UiPlayground'
 
 // env: polyfills (browser support)
@@ -37,6 +38,7 @@ const Root = () => (
           <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/admin/users" component={AdminUsers} />
           <Route path="/admin/categories" component={AdminCategories} />
+          <Route path="/admin/organizations" component={AdminOrgs} />
           {!!withPlayground && (
             <Route strict path="/playground" component={UiPlayground} />
           )}
