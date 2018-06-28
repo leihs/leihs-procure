@@ -28,7 +28,7 @@ const RoomAutocomplete = ({ buildingId, ...props }) => {
         if (skipped) return 'Select a Building first!'
         if (loading) return 'Loading'
         if (error) {
-          return <ErrorPanel error={error} />
+          return <ErrorPanel error={error} data={data} />
         }
         const rooms = data.rooms.map(r => ({
           ...r,

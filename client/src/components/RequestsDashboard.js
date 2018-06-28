@@ -103,7 +103,7 @@ const RequestsTree = ({
         <Loading size="1" />
       </F>
     )
-  if (error) return <ErrorPanel error={error} />
+  if (error) return <ErrorPanel error={error} data={data} />
 
   const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
   const categories = data.main_categories
@@ -342,7 +342,7 @@ const RequestsTable = ({
         <Loading size="1" />
       </F>
     )
-  if (error) return <ErrorPanel error={error} />
+  if (error) return <ErrorPanel error={error} data={data} />
 
   const requests = f.sortBy(data.requests, r =>
     [r.budget_period, r.category_id].join('.')

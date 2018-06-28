@@ -71,7 +71,7 @@ const AdminUsersPage = () => (
   <Query query={ADMIN_USERS_PAGE_QUERY}>
     {({ loading, error, data }) => {
       if (loading) return <p>Loading...</p>
-      if (error) return <ErrorPanel error={error} />
+      if (error) return <ErrorPanel error={error} data={data} />
 
       // actions for admins list
       const updateAdmins = {

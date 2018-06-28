@@ -133,12 +133,13 @@ class RequestLine extends React.Component {
       <Query query={editQuery} variables={{ id: [request.id] }}>
         {({ error, loading, data }) => {
           if (loading) return <Loading />
-          if (error) return <ErrorPanel error={error} />
+          if (error) return <ErrorPanel error={error} data={data} />
           return (
             <Mutation mutation={UPDATE_REQUEST_MUTATION}>
               {(mutate, mutReq) => {
                 if (mutReq.loading) return <Loading />
-                if (mutReq.error) return <ErrorPanel error={mutReq.error} />
+                if (mutReq.error)
+                  return <ErrorPanel error={mutReq.error} data={mutReq.data} />
                 const request = data.requests[0]
                 return (
                   <RequestForm

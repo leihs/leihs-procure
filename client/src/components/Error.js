@@ -4,7 +4,7 @@ import BrowserInfo from 'browser-info'
 
 const browserLine = BrowserLine()
 
-export const ErrorPanel = ({ error }) => {
+export const ErrorPanel = ({ error, data }) => {
   return (
     <div
       className="text-dark rounded border border-red py-2 px-4 m-2"
@@ -24,6 +24,13 @@ export const ErrorPanel = ({ error }) => {
             <pre>{JSON.stringify(error.graphQLErrors, 0, 2)}</pre>
           </details>
         )}
+
+      {!f.isEmpty(data) && (
+        <details>
+          <summary>Data:</summary>
+          <pre>{JSON.stringify(data, 0, 2)}</pre>
+        </details>
+      )}
 
       <p className="text-muted mb-0">
         <small>

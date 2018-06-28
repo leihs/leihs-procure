@@ -75,7 +75,7 @@ const AdminCategoriesPage = ({ match }) => (
   <Query query={CATEGORIES_INDEX_QUERY}>
     {({ loading, error, data }) => {
       if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} />
+      if (error) return <ErrorPanel error={error} data={data} />
 
       const categories = data.main_categories
 
@@ -96,7 +96,7 @@ const AdminCategoriesPage = ({ match }) => (
               <Query query={CATEGORIES_QUERY}>
                 {({ loading, error, data }) => {
                   if (loading) return <Loading />
-                  if (error) return <ErrorPanel error={error} />
+                  if (error) return <ErrorPanel error={error} data={data} />
 
                   return categories.map(c => <CategoryCard key={c.id} {...c} />)
                 }}
@@ -118,7 +118,7 @@ const CategoryPage = ({ match }) => (
   <Query query={CATEGORIES_QUERY}>
     {({ loading, error, data }) => {
       if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} />
+      if (error) return <ErrorPanel error={error} data={data} />
 
       const mainCatId = f.enhyphenUUID(match.params.mainCatId)
       const mainCat = f.find(data.main_categories, { id: mainCatId })

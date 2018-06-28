@@ -21,10 +21,10 @@ const GET_BUILDINGS_QUERY = gql`
 
 const BuildingAutocomplete = props => (
   <Query query={GET_BUILDINGS_QUERY}>
-    {({ loading, error, data: { buildings } }) => {
+    {({ loading, error, data, data: { buildings } }) => {
       if (loading) return 'Loading'
       if (error) {
-        return <ErrorPanel error={error} />
+        return <ErrorPanel error={error} data={data} />
       }
       return <Select options={optionsFromList(buildings)} {...props} />
     }}

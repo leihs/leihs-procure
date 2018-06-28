@@ -19,7 +19,7 @@ const FilterBar = ({
   const content = () => {
     if (loading) return <Loading />
     if (error) {
-      return <ErrorPanel error={error} />
+      return <ErrorPanel error={error} data={data} />
     }
     return (
       <Filters data={data} current={currentFilters} onChange={onFilterChange} />
