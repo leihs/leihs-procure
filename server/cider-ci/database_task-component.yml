@@ -8,7 +8,7 @@ scripts:
       #!/usr/bin/env bash
       set -eux
       createdb "$DATABASE_NAME"
-      psql -d "$DATABASE_NAME" -f database/db/structure.sql
+      psql -d "$DATABASE_NAME" -f server/database/db/structure.sql
 
   test:
     start_when:

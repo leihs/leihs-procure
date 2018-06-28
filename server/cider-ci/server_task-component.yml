@@ -6,7 +6,7 @@ scripts:
         script_key: build-uberjar
       database has been created:
         script_key: create-database
-    body: java -jar target/leihs-procurement.jar run
+    body: cd server && java -jar target/leihs-procurement.jar run
     ignore_state: true
 
   server-is-running:
@@ -27,7 +27,7 @@ scripts:
 
   shutdown-server:
     body: |
-      ./scripts/kill-server
+      cd server && ./scripts/kill-server
     start_when:
       test is terminal:
         script_key: test

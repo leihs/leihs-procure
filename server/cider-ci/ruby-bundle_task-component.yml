@@ -11,6 +11,7 @@ scripts:
       #!/usr/bin/env bash
       set -eux
       export PATH=~/.rubies/$RUBY/bin:$PATH
+      cd server
 
       if [ ! -d ~/.rubies/$RUBY ]; then
         ruby-install --no-install-deps $RUBY_ENGINE $RUBY_VERSION

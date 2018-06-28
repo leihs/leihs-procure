@@ -4,6 +4,7 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -eux
+      cd server
       export LEIN_SNAPSHOTS_IN_RELEASE=yes
       DIGEST=$(git log -n 1 HEAD --pretty=%T)
       LEIN_UBERJAR_FILE="/tmp/leihs-procurement_${DIGEST}.jar"

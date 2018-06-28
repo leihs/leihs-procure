@@ -1,14 +1,16 @@
 jobs:
-  build:
+  client-build:
+    name: 'Frontend: Build'
     run_when:
       any branch is pushed: { type: branch, include_match: ^.*$ }
     task:
       scripts:
         build:
           timeout: 10 minutes
-          body: '{ npm ci || npm i ;} && npm run build'
+          body: 'cd client && { npm ci || npm i ;} && npm run build'
 
-  test:
+  client-specs:
+    name: 'Frontend: Tests'
     run_when:
       any branch is pushed: { type: branch, include_match: ^.*$ }
     task_defaults:
@@ -18,4 +20,4 @@ jobs:
       scripts:
         jest:
           timeout: 10 minutes
-          body: '{ npm ci || npm i ;} && npm test'
+          body: 'cd client && { npm ci || npm i ;} && npm test'
