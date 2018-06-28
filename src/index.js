@@ -14,8 +14,12 @@ import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
 import UiPlayground from './pages/_UiPlayground'
 
+// env: polyfills (browser support)
+require('es6-promise').polyfill()
+require('isomorphic-fetch')
+
 // webpack: inject styles
-import './styles/index.css'
+require('./styles/index.css')
 
 // lodash setup
 f.mixin(lodashMixins)
