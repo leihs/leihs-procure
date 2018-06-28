@@ -75,6 +75,36 @@
                              budget-period-in-requesting-phase)
                         category-inspectable-by-user
                         user-is-admin))},
+     :budget_period
+       {:read true,
+        :write (or
+                 ; existing request
+                 (and request-exists
+                      (not budget-period-is-past)
+                      (or (and user-is-requester
+                               requested-by-user
+                               budget-period-in-requesting-phase)
+                          category-inspectable-by-user
+                          user-is-admin))
+                 ; new request
+                 (and user-is-requester
+                      user-is-inspector
+                      user-is-admin))},
+     :category
+       {:read true,
+        :write (or
+                 ; existing request
+                 (and request-exists
+                      (not budget-period-is-past)
+                      (or (and user-is-requester
+                               requested-by-user
+                               budget-period-in-requesting-phase)
+                          category-inspectable-by-user
+                          user-is-admin))
+                 ; new request
+                 (and user-is-requester
+                      user-is-inspector
+                      user-is-admin))},
      :general_ledger_account_1
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write false},
