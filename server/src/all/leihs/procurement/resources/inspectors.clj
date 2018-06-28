@@ -1,0 +1,49 @@
+(ns leihs.procurement.resources.inspectors
+  (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.utils.ds :as ds]
+            [leihs.procurement.utils.sql :as sql]
+            [logbug.debug :as debug]))
+
+(defn get-inspectors
+  [context _ value]
+  (jdbc/query (-> context
+                  :request
+                  :tx)
+              (-> user/user-base-query
+                  (sql/merge-where
+                    [:in :users.id
+                     (-> (sql/select :pci.user_id)
+                         (sql/from [:procurement_category_inspectors :pci])
+                         (sql/merge-where [:= :pci.category_id (:id value)]))])
+                  sql/format)))
+
+(defn delete-inspectors-for-category-id!
+  [tx c-id]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from [:procurement_category_inspectors :pci])
+                     (sql/merge-where [:= :pci.category_id c-id])
+                     sql/format)))
+
+(defn insert-inspectors!
+  [tx row-maps]
+  (jdbc/execute! tx
+                 (-> (sql/insert-into :procurement_category_inspectors)
+                     (sql/values row-maps)
+                     sql/format)))
+
+(defn update-inspectors!
+  [tx c-id u-ids]
+  (delete-inspectors-for-category-id! tx c-id)
+  (if (not (empty? u-ids))
+    (insert-inspectors! tx
+                        (map #(hash-map :user_id % :category_id c-id) u-ids))))
+
+;#### debug ###################################################################
+; (logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :info)
+; (debug/debug-ns 'cider-ci.utils.shutdown)
+; (debug/debug-ns *ns*)
+; (debug/undebug-ns *ns*)

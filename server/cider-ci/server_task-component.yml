@@ -1,0 +1,34 @@
+scripts:
+
+  run-server:
+    start_when:
+      uberjar has been built:
+        script_key: build-uberjar
+      database has been created:
+        script_key: create-database
+    body: java -jar target/leihs-procurement.jar run
+    ignore_state: true
+
+  server-is-running:
+    body: |
+      # until curl --silent --fail -I http://localhost:${LEIHS_PROCUREMENT_HTTP_PORT}/procure/status;
+      until curl http://localhost:${LEIHS_PROCUREMENT_HTTP_PORT}/procure/status;
+        do sleep 1;
+      done
+    start_when:
+      run server is executing:
+        script_key: run-server
+        states: [executing]
+
+  test:
+    start_when:
+      server is running:
+        script_key: server-is-running
+
+  shutdown-server:
+    body: |
+      ./scripts/kill-server
+    start_when:
+      test is terminal:
+        script_key: test
+        states: [aborted, defective, passed, failed, skipped]
