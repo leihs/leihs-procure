@@ -26,8 +26,7 @@ export const apolloClient = new ApolloClient({
 })
 
 const getCSRFToken = (cookies, name) =>
-  cookies
+  (cookies || '')
     .split(';')
     .map(s => s.trim())
-    .filter(s => s.indexOf(name) === 0)[0]
     .replace(`${name}=`, '')
