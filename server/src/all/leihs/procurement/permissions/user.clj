@@ -40,18 +40,24 @@
              sql/format))))))
 
 (defn viewer?
-  [tx user]
-  (:result
-    (first (jdbc/query
-             tx
-             (-> (sql/select
-                   [(sql/call
-                      :exists
-                      (-> (sql/select true)
-                          (sql/from :procurement_category_viewers)
-                          (sql/where [:= :procurement_category_viewers.user_id
-                                      (:user_id user)]))) :result])
-                 sql/format)))))
+  ([tx user] (viewer? tx user nil))
+  ([tx user c-id]
+   (:result
+     (first
+       (jdbc/query
+         tx
+         (-> (sql/select
+               [(sql/call
+                  :exists
+                  (cond-> (-> (sql/select true)
+                              (sql/from :procurement_category_viewers)
+                              (sql/merge-where
+                                [:= :procurement_category_viewers.user_id
+                                 (:user_id user)]))
+                    c-id (sql/merge-where
+                           [:= :procurement_category_viewers.category_id
+                            c-id]))) :result])
+             sql/format))))))
 
 (defn requester?
   [tx user]
