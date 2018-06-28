@@ -1,0 +1,9 @@
+{
+  "public": "procurement_client_app",
+  "rewrites": [
+    {
+      "source": "**",
+      "destination": "/procure/index.html"
+    }
+  ]
+}

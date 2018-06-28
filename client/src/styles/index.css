@@ -1,0 +1,46 @@
+@import '~bootstrap/dist/css/bootstrap.css';
+
+/* variables (used in React inline styles, needs browser support)
+   vars used but not defined here come from bootstrap.
+*/
+:root {
+  --content-color: var(--black);
+  --content-bg-color: var(--white);
+}
+
+body {
+  background: var(--content-bg-color);
+}
+
+@import './bootstrap-extensions.css';
+
+/*
+ TODO: form field styles for 'to be deleted' (muted .bg-danger, .text-strike)
+*/
+
+/* app styles */
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+/* auto-break words */
+body {
+  hyphens: auto;
+}
+
+/* ??? action buttons ??? */
+.btn-massive {
+  /* box-shadow: 0 0.2rem 0 0 rgba(52, 58, 64, 0.25); */
+  border-bottom-width: 0.2rem;
+}
+
+/* FIXES & HACKS */
+
+/* https://getbootstrap.com/docs/4.1/getting-started/browsers-devices/#printing */
+@media print {
+  .container {
+    width: auto;
+  }
+}

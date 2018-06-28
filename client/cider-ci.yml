@@ -1,0 +1,21 @@
+jobs:
+  build:
+    run_when:
+      any branch is pushed: { type: branch, include_match: ^.*$ }
+    task:
+      scripts:
+        build:
+          timeout: 10 minutes
+          body: '{ npm ci || npm i ;} && npm run build'
+
+  test:
+    run_when:
+      any branch is pushed: { type: branch, include_match: ^.*$ }
+    task_defaults:
+      environment_variables:
+        CI: 'true'
+    task:
+      scripts:
+        jest:
+          timeout: 10 minutes
+          body: '{ npm ci || npm i ;} && npm test'

@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button: renders correctly 1`] = `
+Array [
+  <button
+    className="btn btn-secondary"
+    onClick={[Function]}
+    type="button"
+>
+    Button
+</button>,
+  " ",
+  <button
+    className="btn btn-primary"
+    onClick={[Function]}
+    title="test title"
+    type="button"
+>
+    Button
+</button>,
+  " ",
+  <button
+    className="btn btn-secondary"
+    onClick={[Function]}
+    type="button"
+>
+    Button
+</button>,
+  " ",
+  <button
+    className="my-class btn btn-link"
+    onClick={[Function]}
+    title="test title"
+    type="button"
+>
+    Button
+</button>,
+]
+`;
