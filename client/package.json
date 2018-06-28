@@ -16,10 +16,7 @@
   },
   "homepage": "/procure",
   "proxy": {
-    "/graphql": {
-      "target": "http://localhost:3003"
-    },
-    "/images": {
+    "/(graphql|graphiql|images|attachments|status)": {
       "target": "http://localhost:3003"
     }
   },
