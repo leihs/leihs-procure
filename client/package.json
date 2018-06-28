@@ -12,7 +12,6 @@
     "analyze-build": "npm run -s build && npm run -s analyze",
     "lint": "eslint --fix src/{,**/}*.js{x,on}",
     "ci:lint": "eslint src/{,**/}*.js{x,on}",
-    "dev:getSchema": "graphql get-schema",
     "test": "react-scripts test --env=jsdom"
   },
   "homepage": "/procure",
