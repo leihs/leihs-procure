@@ -1,5 +1,5 @@
 {
-  "public": "procurement_client_app",
+  "public": "procure_client_app",
   "rewrites": [
     {
       "source": "**",
