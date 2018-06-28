@@ -17,7 +17,7 @@ const RequestLineClosed = ({ request, onClick }) => (
     <Col sm="2">{request.article_name.value}</Col>
     <Col sm="2">{request.receiver.value}</Col>
     <Col sm="2">
-      <code>Org #{request.organization.id.split('-')[0]}</code>
+      <code>Org #{request.organization.value.id.split('-')[0]}</code>
     </Col>
     <Col sm="1">
       <Div cls="badge badge-secondary">

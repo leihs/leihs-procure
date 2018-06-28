@@ -15,11 +15,15 @@ export const RequestFieldsForIndex = gql`
     id
 
     category {
-      id
-      name
+      value {
+        id
+        name
+      }
     }
     budget_period {
-      id
+      value {
+        id
+      }
     }
 
     article_name {
@@ -29,7 +33,9 @@ export const RequestFieldsForIndex = gql`
       value
     }
     organization {
-      id
+      value {
+        id
+      }
     }
 
     # FIXME: price fields
@@ -71,11 +77,15 @@ export const RequestFieldsForShow = gql`
     ...RequestFieldsForIndex
 
     category {
-      id
-      name
+      value {
+        id
+        name
+      }
     }
     budget_period {
-      id
+      value {
+        id
+      }
     }
 
     article_name {
@@ -88,7 +98,9 @@ export const RequestFieldsForShow = gql`
       ...RequestFieldString
     }
     organization {
-      id
+      value {
+        id
+      }
     }
 
     # FIXME: price fields
