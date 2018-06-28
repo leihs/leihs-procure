@@ -17,6 +17,7 @@ jobs:
         traits:
           JDK 8: true
           Leiningen 2: true
+          g2016: true
         ports:
           LEIHS_PROCUREMENT_HTTP_PORT:
             min: 3200
