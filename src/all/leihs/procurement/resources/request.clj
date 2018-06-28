@@ -164,8 +164,8 @@
     (= result '(1))))
 
 (defn requested-by?
-  [tx request user]
-  (= (:id user)
+  [tx request auth-entity]
+  (= (:user_id auth-entity)
      (-> request-base-query
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
