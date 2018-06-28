@@ -21,7 +21,7 @@ isDev &&
 
 const buildAuthHeaders = () =>
   isDev
-    ? { 'X-Fake-Authorization': window.LEIHS_DEV_CURRENT_USER_ID }
+    ? { 'X-Fake-Token-Authorization': window.LEIHS_DEV_CURRENT_USER_ID }
     : { 'X-CSRF-Token': getCSRFToken(document.cookie, CSRF_COOKIE_NAME) }
 
 export const apolloClient = new ApolloClient({
