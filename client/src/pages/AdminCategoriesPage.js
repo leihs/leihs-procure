@@ -77,12 +77,12 @@ const AdminCategoriesPage = ({ match }) => (
       if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
-      const categories = data.main_categories
+      const categoriesToc = data.main_categories
 
       return (
         <MainWithSidebar
           sidebar={
-            <TableOfContents categories={categories} baseUrl={match.url} />
+            <TableOfContents categories={categoriesToc} baseUrl={match.url} />
           }
         >
           <Switch>
@@ -98,7 +98,9 @@ const AdminCategoriesPage = ({ match }) => (
                   if (loading) return <Loading />
                   if (error) return <ErrorPanel error={error} data={data} />
 
-                  return categories.map(c => <CategoryCard key={c.id} {...c} />)
+                  return data.main_categories.map(c => (
+                    <CategoryCard key={c.id} {...c} />
+                  ))
                 }}
               </Query>
             </Route>
