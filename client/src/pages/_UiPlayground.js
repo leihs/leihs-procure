@@ -20,6 +20,7 @@ import Loading from '../components/Loading'
 
 import { examples as BootstrapExamples } from '../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../components/Bootstrap/DownshiftMultiSelect.examples'
+import { allIcons } from '../components/Icons.examples'
 
 // # DATA
 
@@ -34,6 +35,11 @@ const PAGES = [
         <hr />
       </F>
     ))
+  },
+  {
+    id: 'icons',
+    title: 'Icons',
+    content: allIcons
   },
   {
     id: 'loading-indicator',
