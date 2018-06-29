@@ -110,12 +110,13 @@
 
 (defn get-total-price-cents
   [tx qty-type bp-id]
-  (some-> (total-price-query qty-type bp-id)
-          (->> (jdbc/query tx))
-          first
-          :result
-          (/ 100)
-          round))
+  (or (some-> (total-price-query qty-type bp-id)
+              (->> (jdbc/query tx))
+              first
+              :result
+              (/ 100)
+              round)
+      0))
 
 (defn total-price-cents-requested-quantities
   [context _ value]
