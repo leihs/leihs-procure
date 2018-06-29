@@ -168,8 +168,9 @@
                        ; :attachments {:type :RequestFieldAttachments},
                        :budget_period {:type :RequestFieldBudgetPeriod},
                        :category {:type :RequestFieldCategory},
-                       :general_ledger_account_1 {:type :RequestFieldString}
-                       :general_ledger_account_2 {:type :RequestFieldString}
+                       ; TODO: new requirement
+                       ; :general_ledger_account_1 {:type :RequestFieldString}
+                       ; :general_ledger_account_2 {:type :RequestFieldString}
                        :id {:type (non-null ID)},
                        :inspection_comment {:type :RequestFieldString},
                        :internal_order_number {:type :RequestFieldString},

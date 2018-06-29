@@ -16,6 +16,7 @@
 (def attrs-mapping
   {:budget_period :budget_period_id,
    :category :category_id,
+   :model :model_id,
    :organization :organization_id,
    :room :room_id,
    :supplier :supplier_id,

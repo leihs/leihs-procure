@@ -90,8 +90,8 @@
                                     (requests-query context arguments value)
                                     {:row-fn (request/row-fn tx)})]
       (->> proc-requests
-           (map #(request-perms/apply-permissions tx auth-user %))
-           (map request/reverse-exchange-attrs)))))
+           (map request/reverse-exchange-attrs)
+           (map #(request-perms/apply-permissions tx auth-user %))))))
 
 (defn total-price-query
   [qty-type bp-id]

@@ -7,125 +7,143 @@ describe 'requests' do
       @q = <<-GRAPHQL
         query RequestForEdit($requestIds: [ID!]!) {
           requests(id: $requestIds) {
-            ...RequestFieldsForShow
-          }
-        }
-
-        fragment RequestFieldsForShow on Request {
-          ...RequestFieldsForIndex
-          category {
-            value {
-              id
-              name
+            accounting_type {
+              read
+              value
+              write
             }
-          }
-          budget_period {
-            value {
-              id
+            accounting_type {
+              read
+              value
+              write
             }
-          }
-          article_name {
-            ...RequestFieldString
-          }
-          supplier {
-            value {
-              id
-              name
+            article_name {
+              read
+              value
+              write
             }
-            read
-          }
-          receiver {
-            ...RequestFieldString
-          }
-          organization {
-            value {
-              id
+            article_number {
+              read
+              value
+              write
             }
-          }
-          requested_quantity {
-            ...RequestFieldInt
-          }
-          approved_quantity {
-            ...RequestFieldInt
-          }
-          order_quantity {
-            ...RequestFieldInt
-          }
-          article_number {
-            ...RequestFieldString
-          }
-          motivation {
-            ...RequestFieldString
-          }
-          room {
-            read
-            write
-            value {
-              id
-              name
-              building {
+            budget_period {
+              read
+              value {
                 id
-                name
               }
+              write
+            }
+            category {
+              read
+              value {
+                id
+              }
+              write
+            }
+            id
+            inspection_comment {
+              read
+              value
+              write
+            }
+            internal_order_number {
+              read
+              value
+              write
+            }
+            model {
+              read
+              value {
+                id
+              }
+              write
+            }
+            motivation {
+              read
+              value
+              write
+            }
+            order_quantity {
+              read
+              value
+              write
+            }
+            organization {
+              read
+              value {
+                id
+              }
+              write
+            }
+            price_cents {
+              read
+              value
+              write
+            }
+            price_cents {
+              read
+              value
+              write
+            }
+            priority {
+              read
+              value
+              write
+            }
+            priority_inspector {
+              read
+              value
+              write
+            }
+            receiver {
+              read
+              value
+              write
+            }
+            replacement {
+              read
+              value
+              write
+            }
+            requested_quantity {
+              read
+              value
+              write
+            }
+            room {
+              read
+              value {
+                id
+              }
+              write
+            }
+            state {
+              read
+              value
+              write
+            }
+            supplier {
+              read
+              value {
+                id
+              }
+              write
+            }
+            supplier_name {
+              read
+              value
+              write
+            }
+            user {
+              read
+              value {
+                id
+              }
+              write
             }
           }
-          inspection_comment {
-            ...RequestFieldString
-          }
         }
-
-        fragment RequestFieldsForIndex on Request {
-          id
-          category {
-            value {
-              id
-              name
-            }
-          }
-          budget_period {
-            value {
-              id
-            }
-          }
-          article_name {
-            value
-          }
-          receiver {
-            value
-          }
-          organization {
-            value {
-              id
-            }
-          }
-          requested_quantity {
-            value
-          }
-          approved_quantity {
-            value
-          }
-          order_quantity {
-            value
-          }
-          replacement {
-            value
-          }
-        }
-
-        fragment RequestFieldString on RequestFieldString {
-          value
-          read
-          write
-        }
-
-        fragment RequestFieldInt on RequestFieldInt {
-          value
-          read
-          write
-        }
-
-        fragment RequestFieldString on RequestFieldString { value, read, write }
-        fragment RequestFieldInt on RequestFieldInt { value, read, write }
       GRAPHQL
     end
 
