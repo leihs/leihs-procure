@@ -12,6 +12,11 @@ export const DisplayName = (o, short = false) => {
         ? `${o.name}`
         : `${o.name} (${o.description})`
 
+    case 'Organization':
+      return short || !o.shortname
+        ? `${o.shortname || o.name}`
+        : `${o.name} (${o.shortname})`
+
     default:
       throw new Error(`DisplayName: unknown type '${o.__typename}'!`)
   }

@@ -65,13 +65,13 @@ const AdminOrgsPage = () => (
           <ul className="list-unstyled mt-2">
             {departmentsOrgs.map(dep => (
               <li key={dep.id}>
-                <h2 className="h3">{dep.shortname || dep.name}</h2>
+                <h2 className="h3">{DisplayName(dep)}</h2>
                 {!f.isEmpty(dep.organizations) && (
                   <ul className="list-unstyled mb-4">
                     {dep.organizations.map(org => (
                       <li key={org.id}>
                         <h3 className="h5 text-bold mb-0">
-                          {org.shortname || org.name}
+                          {DisplayName(org)}
                         </h3>
                         <ul className="list-unstyled mb-2">
                           {f.map(requestersByOrg[org.id], req => (
