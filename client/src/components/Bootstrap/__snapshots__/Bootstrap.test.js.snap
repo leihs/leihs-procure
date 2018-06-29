@@ -82,8 +82,73 @@ Array [
     title="test title"
     type="button"
 >
-    Button
+    Button with title
 </button>,
+  " ",
+  <button
+    className="btn btn-primary"
+    onClick={[Function]}
+    type="button"
+>
+    Button primary
+</button>,
+  " ",
+  <button
+    className="btn btn-secondary"
+    onClick={[Function]}
+    type="button"
+>
+    Button secondary
+</button>,
+  " ",
+  <button
+    className="btn btn-success"
+    onClick={[Function]}
+    type="button"
+>
+    Button success
+</button>,
+  " ",
+  <button
+    className="btn btn-danger"
+    onClick={[Function]}
+    type="button"
+>
+    Button danger
+</button>,
+  " ",
+  <button
+    className="btn btn-warning"
+    onClick={[Function]}
+    type="button"
+>
+    Button warning
+</button>,
+  " ",
+  <button
+    className="btn btn-info"
+    onClick={[Function]}
+    type="button"
+>
+    Button info
+</button>,
+  " ",
+  <button
+    className="btn btn-light"
+    onClick={[Function]}
+    type="button"
+>
+    Button light
+</button>,
+  " ",
+  <button
+    className="btn btn-dark"
+    onClick={[Function]}
+    type="button"
+>
+    Button dark
+</button>,
+  " ",
   " ",
   <button
     className="btn btn-secondary"
