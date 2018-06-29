@@ -7,6 +7,7 @@ export { Collapse } from './Collapse'
 
 export { default as StatefulForm, StatefulInput } from './StatefulForm'
 
+export { default as InputDate } from './InputDate'
 export { default as Select } from './Select'
 export { default as ButtonRadio } from './ButtonRadio'
 export { default as MultiSelect } from './MultiSelect'

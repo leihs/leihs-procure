@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Badge } from './Bootstrap'
+import { Button, Badge, InputDate } from './index'
 
 const _space_ = ' '
 
@@ -64,6 +64,20 @@ export const examples = [
         <Badge light>Badge light</Badge>
         {_space_}
         <Badge dark>Badge dark</Badge>
+      </React.Fragment>
+    )
+  },
+  {
+    name: 'InputDate',
+    content: (
+      <React.Fragment>
+        no value
+        <br />
+        <InputDate />
+        <hr />
+        with value <code>1985-10-26T08:15:00.000Z</code>
+        <br />
+        <InputDate value="1985-10-26T08:15:00.000Z" />
       </React.Fragment>
     )
   }

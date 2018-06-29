@@ -168,3 +168,50 @@ Array [
 </button>,
 ]
 `;
+
+exports[`InputDate: renders correctly 1`] = `
+Array [
+  "no value",
+  <br />,
+  <div
+    className="DayPickerInput"
+>
+    <input
+        className="form-control"
+        name={undefined}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        placeholder=""
+        required={undefined}
+        value={null}
+    />
+</div>,
+  <hr />,
+  "with value ",
+  <code>
+    1985-10-26T08:15:00.000Z
+</code>,
+  <br />,
+  <div
+    className="DayPickerInput"
+>
+    <input
+        className="form-control"
+        name={undefined}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        placeholder=""
+        required={undefined}
+        value="10/26/1985"
+    />
+</div>,
+]
+`;
