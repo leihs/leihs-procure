@@ -7,6 +7,7 @@ import gql from 'graphql-tag'
 // import StatefulForm from '../components/StatefulForm'
 // import Icon from '../components/Icons'
 import { Div } from '../components/Bootstrap'
+import Loading from '../components/Loading'
 
 // # DATA
 //
@@ -21,7 +22,7 @@ const SOME_PAGE_QUERY = gql`
 const SomePage = () => (
   <Query query={SOME_PAGE_QUERY}>
     {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>
+      if (loading) return <Loading />
       if (error)
         return (
           <p>

@@ -9,6 +9,7 @@ import gql from 'graphql-tag'
 // import * as fragments from '../queries/fragments'
 // import Icon from '../components/Icons'
 // import { Div } from '../components/Bootstrap'
+import Loading from '../components/Loading'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
 import { ErrorPanel } from '../components/Error'
@@ -49,7 +50,7 @@ const ADMIN_ORGS_PAGE_QUERY = gql`
 const AdminOrgsPage = () => (
   <Query query={ADMIN_ORGS_PAGE_QUERY}>
     {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>
+      if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
       const departmentsOrgs = f.sortBy(data.organizations, 'name')

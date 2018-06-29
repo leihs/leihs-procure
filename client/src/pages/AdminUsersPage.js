@@ -17,6 +17,7 @@ import {
   InputText,
   StatefulForm
 } from '../components/Bootstrap'
+import Loading from '../components/Loading'
 import { MainWithSidebar } from '../components/Layout'
 import { DisplayName } from '../components/decorators'
 import { ErrorPanel } from '../components/Error'
@@ -70,7 +71,7 @@ const UPDATE_REQUESTERS_MUTATION = gql`
 const AdminUsersPage = () => (
   <Query query={ADMIN_USERS_PAGE_QUERY}>
     {({ loading, error, data }) => {
-      if (loading) return <p>Loading...</p>
+      if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
       // actions for admins list
