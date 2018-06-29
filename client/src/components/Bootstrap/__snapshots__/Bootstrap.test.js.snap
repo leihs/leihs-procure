@@ -1,5 +1,71 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Badge: renders correctly 1`] = `
+Array [
+  <h3>
+    Heading 
+    <span
+        className="badge badge-primary"
+    >
+        Badge
+    </span>
+</h3>,
+  <span
+    className="badge badge-primary"
+>
+    Badge
+</span>,
+  " ",
+  <span
+    className="badge badge-primary"
+>
+    Badge primary
+</span>,
+  " ",
+  <span
+    className="badge badge-secondary"
+>
+    Badge secondary
+</span>,
+  " ",
+  <span
+    className="badge badge-success"
+>
+    Badge success
+</span>,
+  " ",
+  <span
+    className="badge badge-danger"
+>
+    Badge danger
+</span>,
+  " ",
+  <span
+    className="badge badge-warning"
+>
+    Badge warning
+</span>,
+  " ",
+  <span
+    className="badge badge-info"
+>
+    Badge info
+</span>,
+  " ",
+  <span
+    className="badge badge-light"
+>
+    Badge light
+</span>,
+  " ",
+  <span
+    className="badge badge-dark"
+>
+    Badge dark
+</span>,
+]
+`;
+
 exports[`Button: renders correctly 1`] = `
 Array [
   <button
