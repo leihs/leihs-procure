@@ -27,6 +27,7 @@ const Navbar = ({ withPlayground }) => (
         requests
       </NavItem>
       <span className="navbar-text">admin</span>
+      <NavItem to="/admin/budget-periods">budget periods</NavItem>
       <NavItem to="/admin/users">users</NavItem>
       <NavItem to="/admin/categories">categories</NavItem>
       <NavItem to="/admin/organizations">organizations</NavItem>
