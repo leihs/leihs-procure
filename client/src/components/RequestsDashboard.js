@@ -17,49 +17,68 @@ import FilterBar from './RequestsFilterBar'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsTreeFiltered')
 
-const RequestsDashboard = props => (
-  <MainWithSidebar
-    sidebar={
-      <FilterBar
-        filters={props.filters}
-        currentFilters={props.currentFilters}
-        onFilterChange={props.onFilterChange}
-      />
-    }
-  >
-    <ButtonGroup size="sm">
-      {['tree', 'table'].map(m => (
-        <Button
-          key={m}
-          size="sm"
-          outline
-          color="secondary"
-          active={props.viewMode === m}
-          onClick={e => props.onSetViewMode(m)}
-        >
-          {m}
+const RequestsDashboard = props => {
+  const { requestsQuery, refetchAllData } = props
+  const pageHeader = (
+    <Row>
+      <Col>
+        <h4>
+          {f.get(props.requestsQuery.data, 'requests.length') || 0} Requests
+        </h4>
+      </Col>
+      <Col xs="1" cls="text-right">
+        <ButtonGroup size="sm">
+          {['tree', 'table'].map(m => (
+            <Button
+              key={m}
+              size="sm"
+              outline
+              color="secondary"
+              active={props.viewMode === m}
+              onClick={e => props.onSetViewMode(m)}
+            >
+              {m}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <Button color="link" title="refresh data" onClick={refetchAllData}>
+          <Icon.Reload spin={requestsQuery.loading} />
         </Button>
-      ))}
-    </ButtonGroup>
+      </Col>
+    </Row>
+  )
 
-    {props.viewMode === 'table' ? (
-      <RequestsTable
-        requestsQuery={props.requestsQuery}
-        refetchAllData={props.refetchAllData}
-        editQuery={props.editQuery} //tmp?
-      />
-    ) : (
-      <RequestsTree
-        requestsQuery={props.requestsQuery}
-        refetchAllData={props.refetchAllData}
-        openPanels={props.openPanels}
-        onPanelToggle={props.onPanelToggle}
-        editQuery={props.editQuery} //tmp?
-        filters={props.currentFilters} // tmp
-      />
-    )}
-  </MainWithSidebar>
-)
+  return (
+    <MainWithSidebar
+      sidebar={
+        <FilterBar
+          filters={props.filters}
+          currentFilters={props.currentFilters}
+          onFilterChange={props.onFilterChange}
+        />
+      }
+    >
+      {pageHeader}
+
+      {props.viewMode === 'table' ? (
+        <RequestsTable
+          requestsQuery={requestsQuery}
+          refetchAllData={refetchAllData}
+          editQuery={props.editQuery} //tmp?
+        />
+      ) : (
+        <RequestsTree
+          requestsQuery={requestsQuery}
+          refetchAllData={refetchAllData}
+          openPanels={props.openPanels}
+          onPanelToggle={props.onPanelToggle}
+          editQuery={props.editQuery} //tmp?
+          filters={props.currentFilters} // tmp
+        />
+      )}
+    </MainWithSidebar>
+  )
+}
 
 export default RequestsDashboard
 
@@ -69,11 +88,33 @@ function tmpFilterBudgetPeriods(periods, filters) {
   return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
 }
 
-// // FIXME: remove this main_categories query can be filtered by id
-// function tmpFilterMainCategories(categories, filters) {
-//   if (!filters.categories) return categories
-//   return categories.filter(c => filters.categories.indexOf(c.id) !== -1)
-// }
+const RequestsTable = ({
+  requestsQuery: { loading, error, data },
+  editQuery,
+  filters,
+  refetchAllData,
+  openPanels,
+  onPanelToggle
+}) => {
+  if (loading) return <Loading size="1" />
+  if (error) return <ErrorPanel error={error} data={data} />
+
+  const requests = f.sortBy(data.requests, r =>
+    [r.budget_period, r.category_id].join('.')
+  )
+
+  return f.map(requests, (r, i) => (
+    <F key={r.id}>
+      <div
+        className={cx('border-top', {
+          'border-bottom': i + 1 === requests.length // only last
+        })}
+      >
+        <RequestLine request={r} editQuery={editQuery} />
+      </div>
+    </F>
+  ))
+}
 
 const RequestsTree = ({
   requestsQuery: { loading, error, data },
@@ -83,26 +124,7 @@ const RequestsTree = ({
   openPanels,
   onPanelToggle
 }) => {
-  const pageHeader = (
-    <Row>
-      <Col>
-        <h4>{f.get(data, 'requests.length') || 0} Requests</h4>
-      </Col>
-      <Col xs="1" cls="text-right">
-        <Button color="link" title="refresh data" onClick={refetchAllData}>
-          <Icon.Reload spin={loading} />
-        </Button>
-      </Col>
-    </Row>
-  )
-
-  if (loading)
-    return (
-      <F>
-        {pageHeader}
-        <Loading size="1" />
-      </F>
-    )
+  if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
   const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
@@ -114,49 +136,43 @@ const RequestsTree = ({
     r => `${r.budget_period.id}|${r.category.id}`
   )
 
-  return (
-    <F>
-      {pageHeader}
-
-      {budgetPeriods.map(b => (
-        <BudgetPeriodCard key={b.id} budgetPeriod={b}>
-          {categories.map(cat => (
-            <CategoryLine
-              key={cat.id}
-              category={cat}
-              isOpen={openPanels.cats.includes(cat.id)}
-              onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
-            >
-              {cat.categories.map(sc => {
-                const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
-                return (
-                  <SubCategoryLine
-                    key={sc.id}
-                    category={sc}
-                    requestCount={reqs.length}
-                    isOpen={openPanels.cats.includes(sc.id)}
-                    onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
-                  >
-                    {f.map(reqs, (r, i) => (
-                      <F key={r.id}>
-                        <div
-                          className={cx({
-                            'border-bottom': i + 1 < reqs.length // not if last
-                          })}
-                        >
-                          <RequestLine request={r} editQuery={editQuery} />
-                        </div>
-                      </F>
-                    ))}
-                  </SubCategoryLine>
-                )
-              })}
-            </CategoryLine>
-          ))}
-        </BudgetPeriodCard>
+  return budgetPeriods.map(b => (
+    <BudgetPeriodCard key={b.id} budgetPeriod={b}>
+      {categories.map(cat => (
+        <CategoryLine
+          key={cat.id}
+          category={cat}
+          isOpen={openPanels.cats.includes(cat.id)}
+          onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
+        >
+          {cat.categories.map(sc => {
+            const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
+            return (
+              <SubCategoryLine
+                key={sc.id}
+                category={sc}
+                requestCount={reqs.length}
+                isOpen={openPanels.cats.includes(sc.id)}
+                onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
+              >
+                {f.map(reqs, (r, i) => (
+                  <F key={r.id}>
+                    <div
+                      className={cx({
+                        'border-bottom': i + 1 < reqs.length // not if last
+                      })}
+                    >
+                      <RequestLine request={r} editQuery={editQuery} />
+                    </div>
+                  </F>
+                ))}
+              </SubCategoryLine>
+            )
+          })}
+        </CategoryLine>
       ))}
-    </F>
-  )
+    </BudgetPeriodCard>
+  ))
 }
 
 const budgetPeriodDates = bp => {
@@ -311,58 +327,5 @@ const SubCategoryLine = ({
         </F>
       )}
     </Collapse>
-  )
-}
-
-const RequestsTable = ({
-  requestsQuery: { loading, error, data },
-  editQuery,
-  filters,
-  refetchAllData,
-  openPanels,
-  onPanelToggle
-}) => {
-  const pageHeader = (
-    <Row>
-      <Col>
-        <h4>{f.get(data, 'requests.length') || 0} Requests</h4>
-      </Col>
-      <Col xs="1" cls="text-right">
-        <Button color="link" title="refresh data" onClick={refetchAllData}>
-          <Icon.Reload spin={loading} />
-        </Button>
-      </Col>
-    </Row>
-  )
-
-  if (loading)
-    return (
-      <F>
-        {pageHeader}
-        <Loading size="1" />
-      </F>
-    )
-  if (error) return <ErrorPanel error={error} data={data} />
-
-  const requests = f.sortBy(data.requests, r =>
-    [r.budget_period, r.category_id].join('.')
-  )
-
-  return (
-    <F>
-      {pageHeader}
-
-      {f.map(requests, (r, i) => (
-        <F key={r.id}>
-          <div
-            className={cx('border-top', {
-              'border-bottom': i + 1 === requests.length // only last
-            })}
-          >
-            <RequestLine request={r} editQuery={editQuery} />
-          </div>
-        </F>
-      ))}
-    </F>
   )
 }
