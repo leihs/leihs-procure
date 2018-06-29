@@ -46,7 +46,7 @@ Node.propTypes = {
   tag: PropTypes.string
 }
 
-export { Node as __Node }
+export { Node as __Node } // "internal" usage only
 
 export const Div = props => Node(props)
 export const Pre = props => Node({ ...props, tag: 'span' })

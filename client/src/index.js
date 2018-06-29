@@ -56,3 +56,5 @@ window.debugObj = obj => {
   console.debug(obj) // eslint-disable-line no-console
   return obj
 }
+window.debug = () => (localStorage.debug = 'app:*')
+window.nodebug = () => (localStorage.debug = '')
