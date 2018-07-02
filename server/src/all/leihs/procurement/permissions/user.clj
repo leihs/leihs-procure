@@ -43,21 +43,20 @@
   ([tx user] (viewer? tx user nil))
   ([tx user c-id]
    (:result
-     (first
-       (jdbc/query
-         tx
-         (-> (sql/select
-               [(sql/call
-                  :exists
-                  (cond-> (-> (sql/select true)
-                              (sql/from :procurement_category_viewers)
-                              (sql/merge-where
-                                [:= :procurement_category_viewers.user_id
-                                 (:user_id user)]))
-                    c-id (sql/merge-where
-                           [:= :procurement_category_viewers.category_id
-                            c-id]))) :result])
-             sql/format))))))
+     (first (jdbc/query
+              tx
+              (-> (sql/select
+                    [(sql/call
+                       :exists
+                       (cond-> (-> (sql/select true)
+                                   (sql/from :procurement_category_viewers)
+                                   (sql/merge-where
+                                     [:= :procurement_category_viewers.user_id
+                                      (:user_id user)]))
+                         c-id (sql/merge-where
+                                [:= :procurement_category_viewers.category_id
+                                 c-id]))) :result])
+                  sql/format))))))
 
 (defn requester?
   [tx user]
@@ -77,3 +76,9 @@
 (defn requester-of?
   [tx user request]
   (= (str (:user_id user)) (str (:user_id request))))
+
+(defn advanced?
+  [tx user]
+  (->> [viewer? inspector? admin?]
+       (map #(% tx user))
+       (some true?)))

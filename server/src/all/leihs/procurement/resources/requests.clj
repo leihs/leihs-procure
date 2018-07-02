@@ -6,13 +6,11 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources.budget-period :as budget-period]
+            [leihs.procurement.resources.budget-periods :as budget-periods]
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
-
-(def requests-base-query
-  (-> (sql/select :procurement_requests.* [request/state-sql :state])
-      (sql/from :procurement_requests)))
 
 (defn search-query
   [sql-query term]
@@ -36,6 +34,7 @@
 (defn requests-query
   [context arguments _]
   (let [id (:id arguments)
+        advanced-user? (:advanced-user? context)
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
@@ -44,24 +43,34 @@
         requested-by-auth-user (:requested_by_auth_user arguments)
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
         state (:state arguments)
+        state-set (:request-state-set context)
         search-term (:search arguments)]
     (sql/format
-      (cond-> requests-base-query
+      (cond-> (request/requests-base-query state-set)
+        ; TODO: empty check already done in caller
         (not (empty? id)) (sql/merge-where [:in :procurement_requests.id id])
+        ; TODO: empty check already done in caller
         (not (empty? category-id))
           (sql/merge-where [:in :procurement_requests.category_id category-id])
+        ; TODO: empty check already done in caller
         (not (empty? budget-period-id))
           (sql/merge-where [:in :procurement_requests.budget_period_id
                             budget-period-id])
+        ; TODO: empty check already done in caller
         (not (empty? organization-id))
           (sql/merge-where [:in :procurement_requests.organization_id
                             organization-id])
+        ; TODO: empty check already done in caller
         (not (empty? priority)) (sql/merge-where
                                   [:in :procurement_requests.priority priority])
+        ; TODO: empty check already done in caller
         (not (empty? inspector-priority))
           (sql/merge-where [:in :procurement_requests.inspector_priority
                             inspector-priority])
-        (not (empty? state)) (sql/merge-where [:in request/state-sql state])
+        ; TODO: empty check already done in caller
+        (not (empty? state))
+          (sql/merge-where [:in (request/state-sql (:request-state-set context))
+                            state])
         requested-by-auth-user
           (sql/merge-where [:= :procurement_requests.user_id
                             (-> context
@@ -80,40 +89,57 @@
                                        :id)]))])
         search-term (search-query search-term)))))
 
-(defn valid-state-combinations
-  [tx user]
-  (if (some #(% tx user)
-            [user-perms/viewer? user-perms/inspector? user-perms/admin?])
-    #{"new" "approved" "partially_approved" "rejected"}
-    #{"new" "in_approval"}))
-
-(defn ensure-valid-states
-  [tx states user]
-  (let [valid-states (valid-state-combinations tx user)]
-    (if-not (clojure.set/subset? states valid-states)
-      (throw (ex-info "Invalid state combinations for requests' filter"
-                      {:states states})))))
+(defn sanitize-and-enhance-context
+  [context arguments value]
+  "It returns context unchanged if `state` arg not provided.
+  It throws if `state` argument is provided but `budget_period_id` is missing
+  or `state` arg has not an allowed value in combination with `budget_period_id`.
+  Otherwise it enhances the context with additional key/val pair."
+  (if-let [state-arg (:state arguments)]
+    (if (nil? (:budget_period_id arguments))
+      (throw (Exception.
+               "You must provide budget_period_id in combination with state!"))
+      (let [ring-request (:request context)
+            tx (:tx ring-request)
+            budget-periods (budget-periods/get-budget-periods tx
+                                                              (:budget_period_id
+                                                                arguments))
+            valid-states (request/valid-state-combinations
+                           tx
+                           (:authenticated-entity ring-request)
+                           budget-periods)]
+        (if-not (clojure.set/subset? (->> state-arg
+                                          (map keyword)
+                                          set)
+                                     valid-states)
+          (throw
+            (Exception.
+              "Invalid state combinations for budget_period_ids and user permissions!"))
+          (assoc context :request-state-set valid-states))))
+    context))
 
 (defn get-requests
   [context arguments value]
-  (if-let [states (:state arguments)]
-    (let [ring-request (-> context
-                           :request)]
-      (ensure-valid-states (:tx ring-request)
-                           (set states)
-                           (:authenticated-entity ring-request))))
   (if (some #(= (% arguments) [])
+            ; TODO: more filters (priority, etc.)
             [:id :budget_period_id :category_id :organization_id :user_id])
     []
-    (let [request (:request context)
-          tx (:tx request)
-          auth-user (:authenticated-entity request)
-          proc-requests (jdbc/query tx
-                                    (requests-query context arguments value)
-                                    {:row-fn (request/row-fn tx)})]
+    (let [sanitized-and-enhanced-context
+            (sanitize-and-enhance-context context arguments value)
+          ring-request (-> sanitized-and-enhanced-context
+                           :request)
+          tx (:tx ring-request)
+          proc-requests
+            (jdbc/query
+              tx
+              (requests-query sanitized-and-enhanced-context arguments value)
+              {:row-fn (request/row-fn tx)})]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
-           (map #(request-perms/apply-permissions tx auth-user %))))))
+           (map #(request-perms/apply-permissions tx
+                                                  (:authenticated-entity
+                                                    ring-request)
+                                                  %))))))
 
 (defn total-price-query
   [qty-type bp-id]

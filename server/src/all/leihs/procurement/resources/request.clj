@@ -4,7 +4,9 @@
             [clojure.set :refer [map-invert]]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions.request :as request-perms]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.attachments :as attachments]
+            [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.resources.supplier :as supplier]
@@ -38,19 +40,47 @@
   [req]
   (exchange-attrs req (map-invert attrs-mapping)))
 
-(def state-sql
-  (sql/call :case
-            [:= :procurement_requests.approved_quantity nil]
-            "new"
-            [:= :procurement_requests.approved_quantity 0]
-            "denied"
-            [:and [:< 0 :procurement_requests.approved_quantity]
-             [:< :procurement_requests.approved_quantity
-              :procurement_requests.requested_quantity]]
-            "partially_approved"
-            [:>= :procurement_requests.approved_quantity
-             :procurement_requests.requested_quantity]
-            "approved"))
+(defn valid-state-combinations
+  [tx user budget-periods]
+  (if (or (user-perms/advanced? tx user)
+          (->> budget-periods
+               (map #(budget-period/past? tx %))
+               (every? true?)))
+    #{:new :approved :partially_approved :rejected}
+    #{:new :in_approval}))
+
+(defn state-sql
+  [state-set]
+  (cond
+    ((= state-set #{:new :approved :partially_approved :rejected})
+      (sql/call :case
+                [:= :procurement_requests.approved_quantity nil]
+                "new"
+                [:= :procurement_requests.approved_quantity 0]
+                "denied"
+                [:and [:< 0 :procurement_requests.approved_quantity]
+                 [:< :procurement_requests.approved_quantity
+                  :procurement_requests.requested_quantity]]
+                "partially_approved"
+                [:>= :procurement_requests.approved_quantity
+                 :procurement_requests.requested_quantity]
+                "approved"))
+      ((= state-set #{:new :in_approval})
+        (sql/call :case
+                  [:= :procurement_requests.approved_quantity nil]
+                  "new"
+                  :else
+                  "in_approval"))
+    true (throw (Exception. "Unknown request state set!"))))
+
+(defn requests-base-query
+  [state-set]
+  (-> (sql/select :procurement_requests.* [(state-sql state-set) :state])
+      (sql/from :procurement_requests)))
+
+(def requests-query-without-state
+  (-> (sql/select :procurement_requests.*)
+      (sql/from :procurement_requests)))
 
 (def priorities-mapping {:normal 1, :high 2})
 
@@ -76,21 +106,17 @@
   [tx]
   (comp add-priority-inspector remap-priority remap-inspector-priority))
 
-(def request-base-query
-  (-> (sql/select :procurement_requests.* [state-sql :state])
-      (sql/from :procurement_requests)))
-
 (defn get-request-by-id
-  [tx id]
-  (-> request-base-query
+  [tx state-set id]
+  (-> (requests-base-query state-set)
       (sql/where [:= :procurement_requests.id id])
       sql/format
       (->> (jdbc/query tx))
       first))
 
 (defn get-request-by-attrs
-  [tx attrs]
-  (-> request-base-query
+  [tx state-set attrs]
+  (-> (requests-base-query state-set)
       (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
       sql/format
       (->> (jdbc/query tx))
@@ -102,6 +128,9 @@
         ring-req (:request context)
         tx (:tx ring-req)
         auth-user (:authenticated-entity ring-req)
+        budget-period
+          (budget-period/get-budget-period tx (:budget_period_id input-data))
+        state-set (valid-state-combinations tx auth-user [budget-period])
         write-data (or (and (:priority_inspector input-data)
                             (-> input-data
                                 add-inspector-priority
@@ -116,7 +145,7 @@
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx auth-user write-data))
     (->> write-data-with-exchanged-attrs
-         (get-request-by-attrs tx)
+         (get-request-by-attrs tx state-set)
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
@@ -127,7 +156,10 @@
         auth-user (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
-        proc-request (get-request-by-id tx req-id)
+        budget-period
+          (budget-period/get-budget-period tx (:budget_period_id input-data))
+        state-set (valid-state-combinations tx auth-user [budget-period])
+        proc-request (get-request-by-id tx state-set req-id)
         write-data (let [input-data-without-id (dissoc input-data :id)]
                      (or (and (:priority_inspector input-data-without-id)
                               (-> input-data-without-id
@@ -147,7 +179,7 @@
                                                         proc-request)
                                                       write-data))
     (->> req-id
-         (get-request-by-id tx)
+         (get-request-by-id tx state-set)
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
@@ -167,7 +199,7 @@
 (defn requested-by?
   [tx request auth-entity]
   (= (:user_id auth-entity)
-     (-> request-base-query
+     (-> requests-query-without-state
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
          (->> (jdbc/query tx))
