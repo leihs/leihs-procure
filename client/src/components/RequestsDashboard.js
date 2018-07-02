@@ -3,7 +3,7 @@ import cx from 'classnames'
 import f from 'lodash'
 import { DateTime } from 'luxon'
 
-import { Row, Col, Button, ButtonGroup, Collapse } from './Bootstrap'
+import { Row, Col, Button, ButtonGroup, Collapsing } from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
@@ -195,7 +195,7 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   } = budgetPeriodDates(budgetPeriod)
 
   return (
-    <Collapse id={'bp' + budgetPeriod.id} startOpen>
+    <Collapsing id={'bp' + budgetPeriod.id} startOpen>
       {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
         <div className={cx('card mb-3')}>
           <div
@@ -234,12 +234,12 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
             )}
         </div>
       )}
-    </Collapse>
+    </Collapsing>
   )
 }
 
 const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
-  <Collapse
+  <Collapsing
     id={'bp' + category.id}
     canToggle={canToggle}
     startOpen={isOpen}
@@ -275,7 +275,7 @@ const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
           )}
       </F>
     )}
-  </Collapse>
+  </Collapsing>
 )
 
 const SubCategoryLine = ({
@@ -289,7 +289,7 @@ const SubCategoryLine = ({
     !!isOpen && React.Children.count(children) > 0
 
   return (
-    <Collapse
+    <Collapsing
       id={'bp' + category.id}
       canToggle={requestCount > 0}
       startOpen={isOpen}
@@ -326,6 +326,6 @@ const SubCategoryLine = ({
           )}
         </F>
       )}
-    </Collapse>
+    </Collapsing>
   )
 }

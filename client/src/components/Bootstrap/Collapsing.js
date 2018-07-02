@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import f from 'lodash'
 import Icon from '../Icons'
 
-export class Collapse extends React.Component {
+export class Collapsing extends React.Component {
   static defaultProps = { startOpen: false, canToggle: true }
   static propTypes = { id: PropTypes.string.isRequired }
 

@@ -3,7 +3,7 @@ export * from './Bootstrap'
 
 export * from './helpers'
 
-export { Collapse } from './Collapse'
+export { Collapsing } from './Collapsing'
 
 export { default as StatefulForm, StatefulInput } from './StatefulForm'
 
