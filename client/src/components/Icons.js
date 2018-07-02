@@ -26,6 +26,18 @@ import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown'
 import faCaretLeft from '@fortawesome/fontawesome-free-solid/faCaretLeft'
 import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight'
 import faSyncAlt from '@fortawesome/fontawesome-free-solid/faSyncAlt'
+import faCog from '@fortawesome/fontawesome-free-solid/faCog'
+import faBars from '@fortawesome/fontawesome-free-solid/faBars'
+import faCode from '@fortawesome/fontawesome-free-solid/faCode'
+import faTasks from '@fortawesome/fontawesome-free-solid/faTasks'
+import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
+import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
+import faSitemap from '@fortawesome/fontawesome-free-solid/faSitemap'
+import faOutdent from '@fortawesome/fontawesome-free-solid/faOutdent'
+import faDolly from '@fortawesome/fontawesome-free-solid/faDolly'
+import faWrench from '@fortawesome/fontawesome-free-solid/faWrench'
+import faCogs from '@fortawesome/fontawesome-free-solid/faCogs'
+import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
 
 const ICONS = {
   CaretUp: {
@@ -73,7 +85,7 @@ const ICONS = {
     src: faTrashAlt,
     description: 'Deleting things'
   },
-  ProcurementLogo: { src: faChartPie },
+  LeihsProcurement: { src: faChartPie },
   Paperclip: {
     src: faPaperclip
   },
@@ -102,6 +114,42 @@ const ICONS = {
   },
   Reload: {
     src: faSyncAlt
+  },
+  Settings: {
+    src: faCog
+  },
+  HamburgerMenu: {
+    src: faBars
+  },
+  Code: {
+    src: faCode
+  },
+  Requests: {
+    src: faTasks
+  },
+  Contact: {
+    src: faEnvelope
+  },
+  Users: {
+    src: faUsers
+  },
+  Categories: {
+    src: faSitemap
+  },
+  Organizations: {
+    src: faOutdent
+  },
+  LeihsAdmin: {
+    src: faWrench
+  },
+  LeihsBorrow: {
+    src: faDolly
+  },
+  LeihsManage: {
+    src: faCogs
+  },
+  Language: {
+    src: faGlobe
   }
 }
 

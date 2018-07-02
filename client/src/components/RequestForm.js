@@ -253,7 +253,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                   className="btn m-1 btn-outline-dark btn-massive"
                   onClick={() => window.alert('TODO!')}
                 >
-                  <Icon.Calendar /> {t('form_btn_change_budget_period')}
+                  <Icon.BudgetPeriod /> {t('form_btn_change_budget_period')}
                 </button>
                 <button
                   type="button"
