@@ -13,14 +13,14 @@ import {
   // FormGroup,
   // InputText,
   FormField
-} from '../components/Bootstrap'
-import StatefulForm from '../components/Bootstrap/StatefulForm'
-import { MainWithSidebar } from '../components/Layout'
-import Loading from '../components/Loading'
+} from '../../components/Bootstrap'
+import StatefulForm from '../../components/Bootstrap/StatefulForm'
+import { MainWithSidebar } from '../../components/Layout'
+import Loading from '../../components/Loading'
 
-import { examples as BootstrapExamples } from '../components/Bootstrap/Bootstrap.examples'
-import { examples as MultiSelectExamples } from '../components/Bootstrap/DownshiftMultiSelect.examples'
-import { allIcons } from '../components/Icons.examples'
+import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
+import { examples as MultiSelectExamples } from '../../components/Bootstrap/DownshiftMultiSelect.examples'
+import { allIcons } from '../../components/Icons.examples'
 
 // # DATA
 

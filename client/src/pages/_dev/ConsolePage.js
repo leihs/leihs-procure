@@ -31,7 +31,7 @@ function graphQLFetcher(graphQLParams) {
   }).then(response => response.json())
 }
 
-class GraphiqlPage extends Component {
+class DevConsole extends Component {
   render() {
     return (
       <div style={{ height: '100vh' }}>
@@ -39,10 +39,14 @@ class GraphiqlPage extends Component {
           fetcher={graphQLFetcher}
           query={exampleQuery}
           editorTheme="dracula"
-        />
+        >
+          <GraphiQL.Logo>
+            <b>API Console</b>
+          </GraphiQL.Logo>
+        </GraphiQL>
       </div>
     )
   }
 }
 
-export default GraphiqlPage
+export default DevConsole

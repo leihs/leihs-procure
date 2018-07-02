@@ -14,7 +14,8 @@ import AdminUsers from './pages/AdminUsersPage'
 import AdminCategories from './pages/AdminCategoriesPage'
 import AdminOrgs from './pages/AdminOrgsPage'
 import AdminBudgetPeriods from './pages/AdminBudgetPeriodsPage'
-import UiPlayground from './pages/_UiPlayground'
+import DevUiCatalog from './pages/_dev/UiCatalogPage'
+import DevConsole from './pages/_dev/ConsolePage'
 
 // env: polyfills (browser support)
 require('es6-promise').polyfill()
@@ -28,12 +29,12 @@ f.mixin(lodashMixins)
 
 const baseName = process.env.PUBLIC_URL // set in package.json/homepage
 const supportsHistory = 'pushState' in window.history
-const withPlayground = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development'
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>
     <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
-      <App withPlayground={withPlayground}>
+      <App isDev={isDev}>
         <Switch>
           <Route exact path="/" render={() => <Redirect to="/requests" />} />
           <Route exact path="/requests" component={RequestsIndex} />
@@ -41,10 +42,13 @@ const Root = () => (
           <Route path="/admin/categories" component={AdminCategories} />
           <Route path="/admin/organizations" component={AdminOrgs} />
           <Route path="/admin/budget-periods" component={AdminBudgetPeriods} />
-          {!!withPlayground && (
-            <Route strict path="/playground" component={UiPlayground} />
-          )}
-          <Route component={() => '404'} />
+
+          <Route strict path="/dev/playground" component={DevUiCatalog} />
+          <Route strict path="/dev/console" component={DevConsole} />
+
+          <Route
+            component={() => <center className="h1">404 not found</center>}
+          />
         </Switch>
       </App>
     </BrowserRouter>

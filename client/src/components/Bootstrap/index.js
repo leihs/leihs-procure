@@ -3,6 +3,7 @@ export * from './Bootstrap'
 
 export * from './helpers'
 
+export * from './Navs'
 export { Collapsing } from './Collapsing'
 
 export { default as StatefulForm, StatefulInput } from './StatefulForm'
