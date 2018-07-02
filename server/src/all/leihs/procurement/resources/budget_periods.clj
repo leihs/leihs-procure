@@ -11,11 +11,16 @@
       (sql/order-by [:end_date :desc])))
 
 (defn get-budget-periods
-  [context _ _]
-  (jdbc/query (-> context
-                  :request
-                  :tx)
-              (sql/format budget-periods-base-query)))
+  ([tx ids]
+   (jdbc/query tx
+               (-> budget-periods-base-query
+                   (sql/merge-where [:in :procurement_budget_periods.id ids])
+                   sql/format)))
+  ([context _ _]
+   (jdbc/query (-> context
+                   :request
+                   :tx)
+               (sql/format budget-periods-base-query))))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
