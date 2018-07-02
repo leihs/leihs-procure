@@ -2,8 +2,10 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.math.numeric-tower :refer [round]]
+            clojure.set
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request :as request-perms]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
@@ -78,8 +80,28 @@
                                        :id)]))])
         search-term (search-query search-term)))))
 
+(defn valid-state-combinations
+  [tx user]
+  (if (some #(% tx user)
+            [user-perms/viewer? user-perms/inspector? user-perms/admin?])
+    #{"new" "approved" "partially_approved" "rejected"}
+    #{"new" "in_approval"}))
+
+(defn ensure-valid-states
+  [tx states user]
+  (let [valid-states (valid-state-combinations tx user)]
+    (if-not (clojure.set/subset? states valid-states)
+      (throw (ex-info "Invalid state combinations for requests' filter"
+                      {:states states})))))
+
 (defn get-requests
   [context arguments value]
+  (if-let [states (:state arguments)]
+    (let [ring-request (-> context
+                           :request)]
+      (ensure-valid-states (:tx ring-request)
+                           (set states)
+                           (:authenticated-entity ring-request))))
   (if (some #(= (% arguments) [])
             [:id :budget_period_id :category_id :organization_id :user_id])
     []

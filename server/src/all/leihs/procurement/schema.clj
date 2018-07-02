@@ -55,6 +55,7 @@
 ; a function for debugging convenience. will be a var later.
 (defn query-resolver-map
   []
+  ; FIXME: authorize all queries!!!
   {:admins (-> admins/get-admins
                (authorization/ensure-one-of [user-perms/admin?])),
    :budget-limits budget-limits/get-budget-limits,
