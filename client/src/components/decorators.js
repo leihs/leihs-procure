@@ -1,4 +1,5 @@
 import f from 'lodash'
+import { formatMoney } from 'accounting-js'
 
 export const DisplayName = (o, short = false) => {
   if (!o) return
@@ -35,3 +36,14 @@ export const RequestTotalAmount = fields => {
   const price = (parseInt(fields.price_cents, 10) || 0) / 100
   return (parseInt(quantity, 10) || 0) * price
 }
+
+// TODO: currency config, hardcoded to CH-de for now
+// NOTE: `precision: 0` because Procure only supports integers
+export const formatCurrency = n =>
+  formatMoney(n, {
+    decimal: '.',
+    thousand: "'",
+    symbol: 'CHF',
+    format: '%v %s',
+    precision: 0
+  })

@@ -18,7 +18,7 @@ import {
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 import { MainWithSidebar } from '../components/Layout'
-// import { DisplayName } from '../components/decorators'
+import { formatCurrency } from '../components/decorators'
 
 // # DATA
 //
@@ -111,14 +111,14 @@ const BudgetPeriodsTable = ({ budgetPeriods }) => {
                       title="Total aller Anträge mit Status &quot;Neu&quot;"
                     >
                       <Icon.ShoppingCart />{' '}
-                      {/* TODO: money format CHF 24'430 */}
-                      {bp.total_price_cents_requested_quantities}
+                      {formatCurrency(
+                        bp.total_price_cents_requested_quantities
+                      )}
                     </Badge>{' '}
                     {/* TODO: tooltip */}
                     <Badge success title="Total aller bewilligten Anträge">
                       <Icon.ShoppingCart />{' '}
-                      {/* TODO: money format CHF 24'430 */}
-                      {bp.total_price_cents_approved_quantities}
+                      {formatCurrency(bp.total_price_cents_approved_quantities)}
                     </Badge>
                   </td>
                 </tr>
