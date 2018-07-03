@@ -68,11 +68,11 @@ const PAGES = [
     )
   },
   {
-    id: 'controlled-form',
-    title: 'Controlled Form',
+    id: 'stateful-form',
+    title: 'Stateful Form',
     content: (
       <F>
-        <code>{'<StatefulForm/>'}</code>
+        <code>{'<StatefulForm/>'}</code> simple key/value
         <hr />
         <StatefulForm idPrefix="mock-form" values={{ foo: '', bar: '' }}>
           {({ fields, formPropsFor }) => {
@@ -89,6 +89,41 @@ const PAGES = [
                     <Col>
                       <FormField label="foo" {...formPropsFor('foo')} />
                       <FormField label="bar" {...formPropsFor('bar')} />
+                    </Col>
+                  </Row>
+                </form>
+                <pre>
+                  <code>{JSON.stringify(fields, 0, 2)}</code>
+                </pre>
+              </F>
+            )
+          }}
+        </StatefulForm>
+        <hr />
+        <code>{'<StatefulForm/>'}</code> nested objects, initial values
+        <hr />
+        <StatefulForm
+          idPrefix="mock-form"
+          values={{ one: { foo: '1', bar: 'a' }, two: { foo: '2', bar: 'b' } }}
+        >
+          {({ fields, formPropsFor }) => {
+            return (
+              <F>
+                <form
+                  id="mock-form"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    window.alert(JSON.stringify(fields, 0, 2))
+                  }}
+                >
+                  <Row>
+                    <Col>
+                      <FormField label="one foo" {...formPropsFor('one.foo')} />
+                      <FormField label="one bar" {...formPropsFor('one.bar')} />
+                    </Col>
+                    <Col>
+                      <FormField label="two foo" {...formPropsFor('two.foo')} />
+                      <FormField label="two bar" {...formPropsFor('two.bar')} />
                     </Col>
                   </Row>
                 </form>
