@@ -117,9 +117,9 @@
 (defn transform-row
   [tx auth-user row]
   (-> (add-state tx auth-user row)
-      add-priority-inspector
+      remap-inspector-priority
       remap-priority
-      remap-inspector-priority))
+      add-priority-inspector))
 
 (defn get-request-by-id
   [tx id]
@@ -143,8 +143,6 @@
         ring-req (:request context)
         tx (:tx ring-req)
         auth-user (:authenticated-entity ring-req)
-        budget-period
-          (budget-period/get-budget-period tx (:budget_period_id input-data))
         write-data (or (and (:priority_inspector input-data)
                             (-> input-data
                                 add-inspector-priority
@@ -170,8 +168,6 @@
         auth-user (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
-        budget-period
-          (budget-period/get-budget-period tx (:budget_period_id input-data))
         proc-request (get-request-by-id tx req-id)
         write-data (let [input-data-without-id (dissoc input-data :id)]
                      (or (and (:priority_inspector input-data-without-id)
