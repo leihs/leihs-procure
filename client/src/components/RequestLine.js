@@ -119,8 +119,6 @@ const updateRequestFromFields = (mutate, request, fields) => {
     id: request.id
   }
 
-  console.log({ request, fields, requestData })
-
   mutate({ variables: { requestData } })
 }
 

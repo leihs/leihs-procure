@@ -1,4 +1,19 @@
 jobs:
+  client-lint:
+    name: 'Frontend: Lint'
+    run_when:
+      any branch is pushed: { type: branch, include_match: ^.*$ }
+    task_defaults: &TASK_DEFAULTS
+      environment_variables:
+        CI: 'true'
+      traits:
+        g2016: true
+    task:
+      scripts:
+        build:
+          timeout: 10 minutes
+          body: 'cd client && { npm ci || npm i ;} && npm run ci:lint'
+
   client-build:
     name: 'Frontend: Build'
     run_when:
