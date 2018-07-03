@@ -22,6 +22,16 @@
                    :tx)
                (sql/format budget-periods-base-query))))
 
+(defn get-phase-of-budget-periods
+  [tx budget-periods]
+  (let [past-bool-set (->> budget-periods
+                           (map #(budget-period/past? tx %))
+                           set)]
+    (case past-bool-set
+      #{true} :past
+      #{false} :current-and-future
+      :mixed)))
+
 (defn delete-budget-periods-not-in!
   [tx ids]
   (jdbc/execute! tx

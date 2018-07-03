@@ -81,6 +81,14 @@
                                        :id)]))])
         search-term (search-query search-term)))))
 
+(defn valid-state-values-combination?
+  [state-value-range-type state-arg]
+  (let [valid-states (state-value-range-type request/valid-state-ranges)]
+    (clojure.set/subset? (->> state-arg
+                              (map keyword)
+                              set)
+                         valid-states)))
+
 (defn sanitize-and-enhance-context
   [context arguments value]
   "It returns context unchanged if `state` arg not provided.
@@ -88,27 +96,32 @@
   or `state` arg has not an allowed value in combination with `budget_period_id`.
   Otherwise it enhances the context with additional key/val pair."
   (if-let [state-arg (:state arguments)]
-    (if (nil? (:budget_period_id arguments))
-      (throw (Exception.
-               "You must provide budget_period_id in combination with state!"))
-      (let [ring-request (:request context)
-            tx (:tx ring-request)
-            budget-periods (budget-periods/get-budget-periods tx
-                                                              (:budget_period_id
-                                                                arguments))
-            state-value-range-type (request/state-value-range-type
-                                     tx
-                                     (:authenticated-entity ring-request)
-                                     budget-periods)
-            valid-states (state-value-range-type request/valid-state-ranges)]
-        (if-not (clojure.set/subset? (->> state-arg
-                                          (map keyword)
-                                          set)
-                                     valid-states)
+    (let [rrequest (:request context)
+          tx (:tx rrequest)
+          auth-user (:authenticated-entity rrequest)
+          budget-period-arg (:budget_period_id arguments)
+          budget-periods (map #(budget-period/get-budget-period-by-id tx %)
+                           budget-period-arg)
+          phase-of-budget-periods
+            (budget-periods/get-phase-of-budget-periods tx budget-periods)
+          state-value-range-type (request/state-value-range-type
+                                   tx
+                                   auth-user
+                                   phase-of-budget-periods)]
+      (cond
+        (nil? budget-period-arg)
           (throw
             (Exception.
-              "Invalid state combinations for budget_period_ids and user permissions!"))
-          (assoc context :state-value-range-type state-value-range-type))))
+              "One must provide budget_period_id in combination with state."))
+        (= phase-of-budget-periods :mixed)
+          (throw
+            (Exception.
+              "One cannot mix past budget periods with the current or future ones in combination with state."))
+        (not (valid-state-values-combination? state-value-range-type state-arg))
+          (throw
+            (Exception.
+              "Invalid state combinations for budget_period_ids and user permissions."))
+        true (assoc context :state-value-range-type state-value-range-type)))
     context))
 
 (defn get-requests

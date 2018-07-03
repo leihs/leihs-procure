@@ -41,38 +41,35 @@
   (exchange-attrs req (map-invert attrs-mapping)))
 
 (def valid-state-ranges
-  {:advanced-user #{:new :approved :partially_approved :denied},
-   :requester #{:new :in_approval}})
+  {:normal #{:new :approved :partially_approved :denied},
+   :restricted #{:new :in_approval}})
 
 (defn state-value-range-type
-  [tx user budget-periods]
-  (if (or (user-perms/advanced? tx user)
-          (->> budget-periods
-               (map #(budget-period/past? tx %))
-               (every? true?)))
-    :advanced-user
-    :requester))
+  [tx user phase-of-budget-periods]
+  (if (or (user-perms/advanced? tx user) (= phase-of-budget-periods :past))
+    :normal
+    :restricted))
 
 (defn state-sql
   [state-set-type]
   (case state-set-type
-    :advanced-user (sql/call :case
-                             [:= :procurement_requests.approved_quantity nil]
-                             "new"
-                             [:= :procurement_requests.approved_quantity 0]
-                             "denied"
-                             [:< :procurement_requests.approved_quantity
-                              :procurement_requests.requested_quantity]
-                             "partially_approved"
-                             [:>= :procurement_requests.approved_quantity
-                              :procurement_requests.requested_quantity]
-                             "approved")
-    :requester (sql/call :case
-                         [:= :procurement_requests.approved_quantity nil]
-                         "new"
-                         :else
-                         "in_approval")
-    (throw (Exception. "Unknown request state set!"))))
+    :normal (sql/call :case
+                      [:= :procurement_requests.approved_quantity nil]
+                      "new"
+                      [:= :procurement_requests.approved_quantity 0]
+                      "denied"
+                      [:< :procurement_requests.approved_quantity
+                       :procurement_requests.requested_quantity]
+                      "partially_approved"
+                      [:>= :procurement_requests.approved_quantity
+                       :procurement_requests.requested_quantity]
+                      "approved")
+    :restricted (sql/call :case
+                          [:= :procurement_requests.approved_quantity nil]
+                          "new"
+                          :else
+                          "in_approval")
+    (throw (Exception. "Unknown request state set."))))
 
 (def requests-base-query
   (-> (sql/select :procurement_requests.*)
@@ -106,11 +103,11 @@
           range-type (state-value-range-type tx auth-user [budget-period])
           requested-quantity (:requested_quantity row)]
       (case range-type
-        :requester "in_approval"
-        :advanced-user
-          (cond (= 0 approved-quantity) "denied"
-                (< approved-quantity requested-quantity) "partially_approved"
-                (<= requested-quantity approved-quantity) "approved")))
+        :restricted "in_approval"
+        :normal (cond (= 0 approved-quantity) "denied"
+                      (< approved-quantity requested-quantity)
+                        "partially_approved"
+                      (<= requested-quantity approved-quantity) "approved")))
     "new"))
 
 (defn add-state
