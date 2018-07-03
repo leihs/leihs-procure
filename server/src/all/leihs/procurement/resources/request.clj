@@ -52,7 +52,7 @@
 (defn state-sql
   [state-set]
   (cond
-    ((= state-set #{:new :approved :partially_approved :rejected})
+    (= state-set #{:new :approved :partially_approved :rejected})
       (sql/call :case
                 [:= :procurement_requests.approved_quantity nil]
                 "new"
@@ -64,13 +64,13 @@
                 "partially_approved"
                 [:>= :procurement_requests.approved_quantity
                  :procurement_requests.requested_quantity]
-                "approved"))
-      ((= state-set #{:new :in_approval})
-        (sql/call :case
-                  [:= :procurement_requests.approved_quantity nil]
-                  "new"
-                  :else
-                  "in_approval"))
+                "approved")
+    (= state-set #{:new :in_approval})
+      (sql/call :case
+                [:= :procurement_requests.approved_quantity nil]
+                "new"
+                :else
+                "in_approval")
     true (throw (Exception. "Unknown request state set!"))))
 
 (defn requests-base-query
