@@ -46,7 +46,7 @@
         state-set (:request-state-set context)
         search-term (:search arguments)]
     (sql/format
-      (cond-> (request/requests-base-query state-set)
+      (cond-> request/requests-base-query
         id (sql/merge-where [:in :procurement_requests.id id])
         category-id (sql/merge-where [:in :procurement_requests.category_id
                                       category-id])
@@ -60,8 +60,9 @@
         inspector-priority (sql/merge-where
                              [:in :procurement_requests.inspector_priority
                               inspector-priority])
-        state (sql/merge-where
-                [:in (request/state-sql (:request-state-set context)) state])
+        state (sql/merge-where [:in
+                                (request/state-sql (:state-value-range-type
+                                                     context)) state])
         requested-by-auth-user
           (sql/merge-where [:= :procurement_requests.user_id
                             (-> context
@@ -95,10 +96,11 @@
             budget-periods (budget-periods/get-budget-periods tx
                                                               (:budget_period_id
                                                                 arguments))
-            valid-states (request/valid-state-combinations
-                           tx
-                           (:authenticated-entity ring-request)
-                           budget-periods)]
+            state-value-range-type (request/state-value-range-type
+                                     tx
+                                     (:authenticated-entity ring-request)
+                                     budget-periods)
+            valid-states (state-value-range-type request/valid-state-ranges)]
         (if-not (clojure.set/subset? (->> state-arg
                                           (map keyword)
                                           set)
@@ -106,26 +108,27 @@
           (throw
             (Exception.
               "Invalid state combinations for budget_period_ids and user permissions!"))
-          (assoc context :request-state-set valid-states))))
+          (assoc context :state-value-range-type state-value-range-type))))
     context))
 
 (defn get-requests
   [context arguments value]
   (if (some #(= (% arguments) [])
-            ; TODO: more filters (priority, etc.)
             [:id :budget_period_id :category_id :inspector_priority
              :organization_id :priority :state :user_id])
     []
     (let [sanitized-and-enhanced-context
             (sanitize-and-enhance-context context arguments value)
-          ring-request (-> sanitized-and-enhanced-context
-                           :request)
+          ring-request (:request sanitized-and-enhanced-context)
           tx (:tx ring-request)
           proc-requests
             (jdbc/query
               tx
               (requests-query sanitized-and-enhanced-context arguments value)
-              {:row-fn (request/row-fn tx)})]
+              {:row-fn #(request/transform-row tx
+                                               (:authenticated-entity
+                                                 ring-request)
+                                               %)})]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
            (map #(request-perms/apply-permissions tx

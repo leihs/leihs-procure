@@ -40,45 +40,41 @@
   [req]
   (exchange-attrs req (map-invert attrs-mapping)))
 
-(defn valid-state-combinations
+(def valid-state-ranges
+  {:advanced-user #{:new :approved :partially_approved :denied},
+   :requester #{:new :in_approval}})
+
+(defn state-value-range-type
   [tx user budget-periods]
   (if (or (user-perms/advanced? tx user)
           (->> budget-periods
                (map #(budget-period/past? tx %))
                (every? true?)))
-    #{:new :approved :partially_approved :rejected}
-    #{:new :in_approval}))
+    :advanced-user
+    :requester))
 
 (defn state-sql
-  [state-set]
-  (cond
-    (= state-set #{:new :approved :partially_approved :rejected})
-      (sql/call :case
-                [:= :procurement_requests.approved_quantity nil]
-                "new"
-                [:= :procurement_requests.approved_quantity 0]
-                "denied"
-                [:and [:< 0 :procurement_requests.approved_quantity]
-                 [:< :procurement_requests.approved_quantity
-                  :procurement_requests.requested_quantity]]
-                "partially_approved"
-                [:>= :procurement_requests.approved_quantity
-                 :procurement_requests.requested_quantity]
-                "approved")
-    (= state-set #{:new :in_approval})
-      (sql/call :case
-                [:= :procurement_requests.approved_quantity nil]
-                "new"
-                :else
-                "in_approval")
-    true (throw (Exception. "Unknown request state set!"))))
+  [state-set-type]
+  (case state-set-type
+    :advanced-user (sql/call :case
+                             [:= :procurement_requests.approved_quantity nil]
+                             "new"
+                             [:= :procurement_requests.approved_quantity 0]
+                             "denied"
+                             [:< :procurement_requests.approved_quantity
+                              :procurement_requests.requested_quantity]
+                             "partially_approved"
+                             [:>= :procurement_requests.approved_quantity
+                              :procurement_requests.requested_quantity]
+                             "approved")
+    :requester (sql/call :case
+                         [:= :procurement_requests.approved_quantity nil]
+                         "new"
+                         :else
+                         "in_approval")
+    (throw (Exception. "Unknown request state set!"))))
 
-(defn requests-base-query
-  [state-set]
-  (-> (sql/select :procurement_requests.* [(state-sql state-set) :state])
-      (sql/from :procurement_requests)))
-
-(def requests-query-without-state
+(def requests-base-query
   (-> (sql/select :procurement_requests.*)
       (sql/from :procurement_requests)))
 
@@ -102,21 +98,43 @@
   [row]
   (assoc row :inspector_priority (:priority_inspector row)))
 
-(defn row-fn
-  [tx]
-  (comp add-priority-inspector remap-priority remap-inspector-priority))
+(defn get-state
+  [tx auth-user row]
+  (if-let [approved-quantity (:approved_quantity row)]
+    (let [budget-period
+            (budget-period/get-budget-period-by-id tx (:budget_period_id row))
+          range-type (state-value-range-type tx auth-user [budget-period])
+          requested-quantity (:requested_quantity row)]
+      (case range-type
+        :requester "in_approval"
+        :advanced-user
+          (cond (= 0 approved-quantity) "denied"
+                (< approved-quantity requested-quantity) "partially_approved"
+                (<= requested-quantity approved-quantity) "approved")))
+    "new"))
+
+(defn add-state
+  [tx auth-user row]
+  (assoc row :state (get-state tx auth-user row)))
+
+(defn transform-row
+  [tx auth-user row]
+  (-> (add-state tx auth-user row)
+      add-priority-inspector
+      remap-priority
+      remap-inspector-priority))
 
 (defn get-request-by-id
-  [tx state-set id]
-  (-> (requests-base-query state-set)
+  [tx id]
+  (-> requests-base-query
       (sql/where [:= :procurement_requests.id id])
       sql/format
       (->> (jdbc/query tx))
       first))
 
 (defn get-request-by-attrs
-  [tx state-set attrs]
-  (-> (requests-base-query state-set)
+  [tx attrs]
+  (-> requests-base-query
       (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
       sql/format
       (->> (jdbc/query tx))
@@ -130,7 +148,6 @@
         auth-user (:authenticated-entity ring-req)
         budget-period
           (budget-period/get-budget-period tx (:budget_period_id input-data))
-        state-set (valid-state-combinations tx auth-user [budget-period])
         write-data (or (and (:priority_inspector input-data)
                             (-> input-data
                                 add-inspector-priority
@@ -145,7 +162,7 @@
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx auth-user write-data))
     (->> write-data-with-exchanged-attrs
-         (get-request-by-attrs tx state-set)
+         (get-request-by-attrs tx)
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
@@ -158,8 +175,7 @@
         req-id (:id input-data)
         budget-period
           (budget-period/get-budget-period tx (:budget_period_id input-data))
-        state-set (valid-state-combinations tx auth-user [budget-period])
-        proc-request (get-request-by-id tx state-set req-id)
+        proc-request (get-request-by-id tx req-id)
         write-data (let [input-data-without-id (dissoc input-data :id)]
                      (or (and (:priority_inspector input-data-without-id)
                               (-> input-data-without-id
@@ -179,7 +195,7 @@
                                                         proc-request)
                                                       write-data))
     (->> req-id
-         (get-request-by-id tx state-set)
+         (get-request-by-id tx)
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
@@ -199,7 +215,7 @@
 (defn requested-by?
   [tx request auth-entity]
   (= (:user_id auth-entity)
-     (-> requests-query-without-state
+     (-> requests-base-query
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
          (->> (jdbc/query tx))
