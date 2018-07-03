@@ -47,30 +47,21 @@
         search-term (:search arguments)]
     (sql/format
       (cond-> (request/requests-base-query state-set)
-        ; TODO: empty check already done in caller
-        (not (empty? id)) (sql/merge-where [:in :procurement_requests.id id])
-        ; TODO: empty check already done in caller
-        (not (empty? category-id))
-          (sql/merge-where [:in :procurement_requests.category_id category-id])
-        ; TODO: empty check already done in caller
-        (not (empty? budget-period-id))
-          (sql/merge-where [:in :procurement_requests.budget_period_id
+        id (sql/merge-where [:in :procurement_requests.id id])
+        category-id (sql/merge-where [:in :procurement_requests.category_id
+                                      category-id])
+        budget-period-id (sql/merge-where
+                           [:in :procurement_requests.budget_period_id
                             budget-period-id])
-        ; TODO: empty check already done in caller
-        (not (empty? organization-id))
-          (sql/merge-where [:in :procurement_requests.organization_id
-                            organization-id])
-        ; TODO: empty check already done in caller
-        (not (empty? priority)) (sql/merge-where
-                                  [:in :procurement_requests.priority priority])
-        ; TODO: empty check already done in caller
-        (not (empty? inspector-priority))
-          (sql/merge-where [:in :procurement_requests.inspector_priority
-                            inspector-priority])
-        ; TODO: empty check already done in caller
-        (not (empty? state))
-          (sql/merge-where [:in (request/state-sql (:request-state-set context))
-                            state])
+        organization-id (sql/merge-where [:in
+                                          :procurement_requests.organization_id
+                                          organization-id])
+        priority (sql/merge-where [:in :procurement_requests.priority priority])
+        inspector-priority (sql/merge-where
+                             [:in :procurement_requests.inspector_priority
+                              inspector-priority])
+        state (sql/merge-where
+                [:in (request/state-sql (:request-state-set context)) state])
         requested-by-auth-user
           (sql/merge-where [:= :procurement_requests.user_id
                             (-> context
@@ -122,7 +113,8 @@
   [context arguments value]
   (if (some #(= (% arguments) [])
             ; TODO: more filters (priority, etc.)
-            [:id :budget_period_id :category_id :organization_id :user_id])
+            [:id :budget_period_id :category_id :inspector_priority
+             :organization_id :priority :state :user_id])
     []
     (let [sanitized-and-enhanced-context
             (sanitize-and-enhance-context context arguments value)
