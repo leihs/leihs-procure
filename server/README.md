@@ -7,8 +7,9 @@ WIP
 1. clone this repo
 2. copy `profiles_template.clj` to `profiles.clj`
 3. adjust the `LEIHS_DATABASE_URL` and `LEIHS_HTTP_BASE_URL` in this file according to your local needs
-4. `lein run "run"`
-5. `graphiql` is now available at `http://LEIHS_HTTP_BASE_URL/procure/graphiql/index.html`
+4. copy `resources/dev/log4j.properties.template` to `log4j.properties` and adjust according to your local needs
+5. `lein run "run"`
+6. `graphiql` is now available at `http://LEIHS_HTTP_BASE_URL/procure/graphiql/index.html`
 
 You can mock the authenticated user by setting request's header: `Authorization: user_id` for POST or
 `user_id` query param for GET requests.

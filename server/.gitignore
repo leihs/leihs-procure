@@ -8,3 +8,4 @@
 /tmp
 figwheel_server.log
 profiles.clj
+/resources/dev/log4j.properties
