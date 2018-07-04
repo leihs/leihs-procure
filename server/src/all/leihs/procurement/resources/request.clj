@@ -124,12 +124,20 @@
       remap-priority
       add-priority-inspector))
 
+(defn get-request-by-id
+  [tx id]
+  (-> requests-base-query
+      (sql/where [:= :procurement_requests.id id])
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
 (defn get-account-perms
   [context value attr]
   (let [rrequest (:request context)
         tx (:tx rrequest)
         auth-user (:authenticated-entity rrequest)
-        req (request/get-request-by-id tx (:id value))
+        req (get-request-by-id tx (:id value))
         rf-perms
           (request-fields-perms/get-for-user-and-request tx auth-user req)
         attr-perms (attr rf-perms)]
@@ -149,14 +157,6 @@
 (defn procurement-account
   [context _ value]
   (get-account-perms context value :procurement_account))
-
-(defn get-request-by-id
-  [tx id]
-  (-> requests-base-query
-      (sql/where [:= :procurement_requests.id id])
-      sql/format
-      (->> (jdbc/query tx))
-      first))
 
 (defn get-request-by-attrs
   [tx attrs]
