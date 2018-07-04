@@ -39,6 +39,7 @@
     "eslint-config-prettier": "^2.7.0",
     "eslint-plugin-prettier": "^2.6.1",
     "eslint-plugin-react": "^7.10.0",
+    "graphiql": "^0.11.11",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "isomorphic-fetch": "^2.2.1",
