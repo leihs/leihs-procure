@@ -5,6 +5,7 @@ export * from './helpers'
 
 export * from './Navs'
 export { Collapsing } from './Collapsing'
+export { default as Tooltipped } from './Tooltipped'
 
 export { default as StatefulForm, StatefulInput } from './StatefulForm'
 

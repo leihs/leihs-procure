@@ -9,11 +9,13 @@ import gql from 'graphql-tag'
 // import * as fragments from '../queries/fragments'
 import Icon from '../components/Icons'
 import {
+  Button,
   Badge,
   StatefulForm,
   FormField,
   FormGroup,
-  InputDate
+  InputDate,
+  Tooltipped
 } from '../components/Bootstrap'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
@@ -105,21 +107,29 @@ const BudgetPeriodsTable = ({ budgetPeriods }) => {
                     </FormGroup>
                   </td>
                   <td>
-                    {/* TODO: tooltip */}
-                    <Badge
-                      info
-                      title="Total aller Anträge mit Status &quot;Neu&quot;"
-                    >
-                      <Icon.ShoppingCart />{' '}
-                      {formatCurrency(
-                        bp.total_price_cents_requested_quantities
+                    {bp.total_price_cents_requested_quantities > 0 &&
+                      bp.total_price_cents_approved_quantities > 0 && (
+                        <React.Fragment>
+                          <Tooltipped
+                            text={'Total aller Anträge mit Status "Neu"'}
+                          >
+                            <Badge info id={`badge_requested_${bp.id}`}>
+                              <Icon.ShoppingCart />{' '}
+                              {formatCurrency(
+                                bp.total_price_cents_requested_quantities
+                              )}
+                            </Badge>
+                          </Tooltipped>{' '}
+                          <Tooltipped text={'Total aller bewilligten Anträge'}>
+                            <Badge success id={`badge_approved_${bp.id}`}>
+                              <Icon.ShoppingCart />{' '}
+                              {formatCurrency(
+                                bp.total_price_cents_approved_quantities
+                              )}
+                            </Badge>
+                          </Tooltipped>
+                        </React.Fragment>
                       )}
-                    </Badge>{' '}
-                    {/* TODO: tooltip */}
-                    <Badge success title="Total aller bewilligten Anträge">
-                      <Icon.ShoppingCart />{' '}
-                      {formatCurrency(bp.total_price_cents_approved_quantities)}
-                    </Badge>
                   </td>
                 </tr>
               ))}
