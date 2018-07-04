@@ -4,9 +4,12 @@
             [clojure.set :refer [map-invert]]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions.request :as request-perms]
+            [leihs.procurement.permissions.request-fields :as
+             request-fields-perms]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.attachments :as attachments]
             [leihs.procurement.resources.budget-period :as budget-period]
+            [leihs.procurement.resources.category :as category]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.resources.supplier :as supplier]
@@ -120,6 +123,32 @@
       remap-inspector-priority
       remap-priority
       add-priority-inspector))
+
+(defn get-account-perms
+  [context value attr]
+  (let [rrequest (:request context)
+        tx (:tx rrequest)
+        auth-user (:authenticated-entity rrequest)
+        req (request/get-request-by-id tx (:id value))
+        rf-perms
+          (request-fields-perms/get-for-user-and-request tx auth-user req)
+        attr-perms (attr rf-perms)]
+    (->> value
+         :category
+         :value
+         (category/get-category-by-id tx)
+         attr
+         (if (:read attr-perms))
+         (hash-map :value)
+         (merge (attr rf-perms)))))
+
+(defn general-ledger-account
+  [context _ value]
+  (get-account-perms context value :general_ledger_account))
+
+(defn procurement-account
+  [context _ value]
+  (get-account-perms context value :procurement_account))
 
 (defn get-request-by-id
   [tx id]

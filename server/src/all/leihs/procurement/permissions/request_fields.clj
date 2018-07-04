@@ -99,13 +99,9 @@
                                user-is-admin))
                       ; new request
                       (or user-is-requester user-is-inspector user-is-admin))},
-     ; TODO: new requirement
-     ; :general_ledger_account_1
-     ;   {:read (or category-viewable-by-user user-is-inspector user-is-admin),
-     ;    :write false},
-     ; :general_ledger_account_2
-     ;   {:read (or category-viewable-by-user user-is-inspector user-is-admin),
-     ;    :write false},
+     :general_ledger_account
+       {:read (or category-viewable-by-user user-is-inspector user-is-admin),
+        :write false},
      :inspection_comment
        {:read
           (or (and user-is-requester requested-by-user budget-period-is-past)
@@ -182,6 +178,9 @@
                           :write (and (not budget-period-is-past)
                                       (or category-inspectable-by-user
                                           user-is-admin))},
+     :procurement_account
+       {:read (or category-viewable-by-user user-is-inspector user-is-admin),
+        :write false},
      :receiver {:read (or (and user-is-requester
                                (or (and request-exists requested-by-user) true))
                           category-viewable-by-user

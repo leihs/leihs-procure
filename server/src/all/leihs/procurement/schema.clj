@@ -71,6 +71,7 @@
    :categories categories/get-categories,
    :current-user current-user/get-current-user,
    :department organization/get-department,
+   :general-ledger-account request/general-ledger-account,
    :inspectors inspectors/get-inspectors,
    :main-category main-category/get-main-category,
    :main-categories main-categories/get-main-categories,
@@ -82,6 +83,7 @@
    :requests requests/get-requests,
    :requesters-organizations
      requesters-organizations/get-requesters-organizations,
+   :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,
    :supplier supplier/get-supplier,

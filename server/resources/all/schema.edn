@@ -170,9 +170,9 @@
                        ; :attachments {:type :RequestFieldAttachments},
                        :budget_period {:type :RequestFieldBudgetPeriod},
                        :category {:type :RequestFieldCategory},
-                       ; TODO: new requirement
-                       ; :general_ledger_account_1 {:type :RequestFieldString}
-                       ; :general_ledger_account_2 {:type :RequestFieldString}
+                       :general_ledger_account
+                         {:resolve :general-ledger-account,
+                          :type :RequestFieldGeneralLedgerAccount},
                        :id {:type (non-null ID)},
                        :inspection_comment {:type :RequestFieldString},
                        :internal_order_number {:type :RequestFieldString},
@@ -184,6 +184,9 @@
                        :price_currency {:type :RequestFieldString},
                        :priority {:type :RequestFieldInt},
                        :priority_inspector {:type :RequestFieldInt},
+                       :procurement_account {:resolve :procurement-account,
+                                             :type
+                                               :RequestFieldProcurementAccount},
                        :receiver {:type :RequestFieldString},
                        :replacement {:type :RequestFieldBoolean},
                        :requested_quantity {:type :RequestFieldInt},
@@ -206,6 +209,10 @@
                                     :value {:resolve :category,
                                             :type (non-null :Category)},
                                     :write {:type (non-null Boolean)}}},
+    :RequestFieldGeneralLedgerAccount {:fields
+                                         {:read {:type (non-null Boolean)},
+                                          :value {:type String},
+                                          :write {:type (non-null Boolean)}}},
     :RequestFieldID {:fields {:read {:type (non-null Boolean)},
                               :value {:type (non-null ID)},
                               :write {:type (non-null Boolean)}}},
@@ -219,6 +226,10 @@
                                         :value {:resolve :organization,
                                                 :type (non-null :Organization)},
                                         :write {:type (non-null Boolean)}}},
+    :RequestFieldProcurementAccount {:fields {:read {:type (non-null Boolean)},
+                                              :value {:type String},
+                                              :write {:type (non-null
+                                                              Boolean)}}},
     :RequestFieldRoom {:fields {:read {:type (non-null Boolean)},
                                 :value {:resolve :room, :type (non-null :Room)},
                                 :write {:type (non-null Boolean)}}},
