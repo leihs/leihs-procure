@@ -41,6 +41,11 @@ describe 'requests' do
               }
               write
             }
+            general_ledger_account {
+              read
+              value 
+              write
+            }
             id
             inspection_comment {
               read
@@ -94,6 +99,11 @@ describe 'requests' do
             priority_inspector {
               read
               value
+              write
+            }
+            procurement_account {
+              read
+              value 
               write
             }
             receiver {
