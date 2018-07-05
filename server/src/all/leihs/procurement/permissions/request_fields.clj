@@ -135,15 +135,14 @@
                   :write (and user-is-requester
                               (or (and request-exists requested-by-user) true)
                               budget-period-in-requesting-phase)},
-     :order_quantity {:read (or (and user-is-requester requested-by-user) ; TODO:
-                                ; really
-                                ; ?
-                                user-is-inspector
-                                category-inspectable-by-user
-                                user-is-admin),
-                      :write (and (not budget-period-is-past)
-                                  (or category-inspectable-by-user
-                                      user-is-admin))},
+     :order_quantity
+       {:read
+          (or (and user-is-requester requested-by-user budget-period-is-past)
+              user-is-inspector
+              category-viewable-by-user
+              user-is-admin),
+        :write (and (not budget-period-is-past)
+                    (or category-inspectable-by-user user-is-admin))},
      :organization
        {:read true,
         :write (and (not request-exists) ; can be set only for new
