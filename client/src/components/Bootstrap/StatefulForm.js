@@ -5,21 +5,30 @@ import fpSet from 'lodash/fp/set'
 import logger from 'debug'
 const log = logger('app:ui:StatefulForm')
 
-// NOTE: handling of getDerivedStateFromProps is dependent on keeping the
-//       given props in state as well!
-//       explanations: <https://github.com/reactjs/reactjs.org/issues/721>
+/*
 
-// # StatefulForm ############################################################
-// state container to handle a flat form like in plain HTML.
-// input fields use `name`, `value` and `onChange`.
-//
-// 'name' is interpreted as a object key path in case nested data is nedded
-// (`user.name=ann` == {user:{name: 'ann'}})
-//
-// actual form is rendered by consumer using the `render` prop,
-// which will be called with the fields, a callback, and helper.
-// helper `formPropsFor` is recommended for normal usage,
-// `fields`, `connectFormProps`, `onChange` are given as well for customizations.
+# StatefulForm ############################################################
+
+  state container to handle a flat form like in plain HTML.
+  input fields use `name`, `value` and `onChange`.
+
+  'name' is interpreted as a object key path in case nested data is nedded
+  (`user.name=ann` == {user:{name: 'ann'}})
+
+  actual form is rendered by consumer using the `render` prop,
+  which will be called with the fields, a callback, and helper.
+  helper `formPropsFor` is recommended for normal usage,
+  `fields`, `connectFormProps`, `onChange` are given as well for customizations.
+
+  NOTE: internal form state does NOT reset when `props.values` changes!
+  To reset it manually, set a different `props.key` in a parent component!
+  see <https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key>
+
+  NOTE: if more features (like validation) should be added, consider using Formik
+        <https://github.com/jaredpalmer/formik>
+
+*/
+
 export default class StatefulForm extends React.PureComponent {
   static defaultProps = { values: {}, children: () => {}, onChange: () => {} }
   static propTypes = {
@@ -35,23 +44,6 @@ export default class StatefulForm extends React.PureComponent {
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)
   }
-
-  //
-  // NOTE: not needed, form state always wins, otherwise reset from outside!
-  //
-  // // if new values given via props, reset internal fields state
-  // static getDerivedStateFromProps(nextProps, prevState) {
-  //   log('getDerivedStateFromProps', { nextProps, prevState })
-  //   if (nextProps.values === prevState.originalValues) {
-  //     log('getDerivedStateFromProps', 'no update, values === originalValues')
-  //     return null
-  //   }
-  //   if (nextProps.values === prevState.fields) {
-  //     log('getDerivedStateFromProps', 'no update, values === fields')
-  //     return null
-  //   }
-  //   return { fields: nextProps.values, originalValues: nextProps.values }
-  // }
 
   handleInputChange(event) {
     log('handleInputChange', { event })

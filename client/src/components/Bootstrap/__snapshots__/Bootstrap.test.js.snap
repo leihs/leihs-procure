@@ -169,6 +169,229 @@ Array [
 ]
 `;
 
+exports[`FormField: renders correctly 1`] = `
+Array [
+  <h2>
+    controlled
+</h2>,
+  <div
+    className="row"
+>
+    <div
+        className="col"
+    >
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=text
+                 
+            </label>
+            <div
+                className=""
+            >
+                <input
+                    aria-describedby={null}
+                    autoComplete="off"
+                    className="form-control form-control"
+                    id={undefined}
+                    name="a"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    type="text"
+                    value="some text"
+                />
+                 
+            </div>
+        </fieldset>
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=text-static
+                 
+            </label>
+            <div
+                className=""
+            >
+                <span
+                    className="form-control-plaintext"
+                    id={undefined}
+                >
+                    some static text
+                </span>
+                 
+            </div>
+        </fieldset>
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=textarea
+                 
+            </label>
+            <div
+                className=""
+            >
+                <textarea
+                    aria-describedby={null}
+                    autoComplete="off"
+                    className="form-control"
+                    id={undefined}
+                    name="c"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    rows={3}
+                    type={null}
+                    value="some text"
+                />
+                 
+            </div>
+        </fieldset>
+    </div>
+    <div
+        className="col"
+    >
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=number
+                 
+            </label>
+            <div
+                className=""
+            >
+                <input
+                    aria-describedby={null}
+                    autoComplete="off"
+                    className="form-control"
+                    id={undefined}
+                    name="d"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    type="number"
+                    value="23.42"
+                />
+                 
+            </div>
+        </fieldset>
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=number-integer
+                 
+            </label>
+            <div
+                className=""
+            >
+                <input
+                    aria-describedby={null}
+                    autoComplete="off"
+                    className="form-control"
+                    id={undefined}
+                    min={1}
+                    name="e"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    step={1}
+                    type="number"
+                    value="42"
+                />
+                 
+            </div>
+        </fieldset>
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=checkbox
+                 
+            </label>
+            <div
+                className=""
+            >
+                <input
+                    aria-describedby={null}
+                    autoComplete="off"
+                    checked={true}
+                    className="form-control"
+                    id={undefined}
+                    name="f"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    type="checkbox"
+                    value={undefined}
+                />
+                 
+            </div>
+        </fieldset>
+        <fieldset
+            className="form-group"
+        >
+            <label
+                className=""
+                htmlFor={undefined}
+            >
+                type=checkbox
+                 
+            </label>
+            <div
+                className=""
+            >
+                <input
+                    aria-describedby={null}
+                    autoComplete="off"
+                    checked={undefined}
+                    className="form-control"
+                    id={undefined}
+                    name="g"
+                    onChange={[Function]}
+                    placeholder={undefined}
+                    type="checkbox"
+                    value={undefined}
+                />
+                 
+            </div>
+        </fieldset>
+    </div>
+    <div
+        className="col"
+    >
+        <pre>
+            {
+              "a": "some text",
+              "b": "some static text",
+              "c": "some text",
+              "d": "23.42",
+              "e": "42",
+              "f": true
+            }
+        </pre>
+    </div>
+</div>,
+]
+`;
+
 exports[`InputDate: renders correctly 1`] = `
 Array [
   "no value",
@@ -186,8 +409,9 @@ Array [
         onKeyDown={[Function]}
         onKeyUp={[Function]}
         placeholder=""
+        readOnly={undefined}
         required={undefined}
-        value={null}
+        value=""
     />
 </div>,
   <hr />,
@@ -209,6 +433,7 @@ Array [
         onKeyDown={[Function]}
         onKeyUp={[Function]}
         placeholder=""
+        readOnly={undefined}
         required={undefined}
         value="10/26/1985"
     />

@@ -20,7 +20,14 @@ const getSelectedValueFromEvent = ({ target }, multiple) =>
         .filter(({ selected }) => selected)
         .map(({ value }) => value)
 
-const Select = ({ options, multiple, emptyOption, value, ...props }) => {
+const Select = ({
+  options,
+  multiple,
+  emptyOption,
+  value,
+  readOnly,
+  ...props
+}) => {
   const selectedValue = getSelectedValueFromProps(value, multiple)
   if (emptyOption === true) emptyOption = Select.defaultProps.emptyOption
   return (
@@ -30,6 +37,7 @@ const Select = ({ options, multiple, emptyOption, value, ...props }) => {
       className={cx('custom-select', props.className)}
       multiple={multiple}
       value={selectedValue}
+      disabled={readOnly}
       onChange={e => {
         if (props.readOnly) return e.preventDefault()
         props.onChange({

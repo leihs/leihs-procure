@@ -154,10 +154,12 @@ export const InputText = props => (
   <StatefulInput {...props}>
     {inputProps => (
       <Node
+        {...props}
         {...inputProps}
         tag="input"
         type="text"
         cls={['form-control', inputProps.cls]}
+        value={inputProps.value || props.value}
         autoComplete={
           props.autoComplete === true // let the browser decide if true, or
             ? null // pass through given prop or turn off if falsy/nothing
@@ -196,6 +198,9 @@ export const FormField = ({
   type = 'text',
   value,
   autoComplete,
+  minRows,
+  maxRows,
+  className,
   ...inputProps
 }) => {
   const supportedTypes = [
@@ -216,18 +221,28 @@ export const FormField = ({
 
   let tag = 'input'
   let mainClass = 'form-control'
-  if (!id) id = name
+  let inputNode
   if (!name) name = id
 
-  if (type === 'number-integer') {
-    type = 'number'
-    inputProps = { min: 1, step: 1, ...inputProps }
+  if (type === 'text') {
+    tag = InputText
+  }
+
+  if (type === 'text-static') {
+    tag = inputProps.tag || 'span'
+    mainClass = 'form-control-plaintext'
+    inputNode = (
+      <Node tag={tag} id={id} className={cx(mainClass, className)}>
+        {value}
+      </Node>
+    )
   }
 
   if (type === 'textarea') {
     tag = type
     type = null
-    let [minRows, maxRows] = [3, 7]
+    minRows = f.presence(minRows) || 3
+    maxRows = f.presence(maxRows) || 7
     inputProps = {
       rows: Math.max(
         minRows,
@@ -237,9 +252,9 @@ export const FormField = ({
     }
   }
 
-  if (type === 'text-static') {
-    tag = 'span'
-    mainClass = 'form-control-plaintext'
+  if (type === 'number-integer') {
+    type = 'number'
+    inputProps = { min: 1, step: 1, ...inputProps }
   }
 
   const inputAutoComplete =
@@ -247,7 +262,7 @@ export const FormField = ({
       ? null // pass through given prop or turn off if falsy/nothing
       : autoComplete || 'off'
 
-  const inputNode = (
+  inputNode = inputNode || (
     <Node
       aria-describedby={helpText ? `${id}--Help` : null}
       {...inputProps}

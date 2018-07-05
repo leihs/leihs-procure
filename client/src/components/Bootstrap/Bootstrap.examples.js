@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Badge, InputDate } from './index'
+import { Row, Col, Button, Badge, FormField, InputDate } from './index'
 
 const _space_ = ' '
 
@@ -66,6 +66,136 @@ export const examples = [
         <Badge dark>Badge dark</Badge>
       </React.Fragment>
     )
+  },
+  {
+    name: 'FormField',
+    content: (() => {
+      class DemoForm extends React.Component {
+        state = {
+          a: 'some text',
+          b: 'some static text',
+          c: 'some text',
+          d: '23.42',
+          e: '42',
+          f: true
+        }
+        render() {
+          return (
+            <Row>
+              <Col>
+                <FormField
+                  type="text"
+                  label="type=text"
+                  name="a"
+                  value={this.state.a}
+                  onChange={e => this.setState({ a: e.target.value })}
+                />
+                <FormField
+                  name="b"
+                  type="text-static"
+                  label="type=text-static"
+                  value={this.state.b}
+                  onChange={e => this.setState({ b: e.target.value })}
+                />
+                <FormField
+                  name="c"
+                  type="textarea"
+                  label="type=textarea"
+                  value={this.state.c}
+                  onChange={e => this.setState({ c: e.target.value })}
+                />
+              </Col>
+              <Col>
+                <FormField
+                  name="d"
+                  type="number"
+                  label="type=number"
+                  value={this.state.d}
+                  onChange={e => this.setState({ d: e.target.value })}
+                />
+                <FormField
+                  name="e"
+                  type="number-integer"
+                  label="type=number-integer"
+                  value={this.state.e}
+                  onChange={e => this.setState({ e: e.target.value })}
+                />
+                <FormField
+                  name="f"
+                  type="checkbox"
+                  label="type=checkbox"
+                  checked={this.state.f}
+                  onChange={e => this.setState({ f: e.target.value })}
+                />
+                <FormField
+                  name="g"
+                  type="checkbox"
+                  label="type=checkbox"
+                  checked={this.state.g}
+                  onChange={e => this.setState({ g: e.target.value })}
+                />
+              </Col>
+              <Col>
+                <pre>{JSON.stringify(this.state, 0, 2)}</pre>
+              </Col>
+            </Row>
+          )
+        }
+      }
+      return (
+        <React.Fragment>
+          <h2>controlled</h2>
+          <DemoForm />
+          {/* <h2>uncontrolled</h2>
+          <Row>
+            <Col>
+              <FormField
+                name="a"
+                type="text"
+                label="type=text"
+                defaultValue="some text"
+              />
+              <FormField
+                name="b"
+                type="text-static"
+                label="type=text-static"
+                defaultValue="some static text"
+              />
+              <FormField
+                name="c"
+                type="textarea"
+                label="type=textarea"
+                defaultValue="some text"
+              />
+            </Col>
+            <Col>
+              <FormField
+                name="d"
+                type="number"
+                label="type=number"
+                defaultValue="23.42"
+              />
+              <FormField
+                name="e"
+                type="number-integer"
+                label="type=number-integer"
+                defaultValue="42"
+              />
+              <FormField name="f" type="checkbox" label="type=checkbox" />
+              <FormField
+                name="g"
+                type="checkbox"
+                label="type=checkbox defaultChecked={true}"
+                defaultChecked={true}
+              />
+            </Col>
+            <Col>
+              <pre>(form state kept in DOM)</pre>
+            </Col>
+          </Row> */}
+        </React.Fragment>
+      )
+    })()
   },
   {
     name: 'InputDate',

@@ -1,5 +1,5 @@
 import React from 'react'
-// import cx from 'classnames'
+import cx from 'classnames'
 // import f from 'lodash'
 
 import { DateTime } from 'luxon'
@@ -25,19 +25,26 @@ const DatePicker = ({
   name,
   value,
   required,
+  readOnly,
   onChange,
-  inputProps,
+  inputProps = {},
   ...dayPickerProps
 }) => (
   <DayPickerInput
     {...dayPickerProps}
-    inputProps={{ className: 'form-control', name, required, ...inputProps }}
-    value={!value ? null : DateTime.fromISO(value).toJSDate()}
+    inputProps={{
+      name,
+      required,
+      readOnly,
+      ...inputProps,
+      className: cx('form-control', inputProps.className)
+    }}
+    value={!value ? '' : DateTime.fromISO(value).toJSDate()}
     placeholder={''}
     formatDate={formatDate}
     parseDate={parseDate}
     onDayChange={day =>
-      onChange({ target: { value: day.toISOString(), name } })
+      onChange({ target: { value: day ? day.toISOString() : null, name } })
     }
   />
 )
