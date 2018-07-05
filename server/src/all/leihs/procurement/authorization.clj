@@ -7,14 +7,14 @@
             [logbug.debug :as debug])
   (:import [leihs.procurement UnauthorizedException]))
 
-(defn ensure-one-of
+(defn wrap-ensure-one-of
   [resolver predicates]
   (fn [context args value]
-    (let [request (:request context)
-          tx (:tx request)
-          auth-user (:authenticated-entity request)]
+    (let [rrequest (:request context)
+          tx (:tx rrequest)
+          auth-entity (:authenticated-entity rrequest)]
       (if (->> predicates
-               (map #(% tx auth-user))
+               (map #(% tx auth-entity))
                (some true?))
         (resolver context args value)
         (throw (UnauthorizedException. "Not authorized for this query path."

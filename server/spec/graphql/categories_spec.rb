@@ -11,6 +11,7 @@ describe 'categories' do
           FactoryBot.create(:category_inspector,
                             category_id: cat.id,
                             user_id: user.id)
+          admin = User.find(id: FactoryBot.create(:admin).user_id)
 
           FactoryBot.create(:request, category_id: cat.id)
           q = <<-GRAPHQL
@@ -21,7 +22,7 @@ describe 'categories' do
               }
             }
           GRAPHQL
-          result = query(q, user.id)
+          result = query(q, admin.id)
           expect(result).to eq({
             'data' => {
               'categories' => [
@@ -39,6 +40,8 @@ describe 'categories' do
                             category_id: cat.id,
                             user_id: user.id)
           FactoryBot.create(:template, category_id: cat.id)
+          admin = User.find(id: FactoryBot.create(:admin).user_id)
+
           q = <<-GRAPHQL
             query {
               categories {
@@ -47,7 +50,8 @@ describe 'categories' do
               }
             }
           GRAPHQL
-          result = query(q, user.id)
+
+          result = query(q, admin.id)
           expect(result).to eq({
             'data' => {
               'categories' => [

@@ -55,18 +55,23 @@
 ; a function for debugging convenience. will be a var later.
 (defn query-resolver-map
   []
-  ; FIXME: authorize all queries!!!
   {:admins (-> admins/get-admins
-               (authorization/ensure-one-of [user-perms/admin?])),
+               (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,
    :budget-periods budget-periods/get-budget-periods,
    :buildings buildings/get-buildings,
    :building building/get-building,
    :building-rooms rooms/get-building-rooms,
-   :can-delete-budget-period? budget-period/can-delete?,
-   :can-delete-category? category/can-delete?,
-   :can-delete-main-category? main-category/can-delete?,
+   :can-delete-budget-period? (-> budget-period/can-delete?
+                                  (authorization/wrap-ensure-one-of
+                                    [user-perms/admin?])),
+   :can-delete-category? (-> category/can-delete?
+                             (authorization/wrap-ensure-one-of
+                               [user-perms/admin?])),
+   :can-delete-main-category? (-> main-category/can-delete?
+                                  (authorization/wrap-ensure-one-of
+                                    [user-perms/admin?])),
    :category category/get-category,
    :categories categories/get-categories,
    :current-user current-user/get-current-user,
@@ -82,7 +87,8 @@
    :priorities-inspector (fn [_ _ _] [0 1 2 3]),
    :requests requests/get-requests,
    :requesters-organizations
-     requesters-organizations/get-requesters-organizations,
+     (-> requesters-organizations/get-requesters-organizations
+         (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,
@@ -95,48 +101,82 @@
      requests/total-price-cents-order-quantities,
    :user user/get-user,
    :users users/get-users,
-   :viewers viewers/get-viewers})
+   :viewers (fn [context args value]
+              (let [rrequest (:request context)
+                    tx (:tx rrequest)
+                    auth-entity (:authenticated-entity rrequest)]
+                ((-> viewers/get-viewers
+                     (authorization/wrap-ensure-one-of
+                       [user-perms/admin?
+                        (fn [tx auth-entity]
+                          (user-perms/inspector? tx
+                                                 auth-entity
+                                                 (log/spy (:id value))))]))
+                  context
+                  args
+                  value)))})
 
+; a function for debugging convenience. will be a var later.
 (defn mutation-resolver-map
   []
-  {:create-request (-> request/create-request!
-                       (authorization/ensure-one-of [user-perms/admin?
-                                                     user-perms/inspector?
-                                                     user-perms/requester?])),
-   :delete-request
-     #((-> request/delete-request!
-           (authorization/ensure-one-of
-             [user-perms/admin? user-perms/inspector?
-              (fn [tx auth-user]
-                (and (user-perms/requester? tx auth-user)
-                     (request/requested-by? tx (:input_data %2) auth-user)))]))
-        %1
-        %2
-        %3),
+  {:create-request (fn [context args value]
+                     (let [rrequest (:request context)
+                           tx (:tx rrequest)
+                           auth-entity (:authenticated-entity rrequest)
+                           input-data (:input_data args)
+                           budget-period (budget-period/get-budget-period-by-id
+                                           tx
+                                           (:budget_period input-data))]
+                       (authorization/authorize-and-apply
+                         #(request/create-request! context args value)
+                         :if-only
+                         #(and (not (budget-period/past? tx budget-period))
+                               (or (user-perms/admin? tx auth-entity)
+                                   (user-perms/inspector? tx auth-entity)
+                                   (and (user-perms/requester? tx auth-entity)
+                                        (= (:user input-data)
+                                           (str (:user_id auth-entity)))
+                                        (budget-period/in-requesting-phase?
+                                          tx
+                                          budget-period))))))),
+   :delete-request (fn [context args value]
+                     ((-> request/delete-request!
+                          (authorization/wrap-ensure-one-of
+                            [user-perms/admin? user-perms/inspector?
+                             (fn [tx auth-entity]
+                               (and (user-perms/requester? tx auth-entity)
+                                    (request/requested-by? tx
+                                                           (:input_data args)
+                                                           auth-entity)))]))
+                       context
+                       args
+                       value)),
    :update-admins (-> admins/update-admins!
-                      (authorization/ensure-one-of [user-perms/admin?])),
+                      (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!
-                              (authorization/ensure-one-of
+                              (authorization/wrap-ensure-one-of
                                 [user-perms/admin?])),
    :update-categories-viewers (-> categories/update-categories-viewers!
-                                  (authorization/ensure-one-of
+                                  (authorization/wrap-ensure-one-of
                                     [user-perms/admin? user-perms/inspector?])),
    :update-main-categories (-> main-categories/update-main-categories!
-                               (authorization/ensure-one-of
+                               (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
-   :update-request
-     #((-> request/update-request!
-           (authorization/ensure-one-of
-             [user-perms/admin? user-perms/inspector?
-              (fn [tx auth-user]
-                (and (user-perms/requester? tx auth-user)
-                     (request/requested-by? tx (:input_data %2) auth-user)))]))
-        %1
-        %2
-        %3),
+   :update-request (fn [context args value]
+                     ((-> request/update-request!
+                          (authorization/wrap-ensure-one-of
+                            [user-perms/admin? user-perms/inspector?
+                             (fn [tx auth-entity]
+                               (and (user-perms/requester? tx auth-entity)
+                                    (request/requested-by? tx
+                                                           (:input_data args)
+                                                           auth-entity)))]))
+                       context
+                       args
+                       value)),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
-         (authorization/ensure-one-of [user-perms/admin?]))})
+         (authorization/wrap-ensure-one-of [user-perms/admin?]))})
 
 (defn- wrap-map-with-error
   [arg]

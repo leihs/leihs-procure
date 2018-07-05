@@ -31,7 +31,7 @@
                                 (-> context
                                     :request
                                     :authenticated-entity
-                                    :id)]))))))
+                                    :user_id)]))))))
 
 (defn get-categories
   [context arguments value]
