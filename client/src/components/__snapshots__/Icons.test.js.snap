@@ -797,3 +797,169 @@ Array [
   <hr />,
 ]
 `;
+
+exports[`usage: renders correctly 1`] = `
+Array [
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x "
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-dark"
+    color="dark"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-secondary"
+    color="secondary"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-light"
+    color="light"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-primary"
+    color="primary"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-success"
+    color="success"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-warning"
+    color="warning"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-danger"
+    color="danger"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  " ",
+  <svg
+    aria-hidden="true"
+    className="svg-inline--fa fa-chart-pie fa-w-18 fa-2x text-info"
+    color="info"
+    data-icon="chart-pie"
+    data-prefix="fas"
+    role="img"
+    style={Object {}}
+    viewBox="0 0 576 512"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path
+        d="M288 12.3V240h227.7c6.9 0 12.3-5.8 12-12.7-6.4-122.4-104.5-220.6-227-227-6.9-.3-12.7 5.1-12.7 12zM552.7 288c6.9 0 12.3 5.8 12 12.7-2.8 53.2-23.2 105.6-61.2 147.8-4.6 5.1-12.6 5.4-17.5.5L325 288h227.7zM401 433c4.8 4.8 4.7 12.8-.4 17.3-42.6 38.4-99 61.7-160.8 61.7C107.6 511.9-.2 403.8 0 271.5.2 143.4 100.8 38.9 227.3 32.3c6.9-.4 12.7 5.1 12.7 12V272l161 161z"
+        fill="currentColor"
+        style={Object {}}
+    />
+</svg>,
+  <br />,
+]
+`;

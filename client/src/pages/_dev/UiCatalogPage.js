@@ -20,7 +20,16 @@ import Loading from '../../components/Loading'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/DownshiftMultiSelect.examples'
-import { allIcons } from '../../components/Icons.examples'
+import { examples as IconExamples } from '../../components/Icons.examples'
+
+const ExamplesList = ({ examples }) =>
+  examples.map(({ name, content }, i) => (
+    <F key={i}>
+      <h4>{name}</h4>
+      {content}
+      <hr />
+    </F>
+  ))
 
 // # DATA
 
@@ -28,18 +37,12 @@ const PAGES = [
   {
     id: 'bootstrap',
     title: 'Bootstrap',
-    content: BootstrapExamples.map(({ name, content }, i) => (
-      <F key={i}>
-        <h4>{name}</h4>
-        {content}
-        <hr />
-      </F>
-    ))
+    content: <ExamplesList examples={BootstrapExamples} />
   },
   {
     id: 'icons',
     title: 'Icons',
-    content: allIcons
+    content: <ExamplesList examples={IconExamples} />
   },
   {
     id: 'loading-indicator',

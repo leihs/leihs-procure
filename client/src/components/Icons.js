@@ -156,19 +156,16 @@ const ICONS = {
 const Icons = f.fromPairs(
   f.map(ICONS, ({ src, extraProps = {} }, name) => {
     const iconComponent = ({ spaced, ...givenProps }) => {
-      if (givenProps.children) {
+      const iconProps = { ...extraProps, ...givenProps }
+      if (iconProps.children) {
         throw new Error('Icons cant have `children`!')
       }
       const iconClassName = cx(extraProps.className, givenProps.className, {
-        'mr-1': spaced
+        'mr-1': spaced,
+        [`text-${iconProps.color}`]: iconProps.color
       })
       return (
-        <FontAwesomeIcon
-          {...extraProps}
-          {...givenProps}
-          icon={src}
-          className={iconClassName}
-        />
+        <FontAwesomeIcon {...iconProps} icon={src} className={iconClassName} />
       )
     }
     iconComponent.displayName = `Icon.${name}`
