@@ -1,12 +1,11 @@
 import React from 'react'
-// import cx from 'classnames'
+import cx from 'classnames'
 import f from 'lodash'
 
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
-// import t from '../locale/translate'
-// import * as fragments from '../queries/fragments'
+import t from '../locale/translate'
 import Icon from '../components/Icons'
 import {
   Button,
@@ -22,11 +21,18 @@ import { ErrorPanel } from '../components/Error'
 import { MainWithSidebar } from '../components/Layout'
 import { formatCurrency } from '../components/decorators'
 
-// # DATA
+const mutationErrorHandler = err => {
+  // not much we can do on backend error
+  // eslint-disable-next-line no-console
+  console.error(err)
+  window.confirm('Error! ' + err) && window.location.reload()
+}
+
+// # DATA & ACTIONS
 //
-const ADMIN_BUDGET_PERIODS_PAGE_QUERY = gql`
-  query AdminBudgetPeriods {
-    budget_periods {
+const ADMIN_BUDGET_PERIODS_FRAGMENTS = {
+  props: gql`
+    fragment AdminBudgetPeriodProps on BudgetPeriod {
       id
       name
       inspection_start_date
@@ -35,85 +41,170 @@ const ADMIN_BUDGET_PERIODS_PAGE_QUERY = gql`
       total_price_cents_requested_quantities
       total_price_cents_approved_quantities
     }
+  `
+}
+
+const ADMIN_BUDGET_PERIODS_PAGE_QUERY = gql`
+  query AdminBudgetPeriods {
+    budget_periods {
+      ...AdminBudgetPeriodProps
+    }
   }
+  ${ADMIN_BUDGET_PERIODS_FRAGMENTS.props}
 `
+
+const ADMIN_UPDATE_BUDGET_PERIODS_MUTATION = gql`
+  mutation updateBudgetPeriods($budgetPeriods: [BudgetPeriodInput]) {
+    budget_periods(input_data: $budgetPeriods) {
+      ...AdminBudgetPeriodProps
+    }
+  }
+  ${ADMIN_BUDGET_PERIODS_FRAGMENTS.props}
+`
+
+const updateBudgetPeriods = {
+  mutation: {
+    mutation: ADMIN_UPDATE_BUDGET_PERIODS_MUTATION,
+    onError: mutationErrorHandler,
+
+    update: (cache, { data: { budget_periods, ...data } }) => {
+      // update the internal cache with the new data we received.
+      cache.writeQuery({
+        query: ADMIN_BUDGET_PERIODS_PAGE_QUERY,
+        data: { budget_periods }
+      })
+    }
+  },
+  doUpdate: (mutate, fields) => {
+    const data = fields
+      .filter(i => !i.toDelete && !f.isEmpty(i.name))
+      .map(i => f.pick(i, ['id', 'name', 'inspection_start_date', 'end_date']))
+
+    mutate({
+      variables: { budgetPeriods: data }
+    })
+  }
+}
 
 // # PAGE
 //
-const AdminOrgsPage = () => (
-  <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
-    {({ loading, error, data }) => {
-      if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} data={data} />
+class AdminBudgetPeriodsPage extends React.Component {
+  state = { formKey: Date.now() }
+  render() {
+    return (
+      <Mutation
+        {...updateBudgetPeriods.mutation}
+        onCompleted={() => this.setState({ formKey: Date.now() })}
+      >
+        {(mutate, info) => (
+          <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
+            {({ loading, error, data }) => {
+              if (loading) return <Loading />
+              if (error) return <ErrorPanel error={error} data={data} />
 
-      const budgetPeriods = f.sortBy(data.budget_periods, 'end_date')
+              const budgetPeriods = f.sortBy(data.budget_periods, 'end_date')
 
-      return (
-        <MainWithSidebar>
-          <h1>Budgetperioden</h1>
-          <BudgetPeriodsTable budgetPeriods={budgetPeriods} />
-        </MainWithSidebar>
-      )
-    }}
-  </Query>
-)
+              return (
+                <MainWithSidebar>
+                  <h1>Budgetperioden</h1>
+                  <BudgetPeriodsTable
+                    budgetPeriods={budgetPeriods}
+                    updateAction={fields =>
+                      updateBudgetPeriods.doUpdate(mutate, fields)
+                    }
+                    key={this.state.formKey}
+                  />
+                </MainWithSidebar>
+              )
+            }}
+          </Query>
+        )}
+      </Mutation>
+    )
+  }
+}
 
-export default AdminOrgsPage
+export default AdminBudgetPeriodsPage
 
 // # VIEW PARTIALS
 //
 
-const BudgetPeriodsTable = ({ budgetPeriods }) => {
-  const formValues = f.fromPairs(f.map(budgetPeriods, bp => [bp.id, bp]))
+const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
+  const formValues = budgetPeriods
+
   return (
     <StatefulForm idPrefix="budgetPeriods" values={formValues}>
-      {({ fields, formPropsFor, getValue }) => (
-        <React.Fragment>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Startdatum der Prüfphase</th>
-                <th>Enddatum der Budgetperiode</th>
-                <th>Total Anträge</th>
-              </tr>
-            </thead>
-            <tbody>
-              {budgetPeriods.map(bp => (
-                <tr className="info" key={bp.id}>
-                  <td>
-                    <FormField
-                      required
-                      label="Name"
-                      placeholder="Name"
-                      hideLabel
-                      {...formPropsFor(`${bp.id}.name`)}
-                    />
-                  </td>
-                  <td>
-                    <FormGroup label="Startdatum der Prüfphase" hideLabel>
-                      <InputDate
+      {({ fields, formPropsFor, getValue, setValue }) => {
+        const onSave = () => updateAction(fields)
+        const onAddRow = () => {
+          setValue(fields.length, {})
+        }
+        return (
+          <React.Fragment>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Startdatum der Prüfphase</th>
+                  <th>Enddatum der Budgetperiode</th>
+                  <th>Total Anträge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fields.map(({ toDelete = false, ...bp }, n) => (
+                  <tr
+                    key={n}
+                    className={cx([
+                      'rounded',
+                      {
+                        'text-strike bg-danger-light': toDelete,
+                        // new lines are marked and should show form validation styles
+                        'was-validated bg-info-light': !bp.id
+                      }
+                    ])}
+                  >
+                    <td>
+                      <FormField
                         required
-                        {...formPropsFor(`${bp.id}.inspection_start_date`)}
+                        label="Name"
+                        placeholder="Name"
+                        hideLabel
+                        readOnly={toDelete}
+                        {...formPropsFor(`${n}.name`)}
                       />
-                    </FormGroup>
-                  </td>
-                  <td>
-                    <FormGroup label="Enddatum" hideLabel>
-                      <InputDate
-                        required
-                        {...formPropsFor(`${bp.id}.end_date`)}
-                      />
-                    </FormGroup>
-                  </td>
-                  <td>
-                    {bp.total_price_cents_requested_quantities > 0 &&
-                      bp.total_price_cents_approved_quantities > 0 && (
+                    </td>
+                    <td>
+                      <FormGroup label="Startdatum der Prüfphase" hideLabel>
+                        <InputDate
+                          required
+                          readOnly={toDelete}
+                          inputProps={{
+                            className: cx({ 'text-strike ': toDelete })
+                          }}
+                          {...formPropsFor(`${n}.inspection_start_date`)}
+                        />
+                      </FormGroup>
+                    </td>
+                    <td>
+                      <FormGroup label="Enddatum" hideLabel>
+                        <InputDate
+                          required
+                          readOnly={toDelete}
+                          inputProps={{
+                            className: cx({ 'text-strike ': toDelete })
+                          }}
+                          {...formPropsFor(`${n}.end_date`)}
+                        />
+                      </FormGroup>
+                    </td>
+                    <td>
+                      {bp.total_price_cents_requested_quantities > 0 &&
+                      bp.total_price_cents_approved_quantities > 0 ? (
                         <React.Fragment>
                           <Tooltipped
                             text={'Total aller Anträge mit Status "Neu"'}
                           >
-                            <Badge info id={`badge_requested_${bp.id}`}>
+                            <Badge info id={`badge_requested_${n}`}>
                               <Icon.ShoppingCart />{' '}
                               {formatCurrency(
                                 bp.total_price_cents_requested_quantities
@@ -121,7 +212,7 @@ const BudgetPeriodsTable = ({ budgetPeriods }) => {
                             </Badge>
                           </Tooltipped>{' '}
                           <Tooltipped text={'Total aller bewilligten Anträge'}>
-                            <Badge success id={`badge_approved_${bp.id}`}>
+                            <Badge success id={`badge_approved_${n}`}>
                               <Icon.ShoppingCart />{' '}
                               {formatCurrency(
                                 bp.total_price_cents_approved_quantities
@@ -129,37 +220,46 @@ const BudgetPeriodsTable = ({ budgetPeriods }) => {
                             </Badge>
                           </Tooltipped>
                         </React.Fragment>
+                      ) : (
+                        <FormGroup>
+                          <div className="form-check mt-2">
+                            <label className="form-check-label">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={toDelete}
+                                onChange={e => {
+                                  setValue(`${n}.toDelete`, !!e.target.checked)
+                                }}
+                              />
+                              {'remove'}
+                            </label>
+                          </div>
+                        </FormGroup>
                       )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan="5">
+                    <Tooltipped text="Neue Budgetperiode erstellen">
+                      <Button color="link" id="add_bp_btn" onClick={onAddRow}>
+                        <Icon.PlusCircle color="success" size="2x" />
+                      </Button>
+                    </Tooltipped>{' '}
+                    <Button color="primary" onClick={onSave}>
+                      <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+                    </Button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-            {/* <tfoot>
-              <tr>
-                <td className="h3" colSpan="3">
-                  <i
-                    className="fa fa-plus-circle"
-                    data-toggle="tooltip"
-                    title="Neue Budgetperiode erstellen"
-                  />
-                </td>
-                <td className="text-right">
-                  <button className="btn btn-success" type="submit">
-                    <i className="fa fa-check" />
-                    Speichern
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="5">
-                  <div className="flash" />
-                </td>
-              </tr>
-            </tfoot> */}
-          </table>
-          {/* <pre>{JSON.stringify(fields, 0, 2)}</pre> */}
-        </React.Fragment>
-      )}
+              </tfoot>
+            </table>
+            {/* <pre>{JSON.stringify(fields, 0, 2)}</pre> */}
+          </React.Fragment>
+        )
+      }}
     </StatefulForm>
   )
 }

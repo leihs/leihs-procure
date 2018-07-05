@@ -43,7 +43,7 @@ const Node = ({ tag = 'div', ...props }) => {
   return <Tag {...restProps} className={bsClasses} />
 }
 Node.propTypes = {
-  tag: PropTypes.string
+  tag: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
 }
 
 export { Node as __Node } // "internal" usage only

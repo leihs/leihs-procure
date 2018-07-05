@@ -38,6 +38,7 @@ import faDolly from '@fortawesome/fontawesome-free-solid/faDolly'
 import faWrench from '@fortawesome/fontawesome-free-solid/faWrench'
 import faCogs from '@fortawesome/fontawesome-free-solid/faCogs'
 import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
+import faPlusCircle from '@fortawesome/fontawesome-free-solid/faPlusCircle'
 
 const ICONS = {
   CaretUp: {
@@ -62,6 +63,9 @@ const ICONS = {
   },
   Cross: {
     src: faTimes
+  },
+  PlusCircle: {
+    src: faPlusCircle
   },
   Exchange: {
     src: faExchange
