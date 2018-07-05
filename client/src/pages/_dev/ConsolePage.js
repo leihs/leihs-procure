@@ -11,7 +11,7 @@ import {
 } from '../../apollo-client'
 
 const exampleQuery = `
-query {
+query allTheRooms {
   rooms {
     id
     name

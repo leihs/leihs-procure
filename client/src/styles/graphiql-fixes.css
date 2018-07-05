@@ -1,0 +1,5 @@
+.graphiql-container .topBar,
+.graphiql-container .doc-explorer-title-bar,
+.graphiql-container .history-title-bar {
+  height: 48px;
+}
