@@ -41,6 +41,11 @@ describe 'requests' do
               }
               write
             }
+            cost_center {
+              read
+              value 
+              write
+            }
             general_ledger_account {
               read
               value 

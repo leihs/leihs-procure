@@ -74,6 +74,7 @@
                                     [user-perms/admin?])),
    :category category/get-category,
    :categories categories/get-categories,
+   :cost-center request/cost-center,
    :current-user current-user/get-current-user,
    :department organization/get-department,
    :general-ledger-account request/general-ledger-account,

@@ -150,6 +150,10 @@
          (hash-map :value)
          (merge (attr rf-perms)))))
 
+(defn cost-center
+  [context _ value]
+  (get-account-perms context value :cost_center))
+
 (defn general-ledger-account
   [context _ value]
   (get-account-perms context value :general_ledger_account))

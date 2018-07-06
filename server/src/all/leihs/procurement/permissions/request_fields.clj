@@ -99,6 +99,9 @@
                                user-is-admin))
                       ; new request
                       (or user-is-requester user-is-inspector user-is-admin))},
+     :cost_center
+       {:read (or category-viewable-by-user user-is-inspector user-is-admin),
+        :write false},
      :general_ledger_account
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write false},
