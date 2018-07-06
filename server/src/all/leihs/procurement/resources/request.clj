@@ -31,11 +31,12 @@
   ([req] (exchange-attrs req attrs-mapping))
   ([req mapping]
    (reduce (fn [mem [attr1 attr2]]
-             (if-let [value (attr1 mem)]
-               (-> mem
-                   (assoc attr2 value)
-                   (dissoc attr1))
-               mem))
+             (let [value (attr1 mem)]
+               (if (contains? mem attr1)
+                 (-> mem
+                     (assoc attr2 value)
+                     (dissoc attr1))
+                 mem)))
      req
      mapping)))
 
