@@ -38,8 +38,7 @@
         :write (and (not budget-period-is-past)
                     (or category-inspectable-by-user user-is-admin))},
      :article_name
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -51,8 +50,7 @@
                         category-inspectable-by-user
                         user-is-admin))},
      :article_number
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -64,8 +62,7 @@
                         category-inspectable-by-user
                         user-is-admin))},
      :attachments
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -117,8 +114,7 @@
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write (and (not budget-period-is-past)
                     (or category-inspectable-by-user user-is-admin))},
-     :model {:read (or (and user-is-requester
-                            (or (and request-exists requested-by-user) true))
+     :model {:read (or (and user-is-requester requested-by-user)
                        category-viewable-by-user
                        user-is-inspector
                        user-is-admin),
@@ -129,9 +125,7 @@
                                budget-period-in-requesting-phase)
                           category-inspectable-by-user
                           user-is-admin))},
-     :motivation {:read (or (and user-is-requester
-                                 (or (and request-exists requested-by-user)
-                                     true))
+     :motivation {:read (or (and user-is-requester requested-by-user)
                             category-viewable-by-user
                             user-is-inspector
                             user-is-admin),
@@ -152,8 +146,7 @@
                     ; requests
                     (or user-is-requester user-is-inspector user-is-admin))},
      :price_cents
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -164,8 +157,7 @@
                         category-inspectable-by-user
                         user-is-admin))},
      :price_currency {:read true, :write false},
-     :priority {:read (or (and user-is-requester
-                               (or (and request-exists requested-by-user) true))
+     :priority {:read (or (and user-is-requester requested-by-user)
                           category-viewable-by-user
                           user-is-inspector
                           user-is-admin),
@@ -183,8 +175,7 @@
      :procurement_account
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write false},
-     :receiver {:read (or (and user-is-requester
-                               (or (and request-exists requested-by-user) true))
+     :receiver {:read (or (and user-is-requester requested-by-user)
                           category-viewable-by-user
                           user-is-inspector
                           user-is-admin),
@@ -196,8 +187,7 @@
                                 category-inspectable-by-user
                                 user-is-admin))},
      :replacement
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -209,8 +199,7 @@
                         category-inspectable-by-user
                         user-is-admin))},
      :requested_quantity
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
@@ -220,8 +209,7 @@
                              budget-period-in-requesting-phase)
                         category-inspectable-by-user ; TODO: why?
                         user-is-admin))},
-     :room {:read (or (and user-is-requester
-                           (or (and request-exists requested-by-user) true))
+     :room {:read (or (and user-is-requester requested-by-user)
                       category-viewable-by-user
                       user-is-inspector
                       user-is-admin),
@@ -232,14 +220,12 @@
                               budget-period-in-requesting-phase)
                          category-inspectable-by-user
                          user-is-admin))},
-     :state {:read (or (and user-is-requester
-                            (or (and request-exists requested-by-user) true))
+     :state {:read (or (and user-is-requester requested-by-user)
                        category-viewable-by-user
                        user-is-inspector
                        user-is-admin),
              :write false},
-     :supplier {:read (or (and user-is-requester
-                               (or (and request-exists requested-by-user) true))
+     :supplier {:read (or (and user-is-requester requested-by-user)
                           category-viewable-by-user
                           user-is-inspector
                           user-is-admin),
@@ -252,8 +238,7 @@
                                 category-inspectable-by-user
                                 user-is-admin))},
      :supplier_name
-       {:read (or (and user-is-requester
-                       (or (and request-exists requested-by-user) true))
+       {:read (or (and user-is-requester requested-by-user)
                   category-viewable-by-user
                   user-is-inspector
                   user-is-admin),
