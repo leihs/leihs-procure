@@ -268,6 +268,8 @@
                             :sort_by {:type String},
                             :sort_dir {:type String},
                             :states {:type (list String)}}},
+    :Settings {:fields {:contact_url {:type String},
+                        :inspection_comments {:type (list String)}}},
     :Supplier {:fields {:id {:type (non-null ID)},
                         :name {:type (non-null String)}}},
     :User {:fields {:email {:type String},
@@ -306,6 +308,7 @@
                :type (list :Request)},
     :rooms
       {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
+    :settings {:resolve :settings, :type :Settings},
     :users {:args {:exclude_ids {:type (list ID)},
                    :limit {:type (non-null Int)},
                    :offset {:type (non-null Int)},

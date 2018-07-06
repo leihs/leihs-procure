@@ -93,6 +93,8 @@
    :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,
+   :settings (-> settings/get-settings
+                 (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :supplier supplier/get-supplier,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,
@@ -110,12 +112,11 @@
                      (authorization/wrap-ensure-one-of
                        [user-perms/admin?
                         (fn [tx auth-entity]
-                          (user-perms/inspector? tx
-                                                 auth-entity
-                                                 (log/spy (:id value))))]))
-                  context
-                  args
-                  value)))})
+                          (user-perms/inspector? tx auth-entity (:id value)))])
+                     context
+                     args
+                     value))))})
+
 
 ; a function for debugging convenience. will be a var later.
 (defn mutation-resolver-map
