@@ -8,7 +8,9 @@
 
 (defn get-settings
   [context _ _]
-  (jdbc/query (-> context
-                  :request
-                  :tx)
-              (sql/format settings-query)))
+  (->> settings-base-query
+       sql/format
+       (jdbc/query (-> context
+                       :request
+                       :tx))
+       first))

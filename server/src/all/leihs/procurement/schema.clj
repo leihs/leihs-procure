@@ -31,6 +31,7 @@
      requesters-organizations]
     [leihs.procurement.resources.room :as room]
     [leihs.procurement.resources.rooms :as rooms]
+    [leihs.procurement.resources.settings :as settings]
     [leihs.procurement.resources.supplier :as supplier]
     [leihs.procurement.resources.user :as user]
     [leihs.procurement.resources.users :as users]
