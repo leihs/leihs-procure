@@ -218,7 +218,7 @@
                     (or (and user-is-requester
                              (or (and request-exists requested-by-user) true)
                              budget-period-in-requesting-phase)
-                        category-inspectable-by-user
+                        category-inspectable-by-user ; TODO: why?
                         user-is-admin))},
      :room {:read (or (and user-is-requester
                            (or (and request-exists requested-by-user) true))
