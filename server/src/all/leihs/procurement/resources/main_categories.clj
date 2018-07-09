@@ -1,7 +1,9 @@
 (ns leihs.procurement.resources.main-categories
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.graphql.helpers :refer
+             [add-resource-type add-to-parent-values]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.budget-limits :as budget-limits]
             [leihs.procurement.resources.categories :as categories]
@@ -14,23 +16,28 @@
   (-> (sql/select :procurement_main_categories.*)
       (sql/from :procurement_main_categories)))
 
+(defn merge-image-path
+  [tx mc]
+  (let [image (->> (:id mc)
+                   image/image-query-for-main-category
+                   sql/format
+                   (jdbc/query tx)
+                   first)]
+    (if-let [image-id (:id image)]
+      (merge mc {:image_url (path :image {:image-id image-id})})
+      mc)))
+
 (defn get-main-categories
-  [context _ _]
+  [context _ value]
   (let [tx (-> context
                :request
                :tx)]
     (->> main-categories-base-query
          sql/format
          (jdbc/query tx)
-         (map (fn [mc]
-                (let [image (->> (:id mc)
-                                 image/image-query-for-main-category
-                                 sql/format
-                                 (jdbc/query tx)
-                                 first)]
-                  (if-let [image-id (:id image)]
-                    (merge mc {:image_url (path :image {:image-id image-id})})
-                    mc)))))))
+         (map #(add-resource-type % :main-category))
+         (map #(add-to-parent-values % value))
+         (map #(merge-image-path tx %)))))
 
 (defn get-main-categories-by-names
   [tx names]

@@ -85,8 +85,6 @@
    :model model/get-model,
    :organization organization/get-organization,
    :organizations organizations/get-organizations,
-   :priorities (fn [_ _ _] [0 1]),
-   :priorities-inspector (fn [_ _ _] [0 1 2 3]),
    :requests requests/get-requests,
    :requesters-organizations
      (-> requesters-organizations/get-requesters-organizations
@@ -117,7 +115,6 @@
                      context
                      args
                      value))))})
-
 
 ; a function for debugging convenience. will be a var later.
 (defn mutation-resolver-map

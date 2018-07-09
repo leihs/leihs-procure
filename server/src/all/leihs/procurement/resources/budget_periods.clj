@@ -2,6 +2,7 @@
   (:require [clj-time.format :as time-format]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.graphql.helpers :refer [add-resource-type]]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.utils.sql :as sql]))
 
@@ -10,17 +11,26 @@
       (sql/from :procurement_budget_periods)
       (sql/order-by [:end_date :desc])))
 
+(defn budget-periods-query
+  [args]
+  (cond-> budget-periods-base-query
+    (:id args) (sql/merge-where [:in :procurement_budget_periods.id
+                                 (:id args)])))
+
 (defn get-budget-periods
   ([tx ids]
    (jdbc/query tx
                (-> budget-periods-base-query
                    (sql/merge-where [:in :procurement_budget_periods.id ids])
                    sql/format)))
-  ([context _ _]
-   (jdbc/query (-> context
-                   :request
-                   :tx)
-               (sql/format budget-periods-base-query))))
+  ([context args _]
+   (->> args
+        budget-periods-query
+        sql/format
+        (jdbc/query (-> context
+                        :request
+                        :tx))
+        (map #(add-resource-type % :budget-period)))))
 
 (defn get-phase-of-budget-periods
   [tx budget-periods]

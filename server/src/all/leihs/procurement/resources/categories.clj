@@ -3,6 +3,8 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.graphql.helpers :refer
+             [add-resource-type add-to-parent-values]]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.category :as category]
             [leihs.procurement.resources.inspectors :as inspectors]
@@ -35,10 +37,12 @@
 
 (defn get-categories
   [context arguments value]
-  (jdbc/query (-> context
-                  :request
-                  :tx)
-              (categories-query context arguments value)))
+  (->> (categories-query context arguments value)
+       (jdbc/query (-> context
+                       :request
+                       :tx))
+       (map #(add-resource-type % :category))
+       (map #(add-to-parent-values % value))))
 
 (defn delete-categories-not-in-main-category-ids!
   [tx ids]

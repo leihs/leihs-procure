@@ -1,8 +1,10 @@
 (ns leihs.procurement.resources.requests
   (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
             [clojure.math.numeric-tower :refer [round]]
             clojure.set
+            clojure.string
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.permissions.user :as user-perms]
@@ -31,12 +33,41 @@
          ["~~*" :rooms.name term-percent] ["~~*" :users.firstname term-percent]
          ["~~*" :users.lastname term-percent]]))))
 
+(defn get-id-from-parent-values
+  [value resource-type]
+  (some->> value
+           :parent-values (find-first #(= (:resource-type %) resource-type))
+           :id vector))
+
+(defn get-id-from-current-value
+  [value resource-type]
+  (if (= (:resource-type value) resource-type) [(:id value)]))
+
+(defn get-id-from-resolution-context
+  [value resource-type]
+  (or (get-id-from-parent-values value resource-type)
+      (get-id-from-current-value value resource-type)))
+
+(defn get-id-from-arguments
+  [arguments resource-type]
+  (some->> arguments
+           (-> resource-type
+               name
+               (clojure.string/replace "-" "_")
+               (str "_id")
+               keyword)))
+
+(defn get-id
+  [resource-type arguments value]
+  (or (get-id-from-arguments arguments resource-type)
+      (get-id-from-resolution-context value resource-type)))
+
 (defn requests-query
-  [context arguments _]
+  [context arguments value]
   (let [id (:id arguments)
         advanced-user? (:advanced-user? context)
-        category-id (:category_id arguments)
-        budget-period-id (:budget_period_id arguments)
+        category-id (get-id :category arguments value)
+        budget-period-id (get-id :budget-period arguments value)
         organization-id (:organization_id arguments)
         priority (some->> arguments
                           :priority

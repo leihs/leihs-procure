@@ -37,10 +37,3 @@
           (map #(% request-data-with-perms))
           (map :write)
           (every? true?)))))
-
-; (apply-permissions (get-ds) {:id "2c78414f-b9ad-5b89-8b93-3d651566eb8e"}
-; {:article_name "test"})
-; (authorized-to-write-all-fields?
-;   (get-ds)
-;   {:id "2c78414f-b9ad-5b89-8b93-3d651566eb8e"}
-;   {:article_name "test"})

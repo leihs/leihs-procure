@@ -13,6 +13,7 @@ describe 'request' do
                           category_id: category.id)
 
         attrs = {
+          article_name: Faker::Commerce.product_name,
           budget_period: FactoryBot.create(:budget_period).id,
           category: category.id,
           organization: FactoryBot.create(:organization).id,
@@ -143,14 +144,14 @@ describe 'request' do
         user = binding.local_variable_get(user_name)
 
         q = <<-GRAPHQL
-        mutation {
-          request(input_data: {
-            id: "#{request.id}",
-            article_name: "#{user_name}"
-          }) {
-            id
+          mutation {
+            request(input_data: {
+              id: "#{request.id}",
+              article_name: "#{user_name}"
+            }) {
+              id
+            }
           }
-        }
         GRAPHQL
 
         result = query(q, user.id)
