@@ -5,8 +5,8 @@ import f from 'lodash'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import t from '../locale/translate'
-import Icon from '../components/Icons'
+import t from '../../locale/translate'
+import Icon from '../../components/Icons'
 import {
   Button,
   Badge,
@@ -15,11 +15,11 @@ import {
   FormGroup,
   InputDate,
   Tooltipped
-} from '../components/Bootstrap'
-import Loading from '../components/Loading'
-import { ErrorPanel } from '../components/Error'
-import { MainWithSidebar } from '../components/Layout'
-import { formatCurrency } from '../components/decorators'
+} from '../../components/Bootstrap'
+import Loading from '../../components/Loading'
+import { ErrorPanel } from '../../components/Error'
+import { MainWithSidebar } from '../../components/Layout'
+import { formatCurrency } from '../../components/decorators'
 
 const mutationErrorHandler = err => {
   // not much we can do on backend error

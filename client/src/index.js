@@ -10,10 +10,12 @@ import App from './components/App'
 
 // all the pages
 import RequestsIndex from './pages/RequestsIndexPage'
-import AdminUsers from './pages/AdminUsersPage'
-import AdminCategories from './pages/AdminCategoriesPage'
-import AdminOrgs from './pages/AdminOrgsPage'
-import AdminBudgetPeriods from './pages/AdminBudgetPeriodsPage'
+
+import AdminUsers from './pages/admin/AdminUsersPage'
+import AdminCategories from './pages/admin/AdminCategoriesPage'
+import AdminOrgs from './pages/admin/AdminOrgsPage'
+import AdminBudgetPeriods from './pages/admin/AdminBudgetPeriodsPage'
+
 import DevUiCatalog from './pages/_dev/UiCatalogPage'
 import DevConsole from './pages/_dev/ConsolePage'
 

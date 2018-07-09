@@ -5,14 +5,14 @@ import f from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
-// import t from '../locale/translate'
-// import * as fragments from '../graphql-fragments'
-// import Icon from '../components/Icons'
-// import { Div } from '../components/Bootstrap'
-import Loading from '../components/Loading'
-import { MainWithSidebar } from '../components/Layout'
-import { DisplayName } from '../components/decorators'
-import { ErrorPanel } from '../components/Error'
+// import t from '../../locale/translate'
+// import * as fragments from '../../graphql-fragments'
+// import Icon from '../../components/Icons'
+// import { Div } from '../../components/Bootstrap'
+import Loading from '../../components/Loading'
+import { MainWithSidebar } from '../../components/Layout'
+import { DisplayName } from '../../components/decorators'
+import { ErrorPanel } from '../../components/Error'
 
 // # DATA
 //
