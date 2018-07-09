@@ -1,10 +1,11 @@
-export const requestPriorities = ['normal', 'high']
+export const REQUEST_PRIORITIES = ['NORMAL', 'HIGH']
 
-export const requestInspectoryPriorities = [
-  'low',
-  'medium',
-  'high',
-  'mandatory'
+export const REQUEST_INSPECTOR_PRIORITIES = [
+  'LOW',
+  'MEDIUM',
+  'HIGH',
+  'MANDATORY'
 ]
 
-export const requestReplacementValues = ['replacement', 'new']
+// TODO: ENUMs
+export const REQUEST_REPLACEMENT_VALUES = ['replacement', 'new']

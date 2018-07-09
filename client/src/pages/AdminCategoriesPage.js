@@ -7,7 +7,7 @@ import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
 // import t from '../locale/translate'
-// import * as fragments from '../queries/fragments'
+// import * as fragments from '../graphql-fragments'
 import Icon from '../components/Icons'
 import {
   Div,

@@ -3,8 +3,7 @@ import f from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import * as Fragments from '../queries/fragments'
-import { FILTERS_QUERY } from '../queries/RequestFilters'
+import * as Fragments from '../graphql-fragments'
 // import Loading from '../components/Loading'
 // import { ErrorPanel } from '../components/Error'
 import RequestsDashboard from '../components/RequestsDashboard'
@@ -40,6 +39,29 @@ import RequestsDashboard from '../components/RequestsDashboard'
 //   }
 // `
 
+const FILTERS_QUERY = gql`
+  query RequestFilters {
+    budget_periods {
+      id
+      name
+    }
+    categories {
+      id
+      name
+    }
+    # FIXME: should be 'root_only: false' when UI ready
+    organizations(root_only: false) {
+      id
+      name
+      shortname
+    }
+    # priorities {
+    #   index
+    #   name
+    # }
+  }
+`
+
 const REQUESTS_QUERY = gql`
   # NOTE: requests only shown grouped by period > main cat > sub cat > request.
   # Query using distinct entry points bc also empty "groups" are shown,
@@ -47,8 +69,8 @@ const REQUESTS_QUERY = gql`
   query RequestsIndexFiltered(
     $search: String
     $budgetPeriods: [ID]
-    $priority: [String]
-    $inspectory_priority: [String]
+    $priority: [Priority]
+    $inspectory_priority: [InspectorPriority]
     $categories: [ID] # $organizations: [ID]
   ) {
     # TODO: filter arg (id: $budgetPeriods)
@@ -83,15 +105,7 @@ const REQUESTS_QUERY = gql`
   ${Fragments.RequestFieldsForIndex}
 `
 
-const REQUEST_EDIT_QUERY = gql`
-  query RequestForEdit($id: [ID!]!) {
-    requests(id: $id) {
-      ...RequestFieldsForShow
-    }
-  }
-  ${Fragments.RequestFieldsForShow}
-`
-
+// TODO: modularize `storageFactory`
 const LOCAL_STORE_KEY = 'leihs-procure'
 const storageFactory = ({ KEY }) => {
   return {
@@ -176,7 +190,6 @@ class RequestsIndexPage extends React.Component {
                     onFilterChange={this.onFilterChange}
                     filters={filtersQuery}
                     requestsQuery={requestsQuery}
-                    editQuery={REQUEST_EDIT_QUERY}
                     refetchAllData={refetchAllData}
                     openPanels={state.openPanels}
                     onPanelToggle={this.onPanelToggle}

@@ -26,10 +26,10 @@ export const DisplayName = (o, short = false) => {
 export const RequestTotalAmount = fields => {
   const quantity = f.last(
     f.filter(
-      ['requested', 'approved', 'ordered'].map(
+      ['requested', 'approved', 'order'].map(
         k =>
-          f.get(fields, [`quantity_${k}`, 'value']) ||
-          f.get(fields, [`quantity_${k}`])
+          f.get(fields, [`${k}_quantity`, 'value']) ||
+          f.get(fields, [`${k}_quantity`])
       )
     )
   )
