@@ -3,7 +3,17 @@ import cx from 'classnames'
 import f from 'lodash'
 import { DateTime } from 'luxon'
 
-import { Row, Col, Button, ButtonGroup, Collapsing } from './Bootstrap'
+import {
+  Row,
+  Col,
+  Button,
+  ButtonGroup,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  Collapsing
+} from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
@@ -28,18 +38,35 @@ const RequestsDashboard = props => {
       </Col>
       <Col xs="1" cls="text-right">
         <ButtonGroup size="sm">
-          {['tree', 'table'].map(m => (
-            <Button
-              key={m}
-              size="sm"
-              outline
-              color="secondary"
-              active={props.viewMode === m}
-              onClick={e => props.onSetViewMode(m)}
-            >
-              {m}
-            </Button>
-          ))}
+          <UncontrolledDropdown>
+            <DropdownToggle caret outline size="sm">
+              {props.viewMode === 'tree' ? (
+                <Icon.TreeView />
+              ) : (
+                <Icon.ListView />
+              )}
+            </DropdownToggle>
+            <DropdownMenu right style={{ minWidth: '7rem' }}>
+              <DropdownItem header>Viewmode</DropdownItem>
+              {['tree', 'table'].map(m => (
+                <DropdownItem
+                  key={m}
+                  active={props.viewMode === m}
+                  onClick={e => props.onSetViewMode(m)}
+                >
+                  {m === 'tree' ? (
+                    <F>
+                      <Icon.TreeView /> Tree
+                    </F>
+                  ) : (
+                    <F>
+                      <Icon.ListView /> List
+                    </F>
+                  )}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </UncontrolledDropdown>
         </ButtonGroup>
         <Button color="link" title="refresh data" onClick={refetchAllData}>
           <Icon.Reload spin={requestsQuery.loading} />

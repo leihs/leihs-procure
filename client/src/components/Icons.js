@@ -39,6 +39,8 @@ import faWrench from '@fortawesome/fontawesome-free-solid/faWrench'
 import faCogs from '@fortawesome/fontawesome-free-solid/faCogs'
 import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
 import faPlusCircle from '@fortawesome/fontawesome-free-solid/faPlusCircle'
+import faStream from '@fortawesome/fontawesome-free-solid/faStream'
+import faListUl from '@fortawesome/fontawesome-free-solid/faListUl'
 
 const ICONS = {
   CaretUp: {
@@ -154,6 +156,12 @@ const ICONS = {
   },
   Language: {
     src: faGlobe
+  },
+  TreeView: {
+    src: faStream
+  },
+  ListView: {
+    src: faListUl
   }
 }
 
@@ -165,11 +173,17 @@ const Icons = f.fromPairs(
         throw new Error('Icons cant have `children`!')
       }
       const iconClassName = cx(extraProps.className, givenProps.className, {
-        'mr-1': spaced,
         [`text-${iconProps.color}`]: iconProps.color
       })
       return (
-        <FontAwesomeIcon {...iconProps} icon={src} className={iconClassName} />
+        <React.Fragment>
+          <FontAwesomeIcon
+            {...iconProps}
+            icon={src}
+            className={iconClassName}
+          />
+          {!!spaced && ' '}
+        </React.Fragment>
       )
     }
     iconComponent.displayName = `Icon.${name}`
