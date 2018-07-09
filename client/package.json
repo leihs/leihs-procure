@@ -10,6 +10,7 @@
     "build": "react-scripts build",
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
+    "coverage": "npm test -- --coverage",
     "lint": "eslint --fix src/{,**/}*.js{,x,on}",
     "ci:lint": "eslint src/{,**/}*.js{,x,on}",
     "test": "react-scripts test --env=jsdom"
@@ -19,6 +20,12 @@
     "/(graphql|graphiql|images|attachments|status)": {
       "target": "http://localhost:3003"
     }
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/components/Bootstrap/*.{js,jsx}",
+      "!**/*.examples.{js,jsx}"
+    ]
   },
   "devDependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
