@@ -142,6 +142,8 @@
                         :general_ledger_account {:type String},
                         :id {:type (non-null ID)},
                         :inspectors {:resolve :inspectors, :type (list :User)},
+                        :main_category {:resolve :main-category,
+                                        :type :MainCategory},
                         :name {:type (non-null String)},
                         :procurement_account {:type String},
                         :viewers {:resolve :viewers, :type (list :User)}}},
