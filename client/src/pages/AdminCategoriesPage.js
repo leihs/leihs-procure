@@ -58,6 +58,7 @@ const CATEGORIES_QUERY = gql`
         name
         cost_center
         general_ledger_account
+        procurement_account
         inspectors {
           id
           login
@@ -77,7 +78,7 @@ const AdminCategoriesPage = ({ match }) => (
       if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
-      const categoriesToc = data.main_categories
+      const categoriesToc = f.sortBy(data.main_categories, 'name')
 
       return (
         <MainWithSidebar
@@ -170,7 +171,7 @@ const CategoryCard = ({ id, name, image_url, budget_limits, categories }) => (
         </Col>
       </Row>
 
-      {categories.map(cat => (
+      {f.sortBy(categories, 'name').map(cat => (
         <React.Fragment key={cat.id}>
           <FormField
             className="font-weight-bold"
@@ -190,8 +191,14 @@ const CategoryCard = ({ id, name, image_url, budget_limits, categories }) => (
               <FormField
                 className="form-control-sm"
                 name="sub_category_account"
-                label="account"
+                label="general ledger account"
                 defaultValue={cat.general_ledger_account}
+              />
+              <FormField
+                className="form-control-sm"
+                name="sub_category_account"
+                label="procurement account"
+                defaultValue={cat.procurement_account}
               />
             </Col>
             <Col sm>
