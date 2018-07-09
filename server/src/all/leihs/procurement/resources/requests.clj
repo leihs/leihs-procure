@@ -38,8 +38,12 @@
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
-        priority (:priority arguments)
-        inspector-priority (:inspector_priority arguments)
+        priority (some->> arguments
+                          :priority
+                          (map request/to-name-and-lower-case))
+        inspector-priority (some->> arguments
+                                    :inspector_priority
+                                    (map request/to-name-and-lower-case))
         requested-by-auth-user (:requested_by_auth_user arguments)
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
         state (:state arguments)

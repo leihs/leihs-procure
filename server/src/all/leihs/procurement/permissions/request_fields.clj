@@ -110,6 +110,14 @@
               user-is-admin),
         :write (and (not budget-period-is-past)
                     (or category-inspectable-by-user user-is-admin))},
+     :inspector_priority {:read (or category-viewable-by-user
+                                    user-is-inspector ; TODO: or
+                                    ; category-inspectable-by-user
+                                    ; ?
+                                    user-is-admin),
+                          :write (and (not budget-period-is-past)
+                                      (or category-inspectable-by-user
+                                          user-is-admin))},
      :internal_order_number
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write (and (not budget-period-is-past)
@@ -164,14 +172,6 @@
                 :write (and user-is-requester
                             (or (and request-exists requested-by-user) true)
                             budget-period-in-requesting-phase)},
-     :priority_inspector {:read (or category-viewable-by-user
-                                    user-is-inspector ; TODO: or
-                                    ; category-inspectable-by-user
-                                    ; ?
-                                    user-is-admin),
-                          :write (and (not budget-period-is-past)
-                                      (or category-inspectable-by-user
-                                          user-is-admin))},
      :procurement_account
        {:read (or category-viewable-by-user user-is-inspector user-is-admin),
         :write false},

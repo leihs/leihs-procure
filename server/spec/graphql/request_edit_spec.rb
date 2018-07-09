@@ -57,6 +57,11 @@ describe 'requests' do
               value
               write
             }
+            inspector_priority {
+              read
+              value
+              write
+            }
             internal_order_number {
               read
               value
@@ -97,11 +102,6 @@ describe 'requests' do
               write
             }
             priority {
-              read
-              value
-              write
-            }
-            priority_inspector {
               read
               value
               write
@@ -178,6 +178,16 @@ describe 'requests' do
       @user = FactoryBot.create(:user)
       category = FactoryBot.create(:category)
       FactoryBot.create(:category_inspector,
+                        user_id: @user.id,
+                        category_id: category.id)
+      @request = FactoryBot.create(:request,
+                                   category_id: category.id)
+    end
+
+    it 'as viewer' do
+      @user = FactoryBot.create(:user)
+      category = FactoryBot.create(:category)
+      FactoryBot.create(:category_viewer,
                         user_id: @user.id,
                         category_id: category.id)
       @request = FactoryBot.create(:request,

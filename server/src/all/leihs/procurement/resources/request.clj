@@ -2,6 +2,7 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.tools.logging :as log]
             [clojure.set :refer [map-invert]]
+            [clojure.string :refer [lower-case upper-case]]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions.request :as request-perms]
             [leihs.procurement.permissions.request-fields :as
@@ -79,26 +80,6 @@
   (-> (sql/select :procurement_requests.*)
       (sql/from :procurement_requests)))
 
-(def priorities-mapping {:normal 1, :high 2})
-
-(def inspector-priorities-mapping {:low 0, :medium 1, :high 2, :mandatory 3})
-
-(defn remap-priority
-  [row]
-  (update row :priority #((keyword %) priorities-mapping)))
-
-(defn remap-inspector-priority
-  [row]
-  (update row :inspector_priority #((keyword %) inspector-priorities-mapping)))
-
-(defn add-priority-inspector
-  [row]
-  (assoc row :priority_inspector (:inspector_priority row)))
-
-(defn add-inspector-priority
-  [row]
-  (assoc row :inspector_priority (:priority_inspector row)))
-
 (defn get-state
   [tx auth-user row]
   (if-let [approved-quantity (:approved_quantity row)]
@@ -118,12 +99,39 @@
   [tx auth-user row]
   (assoc row :state (get-state tx auth-user row)))
 
+(defn to-name-and-lower-case
+  [x]
+  (-> x
+      name
+      lower-case))
+
+(defn to-name-and-lower-case-priorities
+  [m]
+  (cond-> m
+    (:priority m) (update :priority to-name-and-lower-case)
+    (:inspector_priority m) (update :inspector_priority
+                                    to-name-and-lower-case)))
+
+(defn upper-case-keyword-value
+  [row attr]
+  (update row
+          attr
+          #(-> %
+               upper-case
+               keyword)))
+
+(defn treat-priority [row] (upper-case-keyword-value row :priority))
+
+(defn treat-inspector-priority
+  [row]
+  (upper-case-keyword-value row :inspector_priority))
+
 (defn transform-row
   [tx auth-user row]
-  (-> (add-state tx auth-user row)
-      remap-inspector-priority
-      remap-priority
-      add-priority-inspector))
+  (->> row
+       (add-state tx auth-user)
+       treat-priority
+       treat-inspector-priority))
 
 (defn get-request-by-id
   [tx id]
@@ -174,15 +182,11 @@
 (defn create-request!
   [context args _]
   (let [input-data (:input_data args)
+        write-data (to-name-and-lower-case-priorities input-data)
+        write-data-with-exchanged-attrs (exchange-attrs write-data)
         ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)
-        write-data (or (and (:priority_inspector input-data)
-                            (-> input-data
-                                add-inspector-priority
-                                (dissoc :priority_inspector)))
-                       input-data)
-        write-data-with-exchanged-attrs (exchange-attrs write-data)]
+        auth-user (:authenticated-entity ring-req)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/insert-into :procurement_requests)
@@ -201,14 +205,14 @@
         tx (:tx ring-req)
         auth-user (:authenticated-entity ring-req)
         input-data (:input_data args)
+        input-data-without-id (dissoc input-data :id)
+        write-data (cond-> input-data-without-id
+                     (:priority input-data-without-id)
+                       (update :priority to-name-and-lower-case)
+                     (:inspector_priority input-data-without-id)
+                       (update :inspector_priority to-name-and-lower-case))
         req-id (:id input-data)
-        proc-request (get-request-by-id tx req-id)
-        write-data (let [input-data-without-id (dissoc input-data :id)]
-                     (or (and (:priority_inspector input-data-without-id)
-                              (-> input-data-without-id
-                                  add-inspector-priority
-                                  (dissoc :priority_inspector)))
-                         input-data-without-id))]
+        proc-request (get-request-by-id tx req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
