@@ -27,6 +27,9 @@ require('./styles/index.css')
 // lodash setup
 f.mixin(lodashMixins)
 
+// dev helpers
+initDevHelpers()
+
 const baseName = process.env.PUBLIC_URL // set in package.json/homepage
 const supportsHistory = 'pushState' in window.history
 const isDev = process.env.NODE_ENV === 'development'
@@ -54,17 +57,24 @@ const Root = () => (
     </BrowserRouter>
   </ApolloProvider>
 )
+
 ReactDOM.render(<Root />, document.getElementById('root'))
 
-// dev helpers
-window.f = f
-window.debugObj = obj => {
-  console.debug(obj) // eslint-disable-line no-console
-  return obj
-}
-window.debug = () => {
-  localStorage.debug = 'app:*'
-}
-window.nodebug = () => {
-  localStorage.debug = ''
+//
+function initDevHelpers() {
+  window.f = f
+  window.debugObj = obj => {
+    console.debug(obj) // eslint-disable-line no-console
+    return obj
+  }
+
+  window.debug = () => {
+    localStorage.debug = 'app:*'
+  }
+  window.nodebug = () => {
+    localStorage.debug = ''
+  }
+  Object.defineProperty(window, 'isDebug', {
+    get: () => /\*|(app:)/.test(localStorage.debug)
+  })
 }
