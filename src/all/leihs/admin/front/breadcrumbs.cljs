@@ -70,6 +70,8 @@
 (defn user-delete-li [id] (li :user-delete [:span [:i.fas.fa-times] " Delete "] {:user-id id} {}))
 (defn user-edit-li [id] (li :user-edit [:span [:i.fas.fa-edit] " Edit "] {:user-id id} {}))
 (defn user-li [id] (li :user [:span icons/user " User "] {:user-id id} {}))
+(defn user-inventory-pools-rooles-li [id] (li :user-inventory-pools-roles [:span " Inventory-Pools-Roles "] {:user-id id} {}))
+
 (defn user-add-li [] (li :user-new [:span [:i.fas.fa-plus-circle] " Add user "]))
 (defn users-li [] (li :users [:span icons/users " Users "] {} {}))
 

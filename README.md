@@ -73,7 +73,6 @@ Identified Problems
 To be Discussed
 ---------------
 
-* Refactoring `is_admin`, change code in legacy (should be "easy")
 * Refactoring/decomplect authentication systems
 * Refactoring/decomplect language settings
 * Refactoring/decomplect settings table
@@ -106,6 +105,9 @@ changes so far:
 
 TODOs
 -----
+
+* Add constraint: account_enabeled requires non null email 
+* try to fix text-warning visibility problem with css
 
 ### External and PM
 

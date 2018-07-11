@@ -48,10 +48,12 @@
      {:for :sign-out}
      "Sign out"]
     [:button#sign-out.btn.btn-dark.form-group
-     {:style {:padding 7}
-      :type :submit}
-     [:i.fas.fa-sign-out-alt]
-     [:span.sr-only "Sign out"]]]])
+     {:type :submit
+      :style {:padding-top "0.2rem"
+              :padding-bottom "0.2rem"}}
+     [:span 
+      [:span " Sign out "]
+      [:i.fas.fa-sign-out-alt]]]]])
 
 (defn navbar-user-nav []
   (if-let [user @state/user*]
@@ -86,6 +88,24 @@
        ])]
    [navbar-user-nav]])
 
+(defn version-component []
+  [:span.navbar-text "Version " 
+   (let [major (:version_major @state/leihs-admin-version*)
+         minor (:version_minor @state/leihs-admin-version*)
+         patch (:version_patch @state/leihs-admin-version*)
+         pre (:version_pre @state/leihs-admin-version*)
+         build (:version_build @state/leihs-admin-version*)]
+     [:span
+      [:span.major major]
+      "." [:span.minor minor]
+      "." [:span.patch patch]
+      (when pre
+        [:span "-" 
+         [:span.pre pre]])
+      (when build
+        [:span "+" 
+         [:span.build build]])])])
+
 (defn current-page []
   [:div
    [leihs.admin.front.requests.modal/modal-component]
@@ -99,7 +119,7 @@
    [:nav.footer.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col.mt-4
     [:div.col
      [:a.navbar-brand {:href (path :admin {})} "leihs-admin"]
-     [:span.navbar-text "Version 0.0.0 Alpha"]]
+     [version-component]]
     [:div.col
      [:a.navbar-text 
       {:href (path :auth-info)} "Auth-Info"]]

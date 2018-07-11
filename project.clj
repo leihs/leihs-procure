@@ -65,10 +65,10 @@
 
   :main leihs.admin.back.main
 
-  :plugins [[lein-environ "1.1.0"]
+  :plugins [[lein-asset-minifier "0.4.3" :exclusions [org.clojure/clojure]]
             [lein-cljsbuild "1.1.7"]
-            [lein-asset-minifier "0.4.3"
-             :exclusions [org.clojure/clojure]]]
+            [lein-environ "1.1.0"]
+            [lein-shell "0.4.2"]]
 
   :cljsbuild {:builds
               {:min {:source-paths ["src/all" "src/prod"]
@@ -115,7 +115,8 @@
               :env {:dev true}}
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["src/all" "src/prod"]
-                       :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
+                       :prep-tasks [["shell" "./bin/build-timestamp"]
+                                    "compile" ["cljsbuild" "once" "min"]]
                        :resource-paths ["resources/all" "resources/prod" "target/cljsbuild"]
                        :aot [#"leihs\..*"]
                        :uberjar-name "leihs-admin.jar"}

@@ -29,7 +29,7 @@ feature 'Manage users', type: :feature do
     end
 
 
-    scenario 'adding a new user and sign it as the new user' do 
+    scenario 'adding a new user and signing in as the new user' do 
 
       visit '/admin/'
       click_on 'Users'

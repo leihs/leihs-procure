@@ -100,6 +100,5 @@
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)
-
 ;(logging-config/set-logger! :level :debug)
 ;(debug/wrap-with-log-debug #'groups-formated-query)

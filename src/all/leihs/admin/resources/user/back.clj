@@ -47,7 +47,10 @@
         (sql/from :contracts)
         (sql/merge-where [:= :contracts.user_id :users.id]))
     :contracts_count]
-   ])
+   [(-> (sql/select :%count.*)
+        (sql/from :access_rights)
+        (sql/merge-where [:= :access_rights.user_id :users.id]))
+    :inventory_pool_roles_count]])
 
 (def user-write-keys
   [:address
@@ -99,7 +102,7 @@
   ([{tx :tx {user-id :user-id target-user-id :target-user-id} :route-params}]
    (transfer-data user-id target-user-id tx))
   ([user-id target-user-id tx]
-   (doseq [table [:access_rights :reservations :contracts :orders]]
+   (doseq [table [:reservations :contracts :orders]]
      (jdbc/update! tx table
                    {:user_id target-user-id}
                    ["user_id = ?" user-id]))
@@ -207,6 +210,30 @@
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn user-inventory-pools-roles-query [user-id]
+  (-> (sql/select :iprs.* [:inventory_pools.name :inventory_pool_name])
+      (sql/from [:access_rights :iprs])
+      (sql/merge-where [:= :user_id user-id])
+      (sql/merge-where [:= nil :deleted_at])
+      (sql/merge-where [:or [:= nil :suspended_until] [:> :suspended_until (sql/raw "now()")]])
+      (sql/merge-join :inventory_pools [:= :iprs.inventory_pool_id :inventory_pools.id])
+      sql/format))
+
+(defn inventory-pools-roles [user-id tx]
+  (->> user-id 
+       user-inventory-pools-roles-query 
+       (jdbc/query tx)))
+
+(defn user-inventory-pools-roles 
+  [{tx :tx data :body {user-id :user-id} :route-params}]
+  {:body
+   {:inventory_pools_roles
+    (inventory-pools-roles user-id tx)
+    }})
+
+
+;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn create-user
   ([{tx :tx data :body}]
    (create-user (prepare-write-data data tx) tx))
@@ -227,6 +254,7 @@
 (def routes
   (cpj/routes
     (cpj/GET user-path [] #'user)
+    (cpj/GET (path :user-inventory-pools-roles {:user-id ":user-id"}) [] #'user-inventory-pools-roles)
     (cpj/PATCH user-path [] #'patch-user)
     (cpj/DELETE user-path [] #'delete-user)
     (cpj/POST user-transfer-path [] #'transfer-data)

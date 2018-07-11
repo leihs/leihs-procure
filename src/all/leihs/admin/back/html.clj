@@ -7,6 +7,7 @@
     [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
     [leihs.admin.utils.json :refer [to-json]]
     [leihs.admin.utils.url.core :as url]
+    [leihs.admin.utils.release-info :as release-info]
 
     [clojure.java.jdbc :as jdbc]
     [hiccup.page :refer [include-js html5]]
@@ -50,14 +51,19 @@
             [:shibboleth_enabled
              :shibboleth_login_path])))))
 
+(defn body-attributes [request]
+  {:data-user (user-data request)
+   :data-settings (settings-data request)
+   :data-leihsadminversion (url/encode (to-json release-info/leihs-admin-version))
+   :data-leihsversion (url/encode (to-json release-info/leihs-version))})
+
 (defn not-found-handler [request]
   {:status 404
    :headers {"Content-Type" "text/html"}
    :body (html5
            (head)
            [:body
-            {:data-user (user-data request)
-             :data-settings (settings-data request)}
+            (body-attributes request)
             [:div.container-fluid
              [:h1.text-danger "Error 404 - Not Found"]]])})
 
@@ -66,8 +72,7 @@
    :body (html5
            (head)
            [:body
-            {:data-user (user-data request)
-             :data-settings (settings-data request)}
+            (body-attributes request)
             [:div#app.container-fluid
              [:div.alert.alert-warning
               [:h1 "Leihs Admin2"]

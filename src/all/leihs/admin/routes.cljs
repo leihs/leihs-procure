@@ -67,6 +67,7 @@
    :user-delete #'user/delete-page
    :user-edit #'user/edit-page
    :user-new #'user/new-page
+   :user-inventory-pools-roles #'user/inventory-pools-roles-page
    :users #'users/page
    })
 
@@ -90,10 +91,10 @@
                              :url location-href
                              :path (.getPath location-url)
                              :query-params (-> location-url .getQuery decode-query-params))
-                      (js/console.log (with-out-str (pprint [handler-key route-params])))
+                      ;(js/console.log (with-out-str (pprint [handler-key route-params])))
                       ))
      :path-exists? (fn [path]
-                     (js/console.log (with-out-str (pprint (match-path path))))
+                     ;(js/console.log (with-out-str (pprint (match-path path))))
                      (boolean (when-let [handler-key (:handler (match-path path))]
                                 (when-not (handler-key paths/external-handlers)
                                   handler-key))))}))

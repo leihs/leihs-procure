@@ -53,7 +53,7 @@
 
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn clean-and-fetch [_]
+(defn clean-and-fetch [& args]
   (reset! user-data* nil)
   (fetch-user))
 
@@ -65,27 +65,28 @@
    (field-component kw {}))
   ([kw opts]
    (let [opts (merge {:type :text} opts)]
-     [:div.form-group.row
-      [:label.col.col-form-label.col-sm-2 {:for kw} kw]
-      [:div.col.col-sm-10
-       [:div.input-group
-        (if @edit-mode?*
-          [:input.form-control
-           {:id kw
-            :type (:type opts)
-            :value (or (kw @user-data*) "")
-            :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
-            :disabled (not @edit-mode?*)}]
-          [:div
-           (if-let [value (-> @user-data* kw presence)]
-             [:span.form-control-plaintext.text-truncate
-              {:style
-               {:max-width "20em"}}
-              (case (:type opts)
-                :email [:a {:href (str "mailto:" value)}
-                        [:i.fas.fa-envelope] " " value]
-                :url [:a {:href value} value]
-                value)])])]]])))
+     (when (or @edit-mode?* (not= kw :password))
+       [:div.form-group.row
+        [:label.col.col-form-label.col-sm-2 {:for kw} kw]
+        [:div.col.col-sm-10
+         [:div.input-group
+          (if @edit-mode?*
+            [:input.form-control
+             {:id kw
+              :type (:type opts)
+              :value (or (kw @user-data*) "")
+              :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
+              :disabled (not @edit-mode?*)}]
+            [:div
+             (if-let [value (-> @user-data* kw presence)]
+               [:span.form-control-plaintext.text-truncate
+                {:style
+                 {:max-width "20em"}}
+                (case (:type opts)
+                  :email [:a {:href (str "mailto:" value)}
+                          [:i.fas.fa-envelope] " " value]
+                  :url [:a {:href value} value]
+                  value)])])]]]))))
 
 (defn checkbox-component [kw]
   [:div.form-check.form-check-inline
@@ -269,7 +270,13 @@
     (let [c (:contracts_count @user-data*)]
       (if (< c 1)
         [:span "The user has no contracts."]
-        [:span "The user has " c " " (pluralize-noun c "contract")  ". "]))]])
+        [:span "The user has " c " " (pluralize-noun c "contract")  ". "]))
+    (let [c (:inventory_pool_roles_count @user-data*)]
+      (if (< c 1)
+        [:span "The user has no inventory pool roles."]
+        [:span "The user has " 
+         [:a {:href (path :user-inventory-pools-roles {:user-id @user-id*})}
+          c " inventory pool " (pluralize-noun c "role")]  ". "]))]])
 
 (defn user-component []
   [:div.user-component
@@ -317,6 +324,87 @@
      [user-id-component]]]
    [user-component]
    [debug-component]])
+
+
+;;; inventory pool roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def inventory-pools-roles-data* (reagent/atom nil))
+
+(defn prepare-inventory-pools-data [data]
+  (->> data
+       (reduce (fn [roles role]
+                 (-> roles
+                     (assoc-in [(:inventory_pool_id role) :name] (:inventory_pool_name role))
+                     (assoc-in [(:inventory_pool_id role) :id] (:inventory_pool_id role))
+                     (assoc-in [(:inventory_pool_id role) :key] (:inventory_pool_id role))
+                     (assoc-in [(:inventory_pool_id role) :roles (:role role)] role)))
+               {})
+       (map (fn [[_ v]] v))
+       (sort-by :name)
+       (into [])))
+
+(defonce fetch-inventory-pools-roles-id* (reagent/atom nil))
+
+(defn fetch-inventory-pools-roles []
+  (let [resp-chan (async/chan)
+        id (requests/send-off {:url (path :user-inventory-pools-roles 
+                                          (-> @state/routing-state* :route-params))
+                               :method :get
+                               :query-params {}}
+                              {:modal false
+                               :title "Fetch Inventory-Pools-Roles"
+                               :retry-fn #'fetch-inventory-pools-roles}
+                              :chan resp-chan)]
+    (reset! fetch-inventory-pools-roles-id* id)
+    (go (let [resp (<! resp-chan)]
+          (when (and (= (:status resp) 200)
+                     (= id @fetch-inventory-pools-roles-id*))
+            (reset! inventory-pools-roles-data* 
+                    (-> resp :body :inventory_pools_roles prepare-inventory-pools-data)))))))
+
+(defn clean-and-fetch-inventory-pools-roles [& args]
+  (clean-and-fetch)
+  (reset! inventory-pools-roles-data* nil)
+  (fetch-inventory-pools-roles))
+
+(defn inventory-pools-roles-debug-component []
+  [:div
+   (when (:debug @state/global-state*)
+     [:div.inventory-pools-roles-debug
+      [:hr]
+      [:div.inventory-pools-roles-data
+       [:h3 "@inventory-pools-roles-data*"]
+       [:pre (with-out-str (pprint @inventory-pools-roles-data*))]]])
+   [debug-component]])
+
+(defn inventory-pools-roles-page []
+  [:div.user-inventory-pools-roles
+   [state/hidden-routing-state-component
+    {:will-mount clean-and-fetch-inventory-pools-roles
+     :did-change clean-and-fetch-inventory-pools-roles}]
+   (breadcrumbs/nav-component
+     [(breadcrumbs/leihs-li)
+      (breadcrumbs/admin-li)
+      (breadcrumbs/users-li)
+      (breadcrumbs/user-li @user-id*)
+      (breadcrumbs/user-inventory-pools-rooles-li @user-id*)]
+     [])
+   [:div.row
+    [:div.col-lg
+     [:h1
+      [:span " User "]
+      [user-name-component]
+      " Inventory-Pools-Roles"]
+     [user-id-component]]]
+   [:div.roles
+    [:h1 "Active Roles"]
+    (for [pool @inventory-pools-roles-data*]
+      [:div.pool {:key (:id pool)}
+       [:h2 "Pool \"" (:name pool) "\""]
+       [:ul
+        (for [[_ role] (:roles pool)]
+          [:li {:key (:id role)} (:role role)])]])]
+   [inventory-pools-roles-debug-component]])
 
 
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -439,8 +527,11 @@
     [:h2 "Delete User"]]
    [:div.card-body
     [:p
-     "Deleting this user is not possible if the user is associated with contracts or other entities "
-     "the delete operation will just fail without destroying data. "]
+     "Deleting this user is not possible if it is associated with contracts, reserverations, or orders. "
+     "If this is the case this operation will fail without deleting or even changing any data. "]
+    [:p.text-danger
+     "Permissions, such as given by delegations, groups, or roles will not inhibt deletion of this user. 
+     They will be deleted." ]
     [:div.float-right
      [:button.btn.btn-warning.btn-lg
       {:on-click delete-user}
@@ -471,9 +562,11 @@
     [:h2 "Transfer Data and Delete User"]]
    [:div.card-body
     [:p
-     "Related data of this user will be "
-     "transfered, respectively re-associated with the user entered below."
-     "Leihs itself will be consistent after this operation. "]
+     "Contracts, reserverations, and orders of this user will be "
+     "transfered to the user entered below. " ]
+    [:p.text-danger
+     "Permissions, such as given by delegations, groups, or roles will not be 
+     transfered! " ]
     [:p.text-danger
      "Audits will still contain references to the removed user! "]
     [:p.text-danger
@@ -481,8 +574,8 @@
      "will become inconsistent with the data in leihs!"]
     [:div.form
      [:div.form-group
-      [:label {:for :user-transfer-id} "Id of user to transfer data to:" ]
-      [:input#user-transfer-id.form-control
+      [:label {:for :target-user-id} "Target user id" ]
+      [:input#target-user-id.form-control
        {:type :text
         :value (or (-> @transfer-data* :target-user-id) "")
         :on-change #(swap! transfer-data* assoc
@@ -509,9 +602,5 @@
    [:h1 "Delete User "
     [user-name-component]]
    [user-id-component]
-   [:p.text-danger
-    "Users should never be deleted! "
-    "Instead it is recommended to " [:b " disable sign-in"]
-    " via editing the user. "]
    [delete-without-reasignment-component]
    [delete-with-transfer-component]])

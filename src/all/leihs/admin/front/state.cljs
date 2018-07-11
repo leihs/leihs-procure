@@ -66,9 +66,13 @@
                        (fn [s] (merge s {:timestamp (js/moment)}))) 1000)
 
 
-(def user* (atom (dom/data-attribute "body" "user")))
+(def user* (reagent/atom (dom/data-attribute "body" "user")))
 
-(def settings* (atom (dom/data-attribute "body" "settings")))
+(def settings* (reagent/atom (dom/data-attribute "body" "settings")))
+
+(def leihs-admin-version* (reagent/atom (dom/data-attribute "body" "leihsadminversion")))
+
+(def leihs-version (dom/data-attribute "body" "leihsversion"))
 
 
 (def debug?* (reaction (:debug @global-state*)))
@@ -98,6 +102,9 @@
      [:div
       [:h3 "@global-state*"]
       [:pre (with-out-str (pprint @global-state*))]]
+     [:div
+      [:h3 "@leihs-admin-version"]
+      [:pre (with-out-str (pprint @leihs-admin-version*))]]
      [:div
       [:h3 "@routing-state*"]
       [:pre (with-out-str (pprint @routing-state*))]]

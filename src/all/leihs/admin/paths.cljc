@@ -60,6 +60,7 @@
                   (leaf "" :user)
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
+                  (leaf "/inventory-pools-roles/" :user-inventory-pools-roles)
                   (branch "/api-tokens/"
                           (leaf "" :api-tokens)
                           (leaf "add " :api-token-add)
@@ -97,7 +98,7 @@
                   (leaf "/shib-sign-in" :auth-shib-sign-in)
                   (leaf "/password-sign-in" :auth-password-sign-in)
                   (leaf "/sign-out" :auth-sign-out))
-          (leaf "/procurement" :procurement)
+          (leaf "/procure" :procurement)
           (leaf "/manage" :lending)
           (leaf "/borrow" :borrow)
           (branch "/admin"
@@ -122,7 +123,7 @@
                   (leaf "/mail_templates" :admin-mail-templates)
                   (leaf "/rooms" :admin-rooms)
                   (leaf "/settings" :admin-settings)
-                  (leaf "/statistics" :adming-statistics)
+                  (leaf "/statistics" :admin-statistics)
                   (leaf "/suppliers" :admin-suppliers)
                   )))
 
@@ -140,3 +141,5 @@
    (str (path kw route-params) "?"
         (encode-query-params query-params))))
 
+
+;(path :user-inventory-pools-roles {:user-id "123"})

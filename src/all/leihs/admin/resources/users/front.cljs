@@ -15,6 +15,7 @@
     [leihs.admin.utils.seq :refer [with-index]]
     [leihs.admin.resources.users.shared :as shared]
 
+    [clojure.string :as str]
     [accountant.core :as accountant]
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
@@ -175,42 +176,44 @@
 (def default-colconfig 
   {:id true
    :org_id true
-   :firstname true
-   :lastname true
+   :name true
    :email true
    :customcols []})
+
+(defn user-link-component [user inner-component]
+  [:a {:href (path :user {:user-id (:id user)})}
+   inner-component])
 
 (defn users-thead-component [colconfig]
   [:thead
    [:tr
-    [:th]
-    [:th]
-    (when (:id colconfig) [:th "Id"])
+    [:th "Index"]
+    [:th "Image" ]
     (when (:org_id colconfig) [:th "Org id"])
-    (when (:firstname colconfig) [:th "Firstname"])
-    (when (:lastname colconfig) [:th "Lastname"]) 
+    (when (:name colconfig) [:th "Name"])
     (when (:email colconfig) [:th "Email"])
     (for [{th :th key :key} (:customcols colconfig)]
       [th {:key key}])]])
 
 (defn user-row-component [colconfig user]
   [:tr {:key (:id user)}
-   [:td (:index user)]
+   [:td (user-link-component user (:index user))]
    [:td [:a {:href (path :user {:user-id (:id user)})}
          [:img 
           {:height 32
            :width 32
            :src (or (:img32_url user)
-                         (gravatar-url (:email user)))}]]]
-   (when (:id colconfig)
-     [:td [:a {:href (path :user {:user-id (:id user)})}
-           (short-id (:id user))]])
+                    (gravatar-url (:email user)))}]]]
    (when (:org_id colconfig)
-     [:td {:style {:font-family "monospace"}} (:org_id user)])
-   (when (:firstname colconfig)
-     [:td (:firstname user)])
-   (when (:lastname colconfig)
-     [:td (:lastname user)])
+     [:td [user-link-component user
+           [:span {:style {:font-family "monospace"}} 
+            (:org_id user)]]])
+   (when (:name colconfig)
+     [:td [user-link-component user 
+           [:span 
+            [:span.firstname (-> user :firstname str/trim presence)]
+            " "
+            [:span.lastname (-> user :lastname str/trim presence)]]]])
    (when (:email colconfig)
      [:td [:a {:href (str "mailto:" (:email user))}
            [:i.fas.fa-envelope] " " (:email user)]])

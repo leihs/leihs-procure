@@ -82,6 +82,7 @@
    :shutdown shutdown/routes
    :status status/routes
    :user user/routes
+   :user-inventory-pools-roles user/routes
    :user-transfer-data user/routes
    :users users/routes })
 

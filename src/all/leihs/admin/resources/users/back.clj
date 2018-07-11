@@ -18,11 +18,10 @@
 
 
 (def users-base-query
-  (-> (apply sql/select shared/default-fields)
+  (-> (apply sql/select (map #(keyword (str "users." %)) shared/default-fields))
       (sql/from :users)
       (sql/order-by :lastname :firstname)
-      (sql/merge-where [:= nil :delegator_user_id])
-      ))
+      (sql/merge-where [:= nil :delegator_user_id])))
 
 (-> 
   (apply sql/select 
@@ -117,9 +116,10 @@
     (cpj/POST (path :users) [] #'user/routes)))
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :info)
+;(logging-config/set-logger! :level :debug)
 ;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)
 
 ;(logging-config/set-logger! :level :debug)
+;(debug/wrap-with-log-debug #'select-fields)
 ;(debug/wrap-with-log-debug #'users-formated-query)

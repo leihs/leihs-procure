@@ -407,10 +407,8 @@
    [:div.card-header.bg-warning
     [:h2 "Delete Delegation"]]
    [:div.card-body
-    [:p.text-warning
-     "If the to be deleted delegation is associated with other entities "
-     " (such as contracts e.g.) it is not possible to delete the delegation. "
-     " The delete operation will fail then without altering any data. "]
+    [:p "Deleting this delegation is not possible if it is associated with contracts, reserverations, or orders. "
+     "If this is the case this operation will fail without deleting or even changing any data. "]
     [:div.float-right
      [:button.btn.btn-warning.btn-lg
       {:on-click delete-delegation}
