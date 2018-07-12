@@ -10,4 +10,5 @@ export LEIHS_SECRET="secret"
 export LEIHS_HTTP_BASE_URL="http://localhost:3003"
 export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_procure2?max-pool-size=5"
 
+lein clean
 lein with-profile dev run "run"
