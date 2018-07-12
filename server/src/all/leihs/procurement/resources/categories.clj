@@ -18,10 +18,12 @@
 
 (defn categories-query
   [context arguments value]
-  (let [inspected-by-auth-user (:inspected_by_auth_user arguments)
+  (let [id (:id arguments)
+        inspected-by-auth-user (:inspected_by_auth_user arguments)
         main-category-id (:id value)]
     (sql/format
       (cond-> categories-base-query
+        id (sql/merge-where [:in :procurement_categories.id id])
         main-category-id (sql/merge-where
                            [:= :procurement_categories.main_category_id
                             main-category-id])
@@ -37,6 +39,7 @@
 
 (defn get-categories
   [context arguments value]
+  (log/debug arguments)
   (->> (categories-query context arguments value)
        (jdbc/query (-> context
                        :request
