@@ -24,13 +24,15 @@
                    (sql/merge-where [:in :procurement_budget_periods.id ids])
                    sql/format)))
   ([context args _]
-   (->> args
-        budget-periods-query
-        sql/format
-        (jdbc/query (-> context
-                        :request
-                        :tx))
-        (map #(add-resource-type % :budget-period)))))
+   (if (= (:id args) [])
+     []
+     (->> args
+          budget-periods-query
+          sql/format
+          (jdbc/query (-> context
+                          :request
+                          :tx))
+          (map #(add-resource-type % :budget-period))))))
 
 (defn get-phase-of-budget-periods
   [tx budget-periods]

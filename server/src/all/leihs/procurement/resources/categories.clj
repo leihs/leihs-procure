@@ -39,13 +39,14 @@
 
 (defn get-categories
   [context arguments value]
-  (log/debug arguments)
-  (->> (categories-query context arguments value)
-       (jdbc/query (-> context
-                       :request
-                       :tx))
-       (map #(add-resource-type % :category))
-       (map #(add-to-parent-values % value))))
+  (if (= (:id arguments) [])
+    []
+    (->> (categories-query context arguments value)
+         (jdbc/query (-> context
+                         :request
+                         :tx))
+         (map #(add-resource-type % :category))
+         (map #(add-to-parent-values % value)))))
 
 (defn delete-categories-not-in-main-category-ids!
   [tx ids]
