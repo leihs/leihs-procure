@@ -24,7 +24,6 @@ const mutationErrorHandler = err => {
 const ADMIN_SETTINGS_FRAGMENTS = {
   props: gql`
     fragment AdminSettingsProps on ProcurementSettings {
-      id
       contact_url
       inspection_comments
     }
@@ -41,7 +40,7 @@ const ADMIN_SETTINGS_PAGE_QUERY = gql`
 `
 
 const ADMIN_UPDATE_SETTINGS_MUTATION = gql`
-  mutation updateSettings($settings: [SettingsInput]) {
+  mutation updateSettings($settings: ProcurementSettingsInput) {
     settings(input_data: $settings) {
       ...AdminSettingsProps
     }
