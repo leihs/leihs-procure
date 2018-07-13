@@ -6,9 +6,9 @@ import f from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
-// import t from '../locale/translate'
-// import * as fragments from '../graphql-fragments'
-import Icon from '../components/Icons'
+// import t from '../../locale/translate'
+// import * as fragments from '../../graphql-fragments'
+import Icon from '../../components/Icons'
 import {
   Div,
   Row,
@@ -17,13 +17,13 @@ import {
   FormGroup,
   InputText,
   FormField
-} from '../components/Bootstrap'
-import { MainWithSidebar } from '../components/Layout'
-import { DisplayName } from '../components/decorators'
-import Loading from '../components/Loading'
-import { ErrorPanel } from '../components/Error'
-// import StatefulForm from '../components/StatefulForm'
-import UserAutocomplete from '../components/UserAutocomplete'
+} from '../../components/Bootstrap'
+import { MainWithSidebar } from '../../components/Layout'
+import { DisplayName } from '../../components/decorators'
+import Loading from '../../components/Loading'
+import { ErrorPanel } from '../../components/Error'
+// import StatefulForm from '../../components/StatefulForm'
+import UserAutocomplete from '../../components/UserAutocomplete'
 
 const CATEGORIES_INDEX_QUERY = gql`
   query MainCategoriesIndex {
