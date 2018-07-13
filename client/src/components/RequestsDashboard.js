@@ -29,12 +29,19 @@ import FilterBar from './RequestsFilterBar'
 
 const RequestsDashboard = props => {
   const { requestsQuery, refetchAllData } = props
+
+  const requests = f.flatMap(
+    f.flatMap(
+      f.flatMap(f.get(requestsQuery, 'data.budget_periods'), 'main_categories'),
+      'categories'
+    ),
+    'requests'
+  )
+
   const pageHeader = (
     <Row>
       <Col>
-        <h4>
-          {f.get(props.requestsQuery.data, 'requests.length') || 0} Requests
-        </h4>
+        <h4>{requests.length} Requests</h4>
       </Col>
       <Col xs="1" cls="text-right">
         <ButtonGroup size="sm">
@@ -109,12 +116,6 @@ const RequestsDashboard = props => {
 
 export default RequestsDashboard
 
-// FIXME: remove this budgetperiods query can be filtered by id
-function tmpFilterBudgetPeriods(periods, filters) {
-  if (!filters.budgetPeriods) return periods
-  return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
-}
-
 const RequestsTable = ({
   requestsQuery: { loading, error, data },
   editQuery,
@@ -154,18 +155,11 @@ const RequestsTree = ({
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
-  const categories = data.main_categories
-  const requests = data.requests
-  const groupedRequests = f.groupBy(
-    requests,
-    // custom key to quickly find later, where we map using those groups:
-    r => `${r.budget_period.id}|${r.category.id}`
-  )
+  console.log({ data })
 
-  return budgetPeriods.map(b => (
+  return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
-      {categories.map(cat => (
+      {b.main_categories.map(cat => (
         <CategoryLine
           key={cat.id}
           category={cat}
@@ -173,7 +167,7 @@ const RequestsTree = ({
           onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
         >
           {cat.categories.map(sc => {
-            const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
+            const reqs = sc.requests
             return (
               <SubCategoryLine
                 key={sc.id}
