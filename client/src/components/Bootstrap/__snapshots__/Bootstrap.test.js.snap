@@ -330,18 +330,26 @@ Array [
             <div
                 className=""
             >
-                <input
-                    aria-describedby={null}
-                    autoComplete="off"
-                    checked={true}
-                    className="form-control"
-                    id={undefined}
-                    name="f"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    type="checkbox"
-                    value={undefined}
-                />
+                <div
+                    className="custom-control custom-checkbox"
+                >
+                    <input
+                        aria-describedby={null}
+                        autoComplete="off"
+                        checked={true}
+                        className="custom-control-input"
+                        id="example_formfield_f"
+                        name="f"
+                        onChange={[Function]}
+                        placeholder={undefined}
+                        type="checkbox"
+                        value={undefined}
+                    />
+                    <label
+                        className="custom-control-label"
+                        htmlFor="example_formfield_f"
+                    />
+                </div>
                  
             </div>
         </fieldset>
@@ -358,18 +366,26 @@ Array [
             <div
                 className=""
             >
-                <input
-                    aria-describedby={null}
-                    autoComplete="off"
-                    checked={undefined}
-                    className="form-control"
-                    id={undefined}
-                    name="g"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    type="checkbox"
-                    value={undefined}
-                />
+                <div
+                    className="custom-control custom-checkbox"
+                >
+                    <input
+                        aria-describedby={null}
+                        autoComplete="off"
+                        checked={undefined}
+                        className="custom-control-input"
+                        id="example_formfield_g"
+                        name="g"
+                        onChange={[Function]}
+                        placeholder={undefined}
+                        type="checkbox"
+                        value={undefined}
+                    />
+                    <label
+                        className="custom-control-label"
+                        htmlFor="example_formfield_g"
+                    />
+                </div>
                  
             </div>
         </fieldset>

@@ -155,8 +155,6 @@ const RequestsTree = ({
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  console.log({ data })
-
   return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
       {b.main_categories.map(cat => (
@@ -168,6 +166,9 @@ const RequestsTree = ({
         >
           {cat.categories.map(sc => {
             const reqs = sc.requests
+            if (filters.onlyCategoriesWithRequests && f.isEmpty(reqs)) {
+              return false
+            }
             return (
               <SubCategoryLine
                 key={sc.id}
