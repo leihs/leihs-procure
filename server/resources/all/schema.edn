@@ -78,6 +78,7 @@
                             :supplier {:type ID},
                             :supplier_name {:type String},
                             :user {:type ID}}},
+    :RequestCategoryInput {:fields {:category {:type ID}, :id {:type ID}}},
     :RequesterOrganizationInput {:fields {:department {:type (non-null String)},
                                           :organization {:type (non-null
                                                                  String)},
@@ -93,10 +94,9 @@
                                                      :CategoryViewersInput)}},
                          :resolve :update-categories-viewers,
                          :type (list :Category)},
-    :change_request_category {:args {:input_data {:id {:type ID}
-                                                  :category {:type ID}}}
-                              :resolve :change-request-category
-                              :type :Category}}
+    :change_request_category {:args {:input_data {:type :RequestCategoryInput}},
+                              :resolve :change-request-category,
+                              :type :Request},
     :delete_request {:args {:input_data {:type :DeleteRequestInput}},
                      :resolve :delete-request,
                      :type Boolean},

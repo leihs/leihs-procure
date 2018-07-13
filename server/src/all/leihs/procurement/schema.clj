@@ -75,7 +75,6 @@
                                     [user-perms/admin?])),
    :category category/get-category,
    :categories categories/get-categories,
-   :change-request-category request/change-request-category,
    :cost-center request/cost-center,
    :current-user current-user/get-current-user,
    :department organization/get-department,
@@ -140,6 +139,7 @@
                                         (budget-period/in-requesting-phase?
                                           tx
                                           budget-period))))))),
+   :change-request-category request/change-category!,
    :delete-request (fn [context args value]
                      ((-> request/delete-request!
                           (authorization/wrap-ensure-one-of
