@@ -99,6 +99,7 @@ const RequestsTree = ({
           <CategoryLine
             key={cat.id}
             category={cat}
+            requestCount={subCatReqs.length}
             isOpen={openPanels.cats.includes(cat.id)}
             onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
           >
@@ -199,7 +200,14 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   )
 }
 
-const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
+const CategoryLine = ({
+  category,
+  requestCount,
+  canToggle,
+  isOpen,
+  onToggle,
+  ...props
+}) => (
   <Collapsing
     id={'bp' + category.id}
     canToggle={canToggle}
@@ -225,7 +233,7 @@ const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
           <h5 className="mb-0">
             <Caret spaced />
             <ImageThumbnail imageUrl={category.image_url} />
-            {category.name}
+            {category.name} <small>({requestCount})</small>
           </h5>
         </li>
         {isOpen &&
