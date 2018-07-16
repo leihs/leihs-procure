@@ -43,6 +43,7 @@ export default class StatefulForm extends React.PureComponent {
     this.state = { fields: props.values, originalValues: props.values }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)
+    this.setValues = this.setValues.bind(this)
   }
 
   handleInputChange(event) {
@@ -64,6 +65,16 @@ export default class StatefulForm extends React.PureComponent {
     }, () => f.isFunction(callback) && callback(this.state.fields))
   }
 
+  // reset ALL fields in one go
+  setValues(values) {
+    const callback = this.props.onChange
+    log('setValues', { values, callback })
+    this.setState(
+      { fields: values },
+      () => f.isFunction(callback) && callback(this.state.fields)
+    )
+  }
+
   render({ props, state } = this) {
     log('render', { props, state })
     const connectFormProps = (fields, opts = {}) => {
@@ -81,6 +92,7 @@ export default class StatefulForm extends React.PureComponent {
           value: getValue(name),
           onChange: this.handleInputChange
         }),
+        setValues: this.setValues,
         getValue,
         setValue
       }

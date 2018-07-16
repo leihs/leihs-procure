@@ -76,20 +76,28 @@ const Filters = ({ data, current, onChange }) => {
     }))
   }
 
+  const defaultFilters = {
+    ...f.fromPairs(
+      Object.keys(available).map(key => {
+        const values = f.flatMap(
+          available[key],
+          ({ value, options }) => (value ? value : f.map(options, 'value'))
+        )
+        return [key, values]
+      })
+    ),
+    priority: null,
+    inspectory_priority: null
+  }
+
   return (
     <StatefulForm
       idPrefix="requests_filter"
       values={current}
       onChange={onChange}
     >
-      {({ fields, formPropsFor, setValue }) => {
-        const selectDefaultFilters = () => {
-          Object.keys(available).forEach(k =>
-            setValue(k, f.map(available[k], 'value'))
-          )
-          setValue('onlyOwnRequests', false)
-          setValue('onlyCategoriesWithRequests', true)
-        }
+      {({ fields, formPropsFor, setValue, setValues }) => {
+        const selectDefaultFilters = () => setValues(defaultFilters)
 
         return (
           <F>

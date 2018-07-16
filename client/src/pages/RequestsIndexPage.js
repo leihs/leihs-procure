@@ -69,11 +69,11 @@ const FILTERS_QUERY = gql`
 
 const REQUESTS_QUERY = gql`
   query RequestsIndexFiltered(
-    $budgetPeriods: [ID]
-    $categories: [ID]
+    $budgetPeriods: [ID!]
+    $categories: [ID!]
     $search: String
-    $priority: [Priority]
-    $inspectory_priority: [InspectorPriority]
+    $priority: [Priority!]
+    $inspectory_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
   ) {
     budget_periods(id: $budgetPeriods) {
