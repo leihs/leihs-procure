@@ -41,7 +41,11 @@ const RequestsDashboard = props => {
   const pageHeader = (
     <Row>
       <Col>
-        <h4>{requests.length} Requests</h4>
+        <h4>
+          {requestsQuery.loading || !requestsQuery.data
+            ? ' '
+            : `${requests.length || 0} Requests`}
+        </h4>
       </Col>
       <Col xs="1" cls="text-right">
         <Button color="link" title="refresh data" onClick={refetchAllData}>
