@@ -157,42 +157,48 @@ const RequestsTree = ({
 
   return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
-      {b.main_categories.map(cat => (
-        <CategoryLine
-          key={cat.id}
-          category={cat}
-          isOpen={openPanels.cats.includes(cat.id)}
-          onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
-        >
-          {cat.categories.map(sc => {
-            const reqs = sc.requests
-            if (filters.onlyCategoriesWithRequests && f.isEmpty(reqs)) {
-              return false
-            }
-            return (
-              <SubCategoryLine
-                key={sc.id}
-                category={sc}
-                requestCount={reqs.length}
-                isOpen={openPanels.cats.includes(sc.id)}
-                onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
-              >
-                {f.map(reqs, (r, i) => (
-                  <F key={r.id}>
-                    <div
-                      className={cx({
-                        'border-bottom': i + 1 < reqs.length // not if last
-                      })}
-                    >
-                      <RequestLine request={r} editQuery={editQuery} />
-                    </div>
-                  </F>
-                ))}
-              </SubCategoryLine>
-            )
-          })}
-        </CategoryLine>
-      ))}
+      {b.main_categories.map(cat => {
+        const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')
+        if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
+          return false
+        }
+        return (
+          <CategoryLine
+            key={cat.id}
+            category={cat}
+            isOpen={openPanels.cats.includes(cat.id)}
+            onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
+          >
+            {cat.categories.map(sc => {
+              const reqs = sc.requests
+              if (filters.onlyCategoriesWithRequests && f.isEmpty(reqs)) {
+                return false
+              }
+              return (
+                <SubCategoryLine
+                  key={sc.id}
+                  category={sc}
+                  requestCount={reqs.length}
+                  isOpen={openPanels.cats.includes(sc.id)}
+                  onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
+                >
+                  {f.map(reqs, (r, i) => (
+                    <F key={r.id}>
+                      <div
+                        className={cx({
+                          'border-bottom': i + 1 < reqs.length // not if last
+                        })}
+                      >
+                        <RequestLine request={r} editQuery={editQuery} />
+                      </div>
+                    </F>
+                  ))}
+                </SubCategoryLine>
+              )
+            })}
+          </CategoryLine>
+        )
+      })}
     </BudgetPeriodCard>
   ))
 }
@@ -313,7 +319,7 @@ const SubCategoryLine = ({
   return (
     <Collapsing
       id={'bp' + category.id}
-      canToggle={requestCount > 0}
+      canToggle={isOpen || requestCount > 0}
       startOpen={isOpen}
       onChange={({ isOpen }) => onToggle(isOpen)}
     >
