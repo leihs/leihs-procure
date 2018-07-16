@@ -1,11 +1,23 @@
 (ns leihs.procurement.graphql
   (:require [clj-logging-config.log4j :as logging-config]
+            [clojure.edn :as edn]
+            [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [com.walmartlabs.lacinia :as lacinia]
-            [leihs.procurement.schema :as schema]
+            [com.walmartlabs.lacinia.schema :as graphql-schema]
+            [com.walmartlabs.lacinia.util :as graphql-util]
+            [leihs.procurement.graphql.resolver :as resolver]
             [logbug.debug :as debug]))
 
-; (def schema (schema/load-schema))
+; (def schema (load-schema))
+
+(defn load-schema
+  []
+  (-> (io/resource "schema.edn")
+      slurp
+      edn/read-string
+      (graphql-util/attach-resolvers (resolver/get-resolver-map))
+      graphql-schema/compile))
 
 (defn exec-query
   [query-string request]
@@ -13,7 +25,7 @@
              "with variables" (-> request
                                   :body
                                   :variables))
-  (lacinia/execute (schema/load-schema) ; load schema dynamically for DEBUGGING
+  (lacinia/execute (load-schema) ; load schema dynamically for DEBUGGING
                    query-string
                    (-> request
                        :body
