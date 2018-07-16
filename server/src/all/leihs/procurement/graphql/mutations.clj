@@ -46,7 +46,7 @@
            #(and
               (not (budget-period/past? tx budget-period))
               (or (user-perms/admin? tx auth-entity)
-                  (user-perms/inspector? tx auth-entity)
+                  (user-perms/inspector? tx auth-entity (:category_id request))
                   (and (user-perms/requester? tx auth-entity)
                        (request/requested-by? tx request auth-entity)
                        (budget-period/in-requesting-phase? tx
