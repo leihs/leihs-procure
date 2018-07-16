@@ -1,5 +1,6 @@
 import React from 'react'
 import f from 'lodash'
+// import x from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -63,43 +64,40 @@ const FILTERS_QUERY = gql`
 `
 
 const REQUESTS_QUERY = gql`
-  # NOTE: requests only shown grouped by period > main cat > sub cat > request.
-  # Query using distinct entry points bc also empty "groups" are shown,
-  # also it makes iterating over them much simpler.
   query RequestsIndexFiltered(
-    $search: String
     $budgetPeriods: [ID]
+    $categories: [ID]
+    $search: String
     $priority: [Priority]
     $inspectory_priority: [InspectorPriority]
-    $categories: [ID] # $organizations: [ID]
+    $onlyOwnRequests: Boolean
   ) {
-    # TODO: filter arg (id: $budgetPeriods)
-    budget_periods {
+    budget_periods(id: $budgetPeriods) {
       id
       name
       inspection_start_date
       end_date
-    }
 
-    # TODO: filter arg (id: $mainCategories)
-    main_categories {
-      id
-      name
-      image_url
-      categories {
+      main_categories {
         id
         name
-      }
-    }
+        image_url
 
-    requests(
-      search: $search
-      budget_period_id: $budgetPeriods
-      category_id: $categories
-      priority: $priority
-      inspectory_priority: $inspectory_priority # organization_id: $organizations
-    ) {
-      ...RequestFieldsForIndex
+        categories(id: $categories) {
+          id
+          name
+
+          requests(
+            # TODO: organization_id: $organizations #
+            search: $search
+            priority: $priority
+            inspectory_priority: $inspectory_priority
+            requested_by_auth_user: $onlyOwnRequests
+          ) {
+            ...RequestFieldsForIndex
+          }
+        }
+      }
     }
   }
   ${Fragments.RequestFieldsForIndex}
@@ -177,6 +175,10 @@ class RequestsIndexPage extends React.Component {
               query={REQUESTS_QUERY}
               variables={state.currentFilters}
               notifyOnNetworkStatusChange
+              // FIXME: apollo bug, need to turn off cache as a workaround!
+              //        <https://github.com/apollographql/apollo-client/issues/2266>
+              //        <https://github.com/apollographql/react-apollo/issues/1192>
+              fetchPolicy="network-only"
             >
               {requestsQuery => {
                 const refetchAllData = async () => {

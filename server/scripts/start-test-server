@@ -6,4 +6,4 @@ export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_test_procure2?
 # auto find some open port
 export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
 
-lein with-profile specs run "run"
+lein with-profile test run "run"
