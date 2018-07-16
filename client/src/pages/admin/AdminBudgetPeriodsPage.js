@@ -256,7 +256,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                 </tr>
               </tfoot>
             </table>
-            {/* <pre>{JSON.stringify(fields, 0, 2)}</pre> */}
+            {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
           </React.Fragment>
         )
       }}
