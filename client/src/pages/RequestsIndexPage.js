@@ -46,9 +46,13 @@ const FILTERS_QUERY = gql`
       id
       name
     }
-    categories {
+    main_categories {
       id
       name
+      categories {
+        id
+        name
+      }
     }
     # FIXME: should be 'root_only: false' when UI ready
     organizations(root_only: false) {
