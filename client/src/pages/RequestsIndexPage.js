@@ -175,10 +175,6 @@ class RequestsIndexPage extends React.Component {
               query={REQUESTS_QUERY}
               variables={state.currentFilters}
               notifyOnNetworkStatusChange
-              // FIXME: apollo bug, need to turn off cache as a workaround!
-              //        <https://github.com/apollographql/apollo-client/issues/2266>
-              //        <https://github.com/apollographql/react-apollo/issues/1192>
-              fetchPolicy="network-only"
             >
               {requestsQuery => {
                 const refetchAllData = async () => {
