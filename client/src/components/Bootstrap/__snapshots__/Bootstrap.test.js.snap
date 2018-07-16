@@ -336,14 +336,14 @@ Array [
                     <input
                         aria-describedby={null}
                         autoComplete="off"
-                        checked={true}
+                        checked={undefined}
                         className="custom-control-input"
                         id="example_formfield_f"
                         name="f"
                         onChange={[Function]}
                         placeholder={undefined}
                         type="checkbox"
-                        value={undefined}
+                        value=""
                     />
                     <label
                         className="custom-control-label"
@@ -379,7 +379,7 @@ Array [
                         onChange={[Function]}
                         placeholder={undefined}
                         type="checkbox"
-                        value={undefined}
+                        value=""
                     />
                     <label
                         className="custom-control-label"

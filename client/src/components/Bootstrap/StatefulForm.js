@@ -96,6 +96,7 @@ export default class StatefulForm extends React.PureComponent {
 }
 
 // # StatefulInput ###########################################################
+// **FOR TEXT FIELDS** (which might have fast keyboard input),
 // its more performant to keep the state in the field,
 // and only "proxy" the change events with a slight debounce
 export class StatefulInput extends React.PureComponent {
