@@ -7,11 +7,11 @@ import {
   Row,
   Col,
   Button,
-  ButtonGroup,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  // ButtonGroup,
+  // UncontrolledDropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
   Collapsing
 } from './Bootstrap'
 
@@ -44,37 +44,6 @@ const RequestsDashboard = props => {
         <h4>{requests.length} Requests</h4>
       </Col>
       <Col xs="1" cls="text-right">
-        <ButtonGroup size="sm">
-          <UncontrolledDropdown>
-            <DropdownToggle caret outline size="sm">
-              {props.viewMode === 'tree' ? (
-                <Icon.TreeView />
-              ) : (
-                <Icon.ListView />
-              )}
-            </DropdownToggle>
-            <DropdownMenu right style={{ minWidth: '7rem' }}>
-              <DropdownItem header>Viewmode</DropdownItem>
-              {['tree', 'table'].map(m => (
-                <DropdownItem
-                  key={m}
-                  active={props.viewMode === m}
-                  onClick={e => props.onSetViewMode(m)}
-                >
-                  {m === 'tree' ? (
-                    <F>
-                      <Icon.TreeView /> Tree
-                    </F>
-                  ) : (
-                    <F>
-                      <Icon.ListView /> List
-                    </F>
-                  )}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </UncontrolledDropdown>
-        </ButtonGroup>
         <Button color="link" title="refresh data" onClick={refetchAllData}>
           <Icon.Reload spin={requestsQuery.loading} />
         </Button>
@@ -94,55 +63,19 @@ const RequestsDashboard = props => {
     >
       {pageHeader}
 
-      {props.viewMode === 'table' ? (
-        <RequestsTable
-          requestsQuery={requestsQuery}
-          refetchAllData={refetchAllData}
-          editQuery={props.editQuery} //tmp?
-        />
-      ) : (
-        <RequestsTree
-          requestsQuery={requestsQuery}
-          refetchAllData={refetchAllData}
-          openPanels={props.openPanels}
-          onPanelToggle={props.onPanelToggle}
-          editQuery={props.editQuery} //tmp?
-          filters={props.currentFilters} // tmp
-        />
-      )}
+      <RequestsTree
+        requestsQuery={requestsQuery}
+        refetchAllData={refetchAllData}
+        openPanels={props.openPanels}
+        onPanelToggle={props.onPanelToggle}
+        editQuery={props.editQuery} //tmp?
+        filters={props.currentFilters} // tmp
+      />
     </MainWithSidebar>
   )
 }
 
 export default RequestsDashboard
-
-const RequestsTable = ({
-  requestsQuery: { loading, error, data },
-  editQuery,
-  filters,
-  refetchAllData,
-  openPanels,
-  onPanelToggle
-}) => {
-  if (loading) return <Loading size="1" />
-  if (error) return <ErrorPanel error={error} data={data} />
-
-  const requests = f.sortBy(data.requests, r =>
-    [r.budget_period, r.category_id].join('.')
-  )
-
-  return f.map(requests, (r, i) => (
-    <F key={r.id}>
-      <div
-        className={cx('border-top', {
-          'border-bottom': i + 1 === requests.length // only last
-        })}
-      >
-        <RequestLine request={r} editQuery={editQuery} />
-      </div>
-    </F>
-  ))
-}
 
 const RequestsTree = ({
   requestsQuery: { loading, error, data },
