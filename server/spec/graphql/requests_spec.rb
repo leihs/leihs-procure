@@ -15,75 +15,141 @@ describe 'requests' do
       }
     GRAPHQL
     result = query(q, user.id)
-    expect(result).to eq({
-      'data' => {
-        'requests' => [
-          { 'id' => request.id
-          }
-        ]
-      }
-    })
+    expect(result).to eq('data' => {
+                           'requests' => [
+                             { 'id' => request.id
+                             }
+                           ]
+                         })
   end
 
-  example 'query for dashboard' do
-    user = FactoryBot.create(:user)
-    FactoryBot.create(:requester_organization, user_id: user.id)
-    request = FactoryBot.create(:request, user_id: user.id)
+  context 'query for dashboard: filtered requests' do
+    before do
+      @user = FactoryBot.create(:user)
+      FactoryBot.create(:requester_organization, user_id: @user.id)
+      budget_periods = Array.new(3) do |i|
+        FactoryBot.create(:budget_period, name: "200#{i}")
+      end
+      categories = Array.new(3) do |_i|
+        mc = FactoryBot.create(:main_category)
+        FactoryBot.create(:category, main_category_id: mc.id)
+      end
+      @requests = budget_periods.map do |bp|
+        categories.map do |cat|
+          FactoryBot.create(
+            :request,
+            user_id: @user.id,
+            budget_period_id: bp.id,
+            category_id: cat.id
+          )
+        end.flatten
+      end
 
-    q = <<-GRAPHQL
-      query RequestsIndexFiltered(
-        $budgetPeriods: [ID]
-        $categories: [ID]
-        $search: String
-        $priority: [Priority]
-        $inspectory_priority: [InspectorPriority]
-        $onlyOwnRequests: Boolean
-      ) {
-        budget_periods(id: $budgetPeriods) {
-          id
-          # name
-          # inspection_start_date
-          # end_date
-
-          main_categories {
+      @query = <<-GRAPHQL
+        query RequestsIndexFiltered(
+          $budgetPeriods: [ID]
+          $categories: [ID]
+          $search: String
+          $priority: [Priority]
+          $inspectory_priority: [InspectorPriority]
+          $onlyOwnRequests: Boolean
+        ) {
+          budget_periods(id: $budgetPeriods) {
             id
-            # name
-            # image_url
+            name
+            # inspection_start_date
+            # end_date
 
-            categories(id: $categories) {
+            main_categories {
               id
               # name
+              # image_url
 
-              requests(
-                # TODO: organization_id: $organizations #
-                search: $search
-                priority: $priority
-                inspectory_priority: $inspectory_priority
-                requested_by_auth_user: $onlyOwnRequests
-              ) {
+              categories(id: $categories) {
                 id
+                # name
+
+                requests(
+                  # TODO: organization_id: $organizations #
+                  search: $search
+                  priority: $priority
+                  inspectory_priority: $inspectory_priority
+                  requested_by_auth_user: $onlyOwnRequests
+                ) {
+                  id
+                }
               }
             }
           }
         }
-      }
-    GRAPHQL
+      GRAPHQL
+    end
 
-    result = query(q, user.id).deep_symbolize_keys
-
-    expect(result).to eq({
-      data: {
-        budget_periods: [{
-          id: request.budget_period_id,
-          main_categories: [{
-            id: Category.find(id: request.category_id).main_category_id,
-            categories: [{
-              id: request.category_id,
-              requests: [{ id: request.id }]
-            }]
-          }]
-        }]
+    example 'no filter arguments' do
+      variables = {}
+      expected_result = {
+        data: {
+          budget_periods: BudgetPeriod.all.reverse.map do |bp|
+            {
+              id: bp.id,
+              name: bp.name,
+              main_categories: Category.all.map do |cat|
+                {
+                  id: cat.main_category_id,
+                  categories: [
+                    {
+                      id: cat.id,
+                      requests: Request.where(
+                        category_id: cat.id, budget_period_id: bp.id
+                      ).map do |r|
+                        { id: r.id }
+                      end
+                    }
+                  ] }
+              end
+            }
+          end
+        }
       }
-    })
+
+      result = query(@query, @user.id, variables).deep_symbolize_keys
+      expect(result).to eq(expected_result)
+    end
+
+    example 'filter for budget periods and categories' do
+      variables = {
+        budgetPeriods: BudgetPeriod.first(2).map(&:id),
+        categories: Category.first(2).map(&:id),
+        priority: ['NORMAL']
+      }
+
+      expected_result = {
+        data: {
+          budget_periods: BudgetPeriod.first(2).reverse.map do |bp|
+            {
+              id: bp.id,
+              name: bp.name,
+              main_categories: Category.all.map.with_index do |cat, i|
+                {
+                  id: cat.main_category_id,
+                  categories: (i > 1) ? [] : [
+                    {
+                      id: cat.id,
+                      requests: Request.where(
+                        category_id: cat.id, budget_period_id: bp.id
+                      ).map do |r|
+                        { id: r.id }
+                      end
+                    }
+                  ] }
+              end
+            }
+          end
+        }
+      }
+
+      result = query(@query, @user.id, variables).deep_symbolize_keys
+      expect(result).to eq(expected_result)
+    end
   end
 end
