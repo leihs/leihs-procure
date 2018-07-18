@@ -49,6 +49,9 @@
                                :supplier {:type ID},
                                :supplier_name {:type String},
                                :user {:type (non-null ID)}}},
+    :ProcurementSettingsInput {:fields {:contact_url {:type String},
+                                        :inspection_comments
+                                          {:type (list String)}}},
     ; NOTE: For the purpose of UI and required fields (*) an extra key
     ; `:required`
     ; should be used rather then using `non-null` and the schema information.
@@ -112,7 +115,10 @@
     :requesters_organizations
       {:args {:input_data {:type (list :RequesterOrganizationInput)}},
        :resolve :update-requesters-organizations,
-       :type (list :RequesterOrganization)}},
+       :type (list :RequesterOrganization)},
+    :settings {:args {:input_data {:type :ProcurementSettingsInput}},
+               :resolve :update-settings,
+               :type :ProcurementSettings}},
  :objects
    {:Attachment {:fields {:filename {:type String},
                           :id {:type (non-null ID)},
@@ -304,8 +310,8 @@
                             :sort_by {:type String},
                             :sort_dir {:type String},
                             :states {:type (list String)}}},
-    :Settings {:fields {:contact_url {:type String},
-                        :inspection_comments {:type (list String)}}},
+    :ProcurementSettings {:fields {:contact_url {:type String},
+                                   :inspection_comments {:type (list String)}}},
     :Supplier {:fields {:id {:type (non-null ID)},
                         :name {:type (non-null String)}}},
     :User {:fields {:email {:type String},
@@ -345,7 +351,7 @@
                :type (list :Request)},
     :rooms
       {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
-    :settings {:resolve :settings, :type :Settings},
+    :settings {:resolve :settings, :type :ProcurementSettings},
     :users {:args {:exclude_ids {:type (list ID)},
                    :limit {:type (non-null Int)},
                    :offset {:type (non-null Int)},

@@ -18,6 +18,10 @@ export const RequestFieldsForIndex = gql`
       value {
         id
         name
+        # FIXME: GraphQL error: db-spec null is missing a required parameter
+        # main_category {
+        #   id
+        # }
       }
     }
     budget_period {

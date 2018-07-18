@@ -15,7 +15,6 @@
     "ci:lint": "eslint src/{,**/}*.js{,x,on}",
     "test": "react-scripts test --env=jsdom"
   },
-  "homepage": "/procure",
   "proxy": {
     "/(graphql|graphiql|images|attachments|status)": {
       "target": "http://localhost:3003"

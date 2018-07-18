@@ -170,6 +170,7 @@ export const InputText = props => (
   </StatefulInput>
 )
 
+// TODO: extract this to `InputField`, use it in `FormField` wrapper
 const FormFieldPropTypes = {
   beforeInput: PropTypes.node,
   afterInput: PropTypes.node,
@@ -182,7 +183,11 @@ const FormFieldPropTypes = {
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string, // enum, already checked at runtime
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool
+  ])
 }
 export const FormField = ({
   beforeInput,
@@ -193,6 +198,7 @@ export const FormField = ({
   label,
   hideLabel,
   labelSmall,
+  inputLabel,
   name,
   placeholder,
   type = 'text',
@@ -214,6 +220,9 @@ export const FormField = ({
   if (children) {
     throw new Error('`children` not supported! Use `FormGroup` instead.')
   }
+  if (type === 'checkbox' && !id) {
+    throw new Error('Input `type=checkbox` is missing required `id`!')
+  }
 
   if (!f.includes(supportedTypes, type)) {
     throw new Error('Unsupported Input Type!')
@@ -222,6 +231,7 @@ export const FormField = ({
   let tag = 'input'
   let mainClass = 'form-control'
   let inputNode
+  let inputLabelNode = false
   if (!name) name = id
 
   if (type === 'text') {
@@ -257,6 +267,12 @@ export const FormField = ({
     inputProps = { min: 1, step: 1, ...inputProps }
   }
 
+  if (type === 'checkbox') {
+    mainClass = 'custom-control-input'
+    inputProps = { ...inputProps, checked: value }
+    value = null
+  }
+
   const inputAutoComplete =
     autoComplete === true // let the browser decide if true, or
       ? null // pass through given prop or turn off if falsy/nothing
@@ -277,6 +293,17 @@ export const FormField = ({
     />
   )
 
+  if (type === 'checkbox') {
+    inputNode = (
+      <div className="custom-control custom-checkbox">
+        {inputNode}
+        <label className="custom-control-label" htmlFor={id}>
+          {inputLabel}
+        </label>
+      </div>
+    )
+  }
+
   return (
     <FormGroup
       label={label}
@@ -286,6 +313,7 @@ export const FormField = ({
     >
       {beforeInput}
       {inputNode}
+      {inputLabelNode}
       {afterInput}
     </FormGroup>
   )

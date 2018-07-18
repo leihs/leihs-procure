@@ -1,5 +1,6 @@
 import React from 'react'
 import f from 'lodash'
+// import x from 'lodash'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -45,9 +46,13 @@ const FILTERS_QUERY = gql`
       id
       name
     }
-    categories {
+    main_categories {
       id
       name
+      categories {
+        id
+        name
+      }
     }
     # FIXME: should be 'root_only: false' when UI ready
     organizations(root_only: false) {
@@ -63,43 +68,40 @@ const FILTERS_QUERY = gql`
 `
 
 const REQUESTS_QUERY = gql`
-  # NOTE: requests only shown grouped by period > main cat > sub cat > request.
-  # Query using distinct entry points bc also empty "groups" are shown,
-  # also it makes iterating over them much simpler.
   query RequestsIndexFiltered(
+    $budgetPeriods: [ID!]
+    $categories: [ID!]
     $search: String
-    $budgetPeriods: [ID]
-    $priority: [Priority]
-    $inspectory_priority: [InspectorPriority]
-    $categories: [ID] # $organizations: [ID]
+    $priority: [Priority!]
+    $inspectory_priority: [InspectorPriority!]
+    $onlyOwnRequests: Boolean
   ) {
-    # TODO: filter arg (id: $budgetPeriods)
-    budget_periods {
+    budget_periods(id: $budgetPeriods) {
       id
       name
       inspection_start_date
       end_date
-    }
 
-    # TODO: filter arg (id: $mainCategories)
-    main_categories {
-      id
-      name
-      image_url
-      categories {
+      main_categories {
         id
         name
-      }
-    }
+        image_url
 
-    requests(
-      search: $search
-      budget_period_id: $budgetPeriods
-      category_id: $categories
-      priority: $priority
-      inspectory_priority: $inspectory_priority # organization_id: $organizations
-    ) {
-      ...RequestFieldsForIndex
+        categories(id: $categories) {
+          id
+          name
+
+          requests(
+            # TODO: organization_id: $organizations #
+            search: $search
+            priority: $priority
+            inspectory_priority: $inspectory_priority
+            requested_by_auth_user: $onlyOwnRequests
+          ) {
+            ...RequestFieldsForIndex
+          }
+        }
+      }
     }
   }
   ${Fragments.RequestFieldsForIndex}

@@ -3,8 +3,16 @@
 exports[`MultiSelect: renders correctly 1`] = `
 <div>
   <select
+    className="form-control"
+    disabled={undefined}
     id="example-multiple-optgroups"
     multiple={true}
+    onChange={[Function]}
+    value={
+      Array [
+        undefined,
+      ]
+    }
   >
     <optgroup
       label="Group 1"
