@@ -15,18 +15,19 @@
                   :tx)
               (sql/format templates-base-query)))
 
-; (defn insert-templates!
-;   [tx ts]
-;   (jdbc/execute! tx
-;                  (-> (sql/insert-into :procurement_templates)
-;                      (sql/values [ts])
-;                      sql/format)))
-
 (defn insert-template!
   [tx tmpl]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_templates)
                      (sql/values [tmpl])
+                     sql/format)))
+
+(defn update-template!
+  [tx tmpl]
+  (jdbc/execute! tx
+                 (-> (sql/update :procurement_templates)
+                     (sql/sset tmpl)
+                     (sql/where [:= :procurement_templates.id (:id tmpl)])
                      sql/format)))
 
 (defn delete-templates!
@@ -44,6 +45,8 @@
     (delete-templates! tx)
     (doseq [tmpl input-data]
       (authorization/authorize-and-apply
-        #(insert-template! tx tmpl)
+        #(if (:id tmpl)
+          (update-template! tx tmpl)
+          (insert-template! tx (dissoc tmpl :id)))
         :if-only
         #(user-perms/inspector? tx auth-entity (:category_id tmpl))))))
