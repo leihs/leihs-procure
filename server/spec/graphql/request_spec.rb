@@ -108,11 +108,8 @@ describe 'request' do
                                       category_id: category.id)
 
           q = <<-GRAPHQL
-            mutation {
-              change_request_category(input_data: {
-                id: "#{request.id}",
-                category: "#{new_category.id}"
-              }) {
+            mutation changeRequestCategory($id: ID!, $newCategoryId: ID!) {
+              change_request_category(input_data: { id: $id, category: $newCategoryId }) {
                 id
                 category {
                   value {
@@ -123,7 +120,9 @@ describe 'request' do
             }
           GRAPHQL
 
-          result = query(q, user.id)
+          variables = { id: request.id, newCategoryId: new_category.id }
+
+          result = query(q, user.id, variables)
 
           expect(result).to be == {
             'data' => {
@@ -236,7 +235,7 @@ describe 'request' do
             mutation {
               delete_request(input_data: {
                 id: "#{request.id}"
-              }) 
+              })
             }
           GRAPHQL
 
@@ -275,7 +274,7 @@ describe 'request' do
             mutation {
               delete_request(input_data: {
                 id: "#{request.id}"
-              }) 
+              })
             }
           GRAPHQL
 
