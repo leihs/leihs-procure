@@ -134,11 +134,11 @@
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
+      ds/wrap-tx
       wrap-resolve-handler
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
-      ds/wrap-tx
       ring-exception/wrap
       wrap-reload-if-dev-or-test))
 
