@@ -108,8 +108,8 @@ describe 'request' do
                                       category_id: category.id)
 
           q = <<-GRAPHQL
-            mutation changeRequestCategory($id: ID!, $newCategoryId: ID!) {
-              change_request_category(input_data: { id: $id, category: $newCategoryId }) {
+            mutation changeRequestCategory($input: RequestCategoryInput!) {
+              change_request_category(input_data: $input) {
                 id
                 category {
                   value {
@@ -120,7 +120,7 @@ describe 'request' do
             }
           GRAPHQL
 
-          variables = { id: request.id, newCategoryId: new_category.id }
+          variables = { input: { id: request.id, category: new_category.id } }
 
           result = query(q, user.id, variables)
 
