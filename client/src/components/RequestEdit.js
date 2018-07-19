@@ -1,6 +1,6 @@
 import React from 'react'
 import f from 'lodash'
-import { Query, Mutation } from 'react-apollo'
+import { Query, Mutation, ApolloConsumer } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import Loading from './Loading'
@@ -28,6 +28,19 @@ const UPDATE_REQUEST_MUTATION = gql`
     }
   }
   ${Fragments.RequestFieldsForShow}
+`
+
+const DELETE_REQUEST_MUTATION = gql`
+  mutation changeRequestCategory($id: ID!) {
+    delete_request(input_data: { id: $id }) {
+      id
+      category {
+        value {
+          id
+        }
+      }
+    }
+  }
 `
 
 const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
@@ -84,37 +97,51 @@ const updateRequestFromFields = (mutate, request, fields) => {
   mutate({ variables: { requestData } })
 }
 
+const doDeleteRequest = (client, request) => {
+  // eslint-disable-next-line no-debugger
+  debugger
+  client.mutate({
+    mutation: DELETE_REQUEST_MUTATION,
+    variables: { id: request.id }
+  })
+}
+
 const RequestEdit = ({ requestId, onClose }) => (
-  <Query
-    fetchPolicy="network-only"
-    query={REQUEST_EDIT_QUERY}
-    variables={{ id: [requestId] }}
-  >
-    {({ error, loading, data }) => {
-      if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} data={data} />
-      return (
-        <Mutation mutation={UPDATE_REQUEST_MUTATION}>
-          {(mutate, mutReq) => {
-            if (mutReq.loading) return <Loading />
-            if (mutReq.error)
-              return <ErrorPanel error={mutReq.error} data={mutReq.data} />
-            const request = data.requests[0]
-            return (
-              <RequestForm
-                className="p-3"
-                request={request}
-                onClose={onClose}
-                onSubmit={fields =>
-                  updateRequestFromFields(mutate, request, fields)
-                }
-              />
-            )
-          }}
-        </Mutation>
-      )
-    }}
-  </Query>
+  <ApolloConsumer>
+    {client => (
+      <Query
+        fetchPolicy="network-only"
+        query={REQUEST_EDIT_QUERY}
+        variables={{ id: [requestId] }}
+      >
+        {({ error, loading, data }) => {
+          if (loading) return <Loading />
+          if (error) return <ErrorPanel error={error} data={data} />
+          return (
+            <Mutation mutation={UPDATE_REQUEST_MUTATION}>
+              {(mutate, mutReq) => {
+                if (mutReq.loading) return <Loading />
+                if (mutReq.error)
+                  return <ErrorPanel error={mutReq.error} data={mutReq.data} />
+                const request = data.requests[0]
+                return (
+                  <RequestForm
+                    className="p-3"
+                    request={request}
+                    onClose={onClose}
+                    onSubmit={fields =>
+                      updateRequestFromFields(mutate, request, fields)
+                    }
+                    doDeleteRequest={e => doDeleteRequest(client, request)}
+                  />
+                )
+              }}
+            </Mutation>
+          )
+        }}
+      </Query>
+    )}
+  </ApolloConsumer>
 )
 
 export default RequestEdit
