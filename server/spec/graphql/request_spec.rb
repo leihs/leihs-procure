@@ -233,15 +233,15 @@ describe 'request' do
           request = FactoryBot.create(:request)
 
           q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
+            mutation deleteRequest($id: ID!) {
+              delete_request(input_data: { id: $id })
             }
           GRAPHQL
 
+          variables = { id: request.id }
+
           [requester, viewer].each do |user|
-            result = query(q, user.id)
+            result = query(q, user.id, variables)
 
             expect(result['data']['delete_request']).to be_nil
             expect(result['errors'].first['exception'])
@@ -272,14 +272,14 @@ describe 'request' do
                                       category_id: category.id)
 
           q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
+            mutation deleteRequest($id: ID!) {
+              delete_request(input_data: { id: $id })
             }
           GRAPHQL
 
-          result = query(q, user.id)
+          variables = { id: request.id }
+
+          result = query(q, user.id, variables)
           expect(result).to be == {
             'data' => {
               'delete_request' => true
