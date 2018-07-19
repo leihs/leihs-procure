@@ -21,6 +21,8 @@
       (leaf "/shutdown" :shutdown)
       (leaf "/status" :status)
       (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))
+      ; NOTE: don't rename the handler-key for image as it may break the
+      ; workaround for the problem with hanging requests
       (branch "/images/" (param :image-id) (leaf "" :image)))
     (leaf true :not-found)))
 
