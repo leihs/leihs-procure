@@ -31,15 +31,8 @@ const UPDATE_REQUEST_MUTATION = gql`
 `
 
 const DELETE_REQUEST_MUTATION = gql`
-  mutation changeRequestCategory($id: ID!) {
-    delete_request(input_data: { id: $id }) {
-      id
-      category {
-        value {
-          id
-        }
-      }
-    }
+  mutation changeRequestCategory($input: DeleteRequestInput) {
+    delete_request(input_data: $input)
   }
 `
 
@@ -102,7 +95,7 @@ const doDeleteRequest = (client, request) => {
   debugger
   client.mutate({
     mutation: DELETE_REQUEST_MUTATION,
-    variables: { id: request.id }
+    variables: { input: { id: request.id } }
   })
 }
 
