@@ -52,8 +52,10 @@
            tmpl-ids []]
       (if tmpl
         (do (authorization/authorize-and-apply
-              #(if (:id tmpl)
-                (template/update-template! tx tmpl)
+              #(if-let [id (:id tmpl)]
+                (if (:to_delete tmpl)
+                  (template/delete-template! tx id)
+                  (template/update-template! tx tmpl))
                 (template/insert-template! tx (dissoc tmpl :id)))
               :if-only
               #(user-perms/inspector? tx auth-entity (:category_id tmpl)))
@@ -61,5 +63,4 @@
                  (get-template-id tx)
                  (conj tmpl-ids)
                  (recur rest-tmpls)))
-        (do (delete-templates-not-in-ids! tx tmpl-ids)
-            (categories/get-categories-for-ids tx cat-ids))))))
+        (categories/get-categories-for-ids tx cat-ids)))))

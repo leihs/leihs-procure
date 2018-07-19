@@ -18,6 +18,13 @@
                      (sql/where [:= :procurement_templates.id (:id tmpl)])
                      sql/format)))
 
+(defn delete-template!
+  [tx id]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_templates)
+                     (sql/where [:= :procurement_templates.id id])
+                     sql/format)))
+
 (defn get-template
   [tx tmpl]
   (let [where-clause (sql/map->where-clause :procurement_templates tmpl)]

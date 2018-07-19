@@ -90,8 +90,9 @@
                              :category_id {:type (non-null ID)},
                              :id {:type ID},
                              :model {:type ID},
-                             :price_cents {:type (non-null Int)},
-                             :supplier_id {:type ID}}}},
+                             :price_cents {:type Int},
+                             :supplier_id {:type ID},
+                             :to_delete {:type Boolean}}}},
  :mutations
    {:admins {:args {:input_data {:type (list :AdminInput)}},
              :resolve :update-admins,

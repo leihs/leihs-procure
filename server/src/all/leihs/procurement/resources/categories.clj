@@ -41,6 +41,7 @@
   [tx ids]
   (-> categories-base-query
       (sql/merge-where [:in :procurement_categories.id ids])
+      (sql/order-by [:procurement_categories.name :asc])
       sql/format
       (->> (jdbc/query tx))))
 
