@@ -23,7 +23,7 @@ describe 'templates' do
 
       q = <<-GRAPHQL
         mutation {
-          templates(input_data: [
+          update_templates(input_data: [
             { id: null,
               article_name: "new tmpl",
               category_id: "#{category.id}",
@@ -37,7 +37,10 @@ describe 'templates' do
               category_id: "#{category.id}",
               price_cents: 100 }
           ]) {
-            article_name
+            id
+            templates {
+              article_name
+            }
           }
         }
       GRAPHQL
@@ -46,10 +49,14 @@ describe 'templates' do
 
       expect(result).to eq({
         'data' => {
-          'templates' => [
-            { 'article_name' => 'new tmpl' },
-            { 'article_name' => 'tmpl 1' },
-            { 'article_name' => 'new art name' }
+          'update_templates' => [
+            { 'id' => category.id,
+              'templates' => [
+                { 'article_name' => 'new tmpl' },
+                { 'article_name' => 'tmpl 1' },
+                { 'article_name' => 'new art name' }
+              ]
+            }
           ]
         }
       })
