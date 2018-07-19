@@ -48,7 +48,7 @@ const translations = {
     requested_quantity: 'Menge beantragt',
     approved_quantity: 'Menge bewilligt',
     order_quantity: 'Bestellmenge',
-    price_total: 'Total CHF',
+    price_total: 'Preis Total',
     price_total_help: 'inkl. MwSt',
     inspection_comment: 'Kommentar des Prüfers',
     attachments: 'Anhänge',

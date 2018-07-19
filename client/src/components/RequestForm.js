@@ -16,7 +16,7 @@ import {
   StatefulForm
 } from './Bootstrap'
 
-import { RequestTotalAmount as TotalAmount } from './decorators'
+import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
 import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
 
@@ -160,7 +160,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                     <FormField
                       type="text-static"
                       name="price_total"
-                      value={TotalAmount(fields)}
+                      value={formatCurrency(TotalAmount(fields))}
                       label={t('request_form_field.price_total')}
                       labelSmall={t('request_form_field.price_help')}
                     />

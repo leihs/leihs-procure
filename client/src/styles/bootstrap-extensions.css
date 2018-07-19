@@ -7,6 +7,19 @@
   padding: 0.3rem 0.6rem;
 }
 
+/* borders */
+.border-style-solid {
+  border-style: solid !important;
+}
+.border-style-dotted {
+  border-style: dotted !important;
+}
+.border-style-dashed {
+  border-style: dashed !important;
+}
+
+/* opacity */
+
 .o-30 {
   opacity: 0.3;
 }
@@ -16,6 +29,8 @@
 .o-70 {
   opacity: 0.7;
 }
+
+/* cursors  */
 
 .pointer-events-none {
   pointer-events: none;

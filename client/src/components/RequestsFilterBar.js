@@ -89,6 +89,8 @@ const Filters = ({ data, current, onChange }) => {
         return [key, values]
       })
     ),
+    onlyOwnRequests: false,
+    onlyCategoriesWithRequests: true,
     priority: null,
     inspectory_priority: null
   }
