@@ -148,10 +148,24 @@
   (reset! ds-without-pooler nil)
   (log/info "Closing ds without pooler done."))
 
+(defn get-database-url-for-pooler
+  [params]
+  (str "jdbc:postgresql://"
+       (:host params)
+       (when-let [port (-> params
+                           :port
+                           presence)]
+         (str ":" port))
+       "/"
+       (:database params)))
+
 (defn get-database-url
-  [scheme params]
-  (str scheme
-       "//"
+  [params]
+  (str "postgresql://"
+       (if-let [username (:username params)]
+         (if-let [password (:password params)]
+           (str username ":" password "@")
+           (str username "@")))
        (:host params)
        (when-let [port (-> params
                            :port
@@ -162,8 +176,8 @@
 
 (defn initialize-ds!
   [params]
-  (log/info "Initializing db pool " params " ...")
-  (let [url (get-database-url "jdbc:postgresql:" params)]
+  (log/info "Initializing datasource with pooler ...")
+  (let [url (get-database-url-for-pooler params)]
     (log/info {:url url})
     (reset!
       ds
@@ -176,18 +190,24 @@
                      (.setMinPoolSize 3)
                      (.setMaxConnectionAge (* 3 60 60))
                      (.setMaxIdleTimeExcessConnections (* 10 60)))}))
-  (log/info "Initializing db pool done."))
+  (log/info "Initializing datasource with pooler done."))
 
 (defn initialize-ds-without-pooler!
   [params]
-  (reset! ds-without-pooler (get-database-url "postgresql:" params)))
+  (log/info "Initializing datasource without pooler ...")
+  (let [url (get-database-url params)]
+    (log/info {:url url})
+    (reset! ds-without-pooler url))
+  (log/info "Initializing datasource without pooler done."))
 
 (defn init
   [params]
   (when @ds (close-ds!))
   (when @ds-without-pooler (close-ds-without-pooler!))
+  (log/info "Initializing db " params " ...")
   (initialize-ds! params)
-  (initialize-ds-without-pooler! params))
+  (initialize-ds-without-pooler! params)
+  (log/info "Initializing db done."))
 
 ;;### Debug
 ;;####################################################################
