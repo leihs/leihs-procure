@@ -34,3 +34,20 @@
         sql/format
         (->> (jdbc/query tx))
         first)))
+
+(defn can-delete?
+  [context _ value]
+  (-> (sql/call
+        :not
+        (sql/call :exists
+                  (-> (sql/select true)
+                      (sql/from [:procurement_requests :pr])
+                      (sql/merge-where [:= :pr.template_id (:id value)]))))
+      (vector :result)
+      sql/select
+      sql/format
+      (->> (jdbc/query (-> context
+                           :request
+                           :tx)))
+      first
+      :result))
