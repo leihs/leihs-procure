@@ -54,16 +54,24 @@ const FILTERS_QUERY = gql`
         name
       }
     }
-    # FIXME: should be 'root_only: false' when UI ready
-    organizations(root_only: false) {
-      id
-      name
-      shortname
+
+    organizations(root_only: true) {
+      ...OrgProps
+      organizations {
+        ...OrgProps
+      }
     }
+
     # priorities {
     #   index
     #   name
     # }
+  }
+
+  fragment OrgProps on Organization {
+    id
+    name
+    shortname
   }
 `
 
@@ -72,6 +80,7 @@ const REQUESTS_QUERY = gql`
     $budgetPeriods: [ID!]
     $categories: [ID!]
     $search: String
+    $organizations: [ID!]
     $priority: [Priority!]
     $inspectory_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
@@ -92,8 +101,8 @@ const REQUESTS_QUERY = gql`
           name
 
           requests(
-            # TODO: organization_id: $organizations #
             search: $search
+            organization_id: $organizations
             priority: $priority
             inspectory_priority: $inspectory_priority
             requested_by_auth_user: $onlyOwnRequests
