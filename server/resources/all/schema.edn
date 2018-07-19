@@ -86,8 +86,12 @@
                                                                  String)},
                                           :user_id {:type (non-null ID)}}},
     :TemplateInput {:fields {:article_name {:type String},
+                             :article_number {:type String},
+                             :category_id {:type (non-null ID)},
                              :id {:type ID},
-                             :model {:type ID}}}},
+                             :model {:type ID},
+                             :price_cents {:type (non-null Int)},
+                             :supplier_id {:type ID}}}},
  :mutations
    {:admins {:args {:input_data {:type (list :AdminInput)}},
              :resolve :update-admins,
