@@ -11,12 +11,12 @@
             [logbug.debug :as debug]
             [logbug.thrown :as thrown]))
 
-
 (def paths
   (branch
     ""
     (branch
       "/procure"
+      (leaf "/file-upload" :file-upload)
       (leaf "/graphql" :graphql)
       (leaf "/shutdown" :shutdown)
       (leaf "/status" :status)
@@ -25,10 +25,6 @@
       ; workaround for the problem with hanging requests
       (branch "/images/" (param :image-id) (leaf "" :image)))
     (leaf true :not-found)))
-
-;(path-for (paths) :user :user-id "{user-id}")
-;(match-route (paths) "/users/512")
-;(match-route (paths) "/?x=5#7")
 
 (defn path
   ([kw] (path-for paths kw))
