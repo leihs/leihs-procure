@@ -73,6 +73,7 @@ const RequestsDashboard = props => {
         refetchAllData={refetchAllData}
         openPanels={props.openPanels}
         onPanelToggle={props.onPanelToggle}
+        doDeleteRequest={props.doDeleteRequest}
         editQuery={props.editQuery} //tmp?
         filters={props.currentFilters} // tmp
       />
@@ -88,7 +89,8 @@ const RequestsTree = ({
   filters,
   refetchAllData,
   openPanels,
-  onPanelToggle
+  onPanelToggle,
+  doDeleteRequest
 }) => {
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
@@ -128,7 +130,11 @@ const RequestsTree = ({
                           'border-bottom': i + 1 < reqs.length // not if last
                         })}
                       >
-                        <RequestLine request={r} editQuery={editQuery} />
+                        <RequestLine
+                          request={r}
+                          editQuery={editQuery}
+                          doDeleteRequest={doDeleteRequest}
+                        />
                       </div>
                     </F>
                   ))}
