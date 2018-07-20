@@ -27,19 +27,18 @@
 
 (defn image
   [{tx :tx, {image-id :image-id} :route-params}]
-  (let [i (->> image-id
-               image-query
-               sql/format
-               (jdbc/query tx)
-               first)]
+  (if-let [i (->> image-id
+                  image-query
+                  sql/format
+                  (jdbc/query tx)
+                  first)]
     (->> i
          :content
          (.decode (Base64/getMimeDecoder))
          (hash-map :body)
          (merge {:headers {"Content-Type" (:content_type i),
-                           "Content-Disposition"
-                             (str "inline; filename=\"" (:filename i) "\""),
-                           "Content-Transfer-Encoding" "binary"}}))))
+                           "Content-Transfer-Encoding" "binary"}}))
+    {:status 404}))
 
 (def image-path (path :image {:image-id ":image-id"}))
 

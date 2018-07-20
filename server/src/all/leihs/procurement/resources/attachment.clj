@@ -22,19 +22,18 @@
 
 (defn attachment
   [{tx :tx, {attachment-id :attachment-id} :route-params}]
-  (let [a (->> attachment-id
-               attachment-query
-               sql/format
-               (jdbc/query tx)
-               first)]
+  (if-let [a (->> attachment-id
+                  attachment-query
+                  sql/format
+                  (jdbc/query tx)
+                  first)]
     (->> a
          :content
          (.decode (Base64/getMimeDecoder))
          (hash-map :body)
          (merge {:headers {"Content-Type" (:content_type a),
-                           "Content-Disposition"
-                             (str "inline; filename=\"" (:filename a) "\""),
-                           "Content-Transfer-Encoding" "binary"}}))))
+                           "Content-Transfer-Encoding" "binary"}}))
+    {:status 404}))
 
 (def attachment-path (path :attachment {:attachment-id ":attachment-id"}))
 
