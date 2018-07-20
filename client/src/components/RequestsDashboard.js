@@ -73,6 +73,7 @@ const RequestsDashboard = props => {
         refetchAllData={refetchAllData}
         openPanels={props.openPanels}
         onPanelToggle={props.onPanelToggle}
+        doChangeRequestCategory={props.doChangeRequestCategory}
         doDeleteRequest={props.doDeleteRequest}
         editQuery={props.editQuery} //tmp?
         filters={props.currentFilters} // tmp
@@ -84,16 +85,21 @@ const RequestsDashboard = props => {
 export default RequestsDashboard
 
 const RequestsTree = ({
-  requestsQuery: { loading, error, data },
+  requestsQuery: { loading, error, data, networkStatus },
   editQuery,
   filters,
   refetchAllData,
   openPanels,
   onPanelToggle,
+  doChangeRequestCategory,
   doDeleteRequest
 }) => {
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
+
+  // eslint-disable-next-line no-debugger
+  console.log({ networkStatus })
+  if (!data || !data.budget_periods) debugger
 
   return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
@@ -133,6 +139,7 @@ const RequestsTree = ({
                         <RequestLine
                           request={r}
                           editQuery={editQuery}
+                          doChangeRequestCategory={doChangeRequestCategory}
                           doDeleteRequest={doDeleteRequest}
                         />
                       </div>

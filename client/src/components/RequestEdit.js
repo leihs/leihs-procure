@@ -84,7 +84,7 @@ const updateRequestFromFields = (mutate, request, fields) => {
   mutate({ variables: { requestData } })
 }
 
-const RequestEdit = ({ requestId, onClose, doDeleteRequest }) => (
+const RequestEdit = ({ requestId, onClose, ...props }) => (
   <Query
     fetchPolicy="network-only"
     query={REQUEST_EDIT_QUERY}
@@ -108,7 +108,8 @@ const RequestEdit = ({ requestId, onClose, doDeleteRequest }) => (
                 onSubmit={fields =>
                   updateRequestFromFields(mutate, request, fields)
                 }
-                doDeleteRequest={e => doDeleteRequest(request)}
+                doDeleteRequest={e => props.doDeleteRequest(request)}
+                doChangeRequestCategory={props.doChangeRequestCategory}
               />
             )
           }}

@@ -270,7 +270,10 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
                 <button
                   type="button"
                   className="btn m-1 btn-outline-dark btn-massive"
-                  onClick={() => window.alert('TODO!')}
+                  onClick={e => {
+                    const newCategoryId = window.prompt('new cat?')
+                    props.doChangeRequestCategory(request, newCategoryId)
+                  }}
                 >
                   <Icon.Exchange /> {t('form_btn_move_category')}
                 </button>
