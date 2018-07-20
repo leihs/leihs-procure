@@ -86,6 +86,59 @@ describe 'request' do
           }
         end
       end
+
+      it 'move to another category' do
+        admin = FactoryBot.create(:user)
+        FactoryBot.create(:admin, user_id: admin.id)
+
+        inspector = FactoryBot.create(:user)
+        category = FactoryBot.create(:category)
+        new_category = FactoryBot.create(:category)
+        FactoryBot.create(:category_inspector,
+                          user_id: inspector.id,
+                          category_id: category.id)
+
+        requester = FactoryBot.create(:user)
+        FactoryBot.create(:requester_organization, user_id: requester.id)
+
+        ['admin', 'inspector', 'requester'].each do |user_name|
+          user = binding.local_variable_get(user_name)
+          request = FactoryBot.create(:request,
+                                      user_id: requester.id,
+                                      category_id: category.id)
+
+          q = <<-GRAPHQL
+            mutation {
+              change_request_category(input_data: {
+                id: "#{request.id}",
+                category: "#{new_category.id}"
+              }) {
+                id
+                category {
+                  value {
+                    id
+                  }
+                }
+              }
+            }
+          GRAPHQL
+
+          result = query(q, user.id)
+
+          expect(result).to be == {
+            'data' => {
+              'change_request_category' => {
+                'id' => request.id,
+                'category' => {
+                  'value' => {
+                    'id' => new_category.id
+                  }
+                }
+              }
+            }
+          }
+        end
+      end
     end
   end
 
@@ -180,15 +233,15 @@ describe 'request' do
           request = FactoryBot.create(:request)
 
           q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
+            mutation changeRequestCategory($input: DeleteRequestInput) {
+              delete_request(input_data: $input)
             }
           GRAPHQL
 
+          variables = { input: { id: request.id } }
+
           [requester, viewer].each do |user|
-            result = query(q, user.id)
+            result = query(q, user.id, variables)
 
             expect(result['data']['delete_request']).to be_nil
             expect(result['errors'].first['exception'])
@@ -218,15 +271,15 @@ describe 'request' do
                                       user_id: requester.id,
                                       category_id: category.id)
 
-          q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
-            }
-          GRAPHQL
+        q = <<-GRAPHQL
+          mutation changeRequestCategory($input: DeleteRequestInput) {
+            delete_request(input_data: $input)
+          }
+        GRAPHQL
 
-          result = query(q, user.id)
+        variables = { input: { id: request.id } }
+
+          result = query(q, user.id, variables)
           expect(result).to be == {
             'data' => {
               'delete_request' => true

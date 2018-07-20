@@ -40,7 +40,7 @@ const prepareFormValues = request => {
   return fields
 }
 
-const RequestForm = ({ request, className, onClose, onSubmit }) => {
+const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
   return (
     <StatefulForm
       idPrefix={`request_form_${request.id}`}
@@ -284,7 +284,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                 <button
                   type="button"
                   className="btn m-1 btn-outline-danger btn-massive"
-                  onClick={() => window.alert('TODO!')}
+                  onClick={props.doDeleteRequest}
                 >
                   <Icon.Trash /> {t('form_btn_delete')}
                 </button>
