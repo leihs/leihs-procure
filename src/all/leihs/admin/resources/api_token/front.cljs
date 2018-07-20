@@ -138,14 +138,16 @@
   [:small.form-text "Presets: "
    (for [period ["day" "week" "month" "year"]]
      [:span {:key period} " "
-      [:button.btn.btn-sm.btn-outline-secondary
+      [:a.btn.btn-sm.btn-outline-secondary
        {:id period
+        :href "#"
         :on-click #(swap! api-token-data* assoc
                      :expires_at (->  (.add (js/moment) 1, period) .format))}
        "now + 1 " period]])
    [:span {:key :never} " "
-    [:button.btn.btn-sm.btn-outline-secondary
+    [:a.btn.btn-sm.btn-outline-secondary
      {:id :never
+      :href "#"
       :on-click #(swap! api-token-data* assoc
                    :expires_at (->  (.add (js/moment) 1000, "years") .format))}
      "never"]]])
