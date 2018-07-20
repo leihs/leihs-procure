@@ -61,9 +61,12 @@ const Filters = ({ data, current, onChange }) => {
         .map(({ id, name }) => ({ value: id, label: name }))
     })),
 
-    organizations: f
-      .sortBy(data.organizations, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
+    organizations: data.organizations.map(({ id, name, organizations }) => ({
+      label: name,
+      options: f
+        .sortBy(organizations, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    })),
 
     priority: CONSTANTS.REQUEST_PRIORITIES.map(value => ({
       value,
@@ -86,6 +89,8 @@ const Filters = ({ data, current, onChange }) => {
         return [key, values]
       })
     ),
+    onlyOwnRequests: false,
+    onlyCategoriesWithRequests: true,
     priority: null,
     inspectory_priority: null
   }
@@ -125,12 +130,6 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Kategorien'}>
-              {/* <Select
-                {...formPropsFor('categories')}
-                multiple
-                emptyOption={false}
-                options={available.categories}
-              /> */}
               <MultiSelect
                 {...formPropsFor('categories')}
                 multiple
@@ -154,15 +153,11 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Organisationen'}>
-              <code>TBD</code>
-              {/* FIXME: wait for MultiSelect (can only select non-root!)
-              <Select
+              <MultiSelect
                 {...formPropsFor('organizations')}
                 multiple
-                emptyOption={false}
                 options={available.organizations}
               />
-              */}
             </FormGroup>
             <FormGroup label={'Priorität'}>
               <Select

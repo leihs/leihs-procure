@@ -39,6 +39,7 @@ export const RequestFieldsForIndex = gql`
     organization {
       value {
         id
+        name
       }
     }
 

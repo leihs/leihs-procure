@@ -12,7 +12,8 @@ import {
   // DropdownToggle,
   // DropdownMenu,
   // DropdownItem,
-  Collapsing
+  Collapsing,
+  Tooltipped
 } from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
@@ -72,6 +73,7 @@ const RequestsDashboard = props => {
         refetchAllData={refetchAllData}
         openPanels={props.openPanels}
         onPanelToggle={props.onPanelToggle}
+        doDeleteRequest={props.doDeleteRequest}
         editQuery={props.editQuery} //tmp?
         filters={props.currentFilters} // tmp
       />
@@ -87,7 +89,8 @@ const RequestsTree = ({
   filters,
   refetchAllData,
   openPanels,
-  onPanelToggle
+  onPanelToggle,
+  doDeleteRequest
 }) => {
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
@@ -127,7 +130,11 @@ const RequestsTree = ({
                           'border-bottom': i + 1 < reqs.length // not if last
                         })}
                       >
-                        <RequestLine request={r} editQuery={editQuery} />
+                        <RequestLine
+                          request={r}
+                          editQuery={editQuery}
+                          doDeleteRequest={doDeleteRequest}
+                        />
                       </div>
                     </F>
                   ))}
@@ -161,7 +168,7 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   } = budgetPeriodDates(budgetPeriod)
 
   return (
-    <Collapsing id={'bp' + budgetPeriod.id} startOpen>
+    <Collapsing id={`bp_${budgetPeriod.id}`} startOpen>
       {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
         <div className={cx('card mb-3')}>
           <div
@@ -176,21 +183,25 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
               <Caret spaced />
               {budgetPeriod.name}
             </h2>
-            <span
-              title="Antragsphase bis"
-              className={cx('mr-3', { 'text-success': isRequesting })}
-            >
-              <Icon.RequestingPhase className="mr-2" />
-              {inspectStartDate.toLocaleString()}
-            </span>
+            <Tooltipped text="Antragsphase bis">
+              <span
+                id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                className={cx('mr-3', { 'text-success': isRequesting })}
+              >
+                <Icon.RequestingPhase className="mr-2" />
+                {inspectStartDate.toLocaleString()}
+              </span>
+            </Tooltipped>
 
-            <span
-              title="Inspectionsphase bis"
-              className={cx({ 'text-success': isInspecting })}
-            >
-              <Icon.InspectionPhase className="mr-2" />
-              {endDate.toLocaleString()}
-            </span>
+            <Tooltipped text="Inspektionsphase bis">
+              <span
+                id={`endDate_tt_${budgetPeriod.id}`}
+                className={cx({ 'text-success': isInspecting })}
+              >
+                <Icon.InspectionPhase className="mr-2" />
+                {endDate.toLocaleString()}
+              </span>
+            </Tooltipped>
           </div>
           {isOpen &&
             props.children && (

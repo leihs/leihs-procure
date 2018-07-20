@@ -15,7 +15,9 @@
            [com.mchange.v2.c3p0 ComboPooledDataSource DataSources]))
 
 (defonce ds (atom nil))
+(defonce ds-without-pooler (atom nil))
 (defn get-ds [] @ds)
+(defn get-ds-without-pooler [] @ds-without-pooler)
 
 (defn check-connection
   []
@@ -62,10 +64,6 @@
           ring.util.codec/form-decode
           (get name)))))
 
-;(get-url-param {:url
-;"postgresql://localhost:5432/madek-v3_development?user=thomas"} "user")
-
-
 (defn- get-user
   [db-conf]
   "Retrieves first non nil value of :user of db-conf,
@@ -108,47 +106,78 @@
          (.setMaxIdleTimeExcessConnections
            (or (:max-idle-time-exess-connections db-conf) (* 10 60))))}))
 
-
 (defn wrap-tx
   [handler]
   (fn [request]
-    (jdbc/with-db-transaction
-      [tx @ds]
-      (try
-        (let [resp (handler (assoc request :tx tx))
-              status (:status resp)]
-          (cond (and status (>= status 400))
-                  (do (log/warn "Rolling back transaction because error status "
-                                status)
-                      (jdbc/db-set-rollback-only! tx))
-                (:graphql-error resp)
-                  (do (log/warn
-                        "Rolling back transaction because of graphql error")
-                      (jdbc/db-set-rollback-only! tx)))
-          resp)
-        (catch Throwable th
-          (log/warn "Rolling back transaction because of " th)
-          (jdbc/db-set-rollback-only! tx)
-          (throw th))))))
+    ; NOTE: for images we have to use a datasource without pooler as somewhere
+    ; there
+    ; is a bug which leads to hanging of the server on all subsequent requests
+    (let [ds (if (= (:handler-key request) :image) @ds-without-pooler @ds)]
+      (jdbc/with-db-transaction
+        [tx ds]
+        (try
+          (let [resp (handler (assoc request :tx tx))
+                status (:status resp)]
+            (cond (and status (>= status 400))
+                    (do (log/warn
+                          "Rolling back transaction because error status "
+                          status)
+                        (jdbc/db-set-rollback-only! tx))
+                  (:graphql-error resp)
+                    (do (log/warn
+                          "Rolling back transaction because of graphql error")
+                        (jdbc/db-set-rollback-only! tx)))
+            resp)
+          (catch Throwable th
+            (log/warn "Rolling back transaction because of " th)
+            (jdbc/db-set-rollback-only! tx)
+            (throw th)))))))
 
-(defn init
+(defn close-ds!
+  []
+  (log/info "Closing db pool ...")
+  (-> @ds
+      :datasource
+      .close)
+  (reset! ds nil)
+  (log/info "Closing db pool done."))
+
+(defn close-ds-without-pooler!
+  []
+  (log/info "Closing ds without pooler ...")
+  (reset! ds-without-pooler nil)
+  (log/info "Closing ds without pooler done."))
+
+(defn get-database-url-for-pooler
   [params]
-  (when @ds
-    (do (log/info "Closing db pool ...")
-        (-> @ds
-            :datasource
-            .close)
-        (reset! ds nil)
-        (log/info "Closing db pool done.")))
-  (log/info "Initializing db pool " params " ...")
-  (let [url (str "jdbc:postgresql://"
-                 (:host params)
-                 (when-let [port (-> params
-                                     :port
-                                     presence)]
-                   (str ":" port))
-                 "/"
-                 (:database params))]
+  (str "jdbc:postgresql://"
+       (:host params)
+       (when-let [port (-> params
+                           :port
+                           presence)]
+         (str ":" port))
+       "/"
+       (:database params)))
+
+(defn get-database-url
+  [params]
+  (str "postgresql://"
+       (if-let [username (:username params)]
+         (if-let [password (:password params)]
+           (str username ":" password "@")
+           (str username "@")))
+       (:host params)
+       (when-let [port (-> params
+                           :port
+                           presence)]
+         (str ":" port))
+       "/"
+       (:database params)))
+
+(defn initialize-ds!
+  [params]
+  (log/info "Initializing datasource with pooler ...")
+  (let [url (get-database-url-for-pooler params)]
     (log/info {:url url})
     (reset!
       ds
@@ -161,8 +190,24 @@
                      (.setMinPoolSize 3)
                      (.setMaxConnectionAge (* 3 60 60))
                      (.setMaxIdleTimeExcessConnections (* 10 60)))}))
-  (log/info "Initializing db pool done.")
-  @ds)
+  (log/info "Initializing datasource with pooler done."))
+
+(defn initialize-ds-without-pooler!
+  [params]
+  (log/info "Initializing datasource without pooler ...")
+  (let [url (get-database-url params)]
+    (log/info {:url url})
+    (reset! ds-without-pooler url))
+  (log/info "Initializing datasource without pooler done."))
+
+(defn init
+  [params]
+  (when @ds (close-ds!))
+  (when @ds-without-pooler (close-ds-without-pooler!))
+  (log/info "Initializing db " params " ...")
+  (initialize-ds! params)
+  (initialize-ds-without-pooler! params)
+  (log/info "Initializing db done."))
 
 ;;### Debug
 ;;####################################################################

@@ -1,7 +1,7 @@
 import React from 'react'
 import f from 'lodash'
 // import x from 'lodash'
-import { Query } from 'react-apollo'
+import { Query, ApolloConsumer } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import * as Fragments from '../graphql-fragments'
@@ -54,16 +54,24 @@ const FILTERS_QUERY = gql`
         name
       }
     }
-    # FIXME: should be 'root_only: false' when UI ready
-    organizations(root_only: false) {
-      id
-      name
-      shortname
+
+    organizations(root_only: true) {
+      ...OrgProps
+      organizations {
+        ...OrgProps
+      }
     }
+
     # priorities {
     #   index
     #   name
     # }
+  }
+
+  fragment OrgProps on Organization {
+    id
+    name
+    shortname
   }
 `
 
@@ -72,6 +80,7 @@ const REQUESTS_QUERY = gql`
     $budgetPeriods: [ID!]
     $categories: [ID!]
     $search: String
+    $organizations: [ID!]
     $priority: [Priority!]
     $inspectory_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
@@ -92,8 +101,8 @@ const REQUESTS_QUERY = gql`
           name
 
           requests(
-            # TODO: organization_id: $organizations #
             search: $search
+            organization_id: $organizations
             priority: $priority
             inspectory_priority: $inspectory_priority
             requested_by_auth_user: $onlyOwnRequests
@@ -106,6 +115,46 @@ const REQUESTS_QUERY = gql`
   }
   ${Fragments.RequestFieldsForIndex}
 `
+
+const DELETE_REQUEST_MUTATION = gql`
+  mutation changeRequestCategory($input: DeleteRequestInput) {
+    delete_request(input_data: $input)
+  }
+`
+
+const doDeleteRequest = (client, request, callback) => {
+  if (!window.confirm('Delete?')) return
+
+  client
+    .mutate({
+      mutation: DELETE_REQUEST_MUTATION,
+      variables: { input: { id: request.id } },
+      update: (cache, response) => {
+        if (!response.data.delete_request) {
+          window.alert('Could not delete!')
+        }
+        // NOTE: manual store update doesnt work yet, but data is this:
+        // const updatedData = {
+        //   budget_periods: currentData.budget_periods.map(bp => ({
+        //     ...bp,
+        //     main_categories: bp.main_categories.map(mc => ({
+        //       ...mc,
+        //       categories: mc.categories.map(sc => ({
+        //         ...sc,
+        //         requests: sc.requests.filter(r => r.id !== request.id)
+        //       }))
+        //     }))
+        //   }))
+        // }
+        // cache.writeQuery({
+        //   query: REQUESTS_QUERY,
+        //   data: updatedData
+        // })
+        callback() // does a full reload :/
+      }
+    })
+    .catch(error => window.alert(error))
+}
 
 // TODO: modularize `storageFactory`
 const LOCAL_STORE_KEY = 'leihs-procure'
@@ -172,37 +221,44 @@ class RequestsIndexPage extends React.Component {
   }
   render({ state } = this) {
     return (
-      <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
-        {filtersQuery => {
-          return (
-            <Query
-              query={REQUESTS_QUERY}
-              variables={state.currentFilters}
-              notifyOnNetworkStatusChange
-            >
-              {requestsQuery => {
-                const refetchAllData = async () => {
-                  await filtersQuery.refetch()
-                  await requestsQuery.refetch()
-                }
-                return (
-                  <RequestsDashboard
-                    viewMode={state.viewMode}
-                    currentFilters={state.currentFilters}
-                    onFilterChange={this.onFilterChange}
-                    filters={filtersQuery}
-                    requestsQuery={requestsQuery}
-                    refetchAllData={refetchAllData}
-                    openPanels={state.openPanels}
-                    onPanelToggle={this.onPanelToggle}
-                    onSetViewMode={this.onSetViewMode}
-                  />
-                )
-              }}
-            </Query>
-          )
-        }}
-      </Query>
+      <ApolloConsumer>
+        {client => (
+          <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
+            {filtersQuery => {
+              return (
+                <Query
+                  query={REQUESTS_QUERY}
+                  variables={state.currentFilters}
+                  notifyOnNetworkStatusChange
+                >
+                  {requestsQuery => {
+                    const refetchAllData = async () => {
+                      await filtersQuery.refetch()
+                      await requestsQuery.refetch()
+                    }
+                    return (
+                      <RequestsDashboard
+                        viewMode={state.viewMode}
+                        currentFilters={state.currentFilters}
+                        onFilterChange={this.onFilterChange}
+                        filters={filtersQuery}
+                        requestsQuery={requestsQuery}
+                        refetchAllData={refetchAllData}
+                        openPanels={state.openPanels}
+                        onPanelToggle={this.onPanelToggle}
+                        onSetViewMode={this.onSetViewMode}
+                        doDeleteRequest={id =>
+                          doDeleteRequest(client, id, refetchAllData)
+                        }
+                      />
+                    )
+                  }}
+                </Query>
+              )
+            }}
+          </Query>
+        )}
+      </ApolloConsumer>
     )
   }
 }
