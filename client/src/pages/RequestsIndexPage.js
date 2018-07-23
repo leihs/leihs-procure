@@ -116,39 +116,51 @@ const REQUESTS_QUERY = gql`
   ${Fragments.RequestFieldsForIndex}
 `
 
-const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
-  mutation changeRequestCategory($input: RequestCategoryInput!) {
-    # NOTE: we dont need any return data bc we refetch anyways
-    change_request_category(input_data: $input) {
-      id
+const doChangeRequestCategory = (client, requestId, newCatId, callback) => {
+  const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
+    mutation changeRequestCategory($input: RequestCategoryInput!) {
+      # NOTE: we dont need any return data bc we refetch anyways
+      change_request_category(input_data: $input) {
+        id
+      }
     }
-  }
-`
+  `
 
-const doChangeRequestCategory = (
-  client,
-  requestId,
-  newCategoryId,
-  callback
-) => {
   client
     .mutate({
       mutation: CHANGE_REQUEST_CATEGORY_MUTATION,
-      variables: { input: { id: requestId, category: newCategoryId } },
-      update: () => {
-        callback()
-      }
+      variables: { input: { id: requestId, category: newCatId } },
+      update: callback
     })
     .catch(error => window.alert(error))
 }
 
-const DELETE_REQUEST_MUTATION = gql`
-  mutation changeRequestCategory($input: DeleteRequestInput) {
-    delete_request(input_data: $input)
-  }
-`
+const doChangeBudgetPeriod = (client, requestId, newBudPeriodId, callback) => {
+  const CHANGE_BUDGET_PERIOD_MUTATION = gql`
+    mutation changeBudgetPeriod($input: RequestBudgetPeriodInput!) {
+      # NOTE: we dont need any return data bc we refetch anyways
+      change_request_budget_period(input_data: $input) {
+        id
+      }
+    }
+  `
+
+  client
+    .mutate({
+      mutation: CHANGE_BUDGET_PERIOD_MUTATION,
+      variables: { input: { id: requestId, budget_period: newBudPeriodId } },
+      update: callback
+    })
+    .catch(error => window.alert(error))
+}
 
 const doDeleteRequest = (client, request, callback) => {
+  const DELETE_REQUEST_MUTATION = gql`
+    mutation changeRequestCategory($input: DeleteRequestInput) {
+      delete_request(input_data: $input)
+    }
+  `
+
   if (!window.confirm('Delete?')) return
 
   client
@@ -281,6 +293,14 @@ class RequestsIndexPage extends React.Component {
                             client,
                             r,
                             categoryId,
+                            refetchAllData
+                          )
+                        }
+                        doChangeBudgetPeriod={(r, budgetPerId) =>
+                          doChangeBudgetPeriod(
+                            client,
+                            r,
+                            budgetPerId,
                             refetchAllData
                           )
                         }

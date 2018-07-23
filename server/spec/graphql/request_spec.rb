@@ -138,6 +138,59 @@ describe 'request' do
           }
         end
       end
+
+      it 'move to another budget period' do
+        admin = FactoryBot.create(:user)
+        FactoryBot.create(:admin, user_id: admin.id)
+
+        inspector = FactoryBot.create(:user)
+        category = FactoryBot.create(:category)
+        FactoryBot.create(:category_inspector,
+                          user_id: inspector.id,
+                          category_id: category.id)
+
+        requester = FactoryBot.create(:user)
+        FactoryBot.create(:requester_organization, user_id: requester.id)
+
+        new_budget_period = FactoryBot.create(:budget_period)
+
+        ['admin', 'inspector', 'requester'].each do |user_name|
+          user = binding.local_variable_get(user_name)
+          request = FactoryBot.create(:request,
+                                      user_id: requester.id,
+                                      category_id: category.id)
+
+          q = <<-GRAPHQL
+            mutation changeRequestBudgetPeriod($input: RequestBudgetPeriodInput) {
+              change_request_budget_period(input_data: $input) {
+                id
+                budget_period {
+                  value {
+                    id
+                  }
+                }
+              }
+            }
+          GRAPHQL
+
+          variables = { input: { id: request.id, budget_period: new_budget_period.id } }
+
+          result = query(q, user.id, variables)
+
+          expect(result).to be == {
+            'data' => {
+              'change_request_budget_period' => {
+                'id' => request.id,
+                'budget_period' => {
+                  'value' => {
+                    'id' => new_budget_period.id
+                  }
+                }
+              }
+            }
+          }
+        end
+      end
     end
   end
 

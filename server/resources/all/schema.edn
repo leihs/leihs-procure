@@ -81,6 +81,8 @@
                             :supplier {:type ID},
                             :supplier_name {:type String},
                             :user {:type ID}}},
+    :RequestBudgetPeriodInput {:fields {:budget_period {:type ID},
+                                        :id {:type ID}}},
     :RequestCategoryInput {:fields {:category {:type ID}, :id {:type ID}}},
     :RequesterOrganizationInput {:fields {:department {:type (non-null String)},
                                           :organization {:type (non-null
@@ -97,6 +99,10 @@
                                                      :CategoryViewersInput)}},
                          :resolve :update-categories-viewers,
                          :type (list :Category)},
+    :change_request_budget_period {:args {:input_data
+                                            {:type :RequestBudgetPeriodInput}},
+                                   :resolve :change-request-budget-period,
+                                   :type :Request},
     :change_request_category {:args {:input_data {:type :RequestCategoryInput}},
                               :resolve :change-request-category,
                               :type :Request},
