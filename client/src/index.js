@@ -9,6 +9,7 @@ import { apolloClient } from './apollo-client'
 import App from './components/App'
 
 // all the pages
+import HomePage from './pages/HomePage'
 import RequestsIndex from './pages/RequestsIndexPage'
 
 import AdminUsers from './pages/admin/AdminUsersPage'
@@ -42,7 +43,7 @@ const Root = () => (
     <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
       <App isDev={isDev}>
         <Switch>
-          <Route exact path="/" render={() => <Redirect to="/requests" />} />
+          <Route exact path="/" component={HomePage} />
           <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/admin/users" component={AdminUsers} />
           <Route path="/admin/categories" component={AdminCategories} />

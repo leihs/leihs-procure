@@ -40,7 +40,7 @@ export default class MainNav extends React.Component {
     return (
       <div>
         <Navbar dark color="dark" expand="lg">
-          <NavbarBrand exact to="/requests">
+          <NavbarBrand exact to="/">
             <Brand />
           </NavbarBrand>
 
