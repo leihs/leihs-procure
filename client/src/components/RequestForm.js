@@ -271,40 +271,23 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 
             <Row m="t-5">
               <Col lg>
-                <ButtonDropdown
-                  direction="down"
-                  isOpen={props.isSelectingNewCategory}
+                <SelectionDropdown
                   toggle={props.onSelectNewRequestCategory}
+                  isOpen={props.isSelectingNewCategory}
+                  options={props.categories.map(mc => ({
+                    key: mc.id,
+                    header: mc.name,
+                    options: mc.categories.map(c => ({
+                      key: c.id,
+                      children: c.name,
+                      disabled: c.id === request.category.value.id,
+                      onClick: e => props.doChangeRequestCategory(c)
+                    }))
+                  }))}
                 >
-                  <DropdownToggle
-                    caret
-                    className="btn m-1 btn-outline-dark btn-massive"
-                  >
-                    <Icon.Exchange /> {t('form_btn_move_category')}
-                  </DropdownToggle>
-                  <DropdownMenu
-                    style={{
-                      height: '15rem',
-                      overflow: 'hidden',
-                      overflowY: 'scroll'
-                    }}
-                  >
-                    {props.categories.map(mc => (
-                      <F key={mc.id}>
-                        <DropdownItem header>{mc.name}</DropdownItem>
-                        {mc.categories.map(c => (
-                          <DropdownItem
-                            key={c.id}
-                            disabled={c.id === request.category.value.id}
-                            onClick={e => props.doChangeRequestCategory(c)}
-                          >
-                            {c.name}
-                          </DropdownItem>
-                        ))}
-                      </F>
-                    ))}
-                  </DropdownMenu>
-                </ButtonDropdown>
+                  <Icon.Exchange /> {t('form_btn_move_category')}
+                </SelectionDropdown>
+
                 <button
                   type="button"
                   className="btn m-1 btn-outline-dark btn-massive"
@@ -350,3 +333,33 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 }
 
 export default RequestForm
+
+const SelectionDropdown = ({
+  toggle,
+  isOpen,
+  children,
+  menuStyle,
+  options
+}) => (
+  <ButtonDropdown direction="down" toggle={toggle} isOpen={isOpen}>
+    <DropdownToggle caret className="btn m-1 btn-outline-dark btn-massive">
+      {children}
+    </DropdownToggle>
+    <DropdownMenu
+      style={{
+        maxHeight: '15rem',
+        overflow: 'hidden',
+        overflowY: 'scroll'
+      }}
+    >
+      {options.map(({ key, header, options }) => (
+        <F key={key}>
+          {!!header && <DropdownItem header>{header}</DropdownItem>}
+          {options.map(({ key, ...props }) => (
+            <DropdownItem key={key} {...props} />
+          ))}
+        </F>
+      ))}
+    </DropdownMenu>
+  </ButtonDropdown>
+)
