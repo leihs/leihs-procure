@@ -7,7 +7,7 @@
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
-    [leihs.procurement.file-upload :as file-upload]
+    [leihs.procurement.resources.upload :as upload]
     [leihs.procurement.graphql :as graphql]
     [leihs.procurement.auth.session :as session]
     [leihs.procurement.paths :refer [path paths]]
@@ -45,12 +45,12 @@
 ; ========================================================
 ; TODO: remove shutdown!!! (and possible others)
 (def skip-authorization-handler-keys
-  #{:attachment :file-upload :image :shutdown :status})
+  #{:attachment :upload :image :shutdown :status})
 ; ========================================================
 
 (def handler-resolve-table
   {:attachment attachment/routes,
-   :file-upload file-upload/routes,
+   :upload upload/routes,
    :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,

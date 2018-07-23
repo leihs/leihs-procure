@@ -16,7 +16,7 @@
     ""
     (branch
       "/procure"
-      (leaf "/file-upload" :file-upload)
+      (leaf "/upload" :upload)
       (leaf "/graphql" :graphql)
       (leaf "/shutdown" :shutdown)
       (leaf "/status" :status)
