@@ -97,10 +97,6 @@ const RequestsTree = ({
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  // eslint-disable-next-line no-debugger
-  console.log({ networkStatus })
-  if (!data || !data.budget_periods) debugger
-
   return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
       {b.main_categories.map(cat => {

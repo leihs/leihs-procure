@@ -17,6 +17,15 @@ const REQUEST_EDIT_QUERY = gql`
     requests(id: $id) {
       ...RequestFieldsForShow
     }
+    # for selecting a new category:
+    main_categories {
+      id
+      name
+      categories {
+        id
+        name
+      }
+    }
   }
   ${Fragments.RequestFieldsForShow}
 `
@@ -84,39 +93,60 @@ const updateRequestFromFields = (mutate, request, fields) => {
   mutate({ variables: { requestData } })
 }
 
-const RequestEdit = ({ requestId, onClose, ...props }) => (
-  <Query
-    fetchPolicy="network-only"
-    query={REQUEST_EDIT_QUERY}
-    variables={{ id: [requestId] }}
-  >
-    {({ error, loading, data }) => {
-      if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} data={data} />
-      return (
-        <Mutation mutation={UPDATE_REQUEST_MUTATION}>
-          {(mutate, mutReq) => {
-            if (mutReq.loading) return <Loading />
-            if (mutReq.error)
-              return <ErrorPanel error={mutReq.error} data={mutReq.data} />
-            const request = data.requests[0]
-            return (
-              <RequestForm
-                className="p-3"
-                request={request}
-                onClose={onClose}
-                onSubmit={fields =>
-                  updateRequestFromFields(mutate, request, fields)
-                }
-                doDeleteRequest={e => props.doDeleteRequest(request)}
-                doChangeRequestCategory={props.doChangeRequestCategory}
-              />
-            )
-          }}
-        </Mutation>
-      )
-    }}
-  </Query>
-)
+class RequestEdit extends React.Component {
+  state = { selectNewCategory: false }
+  onSelectNewRequestCategory = () => {
+    this.setState(s => ({
+      selectNewCategory: !s.selectNewCategory
+    }))
+  }
+  onChangeRequestCategory = newCategory => {
+    const requestId = this.props.requestId
+    if (!requestId || !newCategory.id) {
+      throw new Error()
+    }
+    window.confirm(`Move to category "${newCategory.name}"?`) &&
+      this.props.doChangeRequestCategory(requestId, newCategory.id)
+  }
+  render({ requestId, onClose, ...props } = this.props) {
+    return (
+      <Query
+        fetchPolicy="network-only"
+        query={REQUEST_EDIT_QUERY}
+        variables={{ id: [requestId] }}
+      >
+        {({ error, loading, data }) => {
+          if (loading) return <Loading />
+          if (error) return <ErrorPanel error={error} data={data} />
+          return (
+            <Mutation mutation={UPDATE_REQUEST_MUTATION}>
+              {(mutate, mutReq) => {
+                if (mutReq.loading) return <Loading />
+                if (mutReq.error)
+                  return <ErrorPanel error={mutReq.error} data={mutReq.data} />
+                const request = data.requests[0]
+                return (
+                  <RequestForm
+                    className="p-3"
+                    request={request}
+                    categories={data.main_categories}
+                    onClose={onClose}
+                    onSubmit={fields =>
+                      updateRequestFromFields(mutate, request, fields)
+                    }
+                    doDeleteRequest={e => props.doDeleteRequest(request)}
+                    onSelectNewRequestCategory={this.onSelectNewRequestCategory}
+                    isSelectingNewCategory={this.state.selectNewCategory}
+                    doChangeRequestCategory={this.onChangeRequestCategory}
+                  />
+                )
+              }}
+            </Mutation>
+          )
+        }}
+      </Query>
+    )
+  }
+}
 
 export default RequestEdit

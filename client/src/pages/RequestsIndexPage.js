@@ -125,11 +125,16 @@ const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
   }
 `
 
-const doChangeRequestCategory = (client, request, newCategoryId, callback) => {
+const doChangeRequestCategory = (
+  client,
+  requestId,
+  newCategoryId,
+  callback
+) => {
   client
     .mutate({
       mutation: CHANGE_REQUEST_CATEGORY_MUTATION,
-      variables: { input: { id: request.id, category: newCategoryId } },
+      variables: { input: { id: requestId, category: newCategoryId } },
       update: () => {
         callback()
       }

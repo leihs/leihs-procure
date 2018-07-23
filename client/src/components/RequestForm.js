@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -13,7 +13,11 @@ import {
   FormField,
   Select,
   ButtonRadio,
-  StatefulForm
+  StatefulForm,
+  ButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from './Bootstrap'
 
 import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
@@ -267,16 +271,40 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 
             <Row m="t-5">
               <Col lg>
-                <button
-                  type="button"
-                  className="btn m-1 btn-outline-dark btn-massive"
-                  onClick={e => {
-                    const newCategoryId = window.prompt('new cat?')
-                    props.doChangeRequestCategory(request, newCategoryId)
-                  }}
+                <ButtonDropdown
+                  direction="down"
+                  isOpen={props.isSelectingNewCategory}
+                  toggle={props.onSelectNewRequestCategory}
                 >
-                  <Icon.Exchange /> {t('form_btn_move_category')}
-                </button>
+                  <DropdownToggle
+                    caret
+                    className="btn m-1 btn-outline-dark btn-massive"
+                  >
+                    <Icon.Exchange /> {t('form_btn_move_category')}
+                  </DropdownToggle>
+                  <DropdownMenu
+                    style={{
+                      height: '15rem',
+                      overflow: 'hidden',
+                      overflowY: 'scroll'
+                    }}
+                  >
+                    {props.categories.map(mc => (
+                      <F key={mc.id}>
+                        <DropdownItem header>{mc.name}</DropdownItem>
+                        {mc.categories.map(c => (
+                          <DropdownItem
+                            key={c.id}
+                            disabled={c.id === request.category.value.id}
+                            onClick={e => props.doChangeRequestCategory(c)}
+                          >
+                            {c.name}
+                          </DropdownItem>
+                        ))}
+                      </F>
+                    ))}
+                  </DropdownMenu>
+                </ButtonDropdown>
                 <button
                   type="button"
                   className="btn m-1 btn-outline-dark btn-massive"
@@ -310,6 +338,7 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
                 )}
               </Col>
             </Row>
+
             {window.isDebug && (
               <pre className="mt-4">{JSON.stringify({ fields }, 0, 2)}</pre>
             )}
