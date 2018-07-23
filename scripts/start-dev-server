@@ -1,0 +1,2 @@
+lein do clean, uberjar
+java -jar target/leihs-admin.jar run -s secret
