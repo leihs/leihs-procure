@@ -288,13 +288,24 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
                   <Icon.Exchange /> {t('form_btn_move_category')}
                 </SelectionDropdown>
 
-                <button
-                  type="button"
-                  className="btn m-1 btn-outline-dark btn-massive"
-                  onClick={() => window.alert('TODO!')}
+                <SelectionDropdown
+                  toggle={props.onSelectNewBudgetPeriod}
+                  isOpen={props.isSelectingNewBudgetPeriod}
+                  options={[
+                    {
+                      key: 1,
+                      options: props.budgetPeriods.map(bp => ({
+                        key: bp.id,
+                        children: bp.name,
+                        disabled: bp.id === request.budget_period.value.id,
+                        onClick: e => props.doChangeBudgetPeriod(bp)
+                      }))
+                    }
+                  ]}
                 >
                   <Icon.BudgetPeriod /> {t('form_btn_change_budget_period')}
-                </button>
+                </SelectionDropdown>
+
                 <button
                   type="button"
                   className="btn m-1 btn-outline-danger btn-massive"

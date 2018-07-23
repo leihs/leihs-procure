@@ -26,6 +26,11 @@ const REQUEST_EDIT_QUERY = gql`
         name
       }
     }
+    # for selecting a budget period:
+    budget_periods {
+      id
+      name
+    }
   }
   ${Fragments.RequestFieldsForShow}
 `
@@ -94,7 +99,8 @@ const updateRequestFromFields = (mutate, request, fields) => {
 }
 
 class RequestEdit extends React.Component {
-  state = { selectNewCategory: false }
+  state = { selectNewCategory: false, selectBudgetPeriod: false }
+
   onSelectNewRequestCategory = () => {
     this.setState(s => ({
       selectNewCategory: !s.selectNewCategory
@@ -102,12 +108,23 @@ class RequestEdit extends React.Component {
   }
   onChangeRequestCategory = newCategory => {
     const requestId = this.props.requestId
-    if (!requestId || !newCategory.id) {
-      throw new Error()
-    }
+    if (!requestId || !newCategory.id) throw new Error()
     window.confirm(`Move to category "${newCategory.name}"?`) &&
       this.props.doChangeRequestCategory(requestId, newCategory.id)
   }
+
+  onSelectNewBudgetPeriod = () => {
+    this.setState(s => ({
+      selectBudgetPeriod: !s.selectBudgetPeriod
+    }))
+  }
+  onChangeBudgetPeriod = newBudgetPeriod => {
+    const requestId = this.props.requestId
+    if (!requestId || !newBudgetPeriod.id) throw new Error()
+    window.confirm(`Move to Budget Period "${newBudgetPeriod.name}"?`) &&
+      this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
+  }
+
   render({ requestId, onClose, ...props } = this.props) {
     return (
       <Query
@@ -130,14 +147,21 @@ class RequestEdit extends React.Component {
                     className="p-3"
                     request={request}
                     categories={data.main_categories}
+                    budgetPeriods={data.budget_periods}
                     onClose={onClose}
                     onSubmit={fields =>
                       updateRequestFromFields(mutate, request, fields)
                     }
+                    // action delete
                     doDeleteRequest={e => props.doDeleteRequest(request)}
+                    // action move category
                     onSelectNewRequestCategory={this.onSelectNewRequestCategory}
                     isSelectingNewCategory={this.state.selectNewCategory}
                     doChangeRequestCategory={this.onChangeRequestCategory}
+                    // action move budget period
+                    onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
+                    isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
+                    doChangeBudgetPeriod={this.onChangeBudgetPeriod}
                   />
                 )
               }}

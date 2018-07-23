@@ -74,6 +74,7 @@ const RequestsDashboard = props => {
         openPanels={props.openPanels}
         onPanelToggle={props.onPanelToggle}
         doChangeRequestCategory={props.doChangeRequestCategory}
+        doChangeBudgetPeriod={props.doChangeBudgetPeriod}
         doDeleteRequest={props.doDeleteRequest}
         editQuery={props.editQuery} //tmp?
         filters={props.currentFilters} // tmp
@@ -92,6 +93,7 @@ const RequestsTree = ({
   openPanels,
   onPanelToggle,
   doChangeRequestCategory,
+  doChangeBudgetPeriod,
   doDeleteRequest
 }) => {
   if (loading) return <Loading size="1" />
@@ -136,6 +138,7 @@ const RequestsTree = ({
                           request={r}
                           editQuery={editQuery}
                           doChangeRequestCategory={doChangeRequestCategory}
+                          doChangeBudgetPeriod={doChangeBudgetPeriod}
                           doDeleteRequest={doDeleteRequest}
                         />
                       </div>
