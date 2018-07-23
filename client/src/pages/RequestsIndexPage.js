@@ -116,6 +116,32 @@ const REQUESTS_QUERY = gql`
   ${Fragments.RequestFieldsForIndex}
 `
 
+const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
+  mutation changeRequestCategory($input: RequestCategoryInput!) {
+    # NOTE: we dont need any return data bc we refetch anyways
+    change_request_category(input_data: $input) {
+      id
+    }
+  }
+`
+
+const doChangeRequestCategory = (
+  client,
+  requestId,
+  newCategoryId,
+  callback
+) => {
+  client
+    .mutate({
+      mutation: CHANGE_REQUEST_CATEGORY_MUTATION,
+      variables: { input: { id: requestId, category: newCategoryId } },
+      update: () => {
+        callback()
+      }
+    })
+    .catch(error => window.alert(error))
+}
+
 const DELETE_REQUEST_MUTATION = gql`
   mutation changeRequestCategory($input: DeleteRequestInput) {
     delete_request(input_data: $input)
@@ -247,8 +273,16 @@ class RequestsIndexPage extends React.Component {
                         openPanels={state.openPanels}
                         onPanelToggle={this.onPanelToggle}
                         onSetViewMode={this.onSetViewMode}
-                        doDeleteRequest={id =>
-                          doDeleteRequest(client, id, refetchAllData)
+                        doDeleteRequest={r =>
+                          doDeleteRequest(client, r, refetchAllData)
+                        }
+                        doChangeRequestCategory={(r, categoryId) =>
+                          doChangeRequestCategory(
+                            client,
+                            r,
+                            categoryId,
+                            refetchAllData
+                          )
                         }
                       />
                     )

@@ -10,6 +10,7 @@ import Nav from 'reactstrap/lib/Nav'
 import NavItem from 'reactstrap/lib/NavItem'
 import BsNavLink from 'reactstrap/lib/NavLink'
 import UncontrolledDropdown from 'reactstrap/lib/UncontrolledDropdown'
+import ButtonDropdown from 'reactstrap/lib/ButtonDropdown'
 import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
@@ -22,6 +23,7 @@ export { Nav }
 export { NavItem }
 export { BsNavLink }
 export { UncontrolledDropdown }
+export { ButtonDropdown }
 export { DropdownToggle }
 export { DropdownMenu }
 export { DropdownItem }
