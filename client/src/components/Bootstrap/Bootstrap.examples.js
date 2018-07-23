@@ -122,6 +122,7 @@ export const examples = [
                 />
                 <FormField
                   name="f"
+                  id="example_formfield_f"
                   type="checkbox"
                   label="type=checkbox"
                   checked={this.state.f}
@@ -129,6 +130,7 @@ export const examples = [
                 />
                 <FormField
                   name="g"
+                  id="example_formfield_g"
                   type="checkbox"
                   label="type=checkbox"
                   checked={this.state.g}

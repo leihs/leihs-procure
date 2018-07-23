@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -13,10 +13,14 @@ import {
   FormField,
   Select,
   ButtonRadio,
-  StatefulForm
+  StatefulForm,
+  ButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from './Bootstrap'
 
-import { RequestTotalAmount as TotalAmount } from './decorators'
+import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
 import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
 
@@ -40,7 +44,7 @@ const prepareFormValues = request => {
   return fields
 }
 
-const RequestForm = ({ request, className, onClose, onSubmit }) => {
+const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
   return (
     <StatefulForm
       idPrefix={`request_form_${request.id}`}
@@ -160,7 +164,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                     <FormField
                       type="text-static"
                       name="price_total"
-                      value={TotalAmount(fields)}
+                      value={formatCurrency(TotalAmount(fields))}
                       label={t('request_form_field.price_total')}
                       labelSmall={t('request_form_field.price_help')}
                     />
@@ -267,13 +271,40 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
 
             <Row m="t-5">
               <Col lg>
-                <button
-                  type="button"
-                  className="btn m-1 btn-outline-dark btn-massive"
-                  onClick={() => window.alert('TODO!')}
+                <ButtonDropdown
+                  direction="down"
+                  isOpen={props.isSelectingNewCategory}
+                  toggle={props.onSelectNewRequestCategory}
                 >
-                  <Icon.Exchange /> {t('form_btn_move_category')}
-                </button>
+                  <DropdownToggle
+                    caret
+                    className="btn m-1 btn-outline-dark btn-massive"
+                  >
+                    <Icon.Exchange /> {t('form_btn_move_category')}
+                  </DropdownToggle>
+                  <DropdownMenu
+                    style={{
+                      height: '15rem',
+                      overflow: 'hidden',
+                      overflowY: 'scroll'
+                    }}
+                  >
+                    {props.categories.map(mc => (
+                      <F key={mc.id}>
+                        <DropdownItem header>{mc.name}</DropdownItem>
+                        {mc.categories.map(c => (
+                          <DropdownItem
+                            key={c.id}
+                            disabled={c.id === request.category.value.id}
+                            onClick={e => props.doChangeRequestCategory(c)}
+                          >
+                            {c.name}
+                          </DropdownItem>
+                        ))}
+                      </F>
+                    ))}
+                  </DropdownMenu>
+                </ButtonDropdown>
                 <button
                   type="button"
                   className="btn m-1 btn-outline-dark btn-massive"
@@ -284,7 +315,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                 <button
                   type="button"
                   className="btn m-1 btn-outline-danger btn-massive"
-                  onClick={() => window.alert('TODO!')}
+                  onClick={props.doDeleteRequest}
                 >
                   <Icon.Trash /> {t('form_btn_delete')}
                 </button>
@@ -307,6 +338,7 @@ const RequestForm = ({ request, className, onClose, onSubmit }) => {
                 )}
               </Col>
             </Row>
+
             {window.isDebug && (
               <pre className="mt-4">{JSON.stringify({ fields }, 0, 2)}</pre>
             )}

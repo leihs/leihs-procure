@@ -2,7 +2,7 @@ import f from 'lodash'
 import { formatMoney } from 'accounting-js'
 
 export const DisplayName = (o, short = false) => {
-  if (!o) return
+  if (!o) return '?'
 
   switch (o.__typename) {
     case 'User':
@@ -24,23 +24,23 @@ export const DisplayName = (o, short = false) => {
 }
 
 export const RequestTotalAmount = fields => {
-  const quantity = f.last(
-    f.filter(
-      ['requested', 'approved', 'order'].map(
-        k =>
-          f.get(fields, [`${k}_quantity`, 'value']) ||
-          f.get(fields, [`${k}_quantity`])
-      )
-    )
-  )
-  const price = (parseInt(fields.price_cents, 10) || 0) / 100
+  const allQuantities = ['requested', 'approved', 'order'].map(k => {
+    const v = f.get(fields, [`${k}_quantity`])
+    return f.isObject(v) ? v.value : v
+  })
+  const quantity = f.last(f.filter(allQuantities, f.present))
+
+  const price_cents =
+    f.get(fields, 'price_cents.value') || f.get(fields, 'price_cents') || '0'
+
+  const price = parseInt(price_cents, 10)
   return (parseInt(quantity, 10) || 0) * price
 }
 
 // TODO: currency config, hardcoded to CH-de for now
 // NOTE: `precision: 0` because Procure only supports integers
-export const formatCurrency = n =>
-  formatMoney(n, {
+export const formatCurrency = (n = 0) =>
+  formatMoney(n / 100, {
     decimal: '.',
     thousand: "'",
     symbol: 'CHF',

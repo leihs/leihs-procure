@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { __Node as Node } from './Bootstrap'
 
-const getSelectedValueFromProps = (value, multiple) =>
+export const getSelectedValueFromProps = (value, multiple) =>
   typeof value === 'object'
     ? multiple
       ? value
@@ -13,7 +13,7 @@ const getSelectedValueFromProps = (value, multiple) =>
       ? [value]
       : value
 
-const getSelectedValueFromEvent = ({ target }, multiple) =>
+export const getSelectedValueFromEvent = ({ target }, multiple) =>
   !multiple
     ? target.value
     : [...target.options]

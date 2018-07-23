@@ -2,8 +2,20 @@ import React, { Fragment as F } from 'react'
 // import cx from 'classnames'
 import f from 'lodash'
 
-import { Button, InputText, FormGroup, StatefulForm, Select } from './Bootstrap'
+import {
+  Button,
+  FormField,
+  InputText,
+  FormGroup,
+  StatefulForm,
+  Select
+} from './Bootstrap'
 
+// WIP:
+import MultiSelect from './Bootstrap/DownshiftMultiSelect'
+
+import * as CONSTANTS from '../constants'
+import t from '../locale/translate'
 // import Icon from './Icons'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
@@ -41,22 +53,46 @@ const Filters = ({ data, current, onChange }) => {
     budgetPeriods: f
       .sortBy(data.budget_periods, 'name')
       .map(({ id, name }) => ({ value: id, label: name })),
-    categories: f
-      .sortBy(data.categories, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
-    organizations: f
-      .sortBy(data.organizations, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
-    priority: [
-      { label: 'Normal', value: 'normal' },
-      { label: 'Hoch', value: 'high' }
-    ],
-    inspectory_priority: [
-      { label: 'Zwingend', value: 'mandatory' },
-      { label: 'Hoch', value: 'high' },
-      { label: 'Mittel', value: 'medium' },
-      { label: 'Tief', value: 'low' }
-    ]
+
+    categories: data.main_categories.map(({ id, name, categories }) => ({
+      label: name,
+      options: f
+        .sortBy(categories, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    })),
+
+    organizations: data.organizations.map(({ id, name, organizations }) => ({
+      label: name,
+      options: f
+        .sortBy(organizations, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    })),
+
+    priority: CONSTANTS.REQUEST_PRIORITIES.map(value => ({
+      value,
+      label: t(`priority_label_${value}`)
+    })),
+
+    inspectory_priority: CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(value => ({
+      value,
+      label: t(`inspector_priority_label_${value}`)
+    }))
+  }
+
+  const defaultFilters = {
+    ...f.fromPairs(
+      Object.keys(available).map(key => {
+        const values = f.flatMap(
+          available[key],
+          ({ value, options }) => (value ? value : f.map(options, 'value'))
+        )
+        return [key, values]
+      })
+    ),
+    onlyOwnRequests: false,
+    onlyCategoriesWithRequests: true,
+    priority: null,
+    inspectory_priority: null
   }
 
   return (
@@ -65,12 +101,8 @@ const Filters = ({ data, current, onChange }) => {
       values={current}
       onChange={onChange}
     >
-      {({ formPropsFor, setValue }) => {
-        const selectAllFilters = () => {
-          Object.keys(available).forEach(k =>
-            setValue(k, f.map(available[k], 'value'))
-          )
-        }
+      {({ fields, formPropsFor, setValue, setValues }) => {
+        const selectDefaultFilters = () => setValues(defaultFilters)
 
         return (
           <F>
@@ -79,9 +111,9 @@ const Filters = ({ data, current, onChange }) => {
                 size="sm"
                 color="link"
                 cls="pl-0"
-                onClick={selectAllFilters}
+                onClick={selectDefaultFilters}
               >
-                select all
+                reset filters
               </Button>
             </FormGroup>
 
@@ -98,27 +130,34 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Kategorien'}>
-              <Select
+              <MultiSelect
                 {...formPropsFor('categories')}
                 multiple
-                emptyOption={false}
                 options={available.categories}
               />
             </FormGroup>
             <FormGroup label={'Spezialfilter'}>
-              <code>TBD</code>
-              {/* Nur eigene Anträge / Nur Kategorien mit Anträgen */}
+              <FormField
+                {...formPropsFor('onlyOwnRequests')}
+                type="checkbox"
+                inputLabel="only own Requests"
+                label="only own Requests"
+                hideLabel
+              />
+              <FormField
+                {...formPropsFor('onlyCategoriesWithRequests')}
+                type="checkbox"
+                inputLabel="only Categories with Requests"
+                label="only Categories with Requests"
+                hideLabel
+              />
             </FormGroup>
             <FormGroup label={'Organisationen'}>
-              <code>TBD</code>
-              {/* FIXME: wait for MultiSelect (can only select non-root!)
-              <Select
+              <MultiSelect
                 {...formPropsFor('organizations')}
                 multiple
-                emptyOption={false}
                 options={available.organizations}
               />
-              */}
             </FormGroup>
             <FormGroup label={'Priorität'}>
               <Select
@@ -129,20 +168,17 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Priorität des Prüfers'}>
-              <code>TBD</code>
-
-              {/* FIXME: backend doesnt work?
               <Select
                 {...formPropsFor('inspectory_priority')}
                 multiple
                 emptyOption={false}
                 options={available.inspectory_priority}
               />
-              */}
             </FormGroup>
             <FormGroup label={'Status Antrag'}>
               <code>TBD</code>
             </FormGroup>
+            {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
           </F>
         )
       }}

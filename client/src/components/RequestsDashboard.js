@@ -7,12 +7,13 @@ import {
   Row,
   Col,
   Button,
-  ButtonGroup,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  Collapsing
+  // ButtonGroup,
+  // UncontrolledDropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
+  Collapsing,
+  Tooltipped
 } from './Bootstrap'
 
 // import MultiSelect from './Bootstrap/MultiSelect'
@@ -29,45 +30,25 @@ import FilterBar from './RequestsFilterBar'
 
 const RequestsDashboard = props => {
   const { requestsQuery, refetchAllData } = props
+
+  const requests = f.flatMap(
+    f.flatMap(
+      f.flatMap(f.get(requestsQuery, 'data.budget_periods'), 'main_categories'),
+      'categories'
+    ),
+    'requests'
+  )
+
   const pageHeader = (
     <Row>
       <Col>
         <h4>
-          {f.get(props.requestsQuery.data, 'requests.length') || 0} Requests
+          {requestsQuery.loading || !requestsQuery.data
+            ? ' '
+            : `${requests.length || 0} Requests`}
         </h4>
       </Col>
       <Col xs="1" cls="text-right">
-        <ButtonGroup size="sm">
-          <UncontrolledDropdown>
-            <DropdownToggle caret outline size="sm">
-              {props.viewMode === 'tree' ? (
-                <Icon.TreeView />
-              ) : (
-                <Icon.ListView />
-              )}
-            </DropdownToggle>
-            <DropdownMenu right style={{ minWidth: '7rem' }}>
-              <DropdownItem header>Viewmode</DropdownItem>
-              {['tree', 'table'].map(m => (
-                <DropdownItem
-                  key={m}
-                  active={props.viewMode === m}
-                  onClick={e => props.onSetViewMode(m)}
-                >
-                  {m === 'tree' ? (
-                    <F>
-                      <Icon.TreeView /> Tree
-                    </F>
-                  ) : (
-                    <F>
-                      <Icon.ListView /> List
-                    </F>
-                  )}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </UncontrolledDropdown>
-        </ButtonGroup>
         <Button color="link" title="refresh data" onClick={refetchAllData}>
           <Icon.Reload spin={requestsQuery.loading} />
         </Button>
@@ -87,117 +68,85 @@ const RequestsDashboard = props => {
     >
       {pageHeader}
 
-      {props.viewMode === 'table' ? (
-        <RequestsTable
-          requestsQuery={requestsQuery}
-          refetchAllData={refetchAllData}
-          editQuery={props.editQuery} //tmp?
-        />
-      ) : (
-        <RequestsTree
-          requestsQuery={requestsQuery}
-          refetchAllData={refetchAllData}
-          openPanels={props.openPanels}
-          onPanelToggle={props.onPanelToggle}
-          editQuery={props.editQuery} //tmp?
-          filters={props.currentFilters} // tmp
-        />
-      )}
+      <RequestsTree
+        requestsQuery={requestsQuery}
+        refetchAllData={refetchAllData}
+        openPanels={props.openPanels}
+        onPanelToggle={props.onPanelToggle}
+        doChangeRequestCategory={props.doChangeRequestCategory}
+        doDeleteRequest={props.doDeleteRequest}
+        editQuery={props.editQuery} //tmp?
+        filters={props.currentFilters} // tmp
+      />
     </MainWithSidebar>
   )
 }
 
 export default RequestsDashboard
 
-// FIXME: remove this budgetperiods query can be filtered by id
-function tmpFilterBudgetPeriods(periods, filters) {
-  if (!filters.budgetPeriods) return periods
-  return periods.filter(p => filters.budgetPeriods.indexOf(p.id) !== -1)
-}
-
-const RequestsTable = ({
-  requestsQuery: { loading, error, data },
-  editQuery,
-  filters,
-  refetchAllData,
-  openPanels,
-  onPanelToggle
-}) => {
-  if (loading) return <Loading size="1" />
-  if (error) return <ErrorPanel error={error} data={data} />
-
-  const requests = f.sortBy(data.requests, r =>
-    [r.budget_period, r.category_id].join('.')
-  )
-
-  return f.map(requests, (r, i) => (
-    <F key={r.id}>
-      <div
-        className={cx('border-top', {
-          'border-bottom': i + 1 === requests.length // only last
-        })}
-      >
-        <RequestLine request={r} editQuery={editQuery} />
-      </div>
-    </F>
-  ))
-}
-
 const RequestsTree = ({
-  requestsQuery: { loading, error, data },
+  requestsQuery: { loading, error, data, networkStatus },
   editQuery,
   filters,
   refetchAllData,
   openPanels,
-  onPanelToggle
+  onPanelToggle,
+  doChangeRequestCategory,
+  doDeleteRequest
 }) => {
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  const budgetPeriods = tmpFilterBudgetPeriods(data.budget_periods, filters)
-  const categories = data.main_categories
-  const requests = data.requests
-  const groupedRequests = f.groupBy(
-    requests,
-    // custom key to quickly find later, where we map using those groups:
-    r => `${r.budget_period.id}|${r.category.id}`
-  )
-
-  return budgetPeriods.map(b => (
+  return data.budget_periods.map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b}>
-      {categories.map(cat => (
-        <CategoryLine
-          key={cat.id}
-          category={cat}
-          isOpen={openPanels.cats.includes(cat.id)}
-          onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
-        >
-          {cat.categories.map(sc => {
-            const reqs = groupedRequests[`${b.id}|${sc.id}`] || []
-            return (
-              <SubCategoryLine
-                key={sc.id}
-                category={sc}
-                requestCount={reqs.length}
-                isOpen={openPanels.cats.includes(sc.id)}
-                onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
-              >
-                {f.map(reqs, (r, i) => (
-                  <F key={r.id}>
-                    <div
-                      className={cx({
-                        'border-bottom': i + 1 < reqs.length // not if last
-                      })}
-                    >
-                      <RequestLine request={r} editQuery={editQuery} />
-                    </div>
-                  </F>
-                ))}
-              </SubCategoryLine>
-            )
-          })}
-        </CategoryLine>
-      ))}
+      {b.main_categories.map(cat => {
+        const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')
+        if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
+          return false
+        }
+        return (
+          <CategoryLine
+            key={cat.id}
+            category={cat}
+            requestCount={subCatReqs.length}
+            isOpen={openPanels.cats.includes(cat.id)}
+            onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
+          >
+            {cat.categories.map(sc => {
+              const reqs = sc.requests
+              if (filters.onlyCategoriesWithRequests && f.isEmpty(reqs)) {
+                return false
+              }
+              return (
+                <SubCategoryLine
+                  key={sc.id}
+                  category={sc}
+                  requestCount={reqs.length}
+                  isOpen={openPanels.cats.includes(sc.id)}
+                  onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
+                >
+                  {f.map(reqs, (r, i) => (
+                    <F key={r.id}>
+                      <div
+                        className={cx({
+                          'border-bottom': i + 1 < reqs.length // not if last
+                        })}
+                      >
+                        <RequestLine
+                          request={r}
+                          editQuery={editQuery}
+                          doChangeRequestCategory={doChangeRequestCategory}
+                          doDeleteRequest={doDeleteRequest}
+                        />
+                      </div>
+                    </F>
+                  ))}
+                </SubCategoryLine>
+              )
+            })}
+          </CategoryLine>
+        )
+      })}
     </BudgetPeriodCard>
   ))
 }
@@ -222,7 +171,7 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   } = budgetPeriodDates(budgetPeriod)
 
   return (
-    <Collapsing id={'bp' + budgetPeriod.id} startOpen>
+    <Collapsing id={`bp_${budgetPeriod.id}`} startOpen>
       {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
         <div className={cx('card mb-3')}>
           <div
@@ -237,21 +186,25 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
               <Caret spaced />
               {budgetPeriod.name}
             </h2>
-            <span
-              title="Antragsphase bis"
-              className={cx('mr-3', { 'text-success': isRequesting })}
-            >
-              <Icon.RequestingPhase className="mr-2" />
-              {inspectStartDate.toLocaleString()}
-            </span>
+            <Tooltipped text="Antragsphase bis">
+              <span
+                id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                className={cx('mr-3', { 'text-success': isRequesting })}
+              >
+                <Icon.RequestingPhase className="mr-2" />
+                {inspectStartDate.toLocaleString()}
+              </span>
+            </Tooltipped>
 
-            <span
-              title="Inspectionsphase bis"
-              className={cx({ 'text-success': isInspecting })}
-            >
-              <Icon.InspectionPhase className="mr-2" />
-              {endDate.toLocaleString()}
-            </span>
+            <Tooltipped text="Inspektionsphase bis">
+              <span
+                id={`endDate_tt_${budgetPeriod.id}`}
+                className={cx({ 'text-success': isInspecting })}
+              >
+                <Icon.InspectionPhase className="mr-2" />
+                {endDate.toLocaleString()}
+              </span>
+            </Tooltipped>
           </div>
           {isOpen &&
             props.children && (
@@ -265,7 +218,14 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   )
 }
 
-const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
+const CategoryLine = ({
+  category,
+  requestCount,
+  canToggle,
+  isOpen,
+  onToggle,
+  ...props
+}) => (
   <Collapsing
     id={'bp' + category.id}
     canToggle={canToggle}
@@ -291,7 +251,7 @@ const CategoryLine = ({ category, canToggle, isOpen, onToggle, ...props }) => (
           <h5 className="mb-0">
             <Caret spaced />
             <ImageThumbnail imageUrl={category.image_url} />
-            {category.name}
+            {category.name} <small>({requestCount})</small>
           </h5>
         </li>
         {isOpen &&
@@ -318,7 +278,7 @@ const SubCategoryLine = ({
   return (
     <Collapsing
       id={'bp' + category.id}
-      canToggle={requestCount > 0}
+      canToggle={isOpen || requestCount > 0}
       startOpen={isOpen}
       onChange={({ isOpen }) => onToggle(isOpen)}
     >

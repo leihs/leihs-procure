@@ -108,11 +108,8 @@ describe 'request' do
                                       category_id: category.id)
 
           q = <<-GRAPHQL
-            mutation {
-              change_request_category(input_data: {
-                id: "#{request.id}",
-                category: "#{new_category.id}"
-              }) {
+            mutation changeRequestCategory($input: RequestCategoryInput!) {
+              change_request_category(input_data: $input) {
                 id
                 category {
                   value {
@@ -123,7 +120,9 @@ describe 'request' do
             }
           GRAPHQL
 
-          result = query(q, user.id)
+          variables = { input: { id: request.id, category: new_category.id } }
+
+          result = query(q, user.id, variables)
 
           expect(result).to be == {
             'data' => {
@@ -287,15 +286,15 @@ describe 'request' do
           request = FactoryBot.create(:request)
 
           q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
+            mutation deleteRequest($input: DeleteRequestInput) {
+              delete_request(input_data: $input)
             }
           GRAPHQL
 
+          variables = { input: { id: request.id } }
+
           [requester, viewer].each do |user|
-            result = query(q, user.id)
+            result = query(q, user.id, variables)
 
             expect(result['data']['delete_request']).to be_nil
             expect(result['errors'].first['exception'])
@@ -325,15 +324,15 @@ describe 'request' do
                                       user_id: requester.id,
                                       category_id: category.id)
 
-          q = <<-GRAPHQL
-            mutation {
-              delete_request(input_data: {
-                id: "#{request.id}"
-              }) 
-            }
-          GRAPHQL
+        q = <<-GRAPHQL
+          mutation deleteRequest($input: DeleteRequestInput) {
+            delete_request(input_data: $input)
+          }
+        GRAPHQL
 
-          result = query(q, user.id)
+        variables = { input: { id: request.id } }
+
+          result = query(q, user.id, variables)
           expect(result).to be == {
             'data' => {
               'delete_request' => true
