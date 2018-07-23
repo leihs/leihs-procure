@@ -161,11 +161,8 @@ describe 'request' do
                                       category_id: category.id)
 
           q = <<-GRAPHQL
-            mutation {
-              change_request_budget_period(input_data: {
-                id: "#{request.id}",
-                budget_period: "#{new_budget_period.id}"
-              }) {
+            mutation changeRequestBudgetPeriod($input: RequestBudgetPeriodInput) {
+              change_request_budget_period(input_data: $input) {
                 id
                 budget_period {
                   value {
@@ -176,7 +173,9 @@ describe 'request' do
             }
           GRAPHQL
 
-          result = query(q, user.id)
+          variables = { input: { id: request.id, budget_period: new_budget_period.id } }
+
+          result = query(q, user.id, variables)
 
           expect(result).to be == {
             'data' => {
