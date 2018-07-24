@@ -41,6 +41,7 @@ import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
 import faPlusCircle from '@fortawesome/fontawesome-free-solid/faPlusCircle'
 import faStream from '@fortawesome/fontawesome-free-solid/faStream'
 import faListUl from '@fortawesome/fontawesome-free-solid/faListUl'
+import faCube from '@fortawesome/fontawesome-free-solid/faCube'
 
 const ICONS = {
   CaretUp: {
@@ -162,6 +163,9 @@ const ICONS = {
   },
   ListView: {
     src: faListUl
+  },
+  Templates: {
+    src: faCube
   }
 }
 
