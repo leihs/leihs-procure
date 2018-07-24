@@ -6,7 +6,7 @@
              [budget-periods :as budget-periods] [categories :as categories]
              [main-categories :as main-categories] [request :as request]
              [requesters-organizations :as requesters-organizations]
-             [settings :as settings]]))
+             [settings :as settings] [templates :as templates]]))
 
 ; FIXME: a function for debugging convenience. will be a var later.
 (defn mutation-resolver-map
@@ -114,5 +114,7 @@
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :update-settings (-> settings/update-settings!
-                        (authorization/wrap-ensure-one-of
-                          [user-perms/admin?]))})
+                        (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   :update-templates (-> templates/update-templates!
+                         (authorization/wrap-ensure-one-of
+                           [user-perms/admin? user-perms/inspector?]))})

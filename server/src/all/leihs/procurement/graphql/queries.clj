@@ -13,7 +13,8 @@
              [requesters-organizations :as requesters-organizations]
              [requests :as requests] [room :as room] [rooms :as rooms]
              [settings :as settings] [supplier :as supplier] [user :as user]
-             [users :as users] [viewers :as viewers]]))
+             [template :as template] [templates :as templates] [users :as users]
+             [viewers :as viewers]]))
 
 ; FIXME: a function for debugging convenience. will be a var later.
 (defn query-resolver-map
@@ -35,6 +36,9 @@
    :can-delete-main-category? (-> main-category/can-delete?
                                   (authorization/wrap-ensure-one-of
                                     [user-perms/admin?])),
+   :can-delete-template? (-> template/can-delete?
+                             (authorization/wrap-ensure-one-of
+                               [user-perms/admin? user-perms/inspector?])),
    :category category/get-category,
    :categories categories/get-categories,
    :cost-center request/cost-center,
@@ -57,6 +61,7 @@
    :settings (-> settings/get-settings
                  (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :supplier supplier/get-supplier,
+   :templates templates/get-templates,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,
    :total-price-cents-approved-quantities
