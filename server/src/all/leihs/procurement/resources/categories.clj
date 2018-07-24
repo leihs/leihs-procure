@@ -37,6 +37,14 @@
                                     :authenticated-entity
                                     :user_id)]))))))
 
+(defn get-categories-for-ids
+  [tx ids]
+  (-> categories-base-query
+      (sql/merge-where [:in :procurement_categories.id ids])
+      (sql/order-by [:procurement_categories.name :asc])
+      sql/format
+      (->> (jdbc/query tx))))
+
 (defn get-categories
   [context arguments value]
   (if (= (:id arguments) [])

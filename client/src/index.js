@@ -17,6 +17,7 @@ import AdminUsers from './pages/admin/AdminUsersPage'
 import AdminCategories from './pages/admin/AdminCategoriesPage'
 import AdminOrgs from './pages/admin/AdminOrgsPage'
 import AdminBudgetPeriods from './pages/admin/AdminBudgetPeriodsPage'
+import AdminTemplates from './pages/admin/AdminTemplatesPage'
 import AdminSettings from './pages/admin/AdminSettingsPage'
 
 import DevUiCatalog from './pages/_dev/UiCatalogPage'
@@ -51,6 +52,7 @@ const Root = () => (
           <Route path="/admin/categories" component={AdminCategories} />
           <Route path="/admin/organizations" component={AdminOrgs} />
           <Route path="/admin/budget-periods" component={AdminBudgetPeriods} />
+          <Route path="/admin/templates" component={AdminTemplates} />
           <Route path="/admin/settings" component={AdminSettings} />
 
           <Route strict path="/dev/playground" component={DevUiCatalog} />

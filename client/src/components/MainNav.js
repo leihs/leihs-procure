@@ -82,6 +82,10 @@ export default class MainNav extends React.Component {
                     <Icon.Organizations fixedWidth spaced /> Organisationen
                   </DropdownItemLink>
 
+                  <DropdownItemLink className="pl-3" to="/admin/templates">
+                    <Icon.Templates fixedWidth spaced /> Vorlagen
+                  </DropdownItemLink>
+
                   <DropdownItem divider />
 
                   <DropdownItemLink className="pl-3" to="/admin/settings">

@@ -1,4 +1,6 @@
 class CategoryInspector < Sequel::Model(:procurement_category_inspectors)
+  many_to_one :user
+  many_to_one :category
 end
 
 FactoryBot.define do
