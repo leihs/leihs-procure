@@ -330,7 +330,7 @@
                         :id {:type (non-null ID)},
                         :model {:type :Model},
                         :price_cents {:type (non-null Int)},
-                        :price_currenty {:type (non-null String)},
+                        :price_currency {:type (non-null String)},
                         :supplier {:type :Supplier},
                         :supplier_name {:type String}}},
     :User {:fields {:email {:type String},
