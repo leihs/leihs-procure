@@ -11,6 +11,9 @@ import {
   Select
 } from './Bootstrap'
 
+// WIP:
+import MultiSelect from './Bootstrap/DownshiftMultiSelect'
+
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
 // import Icon from './Icons'
@@ -51,13 +54,19 @@ const Filters = ({ data, current, onChange }) => {
       .sortBy(data.budget_periods, 'name')
       .map(({ id, name }) => ({ value: id, label: name })),
 
-    categories: f
-      .sortBy(data.categories, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
+    categories: data.main_categories.map(({ id, name, categories }) => ({
+      label: name,
+      options: f
+        .sortBy(categories, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    })),
 
-    organizations: f
-      .sortBy(data.organizations, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
+    organizations: data.organizations.map(({ id, name, organizations }) => ({
+      label: name,
+      options: f
+        .sortBy(organizations, 'name')
+        .map(({ id, name }) => ({ value: id, label: name }))
+    })),
 
     priority: CONSTANTS.REQUEST_PRIORITIES.map(value => ({
       value,
@@ -70,18 +79,30 @@ const Filters = ({ data, current, onChange }) => {
     }))
   }
 
+  const defaultFilters = {
+    ...f.fromPairs(
+      Object.keys(available).map(key => {
+        const values = f.flatMap(
+          available[key],
+          ({ value, options }) => (value ? value : f.map(options, 'value'))
+        )
+        return [key, values]
+      })
+    ),
+    onlyOwnRequests: false,
+    onlyCategoriesWithRequests: true,
+    priority: null,
+    inspectory_priority: null
+  }
+
   return (
     <StatefulForm
       idPrefix="requests_filter"
       values={current}
       onChange={onChange}
     >
-      {({ fields, formPropsFor, setValue }) => {
-        const selectAllFilters = () => {
-          Object.keys(available).forEach(k =>
-            setValue(k, f.map(available[k], 'value'))
-          )
-        }
+      {({ fields, formPropsFor, setValue, setValues }) => {
+        const selectDefaultFilters = () => setValues(defaultFilters)
 
         return (
           <F>
@@ -90,9 +111,9 @@ const Filters = ({ data, current, onChange }) => {
                 size="sm"
                 color="link"
                 cls="pl-0"
-                onClick={selectAllFilters}
+                onClick={selectDefaultFilters}
               >
-                select all
+                reset filters
               </Button>
             </FormGroup>
 
@@ -109,10 +130,9 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Kategorien'}>
-              <Select
+              <MultiSelect
                 {...formPropsFor('categories')}
                 multiple
-                emptyOption={false}
                 options={available.categories}
               />
             </FormGroup>
@@ -133,15 +153,11 @@ const Filters = ({ data, current, onChange }) => {
               />
             </FormGroup>
             <FormGroup label={'Organisationen'}>
-              <code>TBD</code>
-              {/* FIXME: wait for MultiSelect (can only select non-root!)
-              <Select
+              <MultiSelect
                 {...formPropsFor('organizations')}
                 multiple
-                emptyOption={false}
                 options={available.organizations}
               />
-              */}
             </FormGroup>
             <FormGroup label={'Priorität'}>
               <Select

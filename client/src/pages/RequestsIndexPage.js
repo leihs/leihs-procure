@@ -1,7 +1,7 @@
 import React from 'react'
 import f from 'lodash'
 // import x from 'lodash'
-import { Query } from 'react-apollo'
+import { Query, ApolloConsumer } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import * as Fragments from '../graphql-fragments'
@@ -46,30 +46,43 @@ const FILTERS_QUERY = gql`
       id
       name
     }
-    categories {
+    main_categories {
       id
       name
+      categories {
+        id
+        name
+      }
     }
-    # FIXME: should be 'root_only: false' when UI ready
-    organizations(root_only: false) {
-      id
-      name
-      shortname
+
+    organizations(root_only: true) {
+      ...OrgProps
+      organizations {
+        ...OrgProps
+      }
     }
+
     # priorities {
     #   index
     #   name
     # }
   }
+
+  fragment OrgProps on Organization {
+    id
+    name
+    shortname
+  }
 `
 
 const REQUESTS_QUERY = gql`
   query RequestsIndexFiltered(
-    $budgetPeriods: [ID]
-    $categories: [ID]
+    $budgetPeriods: [ID!]
+    $categories: [ID!]
     $search: String
-    $priority: [Priority]
-    $inspectory_priority: [InspectorPriority]
+    $organizations: [ID!]
+    $priority: [Priority!]
+    $inspectory_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
   ) {
     budget_periods(id: $budgetPeriods) {
@@ -88,8 +101,8 @@ const REQUESTS_QUERY = gql`
           name
 
           requests(
-            # TODO: organization_id: $organizations #
             search: $search
+            organization_id: $organizations
             priority: $priority
             inspectory_priority: $inspectory_priority
             requested_by_auth_user: $onlyOwnRequests
@@ -102,6 +115,84 @@ const REQUESTS_QUERY = gql`
   }
   ${Fragments.RequestFieldsForIndex}
 `
+
+const doChangeRequestCategory = (client, requestId, newCatId, callback) => {
+  const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
+    mutation changeRequestCategory($input: RequestCategoryInput!) {
+      # NOTE: we dont need any return data bc we refetch anyways
+      change_request_category(input_data: $input) {
+        id
+      }
+    }
+  `
+
+  client
+    .mutate({
+      mutation: CHANGE_REQUEST_CATEGORY_MUTATION,
+      variables: { input: { id: requestId, category: newCatId } },
+      update: callback
+    })
+    .catch(error => window.alert(error))
+}
+
+const doChangeBudgetPeriod = (client, requestId, newBudPeriodId, callback) => {
+  const CHANGE_BUDGET_PERIOD_MUTATION = gql`
+    mutation changeBudgetPeriod($input: RequestBudgetPeriodInput!) {
+      # NOTE: we dont need any return data bc we refetch anyways
+      change_request_budget_period(input_data: $input) {
+        id
+      }
+    }
+  `
+
+  client
+    .mutate({
+      mutation: CHANGE_BUDGET_PERIOD_MUTATION,
+      variables: { input: { id: requestId, budget_period: newBudPeriodId } },
+      update: callback
+    })
+    .catch(error => window.alert(error))
+}
+
+const doDeleteRequest = (client, request, callback) => {
+  const DELETE_REQUEST_MUTATION = gql`
+    mutation changeRequestCategory($input: DeleteRequestInput) {
+      delete_request(input_data: $input)
+    }
+  `
+
+  if (!window.confirm('Delete?')) return
+
+  client
+    .mutate({
+      mutation: DELETE_REQUEST_MUTATION,
+      variables: { input: { id: request.id } },
+      update: (cache, response) => {
+        if (!response.data.delete_request) {
+          window.alert('Could not delete!')
+        }
+        // NOTE: manual store update doesnt work yet, but data is this:
+        // const updatedData = {
+        //   budget_periods: currentData.budget_periods.map(bp => ({
+        //     ...bp,
+        //     main_categories: bp.main_categories.map(mc => ({
+        //       ...mc,
+        //       categories: mc.categories.map(sc => ({
+        //         ...sc,
+        //         requests: sc.requests.filter(r => r.id !== request.id)
+        //       }))
+        //     }))
+        //   }))
+        // }
+        // cache.writeQuery({
+        //   query: REQUESTS_QUERY,
+        //   data: updatedData
+        // })
+        callback() // does a full reload :/
+      }
+    })
+    .catch(error => window.alert(error))
+}
 
 // TODO: modularize `storageFactory`
 const LOCAL_STORE_KEY = 'leihs-procure'
@@ -168,41 +259,60 @@ class RequestsIndexPage extends React.Component {
   }
   render({ state } = this) {
     return (
-      <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
-        {filtersQuery => {
-          return (
-            <Query
-              query={REQUESTS_QUERY}
-              variables={state.currentFilters}
-              notifyOnNetworkStatusChange
-              // FIXME: apollo bug, need to turn off cache as a workaround!
-              //        <https://github.com/apollographql/apollo-client/issues/2266>
-              //        <https://github.com/apollographql/react-apollo/issues/1192>
-              fetchPolicy="network-only"
-            >
-              {requestsQuery => {
-                const refetchAllData = async () => {
-                  await filtersQuery.refetch()
-                  await requestsQuery.refetch()
-                }
-                return (
-                  <RequestsDashboard
-                    viewMode={state.viewMode}
-                    currentFilters={state.currentFilters}
-                    onFilterChange={this.onFilterChange}
-                    filters={filtersQuery}
-                    requestsQuery={requestsQuery}
-                    refetchAllData={refetchAllData}
-                    openPanels={state.openPanels}
-                    onPanelToggle={this.onPanelToggle}
-                    onSetViewMode={this.onSetViewMode}
-                  />
-                )
-              }}
-            </Query>
-          )
-        }}
-      </Query>
+      <ApolloConsumer>
+        {client => (
+          <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
+            {filtersQuery => {
+              return (
+                <Query
+                  query={REQUESTS_QUERY}
+                  variables={state.currentFilters}
+                  notifyOnNetworkStatusChange
+                >
+                  {requestsQuery => {
+                    const refetchAllData = async () => {
+                      await filtersQuery.refetch()
+                      await requestsQuery.refetch()
+                    }
+                    return (
+                      <RequestsDashboard
+                        viewMode={state.viewMode}
+                        currentFilters={state.currentFilters}
+                        onFilterChange={this.onFilterChange}
+                        filters={filtersQuery}
+                        requestsQuery={requestsQuery}
+                        refetchAllData={refetchAllData}
+                        openPanels={state.openPanels}
+                        onPanelToggle={this.onPanelToggle}
+                        onSetViewMode={this.onSetViewMode}
+                        doDeleteRequest={r =>
+                          doDeleteRequest(client, r, refetchAllData)
+                        }
+                        doChangeRequestCategory={(r, categoryId) =>
+                          doChangeRequestCategory(
+                            client,
+                            r,
+                            categoryId,
+                            refetchAllData
+                          )
+                        }
+                        doChangeBudgetPeriod={(r, budgetPerId) =>
+                          doChangeBudgetPeriod(
+                            client,
+                            r,
+                            budgetPerId,
+                            refetchAllData
+                          )
+                        }
+                      />
+                    )
+                  }}
+                </Query>
+              )
+            }}
+          </Query>
+        )}
+      </ApolloConsumer>
     )
   }
 }

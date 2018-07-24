@@ -17,6 +17,20 @@ const REQUEST_EDIT_QUERY = gql`
     requests(id: $id) {
       ...RequestFieldsForShow
     }
+    # for selecting a new category:
+    main_categories {
+      id
+      name
+      categories {
+        id
+        name
+      }
+    }
+    # for selecting a budget period:
+    budget_periods {
+      id
+      name
+    }
   }
   ${Fragments.RequestFieldsForShow}
 `
@@ -84,37 +98,79 @@ const updateRequestFromFields = (mutate, request, fields) => {
   mutate({ variables: { requestData } })
 }
 
-const RequestEdit = ({ requestId, onClose }) => (
-  <Query
-    fetchPolicy="network-only"
-    query={REQUEST_EDIT_QUERY}
-    variables={{ id: [requestId] }}
-  >
-    {({ error, loading, data }) => {
-      if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} data={data} />
-      return (
-        <Mutation mutation={UPDATE_REQUEST_MUTATION}>
-          {(mutate, mutReq) => {
-            if (mutReq.loading) return <Loading />
-            if (mutReq.error)
-              return <ErrorPanel error={mutReq.error} data={mutReq.data} />
-            const request = data.requests[0]
-            return (
-              <RequestForm
-                className="p-3"
-                request={request}
-                onClose={onClose}
-                onSubmit={fields =>
-                  updateRequestFromFields(mutate, request, fields)
-                }
-              />
-            )
-          }}
-        </Mutation>
-      )
-    }}
-  </Query>
-)
+class RequestEdit extends React.Component {
+  state = { selectNewCategory: false, selectBudgetPeriod: false }
+
+  onSelectNewRequestCategory = () => {
+    this.setState(s => ({
+      selectNewCategory: !s.selectNewCategory
+    }))
+  }
+  onChangeRequestCategory = newCategory => {
+    const requestId = this.props.requestId
+    if (!requestId || !newCategory.id) throw new Error()
+    window.confirm(`Move to category "${newCategory.name}"?`) &&
+      this.props.doChangeRequestCategory(requestId, newCategory.id)
+  }
+
+  onSelectNewBudgetPeriod = () => {
+    this.setState(s => ({
+      selectBudgetPeriod: !s.selectBudgetPeriod
+    }))
+  }
+  onChangeBudgetPeriod = newBudgetPeriod => {
+    const requestId = this.props.requestId
+    if (!requestId || !newBudgetPeriod.id) throw new Error()
+    window.confirm(`Move to Budget Period "${newBudgetPeriod.name}"?`) &&
+      this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
+  }
+
+  render({ requestId, onClose, ...props } = this.props) {
+    return (
+      <Query
+        fetchPolicy="network-only"
+        query={REQUEST_EDIT_QUERY}
+        variables={{ id: [requestId] }}
+      >
+        {({ error, loading, data }) => {
+          if (loading) return <Loading />
+          if (error) return <ErrorPanel error={error} data={data} />
+          return (
+            <Mutation mutation={UPDATE_REQUEST_MUTATION}>
+              {(mutate, mutReq) => {
+                if (mutReq.loading) return <Loading />
+                if (mutReq.error)
+                  return <ErrorPanel error={mutReq.error} data={mutReq.data} />
+                const request = data.requests[0]
+                return (
+                  <RequestForm
+                    className="p-3"
+                    request={request}
+                    categories={data.main_categories}
+                    budgetPeriods={data.budget_periods}
+                    onClose={onClose}
+                    onSubmit={fields =>
+                      updateRequestFromFields(mutate, request, fields)
+                    }
+                    // action delete
+                    doDeleteRequest={e => props.doDeleteRequest(request)}
+                    // action move category
+                    onSelectNewRequestCategory={this.onSelectNewRequestCategory}
+                    isSelectingNewCategory={this.state.selectNewCategory}
+                    doChangeRequestCategory={this.onChangeRequestCategory}
+                    // action move budget period
+                    onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
+                    isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
+                    doChangeBudgetPeriod={this.onChangeBudgetPeriod}
+                  />
+                )
+              }}
+            </Mutation>
+          )
+        }}
+      </Query>
+    )
+  }
+}
 
 export default RequestEdit

@@ -1,4 +1,6 @@
 import ApolloClient from 'apollo-boost'
+import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory'
+
 import logger from 'debug'
 const log = logger('app:apollo')
 
@@ -30,7 +32,22 @@ export const fetchOptions = {
   credentials: isDev ? 'omit' : 'same-origin' // send the cookie(s)
 }
 
+const cache = new InMemoryCache({
+  dataIdFromObject: object => {
+    // FIXME: workaround buggy apollo cache, dont cache certain types at all!
+    switch (object.__typename) {
+      case 'MainCategory':
+        return Math.random()
+      case 'Category':
+        return Math.random()
+      default:
+        return defaultDataIdFromObject(object) // fall back to default handling
+    }
+  }
+})
+
 export const apolloClient = new ApolloClient({
+  cache,
   uri: endpointURL,
   // static options for fetch requests:
   fetchOptions,

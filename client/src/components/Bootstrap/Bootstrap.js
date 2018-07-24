@@ -183,7 +183,11 @@ const FormFieldPropTypes = {
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string, // enum, already checked at runtime
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool
+  ])
 }
 export const FormField = ({
   beforeInput,
@@ -265,6 +269,8 @@ export const FormField = ({
 
   if (type === 'checkbox') {
     mainClass = 'custom-control-input'
+    inputProps = { ...inputProps, checked: value }
+    value = null
   }
 
   const inputAutoComplete =

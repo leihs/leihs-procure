@@ -199,6 +199,58 @@
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-user))))
 
+(defn change-budget-period!
+  [context args _]
+  (let [ring-req (:request context)
+        tx (:tx ring-req)
+        auth-user (:authenticated-entity ring-req)
+        input-data (:input_data args)
+        req-id (:id input-data)
+        budget-period-id (:budget_period input-data)
+        proc-request (get-request-by-id tx req-id)]
+    (authorization/authorize-and-apply
+      #(jdbc/execute! tx
+                      (-> (sql/update :procurement_requests)
+                          (sql/sset {:budget_period_id budget-period-id})
+                          (sql/where [:= :procurement_requests.id req-id])
+                          sql/format))
+      :if-only
+      #(request-perms/authorized-to-write-all-fields?
+         tx
+         auth-user
+         (reverse-exchange-attrs proc-request)
+         {:budget_period budget-period-id}))
+    (->> req-id
+         (get-request-by-id tx)
+         reverse-exchange-attrs
+         (request-perms/apply-permissions tx auth-user))))
+
+(defn change-category!
+  [context args _]
+  (let [ring-req (:request context)
+        tx (:tx ring-req)
+        auth-user (:authenticated-entity ring-req)
+        input-data (:input_data args)
+        req-id (:id input-data)
+        cat-id (:category input-data)
+        proc-request (get-request-by-id tx req-id)]
+    (authorization/authorize-and-apply
+      #(jdbc/execute! tx
+                      (-> (sql/update :procurement_requests)
+                          (sql/sset {:category_id cat-id})
+                          (sql/where [:= :procurement_requests.id req-id])
+                          sql/format))
+      :if-only
+      #(request-perms/authorized-to-write-all-fields? tx
+                                                      auth-user
+                                                      (reverse-exchange-attrs
+                                                        proc-request)
+                                                      {:category cat-id}))
+    (->> req-id
+         (get-request-by-id tx)
+         reverse-exchange-attrs
+         (request-perms/apply-permissions tx auth-user))))
+
 (defn update-request!
   [context args _]
   (let [ring-req (:request context)
