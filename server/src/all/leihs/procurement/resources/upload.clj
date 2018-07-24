@@ -1,11 +1,12 @@
 (ns leihs.procurement.resources.upload
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [cheshire.core :rename {generate-string to-json}]
+            [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
+            [leihs.procurement.utils.exif :as exif]
             [leihs.procurement.utils.sql :as sql])
-  (:import [java.util Base64]
-           [org.apache.commons.io FileUtils]))
+  (:import java.util.Base64
+           org.apache.commons.io.FileUtils))
 
 (defn insert-file-upload!
   [tx m]
@@ -17,13 +18,18 @@
 (defn upload
   [{params :params, tx :tx}]
   (let [upload (:upload params)
-        content (->> upload
-                     :tempfile
+        tempfile (:tempfile upload)
+        content (->> tempfile
                      (FileUtils/readFileToByteArray)
                      (.encodeToString (Base64/getMimeEncoder)))
+        metadata (-> tempfile
+                     exif/extract-metadata
+                     to-json
+                     (#(sql/call :cast % :json)))
         upload-map (-> upload
                        (dissoc :tempfile)
-                       (assoc :content content))]
+                       (assoc :content content)
+                       (assoc :metadata metadata))]
     (insert-file-upload! tx upload-map)
     (let [upload-row (-> (sql/select :id)
                          (sql/from :procurement_uploads)
