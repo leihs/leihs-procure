@@ -37,7 +37,7 @@ class DevConsole extends Component {
       <div style={{ height: '100vh' }}>
         <GraphiQL
           fetcher={graphQLFetcher}
-          query={exampleQuery}
+          defaultQuery={exampleQuery}
           editorTheme="dracula"
         >
           <GraphiQL.Logo>
