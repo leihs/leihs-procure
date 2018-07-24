@@ -1,6 +1,6 @@
 import React from 'react'
 // import cx from 'classnames'
-import f from 'lodash'
+// import f from 'lodash'
 
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
