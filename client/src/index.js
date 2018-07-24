@@ -11,6 +11,7 @@ import App from './components/App'
 // all the pages
 import HomePage from './pages/HomePage'
 import RequestsIndex from './pages/RequestsIndexPage'
+import RequestNew from './pages/RequestNewPage'
 
 import AdminUsers from './pages/admin/AdminUsersPage'
 import AdminCategories from './pages/admin/AdminCategoriesPage'
@@ -45,6 +46,7 @@ const Root = () => (
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/requests" component={RequestsIndex} />
+          <Route exact path="/requests/new" component={RequestNew} />
           <Route exact path="/admin/users" component={AdminUsers} />
           <Route path="/admin/categories" component={AdminCategories} />
           <Route path="/admin/organizations" component={AdminOrgs} />

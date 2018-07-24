@@ -26,6 +26,7 @@ const Select = ({
   emptyOption,
   value,
   readOnly,
+  disabled,
   ...props
 }) => {
   const selectedValue = getSelectedValueFromProps(value, multiple)
@@ -37,7 +38,7 @@ const Select = ({
       className={cx('custom-select', props.className)}
       multiple={multiple}
       value={selectedValue}
-      disabled={readOnly}
+      disabled={disabled || readOnly}
       onChange={e => {
         if (props.readOnly) return e.preventDefault()
         props.onChange({
