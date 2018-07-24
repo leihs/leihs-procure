@@ -18,8 +18,8 @@
   (get-model-by-id (-> context
                        :request
                        :tx)
-                   (:value value) ; for RequestFieldModel
-    ))
+                   (or (:value value) ; for RequestFieldModel
+                       (:model_id value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

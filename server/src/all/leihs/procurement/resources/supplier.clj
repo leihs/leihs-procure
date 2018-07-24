@@ -18,8 +18,8 @@
   (get-supplier-by-id (-> context
                           :request
                           :tx)
-                      (:value value) ; for RequestFieldSupplier
-    ))
+                      (or (:value value) ; for RequestFieldSupplier
+                          (:supplier_id value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
