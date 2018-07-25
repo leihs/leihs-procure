@@ -343,7 +343,14 @@
                     :firstname {:type (non-null String)},
                     :id {:type (non-null ID)},
                     :lastname {:type String},
-                    :login {:type String}}}},
+                    :login {:type String},
+                    :permissions {:resolve :permissions,
+                                  :type :UserPermissions}}},
+    :UserPermissions {:fields
+                        {:isAdmin {:type (non-null Boolean)},
+                         :isInspectorForCategories {:type (list :Category)},
+                         :isRequester {:type (non-null Boolean)},
+                         :isViewerForCategories {:type (list :Category)}}}},
  :queries
    {:admins {:resolve :admins, :type (list :User)},
     :budget_limits {:resolve :budget-limits, :type (list :BudgetLimit)},
