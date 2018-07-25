@@ -29,7 +29,6 @@
          ["~~*" :procurement_requests.inspection_comment term-percent]
          ["~~*" :procurement_requests.motivation term-percent]
          ["~~*" :procurement_requests.receiver term-percent]
-         ["~~*" :procurement_requests.supplier_name term-percent]
          ["~~*" :rooms.name term-percent] ["~~*" :users.firstname term-percent]
          ["~~*" :users.lastname term-percent]]))))
 
