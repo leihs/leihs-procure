@@ -101,9 +101,6 @@ export const RequestFieldsForShow = gql`
         name
       }
     }
-    supplier_name {
-      ...RequestFieldString
-    }
     receiver {
       ...RequestFieldString
     }

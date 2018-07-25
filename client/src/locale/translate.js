@@ -34,7 +34,6 @@ const translations = {
     article_name: 'Artikel oder Projekt',
     article_number: 'Artikelnr. oder Herstellernr.',
     supplier: 'Lieferant [auswahl]',
-    supplier_name: 'Lieferant [freitext]',
     receiver: 'Name des Empfängers',
     building: 'Gebäude',
     room: 'Raum',

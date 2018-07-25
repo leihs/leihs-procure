@@ -76,7 +76,6 @@ const updateRequestFromFields = (mutate, request, fields) => {
 
     // TODO: form field with id (autocomplete)
     // ...valueIfWritable(fields, request, 'supplier'),
-    ...valueIfWritable(fields, request, 'supplier_name'),
 
     ...valueIfWritable(fields, request, 'article_number'),
     ...valueIfWritable(fields, request, 'motivation'),
