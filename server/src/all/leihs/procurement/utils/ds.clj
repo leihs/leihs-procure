@@ -112,7 +112,11 @@
     ; NOTE: for images we have to use a datasource without pooler as somewhere
     ; there
     ; is a bug which leads to hanging of the server on all subsequent requests
-    (let [ds (if (= (:handler-key request) :image) @ds-without-pooler @ds)]
+    ; (let [ds (if (= (:handler-key request) :image) @ds-without-pooler @ds)]
+    ; 
+    ; FIXME: using ds without pooler for every handelr for the time being as 
+    ; the problem with hanging server still persists
+    (let [ds @ds-without-pooler]
       (jdbc/with-db-transaction
         [tx ds]
         (try
