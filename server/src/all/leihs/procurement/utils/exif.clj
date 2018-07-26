@@ -1,5 +1,6 @@
 (ns leihs.procurement.utils.exif
   (:require [clojure.java.shell :refer [sh]]
+            [clojure.tools.logging :as log]
             [clojure.string :as string]))
 
 (defn- replace-group-string
@@ -15,7 +16,7 @@
        :out
        string/split-lines
        (map replace-group-string)
-       (map #(string/split % #" : "))
+       (map #(string/split % #"\s+:"))
        flatten
        (map string/trim)
        (apply hash-map)))

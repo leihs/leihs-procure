@@ -1,6 +1,8 @@
 (ns leihs.procurement.resources.upload
-  (:require [cheshire.core :rename {generate-string to-json}]
+  (:require [cheshire.core :refer [generate-string] :rename
+             {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.utils.exif :as exif]
@@ -16,7 +18,7 @@
                      sql/format)))
 
 (defn upload
-  [{params :params, tx :tx}]
+  [{params :params, tx :tx, :as request}]
   (let [upload (:upload params)
         tempfile (:tempfile upload)
         content (->> tempfile
@@ -26,10 +28,12 @@
                      exif/extract-metadata
                      to-json
                      (#(sql/call :cast % :json)))
+        content-type (or (:content-type upload) (get metadata "File:MIMEType"))
         upload-map (-> upload
                        (dissoc :tempfile)
                        (assoc :content content)
-                       (assoc :metadata metadata))]
+                       (assoc :metadata metadata)
+                       (assoc :content-type content-type))]
     (insert-file-upload! tx upload-map)
     (let [upload-row (-> (sql/select :id)
                          (sql/from :procurement_uploads)
