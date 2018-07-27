@@ -17,10 +17,9 @@
                      (sql/values [m])
                      sql/format)))
 
-(defn upload
-  [{params :params, tx :tx, :as request}]
-  (let [upload (:upload params)
-        tempfile (:tempfile upload)
+(defn prepare-upload-row-map
+  [file-data]
+  (let [tempfile (:tempfile file-data)
         content (->> tempfile
                      (FileUtils/readFileToByteArray)
                      (.encodeToString (Base64/getMimeEncoder)))
@@ -28,20 +27,27 @@
                      exif/extract-metadata
                      to-json
                      (#(sql/call :cast % :json)))
-        content-type (or (:content-type upload) (get metadata "File:MIMEType"))
-        upload-map (-> upload
-                       (dissoc :tempfile)
-                       (assoc :content content)
-                       (assoc :metadata metadata)
-                       (assoc :content-type content-type))]
-    (insert-file-upload! tx upload-map)
-    (let [upload-row (-> (sql/select :id)
-                         (sql/from :procurement_uploads)
-                         (sql/order-by [:created_at :desc])
-                         (sql/limit 1)
-                         sql/format
-                         (->> (jdbc/query tx))
-                         first)]
-      {:body upload-row})))
+        content-type (or (:content-type upload) (get metadata "File:MIMEType"))]
+    (-> file-data
+        (dissoc :tempfile)
+        (assoc :content content)
+        (assoc :metadata metadata)
+        (assoc :content-type content-type))))
+
+(defn upload
+  [{params :params, tx :tx}]
+  (let [upload (:upload params)
+        files-data (if (coll? upload) upload [upload])]
+    (doseq [fd files-data]
+      (->> fd
+           prepare-upload-row-map
+           (insert-file-upload! tx)))
+    (let [upload-rows (-> (sql/select :id)
+                          (sql/from :procurement_uploads)
+                          (sql/order-by [:created_at :desc])
+                          (sql/limit (count files))
+                          sql/format
+                          (->> (jdbc/query tx)))]
+      {:body upload-rows})))
 
 (def routes (cpj/routes (cpj/POST (path :upload) [] #'upload)))
