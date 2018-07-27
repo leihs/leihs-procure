@@ -52,6 +52,8 @@ describe 'request' do
         requester = FactoryBot.create(:user)
         FactoryBot.create(:requester_organization, user_id: requester.id)
 
+        upload = FactoryBot.create(:upload)
+
         attrs = {
           budget_period: FactoryBot.create(:budget_period).id,
           category: category.id,

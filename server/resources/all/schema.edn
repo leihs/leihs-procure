@@ -28,7 +28,7 @@
                                :approved_quantity {:type Int},
                                :article_name {:type (non-null String)},
                                :article_number {:type String},
-                               ; :attachments {:type (list :Attachment)},
+                               :attachments {:type (list ID)},
                                :budget_period {:type (non-null ID)},
                                :category {:type (non-null ID)},
                                :inspection_comment {:type String},
