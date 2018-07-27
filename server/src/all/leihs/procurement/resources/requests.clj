@@ -179,10 +179,12 @@
                                                 %)})]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
-           (map #(request-perms/apply-permissions tx
-                                                  (:authenticated-entity
-                                                    ring-request)
-                                                  %))))))
+           (map (fn [proc-req]
+                  (request-perms/apply-permissions
+                    tx
+                    (:authenticated-entity ring-request)
+                    proc-req
+                    #(assoc % :request-id (:id proc-req)))))))))
 
 (defn total-price-query
   [qty-type bp-id]

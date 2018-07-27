@@ -59,7 +59,8 @@ describe 'request' do
           category: category.id,
           organization: FactoryBot.create(:organization).id,
           requested_quantity: 1,
-          room: FactoryBot.create(:room).id
+          room: FactoryBot.create(:room).id,
+          attachments: [{id: upload.id}]
         }
 
         ['admin', 'inspector', 'requester'].each do |user_name|
@@ -72,20 +73,16 @@ describe 'request' do
             mutation {
               new_request(input_data: #{hash_to_graphql attrs2}) {
                 id
+                attachments
               }
             }
           GRAPHQL
 
           result = query(q, user.id)
 
-          request = Request.find(transform_uuid_attrs attrs2)
-          expect(result).to be == {
-            'data' => {
-              'new_request' => {
-                'id' => request.id
-              }
-            }
-          }
+          request = Request.order(:created_at).reverse.first
+          expect(result['data']['new_request']['id']).to be == request.id
+          expect(result['data']['new_request']['attachments'].count).to be == 1
         end
       end
 

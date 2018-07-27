@@ -8,22 +8,26 @@
 (def attrs-to-exclude #{:id})
 
 (defn apply-permissions
-  [tx auth-user proc-request]
-  (let [field-perms (request-fields-perms/get-for-user-and-request
-                      tx
-                      auth-user
-                      proc-request)]
-    (into {}
-          (map
-            (fn [[attr value]]
-              (if (attrs-to-exclude attr)
-                {attr value}
-                {attr (if-let [p-spec (attr field-perms)]
-                        (assoc p-spec :value (if (:read p-spec) value))
-                        ; FIXME: this is a general whitelist fallback
-                        ; remove when all field permissions implemented
-                        {:value value, :read true, :write true})}))
-            proc-request))))
+  ([tx auth-user proc-request]
+   (apply-permissions tx auth-user proc-request identity))
+  ([tx auth-user proc-request ext-fn]
+   (let [field-perms (request-fields-perms/get-for-user-and-request
+                       tx
+                       auth-user
+                       proc-request)]
+     (into {}
+           (map (fn [[attr value]]
+                  (if (attrs-to-exclude attr)
+                    {attr value}
+                    (let [result (if-let [p-spec (attr field-perms)]
+                                   (assoc p-spec
+                                     :value (if (:read p-spec) value))
+                                   ; FIXME: this is a general whitelist fallback
+                                   ; remove when all field permissions
+                                   ; implemented
+                                   {:value value, :read true, :write true})]
+                      (ext-fn result))))
+             proc-request)))))
 
 (defn authorized-to-write-all-fields?
   ([tx auth-user write-data]

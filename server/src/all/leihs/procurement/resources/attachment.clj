@@ -3,7 +3,7 @@
             [clojure.data.codec.base64 :as base64]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as logging]
+            [clojure.tools.logging :as log]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.utils.ds :as ds]
@@ -38,6 +38,13 @@
 (def attachment-path (path :attachment {:attachment-id ":attachment-id"}))
 
 (def routes (cpj/routes (cpj/GET attachment-path [] #'attachment)))
+
+(defn create!
+  [tx data]
+  (jdbc/execute! tx
+                 (-> (sql/insert-into :procurement_attachments)
+                     (sql/values [data])
+                     sql/format)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

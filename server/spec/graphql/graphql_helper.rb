@@ -32,23 +32,8 @@ RSpec.shared_context 'graphql client' do
     GraphqlQuery.new(q, user_id, variables).perform.result
   end
 
-  def map_type_to_gql(rb)
-    case rb.class.name
-    when "String"
-      "\"#{rb}\""
-    when "Float", "Integer", "Fixnum", "TrueClass", "FalseClass"
-      rb
-    else
-      raise "unspecified ruby class"
-    end
-  end
-
   def hash_to_graphql(h)
-    h
-      .map { |k, v| "#{k}: #{map_type_to_gql v}" }
-      .join(",\n")
-      .insert(0, "{\n")
-      .insert(-1, "\n}")
+    h.to_s.gsub(/:(.+?)=>/, "\\1: ")
   end
 end
 

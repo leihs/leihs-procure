@@ -179,25 +179,58 @@
       (->> (jdbc/query tx))
       first))
 
+(defn get-last-created-request
+  [tx]
+  (-> (sql/select :id)
+      (sql/from :procurement_requests)
+      (sql/order-by [:created_at :desc])
+      (sql/limit 1)
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
+(defn insert!
+  [tx data]
+  (jdbc/execute! tx
+                 (-> (sql/insert-into :procurement_requests)
+                     (sql/values [data])
+                     sql/format)))
+
 (defn create-request!
   [context args _]
   (let [input-data (:input_data args)
         write-data (to-name-and-lower-case-priorities input-data)
-        write-data-with-exchanged-attrs (exchange-attrs write-data)
+        uploads (:attachments write-data)
+        write-data-with-exchanged-attrs (-> write-data
+                                            (dissoc :attachments)
+                                            exchange-attrs)
         ring-req (:request context)
         tx (:tx ring-req)
         auth-user (:authenticated-entity ring-req)]
-    (authorization/authorize-and-apply
-      #(jdbc/execute! tx
-                      (-> (sql/insert-into :procurement_requests)
-                          (sql/values [write-data-with-exchanged-attrs])
-                          sql/format))
-      :if-only
-      #(request-perms/authorized-to-write-all-fields? tx auth-user write-data))
-    (->> write-data-with-exchanged-attrs
-         (get-request-by-attrs tx)
-         reverse-exchange-attrs
-         (request-perms/apply-permissions tx auth-user))))
+    (with-local-vars [req-id nil]
+      (authorization/authorize-and-apply
+        #(do (insert! tx write-data-with-exchanged-attrs)
+             (var-set req-id
+                      (-> tx
+                          get-last-created-request
+                          :id))
+             (if uploads
+               (attachments/create-for-request-id-and-uploads! tx
+                                                               (var-get req-id)
+                                                               uploads)))
+        :if-only
+        #(request-perms/authorized-to-write-all-fields? tx
+                                                        auth-user
+                                                        write-data))
+      (as-> (var-get req-id) <>
+        (get-request-by-id tx <>)
+        (reverse-exchange-attrs <>)
+        (request-perms/apply-permissions tx
+                                         auth-user
+                                         <>
+                                         #(assoc %
+                                           :request-id (var-get req-id)))
+        (log/spy <>)))))
 
 (defn change-budget-period!
   [context args _]
