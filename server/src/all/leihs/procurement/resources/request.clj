@@ -126,12 +126,17 @@
   [row]
   (upper-case-keyword-value row :inspector_priority))
 
+(defn initialize-attachments-attribute
+  [row]
+  (assoc row :attachments :unqueried))
+
 (defn transform-row
   [tx auth-user row]
-  (->> row
-       (add-state tx auth-user)
-       treat-priority
-       treat-inspector-priority))
+  (-> row
+      (->> (add-state tx auth-user))
+      treat-priority
+      treat-inspector-priority
+      initialize-attachments-attribute))
 
 (defn get-request-by-id
   [tx id]
@@ -229,8 +234,7 @@
                                          auth-user
                                          <>
                                          #(assoc %
-                                           :request-id (var-get req-id)))
-        (log/spy <>)))))
+                                           :request-id (var-get req-id)))))))
 
 (defn change-budget-period!
   [context args _]

@@ -26,7 +26,6 @@
 
 (defn get-attachments
   [context _ value]
-  (log/debug value)
   (let [tx (-> context
                :request
                :tx)]

@@ -10,7 +10,7 @@
 (defn apply-permissions
   ([tx auth-user proc-request]
    (apply-permissions tx auth-user proc-request identity))
-  ([tx auth-user proc-request ext-fn]
+  ([tx auth-user proc-request transform-fn]
    (let [field-perms (request-fields-perms/get-for-user-and-request
                        tx
                        auth-user
@@ -26,7 +26,7 @@
                                    ; remove when all field permissions
                                    ; implemented
                                    {:value value, :read true, :write true})]
-                      (ext-fn result))))
+                      {attr (transform-fn result)})))
              proc-request)))))
 
 (defn authorized-to-write-all-fields?
