@@ -16,7 +16,10 @@
     "test": "react-scripts test --env=jsdom"
   },
   "proxy": {
-    "/(graphql|graphiql|images|attachments|status)": {
+    "/(graphql|graphiql|images|attachments|status|upload)": {
+      "target": "http://localhost:3003"
+    },
+    "/procure/(graphql|graphiql|images|attachments|status|upload)": {
       "target": "http://localhost:3003"
     }
   },

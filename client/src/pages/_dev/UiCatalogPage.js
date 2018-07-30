@@ -10,9 +10,10 @@ import {
   Row,
   Col,
   // Button,
-  // FormGroup,
+  FormGroup,
   // InputText,
-  FormField
+  FormField,
+  InputFileUpload
 } from '../../components/Bootstrap'
 import StatefulForm from '../../components/Bootstrap/StatefulForm'
 import { MainWithSidebar } from '../../components/Layout'
@@ -150,6 +151,40 @@ const PAGES = [
         <hr />
       </F>
     ))
+  },
+  {
+    id: 'input-file-upload',
+    title: 'InputFileUpload',
+    content: (
+      <F>
+        <form>
+          <FormGroup label="attach a file">
+            <InputFileUpload id="example-input-file-upload" />
+          </FormGroup>
+        </form>
+        <hr />
+        <StatefulForm idPrefix="input-file-upload-mock-form">
+          {({ fields, formPropsFor }) => {
+            return (
+              <F>
+                <form
+                  id="input-file-upload-mock-form"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    window.alert(JSON.stringify(fields, 0, 2))
+                  }}
+                >
+                  <InputFileUpload {...formPropsFor('exampleAttachments')} />
+                </form>
+                <pre>
+                  <code>{JSON.stringify(fields, 0, 2)}</code>
+                </pre>
+              </F>
+            )
+          }}
+        </StatefulForm>
+      </F>
+    )
   }
 ]
 
