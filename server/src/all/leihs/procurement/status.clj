@@ -5,6 +5,9 @@
             [hiccup.page :refer [include-js html5]]
             [logbug.debug :as debug]))
 
+; -----------------------------------------------------------------
+; FIXME: remove html stuff - it was used only for testing purposes
+; -----------------------------------------------------------------
 (defn head
   []
   [:head [:meta {:charset "utf-8"}]
@@ -25,6 +28,9 @@
                    :enctype "multipart/form-data"}
                   [:input {:type "file", :name "files", :multiple true}]
                   [:button {:type "submit"} "upload"]]])})
+; -----------------------------------------------------------------
+; -----------------------------------------------------------------
+; -----------------------------------------------------------------
 
 (def routes (cpj/routes (cpj/GET (path :status) [] #'status)))
 
