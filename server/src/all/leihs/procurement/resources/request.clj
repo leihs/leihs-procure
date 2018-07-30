@@ -81,11 +81,11 @@
       (sql/from :procurement_requests)))
 
 (defn get-state
-  [tx auth-user row]
+  [tx auth-entity row]
   (if-let [approved-quantity (:approved_quantity row)]
     (let [budget-period
             (budget-period/get-budget-period-by-id tx (:budget_period_id row))
-          range-type (state-value-range-type tx auth-user [budget-period])
+          range-type (state-value-range-type tx auth-entity [budget-period])
           requested-quantity (:requested_quantity row)]
       (case range-type
         :restricted "in_approval"
@@ -96,8 +96,8 @@
     "new"))
 
 (defn add-state
-  [tx auth-user row]
-  (assoc row :state (get-state tx auth-user row)))
+  [tx auth-entity row]
+  (assoc row :state (get-state tx auth-entity row)))
 
 (defn to-name-and-lower-case
   [x]
@@ -131,29 +131,33 @@
   (assoc row :attachments :unqueried))
 
 (defn transform-row
-  [tx auth-user row]
-  (-> row
-      (->> (add-state tx auth-user))
-      treat-priority
-      treat-inspector-priority
-      initialize-attachments-attribute))
+  [tx auth-entity row]
+  (->> row
+       (add-state tx auth-entity)
+       treat-priority
+       treat-inspector-priority
+       initialize-attachments-attribute))
+
+(defn query-requests
+  [tx auth-entity query]
+  (jdbc/query tx query {:row-fn #(transform-row tx auth-entity %)}))
 
 (defn get-request-by-id
-  [tx id]
+  [tx auth-entity id]
   (-> requests-base-query
       (sql/where [:= :procurement_requests.id id])
       sql/format
-      (->> (jdbc/query tx))
+      (->> (query-requests tx auth-entity))
       first))
 
 (defn get-account-perms
   [context value attr]
   (let [rrequest (:request context)
         tx (:tx rrequest)
-        auth-user (:authenticated-entity rrequest)
-        req (get-request-by-id tx (:id value))
+        auth-entity (:authenticated-entity rrequest)
+        req (get-request-by-id tx auth-entity (:id value))
         rf-perms
-          (request-fields-perms/get-for-user-and-request tx auth-user req)
+          (request-fields-perms/get-for-user-and-request tx auth-entity req)
         attr-perms (attr rf-perms)]
     (->> value
          :category
@@ -177,21 +181,21 @@
   (get-account-perms context value :procurement_account))
 
 (defn get-request-by-attrs
-  [tx attrs]
+  [tx auth-entity attrs]
   (-> requests-base-query
       (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
       sql/format
-      (->> (jdbc/query tx))
+      (->> (query-requests tx auth-entity))
       first))
 
 (defn get-last-created-request
-  [tx]
-  (-> (sql/select :id)
+  [tx auth-entity]
+  (-> (sql/select :*)
       (sql/from :procurement_requests)
       (sql/order-by [:created_at :desc])
       (sql/limit 1)
       sql/format
-      (->> (jdbc/query tx))
+      (->> (query-requests tx auth-entity))
       first))
 
 (defn insert!
@@ -211,13 +215,12 @@
                                             exchange-attrs)
         ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)]
+        auth-entity (:authenticated-entity ring-req)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
         #(do (insert! tx write-data-with-exchanged-attrs)
              (var-set req-id
-                      (-> tx
-                          get-last-created-request
+                      (-> (get-last-created-request tx auth-entity)
                           :id))
              (if uploads
                (attachments/create-for-request-id-and-uploads! tx
@@ -225,13 +228,13 @@
                                                                uploads)))
         :if-only
         #(request-perms/authorized-to-write-all-fields? tx
-                                                        auth-user
+                                                        auth-entity
                                                         write-data))
       (as-> (var-get req-id) <>
-        (get-request-by-id tx <>)
+        (get-request-by-id tx auth-entity <>)
         (reverse-exchange-attrs <>)
         (request-perms/apply-permissions tx
-                                         auth-user
+                                         auth-entity
                                          <>
                                          #(assoc %
                                            :request-id (var-get req-id)))))))
@@ -240,11 +243,11 @@
   [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)
+        auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
         budget-period-id (:budget_period input-data)
-        proc-request (get-request-by-id tx req-id)]
+        proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
@@ -254,23 +257,23 @@
       :if-only
       #(request-perms/authorized-to-write-all-fields?
          tx
-         auth-user
+         auth-entity
          (reverse-exchange-attrs proc-request)
          {:budget_period budget-period-id}))
     (->> req-id
-         (get-request-by-id tx)
+         (get-request-by-id tx auth-entity)
          reverse-exchange-attrs
-         (request-perms/apply-permissions tx auth-user))))
+         (request-perms/apply-permissions tx auth-entity))))
 
 (defn change-category!
   [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)
+        auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
         cat-id (:category input-data)
-        proc-request (get-request-by-id tx req-id)]
+        proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
@@ -279,20 +282,20 @@
                           sql/format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
-                                                      auth-user
+                                                      auth-entity
                                                       (reverse-exchange-attrs
                                                         proc-request)
                                                       {:category cat-id}))
     (->> req-id
-         (get-request-by-id tx)
+         (get-request-by-id tx auth-entity)
          reverse-exchange-attrs
-         (request-perms/apply-permissions tx auth-user))))
+         (request-perms/apply-permissions tx auth-entity))))
 
 (defn update-request!
   [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
-        auth-user (:authenticated-entity ring-req)
+        auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         input-data-without-id (dissoc input-data :id)
         write-data (cond-> input-data-without-id
@@ -301,7 +304,7 @@
                      (:inspector_priority input-data-without-id)
                        (update :inspector_priority to-name-and-lower-case))
         req-id (:id input-data)
-        proc-request (get-request-by-id tx req-id)]
+        proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
@@ -310,14 +313,14 @@
                           sql/format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
-                                                      auth-user
+                                                      auth-entity
                                                       (reverse-exchange-attrs
                                                         proc-request)
                                                       write-data))
     (->> req-id
-         (get-request-by-id tx)
+         (get-request-by-id tx auth-entity)
          reverse-exchange-attrs
-         (request-perms/apply-permissions tx auth-user))))
+         (request-perms/apply-permissions tx auth-entity))))
 
 (defn delete-request!
   [context args _]
@@ -333,12 +336,12 @@
     (= result '(1))))
 
 (defn requested-by?
-  [tx request auth-entity]
+  [tx auth-entity request]
   (= (:user_id auth-entity)
      (-> requests-base-query
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
-         (->> (jdbc/query tx))
+         (->> (query-requests tx auth-entity))
          first
          :user_id)))
 

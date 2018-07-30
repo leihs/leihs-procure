@@ -37,7 +37,7 @@
              tx (:tx rrequest)
              auth-entity (:authenticated-entity rrequest)
              input-data (:input_data args)
-             request (request/get-request-by-id tx (:id input-data))
+             request (request/get-request-by-id tx auth-entity (:id input-data))
              budget-period (budget-period/get-budget-period-by-id
                              tx
                              (:budget_period_id request))]
@@ -49,7 +49,7 @@
               (or (user-perms/admin? tx auth-entity)
                   (user-perms/inspector? tx auth-entity (:category_id request))
                   (and (user-perms/requester? tx auth-entity)
-                       (request/requested-by? tx request auth-entity)
+                       (request/requested-by? tx auth-entity request)
                        (budget-period/in-requesting-phase? tx
                                                            budget-period))))))),
    :change-request-category
@@ -58,7 +58,7 @@
              tx (:tx rrequest)
              auth-entity (:authenticated-entity rrequest)
              input-data (:input_data args)
-             request (request/get-request-by-id tx (:id input-data))
+             request (request/get-request-by-id tx auth-entity (:id input-data))
              budget-period (budget-period/get-budget-period-by-id
                              tx
                              (:budget_period_id request))]
@@ -70,7 +70,7 @@
               (or (user-perms/admin? tx auth-entity)
                   (user-perms/inspector? tx auth-entity (:category_id request))
                   (and (user-perms/requester? tx auth-entity)
-                       (request/requested-by? tx request auth-entity)
+                       (request/requested-by? tx auth-entity request)
                        (budget-period/in-requesting-phase? tx
                                                            budget-period))))))),
    ; FIXME: not complete! check permissions file!
@@ -81,8 +81,9 @@
                              (fn [tx auth-entity]
                                (and (user-perms/requester? tx auth-entity)
                                     (request/requested-by? tx
-                                                           (:input_data args)
-                                                           auth-entity)))]))
+                                                           auth-entity
+                                                           (:input_data
+                                                             args))))]))
                        context
                        args
                        value)),
@@ -105,8 +106,9 @@
                              (fn [tx auth-entity]
                                (and (user-perms/requester? tx auth-entity)
                                     (request/requested-by? tx
-                                                           (:input_data args)
-                                                           auth-entity)))]))
+                                                           auth-entity
+                                                           (:input_data
+                                                             args))))]))
                        context
                        args
                        value)),
