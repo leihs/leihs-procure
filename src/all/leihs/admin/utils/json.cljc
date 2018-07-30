@@ -11,5 +11,11 @@
 (defn from-json [s]
   (clojure.walk/keywordize-keys
     #?(:clj (cheshire.core/parse-string s)
-       :cljs (js/JSON.parse s))))
+       :cljs (-> s js/JSON.parse js->clj))))
 
+(defn try-parse-json [x]
+  (try
+    (from-json x)
+    (catch #?(:cljs js/Object
+              :clj Exception) _
+      x)))

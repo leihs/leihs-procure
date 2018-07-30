@@ -407,7 +407,7 @@
    [:div.card-header.bg-warning
     [:h2 "Delete Delegation"]]
    [:div.card-body
-    [:p "Deleting this delegation is not possible if it is associated with contracts, reserverations, or orders. "
+    [:p "Deleting this delegation is not possible if it is associated with contracts, reservations, or orders. "
      "If this is the case this operation will fail without deleting or even changing any data. "]
     [:div.float-right
      [:button.btn.btn-warning.btn-lg

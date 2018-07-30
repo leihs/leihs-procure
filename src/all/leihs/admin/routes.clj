@@ -16,7 +16,7 @@
     [leihs.admin.resources.group.back :as group]
     [leihs.admin.resources.group.users.back :as group-users]
     [leihs.admin.resources.groups.back :as groups]
-    [leihs.admin.resources.initial-admin.core :as initial-admin]
+    [leihs.admin.resources.initial-admin.back :as initial-admin]
     [leihs.admin.resources.settings.back :as settings]
     [leihs.admin.resources.shutdown.back :as shutdown]
     [leihs.admin.resources.status.back :as status]
@@ -26,10 +26,10 @@
     [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
     [leihs.admin.utils.json-protocol]
     [leihs.admin.utils.ring-exception :as ring-exception]
+    [leihs.admin.utils.json :as json]
 
     [bidi.bidi :as bidi]
     [bidi.ring :refer [make-handler]]
-    [cheshire.core :as json]
     [compojure.core :as cpj]
     [ring.middleware.accept]
     [ring.middleware.content-type :refer [wrap-content-type]]
@@ -177,19 +177,28 @@
     (let [response (handler request)]
       (assoc-in response [:headers "Vary"] "Accept"))))
 
-(defn canonicalize-params-map [params]
+(defn canonicalize-params-map [params & {:keys [parse-json?]
+                                         :or {parse-json? true}}]
   (if-not (map? params)
     params
     (->> params
          (map (fn [[k v]]
                 [(keyword k)
-                 (try (json/parse-string v true)
-                      (catch Exception _ v))]))
+                 (if parse-json? (json/try-parse-json v) v)]))
          (into {}))))
+
+(canonicalize-params-map 
+  {"email" "thomas.schank@zhdk.ch", "password" "secret"} :parse-json? false)
 
 (defn wrap-canonicalize-params-maps [handler]
   (fn [request]
     (handler (-> request
+                 (assoc :params-raw 
+                        (-> request :params-raw
+                            (canonicalize-params-map :parse-json? false)))
+                 (assoc :query-params-raw 
+                        (-> request :query-params 
+                            (canonicalize-params-map :parse-json? false)))
                  (update-in [:params] canonicalize-params-map)
                  (update-in [:query-params] canonicalize-params-map)
                  (update-in [:form-params] canonicalize-params-map)))))

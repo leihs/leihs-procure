@@ -19,7 +19,9 @@
     [reagent.core :as reagent]
     ))
 
-(def current-query-paramerters* (reaction (-> @state/routing-state* :query-params)))
+(def current-query-paramerters* 
+  (reaction (-> @state/routing-state* :query-params
+                (assoc :term (-> @state/routing-state* :query-params-raw :term)))))
 
 (def default-query-parameters {:is_admin nil
                                :role "any"

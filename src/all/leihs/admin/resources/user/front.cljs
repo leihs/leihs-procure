@@ -530,8 +530,7 @@
      "Deleting this user is not possible if it is associated with contracts, reserverations, or orders. "
      "If this is the case this operation will fail without deleting or even changing any data. "]
     [:p.text-danger
-     "Permissions, such as given by delegations, groups, or roles will not inhibt deletion of this user. 
-     They will be deleted." ]
+     "Permissions, such as given by delegations, groups, or roles will not prevent deletion of this user. " ]
     [:div.float-right
      [:button.btn.btn-warning.btn-lg
       {:on-click delete-user}
@@ -563,10 +562,10 @@
    [:div.card-body
     [:p
      "Contracts, reserverations, and orders of this user will be "
-     "transfered to the user entered below. " ]
+     "transferred to the user entered below. " ]
     [:p.text-danger
      "Permissions, such as given by delegations, groups, or roles will not be 
-     transfered! " ]
+     transferred! " ]
     [:p.text-danger
      "Audits will still contain references to the removed user! "]
     [:p.text-danger

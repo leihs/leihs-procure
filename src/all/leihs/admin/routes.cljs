@@ -20,7 +20,7 @@
     [leihs.admin.resources.group.front :as group]
     [leihs.admin.resources.group.users.front :as group-users]
     [leihs.admin.resources.home.front :as home]
-    [leihs.admin.resources.initial-admin.core :as initial-admin]
+    [leihs.admin.resources.initial-admin.front :as initial-admin]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
     [leihs.admin.utils.core :refer [keyword str presence]]
@@ -90,7 +90,10 @@
                              :page (resolve-page handler-key)
                              :url location-href
                              :path (.getPath location-url)
-                             :query-params (-> location-url .getQuery decode-query-params))
+                             :query-params-raw (-> location-url .getQuery 
+                                                   (decode-query-params :parse-json? false))
+                             :query-params (-> location-url .getQuery 
+                                               decode-query-params))
                       ;(js/console.log (with-out-str (pprint [handler-key route-params])))
                       ))
      :path-exists? (fn [path]

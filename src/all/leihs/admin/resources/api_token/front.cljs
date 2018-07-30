@@ -277,7 +277,7 @@
       [:div.modal-dialog
        [:div.modal-content
         [:div.modal-header.text-success
-         [:h4 "The New API-Token "
+         [:h4 "The new API-Token "
           [:code.token_part (:token_part @api-token-data*)]
           " has been added"]]
         [:div.modal-body.bg-warning

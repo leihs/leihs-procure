@@ -47,8 +47,8 @@
        (sql/limit per-page)
        (sql/offset (* per-page (- page 1))))))
 
-(defn term-fitler [query request]
-  (if-let [term (-> request :query-params :term presence)]
+(defn term-filter [query request]
+  (if-let [term (-> request :query-params-raw :term presence)]
     (-> query
         (sql/merge-where [:or
                           ["%" (str term) :searchable]
@@ -93,7 +93,7 @@
                          shared/normalized-query-parameters)]
     (-> users-base-query
         (set-per-page-and-offset query-params)
-        (term-fitler request)
+        (term-filter request)
         (type-filter request)
         (role-filter request)
         (admins-filter request)
@@ -121,5 +121,5 @@
 ;(debug/debug-ns *ns*)
 
 ;(logging-config/set-logger! :level :debug)
-;(debug/wrap-with-log-debug #'select-fields)
+;(debug/wrap-with-log-debug #'term-filter)
 ;(debug/wrap-with-log-debug #'users-formated-query)

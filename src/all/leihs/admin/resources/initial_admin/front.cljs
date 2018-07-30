@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.initial-admin.core
+(ns leihs.admin.resources.initial-admin.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]

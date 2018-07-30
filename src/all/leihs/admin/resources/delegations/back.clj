@@ -49,7 +49,7 @@
        (sql/offset (* per-page (- page 1))))))
 
 (defn term-fitler [query request]
-  (if-let [term (-> request :query-params :term presence)]
+  (if-let [term (-> request :query-params-raw :term presence)]
     (-> query
         (sql/merge-where [:or
                           ["%" (str term) :searchable]

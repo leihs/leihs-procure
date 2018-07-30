@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.initial-admin.core
+(ns leihs.admin.resources.initial-admin.back
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.admin.utils.core :refer [keyword str presence]])
   (:require
