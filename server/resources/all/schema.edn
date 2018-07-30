@@ -23,7 +23,7 @@
                                                          :BudgetLimitInput)},
                                  :categories {:type (list :CategoryInput)},
                                  :id {:type ID},
-                                 :image {:type :UploadInput},
+                                 :image {:type (list :UploadInput)},
                                  :name {:type (non-null String)}}},
     :NewRequestInput {:fields {:accounting_type {:type String},
                                :approved_quantity {:type Int},
