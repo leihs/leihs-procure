@@ -5,6 +5,7 @@
 (defn wrap
   [handler]
   (fn [request]
+    ; FIXME: query params does not work
     (let [user-id (or (-> request
                           :query-params
                           :user_id)

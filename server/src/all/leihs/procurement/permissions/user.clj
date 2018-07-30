@@ -75,10 +75,6 @@
                                 (:user_id auth-entity)]))) :result])
             sql/format)))))
 
-(defn requester-of?
-  [tx auth-entity request]
-  (= (str (:user_id auth-entity)) (str (:user_id request))))
-
 (defn advanced?
   [tx auth-entity]
   (->> [viewer? inspector? admin?]

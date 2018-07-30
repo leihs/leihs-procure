@@ -14,7 +14,7 @@
                                                              (:budget_period
                                                                proc-request))
         request-without-template (not (:template proc-request))
-        requested-by-user (user-perms/requester-of? tx user proc-request)
+        requested-by-user (= (:user_id user) (:user proc-request))
         user-is-requester (user-perms/requester? tx user)
         user-is-inspector (user-perms/inspector? tx user)
         user-is-admin (user-perms/admin? tx user)
