@@ -73,7 +73,11 @@ describe 'request' do
             mutation {
               new_request(input_data: #{hash_to_graphql attrs2}) {
                 id
-                attachments
+                attachments {
+                  value {
+                    id
+                  }
+                }
               }
             }
           GRAPHQL
