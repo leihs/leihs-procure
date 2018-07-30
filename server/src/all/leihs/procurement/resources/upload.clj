@@ -46,8 +46,8 @@
 
 (defn upload
   [{params :params, tx :tx}]
-  (let [upload (:upload params)
-        files-data (if (coll? upload) upload [upload])]
+  (let [files (:files params)
+        files-data (if (vector? files) files [files])]
     (doseq [fd files-data]
       (->> fd
            prepare-upload-row-map
