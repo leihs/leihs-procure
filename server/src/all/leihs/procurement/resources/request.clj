@@ -14,6 +14,8 @@
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.room :as room]
             [leihs.procurement.resources.supplier :as supplier]
+            [leihs.procurement.resources.uploads :as uploads]
+            [leihs.procurement.utils.helpers :refer [submap?]]
             [leihs.procurement.utils.ds :refer [get-ds]]
             [leihs.procurement.utils.sql :as sql]
             [clojure.java.jdbc :as jdbc]
@@ -205,39 +207,41 @@
                      (sql/values [data])
                      sql/format)))
 
-(defn create-request!
-  [context args _]
-  (let [input-data (:input_data args)
-        write-data (to-name-and-lower-case-priorities input-data)
-        uploads (:attachments write-data)
-        write-data-with-exchanged-attrs (-> write-data
-                                            (dissoc :attachments)
-                                            exchange-attrs)
-        ring-req (:request context)
-        tx (:tx ring-req)
-        auth-entity (:authenticated-entity ring-req)]
-    (with-local-vars [req-id nil]
-      (authorization/authorize-and-apply
-        #(do (insert! tx write-data-with-exchanged-attrs)
-             (var-set req-id
-                      (-> (get-last-created-request tx auth-entity)
-                          :id))
-             (if uploads
-               (attachments/create-for-request-id-and-uploads! tx
-                                                               (var-get req-id)
-                                                               uploads)))
-        :if-only
-        #(request-perms/authorized-to-write-all-fields? tx
-                                                        auth-entity
-                                                        write-data))
-      (as-> (var-get req-id) <>
-        (get-request-by-id tx auth-entity <>)
-        (reverse-exchange-attrs <>)
-        (request-perms/apply-permissions tx
-                                         auth-entity
-                                         <>
-                                         #(assoc %
-                                           :request-id (var-get req-id)))))))
+(defn update!
+  [tx req-id data]
+  (jdbc/execute! tx
+                 (-> (sql/update :procurement_requests)
+                     (sql/sset data)
+                     (sql/where [:= :procurement_requests.id req-id])
+                     sql/format)))
+
+(defn- filter-attachments [m as] (filter #(submap? m %) as))
+
+(defn deal-with-attachments!
+  [tx req-id attachments]
+  (let [uploads-to-delete (filter-attachments {:to_delete true,
+                                               :__typename "Upload"}
+                                              attachments)
+        uploads-to-attachments (filter-attachments {:to_delete false,
+                                                    :__typename "Upload"}
+                                                   attachments)
+        attachments-to-delete (filter-attachments {:to_delete true,
+                                                   :__typename "Attachment"}
+                                                  attachments)
+        ; NOTE: just for purpose of completeness and clarity:
+        ; don't do anything with existing attachments
+        ; attachments-to-retain
+        ; (filter-attachments {:to_delete false, :__typename "Attachment"}
+        ; attachments)
+        ]
+    (if-not (empty? uploads-to-delete)
+      (uploads/delete! tx (map :id uploads-to-delete)))
+    (if-not (empty? attachments-to-delete)
+      (attachments/delete! tx (map :id attachments-to-delete)))
+    (if-not (empty? uploads-to-attachments)
+      (attachments/create-for-request-id-and-uploads! tx
+                                                      req-id
+                                                      uploads-to-attachments))))
 
 (defn change-budget-period!
   [context args _]
@@ -291,36 +295,72 @@
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-entity))))
 
+(defn create-request!
+  [context args _]
+  (let [input-data (:input_data args)
+        write-data (to-name-and-lower-case-priorities input-data)
+        attachments (:attachments write-data)
+        write-data-with-exchanged-attrs (-> write-data
+                                            (dissoc :attachments)
+                                            exchange-attrs)
+        ring-req (:request context)
+        tx (:tx ring-req)
+        auth-entity (:authenticated-entity ring-req)]
+    (with-local-vars [req-id nil]
+      (authorization/authorize-and-apply
+        #(do (insert! tx write-data-with-exchanged-attrs)
+             (var-set req-id
+                      (-> (get-last-created-request tx auth-entity)
+                          :id))
+             (if-not (empty? attachments)
+               (deal-with-attachments! tx (var-get req-id) attachments)))
+        :if-only
+        #(request-perms/authorized-to-write-all-fields? tx
+                                                        auth-entity
+                                                        write-data))
+      (as-> (var-get req-id) <>
+        (get-request-by-id tx auth-entity <>)
+        (reverse-exchange-attrs <>)
+        (request-perms/apply-permissions tx
+                                         auth-entity
+                                         <>
+                                         #(assoc %
+                                           :request-id (var-get req-id)))))))
+
 (defn update-request!
   [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
-        input-data-without-id (dissoc input-data :id)
-        write-data (cond-> input-data-without-id
-                     (:priority input-data-without-id)
-                       (update :priority to-name-and-lower-case)
-                     (:inspector_priority input-data-without-id)
-                       (update :inspector_priority to-name-and-lower-case))
         req-id (:id input-data)
+        attachments (:attachments input-data)
+        update-data
+          (as-> input-data <>
+            (dissoc <> :id)
+            (dissoc <> :attachments)
+            (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
+            (cond-> <>
+              (:inspector_priority <>) (update :inspector_priority
+                                               to-name-and-lower-case)))
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(jdbc/execute! tx
-                      (-> (sql/update :procurement_requests)
-                          (sql/sset write-data)
-                          (sql/where [:= :procurement_requests.id req-id])
-                          sql/format))
+      #(do (update! tx req-id update-data)
+           (if-not (empty? attachments)
+             (deal-with-attachments! tx req-id attachments)))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-entity
                                                       (reverse-exchange-attrs
                                                         proc-request)
-                                                      write-data))
-    (->> req-id
-         (get-request-by-id tx auth-entity)
-         reverse-exchange-attrs
-         (request-perms/apply-permissions tx auth-entity))))
+                                                      update-data))
+    (as-> req-id <>
+      (get-request-by-id tx auth-entity <>)
+      (reverse-exchange-attrs <>)
+      (request-perms/apply-permissions tx
+                                       auth-entity
+                                       <>
+                                       #(assoc % :request-id req-id)))))
 
 (defn delete-request!
   [context args _]

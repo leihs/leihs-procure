@@ -47,6 +47,13 @@
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
+(defn delete!
+  [tx ids]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_attachments)
+                     (sql/where [:in :procurement_attachments.id ids])
+                     sql/format)))
+
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
