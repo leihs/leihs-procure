@@ -9,7 +9,8 @@ import {
   buildAuthHeaders
 } from '../../apollo-client'
 
-import { FilePicker } from './Bootstrap'
+import { FilePicker } from '.'
+import Icon from '../Icons'
 
 class InputFileUpload extends React.Component {
   state = { uploads: [] }
@@ -18,10 +19,17 @@ class InputFileUpload extends React.Component {
     e.preventDefault()
     const files = [...e.target.files]
     files.forEach(rawFile => {
-      const file = FileProps(rawFile)
+      const file = FileObj(rawFile)
+      let isDuplicate = false
       this.setState(
-        cs => ({ uploads: [...cs.uploads, file] }),
+        cs => {
+          if (f.find(cs.uploads, { key: file.key })) {
+            return (isDuplicate = true)
+          }
+          return { uploads: [...cs.uploads, file] }
+        },
         () =>
+          !isDuplicate &&
           uploadFile({
             file,
             onProgress: (i, n) => this.onFileProgress(i, n),
@@ -38,16 +46,31 @@ class InputFileUpload extends React.Component {
   }
 
   onUploadedFile(file) {
-    const callback = this.props.onChange
     this.setState(
       cs => ({
         uploads: cs.uploads.map(u => (u.key === file.key ? file : u))
       }),
-      () =>
-        callback({
-          target: { name: this.props.name, value: this.state.uploads }
-        })
+      () => this.onChangeCallback()
     )
+  }
+
+  onMarkForDeletion(file, toggled) {
+    this.setState(
+      cs => ({
+        uploads: cs.uploads.map(
+          u => (u.key !== file.key ? u : { ...u, toDelete: toggled })
+        )
+      }),
+      () => this.onChangeCallback()
+    )
+  }
+
+  onChangeCallback() {
+    const callback = this.props.onChange
+    const value = this.state.uploads.map(u => ({ ...u, rawFile: undefined }))
+    callback({
+      target: { name: this.props.name, value }
+    })
   }
 
   render(
@@ -56,20 +79,37 @@ class InputFileUpload extends React.Component {
     if (!id) {
       throw new Error('`InputFileUpload` is missing `props.id`!')
     }
+
     return (
-      <div className={cx('input-group input-file-upload', className)}>
+      <div id={id} className={cx('input-group input-file-upload', className)}>
         <FilePicker
-          id={id}
-          name={name}
           multiple
           label="Anhänge auswählen"
           onChange={e => this.onSelectFiles(e)}
         />
 
         <ul className="input-file-upload-list pl-4">
-          {f
-            .sortBy(state.uploads, 'order')
-            .map((i, n) => <li key={n}>file #{n}</li>)}
+          {state.uploads.map(u => (
+            <li
+              key={u.key}
+              className={cx({ 'text-strike text-danger': u.toDelete })}
+            >
+              {u.name}{' '}
+              {!u.id ? (
+                <Icon.Spinner />
+              ) : (
+                <label>
+                  <Icon.Trash className="text-danger" />
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={!!u.toDelete}
+                    onClick={e => this.onMarkForDeletion(u, !u.toDelete)}
+                  />
+                </label>
+              )}
+            </li>
+          ))}
         </ul>
       </div>
     )
@@ -94,10 +134,11 @@ export default InputFileUpload
 const CacheKeyFromFile = file =>
   ['name', 'size', 'lastModified'].map(k => file[k]).join('-')
 
-const FileProps = file => ({
+const FileObj = file => ({
   ...f.pick(file, ['name', 'size', 'type', 'lastModifiedDate']),
   key: CacheKeyFromFile(file),
-  file
+  rawFile: file,
+  toDelete: false
 })
 
 // NOTE: based on & adapted from: <https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications#Handling_the_upload_process_for_a_file>
@@ -107,7 +148,7 @@ function uploadFile({ file, onProgress, onFinish }) {
 
   // headers and body:
   const headers = { Accept: 'application/json', ...buildAuthHeaders() }
-  formData.append('files', file.file)
+  formData.append('files', file.rawFile)
 
   // progress reporting:
   let progress = 0

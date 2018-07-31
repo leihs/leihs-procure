@@ -157,12 +157,14 @@ const PAGES = [
     title: 'InputFileUpload',
     content: (
       <F>
+        <h5>without form</h5>
         <form>
           <FormGroup label="attach a file">
             <InputFileUpload id="example-input-file-upload" />
           </FormGroup>
         </form>
         <hr />
+        <h5>with form (shows form data)</h5>
         <StatefulForm idPrefix="input-file-upload-mock-form">
           {({ fields, formPropsFor }) => {
             return (
