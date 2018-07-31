@@ -11,12 +11,24 @@ import {
 } from '../../apollo-client'
 
 const exampleQuery = `
-query allTheRooms {
-  rooms {
+query meAndMyRequests {
+  current_user {
+    user {
+      email
+    }
+  }
+  requests(requested_by_auth_user: true) {
     id
-    name
-    building {
-      name
+    budget_period {
+      value {
+        name
+      }
+    }
+    article_name {
+      value
+    }
+    motivation {
+      value
     }
   }
 }
