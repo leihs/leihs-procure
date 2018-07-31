@@ -13,7 +13,10 @@ import { FilePicker } from '.'
 import Icon from '../Icons'
 
 class InputFileUpload extends React.Component {
-  state = { uploads: [] }
+  constructor(props) {
+    super(props)
+    this.state = { uploads: props.value || [] }
+  }
 
   onSelectFiles(e) {
     e.preventDefault()
@@ -135,8 +138,9 @@ const CacheKeyFromFile = file =>
   ['name', 'size', 'lastModified'].map(k => file[k]).join('-')
 
 const FileObj = file => ({
-  ...f.pick(file, ['name', 'size', 'type', 'lastModifiedDate']),
+  ...f.pick(file, ['size', 'type', 'lastModifiedDate']),
   key: CacheKeyFromFile(file),
+  filename: file.name,
   rawFile: file,
   toDelete: false
 })

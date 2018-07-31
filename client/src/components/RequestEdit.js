@@ -57,7 +57,8 @@ const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
   }
 }
 
-const boolify = (key, val) => (!val[key] ? null : val[key] === key)
+const boolify = (key, val) =>
+  !val ? false : !val[key] ? null : val[key] === key
 
 const updateRequestFromFields = (mutate, request, fields) => {
   const requestData = {
