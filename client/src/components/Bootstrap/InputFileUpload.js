@@ -61,7 +61,12 @@ class InputFileUpload extends React.Component {
     this.setState(
       cs => ({
         uploads: cs.uploads.map(
-          u => (u.key !== file.key ? u : { ...u, toDelete: toggled })
+          u =>
+            (file.id
+            ? u.id === file.id
+            : u.key === file.key)
+              ? { ...u, toDelete: toggled }
+              : u
         )
       }),
       () => this.onChangeCallback()
@@ -156,7 +161,8 @@ const FileObj = file => ({
   key: CacheKeyFromFile(file),
   filename: file.name,
   rawFile: file,
-  toDelete: false
+  toDelete: false,
+  __typename: 'Upload'
 })
 
 // NOTE: based on & adapted from: <https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications#Handling_the_upload_process_for_a_file>

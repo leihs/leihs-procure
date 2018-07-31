@@ -75,6 +75,11 @@ const updateRequestFromFields = (mutate, request, fields) => {
       valueIfWritable(fields, request, 'replacement')
     ),
 
+    attachments: f.map(
+      valueIfWritable(fields, request, 'attachments').attachments,
+      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
+    ),
+
     // TODO: form field with id (autocomplete)
     // ...valueIfWritable(fields, request, 'supplier'),
 
