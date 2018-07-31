@@ -34,7 +34,7 @@
    [org.clojure/tools.logging "0.4.1"]
    [org.clojure/tools.nrepl "0.2.13"]
    [org.slf4j/slf4j-log4j12 "1.7.25"]
-   [pg-types "2.3.0"]
+   [pg-types "2.4.0-PRE.1"]
    [reagent "0.8.1"]
    [ring "1.6.3"]
    [ring-middleware-accept "2.0.3"]
