@@ -3,16 +3,19 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as logging]
             [leihs.procurement.resources.saved-filters :as saved-filters]
+            [leihs.procurement.resources.user :as user]
             [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.ds :refer [get-ds]]
             [logbug.debug :as debug]))
 
 (defn get-current-user
   [{request :request} _ _]
-  (let [user (-> request
-                 :authenticated-entity)
-        saved-filters (saved-filters/get-saved-filters-by-user-id (:tx request)
-                                                                  (:id user))]
+  (let [tx (:tx request)
+        user-id (-> request
+                    :authenticated-entity
+                    :user_id)
+        user (user/get-user-by-id tx user-id)
+        saved-filters (saved-filters/get-saved-filters-by-user-id tx user-id)]
     {:user user, :saved_filters (:filter saved-filters)}))
 
 ;#### debug ###################################################################

@@ -2,26 +2,28 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.permissions.categories :as categories-perms]
             [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.ds :refer [get-ds]]
             [logbug.debug :as debug]))
 
 (defn admin?
-  [tx user]
+  [tx auth-entity]
   (:result
-    (first (jdbc/query
-             tx
-             (-> (sql/select
-                   [(sql/call :exists
-                              (-> (sql/select true)
-                                  (sql/from :procurement_admins)
-                                  (sql/where [:= :procurement_admins.user_id
-                                              (:user_id user)]))) :result])
-                 sql/format)))))
+    (first
+      (jdbc/query
+        tx
+        (-> (sql/select
+              [(sql/call :exists
+                         (-> (sql/select true)
+                             (sql/from :procurement_admins)
+                             (sql/where [:= :procurement_admins.user_id
+                                         (:user_id auth-entity)]))) :result])
+            sql/format)))))
 
 (defn inspector?
-  ([tx user] (inspector? tx user nil))
-  ([tx user c-id]
+  ([tx auth-entity] (inspector? tx auth-entity nil))
+  ([tx auth-entity c-id]
    (:result
      (first
        (jdbc/query
@@ -33,15 +35,15 @@
                               (sql/from :procurement_category_inspectors)
                               (sql/merge-where
                                 [:= :procurement_category_inspectors.user_id
-                                 (:user_id user)]))
+                                 (:user_id auth-entity)]))
                     c-id (sql/merge-where
                            [:= :procurement_category_inspectors.category_id
                             c-id]))) :result])
              sql/format))))))
 
 (defn viewer?
-  ([tx user] (viewer? tx user nil))
-  ([tx user c-id]
+  ([tx auth-entity] (viewer? tx auth-entity nil))
+  ([tx auth-entity c-id]
    (:result
      (first (jdbc/query
               tx
@@ -52,14 +54,14 @@
                                    (sql/from :procurement_category_viewers)
                                    (sql/merge-where
                                      [:= :procurement_category_viewers.user_id
-                                      (:user_id user)]))
+                                      (:user_id auth-entity)]))
                          c-id (sql/merge-where
                                 [:= :procurement_category_viewers.category_id
                                  c-id]))) :result])
                   sql/format))))))
 
 (defn requester?
-  [tx user]
+  [tx auth-entity]
   (:result
     (first
       (jdbc/query
@@ -70,15 +72,22 @@
                              (sql/from :procurement_requesters_organizations)
                              (sql/where
                                [:= :procurement_requesters_organizations.user_id
-                                (:user_id user)]))) :result])
+                                (:user_id auth-entity)]))) :result])
             sql/format)))))
 
-(defn requester-of?
-  [tx user request]
-  (= (str (:user_id user)) (str (:user_id request))))
-
 (defn advanced?
-  [tx user]
+  [tx auth-entity]
   (->> [viewer? inspector? admin?]
-       (map #(% tx user))
+       (map #(% tx auth-entity))
        (some true?)))
+
+(defn get-permissions
+  [context args value]
+  (let [tx (-> context
+               :request
+               :tx)
+        auth-entity {:user_id (:id value)}]
+    {:isAdmin (admin? tx auth-entity),
+     :isRequester (requester? tx auth-entity),
+     :isInspectorForCategories (categories-perms/inspected-categories tx value),
+     :isViewerForCategories (categories-perms/viewed-categories tx value)}))

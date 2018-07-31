@@ -57,6 +57,7 @@
 (defalias insert-into helpers/insert-into)
 (defalias join helpers/join)
 (defalias limit helpers/limit)
+(defalias merge-left-join helpers/merge-left-join)
 (defalias merge-join helpers/merge-join)
 (defalias merge-where helpers/merge-where)
 (defalias modifiers helpers/modifiers)

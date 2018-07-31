@@ -55,6 +55,7 @@
    :requesters-organizations
      (-> requesters-organizations/get-requesters-organizations
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   :permissions user-perms/get-permissions,
    :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,

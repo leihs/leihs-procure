@@ -76,7 +76,6 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 
                 {/* FIXME: handle field ID vs String */}
                 <FormField {...formPropsFor('supplier')} />
-                <FormField {...formPropsFor('supplier_name')} />
 
                 <FormField {...formPropsFor('receiver')} />
 

@@ -32,7 +32,6 @@ const ADMIN_TEMPLATES_PAGE_QUERY = gql`
       supplier {
         id
       }
-      supplier_name
     }
   }
 `

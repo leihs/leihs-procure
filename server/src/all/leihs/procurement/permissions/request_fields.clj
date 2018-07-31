@@ -14,7 +14,7 @@
                                                              (:budget_period
                                                                proc-request))
         request-without-template (not (:template proc-request))
-        requested-by-user (user-perms/requester-of? tx user proc-request)
+        requested-by-user (= (:user_id user) (:user proc-request))
         user-is-requester (user-perms/requester? tx user)
         user-is-inspector (user-perms/inspector? tx user)
         user-is-admin (user-perms/admin? tx user)
@@ -237,18 +237,6 @@
                                      budget-period-in-requesting-phase)
                                 category-inspectable-by-user
                                 user-is-admin))},
-     :supplier_name
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and request-without-template
-                    (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin))},
      :user {:read true,
             :write
               (and (not request-exists) ; can be set only for new requests

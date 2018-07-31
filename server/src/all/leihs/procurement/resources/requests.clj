@@ -7,6 +7,7 @@
             clojure.string
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.request :as request-perms]
+            [leihs.procurement.permissions.requests :as requests-perms]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.budget-periods :as budget-periods]
@@ -29,7 +30,6 @@
          ["~~*" :procurement_requests.inspection_comment term-percent]
          ["~~*" :procurement_requests.motivation term-percent]
          ["~~*" :procurement_requests.receiver term-percent]
-         ["~~*" :procurement_requests.supplier_name term-percent]
          ["~~*" :rooms.name term-percent] ["~~*" :users.firstname term-percent]
          ["~~*" :users.lastname term-percent]]))))
 
@@ -62,10 +62,9 @@
   (or (get-id-from-arguments arguments resource-type)
       (get-id-from-resolution-context value resource-type)))
 
-(defn requests-query
+(defn requests-query-map
   [context arguments value]
   (let [id (:id arguments)
-        advanced-user? (:advanced-user? context)
         category-id (get-id :category arguments value)
         budget-period-id (get-id :budget-period arguments value)
         organization-id (:organization_id arguments)
@@ -80,41 +79,38 @@
         state (:state arguments)
         state-set (:request-state-set context)
         search-term (:search arguments)]
-    (sql/format
-      (cond-> request/requests-base-query
-        id (sql/merge-where [:in :procurement_requests.id id])
-        category-id (sql/merge-where [:in :procurement_requests.category_id
-                                      category-id])
-        budget-period-id (sql/merge-where
-                           [:in :procurement_requests.budget_period_id
-                            budget-period-id])
-        organization-id (sql/merge-where [:in
-                                          :procurement_requests.organization_id
-                                          organization-id])
-        priority (sql/merge-where [:in :procurement_requests.priority priority])
-        inspector-priority (sql/merge-where
-                             [:in :procurement_requests.inspector_priority
-                              inspector-priority])
-        state (sql/merge-where [:in
-                                (request/state-sql (:state-value-range-type
-                                                     context)) state])
-        requested-by-auth-user
-          (sql/merge-where [:= :procurement_requests.user_id
-                            (-> context
-                                :request
-                                :authenticated-entity
-                                :id)])
-        from-categories-of-auth-user
-          (sql/merge-where
-            [:in :procurement_requests.category_id
-             (-> (sql/select :category_id)
-                 (sql/from :procurement_category_inspectors)
-                 (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                   (-> context
-                                       :request
-                                       :authenticated-entity
-                                       :id)]))])
-        search-term (search-query search-term)))))
+    (cond-> request/requests-base-query
+      id (sql/merge-where [:in :procurement_requests.id id])
+      category-id (sql/merge-where [:in :procurement_requests.category_id
+                                    category-id])
+      budget-period-id (sql/merge-where [:in
+                                         :procurement_requests.budget_period_id
+                                         budget-period-id])
+      organization-id (sql/merge-where [:in
+                                        :procurement_requests.organization_id
+                                        organization-id])
+      priority (sql/merge-where [:in :procurement_requests.priority priority])
+      inspector-priority (sql/merge-where
+                           [:in :procurement_requests.inspector_priority
+                            inspector-priority])
+      state (sql/merge-where
+              [:in (request/state-sql (:state-value-range-type context)) state])
+      requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
+                                               (-> context
+                                                   :request
+                                                   :authenticated-entity
+                                                   :user_id)])
+      from-categories-of-auth-user
+        (sql/merge-where
+          [:in :procurement_requests.category_id
+           (-> (sql/select :category_id)
+               (sql/from :procurement_category_inspectors)
+               (sql/merge-where [:= :procurement_category_inspectors.user_id
+                                 (-> context
+                                     :request
+                                     :authenticated-entity
+                                     :id)]))])
+      search-term (search-query search-term))))
 
 (defn valid-state-values-combination?
   [state-value-range-type state-arg]
@@ -133,7 +129,7 @@
   (if-let [state-arg (:state arguments)]
     (let [rrequest (:request context)
           tx (:tx rrequest)
-          auth-user (:authenticated-entity rrequest)
+          auth-entity (:authenticated-entity rrequest)
           budget-period-arg (:budget_period_id arguments)
           budget-periods (map #(budget-period/get-budget-period-by-id tx %)
                            budget-period-arg)
@@ -141,7 +137,7 @@
             (budget-periods/get-phase-of-budget-periods tx budget-periods)
           state-value-range-type (request/state-value-range-type
                                    tx
-                                   auth-user
+                                   auth-entity
                                    phase-of-budget-periods)]
       (cond
         (nil? budget-period-arg)
@@ -169,14 +165,18 @@
             (sanitize-and-enhance-context context arguments value)
           ring-request (:request sanitized-and-enhanced-context)
           tx (:tx ring-request)
-          proc-requests
-            (jdbc/query
-              tx
-              (requests-query sanitized-and-enhanced-context arguments value)
-              {:row-fn #(request/transform-row tx
-                                               (:authenticated-entity
-                                                 ring-request)
-                                               %)})]
+          auth-entity (:authenticated-entity ring-request)
+          query (as-> sanitized-and-enhanced-context <>
+                  (requests-query-map <> arguments value)
+                  (requests-perms/apply-scope tx <> auth-entity)
+                  (sql/format <>))
+          proc-requests (jdbc/query tx
+                                    query
+                                    {:row-fn #(request/transform-row
+                                                tx
+                                                (:authenticated-entity
+                                                  ring-request)
+                                                %)})]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
            (map #(request-perms/apply-permissions tx
