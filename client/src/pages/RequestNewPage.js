@@ -3,7 +3,7 @@ import f from 'lodash'
 import cx from 'classnames'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
-// import qs from 'qs'
+import qs from 'qs'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
@@ -415,174 +415,187 @@ const FAKE_DATA = {
   }
 }
 
-// TODO: form-selection-to-params
-// const updateQueryParams = ({ fields, params, location }) => {
-//   const formParams = {
-//     ...f.pick(fields, ['budget_period', 'category']),
-//     requester: f.get(fields, 'requester.id')
-//   }
-//   return {
-//     ...location,
-//     search: '?' + qs.stringify({ ...params, ...formParams })
-//   }
-// }
+const readFromQueryParams = params => ({
+  budget_period: f.enhyphenUUID(params.bp),
+  category: f.enhyphenUUID(params.category),
+  template: f.enhyphenUUID(params.template)
+})
 
-class RequestNewPage extends React.Component {
-  // TODO: form-selection-to-params
-  //      - apply url params as state.initalSelection
-  //      - needs query-user-by-id so we get the full object w/ name from uuid.
-  // constructor() {
-  //   this.state = {initalSelection: …}
-  // }
-  render() {
-    return (
-      <RouteParams>
-        {({ params, location, history }) => (
-          <MainWithSidebar>
-            <h1>Antrag erstellen</h1>
-
-            <Query
-              query={NEW_REQUEST_PRESELECTION_QUERY}
-              networkPolicy="cache-then-network"
-            >
-              {({ loading, error, data }) => {
-                if (loading) return <Loading />
-                if (error) return <ErrorPanel error={error} data={data} />
-
-                return (
-                  <NewRequestPreselection
-                    data={data}
-                    // TODO: form-selection-to-params
-                    // onSelectionChange={fields =>
-                    //   history.replace(
-                    //     updateQueryParams({ params, location, fields })
-                    //   )
-                    // }
-                    onSelectionChange={() => {}}
-                  />
-                )
-              }}
-            </Query>
-          </MainWithSidebar>
-        )}
-      </RouteParams>
-    )
+const updateQueryParams = ({ fields, params, location }) => {
+  // const formParams = f.pick(fields, ['budget_period', 'category', 'template'])
+  const formParams = {
+    bp: f.dehyphenUUID(fields.budget_period),
+    category: f.dehyphenUUID(fields.category),
+    template: f.dehyphenUUID(fields.template)
+  }
+  return {
+    ...location,
+    search: '?' + qs.stringify({ ...params, ...formParams })
   }
 }
 
+const RequestNewPage = () => (
+  <RouteParams>
+    {({ params, location, history }) => (
+      <MainWithSidebar>
+        <h1>Antrag erstellen</h1>
+
+        <Query
+          query={NEW_REQUEST_PRESELECTION_QUERY}
+          networkPolicy="cache-then-network"
+        >
+          {({ loading, error, data }) => {
+            if (loading) return <Loading />
+            if (error) return <ErrorPanel error={error} data={data} />
+
+            return (
+              <NewRequestPreselection
+                key={location.key} // reset state on location change!
+                data={data}
+                initialSelection={readFromQueryParams(params)}
+                onSelectionChange={fields =>
+                  history.replace(
+                    updateQueryParams({ params, location, fields })
+                  )
+                }
+              />
+            )
+          }}
+        </Query>
+      </MainWithSidebar>
+    )}
+  </RouteParams>
+)
+
 export default RequestNewPage
 
-const NewRequestPreselection = ({ data, onSelectionChange }) => {
-  const budPeriods = f
-    .sortBy(data.budget_periods, 'end_date')
-    .filter(bp => new Date(bp.inspection_start_date).getTime() > Date.now())
-    .map(bp => ({
-      value: bp.id,
-      label: `${bp.name} – Antragsphase bis ${new Date(
-        bp.inspection_start_date
-      ).toLocaleDateString()}`
-    }))
-
-  const CatWithMainCat = catId => {
-    const mc = f.find(data.main_categories, {
-      categories: [{ id: catId }]
-    })
-    const sc = f.find(mc.categories, { id: catId })
-    return { ...sc, main_category: { ...mc, categories: undefined } }
+class NewRequestPreselection extends React.Component {
+  constructor(props) {
+    super(props)
+    // apply initial selection from URL parameters
+    this.state = { initalSelection: props.initialSelection }
   }
+  render({ state, props: { data, onSelectionChange } } = this) {
+    const budPeriods = f
+      .sortBy(data.budget_periods, 'end_date')
+      .filter(bp => new Date(bp.inspection_start_date).getTime() > Date.now())
+      .map(bp => ({
+        value: bp.id,
+        label: `${bp.name} – Antragsphase bis ${new Date(
+          bp.inspection_start_date
+        ).toLocaleDateString()}`
+      }))
 
-  return (
-    <StatefulForm
-      idPrefix={`request_new`}
-      values={{ budget_period: budPeriods[0].value }}
-      onChange={fields => onSelectionChange(fields)}
-    >
-      {({ fields, setValue, getValue, formPropsFor, ...formHelpers }) => {
-        const selectedCategory = fields.category
-        const selectedTemplate = f.find(data.templates, { id: fields.template })
-        const hasPreselected = !!(selectedTemplate || selectedCategory)
+    const CatWithMainCat = catId => {
+      const mc = f.find(data.main_categories, {
+        categories: [{ id: catId }]
+      })
+      const sc = f.find(mc.categories, { id: catId })
+      return { ...sc, main_category: { ...mc, categories: undefined } }
+    }
 
-        return (
-          <F>
-            <form
-              onSubmit={e => {
-                e.preventDefault()
-                window.alert('TODO!')
-              }}
-            >
-              <FormGroup label="Budgetperiode" className="form-control-lg p-0">
-                <Select
-                  {...formPropsFor('budget_period')}
-                  className="form-control-lg"
-                  required
-                  emptyOption={false}
-                  options={budPeriods}
-                />
-              </FormGroup>
+    const defaultSelection = { budget_period: budPeriods[0].value }
 
-              <FormGroup
-                label="Kategorie & Vorlage"
-                className="form-control-lg p-0"
-              >
-                {hasPreselected ? (
-                  selectedCategory ? (
-                    <Row>
-                      <Col sm>
-                        <SelectedCategory
-                          cat={CatWithMainCat(selectedCategory)}
-                        />
-                      </Col>
-                      <Col sm>
-                        <SelectionCard>Keine Vorlage</SelectionCard>
-                      </Col>
-                    </Row>
-                  ) : (
-                    <Row>
-                      <Col sm>
-                        <SelectedCategory
-                          cat={CatWithMainCat(selectedTemplate.category.id)}
-                        />
-                      </Col>
-                      <Col sm>
-                        <SelectionCard>
-                          <Icon.Templates spaced />
-                          {selectedTemplate.article_name}
-                        </SelectionCard>
-                      </Col>
-                    </Row>
-                  )
-                ) : null}
+    return (
+      <StatefulForm
+        idPrefix={`request_new`}
+        values={{ ...defaultSelection, ...state.initalSelection }}
+        onChange={fields => onSelectionChange(fields)}
+      >
+        {({ fields, setValue, getValue, formPropsFor, ...formHelpers }) => {
+          const resetSelection = () => {
+            setValue('template', undefined)
+            setValue('category', undefined)
+          }
+          const selectedCategory = fields.category
+          const selectedTemplate = f.find(data.templates, {
+            id: fields.template
+          })
+          const hasPreselected = !!(selectedTemplate || selectedCategory)
 
-                {!hasPreselected && (
-                  <CategoriesTemplatesTree
-                    main_categories={data.main_categories}
-                    templates={data.templates}
-                    onSelectCategory={t => setValue('category', t.id)}
-                    onSelectTemplate={t => setValue('template', t.id)}
-                  />
-                )}
-              </FormGroup>
-            </form>
-
-            {hasPreselected && (
-              <NewRequestForm
-                category={selectedCategory}
-                template={selectedTemplate}
-                onCancel={e => {
-                  setValue('template', null)
-                  setValue('category', null)
+          return (
+            <F>
+              <form
+                onSubmit={e => {
+                  e.preventDefault()
+                  window.alert('TODO!')
                 }}
-                // NOTE: reset form if preselection changes
-                key={['budget_period', 'category', 'template']
-                  .map(k => String([fields[k]]))
-                  .join()}
-              />
-            )}
-          </F>
-        )
-      }}
-    </StatefulForm>
-  )
+              >
+                <FormGroup
+                  label="Budgetperiode"
+                  className="form-control-lg p-0"
+                >
+                  <Select
+                    {...formPropsFor('budget_period')}
+                    className="form-control-lg"
+                    required
+                    emptyOption={false}
+                    options={budPeriods}
+                  />
+                </FormGroup>
+
+                <FormGroup
+                  label="Kategorie & Vorlage"
+                  className="form-control-lg p-0"
+                >
+                  {hasPreselected ? (
+                    selectedCategory ? (
+                      <Row>
+                        <Col sm>
+                          <SelectedCategory
+                            cat={CatWithMainCat(selectedCategory)}
+                          />
+                        </Col>
+                        <Col sm>
+                          <SelectionCard>Keine Vorlage</SelectionCard>
+                        </Col>
+                      </Row>
+                    ) : (
+                      <Row>
+                        <Col sm>
+                          <SelectedCategory
+                            cat={CatWithMainCat(selectedTemplate.category.id)}
+                          />
+                        </Col>
+                        <Col sm>
+                          <SelectionCard>
+                            <Icon.Templates spaced />
+                            {selectedTemplate.article_name}
+                          </SelectionCard>
+                        </Col>
+                      </Row>
+                    )
+                  ) : null}
+
+                  {!hasPreselected && (
+                    <CategoriesTemplatesTree
+                      main_categories={data.main_categories}
+                      templates={data.templates}
+                      onSelectCategory={t => setValue('category', t.id)}
+                      onSelectTemplate={t => setValue('template', t.id)}
+                    />
+                  )}
+                </FormGroup>
+              </form>
+
+              {hasPreselected && (
+                <NewRequestForm
+                  category={selectedCategory}
+                  template={selectedTemplate}
+                  onCancel={resetSelection}
+                  // NOTE: reset form if preselection changes
+                  // TODO: remove this, should not be needed anymore
+                  key={['budget_period', 'category', 'template']
+                    .map(k => String([fields[k]]))
+                    .join()}
+                />
+              )}
+            </F>
+          )
+        }}
+      </StatefulForm>
+    )
+  }
 }
 
 const NewRequestForm = ({ template, category, onCancel }) => (
