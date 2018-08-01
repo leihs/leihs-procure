@@ -99,11 +99,13 @@ const FAKE_DATA = {
       }
     },
     article_name: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     receiver: {
+      default: null,
       value: null,
       read: true,
       write: true
@@ -112,91 +114,109 @@ const FAKE_DATA = {
       value: null
     },
     price_cents: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     price_currency: {
+      default: 'CHF',
       value: 'CHF',
       read: true,
       write: false
     },
     requested_quantity: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     approved_quantity: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     order_quantity: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     replacement: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     priority: {
+      default: 'NORMAL',
+      value: 'NORMAL',
       read: true,
-      write: true,
-      value: null
+      write: true
     },
     state: {
-      value: null,
+      default: 'new',
+      value: 'new',
       read: true,
       write: false
     },
     supplier: {
+      default: null,
+      value: null,
       read: true,
       write: true,
-      value: null
     },
     inspector_priority: {
+      default: 'MEDIUM',
+      value: 'MEDIUM',
       read: true,
-      write: true,
-      value: null
+      write: true
     },
     article_number: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     motivation: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     room: {
+      default: null,
+      value: null,
       read: true,
-      write: true,
-      value: null
+      write: true
     },
     inspection_comment: {
+      default: null,
       value: null,
       read: true,
       write: true
     },
     accounting_type: {
-      value: null,
+      default: 'aquisition',
+      value: 'aquisition',
       read: true,
       write: true
     },
     cost_center: {
+      default: '12345',
+      value: '12345',
       read: true,
-      write: false,
-      value: '12345'
+      write: false
     },
     procurement_account: {
+      default: null,
+      value: null,
       read: true,
-      write: false,
-      value: null
+      write: false
     },
     internal_order_number: {
+      default: null,
       value: null,
       read: true,
       write: true
