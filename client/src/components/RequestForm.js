@@ -8,7 +8,7 @@ import Icon from './Icons'
 import {
   Row,
   Col,
-  FilePicker,
+  InputFileUpload,
   FormGroup,
   FormField,
   Select,
@@ -223,7 +223,7 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
                 />
 
                 <FormGroup label={t('request_form_field.attachments')}>
-                  <FilePicker id="attachments" name="attachments" />
+                  <InputFileUpload {...formPropsFor('attachments')} />
                 </FormGroup>
 
                 <FormGroup>

@@ -111,6 +111,23 @@ describe 'main categories' do
           amount_cents: data[:amount_cents]
         )
       end
+
+      @images_before = [
+        { main_category: { name: 'main_cat_1' } }
+      ]
+      @images_before.each do |data|
+        FactoryBot.create(
+          :image,
+          filename: 'foo.jpg',
+          real_filename: 'lisp-machine.jpg',
+          main_category_id: MainCategory.find(data[:main_category]).id
+        )
+      end
+
+      @upload_1 = FactoryBot.create(:upload)
+      @upload_2 = FactoryBot.create(:upload,
+                                    real_filename: 'lisp-machine.jpg',
+                                    content_type: 'image/jpg')
     end
 
     context 'full update' do
@@ -154,6 +171,17 @@ describe 'main categories' do
                                    "#{User.find(firstname: 'user_4').id}"],
                       viewers: ["#{User.find(firstname: 'user_3').id}",
                                 "#{User.find(firstname: 'user_4').id}"] }
+                  ],
+                  image: [
+                    { id: "#{@upload_1.id}",
+                      to_delete: true,
+                      __typename: "Upload" },
+                    { id: "#{@upload_2.id}",
+                      to_delete: false,
+                      __typename: "Upload" },
+                    { id: "#{Image.find(main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
+                      to_delete: true,
+                      __typename: "Image" }
                   ]
                 },
                 { id: "#{MainCategory.find(name: 'main_cat_2').id}",
@@ -325,6 +353,14 @@ describe 'main categories' do
         category_viewers_after.each do |data|
           expect(CategoryViewer.find(data)).to be
         end
+
+        expect(Upload.count).to be == 0
+        expect(Image.count).to be == 1
+        expect(
+          Image.find(
+            main_category_id: MainCategory.find(name: 'main_cat_1').id
+          ).filename
+        ).to be == 'lisp-machine.jpg'
       end
     end
   end

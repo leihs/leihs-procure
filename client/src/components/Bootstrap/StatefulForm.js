@@ -54,12 +54,13 @@ export default class StatefulForm extends React.PureComponent {
 
   updateField({ name, value }, callback) {
     log('updateField', { name, value })
-    this.setState(state => {
-      return {
+    this.setState(
+      state => ({
         ...state,
         fields: fpSet(name, value, state.fields)
-      }
-    }, () => f.isFunction(callback) && callback(this.state.fields))
+      }),
+      () => f.isFunction(callback) && callback(this.state.fields)
+    )
   }
 
   // reset ALL fields in one go

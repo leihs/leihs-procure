@@ -57,7 +57,8 @@ const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
   }
 }
 
-const boolify = (key, val) => (!val[key] ? null : val[key] === key)
+const boolify = (key, val) =>
+  !val ? false : !val[key] ? null : val[key] === key
 
 const updateRequestFromFields = (mutate, request, fields) => {
   const requestData = {
@@ -72,6 +73,11 @@ const updateRequestFromFields = (mutate, request, fields) => {
     replacement: boolify(
       'replacement',
       valueIfWritable(fields, request, 'replacement')
+    ),
+
+    attachments: f.map(
+      valueIfWritable(fields, request, 'attachments').attachments,
+      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
     ),
 
     // TODO: form field with id (autocomplete)

@@ -175,7 +175,15 @@ export const RequestFieldsForEdit = gql`
       ...RequestFieldString
     }
 
-    # TODO: attachments
+    attachments {
+      read
+      write
+      value {
+        id
+        filename
+        url
+      }
+    }
 
     accounting_type {
       ...RequestFieldString
