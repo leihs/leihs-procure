@@ -78,6 +78,11 @@ export const RequestFieldsForEdit = gql`
   fragment RequestFieldsForEdit on Request {
     ...RequestFieldsForIndex
 
+    template {
+      id
+      article_name
+    }
+
     category {
       value {
         id
