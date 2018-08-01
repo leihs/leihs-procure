@@ -33,6 +33,8 @@
 (defn get-ds [] @ds)
 (defn get-ds-without-pooler [] @ds-without-pooler)
 
+(defn wrap-cheat-tx [handler] (fn [request] (handler (assoc request :tx @ds))))
+
 (defn wrap-tx
   [handler]
   (fn [request]

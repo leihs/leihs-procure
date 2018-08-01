@@ -138,12 +138,8 @@
       (wrap-json-body {:keywords? true})
       wrap-empty
       (wrap-secret-byte-array secret)
-      ; ===================================================================
-      ; NOTE: this two wrappers have to be in this order as the first
-      ; depends on the second (context: hanging of requests due to images)
-      ds/wrap-tx
+      ds/wrap-cheat-tx
       wrap-resolve-handler
-      ; ===================================================================
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       wrap-params
