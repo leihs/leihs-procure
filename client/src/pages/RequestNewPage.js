@@ -85,6 +85,125 @@ const NEW_REQUEST_QUERY = gql`
   ${Fragments.RequestFieldsForEdit}
 `
 
+const FAKE_DATA = {
+  new_request: {
+    category: {
+      value: {
+        id: 'ebb12585-ce23-5cbe-8f4f-41a42d60a656',
+        name: 'Stuff'
+      }
+    },
+    budget_period: {
+      value: {
+        id: '9fb023db-725d-5881-8838-bae3e970ffd0'
+      }
+    },
+    article_name: {
+      value: null,
+      read: true,
+      write: true
+    },
+    receiver: {
+      value: null,
+      read: true,
+      write: true
+    },
+    organization: {
+      value: null
+    },
+    price_cents: {
+      value: null,
+      read: true,
+      write: true
+    },
+    price_currency: {
+      value: 'CHF',
+      read: true,
+      write: false
+    },
+    requested_quantity: {
+      value: null,
+      read: true,
+      write: true
+    },
+    approved_quantity: {
+      value: null,
+      read: true,
+      write: true
+    },
+    order_quantity: {
+      value: null,
+      read: true,
+      write: true
+    },
+    replacement: {
+      value: null,
+      read: true,
+      write: true
+    },
+    priority: {
+      read: true,
+      write: true,
+      value: null
+    },
+    state: {
+      value: null,
+      read: true,
+      write: false
+    },
+    supplier: {
+      read: true,
+      write: true,
+      value: null
+    },
+    inspector_priority: {
+      read: true,
+      write: true,
+      value: null
+    },
+    article_number: {
+      value: null,
+      read: true,
+      write: true
+    },
+    motivation: {
+      value: null,
+      read: true,
+      write: true
+    },
+    room: {
+      read: true,
+      write: true,
+      value: null
+    },
+    inspection_comment: {
+      value: null,
+      read: true,
+      write: true
+    },
+    accounting_type: {
+      value: null,
+      read: true,
+      write: true
+    },
+    cost_center: {
+      read: true,
+      write: false,
+      value: '12345'
+    },
+    procurement_account: {
+      read: true,
+      write: false,
+      value: null
+    },
+    internal_order_number: {
+      value: null,
+      read: true,
+      write: true
+    }
+  }
+}
+
 // TODO: form-selection-to-params
 // const updateQueryParams = ({ fields, params, location }) => {
 //   const formParams = {
@@ -257,10 +376,17 @@ const NewRequestPreselection = ({ data, onSelectionChange }) => {
 
 const NewRequestForm = ({ template, onCancel }) => (
   <F>
-    <Query query={NEW_REQUEST_QUERY} networkPolicy="network-only">
-      {({ loading, error, data }) => {
+    <Query
+      query={NEW_REQUEST_QUERY}
+      networkPolicy="network-only"
+      skip={!!FAKE_DATA}
+    >
+      {() => {
+        /* {({ loading, error, data }) => {
         if (loading) return <Loading />
-        if (error) return <ErrorPanel error={error} data={data} />
+        if (error) return <ErrorPanel error={error} data={data} /> */
+
+        const data = FAKE_DATA
 
         const request = { ...data.request }
 
