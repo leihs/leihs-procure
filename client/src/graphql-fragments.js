@@ -74,8 +74,8 @@ export const RequestFieldsForIndex = gql`
   }
 `
 
-export const RequestFieldsForShow = gql`
-  fragment RequestFieldsForShow on Request {
+export const RequestFieldsForEdit = gql`
+  fragment RequestFieldsForEdit on Request {
     ...RequestFieldsForIndex
 
     category {

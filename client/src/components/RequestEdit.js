@@ -15,7 +15,7 @@ import * as Fragments from '../graphql-fragments'
 const REQUEST_EDIT_QUERY = gql`
   query RequestForEdit($id: [ID!]!) {
     requests(id: $id) {
-      ...RequestFieldsForShow
+      ...RequestFieldsForEdit
     }
     # for selecting a new category:
     main_categories {
@@ -32,16 +32,16 @@ const REQUEST_EDIT_QUERY = gql`
       name
     }
   }
-  ${Fragments.RequestFieldsForShow}
+  ${Fragments.RequestFieldsForEdit}
 `
 
 const UPDATE_REQUEST_MUTATION = gql`
   mutation updateRequest($requestData: RequestInput) {
     request(input_data: $requestData) {
-      ...RequestFieldsForShow
+      ...RequestFieldsForEdit
     }
   }
-  ${Fragments.RequestFieldsForShow}
+  ${Fragments.RequestFieldsForEdit}
 `
 
 const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
@@ -124,7 +124,7 @@ class RequestEdit extends React.Component {
       this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
   }
 
-  render({ requestId, onClose, ...props } = this.props) {
+  render({ requestId, onCancel, ...props } = this.props) {
     return (
       <Query
         fetchPolicy="network-only"
@@ -147,7 +147,7 @@ class RequestEdit extends React.Component {
                     request={request}
                     categories={data.main_categories}
                     budgetPeriods={data.budget_periods}
-                    onClose={onClose}
+                    onCancel={onCancel}
                     onSubmit={fields =>
                       updateRequestFromFields(mutate, request, fields)
                     }

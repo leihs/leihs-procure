@@ -1,15 +1,19 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
+import cx from 'classnames'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 // import qs from 'qs'
 
 // import * as CONSTANTS from '../constants'
+import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
-// import Icon from '../components/Icons'
+import Icon from '../components/Icons'
 import {
   Row,
   Col,
+  Badge,
+  Collapsing,
   // FilePicker,
   FormGroup,
   // FormField,
@@ -25,13 +29,13 @@ import {
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
-import { DisplayName } from '../components/decorators'
-import UserAutocomplete from '../components/UserAutocomplete'
+import { formatCurrency } from '../components/decorators'
+import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
 
-const NEW_REQUEST_QUERY = gql`
-  query newRequestQuery {
+const NEW_REQUEST_PRESELECTION_QUERY = gql`
+  query newRequestPreselectionQuery {
     budget_periods {
       id
       name
@@ -41,6 +45,7 @@ const NEW_REQUEST_QUERY = gql`
     main_categories {
       id
       name
+      image_url
       categories {
         id
         name
@@ -64,6 +69,20 @@ const NEW_REQUEST_QUERY = gql`
       }
     }
   }
+`
+
+const NEW_REQUEST_QUERY = gql`
+  query newRequestQuery($budgetPeriod: ID, $category: ID, $template: ID) {
+    new_request(
+      budget_period: $budgetPeriod
+      category: $category
+      template: $template
+    ) {
+      ...RequestFieldsForEdit
+    }
+  }
+
+  ${Fragments.RequestFieldsForEdit}
 `
 
 // TODO: form-selection-to-params
@@ -92,25 +111,16 @@ class RequestNewPage extends React.Component {
           <MainWithSidebar>
             <h1>Antrag erstellen</h1>
 
-            {window.isDebug && (
-              <pre>
-                <mark>
-                  - select: budget period, default is current requesting phase
-                  or param<br />
-                  - select: category, default is param <br />
-                  - select: template, default is param<br />
-                  - select: user, default is param
-                </mark>
-              </pre>
-            )}
-
-            <Query query={NEW_REQUEST_QUERY} networkPolicy="cache-then-network">
+            <Query
+              query={NEW_REQUEST_PRESELECTION_QUERY}
+              networkPolicy="cache-then-network"
+            >
               {({ loading, error, data }) => {
                 if (loading) return <Loading />
                 if (error) return <ErrorPanel error={error} data={data} />
 
                 return (
-                  <NewRequestForm
+                  <NewRequestPreselection
                     data={data}
                     // TODO: form-selection-to-params
                     // onSelectionChange={fields =>
@@ -132,7 +142,7 @@ class RequestNewPage extends React.Component {
 
 export default RequestNewPage
 
-const NewRequestForm = ({ data, onSelectionChange }) => {
+const NewRequestPreselection = ({ data, onSelectionChange }) => {
   const budPeriods = f
     .sortBy(data.budget_periods, 'end_date')
     .filter(bp => new Date(bp.inspection_start_date).getTime() > Date.now())
@@ -143,32 +153,13 @@ const NewRequestForm = ({ data, onSelectionChange }) => {
       ).toLocaleDateString()}`
     }))
 
-  const mainCats = data.main_categories.map(mc => ({
-    value: mc.id,
-    label: mc.name
-  }))
-
-  const SubCats = fields =>
-    !f.present(fields._main_category)
-      ? []
-      : f
-          .find(data.main_categories, {
-            id: fields._main_category
-          })
-          .categories.map(mc => ({
-            value: mc.id,
-            label: mc.name
-          }))
-
-  const Templates = fields =>
-    f
-      .filter(data.templates, {
-        category: { id: fields.category }
-      })
-      .map(mc => ({
-        value: mc.id,
-        label: mc.article_name
-      }))
+  const CatWithMainCat = catId => {
+    const mc = f.find(data.main_categories, {
+      categories: [{ id: catId }]
+    })
+    const sc = f.find(mc.categories, { id: catId })
+    return { ...sc, main_category: { ...mc, categories: undefined } }
+  }
 
   return (
     <StatefulForm
@@ -177,12 +168,9 @@ const NewRequestForm = ({ data, onSelectionChange }) => {
       onChange={fields => onSelectionChange(fields)}
     >
       {({ fields, setValue, getValue, formPropsFor, ...formHelpers }) => {
-        const subCats = SubCats(fields)
-        const requester = getValue('requester')
-        const templates = Templates(fields)
-
-        const showForm = f.present(fields.template)
+        const selectedCategory = fields.category
         const selectedTemplate = f.find(data.templates, { id: fields.template })
+        const hasPreselected = !!(selectedTemplate || selectedCategory)
 
         return (
           <F>
@@ -192,92 +180,72 @@ const NewRequestForm = ({ data, onSelectionChange }) => {
                 window.alert('TODO!')
               }}
             >
-              <FormGroup label="Budgetperiode">
+              <FormGroup label="Budgetperiode" className="form-control-lg p-0">
                 <Select
                   {...formPropsFor('budget_period')}
+                  className="form-control-lg"
                   required
                   emptyOption={false}
                   options={budPeriods}
                 />
               </FormGroup>
-              <Row>
-                <Col lg>
-                  <FormGroup label="Haupt-Kategorie">
-                    <Select
-                      {...formPropsFor('_main_category')}
-                      required
-                      options={mainCats}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col lg>
-                  <FormGroup label="Kategorie">
-                    <Select
-                      {...formPropsFor('category')}
-                      required
-                      disabled={f.isEmpty(subCats)}
-                      options={subCats}
-                    />
-                  </FormGroup>
-                </Col>
-              </Row>
 
-              {/* FIXME: only show if allowed! */}
               <FormGroup
-                label={
-                  <span>
-                    Für anderen Benutzer{' '}
-                    <code>
-                      {'// TBD: permissions for creating for other user'}
-                    </code>
-                  </span>
-                }
+                label="Kategorie & Vorlage"
+                className="form-control-lg p-0"
               >
-                <Row>
-                  <Col sm>
-                    <b className="form-control-plaintext">
-                      {requester ? DisplayName(requester) : 'Nein'}
-                    </b>
-                  </Col>
-                  <Col sm>
-                    <UserAutocomplete
-                      inputProps={{
-                        placeholder: 'Benutzer auswählen'
-                      }}
-                      onSelect={u => setValue('requester', u)}
-                    />
-                  </Col>
-                </Row>
+                {hasPreselected ? (
+                  selectedCategory ? (
+                    <Row>
+                      <Col sm>
+                        <SelectedCategory
+                          cat={CatWithMainCat(selectedCategory)}
+                        />
+                      </Col>
+                      <Col sm>
+                        <SelectionCard>Keine Vorlage</SelectionCard>
+                      </Col>
+                    </Row>
+                  ) : (
+                    <Row>
+                      <Col sm>
+                        <SelectedCategory
+                          cat={CatWithMainCat(selectedTemplate.category.id)}
+                        />
+                      </Col>
+                      <Col sm>
+                        <SelectionCard>
+                          <Icon.Templates spaced />
+                          {selectedTemplate.article_name}
+                        </SelectionCard>
+                      </Col>
+                    </Row>
+                  )
+                ) : null}
 
-                <FormGroup label="Vorlage">
-                  <Select
-                    {...formPropsFor('template')}
-                    required
-                    disabled={f.isEmpty(subCats)}
-                    options={templates}
+                {!hasPreselected && (
+                  <CategoriesTemplatesTree
+                    main_categories={data.main_categories}
+                    templates={data.templates}
+                    onSelectCategory={t => setValue('category', t.id)}
+                    onSelectTemplate={t => setValue('template', t.id)}
                   />
-                </FormGroup>
+                )}
               </FormGroup>
             </form>
 
-            {!!window.isDebug && (
-              <pre>{JSON.stringify({ selectedTemplate, templates }, 0, 2)}</pre>
-            )}
-
-            {!!window.isDebug && <pre>{JSON.stringify({ fields }, 0, 2)}</pre>}
-
-            {showForm && (
-              <RequestForm
-                className="pt-3"
+            {hasPreselected && (
+              <NewRequestForm
+                category={selectedCategory}
+                template={selectedTemplate}
+                onCancel={e => {
+                  setValue('template', null)
+                  setValue('category', null)
+                }}
                 // NOTE: reset form if preselection changes
                 key={['budget_period', 'category', 'template']
-                  .map(k => [fields[k]])
+                  .map(k => String([fields[k]]))
                   .join()}
-                request={selectedTemplate}
-                categories={data.main_categories}
-                budgetPeriods={data.budget_periods}
-                onClose={e => window.alert('TODO')}
-                onSubmit={fields => window.alert(JSON.stringify(fields, 0, 2))}
               />
             )}
           </F>
@@ -286,3 +254,139 @@ const NewRequestForm = ({ data, onSelectionChange }) => {
     </StatefulForm>
   )
 }
+
+const NewRequestForm = ({ template, onCancel }) => (
+  <F>
+    <Query query={NEW_REQUEST_QUERY} networkPolicy="network-only">
+      {({ loading, error, data }) => {
+        if (loading) return <Loading />
+        if (error) return <ErrorPanel error={error} data={data} />
+
+        const request = { ...data.request }
+
+        return (
+          <F>
+            <hr className="my-4" />
+            <RequestForm
+              request={request}
+              categories={data.main_categories}
+              budgetPeriods={data.budget_periods}
+              onCancel={onCancel}
+              onSubmit={fields => window.alert(JSON.stringify(fields, 0, 2))}
+            />
+          </F>
+        )
+      }}
+    </Query>
+  </F>
+)
+
+const CategoriesTemplatesTree = ({
+  main_categories,
+  templates,
+  onSelectCategory,
+  onSelectTemplate
+}) => (
+  <F>
+    <ul className="list-unstyled">
+      {main_categories.map(mc => (
+        <F key={mc.id}>
+          <Collapsing id={'mc' + mc.id} canToggle={true} startOpen={false}>
+            {({
+              isOpen,
+              canToggle,
+              toggleOpen,
+              togglerProps,
+              collapsedProps,
+              Caret
+            }) => (
+              <li className="card mb-3">
+                <h3
+                  className={cx('card-header h4 cursor-pointer', {
+                    'border-bottom-0': !isOpen
+                  })}
+                  {...togglerProps}
+                >
+                  <Caret spaced />
+                  {!!mc.image_url && (
+                    <ImageThumbnail
+                      className="border-0 bg-transparent"
+                      imageUrl={mc.image_url}
+                    />
+                  )}
+                  {mc.name}
+                </h3>
+                {isOpen && (
+                  <ul className="list-group list-group-flush">
+                    {mc.categories.map(sc => (
+                      <F key={sc.id}>
+                        <li className="card list-group-item p-0">
+                          <h4 className="card-header h6">{sc.name}</h4>
+                          <div className="list-group list-group-flush">
+                            {f
+                              .filter(templates, {
+                                category: { id: sc.id }
+                              })
+                              .map(t => (
+                                <F key={t.id}>
+                                  <button
+                                    className="list-group-item list-group-item-action cursor-pointer"
+                                    onClick={e => {
+                                      e.preventDefault
+                                      onSelectTemplate(t)
+                                    }}
+                                  >
+                                    <Icon.PlusCircle
+                                      color="success"
+                                      className="mr-3"
+                                      size="lg"
+                                    />
+                                    <Icon.Templates /> {t.article_name}{' '}
+                                    <Badge secondary>
+                                      {formatCurrency(t.price_cents)}
+                                    </Badge>
+                                  </button>
+                                </F>
+                              ))}
+                            <button
+                              className="list-group-item list-group-item-action cursor-pointer"
+                              onClick={e => {
+                                e.preventDefault
+                                onSelectCategory(sc)
+                              }}
+                            >
+                              <Icon.PlusCircle
+                                color="success"
+                                className="mr-3"
+                              />
+                              {'Ohne Vorlage erstellen'}
+                            </button>
+                          </div>
+                        </li>
+                      </F>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            )}
+          </Collapsing>
+        </F>
+      ))}
+    </ul>
+  </F>
+)
+
+const SelectionCard = ({ children }) => (
+  <div className="card">
+    <div className="card-body px-3 py-2">{children}</div>
+  </div>
+)
+
+const SelectedCategory = ({ cat }) => (
+  <SelectionCard>
+    <Icon.Categories spaced="2" />
+    {cat.main_category.name}
+    <Icon.CaretRight />
+    {cat.name}
+  </SelectionCard>
+)

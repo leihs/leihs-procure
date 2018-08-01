@@ -44,10 +44,11 @@ const prepareFormValues = request => {
   return fields
 }
 
-const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
+const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
+  const requestID = request.id || 'new'
   return (
     <StatefulForm
-      idPrefix={`request_form_${request.id}`}
+      idPrefix={`request_form_${requestID}`}
       values={prepareFormValues(request)}
     >
       {({ fields, setValue, getValue, ...formHelpers }) => {
@@ -61,7 +62,7 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 
         return (
           <form
-            id={request.id}
+            id={requestID}
             className={cx(className)}
             onSubmit={e => {
               e.preventDefault()
@@ -327,11 +328,11 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
                 >
                   <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                 </button>
-                {!!onClose && (
+                {!!onCancel && (
                   <button
                     type="button"
                     className="btn m-1 btn-outline-secondary btn-massive"
-                    onClick={onClose}
+                    onClick={onCancel}
                   >
                     {t('form_btn_cancel')}
                   </button>

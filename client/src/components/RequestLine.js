@@ -41,7 +41,7 @@ class RequestLine extends React.Component {
           <F>
             <RequestEdit
               requestId={request.id}
-              onClose={() => this.setState({ open: false })}
+              onCancel={() => this.setState({ open: false })}
               doChangeRequestCategory={props.doChangeRequestCategory}
               doChangeBudgetPeriod={props.doChangeBudgetPeriod}
               doDeleteRequest={props.doDeleteRequest}
