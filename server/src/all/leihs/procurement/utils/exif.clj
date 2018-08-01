@@ -16,7 +16,7 @@
        :out
        string/split-lines
        (map replace-group-string)
-       (map #(string/split % #"\s+:"))
+       (map #(string/split % #":\s"))
        flatten
        (map string/trim)
        (apply hash-map)))
