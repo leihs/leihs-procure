@@ -3,10 +3,11 @@
   (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require
     [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.authorization :refer [wrap-authorize]]
     [leihs.procurement.backend.html :as html]
     [leihs.procurement.constants :as constants]
     [leihs.procurement.env :as env]
+    [leihs.procurement.resources.upload :as upload]
     [leihs.procurement.graphql :as graphql]
     [leihs.procurement.auth.session :as session]
     [leihs.procurement.paths :refer [path paths]]
@@ -25,9 +26,10 @@
     [compojure.core :as cpj]
     [ring.middleware.accept]
     [ring.middleware.content-type :refer [wrap-content-type]]
-    [ring.middleware.cookies]
-    [ring.middleware.json]
-    [ring.middleware.params]
+    [ring.middleware.cookies :refer [wrap-cookies]]
+    [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
+    [ring.middleware.params :refer [wrap-params]]
+    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
     [ring.middleware.reload :refer [wrap-reload]]
     [ring.util.response :refer [redirect]]
     [ring-graphql-ui.core :refer [wrap-graphiql]]
@@ -42,11 +44,13 @@
 
 ; ========================================================
 ; TODO: remove shutdown!!! (and possible others)
-(def skip-authorization-handler-keys #{:attachment :image :shutdown :status})
+(def skip-authorization-handler-keys
+  #{:attachment :upload :image :shutdown :status})
 ; ========================================================
 
 (def handler-resolve-table
   {:attachment attachment/routes,
+   :upload upload/routes,
    :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,
@@ -126,12 +130,12 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      ring.middleware.json/wrap-json-response
-      (ring.middleware.json/wrap-json-body {:keywords? true})
-      anti-csrf/wrap
-      (authorization/wrap-authorize skip-authorization-handler-keys)
+      wrap-json-response
+      (wrap-json-body {:keywords? true})
+      ; anti-csrf/wrap
+      (wrap-authorize skip-authorization-handler-keys)
       session/wrap
-      ring.middleware.cookies/wrap-cookies
+      wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
       ; ===================================================================
@@ -142,7 +146,8 @@
       ; ===================================================================
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
-      ring.middleware.params/wrap-params
+      wrap-params
+      wrap-multipart-params
       ring-exception/wrap
       wrap-reload-if-dev-or-test))
 

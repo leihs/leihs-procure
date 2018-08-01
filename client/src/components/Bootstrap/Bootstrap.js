@@ -330,13 +330,20 @@ FormField.propTypes = FormFieldPropTypes
 //   </div>
 // )
 
-export const FilePicker = ({ id, name, label }) => (
-  <div>
-    <label className="btn btn-sm btn-block  btn-outline-secondary text-left">
+export const FilePicker = ({ id, name, label, onChange, ...props }) => (
+  <F>
+    <label className="btn btn-sm btn-block btn-outline-secondary text-left">
       <Icon.Paperclip /> {label}
-      <input id={id} name={name} type="file" style={{ opacity: 0, width: 0 }} />
+      <input
+        id={id}
+        name={name}
+        type="file"
+        style={{ opacity: 0, width: 0 }}
+        onChange={onChange}
+        {...props}
+      />
     </label>
-  </div>
+  </F>
 )
 FilePicker.propTypes = {
   id: PropTypes.string,

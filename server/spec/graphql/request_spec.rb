@@ -63,27 +63,37 @@ describe 'request' do
         ['admin', 'inspector', 'requester'].each do |user_name|
           user = binding.local_variable_get(user_name)
 
+          upload_1 = FactoryBot.create(:upload)
+          upload_2 = FactoryBot.create(:upload)
+
           attrs2 = attrs.merge(article_name: user_name,
-                               user: user.id)
+                               user: user.id,
+                               attachments: [{id: upload_1.id, to_delete: false, __typename: 'Upload'},
+                                             {id: upload_2.id, to_delete: true, __typename: 'Upload'}])
 
           q = <<-GRAPHQL
             mutation {
               new_request(input_data: #{hash_to_graphql attrs2}) {
                 id
+                attachments {
+                  value {
+                    id
+                  }
+                }
               }
             }
           GRAPHQL
 
           result = query(q, user.id)
 
-          request = Request.find(transform_uuid_attrs attrs2)
-          expect(result).to be == {
-            'data' => {
-              'new_request' => {
-                'id' => request.id
-              }
-            }
-          }
+          request = Request.order(:created_at).reverse.first
+          expect(result['data']['new_request']['id']).to be == request.id
+          expect(result['data']['new_request']['attachments']['value'].count).to be == 1
+          expect(Upload.count).to be == 0
+          expect(Attachment.count).to be == 1
+
+          Upload.dataset.delete
+          Attachment.dataset.delete
         end
       end
 
@@ -248,26 +258,44 @@ describe 'request' do
       ['admin', 'inspector', 'requester'].each do |user_name|
         user = binding.local_variable_get(user_name)
 
+        upload_1 = FactoryBot.create(:upload)
+        upload_2 = FactoryBot.create(:upload)
+        attachment_1 = FactoryBot.create(:attachment, request_id: request.id)
+        attachment_2 = FactoryBot.create(:attachment, request_id: request.id)
+
         q = <<-GRAPHQL
           mutation {
             request(input_data: {
               id: "#{request.id}",
-              article_name: "#{user_name}"
+              article_name: "#{user_name}",
+              attachments: [
+                { id: "#{upload_1.id}", __typename: "Upload", to_delete: false },
+                { id: "#{upload_2.id}", __typename: "Upload", to_delete: true },
+                { id: "#{attachment_1.id}", __typename: "Attachment", to_delete: false },
+                { id: "#{attachment_2.id}", __typename: "Attachment", to_delete: true }
+              ]
             }) {
               id
+              attachments {
+                value {
+                  id
+                }
+              }
             }
           }
         GRAPHQL
 
         result = query(q, user.id)
-        expect(result).to eq({
-          'data' => {
-            'request' => {
-              'id' => request.id
-            }
-          }
-        })
+
+        expect(result['data']['request']['id']).to be == request.id
+        expect(result['data']['request']['attachments']['value'].count).to be == 2
+        expect(Upload.all.count).to be == 0
+        expect(Attachment.count).to be == 2
+        expect(Attachment.all.map(&:id)).to include attachment_1.id
         expect(request.reload.article_name).to be == user_name
+
+        Attachment.dataset.delete
+        Upload.dataset.delete
       end
     end
 

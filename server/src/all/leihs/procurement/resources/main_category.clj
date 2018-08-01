@@ -2,6 +2,10 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.resources.image :as image]
+            [leihs.procurement.resources.images :as images]
+            [leihs.procurement.resources.uploads :as uploads]
+            [leihs.procurement.utils.helpers :refer [submap?]]
             [leihs.procurement.utils.ds :as ds]
             [leihs.procurement.utils.sql :as sql]
             [logbug.debug :as debug]))
@@ -36,14 +40,42 @@
   [tx mc-name]
   (first (jdbc/query tx (main-category-query-by-name mc-name))))
 
-(defn insert-main-category!
+(defn insert!
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_main_categories)
                      (sql/values [mc])
                      sql/format)))
 
-(defn update-main-category!
+(defn- filter-images [m is] (filter #(submap? m %) is))
+
+(defn deal-with-image!
+  [tx mc-id images]
+  (let [uploads-to-delete (filter-images {:to_delete true, :__typename "Upload"}
+                                         images)
+        uploads-to-images
+          (filter-images {:to_delete false, :__typename "Upload"} images)
+        images-to-delete (filter-images {:to_delete true, :__typename "Image"}
+                                        images)
+        ; NOTE: just for purpose of completeness and clarity:
+        ; don't do anything with existing images
+        ; images-to-retain
+        ; (filter-images {:to_delete false, :__typename "Image"}
+        ; images)
+        ]
+    (if-not (empty? uploads-to-delete)
+      (uploads/delete! tx (map :id uploads-to-delete)))
+    (if-not (empty? images-to-delete)
+      (images/delete! tx (map :id images-to-delete)))
+    (when-not (empty? uploads-to-images)
+      (if (> (count uploads-to-images) 1)
+        (throw (Exception. "Uploading of more than one image is not allowed.")))
+      (image/create-for-main-category-id-and-upload! tx
+                                                     mc-id
+                                                     (first
+                                                       uploads-to-images)))))
+
+(defn update!
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)

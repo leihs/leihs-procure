@@ -11,12 +11,15 @@
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
     "coverage": "npm test -- --coverage",
-    "lint": "eslint --fix src/{,**/}*.js{,x,on}",
-    "ci:lint": "eslint src/{,**/}*.js{,x,on}",
+    "lint": "eslint --fix 'src/{,**/}*.js{,x,on}'",
+    "ci:lint": "eslint 'src/{,**/}*.js{,x,on}'",
     "test": "react-scripts test --env=jsdom"
   },
   "proxy": {
-    "/(graphql|graphiql|images|attachments|status)": {
+    "/(graphql|graphiql|images|attachments|status|upload)": {
+      "target": "http://localhost:3003"
+    },
+    "/procure/(graphql|graphiql|images|attachments|status|upload)": {
       "target": "http://localhost:3003"
     }
   },

@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.main-categories
-  (:require [clj-logging-config.log4j :as logging-config]
+  (:require [leihs.procurement.resources.main-category :as main-category]
+            [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.graphql.helpers :refer
@@ -68,19 +69,21 @@
         (let [mc-name (:name mc)]
           (do
             (if (:id mc)
-              (main-category/update-main-category! tx
-                                                   (select-keys mc [:id :name]))
-              (main-category/insert-main-category! tx {:name mc-name}))
+              (main-category/update! tx (select-keys mc [:id :name]))
+              (main-category/insert! tx {:name mc-name}))
             (let [mc-id (or (:id mc)
                             (->> mc-name
                                  (main-category/get-main-category-by-name tx)
                                  :id))
+                  image (:image mc)
                   budget-limits (->> mc
                                      :budget_limits
                                      (map #(merge % {:main_category_id mc-id})))
                   categories (->> mc
                                   :categories
                                   (map #(merge % {:main_category_id mc-id})))]
+              (if-not (empty? image)
+                (main-category/deal-with-image! tx mc-id image))
               (budget-limits/update-budget-limits! tx budget-limits)
               (categories/update-categories! tx mc-id categories)
               (recur rest-mcs (conj mc-ids mc-id)))))
