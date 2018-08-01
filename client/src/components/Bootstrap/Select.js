@@ -93,4 +93,10 @@ Select.propTypes = {
   ])
 }
 
+// NOTE: placeholder while data is loading etc.
+const SelectPlaceholder = (text, rest) => (
+  <Select {...rest} disabled emptyOption={{ children: text }} options={[]} />
+)
+Select.Placeholder = SelectPlaceholder
+
 export default Select

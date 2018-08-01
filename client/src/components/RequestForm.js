@@ -270,49 +270,56 @@ const RequestForm = ({ request, className, onClose, onSubmit, ...props }) => {
 
             <Row m="t-5">
               <Col lg>
-                <SelectionDropdown
-                  toggle={props.onSelectNewRequestCategory}
-                  isOpen={props.isSelectingNewCategory}
-                  options={props.categories.map(mc => ({
-                    key: mc.id,
-                    header: mc.name,
-                    options: mc.categories.map(c => ({
-                      key: c.id,
-                      children: c.name,
-                      disabled: c.id === request.category.value.id,
-                      onClick: e => props.doChangeRequestCategory(c)
-                    }))
-                  }))}
-                >
-                  <Icon.Exchange /> {t('form_btn_move_category')}
-                </SelectionDropdown>
-
-                <SelectionDropdown
-                  toggle={props.onSelectNewBudgetPeriod}
-                  isOpen={props.isSelectingNewBudgetPeriod}
-                  options={[
-                    {
-                      key: 1,
-                      options: props.budgetPeriods.map(bp => ({
-                        key: bp.id,
-                        children: bp.name,
-                        disabled: bp.id === request.budget_period.value.id,
-                        onClick: e => props.doChangeBudgetPeriod(bp)
+                {!!props.doChangeRequestCategory && (
+                  <SelectionDropdown
+                    toggle={props.onSelectNewRequestCategory}
+                    isOpen={props.isSelectingNewCategory}
+                    options={props.categories.map(mc => ({
+                      key: mc.id,
+                      header: mc.name,
+                      options: mc.categories.map(c => ({
+                        key: c.id,
+                        children: c.name,
+                        disabled: c.id === request.category.value.id,
+                        onClick: e => props.doChangeRequestCategory(c)
                       }))
-                    }
-                  ]}
-                >
-                  <Icon.BudgetPeriod /> {t('form_btn_change_budget_period')}
-                </SelectionDropdown>
+                    }))}
+                  >
+                    <Icon.Exchange /> {t('form_btn_move_category')}
+                  </SelectionDropdown>
+                )}
 
-                <button
-                  type="button"
-                  className="btn m-1 btn-outline-danger btn-massive"
-                  onClick={props.doDeleteRequest}
-                >
-                  <Icon.Trash /> {t('form_btn_delete')}
-                </button>
+                {!!props.doChangeBudgetPeriod && (
+                  <SelectionDropdown
+                    toggle={props.onSelectNewBudgetPeriod}
+                    isOpen={props.isSelectingNewBudgetPeriod}
+                    options={[
+                      {
+                        key: 1,
+                        options: props.budgetPeriods.map(bp => ({
+                          key: bp.id,
+                          children: bp.name,
+                          disabled: bp.id === request.budget_period.value.id,
+                          onClick: e => props.doChangeBudgetPeriod(bp)
+                        }))
+                      }
+                    ]}
+                  >
+                    <Icon.BudgetPeriod /> {t('form_btn_change_budget_period')}
+                  </SelectionDropdown>
+                )}
+
+                {!!props.doDeleteRequest && (
+                  <button
+                    type="button"
+                    className="btn m-1 btn-outline-danger btn-massive"
+                    onClick={props.doDeleteRequest}
+                  >
+                    <Icon.Trash /> {t('form_btn_delete')}
+                  </button>
+                )}
               </Col>
+
               <Col lg order="first" className="mt-3 mt-lg-0">
                 <button
                   type="submit"

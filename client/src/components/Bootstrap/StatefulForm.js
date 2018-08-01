@@ -48,11 +48,8 @@ export default class StatefulForm extends React.PureComponent {
 
   handleInputChange(event) {
     log('handleInputChange', { event })
-    this.updateField(getFieldFromEvent(event), fields => {
-      if (this.props.onChange) {
-        this.props.onChange(fields)
-      }
-    })
+    const callback = this.props.onChange
+    this.updateField(getFieldFromEvent(event), fields => callback(fields))
   }
 
   updateField({ name, value }, callback) {
