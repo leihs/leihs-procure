@@ -3,13 +3,13 @@ import f from 'lodash'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import Loading from './Loading'
-import { ErrorPanel } from './Error'
+import Loading from '../components/Loading'
+import { ErrorPanel } from '../components/Error'
 
-// import { RequestTotalAmount as TotalAmount } from './decorators'
-// import { Div, Row, Col, Badge } from './Bootstrap'
-// import Icon from './Icons'
-import RequestForm from './RequestForm'
+// import { RequestTotalAmount as TotalAmount } from '../components/decorators'
+// import { Div, Row, Col, Badge } from '../components/Bootstrap'
+// import Icon from '../components/Icons'
+import RequestForm from '../components/RequestForm'
 import * as Fragments from '../graphql-fragments'
 
 const REQUEST_EDIT_QUERY = gql`
