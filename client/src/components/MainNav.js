@@ -55,47 +55,55 @@ export default class MainNav extends React.Component {
                 <Icon.Requests fixedWidth spaced /> Anträge
               </NavItemLink>
 
-              <UncontrolledDropdown nav inNavbar>
-                <Routed path="/admin">
-                  {({ isActive }) => (
-                    <DropdownToggle
-                      nav
-                      caret
-                      className={cx({ active: isActive })}
+              {me.permissions.isAdmin && (
+                <UncontrolledDropdown nav inNavbar>
+                  <Routed path="/admin">
+                    {({ isActive }) => (
+                      <DropdownToggle
+                        nav
+                        caret
+                        className={cx({ active: isActive })}
+                      >
+                        <Icon.Settings /> Admin
+                      </DropdownToggle>
+                    )}
+                  </Routed>
+
+                  <DropdownMenu right>
+                    <DropdownItemLink
+                      className="pl-3"
+                      to="/admin/budget-periods"
                     >
-                      <Icon.Settings /> Admin
-                    </DropdownToggle>
-                  )}
-                </Routed>
+                      <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+                    </DropdownItemLink>
 
-                <DropdownMenu right>
-                  <DropdownItemLink className="pl-3" to="/admin/budget-periods">
-                    <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/categories">
+                      <Icon.Categories fixedWidth spaced /> Kategorien
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/categories">
-                    <Icon.Categories fixedWidth spaced /> Kategorien
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/users">
+                      <Icon.Users fixedWidth spaced /> Benutzer
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/users">
-                    <Icon.Users fixedWidth spaced /> Benutzer
-                  </DropdownItemLink>
+                    <DropdownItemLink
+                      className="pl-3"
+                      to="/admin/organizations"
+                    >
+                      <Icon.Organizations fixedWidth spaced /> Organisationen
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/organizations">
-                    <Icon.Organizations fixedWidth spaced /> Organisationen
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/templates">
+                      <Icon.Templates fixedWidth spaced /> Vorlagen
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/templates">
-                    <Icon.Templates fixedWidth spaced /> Vorlagen
-                  </DropdownItemLink>
+                    <DropdownItem divider />
 
-                  <DropdownItem divider />
-
-                  <DropdownItemLink className="pl-3" to="/admin/settings">
-                    <Icon.Settings fixedWidth spaced /> Einstellungen
-                  </DropdownItemLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
+                    <DropdownItemLink className="pl-3" to="/admin/settings">
+                      <Icon.Settings fixedWidth spaced /> Einstellungen
+                    </DropdownItemLink>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              )}
 
               <NavItemLink exact to="/TODO">
                 <Icon.Contact fixedWidth spaced /> Kontakt
