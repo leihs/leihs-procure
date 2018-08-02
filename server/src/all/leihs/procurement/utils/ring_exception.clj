@@ -4,6 +4,7 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.tools.logging :as logging]
             [leihs.procurement.env :as env]
+            [leihs.procurement.utils.helpers :as helpers]
             [logbug.catcher :as catcher]
             [logbug.debug :as debug :refer [I>]]
             [logbug.ring :refer [wrap-handler-with-logging]]
@@ -32,15 +33,17 @@
             (and (instance? clojure.lang.ExceptionInfo e)
                  (contains? (ex-data e) :status))
               {:status (:status (ex-data e)),
-               :headers {"Content-Type" "text/plain"},
-               :body (.getMessage e)}
+               :body (.getMessage (helpers/error-as-graphql "API_ERROR" e))}
             (instance? org.postgresql.util.PSQLException e)
-              {:status 409, :body (.getMessage e)}
+              {:status 409,
+               :body (.getMessage (helpers/error-as-graphql "DATABASE_ERROR"
+                                                            e))}
             :else
               {:status 500,
-               :headers {"Content-Type" "text/plain"},
                :body
-                 "Unclassified error, see the server logs for details."}))))))
+                 (helpers/error-as-graphql
+                   "UNKNOWN_SERVER_ERROR"
+                   "Unclassified error, see the server logs for details.")}))))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
