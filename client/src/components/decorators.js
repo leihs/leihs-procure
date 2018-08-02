@@ -1,13 +1,12 @@
 import f from 'lodash'
 import { formatMoney } from 'accounting-js'
 
-export const DisplayName = (o, short = false) => {
+export const DisplayName = (o, { short = false, abbr = false } = {}) => {
+  if (short && abbr) throw new Error('Invalid Options!')
+
   if (!o) return '?'
 
   switch (o.__typename) {
-    case 'User':
-      return `${o.firstname} ${o.lastname}`
-
     case 'Room':
       return short || !o.description
         ? `${o.name}`
@@ -17,6 +16,22 @@ export const DisplayName = (o, short = false) => {
       return short || !o.shortname
         ? `${o.shortname || o.name}`
         : `${o.name} (${o.shortname})`
+
+    case 'User':
+      if (abbr)
+        return `${o.firstname || ''} ${o.lastname || ''}`
+          .split(/\W/)
+          .map(s => f.first(s).toUpperCase())
+          .filter((s, i, a) => i < 2 || a.length - i <= 3)
+          .join('')
+
+      if (short)
+        return `${f
+          .filter([f.first(f.toUpper(o.firstname))])
+          .concat('')
+          .join('. ')}${o.lastname}`
+
+      return `${o.firstname || ''} ${o.lastname || ''}`.trim()
 
     default:
       throw new Error(`DisplayName: unknown type '${o.__typename}'!`)
