@@ -1,7 +1,9 @@
 import React, { Fragment as F } from 'react'
+import f from 'lodash'
 import cx from 'classnames'
 
 import {
+  Badge,
   Collapse,
   Navbar,
   NavbarToggler,
@@ -17,6 +19,7 @@ import {
 } from './Bootstrap'
 
 import Icon from './Icons'
+import { DisplayName } from './decorators'
 
 const TITLE = 'Bedarfsermittlung'
 
@@ -36,7 +39,7 @@ export default class MainNav extends React.Component {
       isOpen: !this.state.isOpen
     })
   }
-  render({ props: { isDev }, state } = this) {
+  render({ props: { me, isDev }, state } = this) {
     return (
       <div>
         <Navbar dark color="dark" expand="lg">
@@ -144,17 +147,17 @@ export default class MainNav extends React.Component {
                   </DropdownItemLink>
                   <DropdownItem divider />
                   <DropdownItem>
-                    <Icon.LeihsManage />
+                    <Icon.LeihsManage /> Manage
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
 
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
-                  User
+                  <Icon.User size="lg" /> {DisplayName(me, { abbr: true })}
                 </DropdownToggle>
                 <DropdownMenu right>
-                  <DropdownItem>[TODO]</DropdownItem>
+                  <DropdownItem>{tmpUserInfo(me)}</DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
 
@@ -173,3 +176,26 @@ export default class MainNav extends React.Component {
     )
   }
 }
+
+const tmpUserInfo = me => (
+  <F>
+    {[
+      'isAdmin',
+      'isRequester',
+      'isInspectorForCategories',
+      'isViewerForCategories'
+    ]
+      .map(k => [k, me.permissions[k]])
+      .filter(([k, i]) => i && f.present(i))
+      .map(([k, i]) => (
+        <F key={k}>
+          <Badge dark>
+            {k.replace(/ForCategories$/, ` (${i.length} categories)`)}
+          </Badge>{' '}
+        </F>
+      ))}
+    <pre>
+      <small>{JSON.stringify(f.omit(me, 'permissions'), 0, 2)}</small>
+    </pre>
+  </F>
+)
