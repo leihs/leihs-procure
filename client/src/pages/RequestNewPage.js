@@ -72,7 +72,7 @@ const NEW_REQUEST_PRESELECTION_QUERY = gql`
 `
 
 const NEW_REQUEST_QUERY = gql`
-  query newRequestQuery($budgetPeriod: ID, $category: ID, $template: ID) {
+  query newRequestQuery($budgetPeriod: ID!, $category: ID, $template: ID) {
     new_request(
       budget_period: $budgetPeriod
       category: $category
@@ -85,336 +85,6 @@ const NEW_REQUEST_QUERY = gql`
   ${Fragments.RequestFieldsForEdit}
 `
 
-const FAKE_DATA = {
-  FROM_CATEGORY: {
-    new_request: {
-      template: null,
-      category: {
-        value: {
-          id: '5304d73e-28ff-4ee8-9fdd-f032fa0711c1',
-          name: 'Stuff'
-        }
-      },
-      budget_period: {
-        value: {
-          id: '8a9af029-86a5-4d5e-bd05-278f94b89cf3'
-        }
-      },
-      article_name: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      receiver: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      organization: {
-        value: null
-      },
-      price_cents: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      price_currency: {
-        default: 'CHF',
-        value: 'CHF',
-        required: true,
-        read: true,
-        write: false
-      },
-      requested_quantity: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      approved_quantity: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      order_quantity: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      replacement: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      priority: {
-        default: 'NORMAL',
-        value: 'NORMAL',
-        required: true,
-        read: true,
-        write: true
-      },
-      state: {
-        default: 'new',
-        value: 'new',
-        required: true,
-        read: true,
-        write: false
-      },
-      supplier: {
-        default: null,
-        read: true,
-        required: false,
-        write: true,
-        value: null
-      },
-      inspector_priority: {
-        default: 'MEDIUM',
-        value: 'MEDIUM',
-        required: false,
-        read: true,
-        write: true
-      },
-      article_number: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      motivation: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      room: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      inspection_comment: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      accounting_type: {
-        default: 'aquisition',
-        value: 'aquisition',
-        required: true,
-        read: true,
-        write: true
-      },
-      cost_center: {
-        default: '12345',
-        value: '12345',
-        required: false,
-        read: true,
-        write: false
-      },
-      procurement_account: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: false
-      },
-      internal_order_number: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      }
-    }
-  },
-  FROM_TEMPLATE: {
-    new_request: {
-      template: {
-        id: '5badf5e7-d8d1-43f4-bbf4-908ca6e5c548',
-        article_name: 'iPad mini'
-      },
-      category: {
-        value: {
-          id: '8b8d8419-35c0-45cf-8f85-1c25b84e9058',
-          name: 'Stuff'
-        }
-      },
-      budget_period: {
-        value: {
-          id: '8a1137a2-5c27-4825-b12f-428bbc192a7c'
-        }
-      },
-      article_name: {
-        default: 'iPad mini',
-        value: 'iPad mini',
-        required: true,
-        read: true,
-        write: false
-      },
-      receiver: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      organization: {
-        value: null
-      },
-      price_cents: {
-        default: 45000,
-        value: 45000,
-        required: true,
-        read: true,
-        write: false
-      },
-      price_currency: {
-        default: 'CHF',
-        value: 'CHF',
-        required: true,
-        read: true,
-        write: false
-      },
-      requested_quantity: {
-        default: 1,
-        value: 1,
-        required: true,
-        read: true,
-        write: true
-      },
-      approved_quantity: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      order_quantity: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      replacement: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      priority: {
-        default: 'NORMAL',
-        value: 'NORMAL',
-        required: false,
-        read: true,
-        write: true
-      },
-      state: {
-        default: 'new',
-        value: 'new',
-        required: false,
-        read: true,
-        write: false
-      },
-      supplier: {
-        default: {
-          id: '97b27eec-92c2-425b-8631-8d8dc9deb0f7',
-          name: 'Baba Kwest AG'
-        },
-        value: {
-          id: '97b27eec-92c2-425b-8631-8d8dc9deb0f7',
-          name: 'Baba Kwest AG'
-        },
-        required: false,
-        read: true,
-        write: true
-      },
-      inspector_priority: {
-        default: 'MEDIUM',
-        value: 'MEDIUM',
-        required: false,
-        read: true,
-        write: true
-      },
-      article_number: {
-        default: null,
-        required: false,
-        value: null,
-        read: true,
-        write: true
-      },
-      motivation: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      room: {
-        default: null,
-        value: null,
-        required: true,
-        read: true,
-        write: true
-      },
-      inspection_comment: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      },
-      accounting_type: {
-        default: 'aquisition',
-        value: 'aquisition',
-        required: false,
-        read: true,
-        write: true
-      },
-      cost_center: {
-        default: '12345',
-        value: '12345',
-        required: false,
-        read: true,
-        write: false
-      },
-      procurement_account: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: false
-      },
-      internal_order_number: {
-        default: null,
-        value: null,
-        required: false,
-        read: true,
-        write: true
-      }
-    }
-  }
-}
-
 const readFromQueryParams = params => ({
   budget_period: f.enhyphenUUID(params.bp),
   category: f.enhyphenUUID(params.category),
@@ -422,7 +92,6 @@ const readFromQueryParams = params => ({
 })
 
 const updateQueryParams = ({ fields, params, location }) => {
-  // const formParams = f.pick(fields, ['budget_period', 'category', 'template'])
   const formParams = {
     bp: f.dehyphenUUID(fields.budget_period),
     category: f.dehyphenUUID(fields.category),
@@ -494,6 +163,7 @@ class NewRequestPreselection extends React.Component {
       return { ...sc, main_category: { ...mc, categories: undefined } }
     }
 
+    // FIXME: is not applied on first load???
     const defaultSelection = { budget_period: budPeriods[0].value }
 
     return (
@@ -580,6 +250,7 @@ class NewRequestPreselection extends React.Component {
 
               {hasPreselected && (
                 <NewRequestForm
+                  budgetPeriod={fields.budget_period}
                   category={selectedCategory}
                   template={selectedTemplate}
                   onCancel={resetSelection}
@@ -598,19 +269,18 @@ class NewRequestPreselection extends React.Component {
   }
 }
 
-const NewRequestForm = ({ template, category, onCancel }) => (
+const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
   <F>
     <Query
       query={NEW_REQUEST_QUERY}
+      variables={{ budgetPeriod, category }}
       networkPolicy="network-only"
-      skip={!!FAKE_DATA}
     >
-      {() => {
-        /* {({ loading, error, data }) => {
+      {({ loading, error, data }) => {
         if (loading) return <Loading />
-        if (error) return <ErrorPanel error={error} data={data} /> */
+        if (error) return <ErrorPanel error={error} data={data} />
 
-        const data = FAKE_DATA[template ? 'FROM_TEMPLATE' : 'FROM_CATEGORY']
+        // const data = FAKE_DATA[template ? 'FROM_TEMPLATE' : 'FROM_CATEGORY']
 
         const request = { ...data.new_request }
 
