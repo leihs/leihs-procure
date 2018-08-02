@@ -251,8 +251,8 @@ class NewRequestPreselection extends React.Component {
               {hasPreselected && (
                 <NewRequestForm
                   budgetPeriod={fields.budget_period}
-                  category={selectedCategory}
-                  template={selectedTemplate}
+                  category={fields.category}
+                  template={fields.template}
                   onCancel={resetSelection}
                   // NOTE: reset form if preselection changes
                   // TODO: remove this, should not be needed anymore
@@ -273,7 +273,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
   <F>
     <Query
       query={NEW_REQUEST_QUERY}
-      variables={{ budgetPeriod, category }}
+      variables={{ budgetPeriod, template, category }}
       networkPolicy="network-only"
     >
       {({ loading, error, data }) => {

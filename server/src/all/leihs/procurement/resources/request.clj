@@ -28,6 +28,7 @@
    :organization :organization_id,
    :room :room_id,
    :supplier :supplier_id,
+   :template :template_id,
    :user :user_id})
 
 (defn exchange-attrs
@@ -203,9 +204,7 @@
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         template-arg (:template args)
-        req-stub (cond-> args
-                   template-arg (assoc :category template-arg)
-                   (not user-arg) (assoc :user auth-entity))]
+        req-stub (cond-> args (not user-arg) (assoc :user auth-entity))]
     (->> req-stub
          (request-fields-perms/get-for-user-and-request tx auth-entity)
          (map #(apply consider-default %))

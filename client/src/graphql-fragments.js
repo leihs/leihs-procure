@@ -79,8 +79,10 @@ export const RequestFieldsForEdit = gql`
     ...RequestFieldsForIndex
 
     template {
-      id
-      article_name
+      value {
+        id
+        article_name
+      }
     }
 
     category {

@@ -87,6 +87,7 @@
    :settings (-> settings/get-settings
                  (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :supplier supplier/get-supplier,
+   :template template/get-template,
    :templates templates/get-templates,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,
