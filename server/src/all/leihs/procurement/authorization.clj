@@ -17,8 +17,9 @@
                (map #(% tx auth-entity))
                (some true?))
         (resolver context args value)
-        (throw (UnauthorizedException. "Not authorized for this query path."
-                                       {}))))))
+        (throw (UnauthorizedException.
+                 "Not authorized for this query path and arguments."
+                 {}))))))
 
 (defn authorize-and-apply
   [func &
@@ -40,8 +41,9 @@
                                       (every? true?))))]
     (if (auth-func)
       (func)
-      (throw (UnauthorizedException. "Not authorized for this query path."
-                                     {})))))
+      (throw (UnauthorizedException.
+               "Not authorized for this query path and arguments."
+               {})))))
 
 (defn wrap-authorize
   [handler skip-authorization-handler-keys]

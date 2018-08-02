@@ -190,6 +190,27 @@
       (->> (query-requests tx auth-entity))
       first))
 
+(defn- consider-default
+  [attr p-spec]
+  (if (:value p-spec)
+    {attr p-spec}
+    {attr (assoc p-spec :value (:default p-spec))}))
+
+(defn get-new
+  [context args value]
+  (let [ring-req (:request context)
+        tx (:tx ring-req)
+        auth-entity (:authenticated-entity ring-req)
+        user-arg (:user args)
+        template-arg (:template args)
+        req-stub (cond-> args
+                   template-arg (assoc :category template-arg)
+                   (not user-arg) (assoc :user auth-entity))]
+    (->> req-stub
+         (request-fields-perms/get-for-user-and-request tx auth-entity)
+         (map #(apply consider-default %))
+         (into {}))))
+
 (defn get-last-created-request
   [tx auth-entity]
   (-> (sql/select :*)

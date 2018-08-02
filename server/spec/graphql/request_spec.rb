@@ -24,7 +24,7 @@ describe 'request' do
 
         q = <<-GRAPHQL
           mutation {
-            new_request(input_data: #{hash_to_graphql attrs}) {
+            create_request(input_data: #{hash_to_graphql attrs}) {
               id
             }
           }
@@ -48,6 +48,7 @@ describe 'request' do
         FactoryBot.create(:category_inspector,
                           user_id: inspector.id,
                           category_id: category.id)
+        FactoryBot.create(:requester_organization, user_id: inspector.id)
 
         requester = FactoryBot.create(:user)
         FactoryBot.create(:requester_organization, user_id: requester.id)
@@ -73,7 +74,7 @@ describe 'request' do
 
           q = <<-GRAPHQL
             mutation {
-              new_request(input_data: #{hash_to_graphql attrs2}) {
+              create_request(input_data: #{hash_to_graphql attrs2}) {
                 id
                 attachments {
                   value {
@@ -87,8 +88,8 @@ describe 'request' do
           result = query(q, user.id)
 
           request = Request.order(:created_at).reverse.first
-          expect(result['data']['new_request']['id']).to be == request.id
-          expect(result['data']['new_request']['attachments']['value'].count).to be == 1
+          expect(result['data']['create_request']['id']).to be == request.id
+          expect(result['data']['create_request']['attachments']['value'].count).to be == 1
           expect(Upload.count).to be == 0
           expect(Attachment.count).to be == 1
 
