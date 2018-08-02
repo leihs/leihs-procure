@@ -232,7 +232,7 @@
           :cost_center {:resolve :cost-center, :type :RequestFieldCostCenter},
           :general_ledger_account {:resolve :general-ledger-account,
                                    :type :RequestFieldGeneralLedgerAccount},
-          :id {:type (non-null ID)},
+          :id {:type ID},
           :inspection_comment {:type :RequestFieldString},
           :inspector_priority {:type :RequestFieldInspectorPriority},
           :internal_order_number {:type :RequestFieldString},
