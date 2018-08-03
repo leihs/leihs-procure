@@ -21,24 +21,22 @@
              budget-period (budget-period/get-budget-period-by-id
                              tx
                              (:budget_period input-data))
-             category (category/get-category-by-id tx (:category input-data))]
+             category (category/get-category-by-id tx (:category input-data))
+             user-id (:user input-data)]
          (authorization/authorize-and-apply
            #(request/create-request! context args value)
            :if-only
-           #(and (not (and category (:template input-data))) ; template belongs
-                                                             ; to
-                 ; category
-                 ; TODO (not (:organization input-data) -> implicit in user
-                 (not (budget-period/past? tx budget-period))
-                 (or (user-perms/admin? tx auth-entity)
-                     (and (user-perms/requester? tx auth-entity)
-                          (or (and ; (:for_user args)
-                                   (user-perms/inspector? tx
-                                                          auth-entity
-                                                          (:id category)))
-                              (budget-period/in-requesting-phase?
-                                tx
-                                budget-period)))))))),
+           #(and
+              (not (and category (:template input-data))) ; template belongs to
+                                                          ; category
+              (not (:organization input-data)) ; implicit in user
+              (not (budget-period/past? tx budget-period))
+              (or (and (not user-id)
+                       (user-perms/requester? tx auth-entity)
+                       (budget-period/in-requesting-phase? tx budget-period))
+                  (and (user-perms/requester? tx {:user_id user-id})
+                       (or (user-perms/inspector? tx auth-entity (:id category))
+                           (user-perms/admin? tx auth-entity)))))))),
    :change-request-budget-period
      (fn [context args value]
        (let [rrequest (:request context)

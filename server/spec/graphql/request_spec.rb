@@ -16,7 +16,6 @@ describe 'request' do
           article_name: Faker::Commerce.product_name,
           budget_period: FactoryBot.create(:budget_period).id,
           category: category.id,
-          organization: FactoryBot.create(:organization).id,
           requested_quantity: 1,
           room: FactoryBot.create(:room).id,
           user: viewer.id
@@ -39,63 +38,88 @@ describe 'request' do
         expect(Request.find(transform_uuid_attrs attrs)).not_to be
       end
 
-      it 'creates if required general permission exist' do
-        admin = FactoryBot.create(:user)
-        FactoryBot.create(:admin, user_id: admin.id)
-
-        inspector = FactoryBot.create(:user)
-        category = FactoryBot.create(:category)
-        FactoryBot.create(:category_inspector,
-                          user_id: inspector.id,
-                          category_id: category.id)
-        FactoryBot.create(:requester_organization, user_id: inspector.id)
-
+      it 'creates as requester' do
         requester = FactoryBot.create(:user)
         FactoryBot.create(:requester_organization, user_id: requester.id)
 
+        upload_1 = FactoryBot.create(:upload)
+        upload_2 = FactoryBot.create(:upload)
+
         attrs = {
+          article_name: 'new request',
           budget_period: FactoryBot.create(:budget_period).id,
-          category: category.id,
-          organization: FactoryBot.create(:organization).id,
+          category: FactoryBot.create(:category).id,
           requested_quantity: 1,
           room: FactoryBot.create(:room).id,
-          motivation: Faker::Lorem.sentence
+          motivation: Faker::Lorem.sentence,
+          attachments: [{id: upload_1.id, to_delete: false, __typename: 'Upload'},
+                        {id: upload_2.id, to_delete: true, __typename: 'Upload'}]
         }
 
-        ['admin', 'inspector', 'requester'].each do |user_name|
-          user = binding.local_variable_get(user_name)
+        q = <<-GRAPHQL
+          mutation {
+            create_request(input_data: #{hash_to_graphql attrs}) {
+              id
+              attachments {
+                value {
+                  id
+                }
+              }
+            }
+          }
+        GRAPHQL
 
-          upload_1 = FactoryBot.create(:upload)
-          upload_2 = FactoryBot.create(:upload)
+        result = query(q, requester.id)
 
-          attrs2 = attrs.merge(article_name: user_name,
-                               user: user.id,
-                               attachments: [{id: upload_1.id, to_delete: false, __typename: 'Upload'},
-                                             {id: upload_2.id, to_delete: true, __typename: 'Upload'}])
+        request = Request.order(:created_at).reverse.first
+        expect(result['data']['create_request']['id']).to be == request.id
+        expect(result['data']['create_request']['attachments']['value'].count).to be == 1
+        expect(Upload.count).to be == 0
+        expect(Attachment.count).to be == 1
+      end
+
+      context 'create for another user' do
+        before :example do 
+          @requester = FactoryBot.create(:user)
+          FactoryBot.create(:requester_organization, user_id: @requester.id)
+          @category = FactoryBot.create(:category)
+        end
+
+        it 'as admin' do
+          @auth_user = User.find(id: FactoryBot.create(:admin).user_id)
+        end
+
+        it 'as inspector' do
+          @auth_user = FactoryBot.create(:user)
+          FactoryBot.create(:category_inspector,
+                            user_id: @auth_user.id,
+                            category_id: @category.id)
+        end
+
+        after :example do
+          attrs = {
+            article_name: 'new request',
+            budget_period: FactoryBot.create(:budget_period).id,
+            category: @category.id,
+            requested_quantity: 1,
+            room: FactoryBot.create(:room).id,
+            motivation: Faker::Lorem.sentence,
+            user: @requester.id
+          }
 
           q = <<-GRAPHQL
             mutation {
-              create_request(input_data: #{hash_to_graphql attrs2}) {
+              create_request(input_data: #{hash_to_graphql attrs}) {
                 id
-                attachments {
-                  value {
-                    id
-                  }
-                }
               }
             }
           GRAPHQL
 
-          result = query(q, user.id)
+          result = query(q, @auth_user.id)
 
           request = Request.order(:created_at).reverse.first
           expect(result['data']['create_request']['id']).to be == request.id
-          expect(result['data']['create_request']['attachments']['value'].count).to be == 1
-          expect(Upload.count).to be == 0
-          expect(Attachment.count).to be == 1
-
-          Upload.dataset.delete
-          Attachment.dataset.delete
+          expect(request.user_id).to eq(@requester.id)
         end
       end
 

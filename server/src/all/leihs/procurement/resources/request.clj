@@ -315,13 +315,13 @@
         attachments (:attachments write-data)
         template (if-let [t-id (:template write-data)]
                    (template/get-template-by-id tx t-id))
-        organization
-          (requesters/get-organization-of-requester tx (:user_id auth-entity))
+        requester-id (or (:user input-data) (:user_id auth-entity))
+        organization (requesters/get-organization-of-requester tx requester-id)
         write-data-with-exchanged-attrs
           (-> write-data
               (dissoc :attachments)
+              (assoc :user requester-id)
               (assoc :organization (:id organization))
-              (assoc :user (:user_id auth-entity))
               (cond-> template (assoc :category (:category_id template)))
               exchange-attrs)]
     (with-local-vars [req-id nil]
