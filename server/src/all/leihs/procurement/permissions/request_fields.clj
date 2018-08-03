@@ -158,9 +158,10 @@
                             user-is-inspector
                             user-is-admin),
                   :write (and (not budget-period-is-past)
-                              user-is-requester
-                              (or budget-period-in-requesting-phase
-                                  user-is-inspector)),
+                              (or user-is-admin
+                                  (and user-is-requester
+                                       (or budget-period-in-requesting-phase
+                                           user-is-inspector)))),
                   :required true},
      :order_quantity
        {:read
