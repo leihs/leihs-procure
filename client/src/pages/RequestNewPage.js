@@ -87,7 +87,7 @@ const NEW_REQUEST_QUERY = gql`
 `
 
 const CREATE_REQUEST_MUTATION = gql`
-  mutation createRequest($requestData: NewRequestInput) {
+  mutation createRequest($requestData: CreateRequestInput) {
     create_request(input_data: $requestData) {
       ...RequestFieldsForEdit
     }
