@@ -47,46 +47,40 @@
         :write (and (not budget-period-is-past)
                     (or category-inspectable-by-user user-is-admin)),
         :required false},
-     :article_name
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and request-without-template
-                    (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin)),
-        :default (:article_name template),
-        :required true},
-     :article_number
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and request-without-template
-                    (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin)),
-        :default (:article_number template),
-        :required false},
-     :attachments
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin)),
-        :required false},
+     :article_name {:read (or (and user-is-requester requested-by-user)
+                              category-viewable-by-user
+                              user-is-inspector
+                              user-is-admin),
+                    :write (and request-without-template
+                                (not budget-period-is-past)
+                                (or (and user-is-requester
+                                         budget-period-in-requesting-phase)
+                                    category-inspectable-by-user
+                                    user-is-admin)),
+                    :default (:article_name template),
+                    :required true},
+     :article_number {:read (or (and user-is-requester requested-by-user)
+                                category-viewable-by-user
+                                user-is-inspector
+                                user-is-admin),
+                      :write (and request-without-template
+                                  (not budget-period-is-past)
+                                  (or (and user-is-requester
+                                           budget-period-in-requesting-phase)
+                                      category-inspectable-by-user
+                                      user-is-admin)),
+                      :default (:article_number template),
+                      :required false},
+     :attachments {:read (or (and user-is-requester requested-by-user)
+                             category-viewable-by-user
+                             user-is-inspector
+                             user-is-admin),
+                   :write (and (not budget-period-is-past)
+                               (or (and user-is-requester
+                                        budget-period-in-requesting-phase)
+                                   category-inspectable-by-user
+                                   user-is-admin)),
+                   :required false},
      :budget_period
        {:read true,
         :write (or ; existing request
@@ -151,14 +145,12 @@
                        category-viewable-by-user
                        user-is-inspector
                        user-is-admin),
-             :write (and
-                      request-without-template
-                      (not budget-period-is-past)
-                      (or (and user-is-requester
-                               (or (and request-exists requested-by-user) true)
-                               budget-period-in-requesting-phase)
-                          category-inspectable-by-user
-                          user-is-admin)),
+             :write (and request-without-template
+                         (not budget-period-is-past)
+                         (or (and user-is-requester
+                                  budget-period-in-requesting-phase)
+                             category-inspectable-by-user
+                             user-is-admin)),
              :default (:model_id template),
              :required false},
      :motivation {:read (or (and user-is-requester requested-by-user)
@@ -166,7 +158,6 @@
                             user-is-inspector
                             user-is-admin),
                   :write (and user-is-requester
-                              (or (and request-exists requested-by-user) true)
                               budget-period-in-requesting-phase),
                   :required true},
      :order_quantity
@@ -184,20 +175,18 @@
                     ; requests
                     (or user-is-requester user-is-inspector user-is-admin)),
         :required true},
-     :price_cents
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and request-without-template
-                    (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin)),
-        :default (or (:price_cents template) 0),
-        :required true},
+     :price_cents {:read (or (and user-is-requester requested-by-user)
+                             category-viewable-by-user
+                             user-is-inspector
+                             user-is-admin),
+                   :write (and request-without-template
+                               (not budget-period-is-past)
+                               (or (and user-is-requester
+                                        budget-period-in-requesting-phase)
+                                   category-inspectable-by-user
+                                   user-is-admin)),
+                   :default (or (:price_cents template) 0),
+                   :required true},
      :price_currency {:read true,
                       :write request-without-template,
                       :default (or (:price_currency template) "CHF"),
@@ -207,7 +196,6 @@
                           user-is-inspector
                           user-is-admin),
                 :write (and user-is-requester
-                            (or (and request-exists requested-by-user) true)
                             budget-period-in-requesting-phase),
                 :default "NORMAL",
                 :required true},
@@ -220,48 +208,41 @@
                           user-is-admin),
                 :write (and (not budget-period-is-past)
                             (or (and user-is-requester
-                                     (or (and request-exists requested-by-user)
-                                         true)
                                      budget-period-in-requesting-phase)
                                 category-inspectable-by-user
                                 user-is-admin)),
                 :required false},
-     :replacement
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user
-                        user-is-admin)),
-        :default true,
-        :required true},
-     :requested_quantity
-       {:read (or (and user-is-requester requested-by-user)
-                  category-viewable-by-user
-                  user-is-inspector
-                  user-is-admin),
-        :write (and (not budget-period-is-past)
-                    (or (and user-is-requester
-                             (or (and request-exists requested-by-user) true)
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-user ; TODO: why?
-                        user-is-admin)),
-        :required true},
+     :replacement {:read (or (and user-is-requester requested-by-user)
+                             category-viewable-by-user
+                             user-is-inspector
+                             user-is-admin),
+                   :write (and (not budget-period-is-past)
+                               (or (and user-is-requester
+                                        budget-period-in-requesting-phase)
+                                   category-inspectable-by-user
+                                   user-is-admin)),
+                   :default true,
+                   :required true},
+     :requested_quantity {:read (or (and user-is-requester requested-by-user)
+                                    category-viewable-by-user
+                                    user-is-inspector
+                                    user-is-admin),
+                          :write (and
+                                   (not budget-period-is-past)
+                                   (or (and user-is-requester
+                                            budget-period-in-requesting-phase)
+                                       category-inspectable-by-user ; TODO: why?
+                                       user-is-admin)),
+                          :required true},
      :room {:read (or (and user-is-requester requested-by-user)
                       category-viewable-by-user
                       user-is-inspector
                       user-is-admin),
-            :write (and
-                     (not budget-period-is-past)
-                     (or (and user-is-requester
-                              (or (and request-exists requested-by-user) true)
-                              budget-period-in-requesting-phase)
-                         category-inspectable-by-user
-                         user-is-admin)),
+            :write (and (not budget-period-is-past)
+                        (or (and user-is-requester
+                                 budget-period-in-requesting-phase)
+                            category-inspectable-by-user
+                            user-is-admin)),
             :required true},
      :state {:read (or (and user-is-requester requested-by-user)
                        category-viewable-by-user
@@ -276,8 +257,6 @@
                 :write (and request-without-template
                             (not budget-period-is-past)
                             (or (and user-is-requester
-                                     (or (and request-exists requested-by-user)
-                                         true)
                                      budget-period-in-requesting-phase)
                                 category-inspectable-by-user
                                 user-is-admin)),

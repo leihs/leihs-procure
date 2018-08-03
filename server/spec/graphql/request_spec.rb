@@ -58,7 +58,8 @@ describe 'request' do
           category: category.id,
           organization: FactoryBot.create(:organization).id,
           requested_quantity: 1,
-          room: FactoryBot.create(:room).id
+          room: FactoryBot.create(:room).id,
+          motivation: Faker::Lorem.sentence
         }
 
         ['admin', 'inspector', 'requester'].each do |user_name|
