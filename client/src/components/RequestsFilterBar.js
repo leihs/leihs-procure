@@ -116,6 +116,7 @@ const Filters = ({ me, data, current, onChange }) => {
           const b = budgetPeriodDates(bp)
           if (me.roles.isRequester && b.isRequesting) return true
           if (me.roles.isInspector && b.isInspecting) return true
+          return false
         })
         .map(({ id }) => id),
       search: null,

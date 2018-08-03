@@ -33,7 +33,8 @@ class App extends Component {
               if (errCode === 'NO_CONNECTION_TO_SERVER') {
                 return (
                   <FatalErrorScreen>
-                    You are offline or the Server is down!<br />
+                    You are offline or the Server is down!
+                    <br />
                     {retryButton(refetch)}
                   </FatalErrorScreen>
                 )
@@ -43,7 +44,8 @@ class App extends Component {
               if (errCode === 'NOT_AUTHORIZED_FOR_APP') {
                 return (
                   <FatalErrorScreen>
-                    You are not allowed to use this application!<br />
+                    You are not allowed to use this application!
+                    <br />
                     Try going to the <a href="/">home page</a> and maybe log in.
                   </FatalErrorScreen>
                 )
