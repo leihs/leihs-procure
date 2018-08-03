@@ -25,7 +25,11 @@
          (authorization/authorize-and-apply
            #(request/create-request! context args value)
            :if-only
-           #(and (not (budget-period/past? tx budget-period))
+           #(and (not (and category (:template input-data))) ; template belongs
+                                                             ; to
+                 ; category
+                 ; TODO (not (:organization input-data) -> implicit in user
+                 (not (budget-period/past? tx budget-period))
                  (or (user-perms/admin? tx auth-entity)
                      (and (user-perms/requester? tx auth-entity)
                           (or (and ; (:for_user args)

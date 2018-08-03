@@ -1,15 +1,9 @@
 (ns leihs.procurement.resources.requesters-organizations
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as logging]
-            [leihs.procurement.resources.organization :as organization]
-            [leihs.procurement.resources.organizations :as organizations]
-            [leihs.procurement.resources.request :as request]
-            [leihs.procurement.resources.saved-filters :as saved-filters]
-            [leihs.procurement.resources.user :as user]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.resources [organization :as organization]
+             [organizations :as organizations] [saved-filters :as saved-filters]
+             [user :as user]]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def requesters-organizations-base-query
   (-> (sql/select :procurement_requesters_organizations.*)
@@ -21,6 +15,19 @@
                   :request
                   :tx)
               (sql/format requesters-organizations-base-query)))
+
+(defn get-organization-of-requester
+  [tx user-id]
+  (-> (sql/select :procurement_organizations.*)
+      (sql/from :procurement_requesters_organizations)
+      (sql/merge-join :procurement_organizations
+                      [:= :procurement_requesters_organizations.organization_id
+                       :procurement_organizations.id])
+      (sql/merge-where [:= :procurement_requesters_organizations.user_id
+                        user-id])
+      sql/format
+      (->> (jdbc/query tx))
+      first))
 
 (defn create-requester-organization
   [tx data]

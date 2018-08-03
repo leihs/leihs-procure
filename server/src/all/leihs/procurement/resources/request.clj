@@ -1,25 +1,15 @@
 (ns leihs.procurement.resources.request
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as log]
-            [clojure.set :refer [map-invert]]
-            [clojure.string :refer [lower-case upper-case]]
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.request :as request-perms]
-            [leihs.procurement.permissions.request-fields :as
-             request-fields-perms]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.attachments :as attachments]
-            [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.resources.category :as category]
-            [leihs.procurement.resources.model :as model]
-            [leihs.procurement.resources.room :as room]
-            [leihs.procurement.resources.supplier :as supplier]
-            [leihs.procurement.resources.uploads :as uploads]
-            [leihs.procurement.utils.helpers :refer [submap?]]
-            [leihs.procurement.utils.ds :refer [get-ds]]
-            [leihs.procurement.utils.sql :as sql]
+  (:require [clojure [set :refer [map-invert]]
+             [string :refer [lower-case upper-case]]]
             [clojure.java.jdbc :as jdbc]
-            [logbug.debug :as debug]))
+            [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.permissions [request :as request-perms]
+             [request-fields :as request-fields-perms] [user :as user-perms]]
+            [leihs.procurement.resources [attachments :as attachments]
+             [budget-period :as budget-period] [category :as category]
+             [requesters-organizations :as requesters] [template :as template]
+             [uploads :as uploads]]
+            [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -317,15 +307,22 @@
 
 (defn create-request!
   [context args _]
-  (let [input-data (:input_data args)
+  (let [ring-req (:request context)
+        tx (:tx ring-req)
+        auth-entity (:authenticated-entity ring-req)
+        input-data (:input_data args)
         write-data (to-name-and-lower-case-priorities input-data)
         attachments (:attachments write-data)
-        write-data-with-exchanged-attrs (-> write-data
-                                            (dissoc :attachments)
-                                            exchange-attrs)
-        ring-req (:request context)
-        tx (:tx ring-req)
-        auth-entity (:authenticated-entity ring-req)]
+        template (if-let [t-id (:template write-data)]
+                   (template/get-template-by-id tx t-id))
+        organization
+          (requesters/get-organization-of-requester tx (:user_id auth-entity))
+        write-data-with-exchanged-attrs
+          (-> write-data
+              (dissoc :attachments)
+              (assoc :organization (:id organization))
+              (cond-> template (assoc :category (:category_id template)))
+              exchange-attrs)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
         #(do (insert! tx write-data-with-exchanged-attrs)
