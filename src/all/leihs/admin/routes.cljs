@@ -16,11 +16,12 @@
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
-    [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.resources.group.front :as group]
     [leihs.admin.resources.group.users.front :as group-users]
+    [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.initial-admin.front :as initial-admin]
+    [leihs.admin.resources.status.front :as status]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
     [leihs.admin.utils.core :refer [keyword str presence]]
@@ -63,6 +64,7 @@
    :home #'home/page
    :request #'leihs.admin.front.requests.pages.request/page
    :requests #'leihs.admin.front.requests.pages.requests/page
+   :status #'status/info-page
    :user #'user/show-page
    :user-delete #'user/delete-page
    :user-edit #'user/edit-page

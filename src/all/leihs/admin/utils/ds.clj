@@ -3,7 +3,6 @@
   (:require [leihs.admin.utils.core :refer [keyword str presence]])
   (:require
     [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
     [hikari-cp.core :as hikari]
     [pg-types.all]
     [ring.util.codec]
@@ -17,8 +16,29 @@
     )
   (:import
     [java.net.URI]
+    [com.codahale.metrics MetricRegistry]
     ))
 
+;;; status ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defonce metric-registry* (atom nil))
+
+(defn Timer->map [t]
+  {:count (.getCount t)
+   :mean-reate (.getMeanRate t)
+   :one-minute-rate (.getOneMinuteRate t)
+   :five-minute-rate (.getFiveMinuteRate t)
+   :fifteen-minute-rate (.getFifteenMinuteRate t)
+   }) 
+
+(defn status []
+  {:gauges (->> 
+             @metric-registry* .getGauges
+             (map (fn [[n g]] [n (.getValue g)]))
+             (into {}))
+   :timers (->> @metric-registry* .getTimers
+                (map (fn [[n t]] [n (Timer->map t)]))
+                (into {}))})
 
 (defonce ds (atom nil))
 (defn get-ds [] @ds)
@@ -39,7 +59,8 @@
           (throw th))))))
 
 
-(defn init [params]
+(defn init [params health-check-registry]
+  (reset! metric-registry* (MetricRegistry.))
   (when @ds
     (do
       (logging/info "Closing db pool ...")
@@ -66,7 +87,9 @@
         :database-name      (:database params)
         :server-name        (:host params)
         :port-number        (:port params)
-        :register-mbeans    false})})
+        :register-mbeans    false
+        :metric-registry @metric-registry*
+        :health-check-registry health-check-registry})})
   (logging/info "Initializing db pool done.")
   @ds)
 

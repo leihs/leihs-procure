@@ -2,9 +2,10 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.admin.utils.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.routes :as routes]
     [leihs.admin.env]
     [leihs.admin.paths]
+    [leihs.admin.resources.status.back :as status] 
+    [leihs.admin.routes :as routes]
     [leihs.admin.utils.ds :as ds]
     [leihs.admin.utils.http-server :as http-server]
     [leihs.admin.utils.url.http :as http-url]
@@ -32,7 +33,8 @@
     (logging/info "Invoking run with options: " options)
     (when (nil? (:secret options))
       (throw (IllegalStateException. "LEIHS_SECRET resp. secret must be present!")))
-    (let [ds (ds/init (:database-url options))
+    (let [status (status/init)
+          ds (ds/init (:database-url options) (:health-check-registry status))
           secret (-> options :secret)
           app-handler (routes/init secret)
           http-server (http-server/start (:http-base-url options) app-handler)])))

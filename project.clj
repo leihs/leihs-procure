@@ -16,6 +16,7 @@
    [cljsjs/js-yaml "3.3.1-0"]
    [cljsjs/moment "2.22.2-0"]
    [clojure-humanize "0.2.2"]
+   [com.github.mfornos/humanize-slim "1.2.2"]
    [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
    [compojure "1.6.1"]
    [environ "1.1.0"]
@@ -24,6 +25,8 @@
    [hikari-cp "2.6.0"]
    [honeysql "0.9.3"]
    [inflections "0.13.0"]
+   [io.dropwizard.metrics/metrics-core "4.0.3"]
+   [io.dropwizard.metrics/metrics-healthchecks "4.0.3"]
    [io.forward/yaml "1.0.9"]
    [log4j/log4j "1.2.17" :exclusions [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
    [logbug "4.2.2"]
@@ -45,6 +48,7 @@
 
    ; force transitive dependency resolution
    [ring/ring-core "1.6.3"]
+   [com.google.guava/guava "22.0"]
    ]
 
 
@@ -65,7 +69,7 @@
 
   :main leihs.admin.back.main
 
-  :plugins [[lein-asset-minifier "0.4.3" :exclusions [org.clojure/clojure]]
+  :plugins [[lein-asset-minifier "0.4.4" :exclusions [org.clojure/clojure]]
             [lein-cljsbuild "1.1.7"]
             [lein-environ "1.1.0"]
             [lein-shell "0.4.2"]]
@@ -88,9 +92,6 @@
                  :source-map true
                  :optimizations :none
                  :pretty-print  true}}}}
-
-  :sass {:src "resources/all/public/admin/css/"
-         :dst "resources/all/public/admin/css/"}
 
   :figwheel {:http-server-root "public"
              :server-port 3212

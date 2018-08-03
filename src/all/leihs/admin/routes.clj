@@ -24,9 +24,9 @@
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.utils.ds :as ds]
     [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
+    [leihs.admin.utils.json :as json]
     [leihs.admin.utils.json-protocol]
     [leihs.admin.utils.ring-exception :as ring-exception]
-    [leihs.admin.utils.json :as json]
 
     [bidi.bidi :as bidi]
     [bidi.ring :refer [make-handler]]
@@ -50,8 +50,7 @@
 (def skip-authorization-handler-keys
   #{:auth-shib-sign-in
     :auth-password-sign-in
-    :initial-admin
-    :status})
+    :initial-admin})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
   #{
@@ -220,8 +219,6 @@
       dispatch-to-handler
       (auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
-      ring.middleware.json/wrap-json-response
-      (ring.middleware.json/wrap-json-body {:keywords? true})
       anti-csrf/wrap
       auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
@@ -229,13 +226,16 @@
       (wrap-secret-byte-array secret)
       initial-admin/wrap
       settings/wrap
+      ds/wrap-tx
+      status/wrap
+      ring.middleware.json/wrap-json-response
+      (ring.middleware.json/wrap-json-body {:keywords? true})
       wrap-accept
       wrap-add-vary-header
       wrap-resolve-handler
       wrap-canonicalize-params-maps
       ring.middleware.params/wrap-params
       wrap-content-type
-      ds/wrap-tx
       (wrap-resource
         "public" {:allow-symlinks? true
                   :cache-bust-paths ["/admin/css/site.css"

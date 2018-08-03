@@ -123,6 +123,9 @@
     [:div.col
      [:a.navbar-text 
       {:href (path :auth-info)} "Auth-Info"]]
+    [:div.col
+     [:a.navbar-text 
+      {:href (path :status)} "Admin-Status-Info"]]
     [state/debug-toggle-navbar-component]
     [:form.form-inline {:style {:margin-left "0.5em"
                                 :margin-right "0.5em"}}
