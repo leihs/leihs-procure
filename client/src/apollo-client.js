@@ -26,7 +26,7 @@ export const endpointURL = '/procure/graphql'
 export const buildAuthHeaders = () =>
   isDev
     ? { 'X-Fake-Token-Authorization': window.LEIHS_DEV_CURRENT_USER_ID }
-    : { 'X-CSRF-Token': getCSRFToken(document.cookie, CSRF_COOKIE_NAME) }
+    : { 'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME) }
 
 export const fetchOptions = {
   credentials: isDev ? 'omit' : 'same-origin' // send the cookie(s)
@@ -57,9 +57,10 @@ export const apolloClient = new ApolloClient({
 
 // helper
 
-const getCSRFToken = (cookies, name) =>
-  (cookies || '')
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s && s.indexOf(name) === 0)[0]
-    .replace(`${name}=`, '')
+const getCookieValue = (cookies, name) =>
+  (
+    (cookies || '')
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s && s.indexOf(name) === 0)[0] || ''
+  ).replace(`${name}=`, '')

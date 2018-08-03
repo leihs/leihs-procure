@@ -1,7 +1,6 @@
 import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
-import { DateTime } from 'luxon'
 
 import {
   Row,
@@ -15,7 +14,7 @@ import {
   Collapsing,
   Tooltipped
 } from './Bootstrap'
-
+import { budgetPeriodDates } from './decorators'
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
@@ -154,16 +153,6 @@ const RequestsTree = ({
   ))
 }
 
-const budgetPeriodDates = bp => {
-  const now = DateTime.local()
-  const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
-  const endDate = DateTime.fromISO(bp.end_date)
-  const isPast = endDate <= now
-  const isRequesting = !isPast && now <= inspectStartDate
-  const isInspecting = !isPast && !isRequesting
-  return { inspectStartDate, endDate, isPast, isRequesting, isInspecting }
-}
-
 const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
   const {
     inspectStartDate,
@@ -173,13 +162,15 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
     isInspecting
   } = budgetPeriodDates(budgetPeriod)
 
+  const children = f.some(props.children) ? props.children : false
+
   return (
     <Collapsing id={`bp_${budgetPeriod.id}`} startOpen>
       {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
         <div className={cx('card mb-3')}>
           <div
             className={cx('card-header cursor-pointer pl-2', {
-              'border-bottom-0': !isOpen,
+              'border-bottom-0': !(isOpen && children),
               'bg-transparent': !isPast,
               'text-muted': isPast
             })}
@@ -209,10 +200,14 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
               </span>
             </Tooltipped>
           </div>
+
           {isOpen &&
-            props.children && (
-              <ul className="list-group list-group-flush" {...collapsedProps}>
-                {props.children}
+            children && (
+              <ul
+                className="list-group list-group-flush bp-cat-list"
+                {...collapsedProps}
+              >
+                {children}
               </ul>
             )}
         </div>

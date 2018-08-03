@@ -32,7 +32,7 @@
       :main_category_id
       main-category-query-by-id
       (->> (jdbc/query (-> context
-                           :requext
+                           :request
                            :tx)))
       first))
 

@@ -13,12 +13,13 @@ import {
 
 // WIP:
 import MultiSelect from './Bootstrap/DownshiftMultiSelect'
-
+import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
 // import Icon from './Icons'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
+import CurrentUser from '../containers/CurrentUserProvider'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
 
@@ -27,28 +28,37 @@ const FilterBar = ({
   currentFilters,
   onFilterChange,
   ...rest
-}) => {
-  const content = () => {
-    if (loading) return <Loading />
-    if (error) {
-      return <ErrorPanel error={error} data={data} />
-    }
-    return (
-      <Filters data={data} current={currentFilters} onChange={onFilterChange} />
-    )
-  }
+}) => (
+  <CurrentUser>
+    {me => {
+      const content = () => {
+        if (loading) return <Loading />
+        if (error) {
+          return <ErrorPanel error={error} data={data} />
+        }
+        return (
+          <Filters
+            me={me}
+            data={data}
+            current={currentFilters}
+            onChange={onFilterChange}
+          />
+        )
+      }
 
-  return (
-    <div className="h-100 p-3 bg-light mh-md-100vh">
-      <h5>Filters</h5>
-      {content()}
-    </div>
-  )
-}
+      return (
+        <div className="h-100 p-3 bg-light mh-md-100vh">
+          <h5>Filters</h5>
+          {content()}
+        </div>
+      )
+    }}
+  </CurrentUser>
+)
 
 export default FilterBar
 
-const Filters = ({ data, current, onChange }) => {
+const Filters = ({ me, data, current, onChange }) => {
   const available = {
     budgetPeriods: f
       .sortBy(data.budget_periods, 'name')
@@ -79,21 +89,44 @@ const Filters = ({ data, current, onChange }) => {
     }))
   }
 
-  const defaultFilters = {
-    ...f.fromPairs(
-      Object.keys(available).map(key => {
-        const values = f.flatMap(
-          available[key],
-          ({ value, options }) => (value ? value : f.map(options, 'value'))
-        )
-        return [key, values]
-      })
-    ),
-    onlyOwnRequests: false,
+  const allowed = {
+    search: true,
+    budgetPeriods: true,
+    categories: true,
+    organizations: !me.roles.isOnlyRequester,
+    onlyOwnRequests: !me.roles.isOnlyRequester,
     onlyCategoriesWithRequests: true,
-    priority: null,
-    inspectory_priority: null
+    priority: true,
+    inspectory_priority: !me.roles.isOnlyRequester
   }
+
+  const defaultFilters = f.pick(
+    {
+      ...f.fromPairs(
+        Object.keys(available).map(key => {
+          const values = f.flatMap(
+            available[key],
+            ({ value, options }) => (value ? value : f.map(options, 'value'))
+          )
+          return [key, values]
+        })
+      ),
+      budgetPeriods: data.budget_periods
+        .filter(bp => {
+          const b = budgetPeriodDates(bp)
+          if (me.roles.isRequester && b.isRequesting) return true
+          if (me.roles.isInspector && b.isInspecting) return true
+          return false
+        })
+        .map(({ id }) => id),
+      search: null,
+      onlyOwnRequests: false,
+      onlyCategoriesWithRequests: true,
+      priority: null,
+      inspectory_priority: null
+    },
+    f.keys(allowed)
+  )
 
   return (
     <StatefulForm
@@ -117,67 +150,93 @@ const Filters = ({ data, current, onChange }) => {
               </Button>
             </FormGroup>
 
-            <FormGroup label="Suche">
-              <InputText {...formPropsFor('search')} />
-            </FormGroup>
+            {allowed.search && (
+              <FormGroup label="Suche">
+                <InputText {...formPropsFor('search')} />
+              </FormGroup>
+            )}
 
-            <FormGroup label={'Budgetperioden'}>
-              <Select
-                {...formPropsFor('budgetPeriods')}
-                multiple
-                emptyOption={false}
-                options={available.budgetPeriods}
-              />
-            </FormGroup>
-            <FormGroup label={'Kategorien'}>
-              <MultiSelect
-                {...formPropsFor('categories')}
-                multiple
-                options={available.categories}
-              />
-            </FormGroup>
-            <FormGroup label={'Spezialfilter'}>
-              <FormField
-                {...formPropsFor('onlyOwnRequests')}
-                type="checkbox"
-                inputLabel="only own Requests"
-                label="only own Requests"
-                hideLabel
-              />
-              <FormField
-                {...formPropsFor('onlyCategoriesWithRequests')}
-                type="checkbox"
-                inputLabel="only Categories with Requests"
-                label="only Categories with Requests"
-                hideLabel
-              />
-            </FormGroup>
-            <FormGroup label={'Organisationen'}>
-              <MultiSelect
-                {...formPropsFor('organizations')}
-                multiple
-                options={available.organizations}
-              />
-            </FormGroup>
-            <FormGroup label={'Priorität'}>
-              <Select
-                {...formPropsFor('priority')}
-                multiple
-                emptyOption={false}
-                options={available.priority}
-              />
-            </FormGroup>
-            <FormGroup label={'Priorität des Prüfers'}>
-              <Select
-                {...formPropsFor('inspectory_priority')}
-                multiple
-                emptyOption={false}
-                options={available.inspectory_priority}
-              />
-            </FormGroup>
+            {allowed.budgetPeriods && (
+              <FormGroup label={'Budgetperioden'}>
+                <Select
+                  {...formPropsFor('budgetPeriods')}
+                  multiple
+                  emptyOption={false}
+                  options={available.budgetPeriods}
+                />
+              </FormGroup>
+            )}
+
+            {allowed.categories && (
+              <FormGroup label={'Kategorien'}>
+                <MultiSelect
+                  {...formPropsFor('categories')}
+                  multiple
+                  options={available.categories}
+                />
+              </FormGroup>
+            )}
+
+            {allowed.onlyOwnRequests &&
+              allowed.onlyCategoriesWithRequests && (
+                <FormGroup label={'Spezialfilter'}>
+                  {allowed.onlyOwnRequests && (
+                    <FormField
+                      {...formPropsFor('onlyOwnRequests')}
+                      type="checkbox"
+                      inputLabel="only own Requests"
+                      label="only own Requests"
+                      hideLabel
+                    />
+                  )}
+                  {allowed.onlyCategoriesWithRequests && (
+                    <FormField
+                      {...formPropsFor('onlyCategoriesWithRequests')}
+                      type="checkbox"
+                      inputLabel="only Categories with Requests"
+                      label="only Categories with Requests"
+                      hideLabel
+                    />
+                  )}
+                </FormGroup>
+              )}
+
+            {allowed.organizations && (
+              <FormGroup label={'Organisationen'}>
+                <MultiSelect
+                  {...formPropsFor('organizations')}
+                  multiple
+                  options={available.organizations}
+                />
+              </FormGroup>
+            )}
+
+            {allowed.priority && (
+              <FormGroup label={'Priorität'}>
+                <Select
+                  {...formPropsFor('priority')}
+                  multiple
+                  emptyOption={false}
+                  options={available.priority}
+                />
+              </FormGroup>
+            )}
+
+            {allowed.inspectory_priority && (
+              <FormGroup label={'Priorität des Prüfers'}>
+                <Select
+                  {...formPropsFor('inspectory_priority')}
+                  multiple
+                  emptyOption={false}
+                  options={available.inspectory_priority}
+                />
+              </FormGroup>
+            )}
+
             <FormGroup label={'Status Antrag'}>
               <code>TBD</code>
             </FormGroup>
+
             {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
           </F>
         )

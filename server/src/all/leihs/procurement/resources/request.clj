@@ -279,6 +279,12 @@
          reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-entity))))
 
+(def change-category-reset-attrs
+  {:approved_quantity nil,
+   :inspection_comment nil,
+   :inspector_priority "medium",
+   :order_quantity nil})
+
 (defn change-category!
   [context args _]
   (let [ring-req (:request context)
@@ -289,11 +295,14 @@
         cat-id (:category input-data)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(jdbc/execute! tx
-                      (-> (sql/update :procurement_requests)
-                          (sql/sset {:category_id cat-id})
-                          (sql/where [:= :procurement_requests.id req-id])
-                          sql/format))
+      #(jdbc/execute!
+         tx
+         (-> (sql/update :procurement_requests)
+             (sql/sset (cond-> {:category_id cat-id}
+                         (not (user-perms/inspector? tx auth-entity cat-id))
+                           (merge change-category-reset-attrs)))
+             (sql/where [:= :procurement_requests.id req-id])
+             sql/format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-entity

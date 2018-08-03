@@ -141,7 +141,11 @@ describe 'request' do
           user = binding.local_variable_get(user_name)
           request = FactoryBot.create(:request,
                                       user_id: requester.id,
-                                      category_id: category.id)
+                                      category_id: category.id,
+                                      approved_quantity: 1,
+                                      inspection_comment: Faker::Lorem.sentence,
+                                      inspector_priority: 'low',
+                                      order_quantity: 1)
 
           q = <<-GRAPHQL
             mutation changeRequestCategory($input: RequestCategoryInput!) {
@@ -172,6 +176,12 @@ describe 'request' do
               }
             }
           }
+
+          request.reload
+          expect(request.approved_quantity).to be_nil
+          expect(request.inspection_comment).to be_nil
+          expect(request.inspector_priority).to eq('medium')
+          expect(request.order_quantity).to be_nil
         end
       end
 

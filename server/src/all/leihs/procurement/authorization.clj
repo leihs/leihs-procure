@@ -4,6 +4,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.sql :as sql]
+            [leihs.procurement.utils.helpers :as helpers]
             [logbug.debug :as debug])
   (:import [leihs.procurement UnauthorizedException]))
 
@@ -54,4 +55,7 @@
                  (map #(% (:tx request) (:authenticated-entity request)))
                  (some true?)))
       (handler request)
-      {:status 403, :body "Not authorized to access procurement!"})))
+      {:status 403,
+       :body (helpers/error-as-graphql
+               "NOT_AUTHORIZED_FOR_APP"
+               "Not authorized to access procurement!")})))
