@@ -38,20 +38,25 @@
              auth-entity (:authenticated-entity rrequest)
              input-data (:input_data args)
              request (request/get-request-by-id tx auth-entity (:id input-data))
-             budget-period (budget-period/get-budget-period-by-id
-                             tx
-                             (:budget_period_id request))]
+             budget-period-current (budget-period/get-budget-period-by-id
+                                     tx
+                                     (:budget_period_id request))
+             budget-period-new (budget-period/get-budget-period-by-id
+                                 tx
+                                 (:budget_period_id request))]
          (authorization/authorize-and-apply
            #(request/change-budget-period! context args value)
            :if-only
            #(and
-              (not (budget-period/past? tx budget-period))
+              (not (budget-period/past? tx budget-period-current))
+              (not (budget-period/past? tx budget-period-new))
               (or (user-perms/admin? tx auth-entity)
                   (user-perms/inspector? tx auth-entity (:category_id request))
                   (and (user-perms/requester? tx auth-entity)
                        (request/requested-by? tx auth-entity request)
-                       (budget-period/in-requesting-phase? tx
-                                                           budget-period))))))),
+                       (budget-period/in-requesting-phase?
+                         tx
+                         budget-period-current))))))),
    :change-request-category
      (fn [context args value]
        (let [rrequest (:request context)
