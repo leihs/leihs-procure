@@ -13,7 +13,7 @@ import {
 
 // WIP:
 import MultiSelect from './Bootstrap/DownshiftMultiSelect'
-
+import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
 // import Icon from './Icons'
@@ -59,16 +59,6 @@ const FilterBar = ({
 export default FilterBar
 
 const Filters = ({ me, data, current, onChange }) => {
-  const roles = (user => {
-    const p = user.permissions
-    const r = f.pick(p, 'isAdmin', 'isRequester')
-    r.isInspector = f.some(p.isInspectorForCategories)
-    r.isViewer = f.some(p.isViewerForCategories)
-    r.isOnlyRequester =
-      r.isRequester && !(r.isAdmin || r.isInspector || r.isViewer)
-    return r
-  })(me.user)
-
   const available = {
     budgetPeriods: f
       .sortBy(data.budget_periods, 'name')
@@ -103,11 +93,11 @@ const Filters = ({ me, data, current, onChange }) => {
     search: true,
     budgetPeriods: true,
     categories: true,
-    organizations: !roles.isOnlyRequester,
-    onlyOwnRequests: !roles.isOnlyRequester,
+    organizations: !me.roles.isOnlyRequester,
+    onlyOwnRequests: !me.roles.isOnlyRequester,
     onlyCategoriesWithRequests: true,
     priority: true,
-    inspectory_priority: !roles.isOnlyRequester
+    inspectory_priority: !me.roles.isOnlyRequester
   }
 
   const defaultFilters = f.pick(
@@ -121,6 +111,13 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
+      budgetPeriods: data.budget_periods
+        .filter(bp => {
+          const b = budgetPeriodDates(bp)
+          if (me.roles.isRequester && b.isRequesting) return true
+          if (me.roles.isInspector && b.isInspecting) return true
+        })
+        .map(({ id }) => id),
       search: null,
       onlyOwnRequests: false,
       onlyCategoriesWithRequests: true,

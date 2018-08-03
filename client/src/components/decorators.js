@@ -1,4 +1,5 @@
 import f from 'lodash'
+import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
 
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
@@ -36,6 +37,16 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
     default:
       throw new Error(`DisplayName: unknown type '${o.__typename}'!`)
   }
+}
+
+export const budgetPeriodDates = bp => {
+  const now = DateTime.local()
+  const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
+  const endDate = DateTime.fromISO(bp.end_date)
+  const isPast = endDate <= now
+  const isRequesting = !isPast && now <= inspectStartDate
+  const isInspecting = !isPast && !isRequesting
+  return { inspectStartDate, endDate, isPast, isRequesting, isInspecting }
 }
 
 export const RequestTotalAmount = fields => {

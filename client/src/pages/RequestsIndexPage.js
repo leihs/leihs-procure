@@ -14,6 +14,8 @@ const FILTERS_QUERY = gql`
     budget_periods {
       id
       name
+      inspection_start_date
+      end_date
     }
     main_categories {
       id

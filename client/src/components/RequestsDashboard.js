@@ -1,7 +1,6 @@
 import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
-import { DateTime } from 'luxon'
 
 import {
   Row,
@@ -15,7 +14,7 @@ import {
   Collapsing,
   Tooltipped
 } from './Bootstrap'
-
+import { budgetPeriodDates } from './decorators'
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
@@ -152,16 +151,6 @@ const RequestsTree = ({
       })}
     </BudgetPeriodCard>
   ))
-}
-
-const budgetPeriodDates = bp => {
-  const now = DateTime.local()
-  const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
-  const endDate = DateTime.fromISO(bp.end_date)
-  const isPast = endDate <= now
-  const isRequesting = !isPast && now <= inspectStartDate
-  const isInspecting = !isPast && !isRequesting
-  return { inspectStartDate, endDate, isPast, isRequesting, isInspecting }
 }
 
 const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
