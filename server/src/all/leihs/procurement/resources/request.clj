@@ -321,6 +321,7 @@
           (-> write-data
               (dissoc :attachments)
               (assoc :organization (:id organization))
+              (assoc :user (:user_id auth-entity))
               (cond-> template (assoc :category (:category_id template)))
               exchange-attrs)]
     (with-local-vars [req-id nil]

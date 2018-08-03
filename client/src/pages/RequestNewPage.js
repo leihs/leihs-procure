@@ -150,12 +150,8 @@ const updateRequestFromFields = (mutate, request, fields, preselection) => {
 
     // onyl for create:
     budget_period: preselection.budgetPeriod,
-    category: preselection.category,
+    category: preselection.category
     // template: preselection.template,
-
-    // FIXME: hacky hardcode
-    organization: '37bbe3df-7553-5d5f-82fa-7e9a2d94951a',
-    user: '7da6733c-c819-5613-8cad-2a40f51c90da'
   }
 
   mutate({ variables: { requestData } })
@@ -375,7 +371,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                       <mark>OK!</mark>
                     </pre>
 
-                    <RequestLineClosed request={data.request} />
+                    <RequestLineClosed request={data.new_request} />
                   </div>
                 )
               }
