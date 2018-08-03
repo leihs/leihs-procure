@@ -453,7 +453,7 @@ const CategoriesTemplatesTree = ({
                                   <button
                                     className="list-group-item list-group-item-action cursor-pointer"
                                     onClick={e => {
-                                      e.preventDefault
+                                      e.preventDefault()
                                       onSelectTemplate(t)
                                     }}
                                   >
@@ -472,7 +472,7 @@ const CategoriesTemplatesTree = ({
                             <button
                               className="list-group-item list-group-item-action cursor-pointer"
                               onClick={e => {
-                                e.preventDefault
+                                e.preventDefault()
                                 onSelectCategory(sc)
                               }}
                             >
