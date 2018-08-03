@@ -157,8 +157,10 @@
                             category-viewable-by-user
                             user-is-inspector
                             user-is-admin),
-                  :write (and user-is-requester
-                              budget-period-in-requesting-phase),
+                  :write (and (not budget-period-is-past)
+                              user-is-requester
+                              (or budget-period-in-requesting-phase
+                                  user-is-inspector)),
                   :required true},
      :order_quantity
        {:read
