@@ -19,6 +19,7 @@ import t from '../locale/translate'
 // import Icon from './Icons'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
+import CurrentUser from '../containers/CurrentUserProvider'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
 
@@ -40,6 +41,7 @@ const FilterBar = ({
 
   return (
     <div className="h-100 p-3 bg-light mh-md-100vh">
+      <CurrentUser>{me => <pre>{JSON.stringify(me, 0, 2)}</pre>}</CurrentUser>
       <h5>Filters</h5>
       {content()}
     </div>

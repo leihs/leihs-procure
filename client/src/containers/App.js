@@ -1,40 +1,19 @@
 import React, { Component, Fragment as F } from 'react'
 import f from 'lodash'
 import { withRouter } from 'react-router'
-
 import { Query } from 'react-apollo'
-import gql from 'graphql-tag'
 
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
-
 import MainNav from '../components/MainNav'
+import { CURRENT_USER_QUERY } from './CurrentUserProvider'
 
 const MainNavWithRouter = withRouter(MainNav)
 
-const APP_SHELL_QUERY = gql`
-  query appShell {
-    current_user {
-      user {
-        id
-        firstname
-        lastname
-        login
-        email
-        permissions {
-          isAdmin
-          isRequester
-          isInspectorForCategories {
-            id
-          }
-          isViewerForCategories {
-            id
-          }
-        }
-      }
-    }
-  }
-`
+// NOTE: uses fetchPolicy="cache-then-network" to be quick on refreshes
+//       but also make sure the data is correct and connection is possible.
+//       We re-use the Query from `CurrentUserProvider` (to ensure caching),
+//       but not the component because the "AppShell" handles errors differently.
 
 class App extends Component {
   render({ props: { children, isDev } } = this) {
@@ -42,7 +21,7 @@ class App extends Component {
       // TODO: set lang to instance default language
       <div className="ui-app" lang="de">
         <Query
-          query={APP_SHELL_QUERY}
+          query={CURRENT_USER_QUERY}
           fetchPolicy="cache-then-network"
           notifyOnNetworkStatusChange
         >
