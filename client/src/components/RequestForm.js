@@ -1,4 +1,5 @@
 import React, { Fragment as F } from 'react'
+import PropTypes from 'prop-types'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -45,7 +46,7 @@ const prepareFormValues = request => {
 }
 
 const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
-  const requestID = request.id || 'new'
+  const requestID = request.id
   return (
     <StatefulForm
       idPrefix={`request_form_${requestID}`}
@@ -208,7 +209,7 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
                           label: s
                         }))}
                         disabled={formPropsFor('inspection_comment').readOnly}
-                        // NOTE: we dont want to keep the selected value and ust use it once.
+                        // NOTE: we dont want to keep the selected value and just use it once.
                         // Always setting empty value makes it controlled and React resets it for us!
                         value={''}
                         onChange={({ target: { value } }) => {
@@ -351,6 +352,10 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
 }
 
 export default RequestForm
+
+RequestForm.propTypes = {
+  request: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired
+}
 
 const SelectionDropdown = ({
   toggle,

@@ -1,7 +1,7 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 import cx from 'classnames'
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import qs from 'qs'
 
@@ -33,6 +33,7 @@ import { formatCurrency } from '../components/decorators'
 import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
+import { RequestLineClosed } from '../components/RequestLine'
 
 const NEW_REQUEST_PRESELECTION_QUERY = gql`
   query newRequestPreselectionQuery {
@@ -84,6 +85,81 @@ const NEW_REQUEST_QUERY = gql`
 
   ${Fragments.RequestFieldsForEdit}
 `
+
+const CREATE_REQUEST_MUTATION = gql`
+  mutation createRequest($requestData: NewRequestInput) {
+    create_request(input_data: $requestData) {
+      ...RequestFieldsForEdit
+    }
+  }
+  ${Fragments.RequestFieldsForEdit}
+`
+
+const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
+  fieldKey = fieldKey || reqKey
+
+  if (!f.get(requestData, reqKey)) {
+    // eslint-disable-next-line no-debugger
+    debugger
+  }
+
+  if (f.get(requestData, reqKey).write) {
+    return { [fieldKey]: f.get(fields, fieldKey) }
+  }
+}
+
+const boolify = (key, val) =>
+  !val ? false : !val[key] ? null : val[key] === key
+
+const updateRequestFromFields = (mutate, request, fields, preselection) => {
+  const requestData = {
+    ...valueIfWritable(fields, request, 'article_name'),
+    ...valueIfWritable(fields, request, 'receiver'),
+    ...valueIfWritable(fields, request, 'price_cents'),
+
+    ...valueIfWritable(fields, request, 'requested_quantity'),
+    ...valueIfWritable(fields, request, 'approved_quantity'),
+    ...valueIfWritable(fields, request, 'order_quantity'),
+
+    replacement: boolify(
+      'replacement',
+      valueIfWritable(fields, request, 'replacement')
+    ),
+
+    attachments: f.map(
+      valueIfWritable(fields, request, 'attachments').attachments,
+      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
+    ),
+
+    // TODO: form field with id (autocomplete)
+    // ...valueIfWritable(fields, request, 'supplier'),
+
+    ...valueIfWritable(fields, request, 'article_number'),
+    ...valueIfWritable(fields, request, 'motivation'),
+    ...valueIfWritable(fields, request, 'priority'),
+    ...valueIfWritable(fields, request, 'inspector_priority'),
+
+    ...valueIfWritable(fields, request, 'inspection_comment'),
+
+    ...valueIfWritable(fields, request, 'accounting_type'),
+    ...valueIfWritable(fields, request, 'internal_order_number'),
+
+    // NOTE: no building, just room!
+    // ...valueIfWritable(fields, request, 'room', 'room_id'),
+    ...valueIfWritable(fields, request, 'room', 'room'),
+
+    // onyl for create:
+    budget_period: preselection.budgetPeriod,
+    category: preselection.category,
+    // template: preselection.template,
+
+    // FIXME: hacky hardcode
+    organization: '37bbe3df-7553-5d5f-82fa-7e9a2d94951a',
+    user: '7da6733c-c819-5613-8cad-2a40f51c90da'
+  }
+
+  mutate({ variables: { requestData } })
+}
 
 const readFromQueryParams = params => ({
   budget_period: f.enhyphenUUID(params.bp),
@@ -208,8 +284,9 @@ class NewRequestPreselection extends React.Component {
                   label="Kategorie & Vorlage"
                   className="form-control-lg p-0"
                 >
-                  {hasPreselected ? (
-                    selectedCategory ? (
+                  {/* TODO: clear selection buttons on both boxes (like request.form.cancel) */}
+                  {hasPreselected &&
+                    (selectedCategory ? (
                       <Row>
                         <Col sm>
                           <SelectedCategory
@@ -234,8 +311,7 @@ class NewRequestPreselection extends React.Component {
                           </SelectionCard>
                         </Col>
                       </Row>
-                    )
-                  ) : null}
+                    ))}
 
                   {!hasPreselected && (
                     <CategoriesTemplatesTree
@@ -280,21 +356,50 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
         if (loading) return <Loading />
         if (error) return <ErrorPanel error={error} data={data} />
 
-        // const data = FAKE_DATA[template ? 'FROM_TEMPLATE' : 'FROM_CATEGORY']
-
-        const request = { ...data.new_request }
+        const request = {
+          ...data.new_request,
+          id: `new_${String(Math.random()).slice(2, 12)}`
+        }
 
         return (
-          <F>
-            <hr className="my-4" />
-            <RequestForm
-              request={request}
-              categories={data.main_categories}
-              budgetPeriods={data.budget_periods}
-              onCancel={onCancel}
-              onSubmit={fields => window.alert(JSON.stringify(fields, 0, 2))}
-            />
-          </F>
+          <Mutation mutation={CREATE_REQUEST_MUTATION}>
+            {(mutate, mutReq) => {
+              if (mutReq.loading) return <Loading />
+              if (mutReq.error)
+                return <ErrorPanel error={mutReq.error} data={mutReq.data} />
+
+              if (mutReq.called) {
+                return (
+                  <div>
+                    <pre>
+                      <mark>OK!</mark>
+                    </pre>
+
+                    <RequestLineClosed request={data.request} />
+                  </div>
+                )
+              }
+
+              return (
+                <F>
+                  <hr className="my-4" />
+                  <RequestForm
+                    request={request}
+                    categories={data.main_categories}
+                    budgetPeriods={data.budget_periods}
+                    onCancel={onCancel}
+                    onSubmit={fields =>
+                      updateRequestFromFields(mutate, request, fields, {
+                        budgetPeriod,
+                        template,
+                        category
+                      })
+                    }
+                  />
+                </F>
+              )
+            }}
+          </Mutation>
         )
       }}
     </Query>
