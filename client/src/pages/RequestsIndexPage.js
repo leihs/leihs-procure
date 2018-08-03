@@ -171,6 +171,7 @@ const storageFactory = ({ KEY }) => {
     set: o => f.try(() => window.localStorage.setItem(KEY, JSON.stringify(o)))
   }
 }
+// TODO: use user.savedFilters from server, scope cache by user.id!!!
 const userSavedFilters = storageFactory({ KEY: `${LOCAL_STORE_KEY}.filters` })
 const savedPanelTree = storageFactory({ KEY: `${LOCAL_STORE_KEY}.panelTree` })
 
