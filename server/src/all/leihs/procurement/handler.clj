@@ -130,12 +130,12 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      wrap-json-response
-      (wrap-json-body {:keywords? true})
-      ; anti-csrf/wrap
+      anti-csrf/wrap
       (wrap-authorize skip-authorization-handler-keys)
       session/wrap
       wrap-cookies
+      wrap-json-response
+      (wrap-json-body {:keywords? true})
       wrap-empty
       (wrap-secret-byte-array secret)
       ; ===================================================================

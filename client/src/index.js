@@ -6,7 +6,7 @@ import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
-import App from './components/App'
+import App from './containers/App'
 
 // all the pages
 import RequestsIndex from './pages/RequestsIndexPage'

@@ -1,7 +1,9 @@
 import React, { Fragment as F } from 'react'
+import f from 'lodash'
 import cx from 'classnames'
 
 import {
+  Badge,
   Collapse,
   Navbar,
   NavbarToggler,
@@ -17,6 +19,7 @@ import {
 } from './Bootstrap'
 
 import Icon from './Icons'
+import { DisplayName } from './decorators'
 
 const TITLE = 'Bedarfsermittlung'
 
@@ -36,7 +39,7 @@ export default class MainNav extends React.Component {
       isOpen: !this.state.isOpen
     })
   }
-  render({ props: { isDev }, state } = this) {
+  render({ props: { me, isDev }, state } = this) {
     return (
       <div>
         <Navbar dark color="dark" expand="lg">
@@ -52,47 +55,55 @@ export default class MainNav extends React.Component {
                 <Icon.Requests fixedWidth spaced /> Anträge
               </NavItemLink>
 
-              <UncontrolledDropdown nav inNavbar>
-                <Routed path="/admin">
-                  {({ isActive }) => (
-                    <DropdownToggle
-                      nav
-                      caret
-                      className={cx({ active: isActive })}
+              {me.permissions.isAdmin && (
+                <UncontrolledDropdown nav inNavbar>
+                  <Routed path="/admin">
+                    {({ isActive }) => (
+                      <DropdownToggle
+                        nav
+                        caret
+                        className={cx({ active: isActive })}
+                      >
+                        <Icon.Settings /> Admin
+                      </DropdownToggle>
+                    )}
+                  </Routed>
+
+                  <DropdownMenu right>
+                    <DropdownItemLink
+                      className="pl-3"
+                      to="/admin/budget-periods"
                     >
-                      <Icon.Settings /> Admin
-                    </DropdownToggle>
-                  )}
-                </Routed>
+                      <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+                    </DropdownItemLink>
 
-                <DropdownMenu right>
-                  <DropdownItemLink className="pl-3" to="/admin/budget-periods">
-                    <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/categories">
+                      <Icon.Categories fixedWidth spaced /> Kategorien
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/categories">
-                    <Icon.Categories fixedWidth spaced /> Kategorien
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/users">
+                      <Icon.Users fixedWidth spaced /> Benutzer
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/users">
-                    <Icon.Users fixedWidth spaced /> Benutzer
-                  </DropdownItemLink>
+                    <DropdownItemLink
+                      className="pl-3"
+                      to="/admin/organizations"
+                    >
+                      <Icon.Organizations fixedWidth spaced /> Organisationen
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/organizations">
-                    <Icon.Organizations fixedWidth spaced /> Organisationen
-                  </DropdownItemLink>
+                    <DropdownItemLink className="pl-3" to="/admin/templates">
+                      <Icon.Templates fixedWidth spaced /> Vorlagen
+                    </DropdownItemLink>
 
-                  <DropdownItemLink className="pl-3" to="/admin/templates">
-                    <Icon.Templates fixedWidth spaced /> Vorlagen
-                  </DropdownItemLink>
+                    <DropdownItem divider />
 
-                  <DropdownItem divider />
-
-                  <DropdownItemLink className="pl-3" to="/admin/settings">
-                    <Icon.Settings fixedWidth spaced /> Einstellungen
-                  </DropdownItemLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
+                    <DropdownItemLink className="pl-3" to="/admin/settings">
+                      <Icon.Settings fixedWidth spaced /> Einstellungen
+                    </DropdownItemLink>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              )}
 
               <NavItemLink exact to="/TODO">
                 <Icon.Contact fixedWidth spaced /> Kontakt
@@ -144,17 +155,17 @@ export default class MainNav extends React.Component {
                   </DropdownItemLink>
                   <DropdownItem divider />
                   <DropdownItem>
-                    <Icon.LeihsManage />
+                    <Icon.LeihsManage /> Manage
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
 
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
-                  User
+                  <Icon.User size="lg" /> {DisplayName(me, { abbr: true })}
                 </DropdownToggle>
                 <DropdownMenu right>
-                  <DropdownItem>[TODO]</DropdownItem>
+                  <DropdownItem>{tmpUserInfo(me)}</DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
 
@@ -173,3 +184,26 @@ export default class MainNav extends React.Component {
     )
   }
 }
+
+const tmpUserInfo = me => (
+  <F>
+    {[
+      'isAdmin',
+      'isRequester',
+      'isInspectorForCategories',
+      'isViewerForCategories'
+    ]
+      .map(k => [k, me.permissions[k]])
+      .filter(([k, i]) => i && f.present(i))
+      .map(([k, i]) => (
+        <F key={k}>
+          <Badge dark>
+            {k.replace(/ForCategories$/, ` (${i.length} categories)`)}
+          </Badge>{' '}
+        </F>
+      ))}
+    <pre>
+      <small>{JSON.stringify(f.omit(me, 'permissions'), 0, 2)}</small>
+    </pre>
+  </F>
+)
