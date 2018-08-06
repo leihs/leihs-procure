@@ -9,9 +9,9 @@
      [clj-http "3.8.0"] [clj-time "0.14.3"] [cljs-http "0.1.44"]
      [cljsjs/jimp "0.2.27"] [cljsjs/js-yaml "3.3.1-0"]
      [cljsjs/moment "2.17.1-1"] [clojure-humanize "0.2.2"] [clj-pid "0.1.2"]
-     [com.lucasbradstreet/cljs-uuid-utils "1.0.2"] [com.mchange/c3p0 "0.9.5.2"]
+     [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
      [com.walmartlabs/lacinia "0.28.0"] [compojure "1.6.0"] [environ "1.1.0"]
-     [hiccup "1.0.5"] [hickory "0.7.1"] [honeysql "0.9.2"]
+     [hiccup "1.0.5"] [hickory "0.7.1"] [hikari-cp "2.6.0"] [honeysql "0.9.2"]
      [inflections "0.13.0"] [io.forward/yaml "1.0.7"]
      [log4j/log4j "1.2.17" :exclusions
       [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
