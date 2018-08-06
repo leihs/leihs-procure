@@ -4,7 +4,7 @@ import { withRouter } from 'react-router'
 import { Query } from 'react-apollo'
 
 import Loading from '../components/Loading'
-import { ErrorPanel } from '../components/Error'
+import { ErrorPanel, FatalErrorScreen, getErrorCode } from '../components/Error'
 import MainNav from '../components/MainNav'
 import { CURRENT_USER_QUERY } from './CurrentUserProvider'
 
@@ -12,7 +12,7 @@ const MainNavWithRouter = withRouter(MainNav)
 
 // NOTE: uses fetchPolicy="cache-then-network" to be quick on refreshes
 //       but also make sure the data is correct and connection is possible.
-//       We re-use the Query from `CurrentUserProvider` (to ensure caching),
+//       We re-use the query from `CurrentUserProvider` (to ensure caching),
 //       but not the component because the "AppShell" handles errors differently.
 
 class App extends Component {
@@ -29,32 +29,8 @@ class App extends Component {
             if (loading) return <Loading />
 
             if (error) {
-              const errCode = getErrorCode(error)
-              if (errCode === 'NO_CONNECTION_TO_SERVER') {
-                return (
-                  <FatalErrorScreen>
-                    You are offline or the Server is down!
-                    <br />
-                    {retryButton(refetch)}
-                  </FatalErrorScreen>
-                )
-              }
-
-              // FIXME: handle 401 when backend is fixed, all-in-1 msg for now:
-              if (errCode === 'NOT_AUTHORIZED_FOR_APP') {
-                return (
-                  <FatalErrorScreen>
-                    You are not allowed to use this application!
-                    <br />
-                    Try going to the <a href="/">home page</a> and maybe log in.
-                  </FatalErrorScreen>
-                )
-              }
               return (
-                <FatalErrorScreen>
-                  <ErrorPanel error={error} data={data} />
-                  {retryButton(refetch)}
-                </FatalErrorScreen>
+                <ErrorHandler error={error} data={data} refetch={refetch} />
               )
             }
 
@@ -73,25 +49,59 @@ class App extends Component {
 
 export default App
 
-const FatalErrorScreen = ({ children }) => (
-  <div className="m-3 p-5 text-center">{children}</div>
-)
+const ErrorHandler = ({ error, data, refetch }) => {
+  const errCode = getErrorCode(error)
+  const retryButton = (
+    <button
+      type="button"
+      className="btn btn-sm btn-outline-dark"
+      onClick={e => refetch()}
+    >
+      retry
+    </button>
+  )
 
-const retryButton = fn => (
-  <button className="btn btn-sm btn-outline-dark" onClick={fn}>
-    retry
-  </button>
-)
-
-const getErrorCode = error => {
-  const code = f.first(f.map(f.get(error, 'graphQLErrors'), 'extensions.code'))
-  if (code) return code
-
-  if (f.get(error, 'networkError.message') === 'Failed to fetch') {
-    return 'NO_CONNECTION_TO_SERVER'
+  if (
+    errCode === 'NO_CONNECTION_TO_SERVER' ||
+    errCode === 'UNKNOWN_NETWORK_ERROR'
+  ) {
+    return (
+      <FatalErrorScreen error={error}>
+        <p>You are offline or the Server is down!</p>
+        <p>{retryButton}</p>
+      </FatalErrorScreen>
+    )
   }
 
-  if (f.get(error, 'networkError')) {
-    return 'UNKNOWN_NETWORK_ERROR'
+  // FIXME: handle 401 when backend is fixed, all-in-1 msg for now:
+  if (errCode === 'NOT_AUTHORIZED_FOR_APP') {
+    return (
+      <FatalErrorScreen error={error}>
+        <p>
+          You are not allowed to use this application!
+          <br />
+          Try going to the <a href="/">home page</a> and maybe log in.
+        </p>
+      </FatalErrorScreen>
+    )
   }
+  if (f.isString(errCode)) {
+    return (
+      <FatalErrorScreen error={error}>
+        <p>
+          Sorry, there was an error of type <samp>{errCode}</samp>.
+        </p>
+        <p>{retryButton}</p>
+      </FatalErrorScreen>
+    )
+  }
+  // only show error panel if no error code is found (really unexpected)
+  return (
+    <FatalErrorScreen title={false}>
+      <div title={false}>
+        <ErrorPanel error={error} data={data} />
+        {retryButton}
+      </div>
+    </FatalErrorScreen>
+  )
 }
