@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+
+npm ci || echo 'upgrade npm! `npm i -g npm@latest`'
+npm start
