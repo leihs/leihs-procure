@@ -55,8 +55,7 @@
         [tx (:tx request)]
         (try (let [response (->> tx
                                  (assoc request :tx)
-                                 pure-handler
-                                 (hash-map :body))]
+                                 pure-handler)]
                (when (:graphql-error response)
                  (log/warn "Rolling back transaction because of graphql error")
                  (jdbc/db-set-rollback-only! tx))
