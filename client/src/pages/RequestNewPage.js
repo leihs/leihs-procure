@@ -375,6 +375,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                 <F>
                   <hr className="my-4" />
                   <RequestForm
+                    id="new_request"
                     request={request}
                     categories={data.main_categories}
                     budgetPeriods={data.budgetPeriods}

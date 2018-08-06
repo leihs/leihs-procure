@@ -45,11 +45,20 @@ const prepareFormValues = request => {
   return fields
 }
 
-const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
-  const requestID = request.id
+const RequestForm = ({
+  request,
+  id,
+  className,
+  onCancel,
+  onSubmit,
+  ...props
+}) => {
+  const formId = id || request.id
+  if (!formId) throw new Error('missing ID!')
+
   return (
     <StatefulForm
-      idPrefix={`request_form_${requestID}`}
+      idPrefix={`request_form_${formId}`}
       values={prepareFormValues(request)}
     >
       {({ fields, setValue, getValue, ...formHelpers }) => {
@@ -63,7 +72,7 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
 
         return (
           <form
-            id={requestID}
+            id={formId}
             className={cx(className)}
             onSubmit={e => {
               e.preventDefault()
