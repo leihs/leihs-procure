@@ -177,10 +177,16 @@ const Icons = f.fromPairs(
         throw new Error('Icons cant have `children`!')
       }
       const spacing = spaced === true ? 1 : spaced
-      const iconClassName = cx(extraProps.className, givenProps.className, {
-        [`text-${iconProps.color}`]: iconProps.color,
-        [`mr-${spacing}`]: spacing
-      })
+      const iconClassName = cx(
+        extraProps.cls,
+        extraProps.className,
+        givenProps.cls,
+        givenProps.className,
+        {
+          [`text-${iconProps.color}`]: iconProps.color,
+          [`mr-${spacing}`]: spacing
+        }
+      )
       return (
         <React.Fragment>
           <FontAwesomeIcon

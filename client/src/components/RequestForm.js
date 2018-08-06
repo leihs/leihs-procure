@@ -279,12 +279,25 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
                     options={props.categories.map(mc => ({
                       key: mc.id,
                       header: mc.name,
-                      options: mc.categories.map(c => ({
-                        key: c.id,
-                        children: c.name,
-                        disabled: c.id === request.category.value.id,
-                        onClick: e => props.doChangeRequestCategory(c)
-                      }))
+                      options: mc.categories.map(c => {
+                        const isCurrent = c.id === request.category.value.id
+                        return {
+                          key: c.id,
+                          disabled: isCurrent,
+                          onClick: e => props.doChangeRequestCategory(c),
+                          children: (
+                            <F>
+                              {c.name}
+                              {isCurrent && (
+                                <F>
+                                  {' '}
+                                  <Icon.Checkmark cls="pb-1" />
+                                </F>
+                              )}
+                            </F>
+                          )
+                        }
+                      })
                     }))}
                   >
                     <Icon.Exchange /> {t('form_btn_move_category')}
@@ -298,12 +311,26 @@ const RequestForm = ({ request, className, onCancel, onSubmit, ...props }) => {
                     options={[
                       {
                         key: 1,
-                        options: props.budgetPeriods.map(bp => ({
-                          key: bp.id,
-                          children: bp.name,
-                          disabled: bp.id === request.budget_period.value.id,
-                          onClick: e => props.doChangeBudgetPeriod(bp)
-                        }))
+                        options: props.budgetPeriods.map(bp => {
+                          const isCurrent =
+                            bp.id === request.budget_period.value.id
+                          return {
+                            key: bp.id,
+                            disabled: isCurrent,
+                            onClick: e => props.doChangeBudgetPeriod(bp),
+                            children: (
+                              <F>
+                                {bp.name}
+                                {isCurrent && (
+                                  <F>
+                                    {' '}
+                                    <Icon.Checkmark cls="pb-1" />
+                                  </F>
+                                )}
+                              </F>
+                            )
+                          }
+                        })
                       }
                     ]}
                   >
