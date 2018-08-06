@@ -34,6 +34,7 @@ const ADMIN_ORGS_PAGE_QUERY = gql`
       organization {
         id
         name
+        shortname
       }
     }
   }

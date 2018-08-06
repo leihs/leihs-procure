@@ -40,6 +40,7 @@ export const RequestFieldsForIndex = gql`
       value {
         id
         name
+        shortname
       }
     }
 
@@ -103,11 +104,6 @@ export const RequestFieldsForShow = gql`
     }
     receiver {
       ...RequestFieldString
-    }
-    organization {
-      value {
-        id
-      }
     }
 
     price_cents {
@@ -214,6 +210,7 @@ export const RequesterOrg = gql`
     organization {
       id
       name
+      shortname
     }
     department {
       id
