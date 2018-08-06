@@ -14,6 +14,14 @@ export const RequestFieldsForIndex = gql`
   fragment RequestFieldsForIndex on Request {
     id
 
+    user {
+      value {
+        id
+        firstname
+        lastname
+      }
+    }
+
     category {
       value {
         id

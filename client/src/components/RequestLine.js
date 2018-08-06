@@ -58,7 +58,8 @@ const RequestLineClosed = ({ request, onClick, className }) => (
   <Row className={cx('py-3 mx-0', className)} onClick={onClick}>
     <Col sm="2">{request.article_name.value}</Col>
     <Col sm="3">
-      {request.receiver.value} / {DisplayName(request.organization.value)}
+      {DisplayName(request.user.value)} /{' '}
+      {DisplayName(request.organization.value)}
     </Col>
     <Col sm="4">
       <Tooltipped text={t('request_form_field.price_cents')}>
