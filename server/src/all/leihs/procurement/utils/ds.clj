@@ -1,110 +1,39 @@
 (ns leihs.procurement.utils.ds
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require [logbug.catcher :as catcher]
-            [clojure.java.jdbc :as jdbc]
+  (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
-            [ring.util.codec]
-            [pg-types.all]
-            [clj-logging-config.log4j :as logging-config]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug :refer [I> I>> identity-with-logging]]
-            [logbug.ring :refer [wrap-handler-with-logging]]
-            [logbug.thrown :as thrown])
-  (:import [java.net.URI]
-           [com.mchange.v2.c3p0 ComboPooledDataSource DataSources]))
+            [hikari-cp.core :as hikari]
+            [leihs.procurement.utils.core :refer [presence str]]
+            [pg-types.all])
+  (:import com.codahale.metrics.MetricRegistry))
+
+(defonce metric-registry* (atom nil))
+
+(defn Timer->map
+  [t]
+  {:count (.getCount t),
+   :mean-reate (.getMeanRate t),
+   :one-minute-rate (.getOneMinuteRate t),
+   :five-minute-rate (.getFiveMinuteRate t),
+   :fifteen-minute-rate (.getFifteenMinuteRate t)})
+
+(defn status
+  []
+  {:gauges (->> @metric-registry*
+                .getGauges
+                (map (fn [[n g]] [n (.getValue g)]))
+                (into {})),
+   :timers (->> @metric-registry*
+                .getTimers
+                (map (fn [[n t]] [n (Timer->map t)]))
+                (into {}))})
 
 (defonce ds (atom nil))
 (defonce ds-without-pooler (atom nil))
 (defn get-ds [] @ds)
 (defn get-ds-without-pooler [] @ds-without-pooler)
 
-(defn check-connection
-  []
-  (if-not @ds
-    {:OK? true, :message "RDBMS is not initialized!"}
-    (catcher/snatch
-      {:return-fn (fn [e] {:OK? false, :error (.getMessage e)})}
-      (assert (->> (jdbc/query
-                     @ds
-                     ["SELECT true AS state FROM schema_migrations LIMIT 1"])
-                   first
-                   :state))
-      (let [c3p0ds (-> @ds
-                       :datasource)
-            max (.getMaxPoolSize c3p0ds)
-            conns (.getNumConnectionsDefaultUser c3p0ds)
-            busy (.getNumBusyConnectionsDefaultUser c3p0ds)
-            idle (.getNumIdleConnectionsDefaultUser c3p0ds)
-            usage (double (/ busy conns))]
-        {:OK? true,
-         :Max max,
-         :Allocated conns,
-         :usage (Double/parseDouble (String/format "%.2f"
-                                                   (into-array [usage])))}))))
-
-(defn reset
-  []
-  (log/info "resetting c3p0 datasource")
-  (when @ds (.hardReset (:datasource @ds)))
-  (reset! ds nil))
-
-(defn- get-url
-  [db-conf]
-  (str "jdbc:"
-       (or (:url db-conf) (str (:subprotocol db-conf) ":" (:subname db-conf)))))
-
-(defn- get-url-param
-  [db-conf name]
-  (when-let [url-string (:url db-conf)]
-    (when-let [query (-> url-string
-                         java.net.URI/create
-                         .getQuery)]
-      (-> query
-          ring.util.codec/form-decode
-          (get name)))))
-
-(defn- get-user
-  [db-conf]
-  "Retrieves first non nil value of :user of db-conf,
-  :username db-conf, user parameter of the url, PGUSER from env or nil"
-  (or (:user db-conf)
-      (:username db-conf)
-      (get-url-param db-conf "user")
-      (System/getenv "PGUSER")))
-
-(defn- get-password
-  [db-conf]
-  "Retrieves first non nil value of :password of db-conf,
-  password parameter of the url, PGPASSWORD from env or nil"
-  (or (:password db-conf)
-      (get-url-param db-conf "password")
-      (System/getenv "PGPASSWORD")))
-
-(defn- get-max-pool-size
-  [db-conf]
-  (when-let [ps (or (:max_pool_size db-conf)
-                    (get-url-param db-conf "max-pool-size")
-                    (get-url-param db-conf "max_pool_size")
-                    (get-url-param db-conf "pool"))]
-    (Integer. ps)))
-
-(defn- create-c3p0-datasources
-  [db-conf]
-  (log/info create-c3p0-datasources [db-conf])
-  (reset!
-    ds
-    {:datasource
-       (doto (ComboPooledDataSource.)
-         (.setJdbcUrl (get-url db-conf))
-         (#(when-let [user (get-user db-conf)] (.setUser % user)))
-         (#(when-let [password (get-password db-conf)]
-            (.setPassword % password)))
-         (.setMaxPoolSize (or (get-max-pool-size db-conf) 10))
-         (.setMinPoolSize (or (:min-pool-size db-conf) 3))
-         (.setMaxConnectionAge (or (:max-connection-age db-conf) (* 3 60 60)))
-         (.setMaxIdleTimeExcessConnections
-           (or (:max-idle-time-exess-connections db-conf) (* 10 60))))}))
+(defn wrap-cheat-tx [handler] (fn [request] (handler (assoc request :tx @ds))))
 
 (defn wrap-tx
   [handler]
@@ -113,8 +42,8 @@
     ; there
     ; is a bug which leads to hanging of the server on all subsequent requests
     ; (let [ds (if (= (:handler-key request) :image) @ds-without-pooler @ds)]
-    ; 
-    ; FIXME: using ds without pooler for every handelr for the time being as 
+    ;
+    ; FIXME: using ds without pooler for every handelr for the time being as
     ; the problem with hanging server still persists
     (let [ds @ds-without-pooler]
       (jdbc/with-db-transaction
@@ -137,32 +66,6 @@
             (jdbc/db-set-rollback-only! tx)
             (throw th)))))))
 
-(defn close-ds!
-  []
-  (log/info "Closing db pool ...")
-  (-> @ds
-      :datasource
-      .close)
-  (reset! ds nil)
-  (log/info "Closing db pool done."))
-
-(defn close-ds-without-pooler!
-  []
-  (log/info "Closing ds without pooler ...")
-  (reset! ds-without-pooler nil)
-  (log/info "Closing ds without pooler done."))
-
-(defn get-database-url-for-pooler
-  [params]
-  (str "jdbc:postgresql://"
-       (:host params)
-       (when-let [port (-> params
-                           :port
-                           presence)]
-         (str ":" port))
-       "/"
-       (:database params)))
-
 (defn get-database-url
   [params]
   (str "postgresql://"
@@ -178,23 +81,48 @@
        "/"
        (:database params)))
 
+(defn close-ds!
+  []
+  (log/info "Closing db pool ...")
+  (-> @ds
+      :datasource
+      hikari/close-datasource)
+  (reset! ds nil)
+  (log/info "Closing db pool done."))
+
+(defn close-ds-without-pooler!
+  []
+  (log/info "Closing ds without pooler ...")
+  (reset! ds-without-pooler nil)
+  (log/info "Closing ds without pooler done."))
+
 (defn initialize-ds!
-  [params]
-  (log/info "Initializing datasource with pooler ...")
-  (let [url (get-database-url-for-pooler params)]
-    (log/info {:url url})
-    (reset!
-      ds
-      {:datasource (doto (ComboPooledDataSource.)
-                     (.setJdbcUrl url)
-                     (#(when-let [user (:username params)] (.setUser % user)))
-                     (#(when-let [password (:password params)]
-                        (.setPassword % password)))
-                     (.setMaxPoolSize (or (:max-pool-ѕize params) 3))
-                     (.setMinPoolSize 3)
-                     (.setMaxConnectionAge (* 3 60 60))
-                     (.setMaxIdleTimeExcessConnections (* 10 60)))}))
-  (log/info "Initializing datasource with pooler done."))
+  [params health-check-registry]
+  (let [ds-spec {:auto-commit true,
+                 :read-only false,
+                 :connection-timeout 30000,
+                 :validation-timeout 5000,
+                 :idle-timeout 600000,
+                 :max-lifetime (* 3 60 60 1000),
+                 :minimum-idle 10,
+                 :maximum-pool-size (-> params
+                                        :max-pool-size
+                                        presence
+                                        (or 5)),
+                 :pool-name "db-pool",
+                 :adapter "postgresql",
+                 :username (:username params),
+                 :password (:password params),
+                 :database-name (:database params),
+                 :server-name (:host params),
+                 :port-number (:port params),
+                 :register-mbeans false,
+                 :metric-registry @metric-registry*,
+                 :health-check-registry health-check-registry}]
+    (log/info "Initializing datasource with pooler ...")
+    (log/info ds-spec)
+    (reset! ds {:datasource (hikari/make-datasource ds-spec)})
+    (log/info "Initializing datasource with pooler done.")))
 
 (defn initialize-ds-without-pooler!
   [params]
@@ -205,13 +133,13 @@
   (log/info "Initializing datasource without pooler done."))
 
 (defn init
-  [params]
+  [params health-check-registry]
+  (reset! metric-registry* (MetricRegistry.))
   (when @ds (close-ds!))
   (when @ds-without-pooler (close-ds-without-pooler!))
-  (log/info "Initializing db " params " ...")
-  (initialize-ds! params)
+  (initialize-ds! params health-check-registry)
   (initialize-ds-without-pooler! params)
-  (log/info "Initializing db done."))
+  @ds)
 
 ;;### Debug
 ;;####################################################################
