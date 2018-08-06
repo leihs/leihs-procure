@@ -191,7 +191,6 @@ const RequestNewPage = () => (
             return (
               <NewRequestPreselection
                 key={location.key} // reset state on location change!
-                formKey={location.key} // reset state on location change!
                 data={data}
                 budgetPeriods={budgetPeriods}
                 selection={readFromQueryParams(params)}
@@ -234,8 +233,6 @@ class NewRequestPreselection extends React.Component {
 
     return (
       <StatefulForm
-        key={formKey}
-        formKey={formKey}
         idPrefix={`request_new`}
         values={selection}
         onChange={fields => onSelectionChange(fields)}
@@ -329,11 +326,6 @@ class NewRequestPreselection extends React.Component {
                   category={fields.category}
                   template={fields.template}
                   onCancel={() => setSelection()}
-                  // NOTE: reset form if preselection changes
-                  // TODO: remove this, should not be needed anymore
-                  key={['budget_period', 'category', 'template']
-                    .map(k => String([fields[k]]))
-                    .join()}
                 />
               )}
             </F>
@@ -344,13 +336,7 @@ class NewRequestPreselection extends React.Component {
   }
 }
 
-const NewRequestForm = ({
-  budgetPeriod,
-  template,
-  category,
-  onCancel,
-  formKey
-}) => (
+const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
   <F>
     <Query
       query={NEW_REQUEST_QUERY}
@@ -360,8 +346,6 @@ const NewRequestForm = ({
       {({ loading, error, data }) => {
         if (loading) return <Loading />
         if (error) return <ErrorPanel error={error} data={data} />
-
-        console.log({ formKey, budgetPeriod, template, category })
 
         const request = {
           ...data.new_request,
