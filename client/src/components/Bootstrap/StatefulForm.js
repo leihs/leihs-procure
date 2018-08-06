@@ -39,7 +39,8 @@ export default class StatefulForm extends React.PureComponent {
   }
 
   constructor(props) {
-    super()
+    super(props)
+    log('constructor', { props })
     this.state = { fields: props.values, originalValues: props.values }
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)

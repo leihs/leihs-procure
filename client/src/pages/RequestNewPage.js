@@ -177,7 +177,7 @@ const RequestNewPage = () => (
 
         <Query
           query={NEW_REQUEST_PRESELECTION_QUERY}
-          networkPolicy="cache-then-network"
+          fetchPolicy="cache-then-network"
         >
           {({ loading, error, data }) => {
             if (loading) return <Loading />
@@ -194,7 +194,7 @@ const RequestNewPage = () => (
                 formKey={location.key} // reset state on location change!
                 data={data}
                 budgetPeriods={budgetPeriods}
-                initialSelection={readFromQueryParams(params)}
+                selection={readFromQueryParams(params)}
                 onSelectionChange={fields =>
                   history.replace(
                     updateQueryParams({ params, location, fields })
@@ -212,14 +212,10 @@ const RequestNewPage = () => (
 export default RequestNewPage
 
 class NewRequestPreselection extends React.Component {
-  constructor(props) {
-    super(props)
-    // apply initial selection from URL parameters
-    this.state = { initalSelection: props.initialSelection }
-  }
-
   render(
-    { state, props: { data, budgetPeriods, onSelectionChange, formKey } } = this
+    {
+      props: { data, budgetPeriods, selection, onSelectionChange, formKey }
+    } = this
   ) {
     const budPeriods = budgetPeriods.map(bp => ({
       value: bp.id,
@@ -236,15 +232,12 @@ class NewRequestPreselection extends React.Component {
       return { ...sc, main_category: { ...mc, categories: undefined } }
     }
 
-    // FIXME: is not applied on first load???
-    const defaultSelection = { budgetPeriod: budPeriods[0].value }
-
     return (
       <StatefulForm
         key={formKey}
         formKey={formKey}
         idPrefix={`request_new`}
-        values={{ ...defaultSelection, ...state.initalSelection }}
+        values={selection}
         onChange={fields => onSelectionChange(fields)}
       >
         {({ fields, setValue, setValues, formPropsFor, ...formHelpers }) => {
@@ -362,7 +355,7 @@ const NewRequestForm = ({
     <Query
       query={NEW_REQUEST_QUERY}
       variables={{ budgetPeriod, template, category }}
-      networkPolicy="no-cache"
+      fetchPolicy="network-only"
     >
       {({ loading, error, data }) => {
         if (loading) return <Loading />
