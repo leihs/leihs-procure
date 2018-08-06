@@ -29,8 +29,7 @@
      [timothypratley/patchin "0.3.5"] [threatgrid/ring-graphql-ui "0.1.1"]
      [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
      [ring/ring-core "1.6.3"]]
-  :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]
-            [refactor-nrepl "2.3.1"]]
+  :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]]
   :zprint {:width 80, :old? false, :map {:lift-ns? false}}
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
   :jvm-opts
