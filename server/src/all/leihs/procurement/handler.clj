@@ -13,7 +13,6 @@
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.resources.attachment :as attachment]
     [leihs.procurement.resources.image :as image]
-    [leihs.procurement.shutdown :as shutdown]
     [leihs.procurement.status :as status]
     [leihs.procurement.utils.ds :as ds]
     [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer
@@ -43,9 +42,7 @@
 (declare redirect-to-root-handler)
 
 ; ========================================================
-; TODO: remove shutdown!!! (and possible others)
-(def skip-authorization-handler-keys
-  #{:attachment :upload :image :shutdown :status})
+(def skip-authorization-handler-keys #{:attachment :upload :image :status})
 ; ========================================================
 
 (def handler-resolve-table
@@ -54,7 +51,6 @@
    :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,
-   :shutdown shutdown/routes,
    :status status/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
