@@ -11,6 +11,7 @@ import App from './containers/App'
 // all the pages
 import HomePage from './pages/HomePage'
 import RequestsIndex from './pages/RequestsIndexPage'
+import RequestShow from './pages/RequestShowPage'
 import RequestNew from './pages/RequestNewPage'
 
 import AdminUsers from './pages/admin/AdminUsersPage'
@@ -48,6 +49,7 @@ const Root = () => (
           <Route exact path="/" component={HomePage} />
           <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/requests/new" component={RequestNew} />
+          <Route exact path="/requests/:id" component={RequestShow} />
           <Route exact path="/admin/users" component={AdminUsers} />
           <Route path="/admin/categories" component={AdminCategories} />
           <Route path="/admin/organizations" component={AdminOrgs} />

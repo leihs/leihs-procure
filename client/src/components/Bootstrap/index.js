@@ -16,4 +16,4 @@ export { default as MultiSelect } from './MultiSelect'
 
 export { default as InputFileUpload } from './InputFileUpload'
 
-export { ListGroup, ListGroupItem } from 'reactstrap'
+export { Alert, ListGroup, ListGroupItem } from 'reactstrap'

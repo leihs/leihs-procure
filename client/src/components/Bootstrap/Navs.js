@@ -63,3 +63,13 @@ export const RouteParams = ({ children, ...p }) => (
     }}
   </RouterRoute>
 )
+
+// sets HTTP status for server-side render
+export const RoutedStatus = ({ code, children, ...p }) => (
+  <RouterRoute {...p}>
+    {({ staticContext }) => {
+      if (staticContext) staticContext.status = code
+      return children
+    }}
+  </RouterRoute>
+)

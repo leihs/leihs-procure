@@ -7,7 +7,7 @@ import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 
 // import { RequestTotalAmount as TotalAmount } from '../components/decorators'
-// import { Div, Row, Col, Badge } from '../components/Bootstrap'
+import { Alert, RoutedStatus } from '../components/Bootstrap'
 // import Icon from '../components/Icons'
 import RequestForm from '../components/RequestForm'
 import * as Fragments from '../graphql-fragments'
@@ -130,7 +130,17 @@ class RequestEdit extends React.Component {
       this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
   }
 
-  render({ requestId, onCancel, ...props } = this.props) {
+  render({ requestId, onCancel, className, ...props } = this.props) {
+    if (!f.isUUID(requestId)) {
+      return (
+        <RoutedStatus code={400}>
+          <Alert color="danger">
+            The Request id <samp>{requestId}</samp> is not valid!
+          </Alert>
+        </RoutedStatus>
+      )
+    }
+
     return (
       <Query
         fetchPolicy="network-only"
@@ -140,7 +150,19 @@ class RequestEdit extends React.Component {
         {({ error, loading, data }) => {
           if (loading) return <Loading />
           if (error) return <ErrorPanel error={error} data={data} />
+
           const request = data.requests[0]
+
+          if (!request) {
+            return (
+              <RoutedStatus code={404}>
+                <Alert color="danger">
+                  No Request with id <samp>{requestId}</samp> found!
+                </Alert>
+              </RoutedStatus>
+            )
+          }
+
           return (
             <Mutation mutation={UPDATE_REQUEST_MUTATION}>
               {(mutate, mutReq) => {
@@ -149,7 +171,7 @@ class RequestEdit extends React.Component {
                   return <ErrorPanel error={mutReq.error} data={mutReq.data} />
                 return (
                   <RequestForm
-                    className="p-3"
+                    className={className}
                     request={request}
                     categories={data.main_categories}
                     budgetPeriods={data.budget_periods}
@@ -158,15 +180,23 @@ class RequestEdit extends React.Component {
                       updateRequestFromFields(mutate, request, fields)
                     }
                     // action delete
-                    doDeleteRequest={e => props.doDeleteRequest(request)}
+                    doDeleteRequest={
+                      !!props.doDeleteRequest &&
+                      (e => props.doDeleteRequest(request))
+                    }
                     // action move category
                     onSelectNewRequestCategory={this.onSelectNewRequestCategory}
                     isSelectingNewCategory={this.state.selectNewCategory}
-                    doChangeRequestCategory={this.onChangeRequestCategory}
+                    doChangeRequestCategory={
+                      !!props.doChangeRequestCategory &&
+                      this.onChangeRequestCategory
+                    }
                     // action move budget period
                     onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
                     isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
-                    doChangeBudgetPeriod={this.onChangeBudgetPeriod}
+                    doChangeBudgetPeriod={
+                      props.doChangeBudgetPeriod && this.onChangeBudgetPeriod
+                    }
                   />
                 )
               }}

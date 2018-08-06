@@ -40,6 +40,7 @@ class RequestLine extends React.Component {
         {!!open && (
           <F>
             <RequestEdit
+              className="p-3"
               requestId={request.id}
               onCancel={() => this.setState({ open: false })}
               doChangeRequestCategory={props.doChangeRequestCategory}

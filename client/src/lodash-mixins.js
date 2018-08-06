@@ -33,6 +33,15 @@ const uniqBy = (arr, key) =>
 
 const uniqById = arr => uniqBy(arr, 'id')
 
+const UUID_REGEX_STR = [
+  '(00000000-0000-0000-0000-000000000000)',
+  '([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})'
+].join('|')
+
+const UUID_REGEX = new RegExp(`^${UUID_REGEX_STR}$`)
+
+const isUUID = s => UUID_REGEX.test(s)
+
 const dehyphenUUID = uuid =>
   !f.isString(uuid) ? undefined : uuid.split('-').join('')
 
@@ -49,8 +58,10 @@ const mixins = {
   presence,
   uniqBy,
   uniqById,
+  isUUID,
   dehyphenUUID,
-  enhyphenUUID
+  enhyphenUUID,
+  UUID_REGEX
 }
 
 export default mixins
