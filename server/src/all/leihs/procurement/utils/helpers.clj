@@ -6,8 +6,12 @@
 
 (defn submap? [m1 m2] (subset? (set m1) (set m2)))
 
-(defn error-as-graphql
+(defn error-as-graphql-object
   [code message]
   {:errors [{:message message,
              :extensions {:code code, :timestamp (time/now)}}],
    :data []})
+
+(defn error-as-graphql
+  [code message]
+  (to-json (error-as-graphql-object code message)))

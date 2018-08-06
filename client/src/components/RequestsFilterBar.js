@@ -62,7 +62,8 @@ const Filters = ({ me, data, current, onChange }) => {
   const available = {
     budgetPeriods: f
       .sortBy(data.budget_periods, 'name')
-      .map(({ id, name }) => ({ value: id, label: name })),
+      .map(({ id, name }) => ({ value: id, label: name }))
+      .reverse(),
 
     categories: data.main_categories.map(({ id, name, categories }) => ({
       label: name,
