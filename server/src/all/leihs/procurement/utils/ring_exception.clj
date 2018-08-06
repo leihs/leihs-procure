@@ -33,11 +33,11 @@
             (and (instance? clojure.lang.ExceptionInfo e)
                  (contains? (ex-data e) :status))
               {:status (:status (ex-data e)),
-               :body (.getMessage (helpers/error-as-graphql "API_ERROR" e))}
+               :body (helpers/error-as-graphql "API_ERROR" (.getMessage e))}
             (instance? org.postgresql.util.PSQLException e)
               {:status 409,
-               :body (.getMessage (helpers/error-as-graphql "DATABASE_ERROR"
-                                                            e))}
+               :body (helpers/error-as-graphql "DATABASE_ERROR"
+                                               (.getMessage e))}
             :else
               {:status 500,
                :body

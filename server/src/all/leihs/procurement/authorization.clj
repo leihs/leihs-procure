@@ -54,6 +54,6 @@
                  (some true?)))
       (handler request)
       {:status 403,
-       :body (helpers/error-as-graphql
+       :body (helpers/error-as-graphql-object
                "NOT_AUTHORIZED_FOR_APP"
                "Not authorized to access procurement!")})))
