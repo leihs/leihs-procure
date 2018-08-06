@@ -36,12 +36,13 @@ export const RequestFieldsForIndex = gql`
     receiver {
       value
     }
-    organization {
-      value {
-        id
-        name
-      }
-    }
+    # FIXME: is missing when ???
+    # organization {
+    #   value {
+    #     id
+    #     name
+    #   }
+    # }
 
     price_cents {
       value

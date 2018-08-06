@@ -12,18 +12,12 @@ import Icon from '../components/Icons'
 import {
   Row,
   Col,
+  Button,
   Badge,
   Collapsing,
-  // FilePicker,
   FormGroup,
-  // FormField,
   Select,
-  // ButtonRadio,
   StatefulForm,
-  // ButtonDropdown,
-  // DropdownToggle,
-  // DropdownMenu,
-  // DropdownItem,
   RouteParams
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
@@ -148,7 +142,7 @@ const updateRequestFromFields = (mutate, request, fields, preselection) => {
     // ...valueIfWritable(fields, request, 'room', 'room_id'),
     ...valueIfWritable(fields, request, 'room', 'room'),
 
-    // onyl for create:
+    // only for create:
     budget_period: preselection.budgetPeriod,
     category: preselection.category
     // template: preselection.template,
@@ -158,14 +152,14 @@ const updateRequestFromFields = (mutate, request, fields, preselection) => {
 }
 
 const readFromQueryParams = params => ({
-  budget_period: f.enhyphenUUID(params.bp),
+  budgetPeriod: f.enhyphenUUID(params.bp),
   category: f.enhyphenUUID(params.category),
   template: f.enhyphenUUID(params.template)
 })
 
 const updateQueryParams = ({ fields, params, location }) => {
   const formParams = {
-    bp: f.dehyphenUUID(fields.budget_period),
+    bp: f.dehyphenUUID(fields.budgetPeriod),
     category: f.dehyphenUUID(fields.category),
     template: f.dehyphenUUID(fields.template)
   }
@@ -188,11 +182,17 @@ const RequestNewPage = () => (
           {({ loading, error, data }) => {
             if (loading) return <Loading />
             if (error) return <ErrorPanel error={error} data={data} />
+            const budgetPeriods = f
+              .sortBy(data.budget_periods, 'end_date')
+              .filter(
+                bp => new Date(bp.inspection_start_date).getTime() > Date.now()
+              )
 
             return (
               <NewRequestPreselection
                 key={location.key} // reset state on location change!
                 data={data}
+                budgetPeriods={budgetPeriods}
                 initialSelection={readFromQueryParams(params)}
                 onSelectionChange={fields =>
                   history.replace(
@@ -216,16 +216,14 @@ class NewRequestPreselection extends React.Component {
     // apply initial selection from URL parameters
     this.state = { initalSelection: props.initialSelection }
   }
-  render({ state, props: { data, onSelectionChange } } = this) {
-    const budPeriods = f
-      .sortBy(data.budget_periods, 'end_date')
-      .filter(bp => new Date(bp.inspection_start_date).getTime() > Date.now())
-      .map(bp => ({
-        value: bp.id,
-        label: `${bp.name} – Antragsphase bis ${new Date(
-          bp.inspection_start_date
-        ).toLocaleDateString()}`
-      }))
+
+  render({ state, props: { data, budgetPeriods, onSelectionChange } } = this) {
+    const budPeriods = budgetPeriods.map(bp => ({
+      value: bp.id,
+      label: `${bp.name} – Antragsphase bis ${new Date(
+        bp.inspection_start_date
+      ).toLocaleDateString()}`
+    }))
 
     const CatWithMainCat = catId => {
       const mc = f.find(data.main_categories, {
@@ -236,7 +234,7 @@ class NewRequestPreselection extends React.Component {
     }
 
     // FIXME: is not applied on first load???
-    const defaultSelection = { budget_period: budPeriods[0].value }
+    const defaultSelection = { budgetPeriod: budPeriods[0].value }
 
     return (
       <StatefulForm
@@ -244,16 +242,26 @@ class NewRequestPreselection extends React.Component {
         values={{ ...defaultSelection, ...state.initalSelection }}
         onChange={fields => onSelectionChange(fields)}
       >
-        {({ fields, setValue, getValue, formPropsFor, ...formHelpers }) => {
-          const resetSelection = () => {
-            setValue('template', undefined)
-            setValue('category', undefined)
-          }
+        {({ fields, setValue, setValues, formPropsFor, ...formHelpers }) => {
+          const selectedBudgetPeriod = fields.budgetPeriod
           const selectedCategory = fields.category
           const selectedTemplate = f.find(data.templates, {
             id: fields.template
           })
           const hasPreselected = !!(selectedTemplate || selectedCategory)
+          const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
+
+          const setSelection = ({ category, template } = {}) => {
+            setValues({
+              ...f.omit(fields, ['category', 'template']),
+              category,
+              template
+            })
+          }
+          const resetTemplate = () => {
+            if (!selectedTemplate) return setSelection()
+            setSelection({ category: selectedTemplate.category.id })
+          }
 
           return (
             <F>
@@ -263,74 +271,65 @@ class NewRequestPreselection extends React.Component {
                   window.alert('TODO!')
                 }}
               >
-                <FormGroup
-                  label="Budgetperiode"
-                  className="form-control-lg p-0"
-                >
+                <FormGroup label="Budgetperiode" className="form-group-lg">
                   <Select
-                    {...formPropsFor('budget_period')}
-                    className="form-control-lg"
+                    {...formPropsFor('budgetPeriod')}
+                    className="custom-select-lg"
                     required
-                    emptyOption={false}
                     options={budPeriods}
                   />
                 </FormGroup>
 
                 <FormGroup
                   label="Kategorie & Vorlage"
-                  className="form-control-lg p-0"
+                  className="form-group-lg"
                 >
-                  {/* TODO: clear selection buttons on both boxes (like request.form.cancel) */}
-                  {hasPreselected &&
-                    (selectedCategory ? (
-                      <Row>
-                        <Col sm>
-                          <SelectedCategory
-                            cat={CatWithMainCat(selectedCategory)}
-                          />
-                        </Col>
-                        <Col sm>
+                  {hasPreselected && (
+                    <Row>
+                      <Col sm>
+                        {((
+                          cat = selectedCategory
+                            ? CatWithMainCat(selectedCategory)
+                            : CatWithMainCat(selectedTemplate.category.id)
+                        ) => (
+                          <SelectionCard onRemoveClick={() => setSelection()}>
+                            <Icon.Categories spaced="2" />
+                            {cat.main_category.name}
+                            <Icon.CaretRight />
+                            {cat.name}
+                          </SelectionCard>
+                        ))()}
+                      </Col>
+                      <Col sm>
+                        {selectedCategory ? (
                           <SelectionCard>Keine Vorlage</SelectionCard>
-                        </Col>
-                      </Row>
-                    ) : (
-                      <Row>
-                        <Col sm>
-                          <SelectedCategory
-                            cat={CatWithMainCat(selectedTemplate.category.id)}
-                          />
-                        </Col>
-                        <Col sm>
-                          <SelectionCard>
+                        ) : (
+                          <SelectionCard onRemoveClick={resetTemplate}>
                             <Icon.Templates spaced />
                             {selectedTemplate.article_name}
                           </SelectionCard>
-                        </Col>
-                      </Row>
-                    ))}
+                        )}
+                      </Col>
+                    </Row>
+                  )}
 
                   {!hasPreselected && (
                     <CategoriesTemplatesTree
                       main_categories={data.main_categories}
                       templates={data.templates}
-                      onSelectCategory={t => setValue('category', t.id)}
-                      onSelectTemplate={t => setValue('template', t.id)}
+                      onSelectCategory={c => setSelection({ category: c.id })}
+                      onSelectTemplate={t => setSelection({ template: t.id })}
                     />
                   )}
                 </FormGroup>
               </form>
 
-              {hasPreselected && (
+              {hasPreselectedAll && (
                 <NewRequestForm
-                  budgetPeriod={fields.budget_period}
+                  budgetPeriod={fields.budgetPeriod}
                   category={fields.category}
                   template={fields.template}
-                  onCancel={resetSelection}
-                  // NOTE: reset form if preselection changes
-                  // TODO: remove this, should not be needed anymore
-                  key={['budget_period', 'category', 'template']
-                    .map(k => String([fields[k]]))
-                    .join()}
+                  onCancel={() => setSelection()}
                 />
               )}
             </F>
@@ -382,7 +381,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                   <RequestForm
                     request={request}
                     categories={data.main_categories}
-                    budgetPeriods={data.budget_periods}
+                    budgetPeriods={data.budgetPeriods}
                     onCancel={onCancel}
                     onSubmit={fields =>
                       updateRequestFromFields(mutate, request, fields, {
@@ -497,17 +496,15 @@ const CategoriesTemplatesTree = ({
   </F>
 )
 
-const SelectionCard = ({ children }) => (
+const SelectionCard = ({ children, onRemoveClick }) => (
   <div className="card">
-    <div className="card-body px-3 py-2">{children}</div>
+    <div className="card-body px-3 py-2 d-flex justify-content-between align-items-center">
+      <div>{children}</div>
+      {!!onRemoveClick && (
+        <Button color="link" outline size="sm" onClick={e => onRemoveClick()}>
+          <Icon.Cross />
+        </Button>
+      )}
+    </div>
   </div>
-)
-
-const SelectedCategory = ({ cat }) => (
-  <SelectionCard>
-    <Icon.Categories spaced="2" />
-    {cat.main_category.name}
-    <Icon.CaretRight />
-    {cat.name}
-  </SelectionCard>
 )

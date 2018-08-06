@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import f from 'lodash'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -43,65 +44,6 @@ const UPDATE_REQUEST_MUTATION = gql`
   }
   ${Fragments.RequestFieldsForEdit}
 `
-
-const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
-  fieldKey = fieldKey || reqKey
-
-  if (!f.get(requestData, reqKey)) {
-    // eslint-disable-next-line no-debugger
-    debugger
-  }
-
-  if (f.get(requestData, reqKey).write) {
-    return { [fieldKey]: f.get(fields, fieldKey) }
-  }
-}
-
-const boolify = (key, val) =>
-  !val ? false : !val[key] ? null : val[key] === key
-
-const updateRequestFromFields = (mutate, request, fields) => {
-  const requestData = {
-    ...valueIfWritable(fields, request, 'article_name'),
-    ...valueIfWritable(fields, request, 'receiver'),
-    ...valueIfWritable(fields, request, 'price_cents'),
-
-    ...valueIfWritable(fields, request, 'requested_quantity'),
-    ...valueIfWritable(fields, request, 'approved_quantity'),
-    ...valueIfWritable(fields, request, 'order_quantity'),
-
-    replacement: boolify(
-      'replacement',
-      valueIfWritable(fields, request, 'replacement')
-    ),
-
-    attachments: f.map(
-      valueIfWritable(fields, request, 'attachments').attachments,
-      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
-    ),
-
-    // TODO: form field with id (autocomplete)
-    // ...valueIfWritable(fields, request, 'supplier'),
-
-    ...valueIfWritable(fields, request, 'article_number'),
-    ...valueIfWritable(fields, request, 'motivation'),
-    ...valueIfWritable(fields, request, 'priority'),
-    ...valueIfWritable(fields, request, 'inspector_priority'),
-
-    ...valueIfWritable(fields, request, 'inspection_comment'),
-
-    ...valueIfWritable(fields, request, 'accounting_type'),
-    ...valueIfWritable(fields, request, 'internal_order_number'),
-
-    // NOTE: no building, just room!
-    ...valueIfWritable(fields, request, 'room', 'room_id'),
-
-    // NOTE: this must be sent (to identify request) but still cant be changed!
-    id: request.id
-  }
-
-  mutate({ variables: { requestData } })
-}
 
 class RequestEdit extends React.Component {
   state = { selectNewCategory: false, selectBudgetPeriod: false }
@@ -209,3 +151,68 @@ class RequestEdit extends React.Component {
 }
 
 export default RequestEdit
+
+RequestEdit.propTypes = {
+  doChangeBudgetPeriod: PropTypes.func,
+  doChangeRequestCategory: PropTypes.func,
+  doDeleteRequest: PropTypes.func
+}
+
+const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
+  fieldKey = fieldKey || reqKey
+
+  if (!f.get(requestData, reqKey)) {
+    // eslint-disable-next-line no-debugger
+    debugger
+  }
+
+  if (f.get(requestData, reqKey).write) {
+    return { [fieldKey]: f.get(fields, fieldKey) }
+  }
+}
+
+const boolify = (key, val) =>
+  !val ? false : !val[key] ? null : val[key] === key
+
+const updateRequestFromFields = (mutate, request, fields) => {
+  const requestData = {
+    ...valueIfWritable(fields, request, 'article_name'),
+    ...valueIfWritable(fields, request, 'receiver'),
+    ...valueIfWritable(fields, request, 'price_cents'),
+
+    ...valueIfWritable(fields, request, 'requested_quantity'),
+    ...valueIfWritable(fields, request, 'approved_quantity'),
+    ...valueIfWritable(fields, request, 'order_quantity'),
+
+    replacement: boolify(
+      'replacement',
+      valueIfWritable(fields, request, 'replacement')
+    ),
+
+    attachments: f.map(
+      valueIfWritable(fields, request, 'attachments').attachments,
+      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
+    ),
+
+    // TODO: form field with id (autocomplete)
+    // ...valueIfWritable(fields, request, 'supplier'),
+
+    ...valueIfWritable(fields, request, 'article_number'),
+    ...valueIfWritable(fields, request, 'motivation'),
+    ...valueIfWritable(fields, request, 'priority'),
+    ...valueIfWritable(fields, request, 'inspector_priority'),
+
+    ...valueIfWritable(fields, request, 'inspection_comment'),
+
+    ...valueIfWritable(fields, request, 'accounting_type'),
+    ...valueIfWritable(fields, request, 'internal_order_number'),
+
+    // NOTE: no building, just room!
+    ...valueIfWritable(fields, request, 'room', 'room_id'),
+
+    // NOTE: this must be sent (to identify request) but still cant be changed!
+    id: request.id
+  }
+
+  mutate({ variables: { requestData } })
+}
