@@ -31,7 +31,7 @@
                                   :article_number {:type String},
                                   :attachments {:type (list :UploadInput)},
                                   :budget_period {:type (non-null ID)},
-                                  :category {:type (non-null ID)},
+                                  :category {:type ID},
                                   :inspection_comment {:type String},
                                   :inspector_priority {:type
                                                          :InspectorPriority},
@@ -48,6 +48,7 @@
                                   :requested_quantity {:type (non-null Int)},
                                   :room {:type (non-null ID)},
                                   :supplier {:type ID},
+                                  :template {:type ID},
                                   :user {:type ID}}},
     :ProcurementSettingsInput {:fields {:contact_url {:type String},
                                         :inspection_comments

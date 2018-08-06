@@ -191,6 +191,7 @@ const RequestNewPage = () => (
             return (
               <NewRequestPreselection
                 key={location.key} // reset state on location change!
+                formKey={location.key} // reset state on location change!
                 data={data}
                 budgetPeriods={budgetPeriods}
                 initialSelection={readFromQueryParams(params)}
@@ -217,7 +218,9 @@ class NewRequestPreselection extends React.Component {
     this.state = { initalSelection: props.initialSelection }
   }
 
-  render({ state, props: { data, budgetPeriods, onSelectionChange } } = this) {
+  render(
+    { state, props: { data, budgetPeriods, onSelectionChange, formKey } } = this
+  ) {
     const budPeriods = budgetPeriods.map(bp => ({
       value: bp.id,
       label: `${bp.name} – Antragsphase bis ${new Date(
@@ -238,6 +241,8 @@ class NewRequestPreselection extends React.Component {
 
     return (
       <StatefulForm
+        key={formKey}
+        formKey={formKey}
         idPrefix={`request_new`}
         values={{ ...defaultSelection, ...state.initalSelection }}
         onChange={fields => onSelectionChange(fields)}
@@ -250,6 +255,7 @@ class NewRequestPreselection extends React.Component {
           })
           const hasPreselected = !!(selectedTemplate || selectedCategory)
           const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
+          console.log({ hasPreselected, hasPreselectedAll })
 
           const setSelection = ({ category, template } = {}) => {
             setValues({
@@ -330,6 +336,11 @@ class NewRequestPreselection extends React.Component {
                   category={fields.category}
                   template={fields.template}
                   onCancel={() => setSelection()}
+                  // NOTE: reset form if preselection changes
+                  // TODO: remove this, should not be needed anymore
+                  key={['budget_period', 'category', 'template']
+                    .map(k => String([fields[k]]))
+                    .join()}
                 />
               )}
             </F>
@@ -340,16 +351,24 @@ class NewRequestPreselection extends React.Component {
   }
 }
 
-const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
+const NewRequestForm = ({
+  budgetPeriod,
+  template,
+  category,
+  onCancel,
+  formKey
+}) => (
   <F>
     <Query
       query={NEW_REQUEST_QUERY}
       variables={{ budgetPeriod, template, category }}
-      networkPolicy="network-only"
+      networkPolicy="no-cache"
     >
       {({ loading, error, data }) => {
         if (loading) return <Loading />
         if (error) return <ErrorPanel error={error} data={data} />
+
+        console.log({ formKey, budgetPeriod, template, category })
 
         const request = {
           ...data.new_request,

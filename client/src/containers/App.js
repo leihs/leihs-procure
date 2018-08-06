@@ -14,6 +14,9 @@ const MainNavWithRouter = withRouter(MainNav)
 //       but also make sure the data is correct and connection is possible.
 //       We re-use the query from `CurrentUserProvider` (to ensure caching),
 //       but not the component because the "AppShell" handles errors differently.
+//
+// FIXME: when using `refetch` to reload, subsequent requests
+//      are merged into the previous ones, breaking error handling!
 
 class App extends Component {
   render({ props: { children, isDev } } = this) {
@@ -30,7 +33,11 @@ class App extends Component {
 
             if (error) {
               return (
-                <ErrorHandler error={error} data={data} refetch={refetch} />
+                <ErrorHandler
+                  error={error}
+                  data={data}
+                  refetch={e => window.location.reload()}
+                />
               )
             }
 
@@ -55,7 +62,7 @@ const ErrorHandler = ({ error, data, refetch }) => {
     <button
       type="button"
       className="btn btn-sm btn-outline-dark"
-      onClick={e => refetch()}
+      onClick={refetch}
     >
       retry
     </button>
@@ -85,6 +92,7 @@ const ErrorHandler = ({ error, data, refetch }) => {
       </FatalErrorScreen>
     )
   }
+
   if (f.isString(errCode)) {
     return (
       <FatalErrorScreen error={error}>
@@ -95,13 +103,14 @@ const ErrorHandler = ({ error, data, refetch }) => {
       </FatalErrorScreen>
     )
   }
+
   // only show error panel if no error code is found (really unexpected)
   return (
     <FatalErrorScreen title={false}>
-      <div title={false}>
+      <p>
         <ErrorPanel error={error} data={data} />
-        {retryButton}
-      </div>
+      </p>
+      <p>{retryButton}</p>
     </FatalErrorScreen>
   )
 }
