@@ -144,8 +144,8 @@ const updateRequestFromFields = (mutate, request, fields, preselection) => {
 
     // only for create:
     budget_period: preselection.budgetPeriod,
-    category: preselection.category
-    // template: preselection.template,
+    category: preselection.category,
+    template: preselection.template
   }
 
   mutate({ variables: { requestData } })
@@ -245,7 +245,6 @@ class NewRequestPreselection extends React.Component {
           })
           const hasPreselected = !!(selectedTemplate || selectedCategory)
           const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
-          console.log({ hasPreselected, hasPreselectedAll })
 
           const setSelection = ({ category, template } = {}) => {
             setValues({
@@ -261,12 +260,7 @@ class NewRequestPreselection extends React.Component {
 
           return (
             <F>
-              <form
-                onSubmit={e => {
-                  e.preventDefault()
-                  window.alert('TODO!')
-                }}
-              >
+              <form>
                 <FormGroup label="Budgetperiode" className="form-group-lg">
                   <Select
                     {...formPropsFor('budgetPeriod')}
@@ -347,10 +341,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
         if (loading) return <Loading />
         if (error) return <ErrorPanel error={error} data={data} />
 
-        const request = {
-          ...data.new_request,
-          id: `new_${String(Math.random()).slice(2, 12)}`
-        }
+        const request = data.new_request
 
         return (
           <Mutation mutation={CREATE_REQUEST_MUTATION}>
