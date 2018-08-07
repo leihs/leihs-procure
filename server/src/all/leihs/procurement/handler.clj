@@ -11,7 +11,7 @@
             [leihs.procurement.resources [attachment :as attachment]
              [image :as image] [upload :as upload]]
             [leihs.procurement.utils [core :refer [keyword presence]]
-             [ds :as ds] [ring-exception :as ring-exception]]
+             [ds :as datasource] [ring-exception :as ring-exception]]
             [ring-graphql-ui.core :refer [wrap-graphiql]]
             [ring.middleware [cookies :refer [wrap-cookies]]
              [json :refer [wrap-json-body wrap-json-response]]
@@ -109,7 +109,7 @@
       (wrap-json-body {:keywords? true})
       wrap-empty
       (wrap-secret-byte-array secret)
-      ds/wrap-cheat-tx
+      datasource/wrap
       wrap-resolve-handler
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps

@@ -1,6 +1,7 @@
 (ns leihs.procurement.graphql.queries
   (:require
     [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.env :as env]
     [leihs.procurement.permissions.user :as user-perms]
     [leihs.procurement.resources [admins :as admins]
      [attachments :as attachments] [budget-limits :as budget-limits]
@@ -17,8 +18,7 @@
      [template :as template] [templates :as templates] [users :as users]
      [viewers :as viewers]]))
 
-; FIXME: a function for debugging convenience. will be a var later.
-(defn query-resolver-map
+(defn resolver-map-fn
   []
   {:admins (-> admins/get-admins
                (authorization/wrap-ensure-one-of [user-perms/admin?])),
@@ -85,3 +85,9 @@
                      context
                      args
                      value))))})
+
+(def resolver-map (resolver-map-fn))
+
+(defn get-resolver-map
+  []
+  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))
