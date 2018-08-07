@@ -24,7 +24,7 @@
 (def defaults
   {:LEIHS_HTTP_BASE_URL "http://localhost:3211"
    :LEIHS_SECRET (when (= leihs.admin.env/env :dev) "secret")
-   :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"
+   :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?min-pool-size=2&max-pool-size=16"
    })
 
 (defn run [options]
