@@ -85,7 +85,34 @@ describe 'request' do
           expect(Upload.count).to be == 0
           expect(Attachment.count).to be == 1
         end
+
+        example 'from template' do
+          template = FactoryBot.create(:template, {
+            article_name: 'some template',
+            category_id: FactoryBot.create(:category).id,
+          })
+
+          variables = {
+            input: {
+              budget_period: FactoryBot.create(:budget_period).id,
+              template: template.id,
+              requested_quantity: 1,
+              room: FactoryBot.create(:room).id,
+              motivation: Faker::Lorem.sentence,
+              attachments: [{id: uploads[0].id, to_delete: false, __typename: 'Upload'},
+                            {id: uploads[1].id, to_delete: true, __typename: 'Upload'}]
+            }
+          }
+
+          result = query(q, requester.id, variables).deep_symbolize_keys
+
+          request = Request.order(:created_at).reverse.first
+          expect(result[:errors]).to be_nil
+          data = result[:data][:create_request]
+          expect(data[:id]).to be == request.id
+          expect(data[:attachments][:value].count).to be == 1
           expect(data[:article_name][:value].count).to eq template[:article_name]
+          expect(data[:motivation][:value].count).to eq variables[:input][:motivation]
           expect(Upload.count).to be == 0
           expect(Attachment.count).to be == 1
         end
