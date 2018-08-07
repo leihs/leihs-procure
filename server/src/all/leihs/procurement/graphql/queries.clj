@@ -14,9 +14,9 @@
      [organizations :as organizations] [request :as request]
      [requesters-organizations :as requesters-organizations]
      [requests :as requests] [room :as room] [rooms :as rooms]
-     [settings :as settings] [supplier :as supplier] [user :as user]
-     [template :as template] [templates :as templates] [users :as users]
-     [viewers :as viewers]]))
+     [settings :as settings] [supplier :as supplier] [suppliers :as suppliers]
+     [user :as user] [template :as template] [templates :as templates]
+     [users :as users] [viewers :as viewers]]))
 
 (defn resolver-map-fn
   []
@@ -64,6 +64,7 @@
    :settings (-> settings/get-settings
                  (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :supplier supplier/get-supplier,
+   :suppliers suppliers/get-suppliers,
    :templates templates/get-templates,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,
