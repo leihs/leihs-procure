@@ -57,8 +57,8 @@ describe 'request' do
         }
 
         q = <<-GRAPHQL
-          mutation {
-            create_request(input_data: #{hash_to_graphql attrs}) {
+          mutation createRequest($input: CreateRequestInput) {
+            create_request(input_data: $input) {
               id
               attachments {
                 value {
@@ -68,8 +68,9 @@ describe 'request' do
             }
           }
         GRAPHQL
+        variables = {input: attrs}
 
-        result = query(q, requester.id)
+        result = query(q, requester.id, variables)
 
         request = Request.order(:created_at).reverse.first
         expect(result['data']['create_request']['id']).to be == request.id
@@ -79,7 +80,7 @@ describe 'request' do
       end
 
       context 'create for another user' do
-        before :example do 
+        before :example do
           @requester = FactoryBot.create(:user)
           FactoryBot.create(:requester_organization, user_id: @requester.id)
           @category = FactoryBot.create(:category)
