@@ -3,8 +3,7 @@ import cx from 'classnames'
 // import f from 'lodash'
 
 import t from '../locale/translate'
-import { RequestTotalAmount, formatCurrency } from './decorators'
-// import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
+import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
 import { Div, Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
 import RequestEdit from '../containers/RequestEdit'
@@ -60,9 +59,8 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
   <Row className={cx('py-3 mx-0', className)} onClick={onClick}>
     <Col sm="2">{request.article_name.value}</Col>
     <Col sm="3">
-      {/* FIXME: display requesting user + request organization */}
-      {/* {request.receiver.value} / {DisplayName(request.organization.value)} */}
-      {request.receiver.value}
+      {DisplayName(request.user.value)} /{' '}
+      {DisplayName(request.organization.value)}
     </Col>
     <Col sm="4">
       <Tooltipped text={t('request_form_field.price_cents')}>

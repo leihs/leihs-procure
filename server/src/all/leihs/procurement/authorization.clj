@@ -2,6 +2,7 @@
   (:require [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.procurement.env :as env]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.sql :as sql]
             [leihs.procurement.utils.helpers :as helpers]
@@ -46,10 +47,21 @@
                "Not authorized for this query path and arguments."
                {})))))
 
+(def skip-authorization-handler-keys
+  [[:attachment #{:dev :test}] [:image #{:dev :test}] :status
+   [:upload #{:dev :test}]])
+
+(defn- skip?
+  [handler-key]
+  (some #(if (coll? %)
+          (and (= (first %) handler-key) (env/env (second %)))
+          (= handler-key %))
+        skip-authorization-handler-keys))
+
 (defn wrap-authorize
-  [handler skip-authorization-handler-keys]
+  [handler]
   (fn [request]
-    (if (or (skip-authorization-handler-keys (:handler-key request))
+    (if (or (skip? (:handler-key request))
             (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
                   user-perms/requester?]
                  (map #(% (:tx request) (:authenticated-entity request)))

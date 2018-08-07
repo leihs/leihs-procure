@@ -14,6 +14,14 @@ export const RequestFieldsForIndex = gql`
   fragment RequestFieldsForIndex on Request {
     id
 
+    user {
+      value {
+        id
+        firstname
+        lastname
+      }
+    }
+
     category {
       value {
         id
@@ -36,13 +44,13 @@ export const RequestFieldsForIndex = gql`
     receiver {
       value
     }
-    # FIXME: is missing when ???
-    # organization {
-    #   value {
-    #     id
-    #     name
-    #   }
-    # }
+    organization {
+      value {
+        id
+        name
+        shortname
+      }
+    }
 
     price_cents {
       value
@@ -111,11 +119,6 @@ export const RequestFieldsForEdit = gql`
     }
     receiver {
       ...RequestFieldString
-    }
-    organization {
-      value {
-        id
-      }
     }
 
     price_cents {
@@ -222,6 +225,7 @@ export const RequesterOrg = gql`
     organization {
       id
       name
+      shortname
     }
     department {
       id

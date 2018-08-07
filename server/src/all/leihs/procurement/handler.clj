@@ -1,52 +1,25 @@
 (ns leihs.procurement.handler
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require
-    [leihs.procurement.anti-csrf.core :as anti-csrf]
-    [leihs.procurement.authorization :refer [wrap-authorize]]
-    [leihs.procurement.backend.html :as html]
-    [leihs.procurement.constants :as constants]
-    [leihs.procurement.env :as env]
-    [leihs.procurement.resources.upload :as upload]
-    [leihs.procurement.graphql :as graphql]
-    [leihs.procurement.auth.session :as session]
-    [leihs.procurement.paths :refer [path paths]]
-    [leihs.procurement.resources.attachment :as attachment]
-    [leihs.procurement.resources.image :as image]
-    [leihs.procurement.shutdown :as shutdown]
-    [leihs.procurement.status :as status]
-    [leihs.procurement.utils.ds :as ds]
-    [leihs.procurement.utils.http-resources-cache-buster :as cache-buster :refer
-     [wrap-resource]]
-    [leihs.procurement.utils.json-protocol]
-    [leihs.procurement.utils.ring-exception :as ring-exception]
-    [bidi.bidi :as bidi]
-    [bidi.ring :refer [make-handler]]
-    [cheshire.core :as json]
-    [compojure.core :as cpj]
-    [ring.middleware.accept]
-    [ring.middleware.content-type :refer [wrap-content-type]]
-    [ring.middleware.cookies :refer [wrap-cookies]]
-    [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
-    [ring.middleware.params :refer [wrap-params]]
-    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-    [ring.middleware.reload :refer [wrap-reload]]
-    [ring.util.response :refer [redirect]]
-    [ring-graphql-ui.core :refer [wrap-graphiql]]
-    [clj-logging-config.log4j :as logging-config]
-    [clojure.tools.logging :as log]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug :refer [I>]]
-    [logbug.ring :refer [wrap-handler-with-logging]]
-    [logbug.thrown :as thrown]))
+  (:require [bidi.bidi :as bidi]
+            [cheshire.core :refer [parse-string]]
+            [leihs.procurement [authorization :refer [wrap-authorize]]
+             [env :as env] [graphql :as graphql] [paths :refer [path paths]]
+             [status :as status]]
+            [leihs.procurement.anti-csrf.core :as anti-csrf]
+            [leihs.procurement.auth.session :as session]
+            [leihs.procurement.backend.html :as html]
+            [leihs.procurement.resources [attachment :as attachment]
+             [image :as image] [upload :as upload]]
+            [leihs.procurement.utils [core :refer [keyword presence]]
+             [ds :as ds] [ring-exception :as ring-exception]]
+            [ring-graphql-ui.core :refer [wrap-graphiql]]
+            [ring.middleware [cookies :refer [wrap-cookies]]
+             [json :refer [wrap-json-body wrap-json-response]]
+             [multipart-params :refer [wrap-multipart-params]]
+             [params :refer [wrap-params]] [reload :refer [wrap-reload]]]
+            [ring.util.response :refer [redirect]]))
 
 (declare redirect-to-root-handler)
-
-; ========================================================
-; TODO: remove shutdown!!! (and possible others)
-(def skip-authorization-handler-keys
-  #{:attachment :upload :image :shutdown :status})
-; ========================================================
 
 (def handler-resolve-table
   {:attachment attachment/routes,
@@ -54,7 +27,6 @@
    :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,
-   :shutdown shutdown/routes,
    :status status/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,8 +74,7 @@
     params
     (->> params
          (map (fn [[k v]] [(keyword k)
-                           (try (json/parse-string v true)
-                                (catch Exception _ v))]))
+                           (try (parse-string v true) (catch Exception _ v))]))
          (into {}))))
 
 (defn wrap-canonicalize-params-maps
@@ -131,19 +102,15 @@
   [secret]
   (-> dispatch-to-handler
       anti-csrf/wrap
-      (wrap-authorize skip-authorization-handler-keys)
+      wrap-authorize
       session/wrap
       wrap-cookies
       wrap-json-response
       (wrap-json-body {:keywords? true})
       wrap-empty
       (wrap-secret-byte-array secret)
-      ; ===================================================================
-      ; NOTE: this two wrappers have to be in this order as the first
-      ; depends on the second (context: hanging of requests due to images)
-      ds/wrap-tx
+      ds/wrap-cheat-tx
       wrap-resolve-handler
-      ; ===================================================================
       (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       wrap-canonicalize-params-maps
       wrap-params

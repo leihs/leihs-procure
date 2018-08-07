@@ -1,22 +1,15 @@
 (ns leihs.procurement.backend.run
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require [environ.core :as environ]
-            [leihs.procurement.env]
-            [leihs.procurement.handler :as handler]
-            [leihs.procurement.paths]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.http-server :as http-server]
-            [leihs.procurement.utils.url.http :as http-url]
-            [leihs.procurement.utils.url.jdbc :as jdbc-url]
-            [leihs.procurement.utils.url.jdbc]
-            [clojure.tools.cli :as cli :refer [parse-opts]]
+  (:require [clj-pid.core :as pid]
             [clojure.pprint :refer [pprint]]
-            [clojure.tools.logging :as logging]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug]
-            [logbug.thrown :as thrown]
-            [clj-pid.core :as pid]))
+            [clojure.tools [cli :as cli] [logging :as logging]]
+            [environ.core :as environ]
+            [leihs.procurement env [handler :as handler] [status :as status]]
+            [leihs.procurement.utils [core :refer [str]] [ds :as ds]
+             [http-server :as http-server]]
+            [leihs.procurement.utils.url [http :as http-url]
+             [jdbc :as jdbc-url]]
+            [logbug.catcher :as catcher]))
 
 (def defaults
   {:leihs-http-base-url "http://localhost:3211",
@@ -38,7 +31,9 @@
                   (when (nil? (:secret options))
                     (throw (IllegalStateException.
                              "LEIHS_SECRET resp. secret must be present!")))
-                  (ds/init (:database-url options))
+                  (let [status (status/init)]
+                    (ds/init (:database-url options)
+                             (:health-check-registry status)))
                   (let [secret (-> options
                                    :secret)
                         app-handler (handler/init secret)]

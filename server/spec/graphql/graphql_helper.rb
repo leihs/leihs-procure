@@ -5,7 +5,9 @@ class GraphqlQuery
   URL = "#{Constants::LEIHS_HTTP_BASE_URL}/procure/graphql"
   CONN = Faraday.new(url: URL)
 
-  def initialize(query, user_id, variables)
+  attr_reader :response
+
+  def initialize(query, user_id = nil, variables = nil)
     @query = query
     @variables = variables
     @user_id = user_id

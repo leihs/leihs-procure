@@ -18,7 +18,6 @@
       "/procure"
       (leaf "/upload" :upload)
       (leaf "/graphql" :graphql)
-      (leaf "/shutdown" :shutdown)
       (leaf "/status" :status)
       (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))
       ; NOTE: don't rename the handler-key for image as it may break the

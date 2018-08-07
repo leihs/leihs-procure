@@ -2,23 +2,35 @@ import f from 'lodash'
 import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
+  // NOTE: Checks *keys* must be present, but values can be missing.
+  //       Guards against forgetting to query the keys/fields (via GraphQL)!
+  function expectKeys(wanted) {
+    if (!isDev) return
+    const missing = f.difference(wanted, Object.keys(o))
+    if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
+  }
 
   if (!o) return '?'
 
   switch (o.__typename) {
     case 'Room':
+      expectKeys(['name', 'description'])
       return short || !o.description
         ? `${o.name}`
         : `${o.name} (${o.description})`
 
     case 'Organization':
+      expectKeys(['name', 'shortname'])
       return short || !o.shortname
         ? `${o.shortname || o.name}`
         : `${o.name} (${o.shortname})`
 
     case 'User':
+      expectKeys(['firstname', 'lastname'])
       if (abbr)
         return `${o.firstname || ''} ${o.lastname || ''}`
           .split(/\W/)
