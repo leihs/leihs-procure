@@ -43,10 +43,16 @@ describe 'request' do
           mutation createRequest($input: CreateRequestInput) {
             create_request(input_data: $input) {
               id
+              article_name {
+                value
+              }
               attachments {
                 value {
                   id
                 }
+              }
+              motivation {
+                value
               }
             }
           }
@@ -111,8 +117,8 @@ describe 'request' do
           data = result[:data][:create_request]
           expect(data[:id]).to be == request.id
           expect(data[:attachments][:value].count).to be == 1
-          expect(data[:article_name][:value].count).to eq template[:article_name]
-          expect(data[:motivation][:value].count).to eq variables[:input][:motivation]
+          expect(data[:article_name][:value]).to eq template[:article_name]
+          expect(data[:motivation][:value]).to eq variables[:input][:motivation]
           expect(Upload.count).to be == 0
           expect(Attachment.count).to be == 1
         end

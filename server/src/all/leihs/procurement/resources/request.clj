@@ -2,6 +2,7 @@
   (:require [clojure [set :refer [map-invert]]
              [string :refer [lower-case upper-case]]]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions [request :as request-perms]
              [request-fields :as request-fields-perms] [user :as user-perms]]
@@ -320,22 +321,22 @@
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
-        write-data (to-name-and-lower-case-priorities input-data)
-        attachments (:attachments write-data)
-        template (if-let [t-id (:template write-data)]
+        attachments (:attachments input-data)
+        template (if-let [t-id (:template input-data)]
                    (template/get-template-by-id tx t-id))
+        data-from-template (-> template
+                               (dissoc :id))
         requester-id (or (:user input-data) (:user_id auth-entity))
         organization (requesters/get-organization-of-requester tx requester-id)
-        write-data-with-exchanged-attrs
-          (-> write-data
-              (dissoc :attachments)
-              (assoc :user requester-id)
-              (assoc :organization (:id organization))
-              (cond-> template (assoc :category (:category_id template)))
-              exchange-attrs)]
+        write-data (-> input-data
+                       (dissoc :attachments)
+                       (assoc :user requester-id)
+                       (assoc :organization (:id organization))
+                       (cond-> template (merge data-from-template))
+                       to-name-and-lower-case-priorities)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
-        #(do (insert! tx write-data-with-exchanged-attrs)
+        #(do (insert! tx (exchange-attrs write-data))
              (var-set req-id
                       (-> (get-last-created-request tx auth-entity)
                           :id))

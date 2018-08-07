@@ -27,7 +27,7 @@
                                  :name {:type (non-null String)}}},
     :CreateRequestInput {:fields {:accounting_type {:type String},
                                   :approved_quantity {:type Int},
-                                  :article_name {:type (non-null String)},
+                                  :article_name {:type String},
                                   :article_number {:type String},
                                   :attachments {:type (list :UploadInput)},
                                   :budget_period {:type (non-null ID)},
