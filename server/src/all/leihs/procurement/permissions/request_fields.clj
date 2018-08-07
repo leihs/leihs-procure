@@ -50,32 +50,32 @@
                                      (or category-inspectable-by-auth-user
                                          auth-user-is-admin)),
                          :required false},
-     :article_name
-       {:read (or (and auth-user-is-requester requested-by-auth-user)
-                  category-viewable-by-auth-user
-                  auth-user-is-inspector
-                  auth-user-is-admin),
-        :write (and (or (not request-exists) request-without-template)
-                    (not budget-period-is-past)
-                    (or (and auth-user-is-requester
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-auth-user
-                        auth-user-is-admin)),
-        :default (:article_name template),
-        :required true},
-     :article_number
-       {:read (or (and auth-user-is-requester requested-by-auth-user)
-                  category-viewable-by-auth-user
-                  auth-user-is-inspector
-                  auth-user-is-admin),
-        :write (and (or (not request-exists) request-without-template)
-                    (not budget-period-is-past)
-                    (or (and auth-user-is-requester
-                             budget-period-in-requesting-phase)
-                        category-inspectable-by-auth-user
-                        auth-user-is-admin)),
-        :default (:article_number template),
-        :required false},
+     :article_name {:read (or (and auth-user-is-requester
+                                   requested-by-auth-user)
+                              category-viewable-by-auth-user
+                              auth-user-is-inspector
+                              auth-user-is-admin),
+                    :write (and request-without-template
+                                (not budget-period-is-past)
+                                (or (and auth-user-is-requester
+                                         budget-period-in-requesting-phase)
+                                    category-inspectable-by-auth-user
+                                    auth-user-is-admin)),
+                    :default (:article_name template),
+                    :required true},
+     :article_number {:read (or (and auth-user-is-requester
+                                     requested-by-auth-user)
+                                category-viewable-by-auth-user
+                                auth-user-is-inspector
+                                auth-user-is-admin),
+                      :write (and request-without-template
+                                  (not budget-period-is-past)
+                                  (or (and auth-user-is-requester
+                                           budget-period-in-requesting-phase)
+                                      category-inspectable-by-auth-user
+                                      auth-user-is-admin)),
+                      :default (:article_number template),
+                      :required false},
      :attachments {:read (or (and auth-user-is-requester requested-by-auth-user)
                              category-viewable-by-auth-user
                              auth-user-is-inspector
@@ -196,8 +196,7 @@
                              category-viewable-by-auth-user
                              auth-user-is-inspector
                              auth-user-is-admin),
-                   :write (and (or (not request-exists)
-                                   request-without-template)
+                   :write (and request-without-template
                                (not budget-period-is-past)
                                (or (and auth-user-is-requester
                                         budget-period-in-requesting-phase)
@@ -206,7 +205,7 @@
                    :default (or (:price_cents template) 0),
                    :required true},
      :price_currency {:read true,
-                      :write (or (not request-exists) request-without-template),
+                      :write request-without-template,
                       :default (or (:price_currency template) "CHF"),
                       :required true},
      :priority {:read (or (and auth-user-is-requester requested-by-auth-user)

@@ -194,7 +194,6 @@
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
-        template-arg (:template args)
         req-stub (cond-> args (not user-arg) (assoc :user auth-entity))]
     (->> req-stub
          (request-fields-perms/get-for-user-and-request tx auth-entity)
@@ -332,11 +331,13 @@
                        (dissoc :attachments)
                        (assoc :user requester-id)
                        (assoc :organization (:id organization))
-                       (cond-> template (merge data-from-template))
                        to-name-and-lower-case-priorities)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
-        #(do (insert! tx (exchange-attrs write-data))
+        #(do (insert! tx
+                      (-> write-data
+                          (cond-> template (merge data-from-template))
+                          exchange-attrs))
              (var-set req-id
                       (-> (get-last-created-request tx auth-entity)
                           :id))

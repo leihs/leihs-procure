@@ -85,7 +85,8 @@ describe 'request' do
                  requested_quantity: { value: nil, read: false, write: true },
                  approved_quantity: { value: nil, read: false, write: false })
       end
-      pending 'from template' do
+
+      example 'from template' do
         template_category = Category.find(id: template.category_id)
         variables = {
           budgetPeriod: budget_period.id,
