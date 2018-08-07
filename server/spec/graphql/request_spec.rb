@@ -38,25 +38,8 @@ describe 'request' do
         expect(Request.find(transform_uuid_attrs attrs)).not_to be
       end
 
-      it 'creates as requester' do
-        requester = FactoryBot.create(:user)
-        FactoryBot.create(:requester_organization, user_id: requester.id)
-
-        upload_1 = FactoryBot.create(:upload)
-        upload_2 = FactoryBot.create(:upload)
-
-        attrs = {
-          article_name: 'new request',
-          budget_period: FactoryBot.create(:budget_period).id,
-          category: FactoryBot.create(:category).id,
-          requested_quantity: 1,
-          room: FactoryBot.create(:room).id,
-          motivation: Faker::Lorem.sentence,
-          attachments: [{id: upload_1.id, to_delete: false, __typename: 'Upload'},
-                        {id: upload_2.id, to_delete: true, __typename: 'Upload'}]
-        }
-
-        q = <<-GRAPHQL
+      context 'creates as requester' do
+        let :q do <<-GRAPHQL
           mutation createRequest($input: CreateRequestInput) {
             create_request(input_data: $input) {
               id
@@ -68,15 +51,44 @@ describe 'request' do
             }
           }
         GRAPHQL
-        variables = {input: attrs}
+        end
 
-        result = query(q, requester.id, variables)
+        let :requester do
+          requester = FactoryBot.create(:user)
+          FactoryBot.create(:requester_organization, user_id: requester.id)
+          requester
+        end
 
-        request = Request.order(:created_at).reverse.first
-        expect(result['data']['create_request']['id']).to be == request.id
-        expect(result['data']['create_request']['attachments']['value'].count).to be == 1
-        expect(Upload.count).to be == 0
-        expect(Attachment.count).to be == 1
+        let(:uploads) { 2.times.map { FactoryBot.create(:upload) } }
+
+        example 'for category/no template' do
+          variables = {
+            input: {
+              article_name: 'new request',
+              budget_period: FactoryBot.create(:budget_period).id,
+              category: FactoryBot.create(:category).id,
+              requested_quantity: 1,
+              room: FactoryBot.create(:room).id,
+              motivation: Faker::Lorem.sentence,
+              attachments: [{id: uploads[0].id, to_delete: false, __typename: 'Upload'},
+                            {id: uploads[1].id, to_delete: true, __typename: 'Upload'}]
+            }
+          }
+
+          result = query(q, requester.id, variables).deep_symbolize_keys
+
+          request = Request.order(:created_at).reverse.first
+          expect(result[:errors]).to be_nil
+          data = result[:data][:create_request]
+          expect(data[:id]).to be == request.id
+          expect(data[:attachments][:value].count).to be == 1
+          expect(Upload.count).to be == 0
+          expect(Attachment.count).to be == 1
+        end
+          expect(data[:article_name][:value].count).to eq template[:article_name]
+          expect(Upload.count).to be == 0
+          expect(Attachment.count).to be == 1
+        end
       end
 
       context 'create for another user' do
