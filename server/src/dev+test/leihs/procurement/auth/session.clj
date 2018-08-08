@@ -4,12 +4,9 @@
 (defn wrap
   [handler]
   (fn [request]
-    ; FIXME: query params does not work
-    (let [user-id (or (-> request
-                          :query-params
-                          :user_id)
-                      (-> request
+    (let [user-id (some-> request
                           :headers
-                          (get "x-fake-token-authorization")))
-          user (u/get-user-by-id (:tx request) user-id)]
-      (handler (assoc request :authenticated-entity {:user_id (:id user)})))))
+                          (get "x-fake-token-authorization")
+                          (->> (u/get-user-by-id (:tx request)))
+                          :id)]
+      (handler (assoc request :authenticated-entity {:user_id user-id})))))
