@@ -258,9 +258,12 @@ class NewRequestPreselection extends React.Component {
             setSelection({ category: selectedTemplate.category.id })
           }
 
+          // only show validations in error case (only red no green)
+          const showValidations = !selectedBudgetPeriod
+
           return (
             <F>
-              <form>
+              <form className={cx({ 'was-validated': showValidations })}>
                 <FormGroup label="Budgetperiode" className="form-group-lg">
                   <Select
                     {...formPropsFor('budgetPeriod')}
@@ -379,6 +382,9 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                       })
                     }
                   />
+                  {window.isDebug && (
+                    <pre>{JSON.stringify({ request }, 0, 2)}</pre>
+                  )}
                 </F>
               )
             }}
