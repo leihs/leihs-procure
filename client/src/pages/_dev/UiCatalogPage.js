@@ -194,7 +194,7 @@ const PAGES = [
 //
 const UiPlayground = ({ match, location }) => {
   const baseUrl = match.url
-  const flashMsg = f.get(location, 'state.flash')
+  const flashMsg = f.get(location, 'state._flash')
   return (
     <MainWithSidebar sidebar={<TableofContents baseUrl={baseUrl} />}>
       {!!flashMsg && (
@@ -251,7 +251,7 @@ const PageById = ({ match, baseUrl }) => {
       <Redirect
         to={{
           pathname: baseUrl,
-          state: { flash: `The page ${pageId} doesn't exist!` }
+          state: { _flash: `The page ${pageId} doesn't exist!` }
         }}
       />
     )
