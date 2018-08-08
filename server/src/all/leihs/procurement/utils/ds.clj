@@ -1,11 +1,15 @@
 (ns leihs.procurement.utils.ds
   (:refer-clojure :exclude [str keyword])
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [hikari-cp.core :as hikari]
-            [leihs.procurement.utils.core :refer [presence str]]
-            [pg-types.all])
+            [leihs.procurement.utils.core :refer [presence str]])
   (:import com.codahale.metrics.MetricRegistry))
+
+;--------------------------------------------------------------
+; NOTE: it has to be required somewhere even if not referenced.
+; If kept withing ns macro, ns cleaning tools will remove it.
+(require 'pg-types.all)
+;--------------------------------------------------------------
 
 (defonce metric-registry* (atom nil))
 
@@ -33,38 +37,7 @@
 (defn get-ds [] @ds)
 (defn get-ds-without-pooler [] @ds-without-pooler)
 
-(defn wrap-cheat-tx [handler] (fn [request] (handler (assoc request :tx @ds))))
-
-(defn wrap-tx
-  [handler]
-  (fn [request]
-    ; NOTE: for images we have to use a datasource without pooler as somewhere
-    ; there
-    ; is a bug which leads to hanging of the server on all subsequent requests
-    ; (let [ds (if (= (:handler-key request) :image) @ds-without-pooler @ds)]
-    ;
-    ; FIXME: using ds without pooler for every handelr for the time being as
-    ; the problem with hanging server still persists
-    (let [ds @ds-without-pooler]
-      (jdbc/with-db-transaction
-        [tx ds]
-        (try
-          (let [resp (handler (assoc request :tx tx))
-                status (:status resp)]
-            (cond (and status (>= status 400))
-                    (do (log/warn
-                          "Rolling back transaction because error status "
-                          status)
-                        (jdbc/db-set-rollback-only! tx))
-                  (:graphql-error resp)
-                    (do (log/warn
-                          "Rolling back transaction because of graphql error")
-                        (jdbc/db-set-rollback-only! tx)))
-            resp)
-          (catch Throwable th
-            (log/warn "Rolling back transaction because of " th)
-            (jdbc/db-set-rollback-only! tx)
-            (throw th)))))))
+(defn wrap [handler] (fn [request] (handler (assoc request :tx @ds))))
 
 (defn get-database-url
   [params]

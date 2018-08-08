@@ -1,12 +1,9 @@
 (ns leihs.procurement.backend.main
-  (:require [clojure.tools.cli :as cli :refer [parse-opts]]
-            [clojure.pprint :refer [pprint]]
+  (:gen-class)
+  (:require [clojure.pprint :refer [pprint]]
+            [clojure.tools.cli :as cli]
             [leihs.procurement.backend.run :as run]
-            [clojure.tools.logging :as logging]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug]
-            [logbug.thrown :as thrown])
-  (:gen-class))
+            [logbug.thrown :as thrown]))
 
 (thrown/reset-ns-filter-regex #"^(leihs|cider)\..*")
 

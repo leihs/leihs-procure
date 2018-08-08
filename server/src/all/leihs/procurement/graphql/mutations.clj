@@ -1,6 +1,6 @@
 (ns leihs.procurement.graphql.mutations
   (:require
-    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement [authorization :as authorization] [env :as env]]
     [leihs.procurement.permissions.user :as user-perms]
     [leihs.procurement.resources [admins :as admins]
      [budget-period :as budget-period] [budget-periods :as budget-periods]
@@ -9,8 +9,7 @@
      [requesters-organizations :as requesters-organizations]
      [settings :as settings] [templates :as templates]]))
 
-; FIXME: a function for debugging convenience. will be a var later.
-(defn mutation-resolver-map
+(defn resolver-map-fn
   []
   {:create-request
      (fn [context args value]
@@ -131,3 +130,9 @@
    :update-templates (-> templates/update-templates!
                          (authorization/wrap-ensure-one-of
                            [user-perms/admin? user-perms/inspector?]))})
+
+(def resolver-map (resolver-map-fn))
+
+(defn get-resolver-map
+  []
+  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))

@@ -1,5 +1,5 @@
 (ns leihs.procurement.utils.url.shared
-  (:require [ring.util.codec]))
+  (:require ring.util.codec))
 
 (def decode ring.util.codec/url-decode)
 

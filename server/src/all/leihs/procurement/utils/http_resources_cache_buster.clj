@@ -1,14 +1,9 @@
 (ns leihs.procurement.utils.http-resources-cache-buster
-  (:require [pandect.algo.sha1 :as sha1]
+  (:require [clojure.tools.logging :as logging]
+            [pandect.algo.sha1 :as sha1]
             [ring.middleware.resource :as resource]
-            [ring.util.codec :as codec]
-            [ring.util.request :as request]
-            [ring.util.response :as response]
-            [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
-            [logbug.debug :as debug :refer [I> I>> identity-with-logging]]
-            [logbug.ring :refer [wrap-handler-with-logging]]
-            [logbug.thrown :as thrown]))
+            [ring.util [codec :as codec] [request :as request]
+             [response :as response]]))
 
 (def cache-buster-path->original-path (atom {}))
 (def original-path->cache-buster-path (atom {}))

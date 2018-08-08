@@ -1,7 +1,5 @@
 (ns leihs.procurement.resources.settings
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.utils.ds :refer [get-ds]]
             [leihs.procurement.utils.sql :as sql]))
 
 (def settings-base-query

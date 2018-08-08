@@ -1,6 +1,5 @@
 (ns leihs.procurement.auth.session
-  (:require [clojure.tools.logging :as log]
-            [leihs.procurement.resources.user :as u]))
+  (:require [leihs.procurement.resources.user :as u]))
 
 (defn wrap
   [handler]

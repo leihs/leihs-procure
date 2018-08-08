@@ -1,19 +1,13 @@
 (ns leihs.procurement.graphql
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [clojure.java.jdbc :as jdbc]
+  (:require [clojure.edn :as edn]
+            [clojure.java [io :as io] [jdbc :as jdbc]]
             [clojure.tools.logging :as log]
             [com.walmartlabs.lacinia :as lacinia]
-            [com.walmartlabs.lacinia.parser :as graphql-parser]
-            [com.walmartlabs.lacinia.schema :as graphql-schema]
-            [com.walmartlabs.lacinia.util :as graphql-util]
-            [leihs.procurement.graphql.resolver :as resolver]
-            [leihs.procurement.utils.ds :as ds]
-            [logbug.debug :as debug]))
+            [com.walmartlabs.lacinia [parser :as graphql-parser]
+             [schema :as graphql-schema] [util :as graphql-util]]
+            [leihs.procurement.env :as env]
+            [leihs.procurement.graphql.resolver :as resolver]))
 
-; ===========================================================================
-; FIXME: use the defed var instead of calling this function on every request
 (defn load-schema
   []
   (-> (io/resource "schema.edn")
@@ -23,7 +17,8 @@
       graphql-schema/compile))
 
 (def schema (load-schema))
-; ===========================================================================
+
+(defn get-schema [] (if (#{:dev :test} env/env) (load-schema) schema))
 
 (defn exec-query
   [query-string request]
@@ -31,7 +26,7 @@
              "with variables" (-> request
                                   :body
                                   :variables))
-  (lacinia/execute (load-schema) ; load schema dynamically for DEBUGGING
+  (lacinia/execute (get-schema)
                    query-string
                    (-> request
                        :body
@@ -46,7 +41,7 @@
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
-                       (graphql-parser/parse-query schema)
+                       (graphql-parser/parse-query (get-schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]

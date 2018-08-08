@@ -1,7 +1,6 @@
 (ns leihs.procurement.utils.http-server
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
-            [aleph.http :as http-server]))
+  (:require [aleph.http :as http-server]
+            [clojure.tools.logging :as logging]))
 
 (defonce _server (atom nil))
 

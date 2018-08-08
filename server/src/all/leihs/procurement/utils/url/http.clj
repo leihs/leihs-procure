@@ -1,7 +1,7 @@
 (ns leihs.procurement.utils.url.http
   (:require clojure.set
             [leihs.procurement.utils.url.shared :refer
-             [host-port-dissect path-dissect auth-dissect parse-int]]
+             [auth-dissect host-port-dissect parse-int path-dissect]]
             [yaml.core :as yaml]))
 
 (def pattern

@@ -1,18 +1,12 @@
 (ns leihs.procurement.resources.image
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            [clj-logging-config.log4j :as logging-config]
-            [clojure.data.codec.base64 :as base64]
             [clojure.java.jdbc :as jdbc]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :as logging]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug])
-  (:import [java.util Base64]))
+            [leihs.procurement.utils.sql :as sql])
+  (:import java.util.Base64))
 
 (def image-base-query
   (-> (sql/select :procurement_images.*)

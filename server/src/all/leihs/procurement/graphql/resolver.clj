@@ -24,11 +24,17 @@
   [arg]
   (into {} (for [[k v] arg] [k (wrap-resolver-with-error v)])))
 
+(defn resolver-map-fn
+  []
+  (-> (queries/get-resolver-map)
+      (merge (mutations/get-resolver-map))
+      wrap-map-with-error))
+
+(def resolver-map (resolver-map-fn))
+
 (defn get-resolver-map
   []
-  (-> (queries/query-resolver-map)
-      (merge (mutations/mutation-resolver-map))
-      wrap-map-with-error))
+  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

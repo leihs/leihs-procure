@@ -1,14 +1,11 @@
 (ns leihs.procurement.resources.attachments
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            [clj-logging-config.log4j :as logging-config]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.resources.attachment :as attachment]
-            [leihs.procurement.resources.upload :as upload]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+            [leihs.procurement.resources [attachment :as attachment]
+             [upload :as upload]]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def attachments-base-query
   (-> (sql/select :procurement_attachments.*)

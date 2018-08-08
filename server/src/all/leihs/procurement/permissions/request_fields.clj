@@ -1,12 +1,11 @@
 (ns leihs.procurement.permissions.request-fields
   (:require [leihs.procurement.resources.category :as category]
+            [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.template :as template]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
-            [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.utils.ds :as ds]))
+            [leihs.procurement.resources.budget-period :as budget-period]))
 
 (defn get-for-user-and-request
   [tx auth-entity proc-request]

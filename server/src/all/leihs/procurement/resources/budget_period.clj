@@ -1,8 +1,5 @@
 (ns leihs.procurement.resources.budget-period
-  (:require [clj-time.format :as time-format]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.utils.ds :as ds]
+  (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sql]))
 
 (def budget-period-base-query

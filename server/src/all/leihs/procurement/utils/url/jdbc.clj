@@ -1,8 +1,8 @@
 (ns leihs.procurement.utils.url.jdbc
-  (:require [leihs.procurement.utils.url.shared :refer
-             [host-port-dissect path-dissect auth-dissect parse-int]]
-            [ring.util.codec]
-            [clojure.walk]))
+  (:require clojure.walk
+            [leihs.procurement.utils.url.shared :refer
+             [auth-dissect host-port-dissect parse-int]]
+            ring.util.codec))
 
 
 (defn jdbc-url? [url] (boolean (re-matches #"(?i)^jdbc:.+" url)))

@@ -1,10 +1,9 @@
 (ns leihs.procurement.resources.templates
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.resources.categories :as categories]
-            [leihs.procurement.resources.template :as template]
             [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources [categories :as categories]
+             [template :as template]]
             [leihs.procurement.utils.sql :as sql]))
 
 (def templates-base-query

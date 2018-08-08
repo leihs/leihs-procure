@@ -1,6 +1,5 @@
 (ns leihs.procurement.utils.exif
   (:require [clojure.java.shell :refer [sh]]
-            [clojure.tools.logging :as log]
             [clojure.string :as string]))
 
 (defn- replace-group-string
