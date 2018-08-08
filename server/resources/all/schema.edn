@@ -363,6 +363,7 @@
                                :user {:resolve :user, :type (non-null :User)}}},
     :Room {:fields {:building {:resolve :building, :type (non-null :Building)},
                     :description {:type String},
+                    :general {:type (non-null Boolean)},
                     :id {:type (non-null ID)},
                     :name {:type (non-null String)}}},
     :SavedFilters {:fields {:budget_period_ids {:type (list ID)},

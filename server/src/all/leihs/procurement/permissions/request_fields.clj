@@ -1,5 +1,6 @@
 (ns leihs.procurement.permissions.request-fields
-  (:require [leihs.procurement.resources.category :as category]
+  (:require [leihs.procurement.resources.rooms :as rooms]
+            [leihs.procurement.resources.category :as category]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.template :as template]
@@ -260,6 +261,7 @@
                                  budget-period-in-requesting-phase)
                             category-inspectable-by-auth-user
                             auth-user-is-admin)),
+            :default (:id (rooms/general-from-general tx)),
             :required true},
      :state {:read (or (and auth-user-is-requester requested-by-auth-user)
                        category-viewable-by-auth-user

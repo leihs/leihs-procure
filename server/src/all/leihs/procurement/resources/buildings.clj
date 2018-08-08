@@ -2,6 +2,8 @@
   (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sql]))
 
+(def general-id "abae04c5-d767-425e-acc2-7ce04df645d1")
+
 (def buildings-base-query
   (-> (sql/select :buildings.*)
       (sql/from :buildings)))

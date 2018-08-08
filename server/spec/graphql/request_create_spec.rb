@@ -64,15 +64,30 @@ describe 'request' do
             requested_quantity {
               ...RequestFieldInt
             }
+            room {
+              ...RequestFieldRoom
+            }
             approved_quantity {
               ...RequestFieldInt
             }
           }
         }
+
         fragment RequestFieldString on RequestFieldString { value, read, write }
         fragment RequestFieldInt on RequestFieldInt { value, read, write }
+        fragment RequestFieldRoom on RequestFieldRoom {
+          value {
+            building {
+              id
+            },
+            general
+          },
+          read,
+          write
+        }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
+        fragment RequestFieldRoom on RequestFieldRoom { value, read, write }
       GRAPHQL
     end
 
@@ -88,6 +103,7 @@ describe 'request' do
           category: category.id
         }
         result = query(q, requester.id, variables).deep_symbolize_keys
+        # binding.pry
         expect(result.deep_symbolize_keys[:data][:new_request])
           .to eq(template: { value: nil },
                  category: { value: { id: category.id, name: category.name } },
@@ -98,6 +114,14 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 room: {
+                   value: {
+                     building: {
+                       id: 'abae04c5-d767-425e-acc2-7ce04df645d1' 
+                     },
+                     general: true
+                   }
+                 },
                  approved_quantity: { value: nil, read: false, write: false })
       end
 
@@ -120,6 +144,14 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 room: {
+                   value: {
+                     building: {
+                       id: 'abae04c5-d767-425e-acc2-7ce04df645d1' 
+                     },
+                     general: true
+                   }
+                 },
                  approved_quantity: { value: nil, read: false, write: false })
       end
     end
