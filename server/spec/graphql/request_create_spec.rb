@@ -55,6 +55,12 @@ describe 'request' do
           motivation {
             ...RequestFieldString
           }
+          priority {
+            ...RequestFieldBoolean
+          }
+          inspector_priority {
+            ...RequestFieldBoolean
+          }
           requested_quantity {
             ...RequestFieldInt
           }
@@ -65,11 +71,19 @@ describe 'request' do
       }
       fragment RequestFieldString on RequestFieldString { value, read, write }
       fragment RequestFieldInt on RequestFieldInt { value, read, write }
+      fragment RequestFieldBoolean on RequestFieldBoolean { value, read, write }
       GRAPHQL
     end
 
     context 'get data for new request' do
+      before do
+        # check that user is not inspector for category
+        expect(CategoryInspector.find(category_id: category.id, user_id: requester.id)).not_to be
+      end
+
       example 'from category' do
+        pending 'field.read broken'
+
         variables = {
           budgetPeriod: budget_period.id,
           category: category.id
@@ -79,14 +93,18 @@ describe 'request' do
           .to eq(template: { value: nil },
                  category: { value: { id: category.id, name: category.name } },
                  budget_period: { value: { id: budget_period.id } },
-                 article_name: { value: nil, read: false, write: true },
-                 price_cents: { value: 0, read: false, write: true },
-                 motivation: { value: nil, read: false, write: true },
-                 requested_quantity: { value: nil, read: false, write: true },
-                 approved_quantity: { value: nil, read: false, write: false })
+                 article_name: { value: nil, read: true, write: true },
+                 price_cents: { value: 0, read: true, write: true },
+                 motivation: { value: nil, read: true, write: true },
+                 priority: { value: nil, read: true, write: true },
+                 inspector_priority: { value: nil, read: false, write: false },
+                 requested_quantity: { value: nil, read: true, write: true },
+                 approved_quantity: { value: nil, read: true, write: false })
       end
 
       example 'from template' do
+        pending 'field.read broken'
+
         template_category = Category.find(id: template.category_id)
         variables = {
           budgetPeriod: budget_period.id,
@@ -97,11 +115,15 @@ describe 'request' do
           .to eq(template: { value: { id: template.id, article_name: template.article_name } },
                  category: { value: { id: template_category.id, name: template_category.name } },
                  budget_period: { value: { id: budget_period.id } },
-                 article_name: { value: template.article_name, read: false, write: false },
-                 price_cents: { value: template.price_cents, read: false, write: false },
-                 motivation: { value: nil, read: false, write: true },
-                 requested_quantity: { value: nil, read: false, write: true },
-                 approved_quantity: { value: nil, read: false, write: false })
+                 # those come from the template and cant be overridden
+                 article_name: { value: template.article_name, read: true, write: false },
+                 price_cents: { value: template.price_cents, read: true, write: false },
+                 # other form fields:
+                 motivation: { value: nil, read: true, write: true },
+                 priority: { value: nil, read: true, write: true },
+                 inspector_priority: { value: nil, read: false, write: false },
+                 requested_quantity: { value: nil, read: true, write: true },
+                 approved_quantity: { value: nil, read: true, write: false })
       end
     end
   end
@@ -152,14 +174,14 @@ describe 'request' do
         }
       GRAPHQL
 
-      variables = {input: attrs}
+      variables = { input: attrs }
       result = query(q, viewer.id, variables)
 
       expect(result['data']['request']).not_to be
       expect(result['errors'].first['exception'])
         .to be == 'UnauthorizedException'
 
-      expect(Request.find(transform_uuid_attrs attrs)).not_to be
+      expect(Request.find(transform_uuid_attrs(attrs))).not_to be
     end
 
     context 'creates as requester' do
