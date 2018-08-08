@@ -1,7 +1,6 @@
 (ns leihs.procurement.graphql.queries
   (:require
-    [leihs.procurement.authorization :as authorization]
-    [leihs.procurement.env :as env]
+    [leihs.procurement [authorization :as authorization] [env :as env]]
     [leihs.procurement.permissions.user :as user-perms]
     [leihs.procurement.resources [admins :as admins]
      [attachments :as attachments] [budget-limits :as budget-limits]
@@ -14,8 +13,8 @@
      [organizations :as organizations] [request :as request]
      [requesters-organizations :as requesters-organizations]
      [requests :as requests] [room :as room] [rooms :as rooms]
-     [settings :as settings] [supplier :as supplier] [user :as user]
-     [template :as template] [templates :as templates] [users :as users]
+     [settings :as settings] [supplier :as supplier] [template :as template]
+     [templates :as templates] [user :as user] [users :as users]
      [viewers :as viewers]]))
 
 (defn resolver-map-fn

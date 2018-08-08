@@ -1,13 +1,8 @@
 (ns leihs.procurement.authorization
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.env :as env]
+  (:require [leihs.procurement.env :as env]
             [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.utils.sql :as sql]
-            [leihs.procurement.utils.helpers :as helpers]
-            [logbug.debug :as debug])
-  (:import [leihs.procurement UnauthorizedException]))
+            [leihs.procurement.utils.helpers :as helpers])
+  (:import leihs.procurement.UnauthorizedException))
 
 (defn wrap-ensure-one-of
   [resolver predicates]

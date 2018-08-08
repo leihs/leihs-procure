@@ -1,14 +1,8 @@
 (ns leihs.procurement.resources.main-category
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.resources.image :as image]
-            [leihs.procurement.resources.images :as images]
-            [leihs.procurement.resources.uploads :as uploads]
-            [leihs.procurement.utils.helpers :refer [submap?]]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.resources [image :as image] [images :as images]
+             [uploads :as uploads]]
+            [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
 
 (def main-category-base-query
   (-> (sql/select :procurement_main_categories.*)

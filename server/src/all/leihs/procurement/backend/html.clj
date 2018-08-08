@@ -1,6 +1,6 @@
 (ns leihs.procurement.backend.html
   (:refer-clojure :exclude [str keyword])
-  (:require [hiccup.page :refer [include-js html5]]))
+  (:require [hiccup.page :refer [html5]]))
 
 (defn head
   []

@@ -1,25 +1,14 @@
 (ns leihs.procurement.resources.request
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as log]
-            [clojure.set :refer [map-invert]]
-            [clojure.string :refer [lower-case upper-case]]
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.request :as request-perms]
-            [leihs.procurement.permissions.request-fields :as
-             request-fields-perms]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.attachments :as attachments]
-            [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.resources.category :as category]
-            [leihs.procurement.resources.model :as model]
-            [leihs.procurement.resources.room :as room]
-            [leihs.procurement.resources.supplier :as supplier]
-            [leihs.procurement.resources.uploads :as uploads]
-            [leihs.procurement.utils.helpers :refer [submap?]]
-            [leihs.procurement.utils.ds :refer [get-ds]]
-            [leihs.procurement.utils.sql :as sql]
+  (:require [clojure [set :refer [map-invert]]
+             [string :refer [lower-case upper-case]]]
             [clojure.java.jdbc :as jdbc]
-            [logbug.debug :as debug]))
+            [leihs.procurement.authorization :as authorization]
+            [leihs.procurement.permissions [request :as request-perms]
+             [request-fields :as request-fields-perms] [user :as user-perms]]
+            [leihs.procurement.resources [attachments :as attachments]
+             [budget-period :as budget-period] [category :as category]
+             [uploads :as uploads]]
+            [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,

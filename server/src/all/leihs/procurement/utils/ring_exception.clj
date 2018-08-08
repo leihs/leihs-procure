@@ -1,13 +1,8 @@
 (ns leihs.procurement.utils.ring-exception
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]
+  (:require [clojure.tools.logging :as logging]
             [leihs.procurement.env :as env]
             [leihs.procurement.utils.helpers :as helpers]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug :refer [I>]]
-            [logbug.ring :refer [wrap-handler-with-logging]]
             [logbug.thrown :as thrown]))
 
 (defn get-cause

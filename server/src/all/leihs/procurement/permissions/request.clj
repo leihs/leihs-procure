@@ -1,9 +1,6 @@
 (ns leihs.procurement.permissions.request
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.permissions.request-fields :as
-             request-fields-perms]
-            [leihs.procurement.utils.ds :refer [get-ds]]))
+  (:require [leihs.procurement.permissions.request-fields :as
+             request-fields-perms]))
 
 (def attrs-to-exclude #{:id})
 

@@ -1,17 +1,12 @@
 (ns leihs.procurement.resources.main-categories
-  (:require [leihs.procurement.resources.main-category :as main-category]
-            [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.graphql.helpers :refer
              [add-resource-type add-to-parent-values]]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.resources.budget-limits :as budget-limits]
-            [leihs.procurement.resources.categories :as categories]
-            [leihs.procurement.resources.image :as image]
-            [leihs.procurement.resources.main-category :as main-category]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+            [leihs.procurement.resources [budget-limits :as budget-limits]
+             [categories :as categories] [image :as image]
+             [main-category :as main-category]]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def main-categories-base-query
   (-> (sql/select :procurement_main_categories.*)

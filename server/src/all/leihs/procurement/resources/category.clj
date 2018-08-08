@@ -1,10 +1,6 @@
 (ns leihs.procurement.resources.category
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def category-base-query
   (-> (sql/select :procurement_categories.*)

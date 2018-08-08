@@ -1,7 +1,6 @@
 (ns leihs.procurement.resources.budget-periods
   (:require [clj-time.format :as time-format]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
             [leihs.procurement.graphql.helpers :refer [add-resource-type]]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.utils.sql :as sql]))

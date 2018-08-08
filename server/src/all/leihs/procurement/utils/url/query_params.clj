@@ -1,9 +1,8 @@
 (ns leihs.procurement.utils.url.query-params
   (:refer-clojure :exclude [str keyword encode decode])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]]
-            cheshire.core
-            [clojure.walk :refer [keywordize-keys]]
-            [clojure.string :as string]
+  (:require cheshire.core
+            [clojure [string :as string] [walk :refer [keywordize-keys]]]
+            [leihs.procurement.utils.core :refer [keyword presence str]]
             [leihs.procurement.utils.url.shared :as shared]))
 
 (defn try-parse-json

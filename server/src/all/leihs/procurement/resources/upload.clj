@@ -2,11 +2,9 @@
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils.exif :as exif]
-            [leihs.procurement.utils.sql :as sql])
+            [leihs.procurement.utils [exif :as exif] [sql :as sql]])
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))
 

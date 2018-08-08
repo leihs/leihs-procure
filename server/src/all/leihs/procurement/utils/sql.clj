@@ -1,12 +1,7 @@
 (ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format update])
-  (:require [honeysql.format :as format]
-            [honeysql.helpers :as helpers :refer [build-clause]]
-            [honeysql.types :as types]
-            [honeysql.util :as util :refer [defalias]]
-            [logbug.debug :as debug]
-            [clj-logging-config.log4j :as logging-config]
-            [clojure.tools.logging :as logging]))
+  (:require [honeysql [format :as format] [helpers :as helpers]
+             [types :as types] [util :as util :refer [defalias]]]))
 
 ; regex
 (defmethod format/fn-handler "~*"

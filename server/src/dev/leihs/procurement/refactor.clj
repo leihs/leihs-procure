@@ -1,5 +1,4 @@
-(ns leihs.procurement.refactor
-  (:require [clojure.tools.logging :as log]))
+(ns leihs.procurement.refactor)
 
 (defn thread-first-h
   ([f-app] (thread-first-h f-app []))

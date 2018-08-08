@@ -1,6 +1,5 @@
 (ns leihs.procurement.graphql.mutations
-  (:require [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.env :as env]
+  (:require [leihs.procurement [authorization :as authorization] [env :as env]]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources [admins :as admins]
              [budget-period :as budget-period]

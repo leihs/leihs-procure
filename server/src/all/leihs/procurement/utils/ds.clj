@@ -1,11 +1,15 @@
 (ns leihs.procurement.utils.ds
   (:refer-clojure :exclude [str keyword])
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [hikari-cp.core :as hikari]
-            [leihs.procurement.utils.core :refer [presence str]]
-            [pg-types.all])
+            [leihs.procurement.utils.core :refer [presence str]])
   (:import com.codahale.metrics.MetricRegistry))
+
+;--------------------------------------------------------------
+; NOTE: it has to be required somewhere even if not referenced.
+; If kept withing ns macro, ns cleaning tools will remove it.
+(require 'pg-types.all)
+;--------------------------------------------------------------
 
 (defonce metric-registry* (atom nil))
 

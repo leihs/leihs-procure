@@ -1,9 +1,6 @@
 (ns leihs.procurement.permissions.request-fields
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.utils.ds :as ds]))
+  (:require [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources.budget-period :as budget-period]))
 
 (defn get-for-user-and-request
   [tx user proc-request]
