@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 const scalarField = t => gql`
-  fragment RequestField${t} on RequestField${t} { value, read, write }
+  fragment RequestField${t} on RequestField${t} { value, read, write, required }
 `
 
 export const RequestField = {
@@ -95,12 +95,18 @@ export const RequestFieldsForEdit = gql`
     }
 
     category {
+      read
+      write
+      required
       value {
         id
         name
       }
     }
     budget_period {
+      read
+      write
+      required
       value {
         id
       }
@@ -112,6 +118,7 @@ export const RequestFieldsForEdit = gql`
     supplier {
       read
       write
+      required
       value {
         id
         name
@@ -141,11 +148,13 @@ export const RequestFieldsForEdit = gql`
     priority {
       read
       write
+      required
       value
     }
     inspector_priority {
       read
       write
+      required
       value
     }
 
@@ -167,6 +176,7 @@ export const RequestFieldsForEdit = gql`
     room {
       read
       write
+      required
       value {
         id
         name
@@ -184,6 +194,7 @@ export const RequestFieldsForEdit = gql`
     attachments {
       read
       write
+      required
       value {
         id
         filename
@@ -197,12 +208,15 @@ export const RequestFieldsForEdit = gql`
     cost_center {
       read
       write
+      required
       value
     }
     procurement_account {
       read
       write
       value
+      # TODO: for this field a Bool is not enough, its a dependent field!
+      # required
     }
     internal_order_number {
       ...RequestFieldString
