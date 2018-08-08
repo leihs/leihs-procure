@@ -66,8 +66,9 @@ const RequestForm = ({
           ...formHelpers.formPropsFor(key),
           // add translated labels:
           label: t(`request_form_field.${key}`),
-          // add readonly by field permissions
-          readOnly: request[key] ? !request[key].write : null
+          // apply field permissions
+          readOnly: request[key] ? !request[key].write : null,
+          hidden: request[key] ? !request[key].read : false
         })
 
         return (
@@ -113,32 +114,39 @@ const RequestForm = ({
                 />
 
                 <Row>
-                  <Col sm>
-                    <FormGroup label={t('request_form_field.priority')}>
-                      <Select
-                        {...formPropsFor('priority')}
-                        options={CONSTANTS.REQUEST_PRIORITIES.map(v => ({
-                          value: v,
-                          label: t(`priority_label_${v}`)
-                        }))}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col sm>
-                    <FormGroup
-                      label={t('request_form_field.inspector_priority')}
-                    >
-                      <Select
-                        {...formPropsFor('inspector_priority')}
-                        options={CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(
-                          v => ({
-                            value: v,
-                            label: t(`inspector_priority_label_${v}`)
-                          })
-                        )}
-                      />
-                    </FormGroup>
-                  </Col>
+                  <RequestInput field={formPropsFor('priority')}>
+                    {field => (
+                      <Col sm>
+                        <FormGroup label={field.label}>
+                          <Select
+                            {...field}
+                            options={CONSTANTS.REQUEST_PRIORITIES.map(v => ({
+                              value: v,
+                              label: t(`priority_label_${v}`)
+                            }))}
+                          />
+                        </FormGroup>
+                      </Col>
+                    )}
+                  </RequestInput>
+
+                  <RequestInput field={formPropsFor('inspector_priority')}>
+                    {field => (
+                      <Col sm>
+                        <FormGroup label={field.label}>
+                          <Select
+                            {...field}
+                            options={CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(
+                              v => ({
+                                value: v,
+                                label: t(`inspector_priority_label_${v}`)
+                              })
+                            )}
+                          />
+                        </FormGroup>
+                      </Col>
+                    )}
+                  </RequestInput>
                 </Row>
 
                 {/* TODO: replacement with BOOLs or ENUMs
@@ -236,43 +244,54 @@ const RequestForm = ({
                   <InputFileUpload {...formPropsFor('attachments')} />
                 </FormGroup>
 
-                <FormGroup>
-                  <ButtonRadio
-                    {...formPropsFor('accounting_type')}
-                    options={['aquisition', 'investment'].map(k => ({
-                      value: k,
-                      label: t(`request_form_field.accounting_type_label_${k}`)
-                    }))}
-                  />
-                </FormGroup>
-
-                {fields.accounting_type !== 'investment' ? (
-                  <Row>
-                    <Col>
-                      <FormField readOnly {...formPropsFor('cost_center')} />
-                    </Col>
-                    <Col>
-                      <FormField
-                        readOnly
-                        {...formPropsFor('procurement_account')}
+                {request.accounting_type.read && (
+                  <F>
+                    <FormGroup>
+                      <ButtonRadio
+                        {...formPropsFor('accounting_type')}
+                        options={['aquisition', 'investment'].map(k => ({
+                          value: k,
+                          label: t(
+                            `request_form_field.accounting_type_label_${k}`
+                          )
+                        }))}
                       />
-                    </Col>
-                  </Row>
-                ) : (
-                  <Row>
-                    <Col sm>
-                      <FormField {...formPropsFor('internal_order_number')} />
-                    </Col>
+                    </FormGroup>
 
-                    <Col sm>
-                      <FormField
-                        readOnly
-                        value="123456789"
-                        name="general_ledger_account"
-                        label="general_ledger_account"
-                      />
-                    </Col>
-                  </Row>
+                    {fields.accounting_type !== 'investment' ? (
+                      <Row>
+                        <Col>
+                          <FormField
+                            readOnly
+                            {...formPropsFor('cost_center')}
+                          />
+                        </Col>
+                        <Col>
+                          <FormField
+                            readOnly
+                            {...formPropsFor('procurement_account')}
+                          />
+                        </Col>
+                      </Row>
+                    ) : (
+                      <Row>
+                        <Col sm>
+                          <FormField
+                            {...formPropsFor('internal_order_number')}
+                          />
+                        </Col>
+
+                        <Col sm>
+                          <FormField
+                            readOnly
+                            value="123456789"
+                            name="general_ledger_account"
+                            label="general_ledger_account"
+                          />
+                        </Col>
+                      </Row>
+                    )}
+                  </F>
                 )}
               </Col>
             </Row>
@@ -421,4 +440,8 @@ const SelectionDropdown = ({
       ))}
     </DropdownMenu>
   </ButtonDropdown>
+)
+
+const RequestInput = ({ children, field }) => (
+  <F>{!field.hidden && children(field)}</F>
 )
