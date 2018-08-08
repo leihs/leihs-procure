@@ -22,18 +22,25 @@ class ButtonRadio extends React.PureComponent {
     return value || selected
   }
 
-  render({ props } = this) {
-    const {
-      id,
-      name,
-      value,
-      selected,
-      onChange,
-      options = [],
-      withIcons = true,
-      ...restProps
-    } = props
+  isDisabled = (p = this.props) => p.disabled || p.readOnly
+
+  render(
+    {
+      props: {
+        id,
+        name,
+        value,
+        selected,
+        onChange,
+        options = [],
+
+        withIcons = true,
+        ...restProps
+      }
+    } = this
+  ) {
     const selectedValue = this.getSelectedValueProp(value, selected)
+    const isDisabled = this.isDisabled()
     return (
       <div
         className="btn-group btn-group-block"
@@ -43,12 +50,15 @@ class ButtonRadio extends React.PureComponent {
         {options.map(({ label, value, ...item }, n) => {
           const inputID = `${id}_radio_${n}`
           const isSelected = value === selectedValue
-          const onRadioClick = () => {
-            // if already selected, a click de-selects!
-            onChange({
-              target: { name: name, value: isSelected ? null : value }
-            })
-          }
+          const onRadioClick = isDisabled
+            ? null
+            : () => {
+                // if already selected, a click de-selects!
+                onChange({
+                  target: { name: name, value: isSelected ? null : value }
+                })
+              }
+
           return (
             <F key={n}>
               <Label
@@ -56,7 +66,8 @@ class ButtonRadio extends React.PureComponent {
                   'btn btn-block  btn-outline-secondary m-0 text-left font-weight-bold',
                   {
                     'border-left-0': n !== 0,
-                    active: isSelected
+                    active: isSelected,
+                    disabled: isDisabled
                   }
                 )}
                 htmlFor={inputID}
