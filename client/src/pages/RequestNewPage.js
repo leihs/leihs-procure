@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import qs from 'qs'
+import { Redirect } from 'react-router-dom'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
@@ -27,7 +28,6 @@ import { formatCurrency } from '../components/decorators'
 import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
-import { RequestLineClosed } from '../components/RequestLine'
 
 const NEW_REQUEST_PRESELECTION_QUERY = gql`
   query newRequestPreselectionQuery {
@@ -76,17 +76,18 @@ const NEW_REQUEST_QUERY = gql`
       ...RequestFieldsForEdit
     }
   }
-
   ${Fragments.RequestFieldsForEdit}
 `
 
 const CREATE_REQUEST_MUTATION = gql`
   mutation createRequest($requestData: CreateRequestInput) {
     create_request(input_data: $requestData) {
-      ...RequestFieldsForEdit
+      # NOTE: only redirect for now
+      id
+      # ...RequestFieldsForEdit
     }
   }
-  ${Fragments.RequestFieldsForEdit}
+  #{Fragments.RequestFieldsForEdit}
 `
 
 const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
@@ -355,13 +356,17 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
 
               if (mutReq.called) {
                 return (
-                  <div>
-                    <pre>
-                      <mark>OK!</mark>
-                    </pre>
-
-                    <RequestLineClosed request={data.new_request} />
-                  </div>
+                  <Redirect
+                    to={{
+                      pathname: `/requests/${mutReq.data.create_request.id}`,
+                      state: {
+                        flash: {
+                          level: 'success',
+                          message: 'Antrag wurde erfolgreich erstellt'
+                        }
+                      }
+                    }}
+                  />
                 )
               }
 
