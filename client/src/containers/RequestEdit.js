@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment as F } from 'react'
 import PropTypes from 'prop-types'
 import f from 'lodash'
 import { Query, Mutation } from 'react-apollo'
@@ -112,34 +112,41 @@ class RequestEdit extends React.Component {
                 if (mutReq.error)
                   return <ErrorPanel error={mutReq.error} data={mutReq.data} />
                 return (
-                  <RequestForm
-                    className={className}
-                    request={request}
-                    categories={data.main_categories}
-                    budgetPeriods={data.budget_periods}
-                    onCancel={onCancel}
-                    onSubmit={fields =>
-                      updateRequestFromFields(mutate, request, fields)
-                    }
-                    // action delete
-                    doDeleteRequest={
-                      !!props.doDeleteRequest &&
-                      (e => props.doDeleteRequest(request))
-                    }
-                    // action move category
-                    onSelectNewRequestCategory={this.onSelectNewRequestCategory}
-                    isSelectingNewCategory={this.state.selectNewCategory}
-                    doChangeRequestCategory={
-                      !!props.doChangeRequestCategory &&
-                      this.onChangeRequestCategory
-                    }
-                    // action move budget period
-                    onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
-                    isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
-                    doChangeBudgetPeriod={
-                      props.doChangeBudgetPeriod && this.onChangeBudgetPeriod
-                    }
-                  />
+                  <F>
+                    <RequestForm
+                      className={className}
+                      request={request}
+                      categories={data.main_categories}
+                      budgetPeriods={data.budget_periods}
+                      onCancel={onCancel}
+                      onSubmit={fields =>
+                        updateRequestFromFields(mutate, request, fields)
+                      }
+                      // action delete
+                      doDeleteRequest={
+                        !!props.doDeleteRequest &&
+                        (e => props.doDeleteRequest(request))
+                      }
+                      // action move category
+                      onSelectNewRequestCategory={
+                        this.onSelectNewRequestCategory
+                      }
+                      isSelectingNewCategory={this.state.selectNewCategory}
+                      doChangeRequestCategory={
+                        !!props.doChangeRequestCategory &&
+                        this.onChangeRequestCategory
+                      }
+                      // action move budget period
+                      onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
+                      isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
+                      doChangeBudgetPeriod={
+                        props.doChangeBudgetPeriod && this.onChangeBudgetPeriod
+                      }
+                    />
+                    {window.isDebug && (
+                      <pre>{JSON.stringify({ request }, 0, 2)}</pre>
+                    )}
+                  </F>
                 )
               }}
             </Mutation>
