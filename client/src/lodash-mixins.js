@@ -33,10 +33,17 @@ const uniqBy = (arr, key) =>
 
 const uniqById = arr => uniqBy(arr, 'id')
 
+const UUID_REGEX_STR = [
+  '(00000000-0000-0000-0000-000000000000)',
+  '([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[1-5][a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})'
+].join('|')
+
+const UUID_REGEX = new RegExp(`^${UUID_REGEX_STR}$`)
+
+const isUUID = s => UUID_REGEX.test(s)
+
 const dehyphenUUID = uuid =>
-  String(uuid)
-    .split('-')
-    .join('')
+  !f.isString(uuid) ? undefined : uuid.split('-').join('')
 
 const enhyphenUUID = s => {
   if (f.isString(s))
@@ -51,8 +58,10 @@ const mixins = {
   presence,
   uniqBy,
   uniqById,
+  isUUID,
   dehyphenUUID,
-  enhyphenUUID
+  enhyphenUUID,
+  UUID_REGEX
 }
 
 export default mixins
@@ -63,22 +72,22 @@ if (process.env.NODE_ENV !== 'production') {
   const THROWING_FN = () => {
     throw new Error('WTF')
   }
-  assert.equal(lodash_try(() => 23), 23)
+  assert.strictEqual(lodash_try(() => 23), 23)
   assert.strictEqual((() => lodash_try(THROWING_FN))(), undefined)
   assert.doesNotThrow(() => lodash_try(THROWING_FN))
 
-  assert.equal(present({ a: 1 }), true)
-  assert.equal(present([1]), true)
-  assert.equal(present(true), true)
-  assert.equal(present(false), true)
-  assert.equal(present(function() {}), true)
-  assert.equal(present({}), false)
-  assert.equal(present([]), false)
-  assert.equal(present(undefined), false)
-  assert.equal(present(null), false)
+  assert.strictEqual(present({ a: 1 }), true)
+  assert.strictEqual(present([1]), true)
+  assert.strictEqual(present(true), true)
+  assert.strictEqual(present(false), true)
+  assert.strictEqual(present(function() {}), true)
+  assert.strictEqual(present({}), false)
+  assert.strictEqual(present([]), false)
+  assert.strictEqual(present(undefined), false)
+  assert.strictEqual(present(null), false)
 
-  assert.equal(presence(23) || 42, 23)
-  assert.equal(presence(null) || 42, 42)
+  assert.strictEqual(presence(23) || 42, 23)
+  assert.strictEqual(presence(null) || 42, 42)
 
   assert.deepEqual(
     uniqBy(
@@ -97,13 +106,15 @@ if (process.env.NODE_ENV !== 'production') {
     [{ id: 1, name: 'one' }, { id: 2, name: 'two' }]
   )
 
-  assert.equal(
+  assert.strictEqual(
     dehyphenUUID('2ea39047-e663-50d5-9080-838b75883704'),
     '2ea39047e66350d59080838b75883704'
   )
+  assert.strictEqual(dehyphenUUID(), undefined)
 
-  assert.equal(
+  assert.strictEqual(
     enhyphenUUID('2ea39047e66350d59080838b75883704'),
     '2ea39047-e663-50d5-9080-838b75883704'
   )
+  assert.strictEqual(enhyphenUUID(), undefined)
 }

@@ -2,6 +2,10 @@
   (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sql]))
 
+(def templates-base-query
+  (-> (sql/select :procurement_templates.*)
+      (sql/from :procurement_templates)))
+
 (defn insert-template!
   [tx tmpl]
   (jdbc/execute! tx
@@ -24,15 +28,28 @@
                      (sql/where [:= :procurement_templates.id id])
                      sql/format)))
 
+(defn get-template-by-id
+  [tx id]
+  (-> templates-base-query
+      (sql/merge-where [:= :procurement_templates.id id])
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
 (defn get-template
-  [tx tmpl]
-  (let [where-clause (sql/map->where-clause :procurement_templates tmpl)]
-    (-> (sql/select :procurement_templates.*)
-        (sql/from :procurement_templates)
-        (sql/merge-where where-clause)
-        sql/format
-        (->> (jdbc/query tx))
-        first)))
+  ([context _ value]
+   (get-template-by-id (-> context
+                           :request
+                           :tx)
+                       (or (:value value) ; for RequestFieldTemplate
+                           (:template_id value))))
+  ([tx tmpl]
+   (let [where-clause (sql/map->where-clause :procurement_templates tmpl)]
+     (-> templates-base-query
+         (sql/merge-where where-clause)
+         sql/format
+         (->> (jdbc/query tx))
+         first))))
 
 (defn can-delete?
   [context _ value]

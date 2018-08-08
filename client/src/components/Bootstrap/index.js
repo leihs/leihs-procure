@@ -13,4 +13,12 @@ export { default as InputDate } from './InputDate'
 export { default as Select } from './Select'
 export { default as ButtonRadio } from './ButtonRadio'
 export { default as MultiSelect } from './MultiSelect'
+
 export { default as InputFileUpload } from './InputFileUpload'
+
+export {
+  Alert,
+  UncontrolledAlert as AlertDismissable,
+  ListGroup,
+  ListGroupItem
+} from 'reactstrap'

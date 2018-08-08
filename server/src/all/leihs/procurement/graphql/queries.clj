@@ -50,6 +50,29 @@
    :main-category main-category/get-main-category,
    :main-categories main-categories/get-main-categories,
    :model model/get-model,
+   :new-request
+     (fn [context args value]
+       (let [rrequest (:request context)
+             tx (:tx rrequest)
+             auth-entity (:authenticated-entity rrequest)
+             budget-period
+               (budget-period/get-budget-period-by-id tx (:budget_period args))
+             category (category/get-category-by-id tx (:category args))]
+         (authorization/authorize-and-apply
+           #(request/get-new context args value)
+           :if-only
+           #(and (not (and category (:template args))) ; template belongs to
+                 ; category
+                 (not (budget-period/past? tx budget-period))
+                 (or (user-perms/admin? tx auth-entity)
+                     (and (user-perms/requester? tx auth-entity)
+                          (or (and ; (:for_user args)
+                                   (user-perms/inspector? tx
+                                                          auth-entity
+                                                          (:id category)))
+                              (budget-period/in-requesting-phase?
+                                tx
+                                budget-period)))))))),
    :organization organization/get-organization,
    :organizations organizations/get-organizations,
    :requests requests/get-requests,
@@ -63,6 +86,7 @@
    :settings (-> settings/get-settings
                  (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :supplier supplier/get-supplier,
+   :template template/get-template,
    :templates templates/get-templates,
    :total-price-cents-requested-quantities
      requests/total-price-cents-requested-quantities,

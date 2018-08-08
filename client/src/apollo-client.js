@@ -16,7 +16,7 @@ isDev &&
       gasser: 'f721d6b7-8275-5ee0-b225-aa7c13781f45'
     }
 
-    window.LEIHS_DEV_CURRENT_USER_ID = USER_IDS.gasser
+    window.LEIHS_DEV_CURRENT_USER_ID = USER_IDS.mfa
 
     log('RUNNING IN DEV MODE', { fakeUser: window.LEIHS_DEV_CURRENT_USER_ID })
   })()

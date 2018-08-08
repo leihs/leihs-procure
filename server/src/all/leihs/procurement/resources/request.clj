@@ -2,11 +2,13 @@
   (:require [clojure [set :refer [map-invert]]
              [string :refer [lower-case upper-case]]]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions [request :as request-perms]
              [request-fields :as request-fields-perms] [user :as user-perms]]
             [leihs.procurement.resources [attachments :as attachments]
              [budget-period :as budget-period] [category :as category]
+             [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads]]
             [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
 
@@ -17,6 +19,7 @@
    :organization :organization_id,
    :room :room_id,
    :supplier :supplier_id,
+   :template :template_id,
    :user :user_id})
 
 (defn exchange-attrs
@@ -179,6 +182,29 @@
       (->> (query-requests tx auth-entity))
       first))
 
+(defn- consider-default
+  [attr p-spec]
+  (if (:value p-spec)
+    {attr p-spec}
+    (->> p-spec
+         :default
+         (if (:read p-spec))
+         (assoc p-spec :value)
+         (hash-map attr))))
+
+(defn get-new
+  [context args value]
+  (let [ring-req (:request context)
+        tx (:tx ring-req)
+        auth-entity (:authenticated-entity ring-req)
+        user-arg (:user args)
+        req-stub (cond-> args
+                   (not user-arg) (assoc :user (:user_id auth-entity)))]
+    (->> req-stub
+         (request-fields-perms/get-for-user-and-request tx auth-entity)
+         (map #(apply consider-default %))
+         (into {}))))
+
 (defn get-last-created-request
   [tx auth-entity]
   (-> (sql/select :*)
@@ -295,18 +321,28 @@
 
 (defn create-request!
   [context args _]
-  (let [input-data (:input_data args)
-        write-data (to-name-and-lower-case-priorities input-data)
-        attachments (:attachments write-data)
-        write-data-with-exchanged-attrs (-> write-data
-                                            (dissoc :attachments)
-                                            exchange-attrs)
-        ring-req (:request context)
+  (let [ring-req (:request context)
         tx (:tx ring-req)
-        auth-entity (:authenticated-entity ring-req)]
+        auth-entity (:authenticated-entity ring-req)
+        input-data (:input_data args)
+        attachments (:attachments input-data)
+        template (if-let [t-id (:template input-data)]
+                   (template/get-template-by-id tx t-id))
+        data-from-template (-> template
+                               (dissoc :id))
+        requester-id (or (:user input-data) (:user_id auth-entity))
+        organization (requesters/get-organization-of-requester tx requester-id)
+        write-data (-> input-data
+                       (dissoc :attachments)
+                       (assoc :user requester-id)
+                       (assoc :organization (:id organization))
+                       to-name-and-lower-case-priorities)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
-        #(do (insert! tx write-data-with-exchanged-attrs)
+        #(do (insert! tx
+                      (-> write-data
+                          (cond-> template (merge data-from-template))
+                          exchange-attrs))
              (var-set req-id
                       (-> (get-last-created-request tx auth-entity)
                           :id))

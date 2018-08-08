@@ -20,13 +20,16 @@ const GET_ROOMS_QUERY = gql`
     }
   }
 `
+
 const RoomAutocomplete = ({ buildingId, ...props }) => {
   const skipped = !buildingId
+
   return (
     <Query query={GET_ROOMS_QUERY} variables={{ buildingId }} skip={skipped}>
       {({ loading, error, data }) => {
-        if (skipped) return 'Select a Building first!'
-        if (loading) return 'Loading'
+        if (skipped)
+          return Select.Placeholder('Select a Building first!', props)
+        if (loading) return Select.Placeholder('Loading…', props)
         if (error) {
           return <ErrorPanel error={error} data={data} />
         }

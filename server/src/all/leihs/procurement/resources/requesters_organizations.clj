@@ -16,6 +16,19 @@
                   :tx)
               (sql/format requesters-organizations-base-query)))
 
+(defn get-organization-of-requester
+  [tx user-id]
+  (-> (sql/select :procurement_organizations.*)
+      (sql/from :procurement_requesters_organizations)
+      (sql/merge-join :procurement_organizations
+                      [:= :procurement_requesters_organizations.organization_id
+                       :procurement_organizations.id])
+      (sql/merge-where [:= :procurement_requesters_organizations.user_id
+                        user-id])
+      sql/format
+      (->> (jdbc/query tx))
+      first))
+
 (defn create-requester-organization
   [tx data]
   (let [dep-name (:department data)

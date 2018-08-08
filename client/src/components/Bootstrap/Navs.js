@@ -1,6 +1,9 @@
 import React from 'react'
-
-import { Route, NavLink as RouterNavLink } from 'react-router-dom'
+import { parse as parseQuery } from 'qs'
+import {
+  Route as RouterRoute,
+  NavLink as RouterNavLink
+} from 'react-router-dom'
 
 import Collapse from 'reactstrap/lib/Collapse'
 import Navbar from 'reactstrap/lib/Navbar'
@@ -46,5 +49,27 @@ export const DropdownItemLink = p => <DropdownItem tag={RouterNavLink} {...p} />
 
 // like ReactRouter.NavLink but for anything that wants to know if its "active".
 export const Routed = ({ children, ...p }) => (
-  <Route {...p}>{({ match }) => children({ isActive: !!match })}</Route>
+  <RouterRoute {...p}>
+    {({ match }) => children({ isActive: !!match })}
+  </RouterRoute>
+)
+
+// like ReactRouter.Route but additionally with parsed params
+export const RouteParams = ({ children, ...p }) => (
+  <RouterRoute {...p}>
+    {({ location, ...routerProps }) => {
+      const params = parseQuery(location.search.slice(1))
+      return children({ ...routerProps, location, params })
+    }}
+  </RouterRoute>
+)
+
+// sets HTTP status for server-side render
+export const RoutedStatus = ({ code, children, ...p }) => (
+  <RouterRoute {...p}>
+    {({ staticContext }) => {
+      if (staticContext) staticContext.status = code
+      return children
+    }}
+  </RouterRoute>
 )

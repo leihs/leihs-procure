@@ -4,6 +4,25 @@
 
 (def attrs-to-exclude #{:id})
 
+(defn- fallback-p-spec [value] {:value value, :read true, :write true})
+
+(defn with-protected-value
+  [p-spec value]
+  (->> value
+       (if (:read p-spec))
+       (assoc p-spec :value)))
+
+(defn value-with-permissions
+  [field-perms transform-fn attr value]
+  (if (attrs-to-exclude attr)
+    {attr value}
+    {attr (let [res (if-let [p-spec (attr field-perms)]
+                      (with-protected-value p-spec value)
+                      ; FIXME: this is a general whitelist fallback
+                      ; remove when all field permissions implemented
+                      (fallback-p-spec value))]
+            (transform-fn res))}))
+
 (defn apply-permissions
   ([tx auth-user proc-request]
    (apply-permissions tx auth-user proc-request identity))
@@ -12,19 +31,9 @@
                        tx
                        auth-user
                        proc-request)]
-     (into {}
-           (map (fn [[attr value]]
-                  (if (attrs-to-exclude attr)
-                    {attr value}
-                    (let [result (if-let [p-spec (attr field-perms)]
-                                   (assoc p-spec
-                                     :value (if (:read p-spec) value))
-                                   ; FIXME: this is a general whitelist fallback
-                                   ; remove when all field permissions
-                                   ; implemented
-                                   {:value value, :read true, :write true})]
-                      {attr (transform-fn result)})))
-             proc-request)))))
+     (->> proc-request
+          (map #(apply value-with-permissions field-perms transform-fn %))
+          (into {})))))
 
 (defn authorized-to-write-all-fields?
   ([tx auth-user write-data]

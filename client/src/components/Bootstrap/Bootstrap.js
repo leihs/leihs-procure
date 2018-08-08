@@ -183,6 +183,7 @@ const FormFieldPropTypes = {
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string, // enum, already checked at runtime
+  hidden: PropTypes.bool,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -207,8 +208,12 @@ export const FormField = ({
   minRows,
   maxRows,
   className,
+  hidden,
   ...inputProps
 }) => {
+  // FIXME: better hiding like html's input.hidden?
+  if (hidden) return false
+
   const supportedTypes = [
     'text',
     'text-static',
