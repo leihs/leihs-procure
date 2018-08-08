@@ -14,7 +14,7 @@ const RequestShowPage = () => (
   <Routed>
     {({ match }) => (
       <div className="p-3" style={{ maxWidth: '100rem', margin: '0 auto' }}>
-        <h2>Antrag</h2>
+        <h1>Antrag bearbeiten</h1>
         <hr />
         <RequestEdit requestId={match.params.id} />
       </div>
