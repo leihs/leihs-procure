@@ -186,7 +186,11 @@
   [attr p-spec]
   (if (:value p-spec)
     {attr p-spec}
-    {attr (assoc p-spec :value (:default p-spec))}))
+    (->> p-spec
+         :default
+         (if (:read p-spec))
+         (assoc p-spec :value)
+         (hash-map attr))))
 
 (defn get-new
   [context args value]
@@ -194,7 +198,8 @@
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
-        req-stub (cond-> args (not user-arg) (assoc :user auth-entity))]
+        req-stub (cond-> args
+                   (not user-arg) (assoc :user (:user_id auth-entity)))]
     (->> req-stub
          (request-fields-perms/get-for-user-and-request tx auth-entity)
          (map #(apply consider-default %))

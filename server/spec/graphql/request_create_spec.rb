@@ -22,56 +22,57 @@ describe 'request' do
   context 'new' do
     let :q do
       <<-GRAPHQL
-      query newRequestQuery($budgetPeriod: ID!, $category: ID, $template: ID) {
-        new_request(
-          budget_period: $budgetPeriod
-          category: $category
-          template: $template
-        ) {
-          template {
-            value {
-              id
-              article_name
+        query newRequestQuery($budgetPeriod: ID!, $category: ID, $template: ID) {
+          new_request(
+            budget_period: $budgetPeriod
+            category: $category
+            template: $template
+          ) {
+            template {
+              value {
+                id
+                article_name
+              }
             }
-          }
 
-          category {
-            value {
-              id
-              name
+            category {
+              value {
+                id
+                name
+              }
             }
-          }
-          budget_period {
-            value {
-              id
+            budget_period {
+              value {
+                id
+              }
             }
-          }
-          article_name {
-            ...RequestFieldString
-          }
-          price_cents {
-            ...RequestFieldInt
-          }
-          motivation {
-            ...RequestFieldString
-          }
-          priority {
-            ...RequestFieldBoolean
-          }
-          inspector_priority {
-            ...RequestFieldBoolean
-          }
-          requested_quantity {
-            ...RequestFieldInt
-          }
-          approved_quantity {
-            ...RequestFieldInt
+            article_name {
+              ...RequestFieldString
+            }
+            price_cents {
+              ...RequestFieldInt
+            }
+            motivation {
+              ...RequestFieldString
+            }
+            priority {
+              ...RequestFieldPriority
+            }
+            inspector_priority {
+              ...RequestFieldInspectorPriority
+            }
+            requested_quantity {
+              ...RequestFieldInt
+            }
+            approved_quantity {
+              ...RequestFieldInt
+            }
           }
         }
-      }
-      fragment RequestFieldString on RequestFieldString { value, read, write }
-      fragment RequestFieldInt on RequestFieldInt { value, read, write }
-      fragment RequestFieldBoolean on RequestFieldBoolean { value, read, write }
+        fragment RequestFieldString on RequestFieldString { value, read, write }
+        fragment RequestFieldInt on RequestFieldInt { value, read, write }
+        fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
+        fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
       GRAPHQL
     end
 
@@ -82,8 +83,6 @@ describe 'request' do
       end
 
       example 'from category' do
-        pending 'field.read broken'
-
         variables = {
           budgetPeriod: budget_period.id,
           category: category.id
@@ -96,15 +95,13 @@ describe 'request' do
                  article_name: { value: nil, read: true, write: true },
                  price_cents: { value: 0, read: true, write: true },
                  motivation: { value: nil, read: true, write: true },
-                 priority: { value: nil, read: true, write: true },
+                 priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
-                 approved_quantity: { value: nil, read: true, write: false })
+                 approved_quantity: { value: nil, read: false, write: false })
       end
 
       example 'from template' do
-        pending 'field.read broken'
-
         template_category = Category.find(id: template.category_id)
         variables = {
           budgetPeriod: budget_period.id,
@@ -120,10 +117,10 @@ describe 'request' do
                  price_cents: { value: template.price_cents, read: true, write: false },
                  # other form fields:
                  motivation: { value: nil, read: true, write: true },
-                 priority: { value: nil, read: true, write: true },
+                 priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
-                 approved_quantity: { value: nil, read: true, write: false })
+                 approved_quantity: { value: nil, read: false, write: false })
       end
     end
   end
