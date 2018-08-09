@@ -26,7 +26,8 @@
                      to-json
                      (#(sql/call :cast % :json)))
         content-type (or (:content-type file-data)
-                         (get metadata "File:MIMEType"))]
+                         (get metadata "File:MIMEType")
+                         "application/octet-stream")]
     (-> file-data
         (dissoc :tempfile)
         (assoc :content content)
