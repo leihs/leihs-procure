@@ -145,6 +145,11 @@ describe 'requests' do
               }
               write
             }
+            supplier_name {
+              read
+              value 
+              write
+            }
             user {
               read
               value {
