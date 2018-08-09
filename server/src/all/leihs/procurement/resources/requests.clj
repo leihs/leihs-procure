@@ -1,19 +1,13 @@
 (ns leihs.procurement.resources.requests
-  (:require [clj-logging-config.log4j :as logging-config]
+  (:require [clojure set string]
             [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
             [clojure.math.numeric-tower :refer [round]]
-            clojure.set
-            clojure.string
-            [clojure.tools.logging :as log]
-            [leihs.procurement.permissions.request :as request-perms]
-            [leihs.procurement.permissions.requests :as requests-perms]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.budget-period :as budget-period]
-            [leihs.procurement.resources.budget-periods :as budget-periods]
-            [leihs.procurement.resources.request :as request]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+            [leihs.procurement.permissions [request :as request-perms]
+             [requests :as requests-perms]]
+            [leihs.procurement.resources [budget-period :as budget-period]
+             [budget-periods :as budget-periods] [request :as request]]
+            [leihs.procurement.utils.sql :as sql]))
 
 (defn search-query
   [sql-query term]

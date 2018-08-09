@@ -1,11 +1,9 @@
 ; just for testing purposes
 (ns leihs.procurement.scratch
-  (:require [leihs.procurement.paths :refer [path]]
-            [compojure.core :as cpj]
-            [clojure.tools.logging :as log]
+  (:require [compojure.core :as cpj]
             [hiccup.page :refer [html5]]
             [leihs.procurement.backend.html :refer [head]]
-            [logbug.debug :as debug]))
+            [leihs.procurement.paths :refer [path]]))
 
 (defn scratch
   [request]

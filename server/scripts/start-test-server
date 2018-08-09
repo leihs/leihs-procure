@@ -6,4 +6,9 @@ export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_test_procure2?
 # auto find some open port
 export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
 
+cd database
+RAILS_ENV=test bundle exec rake db:environment:set db:drop db:create db:migrate
+cd ..
+
+lein clean
 lein with-profile test run "run"

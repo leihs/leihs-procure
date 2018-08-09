@@ -26,6 +26,7 @@ const Select = ({
   emptyOption,
   value,
   readOnly,
+  disabled,
   ...props
 }) => {
   const selectedValue = getSelectedValueFromProps(value, multiple)
@@ -37,7 +38,7 @@ const Select = ({
       className={cx('custom-select', props.className)}
       multiple={multiple}
       value={selectedValue}
-      disabled={readOnly}
+      disabled={disabled || readOnly}
       onChange={e => {
         if (props.readOnly) return e.preventDefault()
         props.onChange({
@@ -91,5 +92,11 @@ Select.propTypes = {
     })
   ])
 }
+
+// NOTE: placeholder while data is loading etc.
+const SelectPlaceholder = (text, rest) => (
+  <Select {...rest} disabled emptyOption={{ children: text }} options={[]} />
+)
+Select.Placeholder = SelectPlaceholder
 
 export default Select

@@ -21,6 +21,7 @@ const InlineSearch = ({
   itemToString,
   idFromItem,
   onSelect,
+  inputProps,
   ...props
 }) => {
   log('render', props)
@@ -49,7 +50,7 @@ const InlineSearch = ({
           <input
             value=""
             onChange={() => {}}
-            {...getInputProps({ placeholder: 'Search' })}
+            {...getInputProps({ placeholder: 'Search', ...inputProps })}
             {...inputNodeVisualProps}
           />
           <Query

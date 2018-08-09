@@ -1,10 +1,6 @@
 (ns leihs.procurement.resources.user
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.utils.sql :as sql]
-            [leihs.procurement.utils.ds :refer [get-ds]]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def user-base-query
   (-> (sql/select :users.*)
@@ -18,7 +14,7 @@
                      (-> user-base-query
                          (sql/where [:= :users.id
                                      (or (:user_id value) ; for
-                                                          ; RequesterOrganization
+                                         ; RequesterOrganization
                                          (:value value) ; for RequestFieldUser
                                        )])
                          sql/format))))

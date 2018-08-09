@@ -1,16 +1,12 @@
 (ns leihs.procurement.resources.categories
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.graphql.helpers :refer
              [add-resource-type add-to-parent-values]]
             [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.category :as category]
-            [leihs.procurement.resources.inspectors :as inspectors]
-            [leihs.procurement.resources.viewers :as viewers]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+            [leihs.procurement.resources [category :as category]
+             [inspectors :as inspectors] [viewers :as viewers]]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def categories-base-query
   (-> (sql/select :procurement_categories.*)

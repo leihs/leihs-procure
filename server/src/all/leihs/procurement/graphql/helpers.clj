@@ -1,5 +1,4 @@
-(ns leihs.procurement.graphql.helpers
-  (:require [clojure.tools.logging :as log]))
+(ns leihs.procurement.graphql.helpers)
 
 (defn add-resource-type [m t] (assoc m :resource-type t))
 

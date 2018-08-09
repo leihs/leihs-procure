@@ -1,8 +1,6 @@
 (ns leihs.procurement.resources.model
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]))
 
 (defn model-query
   [id]
@@ -18,8 +16,8 @@
   (get-model-by-id (-> context
                        :request
                        :tx)
-                   (:value value) ; for RequestFieldModel
-    ))
+                   (or (:value value) ; for RequestFieldModel
+                       (:model_id value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

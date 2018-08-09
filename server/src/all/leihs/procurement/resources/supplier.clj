@@ -1,8 +1,6 @@
 (ns leihs.procurement.resources.supplier
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]))
 
 (defn supplier-query
   [id]
@@ -18,8 +16,8 @@
   (get-supplier-by-id (-> context
                           :request
                           :tx)
-                      (:value value) ; for RequestFieldSupplier
-    ))
+                      (or (:value value) ; for RequestFieldSupplier
+                          (:supplier_id value))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

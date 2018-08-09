@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 const scalarField = t => gql`
-  fragment RequestField${t} on RequestField${t} { value, read, write }
+  fragment RequestField${t} on RequestField${t} { value, read, write, required }
 `
 
 export const RequestField = {
@@ -83,17 +83,30 @@ export const RequestFieldsForIndex = gql`
   }
 `
 
-export const RequestFieldsForShow = gql`
-  fragment RequestFieldsForShow on Request {
+export const RequestFieldsForEdit = gql`
+  fragment RequestFieldsForEdit on Request {
     ...RequestFieldsForIndex
 
+    template {
+      value {
+        id
+        article_name
+      }
+    }
+
     category {
+      read
+      write
+      required
       value {
         id
         name
       }
     }
     budget_period {
+      read
+      write
+      required
       value {
         id
       }
@@ -105,6 +118,7 @@ export const RequestFieldsForShow = gql`
     supplier {
       read
       write
+      required
       value {
         id
         name
@@ -134,11 +148,13 @@ export const RequestFieldsForShow = gql`
     priority {
       read
       write
+      required
       value
     }
     inspector_priority {
       read
       write
+      required
       value
     }
 
@@ -160,6 +176,7 @@ export const RequestFieldsForShow = gql`
     room {
       read
       write
+      required
       value {
         id
         name
@@ -177,6 +194,7 @@ export const RequestFieldsForShow = gql`
     attachments {
       read
       write
+      required
       value {
         id
         filename
@@ -190,12 +208,15 @@ export const RequestFieldsForShow = gql`
     cost_center {
       read
       write
+      required
       value
     }
     procurement_account {
       read
       write
       value
+      # TODO: for this field a Bool is not enough, its a dependent field!
+      # required
     }
     internal_order_number {
       ...RequestFieldString

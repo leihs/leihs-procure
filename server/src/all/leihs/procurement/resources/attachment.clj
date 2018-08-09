@@ -1,15 +1,9 @@
 (ns leihs.procurement.resources.attachment
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.data.codec.base64 :as base64]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
+  (:require [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug])
-  (:import [java.util Base64]))
+            [leihs.procurement.utils.sql :as sql])
+  (:import java.util.Base64))
 
 (def attachment-base-query
   (-> (sql/select :procurement_attachments.*)

@@ -1,11 +1,7 @@
 (ns leihs.procurement.permissions.user
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.permissions.categories :as categories-perms]
-            [leihs.procurement.utils.sql :as sql]
-            [leihs.procurement.utils.ds :refer [get-ds]]
-            [logbug.debug :as debug]))
+            [leihs.procurement.utils.sql :as sql]))
 
 (defn admin?
   [tx auth-entity]

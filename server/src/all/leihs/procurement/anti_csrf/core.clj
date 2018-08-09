@@ -1,12 +1,8 @@
 (ns leihs.procurement.anti-csrf.core
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]])
   (:require [leihs.procurement.constants :as constants]
-            [clojure.tools.logging :as logging]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug :refer [I>]]
-            [logbug.thrown :as thrown])
-  (:import [java.util UUID]))
+            [leihs.procurement.utils.core :refer [presence str]])
+  (:import java.util.UUID))
 
 (defn http-safe?
   [request]

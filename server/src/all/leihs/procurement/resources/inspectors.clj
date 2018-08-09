@@ -1,11 +1,7 @@
 (ns leihs.procurement.resources.inspectors
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.resources.user :as user]
-            [leihs.procurement.utils.ds :as ds]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+            [leihs.procurement.utils.sql :as sql]))
 
 (defn get-inspectors
   [context _ value]

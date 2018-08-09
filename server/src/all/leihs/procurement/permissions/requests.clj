@@ -1,7 +1,5 @@
 (ns leihs.procurement.permissions.requests
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.permissions.user :as user-perms]
+  (:require [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn apply-scope

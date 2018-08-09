@@ -1,15 +1,9 @@
 (ns leihs.procurement.paths
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.procurement.utils.core :refer [keyword str presence]]
-            [bidi.verbose :refer [branch param leaf]]
-            [bidi.bidi :refer [path-for match-route]]
+  (:require [bidi [bidi :refer [path-for]] [verbose :refer [branch leaf param]]]
+            [leihs.procurement.utils.core :refer [str]]
             [leihs.procurement.utils.url.query-params :refer
-             [encode-query-params]]
-            [uritemplate-clj.core :as uri-templ]
-            [clojure.tools.logging :as logging]
-            [logbug.catcher :as catcher]
-            [logbug.debug :as debug]
-            [logbug.thrown :as thrown]))
+             [encode-query-params]]))
 
 (def paths
   (branch

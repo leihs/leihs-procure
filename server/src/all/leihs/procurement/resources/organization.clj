@@ -1,9 +1,6 @@
 (ns leihs.procurement.resources.organization
-  (:require [clj-logging-config.log4j :as logging-config]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as logging]
-            [leihs.procurement.utils.sql :as sql]
-            [logbug.debug :as debug]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.utils.sql :as sql]))
 
 (def organization-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -35,9 +32,9 @@
                      (-> organization-base-query
                          (sql/merge-where [:= :procurement_organizations.id
                                            (or (:organization_id value) ; for
-                                                                        ; RequesterOrganization
+                                               ; RequesterOrganization
                                                (:value value) ; for
-                                                              ; RequestFieldOrganization
+                                               ; RequestFieldOrganization
                                              )])
                          sql/format))))
 

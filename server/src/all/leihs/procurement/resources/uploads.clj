@@ -1,6 +1,5 @@
 (ns leihs.procurement.resources.uploads
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn delete!

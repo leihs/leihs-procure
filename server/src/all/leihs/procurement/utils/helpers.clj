@@ -2,8 +2,7 @@
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clj-time.core :as clj-time]
-            [clojure.set :refer [subset?]]
-            [clojure.tools.logging :as log]))
+            [clojure.set :refer [subset?]]))
 
 (defn submap? [m1 m2] (subset? (set m1) (set m2)))
 

@@ -1,10 +1,7 @@
 (ns leihs.procurement.utils.json-protocol
-  (:require [clojure.data.json]
-            [clj-time.core :as time]
-            [clj-time.format :as time-format]
-            [clj-time.coerce :as time-coerce]
-            [cheshire.core]
-            [cheshire.generate]))
+  (:require [cheshire core generate]
+            [clj-time [coerce :as time-coerce] [format :as time-format]]
+            clojure.data.json))
 
 (defn- date-time-to-string
   [date-time]

@@ -21,6 +21,19 @@ TODO:
 
 ---
 
+DOCS
+
+documentation of the most important frameworks and libraries used in the client:
+
+- <https://reactjs.org/docs/react-api.html>
+- <https://getbootstrap.com/docs/4.1/getting-started/introduction/>
+- <https://reactstrap.github.io/>
+- <https://fontawesome.com/icons?d=gallery&s=solid&c=objects&m=free>
+- <https://github.com/FortAwesome/react-fontawesome#advanced>
+- <https://www.apollographql.com/docs/react/api/react-apollo.html>
+- <https://reacttraining.com/react-router/web>
+
+---
 dirs
 
 ```

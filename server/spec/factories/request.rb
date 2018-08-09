@@ -19,5 +19,6 @@ FactoryBot.define do
     requested_quantity { rand(50) }
     room_id { create(:room).id }
     user_id { create(:user).id }
+    motivation { Faker::Lorem.sentence }
   end
 end
