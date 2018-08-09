@@ -76,17 +76,15 @@ describe 'request' do
         fragment RequestFieldString on RequestFieldString { value, read, write }
         fragment RequestFieldInt on RequestFieldInt { value, read, write }
         fragment RequestFieldRoom on RequestFieldRoom {
-          value {
-            building {
-              id
-            },
-            general
-          },
-          read,
+          read
           write
+          required
+          value { ...RoomProps }
+          default { ...RoomProps}
         }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
+        fragment RoomProps on Room { id general building { id }}
       GRAPHQL
     end
 
@@ -114,14 +112,23 @@ describe 'request' do
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
                  room: {
+                   read: true,
+                   write: true,
+                   required: true,
                    value: {
+                     id: @general_room_from_general.id,
                      building: {
                        id: @general_room_from_general.building_id
                      },
                      general: true
                    },
-                   read: true,
-                   write: true
+                   default: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
                  },
                  approved_quantity: { value: nil, read: false, write: false })
       end
@@ -146,14 +153,23 @@ describe 'request' do
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
                  room: {
+                   read: true,
+                   write: true,
+                   required: true,
                    value: {
+                     id: @general_room_from_general.id,
                      building: {
                        id: @general_room_from_general.building_id
                      },
                      general: true
                    },
-                   read: true,
-                   write: true
+                   default: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
                  },
                  approved_quantity: { value: nil, read: false, write: false })
       end
