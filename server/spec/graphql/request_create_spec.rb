@@ -64,20 +64,33 @@ describe 'request' do
             requested_quantity {
               ...RequestFieldInt
             }
+            room {
+              ...RequestFieldRoom
+            }
             approved_quantity {
               ...RequestFieldInt
             }
           }
         }
+
         fragment RequestFieldString on RequestFieldString { value, read, write }
         fragment RequestFieldInt on RequestFieldInt { value, read, write }
+        fragment RequestFieldRoom on RequestFieldRoom {
+          read
+          write
+          required
+          value { ...RoomProps }
+          default { ...RoomProps}
+        }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
+        fragment RoomProps on Room { id general building { id }}
       GRAPHQL
     end
 
     context 'get data for new request' do
       before do
+        @general_room_from_general = FactoryBot.create(:room, :general_from_general)
         # check that user is not inspector for category
         expect(CategoryInspector.find(category_id: category.id, user_id: requester.id)).not_to be
       end
@@ -98,6 +111,25 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 room: {
+                   read: true,
+                   write: true,
+                   required: true,
+                   value: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
+                   default: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
+                 },
                  approved_quantity: { value: nil, read: false, write: false })
       end
 
@@ -120,6 +152,25 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 room: {
+                   read: true,
+                   write: true,
+                   required: true,
+                   value: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
+                   default: {
+                     id: @general_room_from_general.id,
+                     building: {
+                       id: @general_room_from_general.building_id
+                     },
+                     general: true
+                   },
+                 },
                  approved_quantity: { value: nil, read: false, write: false })
       end
     end
