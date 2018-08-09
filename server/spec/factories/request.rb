@@ -20,5 +20,6 @@ FactoryBot.define do
     room_id { create(:room).id }
     user_id { create(:user).id }
     motivation { Faker::Lorem.sentence }
+    supplier_name { Faker::Company.name }
   end
 end

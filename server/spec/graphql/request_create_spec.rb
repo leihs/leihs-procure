@@ -70,6 +70,9 @@ describe 'request' do
             approved_quantity {
               ...RequestFieldInt
             }
+            supplier_name {
+              ...RequestFieldString
+            }
           }
         }
 
@@ -111,6 +114,7 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 approved_quantity: { value: nil, read: false, write: false },
                  room: {
                    read: true,
                    write: true,
@@ -130,7 +134,7 @@ describe 'request' do
                      general: true
                    },
                  },
-                 approved_quantity: { value: nil, read: false, write: false })
+                 supplier_name: { value: nil, read: true, write: true })
       end
 
       example 'from template' do
@@ -152,6 +156,7 @@ describe 'request' do
                  priority: { value: 'NORMAL', read: true, write: true },
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
+                 approved_quantity: { value: nil, read: false, write: false },
                  room: {
                    read: true,
                    write: true,
@@ -171,7 +176,7 @@ describe 'request' do
                      general: true
                    },
                  },
-                 approved_quantity: { value: nil, read: false, write: false })
+                 supplier_name: { value: nil, read: true, write: false })
       end
     end
   end
@@ -191,6 +196,9 @@ describe 'request' do
             }
           }
           motivation {
+            value
+          }
+          supplier_name {
             value
           }
         }
@@ -213,14 +221,6 @@ describe 'request' do
         room: FactoryBot.create(:room).id,
         user: viewer.id
       }
-
-      q = <<-GRAPHQL
-        mutation createRequest($input: CreateRequestInput) {
-          create_request(input_data: $input) {
-            id
-          }
-        }
-      GRAPHQL
 
       variables = { input: attrs }
       result = query(q, viewer.id, variables)
@@ -245,7 +245,8 @@ describe 'request' do
             room: FactoryBot.create(:room).id,
             motivation: Faker::Lorem.sentence,
             attachments: [{ id: uploads[0].id, to_delete: false, __typename: 'Upload' },
-                          { id: uploads[1].id, to_delete: true, __typename: 'Upload' }]
+                          { id: uploads[1].id, to_delete: true, __typename: 'Upload' }],
+            supplier_name: 'OBike'
           }
         }
 
@@ -256,6 +257,7 @@ describe 'request' do
         data = result[:data][:create_request]
         expect(data[:id]).to be == request.id
         expect(data[:attachments][:value].count).to be == 1
+        expect(data[:supplier_name][:value]).to eq('OBike')
         expect(Upload.count).to be == 0
         expect(Attachment.count).to be == 1
       end

@@ -281,6 +281,19 @@
                                 auth-user-is-admin)),
                 :default (:supplier_id template),
                 :required false},
+     :supplier_name {:read (or (and auth-user-is-requester
+                                    requested-by-auth-user)
+                               category-viewable-by-auth-user
+                               auth-user-is-inspector
+                               auth-user-is-admin),
+                     :write (and request-without-template
+                                 (not budget-period-is-past)
+                                 (or (and auth-user-is-requester
+                                          budget-period-in-requesting-phase)
+                                     category-inspectable-by-auth-user
+                                     auth-user-is-admin)),
+                     :default (:supplier_name template),
+                     :required false},
      :template {:read true,
                 :write (not request-exists),
                 :default (:id template),
