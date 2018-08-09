@@ -45,6 +45,8 @@ const prepareFormValues = request => {
   return fields
 }
 
+const requiredLabel = (label, required) => label + (required ? ' *' : '')
+
 class RequestForm extends React.Component {
   state = { showValidations: false }
   showValidations = (bool = true) => this.setState({ showValidations: bool })
@@ -61,12 +63,12 @@ class RequestForm extends React.Component {
       >
         {({ fields, setValue, getValue, ...formHelpers }) => {
           const formPropsFor = key => {
-            const required = request[key] ? !request[key].required : null
+            const required = request[key] ? request[key].required : null
             const readOnly = request[key] ? !request[key].write : null
             return {
               ...formHelpers.formPropsFor(key),
               // add translated labels:
-              label: t(`request_form_field.${key}`) + (required ? ' *' : ''),
+              label: requiredLabel(t(`request_form_field.${key}`), required),
               hidden: request[key] ? !request[key].read : false,
               required,
               readOnly
@@ -95,21 +97,33 @@ class RequestForm extends React.Component {
 
                   <FormField {...formPropsFor('receiver')} />
 
-                  <FormGroup label={formPropsFor('building').label}>
-                    <BuildingAutocomplete
-                      {...formPropsFor('building')}
-                      disabled={formPropsFor('room').readOnly}
-                      readOnly={formPropsFor('room').readOnly}
-                    />
-                  </FormGroup>
+                  <RequestInput field={formPropsFor('room')}>
+                    {roomField => (
+                      <F>
+                        <FormGroup
+                          label={requiredLabel(
+                            formPropsFor('building').label,
+                            roomField.required
+                          )}
+                        >
+                          <BuildingAutocomplete
+                            {...formPropsFor('building')}
+                            disabled={roomField.readOnly}
+                            readOnly={roomField.readOnly}
+                            required={roomField.required}
+                          />
+                        </FormGroup>
 
-                  <FormGroup label={formPropsFor('room').label}>
-                    <RoomAutocomplete
-                      {...formPropsFor('room')}
-                      disabled={formPropsFor('room').readOnly}
-                      buildingId={fields.building}
-                    />
-                  </FormGroup>
+                        <FormGroup label={roomField.label}>
+                          <RoomAutocomplete
+                            {...roomField}
+                            disabled={roomField.readOnly}
+                            buildingId={fields.building}
+                          />
+                        </FormGroup>
+                      </F>
+                    )}
+                  </RequestInput>
 
                   <FormField
                     type="textarea"
