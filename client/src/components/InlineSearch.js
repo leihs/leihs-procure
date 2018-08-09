@@ -1,6 +1,6 @@
 import React from 'react'
+import f from 'lodash'
 import cx from 'classnames'
-import isEmpty from 'lodash/isEmpty'
 import Downshift from 'downshift'
 import { Query } from 'react-apollo'
 import Highlighter from 'react-highlight-words'
@@ -9,6 +9,98 @@ import Highlighter from 'react-highlight-words'
 import pgUnaccent from 'lodash/deburr'
 import logger from 'debug'
 const log = logger('app:ui:InlineSearch')
+
+// # COMPONENT
+const defaultProps = {
+  itemToString: item => String(item)
+}
+
+const InlineSearch = ({
+  searchQuery,
+  queryVariables,
+  itemToString,
+  idFromItem,
+  onSelect,
+  ...props
+}) => {
+  log('render', props)
+  return (
+    <Downshift
+      {...props}
+      itemToString={i => itemToString(i) || ''}
+      onSelect={(selectedItem, instance) => {
+        if (!selectedItem) return
+        onSelect && onSelect(selectedItem)
+        instance.clearSelection()
+      }}
+    >
+      {({
+        getInputProps,
+        getItemProps,
+        isOpen,
+        inputValue,
+        selectedItem,
+        highlightedIndex
+      }) => (
+        <div
+          className={cx(UICLASS, 'ui-inline-search')}
+          {...resultsWrapperVisualProps}
+        >
+          <input
+            value=""
+            onChange={() => {}}
+            {...getInputProps({ placeholder: 'Search' })}
+            {...inputNodeVisualProps}
+          />
+          <Query
+            skip={!isOpen || f.isEmpty(inputValue)}
+            query={searchQuery}
+            variables={{ ...queryVariables, searchTerm: inputValue }}
+          >
+            {({ loading, error, data }) => {
+              if (!isOpen) return false
+              if (loading) return <p>Loading...</p>
+              if (error) {
+                log(error)
+                const errMsg =
+                  !error || f.isEmpty(error.graphQLErrors)
+                    ? error.toString()
+                    : JSON.stringify(error.graphQLErrors, 0, 2)
+                return (
+                  <p>
+                    Error :( <code>{errMsg}</code>
+                  </p>
+                )
+              }
+              log('query result', { loading, error, data })
+
+              const resultKeys = f.keys(data)
+              if (resultKeys.length !== 1) throw new Error('Ambiguous result!')
+              const items = data[resultKeys[0]]
+
+              return (
+                <ItemsList
+                  items={items}
+                  searchTerm={inputValue}
+                  itemToString={itemToString}
+                  idFromItem={idFromItem}
+                  selectedItem={selectedItem}
+                  highlightedIndex={highlightedIndex}
+                  getItemProps={getItemProps}
+                  {...props}
+                />
+              )
+            }}
+          </Query>
+        </div>
+      )}
+    </Downshift>
+  )
+}
+
+InlineSearch.defaultProps = defaultProps
+
+export default InlineSearch
 
 // # STYLES
 const UICLASS = 'ui-interactive-text-field'
@@ -77,107 +169,23 @@ const ItemsList = ({
 }) => {
   return (
     <div {...resultsBoxVisualProps}>
-      {items.length === 0 && <div {...resultsItemVisualProps}>No results!</div>}
-      {items.map((item, index) => (
-        <div
-          {...getItemProps({ item: item })}
-          key={idFromItem(item)}
-          {...resultsItemVisualProps}
-          className={cx(resultsItemVisualProps.className, {
-            'rounded-top': index === 0,
-            'bg-dark text-light': highlightedIndex === index
-          })}
-        >
-          {highlightTextParts(searchTerm, itemToString(item))}
-        </div>
-      ))}
+      {f.isEmpty(items) ? (
+        <div {...resultsItemVisualProps}>No results!</div>
+      ) : (
+        items.map((item, index) => (
+          <div
+            {...getItemProps({ item: item })}
+            key={idFromItem(item)}
+            {...resultsItemVisualProps}
+            className={cx(resultsItemVisualProps.className, {
+              'rounded-top': index === 0,
+              'bg-dark text-light': highlightedIndex === index
+            })}
+          >
+            {highlightTextParts(searchTerm, itemToString(item))}
+          </div>
+        ))
+      )}
     </div>
   )
 }
-
-// # COMPONENT
-const defaultProps = {
-  itemToString: item => String(item)
-}
-
-const InlineSearch = ({
-  searchQuery,
-  queryVariables,
-  itemToString,
-  idFromItem,
-  onSelect,
-  ...props
-}) => {
-  log('render', props)
-  return (
-    <Downshift
-      {...props}
-      itemToString={i => itemToString(i) || ''}
-      onSelect={(selectedItem, instance) => {
-        if (!selectedItem) return
-        onSelect && onSelect(selectedItem)
-        instance.clearSelection()
-      }}
-    >
-      {({
-        getInputProps,
-        getItemProps,
-        isOpen,
-        inputValue,
-        selectedItem,
-        highlightedIndex
-      }) => (
-        <div
-          className={cx(UICLASS, 'ui-inline-search')}
-          {...resultsWrapperVisualProps}
-        >
-          <input
-            value=""
-            onChange={() => {}}
-            {...getInputProps({ placeholder: 'Search' })}
-            {...inputNodeVisualProps}
-          />
-          <Query
-            skip={!isOpen || isEmpty(inputValue)}
-            query={searchQuery}
-            variables={{ ...queryVariables, searchTerm: inputValue }}
-          >
-            {({ loading, error, data }) => {
-              if (!isOpen) return false
-              if (loading) return <p>Loading...</p>
-              if (error) {
-                log(error)
-                const errMsg =
-                  !error || isEmpty(error.graphQLErrors)
-                    ? error.toString()
-                    : JSON.stringify(error.graphQLErrors, 0, 2)
-                return (
-                  <p>
-                    Error :( <code>{errMsg}</code>
-                  </p>
-                )
-              }
-
-              return (
-                <ItemsList
-                  items={data.users}
-                  searchTerm={inputValue}
-                  itemToString={itemToString}
-                  idFromItem={idFromItem}
-                  selectedItem={selectedItem}
-                  highlightedIndex={highlightedIndex}
-                  getItemProps={getItemProps}
-                  {...props}
-                />
-              )
-            }}
-          </Query>
-        </div>
-      )}
-    </Downshift>
-  )
-}
-
-InlineSearch.defaultProps = defaultProps
-
-export default InlineSearch
