@@ -25,8 +25,11 @@
          :content
          (.decode (Base64/getMimeDecoder))
          (hash-map :body)
-         (merge {:headers {"Content-Type" (:content_type a),
-                           "Content-Transfer-Encoding" "binary"}}))
+         (merge
+           {:headers {"Content-Type" (:content_type a),
+                      "Content-Transfer-Encoding" "binary",
+                      "Content-Disposition"
+                        (str "inline; " "filename=\"" (:filename a) "\"")}}))
     {:status 404}))
 
 (def attachment-path (path :attachment {:attachment-id ":attachment-id"}))

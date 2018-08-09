@@ -3,16 +3,19 @@ import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
 
 const isDev = process.env.NODE_ENV !== 'production'
+const noop = () => {}
 
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
   // NOTE: Checks *keys* must be present, but values can be missing.
   //       Guards against forgetting to query the keys/fields (via GraphQL)!
-  function expectKeys(wanted) {
-    if (!isDev) return
-    const missing = f.difference(wanted, Object.keys(o))
-    if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
-  }
+  const expectKeys = isDev
+    ? noop
+    : wanted => {
+        if (!isDev) return
+        const missing = f.difference(wanted, Object.keys(o))
+        if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
+      }
 
   if (!o) return '?'
 
@@ -28,6 +31,10 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
       return short || !o.shortname
         ? `${o.shortname || o.name}`
         : `${o.name} (${o.shortname})`
+
+    case 'Supplier':
+      expectKeys(['name'])
+      return o.name
 
     case 'User':
       expectKeys(['firstname', 'lastname'])

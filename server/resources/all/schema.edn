@@ -441,6 +441,11 @@
     :rooms
       {:args {:building_id {:type ID}}, :resolve :rooms, :type (list :Room)},
     :settings {:resolve :settings, :type :ProcurementSettings},
+    :suppliers {:args {:limit {:type (non-null Int)},
+                       :offset {:type (non-null Int)},
+                       :search_term {:type (non-null String)}},
+                :resolve :suppliers,
+                :type (list :Supplier)},
     :templates {:resolve :templates, :type (list :Template)},
     :users {:args {:exclude_ids {:type (list ID)},
                    :limit {:type (non-null Int)},
