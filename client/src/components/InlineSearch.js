@@ -60,6 +60,7 @@ const InlineSearch = ({
           >
             {({ loading, error, data }) => {
               if (!isOpen) return false
+              log('query', { loading, error, data })
               if (loading) return <p>Loading...</p>
               if (error) {
                 log(error)
@@ -73,7 +74,6 @@ const InlineSearch = ({
                   </p>
                 )
               }
-              log('query result', { loading, error, data })
 
               const resultKeys = f.keys(data)
               if (resultKeys.length !== 1) throw new Error('Ambiguous result!')

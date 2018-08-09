@@ -1,5 +1,5 @@
 import React, { Fragment as F } from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -427,9 +427,10 @@ class RequestForm extends React.Component {
 }
 export default RequestForm
 
-RequestForm.propTypes = {
-  request: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired
-}
+// FIXME: require props.id OR props.request.id
+// RequestForm.propTypes = {
+//   request: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired
+// }
 
 const SelectionDropdown = ({
   toggle,
