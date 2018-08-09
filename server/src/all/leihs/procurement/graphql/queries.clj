@@ -9,7 +9,7 @@
      [categories :as categories] [category :as category]
      [current-user :as current-user] [inspectors :as inspectors]
      [main-categories :as main-categories] [main-category :as main-category]
-     [model :as model] [organization :as organization]
+     [model :as model] [models :as models] [organization :as organization]
      [organizations :as organizations] [request :as request]
      [requesters-organizations :as requesters-organizations]
      [requests :as requests] [room :as room] [rooms :as rooms]
@@ -50,6 +50,7 @@
    :main-category main-category/get-main-category,
    :main-categories main-categories/get-main-categories,
    :model model/get-model,
+   :models models/get-models,
    :new-request
      (fn [context args value]
        (let [rrequest (:request context)
