@@ -27,6 +27,8 @@ import RoomAutocomplete from './RoomAutocomplete'
 
 const tmpUppercasey = v => (f.isString(v) ? v.toUpperCase() : v)
 
+const nbsp = '\u00A0'
+
 const prepareFormValues = request => {
   const fields = f.mapValues(f.omit(request, ['room', 'building']), field => {
     if (f.isObject(field)) {
@@ -45,7 +47,7 @@ const prepareFormValues = request => {
   return fields
 }
 
-const requiredLabel = (label, required) => label + (required ? ' *' : '')
+const requiredLabel = (label, required) => label + (required ? `${nbsp}*` : '')
 
 class RequestForm extends React.Component {
   state = { showValidations: false }
