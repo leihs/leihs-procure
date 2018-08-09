@@ -87,7 +87,6 @@ describe 'request' do
         }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
-        fragment RequestFieldRoom on RequestFieldRoom { value, read, write }
       GRAPHQL
     end
 
@@ -103,7 +102,7 @@ describe 'request' do
           category: category.id
         }
         result = query(q, requester.id, variables).deep_symbolize_keys
-        # binding.pry
+        binding.pry
         expect(result.deep_symbolize_keys[:data][:new_request])
           .to eq(template: { value: nil },
                  category: { value: { id: category.id, name: category.name } },
