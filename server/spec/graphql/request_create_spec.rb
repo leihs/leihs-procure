@@ -125,7 +125,7 @@ describe 'request' do
                  inspector_priority: { value: nil, read: false, write: false },
                  requested_quantity: { value: nil, read: true, write: true },
                  approved_quantity: { value: nil, read: false, write: false },
-                 supplier_name: { value: nil, read: true, write: true })
+                 supplier_name: { value: nil, read: true, write: false })
       end
     end
   end

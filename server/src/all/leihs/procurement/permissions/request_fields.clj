@@ -290,7 +290,7 @@
                                           budget-period-in-requesting-phase)
                                      category-inspectable-by-auth-user
                                      auth-user-is-admin)),
-                     :default (:supplier_id template),
+                     :default (:supplier_name template),
                      :required false},
      :template {:read true,
                 :write (not request-exists),
