@@ -92,6 +92,7 @@ describe 'request' do
 
     context 'get data for new request' do
       before do
+        @general_room_from_general = FactoryBot.create(:room, :general_from_general)
         # check that user is not inspector for category
         expect(CategoryInspector.find(category_id: category.id, user_id: requester.id)).not_to be
       end
@@ -102,7 +103,6 @@ describe 'request' do
           category: category.id
         }
         result = query(q, requester.id, variables).deep_symbolize_keys
-        binding.pry
         expect(result.deep_symbolize_keys[:data][:new_request])
           .to eq(template: { value: nil },
                  category: { value: { id: category.id, name: category.name } },
@@ -116,10 +116,12 @@ describe 'request' do
                  room: {
                    value: {
                      building: {
-                       id: 'abae04c5-d767-425e-acc2-7ce04df645d1' 
+                       id: @general_room_from_general.building_id
                      },
                      general: true
-                   }
+                   },
+                   read: true,
+                   write: true
                  },
                  approved_quantity: { value: nil, read: false, write: false })
       end
@@ -146,10 +148,12 @@ describe 'request' do
                  room: {
                    value: {
                      building: {
-                       id: 'abae04c5-d767-425e-acc2-7ce04df645d1' 
+                       id: @general_room_from_general.building_id
                      },
                      general: true
-                   }
+                   },
+                   read: true,
+                   write: true
                  },
                  approved_quantity: { value: nil, read: false, write: false })
       end
