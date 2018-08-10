@@ -17,7 +17,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
         if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
       }
 
-  if (!o) return '?'
+  if (!o) return false
 
   switch (o.__typename) {
     case 'Room':

@@ -115,6 +115,10 @@ export const RequestFieldsForEdit = gql`
     article_name {
       ...RequestFieldString
     }
+
+    supplier_name {
+      ...RequestFieldString
+    }
     supplier {
       read
       write

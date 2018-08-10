@@ -17,10 +17,13 @@
   "inspector_priority_label_HIGH": "Hoch",
   "inspector_priority_label_MANDATORY": "Zwingend",
 
+  "form_input_check_free_text": "Als Freitext",
+
   "request_form_field": {
     "article_name": "Artikel oder Projekt",
     "article_number": "Artikelnr. oder Herstellernr.",
-    "supplier": "Lieferant [auswahl]",
+    "supplier": "Lieferant",
+    "supplier_name": "Lieferant",
     "receiver": "Name des Empfängers",
     "building": "Gebäude",
     "room": "Raum",

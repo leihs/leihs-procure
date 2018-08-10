@@ -189,6 +189,7 @@ export const requestDataFromFields = (request, fields) => {
   const boolify = (key, val) =>
     !val ? false : !val[key] ? null : val[key] === key
 
+  const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room').room
   const requestData = {
     ...valueIfWritable(fields, request, 'article_name'),
@@ -201,9 +202,6 @@ export const requestDataFromFields = (request, fields) => {
     ...valueIfWritable(fields, request, 'order_quantity'),
 
     ...valueIfWritable(fields, request, 'motivation'),
-    // TODO: form field with id (autocomplete)
-    // ...valueIfWritable(fields, request, 'supplier'),
-
     ...valueIfWritable(fields, request, 'priority'),
     ...valueIfWritable(fields, request, 'inspector_priority'),
     ...valueIfWritable(fields, request, 'inspection_comment'),
@@ -222,6 +220,10 @@ export const requestDataFromFields = (request, fields) => {
       valueIfWritable(fields, request, 'attachments').attachments,
       o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
     ),
+
+    ...(supplier
+      ? { supplier: supplier.supplier.id }
+      : valueIfWritable(fields, request, 'supplier_name')),
 
     // NOTE: no building, just room!
     ...(!room ? null : { room })

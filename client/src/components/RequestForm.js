@@ -24,6 +24,7 @@ import {
 import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
 import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
+import SupplierAutocomplete from './SupplierAutocomplete'
 
 const tmpUppercasey = v => (f.isString(v) ? v.toUpperCase() : v)
 
@@ -44,6 +45,9 @@ const prepareFormValues = request => {
 
   fields.room = f.get(request, 'room.value.id')
   fields.building = f.get(request, 'room.value.building.id')
+
+  // extra form controlls
+  fields._supplier_as_text = f.present(fields.supplier_name)
   return fields
 }
 
@@ -94,8 +98,44 @@ class RequestForm extends React.Component {
 
                   <FormField {...formPropsFor('article_number')} />
 
-                  {/* FIXME: handle field ID vs String */}
-                  <FormField {...formPropsFor('supplier')} />
+                  <RequestInput field={formPropsFor('supplier')}>
+                    {supplierField => (
+                      <Row cls="no-gutters">
+                        <Col sm>
+                          {fields._supplier_as_text ? (
+                            <FormField {...formPropsFor('supplier_name')} />
+                          ) : (
+                            <FormGroup label={supplierField.label}>
+                              <SupplierAutocomplete {...supplierField} />
+                            </FormGroup>
+                          )}
+                        </Col>
+                        <Col sm="3" cls="pl-sm-3">
+                          <FormGroup>
+                            <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
+                              <input
+                                type="checkbox"
+                                className="custom-control-input"
+                                {...formPropsFor('_supplier_as_text')}
+                                label={null}
+                              />
+                              <label
+                                className="custom-control-label"
+                                htmlFor={formPropsFor('_supplier_as_text').id}
+                              >
+                                <small>
+                                  {t('form_input_check_free_text').replace(
+                                    /\s/g,
+                                    nbsp
+                                  )}
+                                </small>
+                              </label>
+                            </div>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                    )}
+                  </RequestInput>
 
                   <FormField {...formPropsFor('receiver')} />
 
