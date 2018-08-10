@@ -13,11 +13,11 @@ const SEARCH_SUPPLIERS_QUERY = gql`
   }
 `
 
-const SupplierAutocomplete = ({ onSelect }) => (
+const SupplierAutocomplete = props => (
   <InlineSearch
     searchQuery={SEARCH_SUPPLIERS_QUERY}
     itemToString={DisplayName}
-    onSelect={onSelect}
+    {...props}
   />
 )
 

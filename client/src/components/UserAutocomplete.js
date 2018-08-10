@@ -19,13 +19,13 @@ const SEARCH_USERS_QUERY = gql`
   }
 `
 
-const UserAutocomplete = ({ onSelect, excludeIds, ...p }) => (
+const UserAutocomplete = ({ onSelect, excludeIds, ...props }) => (
   <InlineSearch
-    {...p}
     searchQuery={SEARCH_USERS_QUERY}
     queryVariables={{ excludeIds }}
     itemToString={DisplayName}
     onSelect={onSelect}
+    {...props}
   />
 )
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import f from 'lodash'
 import cx from 'classnames'
 import Downshift from 'downshift'
@@ -14,6 +15,10 @@ const log = logger('app:ui:InlineSearch')
 const defaultProps = {
   itemToString: item => String(item)
 }
+const propTypes = {
+  onSelect: PropTypes.func,
+  onChange: PropTypes.func
+}
 
 const InlineSearch = ({
   searchQuery,
@@ -21,17 +26,23 @@ const InlineSearch = ({
   itemToString,
   idFromItem,
   onSelect,
+  onChange,
   inputProps,
+  value,
   ...props
 }) => {
   log('render', props)
   return (
     <Downshift
       {...props}
+      selectedItem={value}
       itemToString={i => itemToString(i) || ''}
       onSelect={(selectedItem, instance) => {
+        log('onSelect', selectedItem)
         if (!selectedItem) return
         onSelect && onSelect(selectedItem)
+        onChange &&
+          onChange({ target: { name: props.name, value: selectedItem } })
         instance.clearSelection()
       }}
     >
@@ -100,6 +111,7 @@ const InlineSearch = ({
 }
 
 InlineSearch.defaultProps = defaultProps
+InlineSearch.propTypes = propTypes
 
 export default InlineSearch
 
