@@ -120,7 +120,14 @@ class RequestEdit extends React.Component {
                       budgetPeriods={data.budget_periods}
                       onCancel={onCancel}
                       onSubmit={fields =>
-                        updateRequestFromFields(mutate, request, fields)
+                        mutate({
+                          variables: {
+                            requestData: {
+                              id: request.id,
+                              ...requestDataFromFields(request, fields)
+                            }
+                          }
+                        })
                       }
                       // action delete
                       doDeleteRequest={
@@ -165,7 +172,7 @@ RequestEdit.propTypes = {
   doDeleteRequest: PropTypes.func
 }
 
-const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
+export const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
   fieldKey = fieldKey || reqKey
 
   if (!f.get(requestData, reqKey)) {
@@ -178,12 +185,14 @@ const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
   }
 }
 
-const boolify = (key, val) =>
-  !val ? false : !val[key] ? null : val[key] === key
+export const requestDataFromFields = (request, fields) => {
+  const boolify = (key, val) =>
+    !val ? false : !val[key] ? null : val[key] === key
 
-const updateRequestFromFields = (mutate, request, fields) => {
+  const room = valueIfWritable(fields, request, 'room').room
   const requestData = {
     ...valueIfWritable(fields, request, 'article_name'),
+    ...valueIfWritable(fields, request, 'article_number'),
     ...valueIfWritable(fields, request, 'receiver'),
     ...valueIfWritable(fields, request, 'price_cents'),
 
@@ -191,35 +200,32 @@ const updateRequestFromFields = (mutate, request, fields) => {
     ...valueIfWritable(fields, request, 'approved_quantity'),
     ...valueIfWritable(fields, request, 'order_quantity'),
 
-    replacement: boolify(
-      'replacement',
-      valueIfWritable(fields, request, 'replacement')
-    ),
+    ...valueIfWritable(fields, request, 'motivation'),
+    // TODO: form field with id (autocomplete)
+    // ...valueIfWritable(fields, request, 'supplier'),
+
+    ...valueIfWritable(fields, request, 'priority'),
+    ...valueIfWritable(fields, request, 'inspector_priority'),
+    ...valueIfWritable(fields, request, 'inspection_comment'),
+
+    ...valueIfWritable(fields, request, 'accounting_type'),
+    ...valueIfWritable(fields, request, 'internal_order_number'),
+
+    // FIXME: dont hardcode fallback
+    replacement:
+      boolify(
+        'replacement',
+        valueIfWritable(fields, request, 'replacement').replacement
+      ) || false,
 
     attachments: f.map(
       valueIfWritable(fields, request, 'attachments').attachments,
       o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
     ),
 
-    // TODO: form field with id (autocomplete)
-    // ...valueIfWritable(fields, request, 'supplier'),
-
-    ...valueIfWritable(fields, request, 'article_number'),
-    ...valueIfWritable(fields, request, 'motivation'),
-    ...valueIfWritable(fields, request, 'priority'),
-    ...valueIfWritable(fields, request, 'inspector_priority'),
-
-    ...valueIfWritable(fields, request, 'inspection_comment'),
-
-    ...valueIfWritable(fields, request, 'accounting_type'),
-    ...valueIfWritable(fields, request, 'internal_order_number'),
-
     // NOTE: no building, just room!
-    ...valueIfWritable(fields, request, 'room', 'room_id'),
-
-    // NOTE: this must be sent (to identify request) but still cant be changed!
-    id: request.id
+    ...(!room ? null : { room })
   }
 
-  mutate({ variables: { requestData } })
+  return requestData
 }

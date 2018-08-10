@@ -28,6 +28,7 @@ import { formatCurrency } from '../components/decorators'
 import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
+import { requestDataFromFields as requestDataFromFieldsBase } from '../containers/RequestEdit'
 
 const NEW_REQUEST_PRESELECTION_QUERY = gql`
   query newRequestPreselectionQuery {
@@ -90,67 +91,13 @@ const CREATE_REQUEST_MUTATION = gql`
   #{Fragments.RequestFieldsForEdit}
 `
 
-const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
-  fieldKey = fieldKey || reqKey
-
-  if (!f.get(requestData, reqKey)) {
-    // eslint-disable-next-line no-debugger
-    debugger
-  }
-
-  if (f.get(requestData, reqKey).write) {
-    return { [fieldKey]: f.get(fields, fieldKey) }
-  }
-}
-
-const boolify = (key, val) =>
-  !val ? false : !val[key] ? null : val[key] === key
-
-const updateRequestFromFields = (mutate, request, fields, preselection) => {
-  const requestData = {
-    ...valueIfWritable(fields, request, 'article_name'),
-    ...valueIfWritable(fields, request, 'receiver'),
-    ...valueIfWritable(fields, request, 'price_cents'),
-
-    ...valueIfWritable(fields, request, 'requested_quantity'),
-    ...valueIfWritable(fields, request, 'approved_quantity'),
-    ...valueIfWritable(fields, request, 'order_quantity'),
-
-    replacement: boolify(
-      'replacement',
-      valueIfWritable(fields, request, 'replacement')
-    ),
-
-    attachments: f.map(
-      valueIfWritable(fields, request, 'attachments').attachments,
-      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
-    ),
-
-    // TODO: form field with id (autocomplete)
-    // ...valueIfWritable(fields, request, 'supplier'),
-
-    ...valueIfWritable(fields, request, 'article_number'),
-    ...valueIfWritable(fields, request, 'motivation'),
-    ...valueIfWritable(fields, request, 'priority'),
-    ...valueIfWritable(fields, request, 'inspector_priority'),
-
-    ...valueIfWritable(fields, request, 'inspection_comment'),
-
-    ...valueIfWritable(fields, request, 'accounting_type'),
-    ...valueIfWritable(fields, request, 'internal_order_number'),
-
-    // NOTE: no building, just room!
-    // ...valueIfWritable(fields, request, 'room', 'room_id'),
-    ...valueIfWritable(fields, request, 'room', 'room'),
-
-    // only for create:
-    budget_period: preselection.budgetPeriod,
-    category: preselection.category,
-    template: preselection.template
-  }
-
-  mutate({ variables: { requestData } })
-}
+const requestDataFromFields = (request, fields, preselection) => ({
+  ...requestDataFromFieldsBase(request, fields),
+  // only for create:
+  budget_period: preselection.budgetPeriod,
+  category: preselection.category,
+  template: preselection.template
+})
 
 const readFromQueryParams = params => ({
   budgetPeriod: f.enhyphenUUID(params.bp),
@@ -380,10 +327,14 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                     budgetPeriods={data.budgetPeriods}
                     onCancel={onCancel}
                     onSubmit={fields =>
-                      updateRequestFromFields(mutate, request, fields, {
-                        budgetPeriod,
-                        template,
-                        category
+                      mutate({
+                        variables: {
+                          requestData: requestDataFromFields(request, fields, {
+                            budgetPeriod,
+                            template,
+                            category
+                          })
+                        }
                       })
                     }
                   />
