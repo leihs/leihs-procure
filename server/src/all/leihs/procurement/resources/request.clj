@@ -379,7 +379,7 @@
                                                to-name-and-lower-case)))
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(do (update! tx req-id update-data)
+      #(do (update! tx req-id (exchange-attrs update-data))
            (if-not (empty? attachments)
              (deal-with-attachments! tx req-id attachments)))
       :if-only
