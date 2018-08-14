@@ -213,9 +213,9 @@
    (when (:name colconfig)
      [:td [user-link-component user 
            [:span 
-            [:span.firstname (-> user :firstname str/trim presence)]
+            [:span.firstname (some-> user :firstname str/trim presence)]
             " "
-            [:span.lastname (-> user :lastname str/trim presence)]]]])
+            [:span.lastname (some-> user :lastname str/trim presence)]]]])
    (when (:email colconfig)
      [:td [:a {:href (str "mailto:" (:email user))}
            [:i.fas.fa-envelope] " " (:email user)]])
