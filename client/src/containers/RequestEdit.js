@@ -172,17 +172,16 @@ RequestEdit.propTypes = {
   doDeleteRequest: PropTypes.func
 }
 
-export const valueIfWritable = (fields, requestData, reqKey, fieldKey) => {
-  fieldKey = fieldKey || reqKey
+const valueIfWritable = (fields, requestData, key) => {
+  const reqField = f.get(requestData, key)
+  // eslint-disable-next-line no-debugger
+  if (!reqField) debugger // should not happen, ignore in prod
+  if (reqField.write) return f.get(fields, key)
+}
 
-  if (!f.get(requestData, reqKey)) {
-    // eslint-disable-next-line no-debugger
-    debugger
-  }
-
-  if (f.get(requestData, reqKey).write) {
-    return { [fieldKey]: f.get(fields, fieldKey) }
-  }
+const fieldIfWritable = (fields, requestData, key) => {
+  const value = valueIfWritable(fields, requestData, key)
+  if (value) return { [key]: value }
 }
 
 export const requestDataFromFields = (request, fields) => {
@@ -190,40 +189,39 @@ export const requestDataFromFields = (request, fields) => {
     !val ? false : !val[key] ? null : val[key] === key
 
   const supplier = valueIfWritable(fields, request, 'supplier')
-  const room = valueIfWritable(fields, request, 'room').room
+  const room = valueIfWritable(fields, request, 'room')
+
   const requestData = {
-    ...valueIfWritable(fields, request, 'article_name'),
-    ...valueIfWritable(fields, request, 'article_number'),
-    ...valueIfWritable(fields, request, 'receiver'),
-    ...valueIfWritable(fields, request, 'price_cents'),
+    ...fieldIfWritable(fields, request, 'article_name'),
+    ...fieldIfWritable(fields, request, 'article_number'),
+    ...fieldIfWritable(fields, request, 'receiver'),
+    ...fieldIfWritable(fields, request, 'price_cents'),
 
-    ...valueIfWritable(fields, request, 'requested_quantity'),
-    ...valueIfWritable(fields, request, 'approved_quantity'),
-    ...valueIfWritable(fields, request, 'order_quantity'),
+    ...fieldIfWritable(fields, request, 'requested_quantity'),
+    ...fieldIfWritable(fields, request, 'approved_quantity'),
+    ...fieldIfWritable(fields, request, 'order_quantity'),
 
-    ...valueIfWritable(fields, request, 'motivation'),
-    ...valueIfWritable(fields, request, 'priority'),
-    ...valueIfWritable(fields, request, 'inspector_priority'),
-    ...valueIfWritable(fields, request, 'inspection_comment'),
+    ...fieldIfWritable(fields, request, 'motivation'),
+    ...fieldIfWritable(fields, request, 'priority'),
+    ...fieldIfWritable(fields, request, 'inspector_priority'),
+    ...fieldIfWritable(fields, request, 'inspection_comment'),
 
-    ...valueIfWritable(fields, request, 'accounting_type'),
-    ...valueIfWritable(fields, request, 'internal_order_number'),
+    ...fieldIfWritable(fields, request, 'accounting_type'),
+    ...fieldIfWritable(fields, request, 'internal_order_number'),
 
     // FIXME: dont hardcode fallback
     replacement:
-      boolify(
-        'replacement',
-        valueIfWritable(fields, request, 'replacement').replacement
-      ) || false,
+      boolify('replacement', valueIfWritable(fields, request, 'replacement')) ||
+      false,
 
-    attachments: f.map(
-      valueIfWritable(fields, request, 'attachments').attachments,
-      o => ({ ...f.pick(o, 'id', '__typename'), to_delete: !!o.toDelete })
-    ),
+    attachments: f.map(valueIfWritable(fields, request, 'attachments'), o => ({
+      ...f.pick(o, 'id', '__typename'),
+      to_delete: !!o.toDelete
+    })),
 
     ...(supplier
-      ? { supplier: supplier.supplier.id }
-      : valueIfWritable(fields, request, 'supplier_name')),
+      ? { supplier: supplier.id }
+      : fieldIfWritable(fields, request, 'supplier_name')),
 
     // NOTE: no building, just room!
     ...(!room ? null : { room })

@@ -56,6 +56,7 @@ const requiredLabel = (label, required) => label + (required ? `${nbsp}*` : '')
 class RequestForm extends React.Component {
   state = { showValidations: false }
   showValidations = (bool = true) => this.setState({ showValidations: bool })
+  isDisabled = (p = this.props) => p.disabled || p.readOnly
   render(
     { request, id, className, onCancel, onSubmit, ...props } = this.props
   ) {
@@ -103,7 +104,10 @@ class RequestForm extends React.Component {
                       <Row cls="no-gutters">
                         <Col sm>
                           {fields._supplier_as_text ? (
-                            <FormField {...formPropsFor('supplier_name')} />
+                            <FormField
+                              {...formPropsFor('supplier_name')}
+                              readOnly={supplierField.readOnly}
+                            />
                           ) : (
                             <FormGroup label={supplierField.label}>
                               <SupplierAutocomplete {...supplierField} />
@@ -114,10 +118,15 @@ class RequestForm extends React.Component {
                           <FormGroup>
                             <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
                               <input
+                                noValidate
                                 type="checkbox"
                                 className="custom-control-input"
                                 {...formPropsFor('_supplier_as_text')}
-                                label={null}
+                                checked={
+                                  !!formPropsFor('_supplier_as_text').value
+                                }
+                                value={undefined}
+                                label={undefined}
                               />
                               <label
                                 className="custom-control-label"
