@@ -304,6 +304,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
               if (mutReq.called) {
                 return (
                   <Redirect
+                    push // dont replace current route!
                     to={{
                       pathname: `/requests/${mutReq.data.create_request.id}`,
                       state: {
