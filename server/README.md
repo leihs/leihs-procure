@@ -19,7 +19,8 @@ You can mock the authenticated user by setting request's header: `Authorization:
 1. There is a ring middleware which is active with `dev` and `test` profiles. It reloads the code in the changed files. However, this applies only to definitions outside of the main ring handler function. 
 2. If you change something on a middleware, then normally rerun of `(-main "run")` is necessary, which among others also recreates the main ring handler function along with the implied middlewares. Precondition is that you have `lein repl` running.
 3. Depending on the whole project setup, sometimes a restart of the lein process (`repl` or `run`) is necessary.
-4. As a last resort one can also try `lein clean`.
+4. Sometimes even `lein clean`.
+5. And before starting to fill in the resignment form, one can hope that `rm ~/.m2/repository/*` will do.
 
 ### Running tests locally
 
