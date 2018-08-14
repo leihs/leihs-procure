@@ -1,8 +1,8 @@
-(defproject leihs-admin "0.0.0-beta"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject leihs-admin "0.0.0"
+  :description "Admin Service for Leihs"
+  :url "https://github.com/leihs/leihs-admin"
+  :license {:name "AGPL"
+            :url "https://www.gnu.org/licenses/agpl-3.0.de.html "}
   :dependencies
   [
    [aleph "0.4.6"]
@@ -48,12 +48,12 @@
 
    ; force transitive dependency resolution
    [ring/ring-core "1.6.3"]
-   [com.google.guava/guava "22.0"]
+   [com.google.guava/guava "23.0"]
    ]
 
 
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
-  :jvm-opts #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
+  :jvm-opts #=(eval (if (re-matches #"^(9|10)\..*" (System/getProperty "java.version"))
                       ["--add-modules" "java.xml.bind"]
                       []))
 
