@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative 'graphql_helper'
+require_relative '../graphql_helper'
 
 describe 'requests' do
   context 'editing request should not yield any error' do

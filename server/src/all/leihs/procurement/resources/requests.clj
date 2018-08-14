@@ -1,8 +1,8 @@
 (ns leihs.procurement.resources.requests
-  (:require [clojure set string]
+  (:require [clojure.tools.logging :as log]
+            [clojure set string]
             [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
-            [clojure.math.numeric-tower :refer [round]]
             [leihs.procurement.permissions [request :as request-perms]
              [requests :as requests-perms]]
             [leihs.procurement.resources [budget-period :as budget-period]
@@ -54,8 +54,13 @@
 
 (defn get-id
   [resource-type arguments value]
-  (or (get-id-from-arguments arguments resource-type)
-      (get-id-from-resolution-context value resource-type)))
+  (let [id-from-args (get-id-from-arguments arguments resource-type)
+        id-from-context (get-id-from-resolution-context value resource-type)]
+    (if (and id-from-args id-from-context)
+      (throw
+        (Exception.
+          "Value can not be derived from both, resolution context and arguments.")))
+    (or id-from-args id-from-context)))
 
 (defn requests-query-map
   [context arguments value]
@@ -181,58 +186,59 @@
                     proc-req
                     #(assoc % :request-id (:id proc-req)))))))))
 
-(defn total-price-query
-  [qty-type bp-id]
-  (-> (sql/select :pr.budget_period_id
-                  [(sql/call :sum
-                             (sql/call :*
-                                       :pr.price_cents
-                                       (->> qty-type
-                                            name
-                                            (str "pr.")
-                                            keyword))) :result])
-      (sql/from [:procurement_requests :pr])
-      (sql/merge-where [:= :pr.budget_period_id bp-id])
-      (sql/group :pr.budget_period_id)
-      sql/format))
-
 (defn get-total-price-cents
-  [tx qty-type bp-id]
-  (or (some-> (total-price-query qty-type bp-id)
-              (->> (jdbc/query tx))
-              first
-              :result
-              (/ 100)
-              round)
+  [tx m]
+  (or (some->> m
+               sql/format
+               (jdbc/query tx)
+               first
+               :result)
       0))
 
-(defn total-price-cents-requested-quantities
-  [context _ value]
-  (get-total-price-cents (-> context
-                             :request
-                             :tx)
-                         :requested_quantity
-                         (:id value)))
+(defn get-category-id
+  [context value]
+  (let [tx (-> context
+               :request
+               :tx)
+        main-category-id (get-id-from-current-value value :main-category)
+        arg-ids-from-query (some-> context
+                                   :categories-args
+                                   :id)]
+    (case (:resource-type value)
+      :budget-period arg-ids-from-query
+      :main-category
+        (let [ids-from-all-subcategories (-> (sql/select :id)
+                                             (sql/from :procurement_categories)
+                                             (sql/where [:= :main_category_id
+                                                         (:id value)])
+                                             sql/format
+                                             (->> (jdbc/query tx))
+                                             (->> (map #(-> %
+                                                            :id
+                                                            .toString))))]
+          (into []
+                (clojure.set/intersection (set arg-ids-from-query)
+                                          (set ids-from-all-subcategories))))
+      :category [(:id value)])))
 
-(defn total-price-cents-approved-quantities
+(defn total-price-cents
   [context _ value]
-  (get-total-price-cents (-> context
-                             :request
-                             :tx)
-                         :approved_quantity
-                         (:id value)))
-
-(defn total-price-cents-order-quantities
-  [context _ value]
-  (get-total-price-cents (-> context
-                             :request
-                             :tx)
-                         :order_quantity
-                         (:id value)))
-
-;#### debug ###################################################################
-; (logging-config/set-logger! :level :debug)
-; (logging-config/set-logger! :level :info)
-; (debug/debug-ns 'cider-ci.utils.shutdown)
-; (debug/debug-ns *ns*)
-; (debug/undebug-ns *ns*)
+  (let [ring-request (:request context)
+        tx (:tx ring-request)
+        auth-entity (:authenticated-entity ring-request)
+        budget-period-id (get-id-from-resolution-context value :budget-period)
+        category-id (get-category-id context value)
+        requests-args (:requests-args context)]
+    (as-> {} <>
+      (cond-> <>
+        (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
+      (cond-> <> (not-empty category-id) (assoc :category_id category-id))
+      (merge <> requests-args)
+      (requests-query-map context <> nil)
+      (requests-perms/apply-scope tx <> auth-entity)
+      (sql/select <>
+                  [(->> [:order_quantity :approved_quantity :requested_quantity]
+                        (apply sql/call :coalesce)
+                        (sql/call :* :price_cents)
+                        (sql/call :sum)) :result])
+      (get-total-price-cents tx <>))))

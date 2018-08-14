@@ -51,7 +51,7 @@ describe 'requests' do
           $categories: [ID]
           $search: String
           $priority: [Priority]
-          $inspectory_priority: [InspectorPriority]
+          $inspector_priority: [InspectorPriority]
           $onlyOwnRequests: Boolean
         ) {
           budget_periods(id: $budgetPeriods) {
@@ -73,7 +73,7 @@ describe 'requests' do
                   # TODO: organization_id: $organizations #
                   search: $search
                   priority: $priority
-                  inspectory_priority: $inspectory_priority
+                  inspector_priority: $inspector_priority
                   requested_by_auth_user: $onlyOwnRequests
                 ) {
                   id

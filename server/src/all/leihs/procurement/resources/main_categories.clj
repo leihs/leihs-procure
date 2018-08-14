@@ -1,7 +1,10 @@
 (ns leihs.procurement.resources.main-categories
   (:require [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
+            [com.walmartlabs.lacinia [resolve :as resolve]]
             [leihs.procurement.graphql.helpers :refer
-             [add-resource-type add-to-parent-values]]
+             [add-resource-type add-to-parent-values
+              get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
              [categories :as categories] [image :as image]
@@ -27,13 +30,19 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)]
-    (->> main-categories-base-query
-         sql/format
-         (jdbc/query tx)
-         (map #(add-resource-type % :main-category))
-         (map #(add-to-parent-values % value))
-         (map #(merge-image-path tx %)))))
+               :tx)
+        requests-args (get-requests-args-from-context context)
+        categories-args (get-categories-args-from-context context)
+        main-categories (->> main-categories-base-query
+                             sql/format
+                             (jdbc/query tx)
+                             (map #(-> %
+                                       (add-resource-type :main-category)
+                                       (add-to-parent-values value)
+                                       (->> (merge-image-path tx)))))]
+    (resolve/with-context main-categories
+                          {:categories-args categories-args,
+                           :requests-args requests-args})))
 
 (defn get-main-categories-by-names
   [tx names]

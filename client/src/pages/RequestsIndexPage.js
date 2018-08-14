@@ -53,7 +53,7 @@ const REQUESTS_QUERY = gql`
     $search: String
     $organizations: [ID!]
     $priority: [Priority!]
-    $inspectory_priority: [InspectorPriority!]
+    $inspector_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
   ) {
     budget_periods(id: $budgetPeriods) {
@@ -75,7 +75,7 @@ const REQUESTS_QUERY = gql`
             search: $search
             organization_id: $organizations
             priority: $priority
-            inspectory_priority: $inspectory_priority
+            inspector_priority: $inspector_priority
             requested_by_auth_user: $onlyOwnRequests
           ) {
             ...RequestFieldsForIndex
@@ -194,7 +194,7 @@ class RequestsIndexPage extends React.Component {
         categories: [],
         organizations: [],
         priority: [],
-        inspectory_priority: [],
+        inspector_priority: [],
         ...userSavedFilters.get()
       }
     }

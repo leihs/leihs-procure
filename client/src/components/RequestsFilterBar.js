@@ -84,7 +84,7 @@ const Filters = ({ me, data, current, onChange }) => {
       label: t(`priority_label_${value}`)
     })),
 
-    inspectory_priority: CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(value => ({
+    inspector_priority: CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(value => ({
       value,
       label: t(`inspector_priority_label_${value}`)
     }))
@@ -98,7 +98,7 @@ const Filters = ({ me, data, current, onChange }) => {
     onlyOwnRequests: !me.roles.isOnlyRequester,
     onlyCategoriesWithRequests: true,
     priority: true,
-    inspectory_priority: !me.roles.isOnlyRequester
+    inspector_priority: !me.roles.isOnlyRequester
   }
 
   const defaultFilters = f.pick(
@@ -124,7 +124,7 @@ const Filters = ({ me, data, current, onChange }) => {
       onlyOwnRequests: false,
       onlyCategoriesWithRequests: true,
       priority: null,
-      inspectory_priority: null
+      inspector_priority: null
     },
     f.keys(allowed)
   )
@@ -223,13 +223,13 @@ const Filters = ({ me, data, current, onChange }) => {
               </FormGroup>
             )}
 
-            {allowed.inspectory_priority && (
+            {allowed.inspector_priority && (
               <FormGroup label={'Priorität des Prüfers'}>
                 <Select
-                  {...formPropsFor('inspectory_priority')}
+                  {...formPropsFor('inspector_priority')}
                   multiple
                   emptyOption={false}
-                  options={available.inspectory_priority}
+                  options={available.inspector_priority}
                 />
               </FormGroup>
             )}

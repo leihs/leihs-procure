@@ -10,7 +10,8 @@
 
 (def categories-base-query
   (-> (sql/select :procurement_categories.*)
-      (sql/from :procurement_categories)))
+      (sql/from :procurement_categories)
+      (sql/order-by [:procurement_categories.name :asc])))
 
 (defn categories-query
   [context arguments value]
@@ -37,7 +38,6 @@
   [tx ids]
   (-> categories-base-query
       (sql/merge-where [:in :procurement_categories.id ids])
-      (sql/order-by [:procurement_categories.name :asc])
       sql/format
       (->> (jdbc/query tx))))
 
@@ -49,8 +49,9 @@
          (jdbc/query (-> context
                          :request
                          :tx))
-         (map #(add-resource-type % :category))
-         (map #(add-to-parent-values % value)))))
+         (map #(-> %
+                   (add-resource-type :category)
+                   (add-to-parent-values value))))))
 
 (defn delete-categories-not-in-main-category-ids!
   [tx ids]
@@ -106,7 +107,6 @@
                     (-> categories-base-query
                         (sql/merge-where [:in :procurement_categories.id
                                           (map :id categories)])
-                        (sql/order-by [:procurement_categories.name :asc])
                         sql/format))))))
 
 ;#### debug ###################################################################

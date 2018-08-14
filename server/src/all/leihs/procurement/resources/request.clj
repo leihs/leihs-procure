@@ -124,10 +124,21 @@
   [row]
   (assoc row :attachments :unqueried))
 
+(defn add-total-price
+  [row]
+  (let [quantity (or (:order_quantity row)
+                     (:approved_quantity row)
+                     (:requested_quantity row))]
+    (->> row
+         :price_cents
+         (* quantity)
+         (assoc row :total_price_cents))))
+
 (defn transform-row
   [tx auth-entity row]
   (->> row
        (add-state tx auth-entity)
+       add-total-price
        treat-priority
        treat-inspector-priority
        initialize-attachments-attribute))

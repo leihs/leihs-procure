@@ -26,18 +26,22 @@
   (apply format/format [(dedup-join sql-map) params-or-opts]))
 
 (defn map->where-clause
-  [table m]
-  "transforms {:foo 1, :bar 2} of table :baz into
-  [:and [:= baz.foo 1] [:= :baz.bar 2]]"
-  (cons :and
-        (map (fn [[k v]] [:=
-                          (-> table
-                              name
-                              (str "." (name k))
-                              keyword) v])
-          m)))
-
-(map->where-clause :procurement_categories {:name "foo", :cost_center 123})
+  ([m] (map->where-clause nil m))
+  ([table m]
+   "transforms {:foo 1, :bar 2} of table :baz into
+   [:and [:= baz.foo 1] [:= :baz.bar 2]] or
+   [:and [:in baz.foo [1 2]] [:= :baz.bar 3]]"
+   (letfn [(add-table-name [k]
+                           (if table
+                             (-> table
+                                 name
+                                 (str "." (name k))
+                                 keyword)
+                             k))]
+     (->> m
+          (map (fn [[k v]]
+                 (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))
+          (cons :and)))))
 
 (defalias call types/call)
 (defalias param types/param)
