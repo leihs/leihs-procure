@@ -64,7 +64,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     </Col>
     <Col sm="4">
       <Tooltipped text={t('request_form_field.price_cents')}>
-        <Badge secondary id={`price_cents_tt_${request.id}`}>
+        <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
           <Icon.PriceTag className="mr-1" />
           {formatCurrency(request.price_cents.value)}
         </Badge>
@@ -75,16 +75,20 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
           {request.requested_quantity.value || '--'} <Icon.QuestionMark />
         </Badge>
       </Tooltipped>
-      <Tooltipped text={t('request_form_field.approved_quantity')}>
-        <Badge info cls="mr-1" id={`appq_tt_${request.id}`}>
-          {request.approved_quantity.value || '--'} <Icon.Checkmark />
-        </Badge>
-      </Tooltipped>
-      <Tooltipped text={t('request_form_field.order_quantity')}>
-        <Badge info cls="mr-1" id={`ordq_tt_${request.id}`}>
-          {request.order_quantity.value || '--'} <Icon.ShoppingCart />
-        </Badge>
-      </Tooltipped>
+      {!!request.approved_quantity.read && (
+        <Tooltipped text={t('request_form_field.approved_quantity')}>
+          <Badge info cls="mr-1" id={`appq_tt_${request.id}`}>
+            {request.approved_quantity.value || '--'} <Icon.Checkmark />
+          </Badge>
+        </Tooltipped>
+      )}
+      {!!request.order_quantity.read && (
+        <Tooltipped text={t('request_form_field.order_quantity')}>
+          <Badge info cls="mr-1" id={`ordq_tt_${request.id}`}>
+            {request.order_quantity.value || '--'} <Icon.ShoppingCart />
+          </Badge>
+        </Tooltipped>
+      )}
     </Col>
     <Col sm="2">
       <Tooltipped text={t('request_form_field.price_total')}>
