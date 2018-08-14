@@ -1,6 +1,8 @@
 import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
+import { Link } from 'react-router-dom'
+import { stringify as stringifyQuery } from 'qs'
 
 import {
   Row,
@@ -23,6 +25,7 @@ import { ErrorPanel } from './Error'
 import RequestLine from './RequestLine'
 import ImageThumbnail from './ImageThumbnail'
 
+import CurrentUser from '../containers/CurrentUserProvider'
 import FilterBar from './RequestsFilterBar'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsTreeFiltered')
@@ -67,17 +70,22 @@ const RequestsDashboard = props => {
     >
       {pageHeader}
 
-      <RequestsTree
-        requestsQuery={requestsQuery}
-        refetchAllData={refetchAllData}
-        openPanels={props.openPanels}
-        onPanelToggle={props.onPanelToggle}
-        doChangeRequestCategory={props.doChangeRequestCategory}
-        doChangeBudgetPeriod={props.doChangeBudgetPeriod}
-        doDeleteRequest={props.doDeleteRequest}
-        editQuery={props.editQuery} //tmp?
-        filters={props.currentFilters} // tmp
-      />
+      <CurrentUser>
+        {me => (
+          <RequestsTree
+            requestsQuery={requestsQuery}
+            me={me}
+            refetchAllData={refetchAllData}
+            openPanels={props.openPanels}
+            onPanelToggle={props.onPanelToggle}
+            doChangeRequestCategory={props.doChangeRequestCategory}
+            doChangeBudgetPeriod={props.doChangeBudgetPeriod}
+            doDeleteRequest={props.doDeleteRequest}
+            editQuery={props.editQuery} //tmp?
+            filters={props.currentFilters} // tmp
+          />
+        )}
+      </CurrentUser>
     </MainWithSidebar>
   )
 }
@@ -86,6 +94,7 @@ export default RequestsDashboard
 
 const RequestsTree = ({
   requestsQuery: { loading, error, data, networkStatus },
+  me,
   editQuery,
   filters,
   refetchAllData,
@@ -99,7 +108,7 @@ const RequestsTree = ({
   if (error) return <ErrorPanel error={error} data={data} />
 
   return data.budget_periods.map(b => (
-    <BudgetPeriodCard key={b.id} budgetPeriod={b}>
+    <BudgetPeriodCard key={b.id} budgetPeriod={b} me={me}>
       {b.main_categories.map(cat => {
         const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')
         if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
@@ -153,7 +162,7 @@ const RequestsTree = ({
   ))
 }
 
-const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
+const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
   const {
     inspectStartDate,
     endDate,
@@ -176,29 +185,40 @@ const BudgetPeriodCard = ({ budgetPeriod, ...props }) => {
             })}
             {...togglerProps}
           >
-            <h2 className="mb-0 mr-3 h3 d-inline-block">
-              <Caret spaced />
-              {budgetPeriod.name}
-            </h2>
-            <Tooltipped text="Antragsphase bis">
-              <span
-                id={`inspectStartDate_tt_${budgetPeriod.id}`}
-                className={cx('mr-3', { 'text-success': isRequesting })}
-              >
-                <Icon.RequestingPhase className="mr-2" />
-                {inspectStartDate.toLocaleString()}
-              </span>
-            </Tooltipped>
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h2 className="mb-0 mr-3 h3 d-inline-block">
+                  <Caret spaced />
+                  {budgetPeriod.name}
+                </h2>
+                <Tooltipped text="Antragsphase bis">
+                  <span
+                    id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                    className={cx('mr-3', { 'text-success': isRequesting })}
+                  >
+                    <Icon.RequestingPhase className="mr-2" />
+                    {inspectStartDate.toLocaleString()}
+                  </span>
+                </Tooltipped>
 
-            <Tooltipped text="Inspektionsphase bis">
-              <span
-                id={`endDate_tt_${budgetPeriod.id}`}
-                className={cx({ 'text-success': isInspecting })}
-              >
-                <Icon.InspectionPhase className="mr-2" />
-                {endDate.toLocaleString()}
-              </span>
-            </Tooltipped>
+                <Tooltipped text="Inspektionsphase bis">
+                  <span
+                    id={`endDate_tt_${budgetPeriod.id}`}
+                    className={cx({ 'text-success': isInspecting })}
+                  >
+                    <Icon.InspectionPhase className="mr-2" />
+                    {endDate.toLocaleString()}
+                  </span>
+                </Tooltipped>
+              </div>
+              <div>
+                {me.roles.isRequester && (
+                  <Link to={newRequestLink({ budgetPeriod })}>
+                    <Icon.PlusCircle size="2x" color="success" />
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
 
           {isOpen &&
@@ -314,3 +334,8 @@ const SubCategoryLine = ({
     </Collapsing>
   )
 }
+
+const newRequestLink = ({ budgetPeriod }) => ({
+  pathname: '/requests/new',
+  search: '?' + stringifyQuery({ bp: f.dehyphenUUID(budgetPeriod.id) })
+})
