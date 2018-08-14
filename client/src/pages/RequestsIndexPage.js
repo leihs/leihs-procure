@@ -61,15 +61,18 @@ const REQUESTS_QUERY = gql`
       name
       inspection_start_date
       end_date
+      total_price_cents
 
       main_categories {
         id
         name
         image_url
+        total_price_cents
 
         categories(id: $categories) {
           id
           name
+          total_price_cents
 
           requests(
             search: $search

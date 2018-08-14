@@ -5,8 +5,9 @@
   "form_btn_change_budget_period": "Budgetperiode ändern",
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
-  "request_state": "Status",
 
+  "budget_period": "Budgetperiode",
+  "request_state": "Status",
   "priority": "Priorität",
   "priority_label_NORMAL": "Normal",
   "priority_label_HIGH": "Hoch",
@@ -16,6 +17,15 @@
   "inspector_priority_label_MEDIUM": "Mittel",
   "inspector_priority_label_HIGH": "Hoch",
   "inspector_priority_label_MANDATORY": "Zwingend",
+
+  "dashboard": {
+    "bp_total_sum": "Aktuelles Total dieser Budgetperiode",
+    "maincat_total_sum": "Aktuelles Total dieser Hauptkategorie",
+    "subcat_total_sum": "Aktuelles Total dieser Kategorie",
+    "create_request_for_bp": "Antrag für diese Budgetperiode erfassen",
+    "create_request_for_maincat": "Antrag für diese Haupkategorie erfassen",
+    "create_request_for_subcat": "Antrag für diese Kategorie erfassen"
+  },
 
   "form_input_check_free_text": "Als Freitext",
 

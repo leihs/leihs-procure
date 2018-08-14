@@ -4,19 +4,9 @@ import f from 'lodash'
 import { Link } from 'react-router-dom'
 import { stringify as stringifyQuery } from 'qs'
 
-import {
-  Row,
-  Col,
-  Button,
-  // ButtonGroup,
-  // UncontrolledDropdown,
-  // DropdownToggle,
-  // DropdownMenu,
-  // DropdownItem,
-  Collapsing,
-  Tooltipped
-} from './Bootstrap'
-import { budgetPeriodDates } from './decorators'
+import t from '../locale/translate'
+import { Row, Col, Button, Collapsing, Tooltipped } from './Bootstrap'
+import { formatCurrency, budgetPeriodDates } from './decorators'
 // import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
@@ -185,36 +175,59 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
             })}
             {...togglerProps}
           >
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h2 className="mb-0 mr-3 h3 d-inline-block">
+            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
+              <div className="flex-grow-1 flex-sm-grow-0 w-50">
+                <h2 className="mb-0 h3 d-inline-block">
                   <Caret spaced />
                   {budgetPeriod.name}
                 </h2>
-                <Tooltipped text="Antragsphase bis">
-                  <span
-                    id={`inspectStartDate_tt_${budgetPeriod.id}`}
-                    className={cx('mr-3', { 'text-success': isRequesting })}
-                  >
-                    <Icon.RequestingPhase className="mr-2" />
-                    {inspectStartDate.toLocaleString()}
-                  </span>
-                </Tooltipped>
 
-                <Tooltipped text="Inspektionsphase bis">
-                  <span
-                    id={`endDate_tt_${budgetPeriod.id}`}
-                    className={cx({ 'text-success': isInspecting })}
-                  >
-                    <Icon.InspectionPhase className="mr-2" />
-                    {endDate.toLocaleString()}
-                  </span>
-                </Tooltipped>
+                <div className="d-inline-flex flex-wrap ml-3 mt-2">
+                  <Tooltipped text="Antragsphase bis">
+                    <span
+                      id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                      className={cx('mr-3', { 'text-success': isRequesting })}
+                    >
+                      <Icon.RequestingPhase className="mr-2" />
+                      {inspectStartDate.toLocaleString()}
+                    </span>
+                  </Tooltipped>
+
+                  <Tooltipped text="Inspektionsphase bis">
+                    <span
+                      id={`endDate_tt_${budgetPeriod.id}`}
+                      className={cx('mr-3', { 'text-success': isInspecting })}
+                    >
+                      <Icon.InspectionPhase className="mr-2" />
+                      {endDate.toLocaleString()}
+                    </span>
+                  </Tooltipped>
+                </div>
               </div>
-              <div>
+
+              <div className="mr-auto">
+                {!!budgetPeriod.total_price_cents && (
+                  <Tooltipped text={t('dashboard.bp_total_sum')}>
+                    <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
+                      <Icon.ShoppingCart className="mr-1" />
+                      <samp>
+                        {formatCurrency(budgetPeriod.total_price_cents)}
+                      </samp>
+                    </span>
+                  </Tooltipped>
+                )}
+              </div>
+
+              <div className="ml-3 mt-2 mt-md-0">
                 {me.roles.isRequester && (
                   <Link to={newRequestLink({ budgetPeriod })}>
-                    <Icon.PlusCircle size="2x" color="success" />
+                    <Tooltipped text={t('dashboard.create_request_for_bp')}>
+                      <Icon.PlusCircle
+                        id={`tt_bp_cnr_${budgetPeriod.id}`}
+                        size="2x"
+                        color="success"
+                      />
+                    </Tooltipped>
                   </Link>
                 )}
               </div>
@@ -266,11 +279,39 @@ const CategoryLine = ({
           })}
           {...togglerProps}
         >
-          <h5 className="mb-0">
-            <Caret spaced />
-            <ImageThumbnail imageUrl={category.image_url} />
-            {category.name} <small>({requestCount})</small>
-          </h5>
+          <div className="d-flex flex-wrap justify-content-between align-items-baseline">
+            <div className="w-50">
+              <h5 className="mb-0 mr-3 d-inline-block">
+                <Caret spaced />
+                <ImageThumbnail imageUrl={category.image_url} />
+                {category.name} <small>({requestCount})</small>
+              </h5>
+            </div>
+
+            <div className="mr-auto">
+              {!!category.total_price_cents && (
+                <Tooltipped text={t('dashboard.maincat_total_sum')}>
+                  <small id={`ordqmc_tt_${category.id}`}>
+                    <Icon.ShoppingCart className="mr-1" />
+                    <samp>{formatCurrency(category.total_price_cents)}</samp>
+                  </small>
+                </Tooltipped>
+              )}
+            </div>
+            <div className="ml-auto mt-2">
+              {/* {me.roles.isRequester && (
+                <Link to={newRequestLink({ category })}>
+                  <Tooltipped text={t('dashboard.create_request_for_bp')}>
+                    <Icon.PlusCircle
+                      id={`tt_mc_cnr_${category.id}`}
+                      size="2x"
+                      color="success"
+                    />
+                  </Tooltipped>
+                </Link>
+              )} */}
+            </div>
+          </div>
         </li>
         {isOpen &&
           props.children && (
@@ -316,10 +357,24 @@ const SubCategoryLine = ({
             })}
             {...togglerProps}
           >
-            <h6 className="mb-0">
-              <Caret spaced />
-              {category.name} <span>({requestCount})</span>
-            </h6>
+            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
+              <div className="w-50">
+                <h6 className="mb-0 mr-3 d-inline-block">
+                  <Caret spaced />
+                  {category.name} <span>({requestCount})</span>
+                </h6>
+              </div>
+              <div className="mr-auto">
+                {!!category.total_price_cents && (
+                  <Tooltipped text={t('dashboard.subcat_total_sum')}>
+                    <small className="mr-3" id={`ordqsc_tt_${category.id}`}>
+                      <Icon.ShoppingCart className="mr-1" />
+                      <samp>{formatCurrency(category.total_price_cents)}</samp>
+                    </small>
+                  </Tooltipped>
+                )}
+              </div>
+            </div>
           </li>
           {showChildren(isOpen, props.children) && (
             <li
