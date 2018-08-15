@@ -66,7 +66,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       <Tooltipped text={t('request_form_field.price_cents')}>
         <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
           <Icon.PriceTag className="mr-1" />
-          {formatCurrency(request.price_cents.value)}
+          <samp>{formatCurrency(request.price_cents.value)}</samp>
         </Badge>
       </Tooltipped>
 
@@ -94,7 +94,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       <Tooltipped text={t('request_form_field.price_total')}>
         <Badge id={`totalam_tt_${request.id}`}>
           <Icon.ShoppingCart className="mr-1" />
-          {formatCurrency(RequestTotalAmount(request))}
+          <samp>{formatCurrency(RequestTotalAmount(request))}</samp>
         </Badge>
       </Tooltipped>
     </Col>

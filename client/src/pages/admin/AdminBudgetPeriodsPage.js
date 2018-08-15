@@ -206,17 +206,21 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                           >
                             <Badge info id={`badge_requested_${n}`}>
                               <Icon.ShoppingCart />{' '}
-                              {formatCurrency(
-                                bp.total_price_cents_requested_quantities
-                              )}
+                              <samp>
+                                {formatCurrency(
+                                  bp.total_price_cents_requested_quantities
+                                )}
+                              </samp>
                             </Badge>
                           </Tooltipped>{' '}
                           <Tooltipped text={'Total aller bewilligten Anträge'}>
                             <Badge success id={`badge_approved_${n}`}>
                               <Icon.ShoppingCart />{' '}
-                              {formatCurrency(
-                                bp.total_price_cents_approved_quantities
-                              )}
+                              <samp>
+                                {formatCurrency(
+                                  bp.total_price_cents_approved_quantities
+                                )}
+                              </samp>
                             </Badge>
                           </Tooltipped>
                         </React.Fragment>

@@ -248,13 +248,13 @@ class RequestForm extends React.Component {
                     </Col>
 
                     <Col sm="4">
-                      <FormField
-                        type="text-static"
+                      <FormGroup
                         name="price_total"
-                        value={formatCurrency(TotalAmount(fields))}
                         label={t('request_form_field.price_total')}
                         labelSmall={t('request_form_field.price_help')}
-                      />
+                      >
+                        <samp>{formatCurrency(TotalAmount(fields))}</samp>
+                      </FormGroup>
                     </Col>
                   </Row>
 

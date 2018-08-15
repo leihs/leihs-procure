@@ -414,7 +414,9 @@ const CategoriesTemplatesTree = ({
                                     />
                                     <Icon.Templates /> {t.article_name}{' '}
                                     <Badge secondary>
-                                      {formatCurrency(t.price_cents)}
+                                      <samp>
+                                        {formatCurrency(t.price_cents)}
+                                      </samp>
                                     </Badge>
                                   </button>
                                 </F>
