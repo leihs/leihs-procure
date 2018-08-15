@@ -69,6 +69,7 @@
    :user-delete #'user/delete-page
    :user-edit #'user/edit-page
    :user-new #'user/new-page
+   :user-password #'user/password-page
    :user-inventory-pools-roles #'user/inventory-pools-roles-page
    :users #'users/page
    })

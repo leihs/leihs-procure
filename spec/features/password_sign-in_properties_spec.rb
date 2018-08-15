@@ -18,11 +18,11 @@ feature 'Passwords sign-in, sign-out properties ' do
 
       # set a new password in the user's edit page
       click_on @user.email
-      click_on 'Edit'
+      click_on 'Password'
       new_password = Faker::Internet.password(10, 20, true, true)
 
       fill_in 'password', with: new_password
-      click_on 'Save'
+      click_on 'Set'
       wait_until { not first('.modal')}
 
       # sign in with the new password does work

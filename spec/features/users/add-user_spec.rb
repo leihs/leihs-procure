@@ -38,11 +38,16 @@ feature 'Manage users', type: :feature do
       check 'account_enabled'
       check 'password_sign_in_enabled'
       fill_in 'email', with: 'test@example.com'
-      fill_in 'password', with: 'password'
       create_path = current_path
       click_on 'Create'
       # wait for redirect after the users has been created
       wait_until { current_path != create_path }
+
+      click_on_first "Password" 
+      fill_in 'password', with: 'password'
+      password_path = current_path
+      click_on 'Set'
+      wait_until { current_path != password_path}
 
       # sign out and sign in as the new user
       visit '/'

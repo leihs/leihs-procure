@@ -61,6 +61,7 @@
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
                   (leaf "/inventory-pools-roles/" :user-inventory-pools-roles)
+                  (leaf "/password" :user-password)
                   (branch "/api-tokens/"
                           (leaf "" :api-tokens)
                           (leaf "add " :api-token-add)

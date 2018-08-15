@@ -3,7 +3,7 @@
 (def abort [:i.fas.fa-times-circle])
 (def add [:i.fas.fa-plus-circle])
 (def admin [:i.fas.fa-wrench])
-(def api-token [:i.fas.fa-key])
+(def api-token [:i.fas.fa-coins])
 (def api-tokens api-token)
 (def delegation [:i.fas.fa-hands-helping])
 (def delegations delegation)
@@ -16,3 +16,4 @@
 (def sign-out [:i.fas.fa-sign-out-alt])
 (def user [:i.fas.fa-user])
 (def users [:i.fas.fa-user-friends])
+(def password [:i.fas.fa-key])

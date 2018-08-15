@@ -52,6 +52,10 @@
         (sql/merge-where [:= :access_rights.user_id :users.id]))
     :inventory_pool_roles_count]])
 
+
+
+    
+
 (def user-write-keys
   [:address
    :account_enabled
