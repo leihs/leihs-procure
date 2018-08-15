@@ -80,7 +80,7 @@ export default class StatefulForm extends React.PureComponent {
       const defaultConf = { idPrefix: this.props.idPrefix }
       const conf = { ...defaultConf, ...opts }
       const { idPrefix } = conf
-      const getValue = name => f.get(fields, name) || ''
+      const getValue = name => f.defaultTo(f.presence(f.get(fields, name)), '')
       const setValue = (name, value) =>
         this.updateField({ name, value }, props.onChange)
 
@@ -171,5 +171,5 @@ function getFieldFromEvent({ target }) {
         : // text, number, etc:
           target.value
 
-  return { name, value: value || null }
+  return { name, value: value }
 }

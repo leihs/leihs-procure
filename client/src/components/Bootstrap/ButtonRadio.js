@@ -1,7 +1,7 @@
 import React, { Fragment as F } from 'react'
 // import PropTypes from 'prop-types'
 import cx from 'classnames'
-// import f from 'lodash'
+import f from 'lodash'
 import { Label } from './Bootstrap'
 import Icon from '../Icons'
 
@@ -14,12 +14,12 @@ class ButtonRadio extends React.PureComponent {
   getSelectedValueProp(value, selected) {
     // `value` or `selected` is accepted, depending on consistency
     // with DOM or between components is desired.
-    if (value && selected) {
+    if (f.present(value) && f.present(selected)) {
       throw new Error(
         'Props `value` and `selected` were given, please only use 1 of them!'
       )
     }
-    return value || selected
+    return f.present(value) ? value : selected
   }
 
   isDisabled = (p = this.props) => p.disabled || p.readOnly
@@ -29,6 +29,7 @@ class ButtonRadio extends React.PureComponent {
       props: {
         id,
         name,
+        required,
         value,
         selected,
         onChange,
@@ -81,7 +82,8 @@ class ButtonRadio extends React.PureComponent {
                   id={inputID}
                   name={name}
                   value={value}
-                  autoComplete="off"
+                  required={required}
+                  checked={isSelected}
                   aria-checked={isSelected}
                   onClick={onRadioClick}
                 />
