@@ -185,8 +185,7 @@ const fieldIfWritable = (fields, requestData, key) => {
 }
 
 export const requestDataFromFields = (request, fields) => {
-  const boolify = (key, val) =>
-    !val ? false : !val[key] ? null : val[key] === key
+  const boolify = (val, name) => f.presence(val) && name === val
 
   const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room')
@@ -209,10 +208,10 @@ export const requestDataFromFields = (request, fields) => {
     ...fieldIfWritable(fields, request, 'accounting_type'),
     ...fieldIfWritable(fields, request, 'internal_order_number'),
 
-    // FIXME: dont hardcode fallback
-    replacement:
-      boolify('replacement', valueIfWritable(fields, request, 'replacement')) ||
-      false,
+    replacement: boolify(
+      valueIfWritable(fields, request, 'replacement'),
+      'replacement'
+    ),
 
     attachments: f.map(valueIfWritable(fields, request, 'attachments'), o => ({
       ...f.pick(o, 'id', '__typename'),

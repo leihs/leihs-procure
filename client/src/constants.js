@@ -1,3 +1,5 @@
+import f from 'lodash'
+
 export const REQUEST_PRIORITIES = ['NORMAL', 'HIGH']
 
 export const REQUEST_INSPECTOR_PRIORITIES = [
@@ -8,4 +10,10 @@ export const REQUEST_INSPECTOR_PRIORITIES = [
 ]
 
 // TODO: ENUMs
-export const REQUEST_REPLACEMENT_VALUES = ['replacement', 'new']
+export const REQUEST_REPLACEMENT_VALUES_MAP = {
+  true: 'replacement',
+  false: 'new'
+}
+export const REQUEST_REPLACEMENT_VALUES = f.values(
+  REQUEST_REPLACEMENT_VALUES_MAP
+)

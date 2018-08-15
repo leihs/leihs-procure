@@ -218,18 +218,30 @@ class RequestForm extends React.Component {
                     </RequestInput>
                   </Row>
 
-                  {/* TODO: replacement with BOOLs or ENUMs
-                <FormGroup>
-                <ButtonRadio
-                  {...formPropsFor('replacement')}
-                  options={CONSTANTS.REQUEST_REPLACEMENT_VALUES.map(v => ({
-                    value: v,
-                    label: t(
-                      `request_form_field.request_replacement_labels_${v}`
-                    )
-                  }))}
-                />
-              </FormGroup> */}
+                  <RequestInput field={formPropsFor('replacement')}>
+                    {field => (
+                      <FormGroup label={field.label}>
+                        <ButtonRadio
+                          {...formPropsFor('replacement')}
+                          value={
+                            f.isBoolean(field.value)
+                              ? CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
+                                  field.value
+                                ]
+                              : field.value
+                          }
+                          options={CONSTANTS.REQUEST_REPLACEMENT_VALUES.map(
+                            v => ({
+                              value: v,
+                              label: t(
+                                `request_form_field.request_replacement_labels_${v}`
+                              )
+                            })
+                          )}
+                        />
+                      </FormGroup>
+                    )}
+                  </RequestInput>
                 </Col>
 
                 <Col lg>
