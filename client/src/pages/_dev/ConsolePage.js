@@ -24,6 +24,12 @@ query meAndMyRequests {
         name
       }
     }
+    model {
+      value {
+        id
+        product 
+      }
+    }
     article_name {
       value
     }

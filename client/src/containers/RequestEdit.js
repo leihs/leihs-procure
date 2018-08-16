@@ -187,11 +187,11 @@ const fieldIfWritable = (fields, requestData, key) => {
 export const requestDataFromFields = (request, fields) => {
   const boolify = (val, name) => f.presence(val) && name === val
 
+  const model = valueIfWritable(fields, request, 'model')
   const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room')
 
   const requestData = {
-    ...fieldIfWritable(fields, request, 'article_name'),
     ...fieldIfWritable(fields, request, 'article_number'),
     ...fieldIfWritable(fields, request, 'receiver'),
     ...fieldIfWritable(fields, request, 'price_cents'),
@@ -217,6 +217,10 @@ export const requestDataFromFields = (request, fields) => {
       ...f.pick(o, 'id', '__typename'),
       to_delete: !!o.toDelete
     })),
+
+    ...(model
+      ? { model: model.id }
+      : fieldIfWritable(fields, request, 'article_name')),
 
     ...(supplier
       ? { supplier: supplier.id }

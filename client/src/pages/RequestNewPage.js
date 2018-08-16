@@ -24,7 +24,7 @@ import {
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
-import { formatCurrency } from '../components/decorators'
+import { DisplayName, formatCurrency } from '../components/decorators'
 import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
@@ -57,6 +57,7 @@ const NEW_REQUEST_PRESELECTION_QUERY = gql`
       model {
         id
         product
+        version
       }
       price_cents
       price_currency
@@ -247,7 +248,8 @@ class NewRequestPreselection extends React.Component {
                         ) : (
                           <SelectionCard onRemoveClick={resetTemplate}>
                             <Icon.Templates spaced />
-                            {selectedTemplate.article_name}
+                            {selectedTemplate.article_name ||
+                              DisplayName(selectedTemplate.model)}
                           </SelectionCard>
                         )}
                       </Col>

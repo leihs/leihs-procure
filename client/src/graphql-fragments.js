@@ -41,6 +41,14 @@ export const RequestFieldsForIndex = gql`
     article_name {
       value
     }
+    model {
+      value {
+        id
+        product
+        version
+      }
+    }
+
     receiver {
       value
     }
@@ -114,6 +122,16 @@ export const RequestFieldsForEdit = gql`
 
     article_name {
       ...RequestFieldString
+    }
+    model {
+      read
+      write
+      required
+      value {
+        id
+        product
+        version
+      }
     }
 
     supplier_name {

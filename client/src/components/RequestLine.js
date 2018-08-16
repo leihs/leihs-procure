@@ -57,7 +57,9 @@ export default RequestLine
 
 export const RequestLineClosed = ({ request, onClick, className }) => (
   <Row className={cx('py-3 mx-0', className)} onClick={onClick}>
-    <Col sm="2">{request.article_name.value}</Col>
+    <Col sm="2">
+      {request.article_name.value || DisplayName(request.model.value)}
+    </Col>
     <Col sm="3">
       {DisplayName(request.user.value)} /{' '}
       {DisplayName(request.organization.value)}

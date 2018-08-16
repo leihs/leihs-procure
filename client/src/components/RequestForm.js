@@ -24,6 +24,7 @@ import {
 import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
 import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
+import ModelAutocomplete from './ModelAutocomplete'
 import SupplierAutocomplete from './SupplierAutocomplete'
 
 const tmpUppercasey = v => (f.isString(v) ? v.toUpperCase() : v)
@@ -47,6 +48,7 @@ const prepareFormValues = request => {
   fields.building = f.get(request, 'room.value.building.id')
 
   // extra form controlls
+  fields._model_as_text = f.present(fields.article_name)
   fields._supplier_as_text = f.present(fields.supplier_name)
   return fields
 }
@@ -95,7 +97,32 @@ class RequestForm extends React.Component {
             >
               <Row>
                 <Col lg>
-                  <FormField {...formPropsFor('article_name')} />
+                  <RequestInput field={formPropsFor('article_name')}>
+                    {articleField => (
+                      <Row cls="no-gutters">
+                        <Col sm>
+                          {fields._model_as_text ? (
+                            <FormField {...articleField} />
+                          ) : (
+                            <FormGroup label={articleField.label}>
+                              <ModelAutocomplete
+                                {...formPropsFor('model')}
+                                label={articleField.label}
+                              />
+                            </FormGroup>
+                          )}
+                        </Col>
+                        <Col sm="3" cls="pl-sm-3">
+                          <FieldTypeToggle
+                            {...formPropsFor('_model_as_text')}
+                            checked={!!formPropsFor('_model_as_text').value}
+                            disabled={articleField.readOnly}
+                            label={t('form_input_check_free_text')}
+                          />
+                        </Col>
+                      </Row>
+                    )}
+                  </RequestInput>
 
                   <FormField {...formPropsFor('article_number')} />
 
@@ -115,32 +142,11 @@ class RequestForm extends React.Component {
                           )}
                         </Col>
                         <Col sm="3" cls="pl-sm-3">
-                          <FormGroup>
-                            <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                {...formPropsFor('_supplier_as_text')}
-                                checked={
-                                  !!formPropsFor('_supplier_as_text').value
-                                }
-                                disabled={supplierField.readOnly}
-                                value={undefined}
-                                label={undefined}
-                              />
-                              <label
-                                className="custom-control-label"
-                                htmlFor={formPropsFor('_supplier_as_text').id}
-                              >
-                                <small>
-                                  {t('form_input_check_free_text').replace(
-                                    /\s/g,
-                                    nbsp
-                                  )}
-                                </small>
-                              </label>
-                            </div>
-                          </FormGroup>
+                          <FieldTypeToggle
+                            {...formPropsFor('_supplier_as_text')}
+                            disabled={supplierField.readOnly}
+                            label={t('form_input_check_free_text')}
+                          />
                         </Col>
                       </Row>
                     )}
@@ -542,6 +548,25 @@ const SelectionDropdown = ({
       ))}
     </DropdownMenu>
   </ButtonDropdown>
+)
+
+const FieldTypeToggle = ({ id, value, label, ...props }) => (
+  <FormGroup>
+    <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
+      <input
+        type="checkbox"
+        className="custom-control-input"
+        id={id}
+        {...props}
+        checked={value}
+        value={undefined}
+        label={undefined}
+      />
+      <label className="custom-control-label" htmlFor={id}>
+        <small>{label.replace(/\s/g, nbsp)}</small>
+      </label>
+    </div>
+  </FormGroup>
 )
 
 const RequestInput = ({ children, field }) => (
