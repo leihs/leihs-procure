@@ -358,14 +358,14 @@ class RequestForm extends React.Component {
                         <Row>
                           <Col>
                             <FormField
-                              readOnly
                               {...formPropsFor('cost_center')}
+                              readOnly
                             />
                           </Col>
                           <Col>
                             <FormField
-                              readOnly
                               {...formPropsFor('procurement_account')}
+                              readOnly
                             />
                           </Col>
                         </Row>
@@ -374,15 +374,19 @@ class RequestForm extends React.Component {
                           <Col sm>
                             <FormField
                               {...formPropsFor('internal_order_number')}
+                              // NOTE: dependent field, always required *if* shown!
+                              required={true}
+                              label={requiredLabel(
+                                formPropsFor('internal_order_number').label,
+                                true
+                              )}
                             />
                           </Col>
 
                           <Col sm>
                             <FormField
+                              {...formPropsFor('general_ledger_account')}
                               readOnly
-                              value="123456789"
-                              name="general_ledger_account"
-                              label="general_ledger_account"
                             />
                           </Col>
                         </Row>

@@ -222,6 +222,13 @@ export const RequestFieldsForEdit = gql`
       # TODO: for this field a Bool is not enough, its a dependent field!
       # required
     }
+    general_ledger_account {
+      read
+      value
+      # NOTE: it is always read-only (or hidden)
+      # write
+      # required
+    }
     internal_order_number {
       ...RequestFieldString
     }
