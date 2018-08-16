@@ -122,9 +122,7 @@ const Filters = ({ me, data, current, onChange }) => {
         .map(({ id }) => id),
       search: null,
       onlyOwnRequests: false,
-      onlyCategoriesWithRequests: true,
-      priority: null,
-      inspector_priority: null
+      onlyCategoriesWithRequests: true
     },
     f.keys(allowed)
   )
