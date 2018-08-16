@@ -72,7 +72,7 @@ const InlineSearch = ({
             {({ loading, error, data }) => {
               if (!isOpen) return false
               log('query', { loading, error, data })
-              if (loading) return <p>Loading...</p>
+              if (loading) return <EmptyResult>Loading...</EmptyResult>
               if (error) {
                 log(error)
                 const errMsg =
@@ -80,9 +80,9 @@ const InlineSearch = ({
                     ? error.toString()
                     : JSON.stringify(error.graphQLErrors, 0, 2)
                 return (
-                  <p>
+                  <EmptyResult>
                     Error :( <code>{errMsg}</code>
-                  </p>
+                  </EmptyResult>
                 )
               }
 
@@ -126,13 +126,10 @@ const resultsItemVisualProps = { className: 'px-2 py-1' }
 
 const inputNodeVisualProps = {
   className: cx(UICLASS, `${UICLASS}-inputnode`, 'form-control'),
-  style: { position: 'relative', zIndex: 2 }
+  style: { position: 'relative' }
 }
 const resultsWrapperVisualProps = {
-  style: {
-    position: 'relative',
-    zIndex: 2
-  }
+  style: { position: 'relative' }
 }
 const resultsBoxVisualProps = {
   className: cx(UICLASS, `${UICLASS}-results`, 'border rounded w-100 mt-1'),
@@ -199,6 +196,14 @@ const ItemsList = ({
           </div>
         ))
       )}
+    </div>
+  )
+}
+
+const EmptyResult = ({ children }) => {
+  return (
+    <div {...resultsBoxVisualProps}>
+      <div {...resultsItemVisualProps}>{children}</div>
     </div>
   )
 }
