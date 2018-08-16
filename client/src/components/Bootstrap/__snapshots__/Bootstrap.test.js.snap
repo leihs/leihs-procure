@@ -306,7 +306,7 @@ Array [
                     autoComplete="off"
                     className="form-control"
                     id={undefined}
-                    min={1}
+                    min={0}
                     name="e"
                     onChange={[Function]}
                     placeholder={undefined}

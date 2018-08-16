@@ -247,16 +247,31 @@ class RequestForm extends React.Component {
                 <Col lg>
                   <Row>
                     <Col sm="8">
-                      <FormField
-                        {...formPropsFor('price_cents')}
-                        value={(getValue('price_cents') || 0) / 100}
-                        onChange={e =>
-                          setValue('price_cents', e.target.value * 100)
-                        }
-                        type="number-integer"
-                        labelSmall={t('request_form_field.price_help')}
-                        helpText="Bitte nur ganze Zahlen eingeben"
-                      />
+                      <RequestInput field={formPropsFor('price_cents')}>
+                        {priceField => (
+                          <FormField
+                            type="number-integer"
+                            {...priceField}
+                            labelSmall={t('request_form_field.price_help')}
+                            helpText="Bitte nur ganze Zahlen eingeben"
+                            value={
+                              f.isNumber(priceField.value)
+                                ? priceField.value / 100
+                                : priceField.value
+                            }
+                            onChange={e => {
+                              const val = parseInt(e.target.value, 10)
+                              const num = parseInt(val, 10)
+                              setValue(
+                                'price_cents',
+                                f.isNumber(num) && !f.isNaN(num)
+                                  ? num * 100
+                                  : val
+                              )
+                            }}
+                          />
+                        )}
+                      </RequestInput>
                     </Col>
 
                     <Col sm="4">

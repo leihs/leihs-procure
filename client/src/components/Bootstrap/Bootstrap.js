@@ -269,7 +269,7 @@ export const FormField = ({
 
   if (type === 'number-integer') {
     type = 'number'
-    inputProps = { min: 1, step: 1, ...inputProps }
+    inputProps = { min: 0, step: 1, ...inputProps }
   }
 
   if (type === 'checkbox') {
