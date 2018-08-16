@@ -118,13 +118,13 @@ class RequestForm extends React.Component {
                           <FormGroup>
                             <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
                               <input
-                                noValidate
                                 type="checkbox"
                                 className="custom-control-input"
                                 {...formPropsFor('_supplier_as_text')}
                                 checked={
                                   !!formPropsFor('_supplier_as_text').value
                                 }
+                                disabled={supplierField.readOnly}
                                 value={undefined}
                                 label={undefined}
                               />
