@@ -9,7 +9,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
   // NOTE: Checks *keys* must be present, but values can be missing.
   //       Guards against forgetting to query the keys/fields (via GraphQL)!
-  const expectKeys = isDev
+  const expectKeys = !isDev
     ? noop
     : wanted => {
         if (!isDev) return
@@ -31,6 +31,13 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
       return short || !o.shortname
         ? `${o.shortname || o.name}`
         : `${o.name} (${o.shortname})`
+
+    // TODO: check against DB/leihs core and schema
+    case 'Model':
+      expectKeys(['product', 'version'])
+      return short || !o.version
+        ? `${o.product}`
+        : `${o.product} (${o.version})`
 
     case 'Supplier':
       expectKeys(['name'])

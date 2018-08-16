@@ -20,6 +20,7 @@ import { MainWithSidebar } from '../../components/Layout'
 import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
+import ModelAutocomplete from '../../components/ModelAutocomplete'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/DownshiftMultiSelect.examples'
@@ -162,6 +163,14 @@ const PAGES = [
         title: 'User',
         content: (
           <UserAutocomplete
+            onSelect={o => window.alert(JSON.stringify(o, 0, 2))}
+          />
+        )
+      },
+      {
+        title: 'Model',
+        content: (
+          <ModelAutocomplete
             onSelect={o => window.alert(JSON.stringify(o, 0, 2))}
           />
         )
