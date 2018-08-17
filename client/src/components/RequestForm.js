@@ -26,6 +26,7 @@ import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
 import ModelAutocomplete from './ModelAutocomplete'
 import SupplierAutocomplete from './SupplierAutocomplete'
+import UserAutocomplete from './UserAutocomplete'
 
 const tmpUppercasey = v => (f.isString(v) ? v.toUpperCase() : v)
 
@@ -354,6 +355,17 @@ class RequestForm extends React.Component {
                   <FormGroup label={t('request_form_field.attachments')}>
                     <InputFileUpload {...formPropsFor('attachments')} />
                   </FormGroup>
+
+                  <RequestInput field={formPropsFor('user')}>
+                    {userField =>
+                      // NOTE: don't show at all if not writable
+                      !userField.readOnly && (
+                        <FormGroup label={userField.label}>
+                          <UserAutocomplete onlyRequesters {...userField} />
+                        </FormGroup>
+                      )
+                    }
+                  </RequestInput>
 
                   <Let accTypeField={formPropsFor('accounting_type')}>
                     {({ accTypeField }) =>

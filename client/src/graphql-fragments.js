@@ -102,6 +102,17 @@ export const RequestFieldsForEdit = gql`
       }
     }
 
+    user {
+      read
+      write
+      required
+      value {
+        id
+        firstname
+        lastname
+      }
+    }
+
     category {
       read
       write

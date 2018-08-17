@@ -142,7 +142,7 @@ const resultsBoxVisualProps = {
   style: {
     position: 'absolute',
     left: 0,
-    zIndex: 1,
+    zIndex: 100,
     maxHeight: 5.5 * itemHeight + 'em',
     overflowX: 'hidden',
     overflowY: 'scroll',
