@@ -101,9 +101,9 @@ const requestDataFromFields = (request, fields, preselection) => ({
 })
 
 const readFromQueryParams = params => ({
-  budgetPeriod: f.enhyphenUUID(params.bp),
-  category: f.enhyphenUUID(params.category),
-  template: f.enhyphenUUID(params.template)
+  budgetPeriod: f.presence(params.bp) && f.enhyphenUUID(params.bp),
+  category: f.presence(params.category) && f.enhyphenUUID(params.category),
+  template: f.presence(params.template) && f.enhyphenUUID(params.template)
 })
 
 const updateQueryParams = ({ fields, params, location }) => {
