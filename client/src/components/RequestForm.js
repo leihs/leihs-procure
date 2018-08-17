@@ -99,28 +99,37 @@ class RequestForm extends React.Component {
                 <Col lg>
                   <RequestInput field={formPropsFor('article_name')}>
                     {articleField => (
-                      <Row cls="no-gutters">
-                        <Col sm>
-                          {fields._model_as_text ? (
-                            <FormField {...articleField} />
-                          ) : (
-                            <FormGroup label={articleField.label}>
-                              <ModelAutocomplete
-                                {...formPropsFor('model')}
-                                label={articleField.label}
+                      <RequestInput field={formPropsFor('model')}>
+                        {modelField => (
+                          <Row cls="no-gutters">
+                            <Col sm>
+                              {fields._model_as_text ? (
+                                <FormField {...articleField} />
+                              ) : (
+                                <FormGroup label={articleField.label}>
+                                  <ModelAutocomplete
+                                    {...modelField}
+                                    label={articleField.label}
+                                    // NOTE: dependent field model OR article_name
+                                    required={
+                                      articleField.required ||
+                                      modelField.required
+                                    }
+                                  />
+                                </FormGroup>
+                              )}
+                            </Col>
+                            <Col sm="3" cls="pl-sm-3">
+                              <FieldTypeToggle
+                                {...formPropsFor('_model_as_text')}
+                                checked={!!formPropsFor('_model_as_text').value}
+                                disabled={articleField.readOnly}
+                                label={t('form_input_check_free_text')}
                               />
-                            </FormGroup>
-                          )}
-                        </Col>
-                        <Col sm="3" cls="pl-sm-3">
-                          <FieldTypeToggle
-                            {...formPropsFor('_model_as_text')}
-                            checked={!!formPropsFor('_model_as_text').value}
-                            disabled={articleField.readOnly}
-                            label={t('form_input_check_free_text')}
-                          />
-                        </Col>
-                      </Row>
+                            </Col>
+                          </Row>
+                        )}
+                      </RequestInput>
                     )}
                   </RequestInput>
 
