@@ -97,41 +97,41 @@ class RequestForm extends React.Component {
             >
               <Row>
                 <Col lg>
-                  <RequestInput field={formPropsFor('article_name')}>
-                    {articleField => (
-                      <RequestInput field={formPropsFor('model')}>
-                        {modelField => (
-                          <Row cls="no-gutters">
-                            <Col sm>
-                              {fields._model_as_text ? (
-                                <FormField {...articleField} />
-                              ) : (
-                                <FormGroup label={articleField.label}>
-                                  <ModelAutocomplete
-                                    {...modelField}
-                                    label={articleField.label}
-                                    // NOTE: dependent field model OR article_name
-                                    required={
-                                      articleField.required ||
-                                      modelField.required
-                                    }
-                                  />
-                                </FormGroup>
-                              )}
-                            </Col>
-                            <Col sm="3" cls="pl-sm-3">
-                              <FieldTypeToggle
-                                {...formPropsFor('_model_as_text')}
-                                checked={!!formPropsFor('_model_as_text').value}
-                                disabled={articleField.readOnly}
-                                label={t('form_input_check_free_text')}
-                              />
-                            </Col>
-                          </Row>
-                        )}
-                      </RequestInput>
-                    )}
-                  </RequestInput>
+                  <Let
+                    articleField={formPropsFor('article_name')}
+                    modelField={formPropsFor('model')}
+                  >
+                    {({ articleField, modelField }) => {
+                      // NOTE: dependent field model OR article_name
+                      const anyRequired =
+                        articleField.required || modelField.required
+                      return (
+                        <Row cls="no-gutters">
+                          <Col sm>
+                            {fields._model_as_text ? (
+                              <FormField {...articleField} />
+                            ) : (
+                              <FormGroup label={articleField.label}>
+                                <ModelAutocomplete
+                                  {...modelField}
+                                  label={articleField.label}
+                                  required={anyRequired}
+                                />
+                              </FormGroup>
+                            )}
+                          </Col>
+                          <Col sm="3" cls="pl-sm-3">
+                            <FieldTypeToggle
+                              {...formPropsFor('_model_as_text')}
+                              checked={!!formPropsFor('_model_as_text').value}
+                              disabled={articleField.readOnly}
+                              label={t('form_input_check_free_text')}
+                            />
+                          </Col>
+                        </Row>
+                      )
+                    }}
+                  </Let>
 
                   <FormField {...formPropsFor('article_number')} />
 
@@ -565,6 +565,7 @@ const FieldTypeToggle = ({ id, value, label, ...props }) => (
       <input
         type="checkbox"
         className="custom-control-input"
+        formNoValidate
         id={id}
         {...props}
         checked={value}
@@ -578,6 +579,7 @@ const FieldTypeToggle = ({ id, value, label, ...props }) => (
   </FormGroup>
 )
 
+const Let = ({ children, ...props }) => children(props)
 const RequestInput = ({ children, field }) => (
   <F>{!field.hidden && children(field)}</F>
 )
