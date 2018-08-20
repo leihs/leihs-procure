@@ -91,6 +91,12 @@
    :template template/get-template,
    :templates templates/get-templates,
    :total-price-cents requests/total-price-cents,
+   :total-price-cents-requested-quantities
+     requests/total-price-cents-requested-quantities,
+   :total-price-cents-approved-quantities
+     requests/total-price-cents-approved-quantities,
+   :total-price-cents-order-quantities
+     requests/total-price-cents-order-quantities,
    :user user/get-user,
    :users users/get-users,
    :viewers (fn [context args value]

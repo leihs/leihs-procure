@@ -161,7 +161,16 @@
                                               :type (list :MainCategory)},
                             :name {:type (non-null String)},
                             :total_price_cents {:resolve :total-price-cents,
-                                                :type (non-null Int)}}},
+                                                :type (non-null Int)},
+                            :total_price_cents_approved_quantities
+                              {:resolve :total-price-cents-approved-quantities,
+                               :type (non-null Int)},
+                            :total_price_cents_order_quantities
+                              {:resolve :total-price-cents-order-quantities,
+                               :type (non-null Int)},
+                            :total_price_cents_requested_quantities
+                              {:resolve :total-price-cents-requested-quantities,
+                               :type (non-null Int)}}},
     :Building {:fields {:code {:type String},
                         :id {:type (non-null ID)},
                         :name {:type (non-null String)},
