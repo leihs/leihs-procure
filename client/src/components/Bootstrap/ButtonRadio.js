@@ -85,6 +85,7 @@ class ButtonRadio extends React.PureComponent {
                   required={required}
                   checked={isSelected}
                   aria-checked={isSelected}
+                  onChange={onRadioClick}
                   onClick={onRadioClick}
                 />
                 {withIcons &&
