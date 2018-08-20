@@ -17,3 +17,10 @@ export const REQUEST_REPLACEMENT_VALUES_MAP = {
 export const REQUEST_REPLACEMENT_VALUES = f.values(
   REQUEST_REPLACEMENT_VALUES_MAP
 )
+
+export const REQUEST_STATES = [
+  'new',
+  'approved',
+  'partially_approved',
+  'denied'
+]

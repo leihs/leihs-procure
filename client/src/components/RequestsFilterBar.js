@@ -89,6 +89,11 @@ const Filters = ({ me, data, current, onChange }) => {
     inspector_priority: CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(value => ({
       value,
       label: t(`inspector_priority_label_${value}`)
+    })),
+
+    state: CONSTANTS.REQUEST_STATES.map(value => ({
+      value,
+      label: t(`request_state_label_${value}`)
     }))
   }
 
@@ -235,7 +240,12 @@ const Filters = ({ me, data, current, onChange }) => {
             )}
 
             <FormGroup label={'Status Antrag'}>
-              <code>TBD</code>
+              <Select
+                {...formPropsFor('state')}
+                multiple
+                emptyOption={false}
+                options={available.state}
+              />
             </FormGroup>
 
             {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
