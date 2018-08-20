@@ -6,18 +6,12 @@ import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import t from '../../locale/translate'
+import { mutationErrorHandler } from '../../apollo-client'
 import Icon from '../../components/Icons'
 import { Button, StatefulForm, FormField } from '../../components/Bootstrap'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
-
-const mutationErrorHandler = err => {
-  // not much we can do on backend error
-  // eslint-disable-next-line no-console
-  console.error(err)
-  window.confirm('Error! ' + err) && window.location.reload()
-}
 
 // # DATA & ACTIONS
 //

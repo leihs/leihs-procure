@@ -239,6 +239,8 @@ export const FormField = ({
   let inputLabelNode = false
   if (!name) name = id
 
+  inputProps.className = cx(mainClass, className)
+
   if (type === 'text') {
     tag = InputText
   }

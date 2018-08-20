@@ -45,6 +45,15 @@ export const apolloClient = new ApolloClient({
   request: operation => operation.setContext({ headers: buildAuthHeaders() })
 })
 
+// util
+
+export const mutationErrorHandler = err => {
+  // not much we can do on backend error
+  // eslint-disable-next-line no-console
+  console.error(err)
+  window.confirm('Error! ' + err) && window.location.reload()
+}
+
 // helper
 
 const getCookieValue = (cookies, name) =>

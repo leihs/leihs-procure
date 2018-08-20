@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -6,6 +6,7 @@ import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import t from '../../locale/translate'
+import { mutationErrorHandler } from '../../apollo-client'
 import Icon from '../../components/Icons'
 import {
   Button,
@@ -21,28 +22,19 @@ import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
 import { formatCurrency } from '../../components/decorators'
 
-const mutationErrorHandler = err => {
-  // not much we can do on backend error
-  // eslint-disable-next-line no-console
-  console.error(err)
-  window.confirm('Error! ' + err) && window.location.reload()
-}
-
 // # DATA & ACTIONS
 //
-const ADMIN_BUDGET_PERIODS_FRAGMENTS = {
-  props: gql`
-    fragment AdminBudgetPeriodProps on BudgetPeriod {
-      id
-      name
-      inspection_start_date
-      end_date
-      can_delete
-      total_price_cents_requested_quantities
-      total_price_cents_approved_quantities
-    }
-  `
-}
+const ADMIN_BUDGET_PERIODS_PROPS_FRAGMENT = gql`
+  fragment AdminBudgetPeriodProps on BudgetPeriod {
+    id
+    name
+    inspection_start_date
+    end_date
+    can_delete
+    total_price_cents_requested_quantities
+    total_price_cents_approved_quantities
+  }
+`
 
 const ADMIN_BUDGET_PERIODS_PAGE_QUERY = gql`
   query AdminBudgetPeriods {
@@ -50,7 +42,7 @@ const ADMIN_BUDGET_PERIODS_PAGE_QUERY = gql`
       ...AdminBudgetPeriodProps
     }
   }
-  ${ADMIN_BUDGET_PERIODS_FRAGMENTS.props}
+  ${ADMIN_BUDGET_PERIODS_PROPS_FRAGMENT}
 `
 
 const ADMIN_UPDATE_BUDGET_PERIODS_MUTATION = gql`
@@ -59,7 +51,7 @@ const ADMIN_UPDATE_BUDGET_PERIODS_MUTATION = gql`
       ...AdminBudgetPeriodProps
     }
   }
-  ${ADMIN_BUDGET_PERIODS_FRAGMENTS.props}
+  ${ADMIN_BUDGET_PERIODS_PROPS_FRAGMENT}
 `
 
 const updateBudgetPeriods = {
@@ -140,7 +132,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
           setValue(fields.length, {})
         }
         return (
-          <React.Fragment>
+          <F>
             <table className="table">
               <thead>
                 <tr>
@@ -200,7 +192,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                     <td>
                       {bp.total_price_cents_requested_quantities > 0 &&
                       bp.total_price_cents_approved_quantities > 0 ? (
-                        <React.Fragment>
+                        <F>
                           <Tooltipped
                             text={'Total aller Anträge mit Status "Neu"'}
                           >
@@ -223,7 +215,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                               </samp>
                             </Badge>
                           </Tooltipped>
-                        </React.Fragment>
+                        </F>
                       ) : (
                         <FormGroup>
                           <div className="form-check mt-2">
@@ -261,7 +253,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
               </tfoot>
             </table>
             {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
-          </React.Fragment>
+          </F>
         )
       }}
     </StatefulForm>
