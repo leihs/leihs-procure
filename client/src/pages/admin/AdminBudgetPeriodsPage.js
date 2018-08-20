@@ -38,6 +38,7 @@ const ADMIN_BUDGET_PERIODS_FRAGMENTS = {
       inspection_start_date
       end_date
       can_delete
+      # FIXME: is missing from schema!
       total_price_cents_requested_quantities
       total_price_cents_approved_quantities
     }
