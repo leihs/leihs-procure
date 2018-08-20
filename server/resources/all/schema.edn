@@ -359,7 +359,7 @@
                               :required {:type (non-null Boolean)},
                               :value {:resolve :template, :type :Template},
                               :write {:type (non-null Boolean)}}},
-    :RequestFieldUser {:fields {:default {:resolve :user, :type :User},
+    :RequestFieldUser {:fields {:default {:type ID},
                                 :read {:type (non-null Boolean)},
                                 :required {:type (non-null Boolean)},
                                 :value {:resolve :user, :type :User},

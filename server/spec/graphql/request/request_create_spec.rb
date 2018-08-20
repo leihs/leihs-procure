@@ -73,6 +73,9 @@ describe 'request' do
             supplier_name {
               ...RequestFieldString
             }
+            user {
+              ...RequestFieldUser
+            }
           }
         }
 
@@ -84,6 +87,12 @@ describe 'request' do
           required
           value { ...RoomProps }
           default { ...RoomProps}
+        }
+        fragment RequestFieldUser on RequestFieldUser {
+          read
+          write
+          value { id }
+          default
         }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
@@ -134,7 +143,9 @@ describe 'request' do
                      general: true
                    },
                  },
-                 supplier_name: { value: nil, read: true, write: true })
+                 supplier_name: { value: nil, read: true, write: true },
+                 user: { value: nil, read: false, write: false, default: requester.id }
+                )
       end
 
       example 'from template' do
@@ -176,7 +187,9 @@ describe 'request' do
                      general: true
                    },
                  },
-                 supplier_name: { value: nil, read: true, write: false })
+                 supplier_name: { value: nil, read: true, write: false },
+                 user: { value: nil, read: false, write: false, default: requester.id }
+                )
       end
     end
   end
