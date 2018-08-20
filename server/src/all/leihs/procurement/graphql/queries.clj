@@ -85,8 +85,7 @@
    :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,
-   :settings (-> settings/get-settings
-                 (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   :settings settings/get-settings,
    :supplier supplier/get-supplier,
    :suppliers suppliers/get-suppliers,
    :template template/get-template,
