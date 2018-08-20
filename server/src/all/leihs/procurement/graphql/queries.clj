@@ -92,11 +92,14 @@
    :templates templates/get-templates,
    :total-price-cents requests/total-price-cents,
    :total-price-cents-requested-quantities
-     requests/total-price-cents-requested-quantities,
+     (-> requests/total-price-cents-requested-quantities
+         (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-approved-quantities
-     requests/total-price-cents-approved-quantities,
+     (-> requests/total-price-cents-approved-quantities
+         (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-order-quantities
-     requests/total-price-cents-order-quantities,
+     (-> requests/total-price-cents-order-quantities
+         (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :user user/get-user,
    :users users/get-users,
    :viewers (fn [context args value]

@@ -2,6 +2,32 @@ require 'spec_helper'
 require_relative 'graphql_helper'
 
 describe 'budget periods' do
+  context 'query' do
+    example 'authorizes total_price_cents_* query path' do
+      FactoryBot.create(:request)
+
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:category_inspector, user_id: user.id)
+
+      [:requested, :approved, :order].each do |qty_type|
+        tp = "total_price_cents_#{qty_type}_quantities"
+
+        q = <<-GRAPHQL
+          query {
+            budget_periods {
+              id
+              #{tp}
+            }
+          }
+        GRAPHQL
+
+        result = query(q, user.id)
+        expect(result['data']['budget_periods'].first[tp]).to be_nil
+        expect(result['errors'].first['exception']).to be == 'UnauthorizedException'
+      end
+    end
+  end
+
   context 'mutation' do
     before :example do
       budget_periods_before = [{ name: 'bp_to_delete' },
