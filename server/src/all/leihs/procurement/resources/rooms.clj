@@ -21,14 +21,18 @@
   [args value]
   (let [building_id (or (:building_id args) (:id value))]
     (cond-> rooms-base-query
-      building_id (sql/merge-where [:= :rooms.building_id building_id]))))
+      building_id (-> (sql/merge-where [:= :rooms.building_id building_id])
+                      (cond-> (= (str building_id) buildings/general-id)
+                                (sql/merge-where [:= :rooms.general true]))))))
 
 (defn get-rooms
   [context args value]
   (jdbc/query (-> context
                   :request
                   :tx)
-              (sql/format (rooms-query args value))))
+              (-> args
+                  (rooms-query value)
+                  sql/format)))
 
 (defn get-building-rooms
   [context _ value]
