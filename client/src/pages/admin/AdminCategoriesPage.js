@@ -198,6 +198,12 @@ const CategoryPage = ({ match, allData }) => (
   </Mutation>
 )
 
+const extendWhere = (id, list, fn) =>
+  list.map(o => (o.id !== id ? o : { ...o, ...fn(o) }))
+
+const setAsDeleted = (toDelete, id, list) =>
+  extendWhere(id, list, () => ({ toDelete }))
+
 const CategoryCard = ({ id, ...props }) => {
   const formValues = {
     ...f.pick(props, 'name', 'image_url', 'budget_limits'),
@@ -210,12 +216,7 @@ const CategoryCard = ({ id, ...props }) => {
           setValue('categories', [...fields.categories, {}])
         }
         const onMarkSubCatForDeletion = ({ id, toDelete = false }) => {
-          setValue(
-            'categories',
-            fields.categories.map(
-              c => (c.id !== id ? c : { ...c, toDelete: !toDelete })
-            )
-          )
+          setValue('categories', setAsDeleted(!toDelete, id, fields.categories))
         }
         const onAddInspector = (cat, user) => {
           setValue('inspectors', [...fields.inspectors, user])
@@ -223,17 +224,9 @@ const CategoryCard = ({ id, ...props }) => {
         const onRemoveInspector = (cat, { id, toDelete = false }) => {
           setValue(
             'categories',
-            fields.categories.map(
-              c =>
-                c.id !== cat.id
-                  ? c
-                  : {
-                      ...c,
-                      inspectors: c.inspectors.map(
-                        u => (u.id !== id ? u : { ...u, toDelete: !toDelete })
-                      )
-                    }
-            )
+            extendWhere(cat.id, fields.categories, c => ({
+              inspectors: setAsDeleted(!toDelete, id, c.inspectors)
+            }))
           )
         }
         return (
