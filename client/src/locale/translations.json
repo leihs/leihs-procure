@@ -60,5 +60,20 @@
     "procurement_account": "Beschaffungskonto"
   },
   "accounting_type_investment": "Investition",
-  "accounting_type_aquisition": "Beschaffung"
+  "accounting_type_aquisition": "Beschaffung",
+
+  "admin": {
+    "categories": {
+      "add_subcat": "Neue Subkategorie hinzufügen",
+      "delete_subcat": "Subkategorie löschen",
+      "inspectors": "Inspektoren",
+      "list_no_inspectors": "(Keine)",
+      "subcategories": {
+        "cost_center": "Kostenstelle",
+        "general_ledger_account": "Sachkonto Ⅰ",
+        "?___procurement_account___?": "Sachkonto Ⅱ",
+        "procurement_account": "Beschaffungskonto"
+      }
+    }
+  }
 }
