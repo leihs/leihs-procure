@@ -17,11 +17,16 @@
           term-parts (and search-term
                           (map (fn [part] (str "%" part "%"))
                             (clj-str/split search-term #"\s+")))
+          is-requester (:isRequester args)
           exclude-ids (:exclude_ids args)
           offset (:offset args)
           limit (:limit args)]
       (sql/format
         (cond-> users-base-query
+          is-requester (sql/merge-join
+                         :procurement_requesters_organizations
+                         [:= :procurement_requesters_organizations.user_id
+                          :users.id])
           term-parts (sql/merge-where
                        (into [:and]
                              (map (fn [term-percent]

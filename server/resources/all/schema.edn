@@ -464,8 +464,9 @@
                 :type (list :Supplier)},
     :templates {:resolve :templates, :type (list :Template)},
     :users {:args {:exclude_ids {:type (list ID)},
-                   :limit {:type (non-null Int)},
-                   :offset {:type (non-null Int)},
-                   :search_term {:type (non-null String)}},
+                   :isRequester {:type Boolean},
+                   :limit {:type Int},
+                   :offset {:type Int},
+                   :search_term {:type String}},
             :resolve :users,
             :type (list :User)}}}
