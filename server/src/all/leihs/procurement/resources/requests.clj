@@ -187,8 +187,8 @@
                     #(assoc % :request-id (:id proc-req)))))))))
 
 (defn get-total-price-cents
-  [tx m]
-  (or (some->> m
+  [tx sqlmap]
+  (or (some->> sqlmap
                sql/format
                (jdbc/query tx)
                first
@@ -242,3 +242,47 @@
                         (sql/call :* :price_cents)
                         (sql/call :sum)) :result])
       (get-total-price-cents tx <>))))
+
+(defn total-price-sqlmap
+  [qty-type bp-id]
+  (-> (sql/select :pr.budget_period_id
+                  [(sql/call :sum
+                             (sql/call :*
+                                       :pr.price_cents
+                                       (->> qty-type
+                                            name
+                                            (str "pr.")
+                                            keyword))) :result])
+      (sql/from [:procurement_requests :pr])
+      (sql/merge-where [:= :pr.budget_period_id bp-id])
+      (sql/group :pr.budget_period_id)))
+
+(defn specific-total-price-cents
+  [tx qty-type bp-id]
+  (->> bp-id
+       (total-price-sqlmap qty-type)
+       (get-total-price-cents tx)))
+
+(defn total-price-cents-requested-quantities
+  [context _ value]
+  (specific-total-price-cents (-> context
+                                  :request
+                                  :tx)
+                              :requested_quantity
+                              (:id value)))
+
+(defn total-price-cents-approved-quantities
+  [context _ value]
+  (specific-total-price-cents (-> context
+                                  :request
+                                  :tx)
+                              :approved_quantity
+                              (:id value)))
+
+(defn total-price-cents-order-quantities
+  [context _ value]
+  (specific-total-price-cents (-> context
+                                  :request
+                                  :tx)
+                              :order_quantity
+                              (:id value)))

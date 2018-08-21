@@ -151,99 +151,110 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                 </tr>
               </thead>
               <tbody>
-                {fields.map(({ toDelete = false, ...bp }, n) => (
-                  <tr
-                    key={n}
-                    className={cx([
-                      'rounded',
-                      {
-                        'text-strike bg-danger-light': toDelete,
-                        // new lines are marked and should show form validation styles
-                        'was-validated bg-info-light': !bp.id
-                      }
-                    ])}
-                  >
-                    <td>
-                      <FormField
-                        required
-                        label="Name"
-                        placeholder="Name"
-                        hideLabel
-                        readOnly={toDelete}
-                        {...formPropsFor(`${n}.name`)}
-                      />
-                    </td>
-                    <td>
-                      <FormGroup label="Startdatum der Prüfphase" hideLabel>
-                        <InputDate
+                {fields.map(({ toDelete = false, ...bp }, n) => {
+                  // FIXME: use bp.can_delete when fixed in API
+                  const canDelete = !(
+                    bp.total_price_cents_requested_quantities > 0 ||
+                    bp.total_price_cents_approved_quantities > 0
+                  )
+                  return (
+                    <tr
+                      key={n}
+                      className={cx([
+                        'rounded',
+                        {
+                          'text-strike bg-danger-light': toDelete,
+                          // new lines are marked and should show form validation styles
+                          'was-validated bg-info-light': !bp.id
+                        }
+                      ])}
+                    >
+                      <td>
+                        <FormField
                           required
+                          label="Name"
+                          placeholder="Name"
+                          hideLabel
                           readOnly={toDelete}
-                          inputProps={{
-                            className: cx({ 'text-strike ': toDelete })
-                          }}
-                          {...formPropsFor(`${n}.inspection_start_date`)}
+                          {...formPropsFor(`${n}.name`)}
                         />
-                      </FormGroup>
-                    </td>
-                    <td>
-                      <FormGroup label="Enddatum" hideLabel>
-                        <InputDate
-                          required
-                          readOnly={toDelete}
-                          inputProps={{
-                            className: cx({ 'text-strike ': toDelete })
-                          }}
-                          {...formPropsFor(`${n}.end_date`)}
-                        />
-                      </FormGroup>
-                    </td>
-                    <td>
-                      {bp.total_price_cents_requested_quantities > 0 &&
-                      bp.total_price_cents_approved_quantities > 0 ? (
-                        <React.Fragment>
-                          <Tooltipped
-                            text={'Total aller Anträge mit Status "Neu"'}
-                          >
-                            <Badge info id={`badge_requested_${n}`}>
-                              <Icon.ShoppingCart />{' '}
-                              <samp>
-                                {formatCurrency(
-                                  bp.total_price_cents_requested_quantities
-                                )}
-                              </samp>
-                            </Badge>
-                          </Tooltipped>{' '}
-                          <Tooltipped text={'Total aller bewilligten Anträge'}>
-                            <Badge success id={`badge_approved_${n}`}>
-                              <Icon.ShoppingCart />{' '}
-                              <samp>
-                                {formatCurrency(
-                                  bp.total_price_cents_approved_quantities
-                                )}
-                              </samp>
-                            </Badge>
-                          </Tooltipped>
-                        </React.Fragment>
-                      ) : (
-                        <FormGroup>
-                          <div className="form-check mt-2">
-                            <label className="form-check-label">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={toDelete}
-                                onChange={e => {
-                                  setValue(`${n}.toDelete`, !!e.target.checked)
-                                }}
-                              />
-                              {'remove'}
-                            </label>
-                          </div>
+                      </td>
+                      <td>
+                        <FormGroup label="Startdatum der Prüfphase" hideLabel>
+                          <InputDate
+                            required
+                            readOnly={toDelete}
+                            inputProps={{
+                              className: cx({ 'text-strike ': toDelete })
+                            }}
+                            {...formPropsFor(`${n}.inspection_start_date`)}
+                          />
                         </FormGroup>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <FormGroup label="Enddatum" hideLabel>
+                          <InputDate
+                            required
+                            readOnly={toDelete}
+                            inputProps={{
+                              className: cx({ 'text-strike ': toDelete })
+                            }}
+                            {...formPropsFor(`${n}.end_date`)}
+                          />
+                        </FormGroup>
+                      </td>
+                      <td>
+                        {!canDelete ? (
+                          <React.Fragment>
+                            <Tooltipped
+                              text={'Total aller Anträge mit Status "Neu"'}
+                            >
+                              <Badge info id={`badge_requested_${n}`}>
+                                <Icon.ShoppingCart />{' '}
+                                <samp>
+                                  {formatCurrency(
+                                    bp.total_price_cents_requested_quantities
+                                  )}
+                                </samp>
+                              </Badge>
+                            </Tooltipped>{' '}
+                            <Tooltipped
+                              text={'Total aller bewilligten Anträge'}
+                            >
+                              <Badge success id={`badge_approved_${n}`}>
+                                <Icon.ShoppingCart />{' '}
+                                <samp>
+                                  {formatCurrency(
+                                    bp.total_price_cents_approved_quantities
+                                  )}
+                                </samp>
+                              </Badge>
+                            </Tooltipped>
+                          </React.Fragment>
+                        ) : (
+                          <FormGroup>
+                            <div className="form-check mt-2">
+                              <label className="form-check-label">
+                                <input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  checked={toDelete}
+                                  onChange={e => {
+                                    setValue(
+                                      `${n}.toDelete`,
+                                      !!e.target.checked
+                                    )
+                                  }}
+                                />
+                                {'remove'}
+                              </label>
+                            </div>
+                          </FormGroup>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
               <tfoot>
                 <tr>
