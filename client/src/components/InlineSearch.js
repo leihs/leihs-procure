@@ -62,6 +62,7 @@ const InlineSearch = ({
           <input
             value=""
             onChange={() => {}}
+            onFocus={e => e.target.select()}
             {...getInputProps({
               required,
               placeholder: 'Search',
