@@ -46,7 +46,8 @@
    :current-user current-user/get-current-user,
    :department organization/get-department,
    :general-ledger-account request/general-ledger-account,
-   :inspectors inspectors/get-inspectors,
+   :inspectors (-> inspectors/get-inspectors
+                   (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :main-category main-category/get-main-category,
    :main-categories main-categories/get-main-categories,
    :model model/get-model,
