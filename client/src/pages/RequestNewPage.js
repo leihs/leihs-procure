@@ -362,7 +362,7 @@ const CategoriesTemplatesTree = ({
 }) => (
   <F>
     <ul className="list-unstyled">
-      {main_categories.map(mc => (
+      {f.sortBy(main_categories, 'name').map(mc => (
         <F key={mc.id}>
           <Collapsing id={'mc' + mc.id} canToggle={true} startOpen={false}>
             {({
@@ -391,15 +391,18 @@ const CategoriesTemplatesTree = ({
                 </h3>
                 {isOpen && (
                   <ul className="list-group list-group-flush">
-                    {mc.categories.map(sc => (
+                    {f.sortBy(mc.categories, 'name').map(sc => (
                       <F key={sc.id}>
                         <li className="card list-group-item p-0">
                           <h4 className="card-header h6">{sc.name}</h4>
                           <div className="list-group list-group-flush">
                             {f
-                              .filter(templates, {
-                                category: { id: sc.id }
-                              })
+                              .sortBy(
+                                f.filter(templates, {
+                                  category: { id: sc.id }
+                                }),
+                                'name'
+                              )
                               .map(t => (
                                 <F key={t.id}>
                                   <button
