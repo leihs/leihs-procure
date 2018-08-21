@@ -130,7 +130,7 @@
     (let [rrequest (:request context)
           tx (:tx rrequest)
           auth-entity (:authenticated-entity rrequest)
-          budget-period-arg (:budget_period_id arguments)
+          budget-period-arg (get-id :budget-period arguments value)
           budget-periods (map #(budget-period/get-budget-period-by-id tx %)
                            budget-period-arg)
           phase-of-budget-periods
