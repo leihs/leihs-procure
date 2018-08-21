@@ -1,6 +1,42 @@
 import f from 'lodash'
 import assert from 'assert'
 
+// <https://github.com/lodash/lodash/wiki/Deprecations>
+const DEPRECATIONS = {
+  all: 'every',
+  any: 'some',
+  backflow: 'flowRight',
+  callback: 'iteratee',
+  collect: 'map',
+  compose: 'flowRight',
+  contains: 'includes',
+  detect: 'find',
+  foldl: 'reduce',
+  foldr: 'reduceRight',
+  findWhere: 'find',
+  first: 'head',
+  include: 'includes',
+  indexBy: 'keyBy',
+  inject: 'reduce',
+  invoke: 'invokeMap',
+  modArgs: 'overArgs',
+  methods: 'functions',
+  object: 'fromPairs',
+  padLeft: 'padStart',
+  padRight: 'padEnd',
+  pairs: 'toPairs',
+  pluck: 'map',
+  rest: 'tail',
+  restParam: 'rest',
+  select: 'filter',
+  sortByOrder: 'orderBy',
+  trimLeft: 'trimStart',
+  trimRight: 'trimEnd',
+  trunc: 'truncate',
+  unique: 'uniq',
+  where: 'filter'
+}
+
 const lodash_try = fn => {
   try {
     return fn()
@@ -61,7 +97,13 @@ const mixins = {
   isUUID,
   dehyphenUUID,
   enhyphenUUID,
-  UUID_REGEX
+  UUID_REGEX,
+  ...f.fromPairs(
+    f.map(DEPRECATIONS, (replacementFn, oldName) => [
+      [oldName],
+      f[replacementFn]
+    ])
+  )
 }
 
 export default mixins
