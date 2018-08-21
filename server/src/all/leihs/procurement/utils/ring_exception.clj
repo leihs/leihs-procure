@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [str keyword])
   (:require [clojure.tools.logging :as logging]
             [leihs.procurement.env :as env]
-            [leihs.procurement.utils.helpers :as helpers]
+            [leihs.procurement.graphql.helpers :as helpers]
             [logbug.thrown :as thrown]))
 
 (defn get-cause

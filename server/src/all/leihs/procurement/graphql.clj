@@ -6,7 +6,9 @@
             [com.walmartlabs.lacinia [parser :as graphql-parser]
              [schema :as graphql-schema] [util :as graphql-util]]
             [leihs.procurement.env :as env]
-            [leihs.procurement.graphql.resolver :as resolver]))
+            [leihs.procurement.graphql.resolver :as resolver]
+            [leihs.procurement.graphql.helpers :as helpers]
+            [leihs.procurement.utils.ring-exception :refer [get-cause]]))
 
 (defn load-schema
   []
@@ -38,10 +40,20 @@
   (let [result (exec-query query request)]
     (cond-> {:body result} (:errors result) (assoc :graphql-error true))))
 
+(defn parse-query-with-exception-handling
+  [schema query]
+  (try (graphql-parser/parse-query (get-schema) query)
+       (catch Throwable e*
+         (let [e (get-cause e*)
+               m (.getMessage e*)]
+           (log/warn m)
+           (if (env/env #{:dev :test}) (log/debug e))
+           (helpers/error-as-graphql-object "API_ERROR" m)))))
+
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
-                       (graphql-parser/parse-query (get-schema))
+                       (parse-query-with-exception-handling (get-schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
