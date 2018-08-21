@@ -18,6 +18,8 @@ import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
 
+import { Anchor } from '.'
+
 export { Collapse }
 export { Navbar }
 export { NavbarToggler }
@@ -33,6 +35,12 @@ export { DropdownItem }
 
 export const NavLink = p => (
   <BsNavLink activeClassName="active" tag={RouterNavLink} {...p} />
+)
+
+export const NavItemAnchor = p => (
+  <NavItem>
+    <BsNavLink tag={Anchor} {...p} />
+  </NavItem>
 )
 
 export const NavItemLink = p => (

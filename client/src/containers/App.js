@@ -53,6 +53,7 @@ class App extends Component {
                       <MainNavWithRouter
                         isDev={isDev}
                         me={data.current_user.user}
+                        contactUrl={data.settings.contact_url}
                       />
                       <div className="minh-100vh">
                         <FlashAlert {...f.get(location, 'state.flash')} />

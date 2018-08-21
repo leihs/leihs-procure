@@ -79,6 +79,11 @@ export const Col = ({ order, cls, ...props }) => {
   return Node({ ...restProps, cls: cx(colCls, orderCls, cls) })
 }
 
+export const Anchor = ({ target, rel, ...p }) => {
+  if (!rel && target === '_blank') rel = 'noopener noreferrer'
+  return <Node tag="a" target={target} rel={rel} {...p} />
+}
+
 export const Button = ({ massive, className, cls, ...props }) => (
   <BsButton
     type="button" // default in case not given, otherwise its 'submit'
