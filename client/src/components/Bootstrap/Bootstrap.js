@@ -342,7 +342,7 @@ FormField.propTypes = FormFieldPropTypes
 
 export const FilePicker = ({ id, name, label, onChange, ...props }) => (
   <F>
-    <label className="btn btn-sm btn-block btn-outline-secondary text-left">
+    <label className="mb-0 btn btn-sm btn-block btn-outline-secondary text-left">
       <Icon.Paperclip /> {label}
       <input
         id={id}
