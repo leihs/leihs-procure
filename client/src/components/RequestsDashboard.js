@@ -104,9 +104,12 @@ const RequestsTree = ({
         if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
           return false
         }
+
         return (
           <CategoryLine
             key={cat.id}
+            me={me}
+            budgetPeriod={b}
             category={cat}
             requestCount={subCatReqs.length}
             isOpen={openPanels.cats.includes(cat.id)}
@@ -121,6 +124,8 @@ const RequestsTree = ({
                 <SubCategoryLine
                   key={sc.id}
                   category={sc}
+                  me={me}
+                  budgetPeriod={b}
                   requestCount={reqs.length}
                   isOpen={openPanels.cats.includes(sc.id)}
                   onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
@@ -165,91 +170,98 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
 
   return (
     <Collapsing id={`bp_${budgetPeriod.id}`} startOpen>
-      {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
-        <div className={cx('card mb-3')}>
-          <div
-            className={cx('card-header cursor-pointer pl-2', {
-              'border-bottom-0': !(isOpen && children),
-              'bg-transparent': !isPast,
-              'text-muted': isPast
-            })}
-            {...togglerProps}
-          >
-            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
-              <div className="flex-grow-1 flex-sm-grow-0 w-50">
-                <h2 className="mb-0 h3 d-inline-block">
-                  <Caret spaced />
-                  {budgetPeriod.name}
-                </h2>
+      {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => {
+        const newRequestBpLink =
+          me.roles.isRequester && newRequestLink({ budgetPeriod })
 
-                <div className="d-inline-flex flex-wrap ml-3 mt-2">
-                  <Tooltipped text="Antragsphase bis">
-                    <span
-                      id={`inspectStartDate_tt_${budgetPeriod.id}`}
-                      className={cx('mr-3', { 'text-success': isRequesting })}
-                    >
-                      <Icon.RequestingPhase className="mr-2" />
-                      {inspectStartDate.toLocaleString()}
-                    </span>
-                  </Tooltipped>
+        return (
+          <div className={cx('card mb-3')}>
+            <div
+              className={cx('card-header cursor-pointer pl-2', {
+                'border-bottom-0': !(isOpen && children),
+                'bg-transparent': !isPast,
+                'text-muted': isPast
+              })}
+              {...togglerProps}
+            >
+              <div className="d-flex flex-wrap justify-content-between align-items-baseline">
+                <div className="flex-grow-1 flex-sm-grow-0 w-50">
+                  <h2 className="mb-0 h3 d-inline-block">
+                    <Caret spaced />
+                    {budgetPeriod.name}
+                  </h2>
 
-                  <Tooltipped text="Inspektionsphase bis">
-                    <span
-                      id={`endDate_tt_${budgetPeriod.id}`}
-                      className={cx('mr-3', { 'text-success': isInspecting })}
-                    >
-                      <Icon.InspectionPhase className="mr-2" />
-                      {endDate.toLocaleString()}
-                    </span>
-                  </Tooltipped>
+                  <div className="d-inline-flex flex-wrap ml-3 mt-2">
+                    <Tooltipped text="Antragsphase bis">
+                      <span
+                        id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                        className={cx('mr-3', { 'text-success': isRequesting })}
+                      >
+                        <Icon.RequestingPhase className="mr-2" />
+                        {inspectStartDate.toLocaleString()}
+                      </span>
+                    </Tooltipped>
+
+                    <Tooltipped text="Inspektionsphase bis">
+                      <span
+                        id={`endDate_tt_${budgetPeriod.id}`}
+                        className={cx('mr-3', { 'text-success': isInspecting })}
+                      >
+                        <Icon.InspectionPhase className="mr-2" />
+                        {endDate.toLocaleString()}
+                      </span>
+                    </Tooltipped>
+                  </div>
+                </div>
+
+                <div className="mr-auto">
+                  {!!budgetPeriod.total_price_cents && (
+                    <Tooltipped text={t('dashboard.bp_total_sum')}>
+                      <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
+                        <Icon.ShoppingCart className="mr-1" />
+                        <samp>
+                          {formatCurrency(budgetPeriod.total_price_cents)}
+                        </samp>
+                      </span>
+                    </Tooltipped>
+                  )}
+                </div>
+
+                <div className="ml-3 mt-2 mt-md-0">
+                  {newRequestBpLink && (
+                    <Link to={newRequestBpLink}>
+                      <Tooltipped text={t('dashboard.create_request_for_bp')}>
+                        <Icon.PlusCircle
+                          id={`tt_bp_cnr_${budgetPeriod.id}`}
+                          size="2x"
+                          color="success"
+                        />
+                      </Tooltipped>
+                    </Link>
+                  )}
                 </div>
               </div>
-
-              <div className="mr-auto">
-                {!!budgetPeriod.total_price_cents && (
-                  <Tooltipped text={t('dashboard.bp_total_sum')}>
-                    <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
-                      <Icon.ShoppingCart className="mr-1" />
-                      <samp>
-                        {formatCurrency(budgetPeriod.total_price_cents)}
-                      </samp>
-                    </span>
-                  </Tooltipped>
-                )}
-              </div>
-
-              <div className="ml-3 mt-2 mt-md-0">
-                {me.roles.isRequester && (
-                  <Link to={newRequestLink({ budgetPeriod })}>
-                    <Tooltipped text={t('dashboard.create_request_for_bp')}>
-                      <Icon.PlusCircle
-                        id={`tt_bp_cnr_${budgetPeriod.id}`}
-                        size="2x"
-                        color="success"
-                      />
-                    </Tooltipped>
-                  </Link>
-                )}
-              </div>
             </div>
-          </div>
 
-          {isOpen &&
-            children && (
-              <ul
-                className="list-group list-group-flush bp-cat-list"
-                {...collapsedProps}
-              >
-                {children}
-              </ul>
-            )}
-        </div>
-      )}
+            {isOpen &&
+              children && (
+                <ul
+                  className="list-group list-group-flush bp-cat-list"
+                  {...collapsedProps}
+                >
+                  {children}
+                </ul>
+              )}
+          </div>
+        )
+      }}
     </Collapsing>
   )
 }
 
 const CategoryLine = ({
+  me,
+  budgetPeriod,
   category,
   requestCount,
   canToggle,
@@ -298,10 +310,14 @@ const CategoryLine = ({
                 </Tooltipped>
               )}
             </div>
-            <div className="ml-auto mt-2">
-              {/* {me.roles.isRequester && (
-                <Link to={newRequestLink({ category })}>
-                  <Tooltipped text={t('dashboard.create_request_for_bp')}>
+
+            <div className="ml-3 mt-2 mt-md-0">
+              {/* TODO: decide if/how to show these links
+              {me.roles.isRequester && (
+                <Link
+                  to={newRequestLink({ budgetPeriod, mainCategory: category })}
+                >
+                  <Tooltipped text={t('dashboard.create_request_for_maincat')}>
                     <Icon.PlusCircle
                       id={`tt_mc_cnr_${category.id}`}
                       size="2x"
@@ -326,6 +342,8 @@ const CategoryLine = ({
 
 const SubCategoryLine = ({
   category,
+  me,
+  budgetPeriod,
   requestCount,
   isOpen,
   onToggle,
@@ -374,6 +392,20 @@ const SubCategoryLine = ({
                   </Tooltipped>
                 )}
               </div>
+              <div className="ml-3 mt-2 mt-md-0">
+                {/* TODO: decide if/how to show these links
+                {me.roles.isRequester && (
+                  <Link to={newRequestLink({ budgetPeriod, category })}>
+                    <Tooltipped text={t('dashboard.create_request_for_subcat')}>
+                      <Icon.PlusCircle
+                        id={`tt_sc_cnr_${category.id}`}
+                        size="2x"
+                        color="success"
+                      />
+                    </Tooltipped>
+                  </Link>
+                )} */}
+              </div>
             </div>
           </li>
           {showChildren(isOpen, props.children) && (
@@ -390,7 +422,17 @@ const SubCategoryLine = ({
   )
 }
 
-const newRequestLink = ({ budgetPeriod }) => ({
+const newRequestLink = ({
+  budgetPeriod = {},
+  mainCategory = {},
+  category = {}
+}) => ({
   pathname: '/requests/new',
-  search: '?' + stringifyQuery({ bp: f.dehyphenUUID(budgetPeriod.id) })
+  search:
+    '?' +
+    stringifyQuery({
+      bp: f.dehyphenUUID(budgetPeriod.id),
+      mc: f.dehyphenUUID(mainCategory.id),
+      c: f.dehyphenUUID(category.id)
+    })
 })
