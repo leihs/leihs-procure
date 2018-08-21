@@ -236,12 +236,17 @@ class RequestsIndexPage extends React.Component {
     return (
       <ApolloConsumer>
         {client => (
-          <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
+          <Query
+            query={FILTERS_QUERY}
+            fetchPolicy="cache-and-network"
+            notifyOnNetworkStatusChange
+          >
             {filtersQuery => {
               return (
                 <Query
                   query={REQUESTS_QUERY}
                   variables={state.currentFilters}
+                  fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
                   {requestsQuery => {
