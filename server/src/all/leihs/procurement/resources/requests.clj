@@ -76,7 +76,9 @@
                                     (map request/to-name-and-lower-case))
         requested-by-auth-user (:requested_by_auth_user arguments)
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
-        state (:state arguments)
+        state (->> arguments
+                   :state
+                   (map request/to-name-and-lower-case))
         state-set (:request-state-set context)
         search-term (:search arguments)]
     (cond-> request/requests-base-query

@@ -40,8 +40,8 @@
   (exchange-attrs req (map-invert attrs-mapping)))
 
 (def valid-state-ranges
-  {:normal #{:new :approved :partially_approved :denied},
-   :restricted #{:new :in_approval}})
+  {:normal #{:NEW :APPROVED :PARTIALLY_APPROVED :DENIED},
+   :restricted #{:NEW :IN_APPROVAL}})
 
 (defn state-value-range-type
   [tx user phase-of-budget-periods]
@@ -82,12 +82,12 @@
           range-type (state-value-range-type tx auth-entity [budget-period])
           requested-quantity (:requested_quantity row)]
       (case range-type
-        :restricted "in_approval"
-        :normal (cond (= 0 approved-quantity) "denied"
+        :restricted :IN_APPROVAL
+        :normal (cond (= 0 approved-quantity) :DENIED
                       (< approved-quantity requested-quantity)
-                        "partially_approved"
-                      (<= requested-quantity approved-quantity) "approved")))
-    "new"))
+                        :PARTIALLY_APPROVED
+                      (<= requested-quantity approved-quantity) :APPROVED)))
+    :NEW))
 
 (defn add-state
   [tx auth-entity row]
