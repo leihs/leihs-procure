@@ -362,7 +362,7 @@
         :if-only
         #(request-perms/authorized-to-write-all-fields? tx
                                                         auth-entity
-                                                        write-data))
+                                                        input-data))
       (as-> (var-get req-id) <>
         (get-request-by-id tx auth-entity <>)
         (reverse-exchange-attrs <>)

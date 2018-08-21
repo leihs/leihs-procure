@@ -5,12 +5,17 @@ import { DisplayName } from './decorators'
 import InlineSearch from './InlineSearch'
 
 const SEARCH_USERS_QUERY = gql`
-  query searchUsers($searchTerm: String! = "", $excludeIds: [ID]) {
+  query searchUsers(
+    $searchTerm: String! = ""
+    $excludeIds: [ID]
+    $isRequester: Boolean
+  ) {
     users(
       search_term: $searchTerm
       limit: 25
       offset: 0
       exclude_ids: $excludeIds
+      isRequester: $isRequester
     ) {
       id
       firstname
@@ -19,10 +24,15 @@ const SEARCH_USERS_QUERY = gql`
   }
 `
 
-const UserAutocomplete = ({ onSelect, excludeIds, ...props }) => (
+const UserAutocomplete = ({
+  onSelect,
+  excludeIds,
+  onlyRequesters,
+  ...props
+}) => (
   <InlineSearch
     searchQuery={SEARCH_USERS_QUERY}
-    queryVariables={{ excludeIds }}
+    queryVariables={{ excludeIds, isRequester: onlyRequesters }}
     itemToString={DisplayName}
     onSelect={onSelect}
     {...props}

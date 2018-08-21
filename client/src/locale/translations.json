@@ -38,6 +38,7 @@
     "building": "Gebäude",
     "room": "Raum",
     "motivation": "Begründung",
+    "user": "Antragssteller",
 
     "replacement": "Ersatz / Neu",
     "request_replacement_labels_new": "Neu",

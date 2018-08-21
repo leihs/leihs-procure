@@ -188,6 +188,7 @@ export const requestDataFromFields = (request, fields) => {
   const boolify = (val, name) => f.presence(val) && name === val
 
   const model = valueIfWritable(fields, request, 'model')
+  const user = valueIfWritable(fields, request, 'user')
   const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room')
 
@@ -207,6 +208,8 @@ export const requestDataFromFields = (request, fields) => {
 
     ...fieldIfWritable(fields, request, 'accounting_type'),
     ...fieldIfWritable(fields, request, 'internal_order_number'),
+
+    ...(user ? { user: user.id } : null),
 
     replacement: boolify(
       valueIfWritable(fields, request, 'replacement'),
