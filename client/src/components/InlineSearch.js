@@ -62,6 +62,7 @@ const InlineSearch = ({
           <input
             value=""
             onChange={() => {}}
+            onFocus={e => e.target.select()}
             {...getInputProps({
               required,
               placeholder: 'Search',
@@ -141,7 +142,7 @@ const resultsBoxVisualProps = {
   style: {
     position: 'absolute',
     left: 0,
-    zIndex: 1,
+    zIndex: 100,
     maxHeight: 5.5 * itemHeight + 'em',
     overflowX: 'hidden',
     overflowY: 'scroll',

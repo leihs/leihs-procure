@@ -298,9 +298,11 @@
                 :write (not request-exists),
                 :default (:id template),
                 :required true},
-     :user {:read true,
-            :write (and (not request-exists) ; can be set only for new requests
-                        (or auth-user-is-requester
-                            auth-user-is-inspector
+     :user {:read (or category-viewable-by-auth-user
+                      auth-user-is-inspector
+                      auth-user-is-admin),
+            :write (and (not budget-period-is-past)
+                        (or category-inspectable-by-auth-user
                             auth-user-is-admin)),
-            :required true}}))
+            :required true,
+            :default (:user_id auth-entity)}}))

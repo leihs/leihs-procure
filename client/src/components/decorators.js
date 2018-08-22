@@ -91,11 +91,14 @@ export const RequestTotalAmount = fields => {
 
 // TODO: currency config, hardcoded to CH-de for now
 // NOTE: `precision: 0` because Procure only supports integers
-export const formatCurrency = (n = 0) =>
-  formatMoney(n / 100, {
+export const formatCurrency = (n = 0) => {
+  const amount = n / 100
+  if (!f.isNumber(amount) || f.isNaN(amount)) return '---'
+  return formatMoney(amount, {
     decimal: '.',
     thousand: "'",
     symbol: 'CHF',
     format: '%v %s',
     precision: 0
   })
+}

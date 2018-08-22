@@ -26,6 +26,7 @@ import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
 import ModelAutocomplete from './ModelAutocomplete'
 import SupplierAutocomplete from './SupplierAutocomplete'
+import UserAutocomplete from './UserAutocomplete'
 
 const tmpUppercasey = v => (f.isString(v) ? v.toUpperCase() : v)
 
@@ -355,59 +356,77 @@ class RequestForm extends React.Component {
                     <InputFileUpload {...formPropsFor('attachments')} />
                   </FormGroup>
 
-                  {request.accounting_type.read && (
-                    <F>
-                      <FormGroup>
-                        <ButtonRadio
-                          {...formPropsFor('accounting_type')}
-                          options={['aquisition', 'investment'].map(k => ({
-                            value: k,
-                            label: t(
-                              `request_form_field.accounting_type_label_${k}`
-                            )
-                          }))}
-                        />
-                      </FormGroup>
+                  <RequestInput field={formPropsFor('user')}>
+                    {userField =>
+                      // NOTE: don't show at all if not writable
+                      !userField.readOnly && (
+                        <FormGroup label={userField.label}>
+                          <UserAutocomplete onlyRequesters {...userField} />
+                        </FormGroup>
+                      )
+                    }
+                  </RequestInput>
 
-                      {fields.accounting_type !== 'investment' ? (
-                        <Row>
-                          <Col>
-                            <FormField
-                              {...formPropsFor('cost_center')}
-                              readOnly
+                  <Let accTypeField={formPropsFor('accounting_type')}>
+                    {({ accTypeField }) =>
+                      // NOTE: don't show at all if not writable
+                      !accTypeField.readOnly && (
+                        <F>
+                          <FormGroup label={accTypeField.label}>
+                            <ButtonRadio
+                              {...accTypeField}
+                              options={['aquisition', 'investment'].map(k => ({
+                                value: k,
+                                label: t(
+                                  `request_form_field.accounting_type_label_${k}`
+                                )
+                              }))}
                             />
-                          </Col>
-                          <Col>
-                            <FormField
-                              {...formPropsFor('procurement_account')}
-                              readOnly
-                            />
-                          </Col>
-                        </Row>
-                      ) : (
-                        <Row>
-                          <Col sm>
-                            <FormField
-                              {...formPropsFor('internal_order_number')}
-                              // NOTE: dependent field, always required *if* shown!
-                              required={true}
-                              label={requiredLabel(
-                                formPropsFor('internal_order_number').label,
-                                true
-                              )}
-                            />
-                          </Col>
+                          </FormGroup>
 
-                          <Col sm>
-                            <FormField
-                              {...formPropsFor('general_ledger_account')}
-                              readOnly
-                            />
-                          </Col>
-                        </Row>
-                      )}
-                    </F>
-                  )}
+                          {!!accTypeField.value &&
+                            (accTypeField.value !== 'investment' ? (
+                              <Row>
+                                <Col>
+                                  <FormField
+                                    {...formPropsFor('cost_center')}
+                                    readOnly
+                                  />
+                                </Col>
+                                <Col>
+                                  <FormField
+                                    {...formPropsFor('procurement_account')}
+                                    readOnly
+                                  />
+                                </Col>
+                              </Row>
+                            ) : (
+                              <Row>
+                                <Col sm>
+                                  <FormField
+                                    {...formPropsFor('internal_order_number')}
+                                    // NOTE: dependent field, always required *if* shown!
+                                    required={true}
+                                    label={requiredLabel(
+                                      formPropsFor('internal_order_number')
+                                        .label,
+                                      true
+                                    )}
+                                  />
+                                </Col>
+
+                                <Col sm>
+                                  <FormField
+                                    {...formPropsFor('general_ledger_account')}
+                                    readOnly
+                                  />
+                                </Col>
+                              </Row>
+                            ))}
+                        </F>
+                      )
+                    }
+                  </Let>
                 </Col>
               </Row>
 

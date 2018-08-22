@@ -24,15 +24,17 @@ import CurrentUser from '../containers/CurrentUserProvider'
 // const log = logger('app:ui:RequestsListFiltered')
 
 const FilterBar = ({
-  filters: { loading, error, data, ...restFilters },
+  filters: { loading, error, data, networkStatus, ...restFilters },
   currentFilters,
   onFilterChange,
   ...rest
 }) => (
   <CurrentUser>
     {me => {
+      const initialLoading = loading && networkStatus < 2
+
       const content = () => {
-        if (loading) return <Loading />
+        if (initialLoading) return <Loading />
         if (error) {
           return <ErrorPanel error={error} data={data} />
         }

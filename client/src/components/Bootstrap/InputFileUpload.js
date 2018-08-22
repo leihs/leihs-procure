@@ -91,6 +91,43 @@ class InputFileUpload extends React.Component {
 
     return (
       <div id={id} className={cx('input-group input-file-upload', className)}>
+        {f.present(state.uploads) && (
+          <ul className="input-file-upload-list pl-4 mb-1">
+            {state.uploads.map(u => {
+              const txtCls = cx({ 'text-strike text-danger': u.toDelete })
+              const nameOrLink = !u.url ? (
+                u.filename
+              ) : (
+                <a
+                  href={u.url}
+                  className={txtCls}
+                  data-download={u.filename}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {u.filename}
+                </a>
+              )
+              const deleteToggle = isDisabled || (
+                <label>
+                  <Icon.Trash className="text-danger" />
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={!!u.toDelete}
+                    onClick={e => this.onMarkForDeletion(u, !u.toDelete)}
+                  />
+                </label>
+              )
+              return (
+                <li key={u.id || u.key} className={txtCls}>
+                  {nameOrLink} {!u.id ? <Icon.Spinner /> : deleteToggle}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
         {isDisabled || (
           <FilePicker
             multiple
@@ -98,41 +135,6 @@ class InputFileUpload extends React.Component {
             onChange={e => this.onSelectFiles(e)}
           />
         )}
-
-        <ul className="input-file-upload-list pl-4">
-          {state.uploads.map(u => {
-            const txtCls = cx({ 'text-strike text-danger': u.toDelete })
-            const nameOrLink = !u.url ? (
-              u.filename
-            ) : (
-              <a
-                href={u.url}
-                className={txtCls}
-                data-download={u.filename}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {u.filename}
-              </a>
-            )
-            const deleteToggle = isDisabled || (
-              <label>
-                <Icon.Trash className="text-danger" />
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={!!u.toDelete}
-                  onClick={e => this.onMarkForDeletion(u, !u.toDelete)}
-                />
-              </label>
-            )
-            return (
-              <li key={u.id || u.key} className={txtCls}>
-                {nameOrLink} {!u.id ? <Icon.Spinner /> : deleteToggle}
-              </li>
-            )
-          })}
-        </ul>
       </div>
     )
   }

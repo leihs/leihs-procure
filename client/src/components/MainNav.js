@@ -10,6 +10,7 @@ import {
   NavbarBrand,
   Nav,
   NavItemLink,
+  NavItemAnchor,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
@@ -39,7 +40,7 @@ export default class MainNav extends React.Component {
       isOpen: !this.state.isOpen
     })
   }
-  render({ props: { me, isDev }, state } = this) {
+  render({ props: { me, contactUrl, isDev }, state } = this) {
     return (
       <div>
         <Navbar dark color="dark" expand="lg">
@@ -105,9 +106,11 @@ export default class MainNav extends React.Component {
                 </UncontrolledDropdown>
               )}
 
-              <NavItemLink exact to="/TODO">
-                <Icon.Contact fixedWidth spaced /> Kontakt
-              </NavItemLink>
+              {!!contactUrl && (
+                <NavItemAnchor href={contactUrl} target="_blank">
+                  <Icon.Contact fixedWidth spaced /> Kontakt
+                </NavItemAnchor>
+              )}
 
               {!!isDev && (
                 <UncontrolledDropdown nav inNavbar>

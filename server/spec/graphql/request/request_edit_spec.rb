@@ -200,4 +200,75 @@ describe 'requests' do
       expect(result['errors']).not_to be
     end
   end
+
+  context 'change user' do
+    example 'not readable/writable' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:requester_organization, user_id: user.id)
+      request = FactoryBot.create(:request, user_id: user.id)
+
+      q = <<-GRAPHQL
+        query RequestForEdit($requestIds: [ID!]!) {
+          requests(id: $requestIds) {
+            user {
+              read
+              write
+            }
+          }
+        }
+      GRAPHQL
+
+      variables = { requestIds: ["#{request.id}"] }
+      result = query(q, user.id, variables)
+      expect(result).to eq(
+        { 'data' => {
+          'requests' => [
+            { 'user' =>
+              { 'read' => false,
+                'write' => false }
+            }
+          ]
+        }}
+      )
+    end
+
+    example 'readable/writable' do
+      inspector = FactoryBot.create(:user)
+      category = FactoryBot.create(:category)
+      FactoryBot.create(:category_inspector,
+                        user_id: inspector.id,
+                        category_id: category.id)
+
+      admin = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: admin.id)
+
+      request = FactoryBot.create(:request, category_id: category.id)
+
+      q = <<-GRAPHQL
+        query RequestForEdit($requestIds: [ID!]!) {
+          requests(id: $requestIds) {
+            user {
+              read
+              write
+            }
+          }
+        }
+      GRAPHQL
+
+      [inspector, admin].each do |user|
+        variables = { requestIds: ["#{request.id}"] }
+        result = query(q, user.id, variables)
+        expect(result).to eq(
+          { 'data' => {
+            'requests' => [
+              { 'user' =>
+                { 'read' => true,
+                  'write' => true }
+              }
+            ]
+          }}
+        )
+      end
+    end
+  end
 end

@@ -18,7 +18,7 @@
                        .getSimpleName)]
              (log/warn m)
              (if (env/env #{:dev :test}) (log/debug e))
-             (graphql-resolve/resolve-as value {:message m, :exception n}))))))
+             (graphql-resolve/resolve-as nil {:message m, :exception n}))))))
 
 (defn- wrap-map-with-error
   [arg]

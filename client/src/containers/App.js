@@ -14,7 +14,7 @@ import { CURRENT_USER_QUERY } from './CurrentUserProvider'
 
 const MainNavWithRouter = withRouter(MainNav)
 
-// NOTE: uses fetchPolicy="cache-then-network" to be quick on refreshes
+// NOTE: uses fetchPolicy="cache-and-network" to be quick on refreshes
 //       but also make sure the data is correct and connection is possible.
 //       We re-use the query from `CurrentUserProvider` (to ensure caching),
 //       but not the component because the "AppShell" handles errors differently.
@@ -32,7 +32,7 @@ class App extends Component {
             <div className="ui-app" lang="de">
               <Query
                 query={CURRENT_USER_QUERY}
-                fetchPolicy="cache-then-network"
+                fetchPolicy="cache-and-network"
                 notifyOnNetworkStatusChange
               >
                 {({ error, loading, data, refetch }) => {
@@ -53,6 +53,7 @@ class App extends Component {
                       <MainNavWithRouter
                         isDev={isDev}
                         me={data.current_user.user}
+                        contactUrl={data.settings.contact_url}
                       />
                       <div className="minh-100vh">
                         <FlashAlert {...f.get(location, 'state.flash')} />
