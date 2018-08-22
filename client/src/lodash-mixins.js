@@ -75,18 +75,20 @@ const UUID_REGEX_STR = [
 ].join('|')
 
 const UUID_REGEX = new RegExp(`^${UUID_REGEX_STR}$`)
+const DEHYPHENED_UUID_REGEX = /[a-fA-F0-9]{32}/
 
 const isUUID = s => UUID_REGEX.test(s)
+const isDehyphenedUUID = s => DEHYPHENED_UUID_REGEX.test(s)
 
 const dehyphenUUID = uuid =>
   !f.isString(uuid) ? undefined : uuid.split('-').join('')
 
-const enhyphenUUID = s => {
-  if (f.isString(s))
-    return [8, 12, 16, 20, 32]
-      .reduce((m, i, n, a) => [...m, s.slice(a[n - 1], a[n])], [])
-      .join('-')
-}
+const enhyphenUUID = s =>
+  !(f.isString(s) && isDehyphenedUUID(s))
+    ? s
+    : [8, 12, 16, 20, 32]
+        .reduce((m, i, n, a) => [...m, s.slice(a[n - 1], a[n])], [])
+        .join('-')
 
 const mixins = {
   try: lodash_try,
@@ -158,5 +160,8 @@ if (process.env.NODE_ENV !== 'production') {
     enhyphenUUID('2ea39047e66350d59080838b75883704'),
     '2ea39047-e663-50d5-9080-838b75883704'
   )
+  const anObject = { an: 'object' }
+  assert.strictEqual(enhyphenUUID(anObject), anObject)
+  assert.strictEqual(enhyphenUUID('some-other-string'), 'some-other-string')
   assert.strictEqual(enhyphenUUID(), undefined)
 }
