@@ -152,4 +152,61 @@ describe 'requests' do
       expect(result).to eq(expected_result)
     end
   end
+
+  example 'filter for states' do
+    requester = FactoryBot.create(:user)
+    FactoryBot.create(:requester_organization, user_id: requester.id)
+
+    bp_inspection_phase = FactoryBot.create(:budget_period,
+                                            inspection_start_date: Date.today,
+                                            end_date: Date.today + 1.week)
+    bp_past = FactoryBot.create(:budget_period,
+                                inspection_start_date: Date.today - 1.week,
+                                end_date: Date.yesterday)
+    bp_future = FactoryBot.create(:budget_period,
+                                  inspection_start_date: Date.today + 1.month,
+                                  end_date: Date.today + 2.months)
+
+    # request_new_inspection_phase = FactoryBot.create(:request,
+    #                                                  user_id: requester.id,
+    #                                                  budget_period_id: bp_inspection_phase.id,
+    #                                                  requested_quantity: 1)
+
+    request_denied_inspection_phase = FactoryBot.create(:request,
+                                                        user_id: requester.id,
+                                                        budget_period_id: bp_inspection_phase.id,
+                                                        requested_quantity: 1,
+                                                        approved_quantity: 0)
+
+    q = <<-GRAPHQL
+      query RequestsIndexFiltered(
+        $budgetPeriods: [ID]
+        $states: [State]
+      ) {
+        budget_periods(id: $budgetPeriods) {
+          id
+          main_categories {
+            id
+            categories {
+              id
+              requests(state: $states) {
+                id
+              }
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    variables = { budgetPeriods: [bp_inspection_phase.id],
+                  states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
+    result = query(q, requester.id, variables).deep_symbolize_keys
+    requests = \
+      result[:data]
+      .flat_map { |el| el.fetch(:budget_periods) }
+      .flat_map { |el| el.fetch(:main_categories) }
+      .flat_map { |el| el.fetch(:categories) }
+      .flat_map { |el| el.fetch(:requests) }
+    expect(requests).to be_empty
+  end
 end
