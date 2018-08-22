@@ -40,33 +40,50 @@
   (exchange-attrs req (map-invert attrs-mapping)))
 
 (defn get-where-conds-for-states
-  [states]
-  (reduce
-    (fn [or-conds state]
-      (conj
-        or-conds
-        (case state
-          :NEW [:or
-                [:and [:< :procurement_budget_periods.end_date :current_date]
-                 [:= :procurement_requests.approved_quantity nil]]
-                [:< :current_date
-                 :procurement_budget_periods.inspection_start_date]]
-          :IN_APPROVAL [:and
-                        [:>= :current_date
-                         :procurement_budget_periods.inspection_start_date]
-                        [:< :current_date :procurement_budget_periods.end_date]]
-          :APPROVED [:and
+  [states advanced-user?]
+  (let [approved-not-set [:= :procurement_requests.approved_quantity nil]
+        approved-greater-equal-than-requested
+          [:>= :procurement_requests.approved_quantity
+           :procurement_requests.requested_quantity]
+        approved-smaller-than-requested
+          [:< :procurement_requests.approved_quantity
+           :procurement_requests.requested_quantity]
+        approved-zero [:= :procurement_requests.approved_quantity 0]]
+    (reduce
+      (fn [or-conds state]
+        (conj
+          or-conds
+          (case state
+            :NEW (if advanced-user?
+                   approved-not-set
+                   [:or
+                    [:and
                      [:< :procurement_budget_periods.end_date :current_date]
-                     [:>= :procurement_requests.approved_quantity
-                      :procurement_requests.requested_quantity]]
-          :PARTIALLY_APPROVED
-            [:and [:< :procurement_budget_periods.end_date :current_date]
-             [:< :procurement_requests.approved_quantity
-              :procurement_requests.requested_quantity]]
-          :DENIED [:and [:< :procurement_budget_periods.end_date :current_date]
-                   [:= :procurement_requests.approved_quantity 0]])))
-    [:or]
-    states))
+                     approved-not-set]
+                    [:< :current_date
+                     :procurement_budget_periods.inspection_start_date]])
+            :IN_APPROVAL [:and
+                          [:>= :current_date
+                           :procurement_budget_periods.inspection_start_date]
+                          [:< :current_date
+                           :procurement_budget_periods.end_date]]
+            :APPROVED (if advanced-user?
+                        approved-greater-equal-than-requested
+                        [:and
+                         [:< :procurement_budget_periods.end_date :current_date]
+                         approved-greater-equal-than-requested])
+            :PARTIALLY_APPROVED
+              (if advanced-user?
+                approved-smaller-than-requested
+                [:and [:< :procurement_budget_periods.end_date :current_date]
+                 approved-smaller-than-requested])
+            :DENIED (if advanced-user?
+                      approved-zero
+                      [:and
+                       [:< :procurement_budget_periods.end_date :current_date]
+                       approved-zero]))))
+      [:or]
+      states)))
 
 (def state-sql
   (sql/call :case
@@ -85,20 +102,7 @@
   (-> (sql/select :procurement_requests.*)
       (sql/from :procurement_requests)))
 
-(defn get-state
-  [tx auth-entity row]
-  (if-let [approved-quantity (:approved_quantity row)]
-    (let [budget-period
-            (budget-period/get-budget-period-by-id tx (:budget_period_id row))
-          range-type (state-value-range-type tx auth-entity [budget-period])
-          requested-quantity (:requested_quantity row)]
-      (case range-type
-        :restricted :IN_APPROVAL
-        :normal (cond (= 0 approved-quantity) :DENIED
-                      (< approved-quantity requested-quantity)
-                        :PARTIALLY_APPROVED
-                      (<= requested-quantity approved-quantity) :APPROVED)))
-    :NEW))
+(defn get-state [tx auth-entity row] :NEW)
 
 (defn add-state
   [tx auth-entity row]

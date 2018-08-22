@@ -4,7 +4,7 @@
             [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
             [leihs.procurement.permissions [request :as request-perms]
-             [requests :as requests-perms]]
+             [requests :as requests-perms] [user :as user-perms]]
             [leihs.procurement.resources [budget-period :as budget-period]
              [budget-periods :as budget-periods] [request :as request]]
             [leihs.procurement.utils.sql :as sql]))
@@ -78,6 +78,11 @@
         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
+        rrequest (:request context)
+        tx (:tx rrequest)
+        advanced-user? (->> rrequest
+                            :authenticated-entity
+                            (user-perms/advanced? tx))
         start-sqlmap (-> request/requests-base-query
                          (sql/merge-join
                            :procurement_budget_periods
@@ -97,7 +102,8 @@
       inspector-priority (sql/merge-where
                            [:in :procurement_requests.inspector_priority
                             inspector-priority])
-      state (sql/merge-where (request/get-where-conds-for-states state))
+      state (sql/merge-where
+              (request/get-where-conds-for-states state advanced-user?))
       requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
                                                (-> context
                                                    :request
@@ -136,7 +142,6 @@
                                                   ring-request)
                                                 %)})]
       (->> proc-requests
-           (log/spy)
            (map request/reverse-exchange-attrs)
            (map (fn [proc-req]
                   (request-perms/apply-permissions

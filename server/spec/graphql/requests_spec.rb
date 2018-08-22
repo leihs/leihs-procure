@@ -2,6 +2,13 @@ require 'spec_helper'
 require_relative 'graphql_helper'
 
 describe 'requests' do
+  def get_requests(result)
+    result[:data][:budget_periods]
+      .flat_map { |el| el.fetch(:main_categories) }
+      .flat_map { |el| el.fetch(:categories) }
+      .flat_map { |el| el.fetch(:requests) }
+  end
+
   it 'gets data' do
     user = FactoryBot.create(:user)
     FactoryBot.create(:requester_organization, user_id: user.id)
@@ -153,60 +160,82 @@ describe 'requests' do
     end
   end
 
-  example 'filter for states' do
-    requester = FactoryBot.create(:user)
-    FactoryBot.create(:requester_organization, user_id: requester.id)
-
-    bp_inspection_phase = FactoryBot.create(:budget_period,
-                                            inspection_start_date: Date.today,
-                                            end_date: Date.today + 1.week)
-    bp_past = FactoryBot.create(:budget_period,
-                                inspection_start_date: Date.today - 1.week,
-                                end_date: Date.yesterday)
-    bp_future = FactoryBot.create(:budget_period,
-                                  inspection_start_date: Date.today + 1.month,
-                                  end_date: Date.today + 2.months)
-
-    # request_new_inspection_phase = FactoryBot.create(:request,
-    #                                                  user_id: requester.id,
-    #                                                  budget_period_id: bp_inspection_phase.id,
-    #                                                  requested_quantity: 1)
-
-    request_denied_inspection_phase = FactoryBot.create(:request,
-                                                        user_id: requester.id,
-                                                        budget_period_id: bp_inspection_phase.id,
-                                                        requested_quantity: 1,
-                                                        approved_quantity: 0)
-
-    q = <<-GRAPHQL
-      query RequestsIndexFiltered(
-        $budgetPeriods: [ID]
-        $states: [State]
-      ) {
-        budget_periods(id: $budgetPeriods) {
-          id
-          main_categories {
+  context 'filter for states' do
+    let :q do
+      <<-GRAPHQL
+        query RequestsIndexFiltered(
+          $budgetPeriods: [ID]
+          $states: [State]
+        ) {
+          budget_periods(id: $budgetPeriods) {
             id
-            categories {
+            main_categories {
               id
-              requests(state: $states) {
+              categories {
                 id
+                requests(state: $states) {
+                  id
+                }
               }
             }
           }
         }
-      }
-    GRAPHQL
+      GRAPHQL
+    end
 
-    variables = { budgetPeriods: [bp_inspection_phase.id],
-                  states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
-    result = query(q, requester.id, variables).deep_symbolize_keys
-    requests = \
-      result[:data]
-      .flat_map { |el| el.fetch(:budget_periods) }
-      .flat_map { |el| el.fetch(:main_categories) }
-      .flat_map { |el| el.fetch(:categories) }
-      .flat_map { |el| el.fetch(:requests) }
-    expect(requests).to be_empty
+    before :example do
+      @bp_inspection_phase = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.today,
+                          end_date: Date.today + 1.week)
+
+      @bp_past = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.today - 1.week,
+                          end_date: Date.yesterday)
+
+      @bp_future = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.today + 1.month,
+                          end_date: Date.today + 2.months)
+
+      @requester = FactoryBot.create(:user)
+      FactoryBot.create(:requester_organization, user_id: @requester.id)
+
+      @category = FactoryBot.create(:category)
+      @inspector = FactoryBot.create(:user)
+      FactoryBot.create(:category_inspector,
+                        category_id: @category.id,
+                        user_id: @inspector.id)
+
+      # request_new_inspection_phase = FactoryBot.create(:request,
+      #                                                  user_id: requester.id,
+      #                                                  budget_period_id: bp_inspection_phase.id,
+      #                                                  requested_quantity: 1)
+
+      @request_denied_inspection_phase = \
+        FactoryBot.create(:request,
+                          category_id: @category.id,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          requested_quantity: 1,
+                          approved_quantity: 0)
+    end
+
+    example 'requester' do
+      variables = { budgetPeriods: [@bp_inspection_phase.id],
+                    states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
+      result = query(q, @requester.id, variables).deep_symbolize_keys
+      requests = get_requests(result)
+      expect(requests).to be_empty
+    end
+
+    example 'inspector' do
+      variables = { budgetPeriods: [@bp_inspection_phase.id],
+                    states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
+      result = query(q, @inspector.id, variables).deep_symbolize_keys
+      requests = get_requests(result)
+      expect(requests.map { |r| r[:id] }).to include @request_denied_inspection_phase.id
+    end
   end
 end
