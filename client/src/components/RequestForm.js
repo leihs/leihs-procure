@@ -568,7 +568,11 @@ const SelectionDropdown = ({
     >
       {options.map(({ key, header, options }) => (
         <F key={key}>
-          {!!header && <DropdownItem header>{header}</DropdownItem>}
+          {!!header && (
+            <DropdownItem header className="my-2">
+              {header}
+            </DropdownItem>
+          )}
           {options.map(({ key, ...props }) => (
             <DropdownItem key={key} {...props} />
           ))}
