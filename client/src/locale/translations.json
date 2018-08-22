@@ -65,6 +65,10 @@
 
   "admin": {
     "categories": {
+      "image": "Bild",
+      "budget_limits": "Budget-Limite",
+      "subcats": "Subkategorien",
+      "upload_new_image": "Neues Bild hochladen",
       "add_subcat": "Neue Subkategorie hinzufügen",
       "delete_subcat": "Subkategorie löschen",
       "inspectors": "Inspektoren",

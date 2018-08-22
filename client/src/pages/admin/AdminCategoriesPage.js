@@ -31,6 +31,11 @@ const CATEGORIES_INDEX_QUERY = gql`
       id
       name
       image_url
+      # # for TOC 2nd level
+      # categories {
+      #   id
+      #   name
+      # }
     }
   }
 `
@@ -41,6 +46,7 @@ const MAINCAT_PROPS_FRAGMENT = gql`
     name
     can_delete
     image_url
+    # FIXME: should return all *possible* limits (if set or not!)
     budget_limits {
       id
       amount_cents
@@ -48,6 +54,7 @@ const MAINCAT_PROPS_FRAGMENT = gql`
       budget_period {
         id
         name
+        end_date
       }
     }
     categories {
@@ -81,8 +88,8 @@ const CATEGORIES_QUERY = gql`
 
 const UPDATE_CATEGORIES_MUTATION = gql`
   mutation updateCategoriesPeriods($mainCategories: [MainCategoryInput]) {
-    main_categories(input_data: [MainCategoryInput]) {
-      ...AdminBudgetPeriodProps
+    main_categories(input_data: $mainCategories) {
+      ...MainCatProps
     }
   }
   ${MAINCAT_PROPS_FRAGMENT}
@@ -98,19 +105,27 @@ const updateCategories = {
       cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
     }
   },
-  doUpdate: (mutate, mainCat) => {
-    // TODO: handle user list(s)!
-    // .filter(i => !i.toDelete && !f.isEmpty(i.name))
-    // .map(i => f.pick(i, ['id', 'name', 'inspection_start_date', 'end_date']))
-    const data = {
-      ...mainCat,
-      categories: mainCat.categories.filter(mc => !mc.toDelete).map(sc => ({
-        ...sc,
-        inspectors: sc.inspectors.filter(u => !u.toDelete)
+  doUpdate: (mutate, mainCats) => {
+    const data = mainCats.map(mainCat => ({
+      ...f.pick(mainCat, ['id', 'name']),
+      // TODO: image: …
+      budget_limits: f.map(mainCat.budget_limits, l => ({
+        amount_cents: l.amount_cents,
+        budget_period_id: l.budget_period.id
+      })),
+      categories: f.filter(mainCat.categories, mc => !mc.toDelete).map(sc => ({
+        ...f.pick(sc, [
+          'id',
+          'name',
+          'procurement_account',
+          'general_ledger_account',
+          'cost_center'
+        ]),
+        inspectors: f.filter(sc.inspectors, u => !u.toDelete).map(i => i.id)
+        // TODO: viewers
+        // viewers: f.filter(sc.viewers, u => !u.toDelete).map(i => i.id)
       }))
-    }
-
-    if (!window.confirm(JSON.stringify(data, 0, 2))) return
+    }))
 
     mutate({
       variables: { mainCategories: data }
@@ -138,7 +153,7 @@ const AdminCategoriesPage = ({ match }) => (
             <Route
               exact
               path={`${match.url}/:mainCatId`}
-              render={r => <CategoryPage {...r} allData={data} />}
+              render={r => <CategoryPage {...r} />}
               foo="bar"
             />
             {/* NOTE: dont show index for now */}
@@ -167,36 +182,42 @@ export default AdminCategoriesPage
 // # VIEW PARTIALS
 //
 
-const CategoryPage = ({ match, allData }) => (
-  <Mutation
-    {...updateCategories.mutation}
-    onCompleted={() => this.setState({ formKey: Date.now() })}
-  >
-    {(mutate, info) => (
-      <Query query={CATEGORIES_QUERY}>
-        {({ loading, error, data }) => {
-          if (loading) return <Loading />
-          if (error) return <ErrorPanel error={error} data={data} />
+class CategoryPage extends React.Component {
+  state = { formKey: 1 }
+  render({ match } = this.props) {
+    return (
+      <Mutation
+        {...updateCategories.mutation}
+        onCompleted={() => this.setState({ formKey: Date.now() })}
+      >
+        {(mutate, info) => (
+          <Query query={CATEGORIES_QUERY}>
+            {({ loading, error, data }) => {
+              if (loading) return <Loading />
+              if (error) return <ErrorPanel error={error} data={data} />
 
-          const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-          const mainCat = f.find(data.main_categories, { id: mainCatId })
+              const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+              const mainCat = f.find(data.main_categories, { id: mainCatId })
 
-          return (
-            <CategoryCard
-              {...mainCat}
-              doUpdate={cat =>
-                updateCategories.doUpdate(mutate, [
-                  ...cat,
-                  allData.main_categories.filter(mc => mc.id !== cat.id)
-                ])
-              }
-            />
-          )
-        }}
-      </Query>
-    )}
-  </Mutation>
-)
+              return (
+                <CategoryCard
+                  {...mainCat}
+                  formKey={this.state.formKey}
+                  onSubmit={mainCat =>
+                    updateCategories.doUpdate(mutate, [
+                      mainCat,
+                      ...data.main_categories.filter(mc => mc.id !== mainCat.id)
+                    ])
+                  }
+                />
+              )
+            }}
+          </Query>
+        )}
+      </Mutation>
+    )
+  }
+}
 
 const extendWhere = (id, list, fn) =>
   list.map(o => (o.id !== id ? o : { ...o, ...fn(o) }))
@@ -204,13 +225,22 @@ const extendWhere = (id, list, fn) =>
 const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
 
-const CategoryCard = ({ id, ...props }) => {
+const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
   const formValues = {
-    ...f.pick(props, 'name', 'image_url', 'budget_limits'),
+    ...f.pick(props, 'name', 'image_url'),
+    budget_limits: f.sortBy(props.budget_limits, 'endDate'),
     categories: f.sortBy(props.categories, 'name')
   }
+
+  // eslint-disable-next-line no-debugger
+  debugger
+
   return (
-    <StatefulForm key={id} idPrefix="budgetPeriods" values={formValues}>
+    <StatefulForm
+      key={id + formKey}
+      idPrefix="budgetPeriods"
+      values={formValues}
+    >
       {({ fields, formPropsFor, getValue, setValue }) => {
         const onAddSubCat = () => {
           setValue('categories', [...fields.categories, {}])
@@ -219,7 +249,12 @@ const CategoryCard = ({ id, ...props }) => {
           setValue('categories', setAsDeleted(!toDelete, id, fields.categories))
         }
         const onAddInspector = (cat, user) => {
-          setValue('inspectors', [...fields.inspectors, user])
+          setValue(
+            'categories',
+            extendWhere(cat.id, fields.categories, c => ({
+              inspectors: [...c.inspectors, user]
+            }))
+          )
         }
         const onRemoveInspector = (cat, { id, toDelete = false }) => {
           setValue(
@@ -236,10 +271,15 @@ const CategoryCard = ({ id, ...props }) => {
                 <h4 className="mb-0">{fields.name}</h4>
               </div>
               <div className="card-body">
-                <form>
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    onSubmit({ id, ...fields })
+                  }}
+                >
                   <Row>
                     <Col sm>
-                      <h6>Image</h6>
+                      <h6>{t('admin.categories.image')}</h6>
                       {fields.image_url && (
                         <div className="img-thumbnail-wrapper mb-3">
                           <img
@@ -249,20 +289,34 @@ const CategoryCard = ({ id, ...props }) => {
                           />
                         </div>
                       )}
+                      <code>TBD: upload new image</code>
                     </Col>
                     <Col sm>
-                      <h6>Budget-Limits</h6>
+                      <h6>{t('admin.categories.budget_limits')}</h6>
 
                       {fields.budget_limits.map((l, i) => (
                         <Row key={l.id}>
                           <Col sm="4">{l.budget_period.name}</Col>
                           <Col sm>
-                            <InputText
-                              cls="form-control-sm"
-                              {...formPropsFor(
+                            <Let
+                              limitField={formPropsFor(
                                 `budget_limits.${i}.amount_cents`
                               )}
-                            />
+                            >
+                              {({ limitField }) => (
+                                <InputText
+                                  cls="form-control-sm"
+                                  {...limitField}
+                                  value={(limitField.value || 0) / 100}
+                                  onChange={e =>
+                                    setValue(
+                                      limitField.name,
+                                      f.try(() => e.target.value * 100)
+                                    )
+                                  }
+                                />
+                              )}
+                            </Let>
                           </Col>
                           <Col sm="4">{l.amount_currency}</Col>
                         </Row>
@@ -272,7 +326,9 @@ const CategoryCard = ({ id, ...props }) => {
 
                   <Row>
                     <Col>
-                      <h5 style={{ display: 'inline-block' }}>Subkategorien</h5>
+                      <h5 style={{ display: 'inline-block' }}>
+                        {t('admin.categories.subcats')}
+                      </h5>
                     </Col>
                   </Row>
 
@@ -284,6 +340,7 @@ const CategoryCard = ({ id, ...props }) => {
                             className={cx('font-weight-bold', {
                               'text-danger text-strike': cat.toDelete
                             })}
+                            label="category name"
                             hideLabel={true}
                             {...formPropsFor(`categories.${i}.name`)}
                           />
@@ -313,7 +370,7 @@ const CategoryCard = ({ id, ...props }) => {
                       </Row>
                       {!cat.toDelete && (
                         <Row>
-                          <Col sm>
+                          <Col lg>
                             <FormField
                               className="form-control-sm"
                               {...formPropsFor(`categories.${i}.cost_center`)}
@@ -340,12 +397,17 @@ const CategoryCard = ({ id, ...props }) => {
                               )}
                             />
                           </Col>
-                          <Col sm>
+
+                          <Col lg>
                             <ListOfUsers
                               users={cat.inspectors}
                               onAddUser={u => onAddInspector(cat, u)}
                               onRemoveUser={u => onRemoveInspector(cat, u)}
                             />
+                          </Col>
+
+                          <Col lg>
+                            <code>TBD: Viewers</code>
                           </Col>
                         </Row>
                       )}
@@ -363,7 +425,7 @@ const CategoryCard = ({ id, ...props }) => {
                         <Icon.PlusCircle color="success" size="2x" />
                       </Button>
                     </Tooltipped>{' '}
-                    <Button color="primary">
+                    <Button color="primary" type="submit">
                       <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                     </Button>
                   </div>
@@ -397,10 +459,10 @@ const TableOfContents = ({ categories, baseUrl }) => (
           </NavLink>
           {/* NOTE: dont show subcats for now */}
           {/* <ul className="list-unstyled text-muted">
-              {c.categories.map(subcat => (
-                <li key={subcat.id}>{subcat.name}</li>
-              ))}
-            </ul> */}
+            {c.categories.map(subcat => (
+              <li key={subcat.id}>{subcat.name}</li>
+            ))}
+          </ul> */}
         </li>
       ))}
     </ul>
@@ -453,3 +515,5 @@ const ListOfUsers = ({ users, onAddUser, onRemoveUser }) => (
     </Div>
   </React.Fragment>
 )
+
+const Let = ({ children, ...props }) => children(props)
