@@ -1,6 +1,42 @@
 import f from 'lodash'
 import assert from 'assert'
 
+// <https://github.com/lodash/lodash/wiki/Deprecations>
+const DEPRECATIONS = {
+  all: 'every',
+  any: 'some',
+  backflow: 'flowRight',
+  callback: 'iteratee',
+  collect: 'map',
+  compose: 'flowRight',
+  contains: 'includes',
+  detect: 'find',
+  foldl: 'reduce',
+  foldr: 'reduceRight',
+  findWhere: 'find',
+  first: 'head',
+  include: 'includes',
+  indexBy: 'keyBy',
+  inject: 'reduce',
+  invoke: 'invokeMap',
+  modArgs: 'overArgs',
+  methods: 'functions',
+  object: 'fromPairs',
+  padLeft: 'padStart',
+  padRight: 'padEnd',
+  pairs: 'toPairs',
+  pluck: 'map',
+  rest: 'tail',
+  restParam: 'rest',
+  select: 'filter',
+  sortByOrder: 'orderBy',
+  trimLeft: 'trimStart',
+  trimRight: 'trimEnd',
+  trunc: 'truncate',
+  unique: 'uniq',
+  where: 'filter'
+}
+
 const lodash_try = fn => {
   try {
     return fn()
@@ -39,18 +75,20 @@ const UUID_REGEX_STR = [
 ].join('|')
 
 const UUID_REGEX = new RegExp(`^${UUID_REGEX_STR}$`)
+const DEHYPHENED_UUID_REGEX = /[a-fA-F0-9]{32}/
 
 const isUUID = s => UUID_REGEX.test(s)
+const isDehyphenedUUID = s => DEHYPHENED_UUID_REGEX.test(s)
 
 const dehyphenUUID = uuid =>
   !f.isString(uuid) ? undefined : uuid.split('-').join('')
 
-const enhyphenUUID = s => {
-  if (f.isString(s))
-    return [8, 12, 16, 20, 32]
-      .reduce((m, i, n, a) => [...m, s.slice(a[n - 1], a[n])], [])
-      .join('-')
-}
+const enhyphenUUID = s =>
+  !(f.isString(s) && isDehyphenedUUID(s))
+    ? s
+    : [8, 12, 16, 20, 32]
+        .reduce((m, i, n, a) => [...m, s.slice(a[n - 1], a[n])], [])
+        .join('-')
 
 const mixins = {
   try: lodash_try,
@@ -61,7 +99,13 @@ const mixins = {
   isUUID,
   dehyphenUUID,
   enhyphenUUID,
-  UUID_REGEX
+  UUID_REGEX,
+  ...f.fromPairs(
+    f.map(DEPRECATIONS, (replacementFn, oldName) => [
+      [oldName],
+      f[replacementFn]
+    ])
+  )
 }
 
 export default mixins
@@ -116,5 +160,8 @@ if (process.env.NODE_ENV !== 'production') {
     enhyphenUUID('2ea39047e66350d59080838b75883704'),
     '2ea39047-e663-50d5-9080-838b75883704'
   )
+  const anObject = { an: 'object' }
+  assert.strictEqual(enhyphenUUID(anObject), anObject)
+  assert.strictEqual(enhyphenUUID('some-other-string'), 'some-other-string')
   assert.strictEqual(enhyphenUUID(), undefined)
 }

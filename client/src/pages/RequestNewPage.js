@@ -101,16 +101,18 @@ const requestDataFromFields = (request, fields, preselection) => ({
 })
 
 const readFromQueryParams = params => ({
-  budgetPeriod: f.presence(params.bp) && f.enhyphenUUID(params.bp),
-  category: f.presence(params.category) && f.enhyphenUUID(params.category),
-  template: f.presence(params.template) && f.enhyphenUUID(params.template)
+  budgetPeriod: f.enhyphenUUID(params.bp),
+  mainCategory: f.enhyphenUUID(params.mc),
+  category: f.enhyphenUUID(params.c),
+  template: f.enhyphenUUID(params.t)
 })
 
 const updateQueryParams = ({ fields, params, location }) => {
   const formParams = {
     bp: f.dehyphenUUID(fields.budgetPeriod),
-    category: f.dehyphenUUID(fields.category),
-    template: f.dehyphenUUID(fields.template)
+    mc: f.dehyphenUUID(fields.mainCategory),
+    c: f.dehyphenUUID(fields.category),
+    t: f.dehyphenUUID(fields.template)
   }
   return {
     ...location,
@@ -189,15 +191,19 @@ class NewRequestPreselection extends React.Component {
         {({ fields, setValue, setValues, formPropsFor, ...formHelpers }) => {
           const selectedBudgetPeriod = fields.budgetPeriod
           const selectedCategory = fields.category
+          const selectedMainCat = f.find(data.main_categories, {
+            id: fields.mainCategory
+          })
           const selectedTemplate = f.find(data.templates, {
             id: fields.template
           })
           const hasPreselected = !!(selectedTemplate || selectedCategory)
           const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
 
-          const setSelection = ({ category, template } = {}) => {
+          const setSelection = ({ mainCategory, category, template } = {}) => {
             setValues({
-              ...f.omit(fields, ['category', 'template']),
+              ...f.omit(fields, ['mainCategory', 'category', 'template']),
+              mainCategory,
               category,
               template
             })
@@ -206,6 +212,22 @@ class NewRequestPreselection extends React.Component {
             if (!selectedTemplate) return setSelection()
             setSelection({ category: selectedTemplate.category.id })
           }
+
+          // NOTE: if a MC is selected in params, show only it
+          const shownMainCats = f.filter(
+            data.main_categories,
+            !selectedMainCat ? {} : { id: selectedMainCat.id }
+          )
+
+          const categoryTree = sortByName(shownMainCats).map(mc => ({
+            ...mc,
+            categories: sortByName(mc.categories).map(sc => ({
+              ...sc,
+              templates: sortByName(
+                f.filter(data.templates, { category: { id: sc.id } })
+              )
+            }))
+          }))
 
           // only show validations in error case (only red no green)
           const showValidations = !selectedBudgetPeriod
@@ -226,46 +248,85 @@ class NewRequestPreselection extends React.Component {
                   label="Kategorie & Vorlage"
                   className="form-group-lg"
                 >
-                  {hasPreselected && (
-                    <Row>
-                      <Col sm>
-                        {((
-                          cat = selectedCategory
-                            ? CatWithMainCat(selectedCategory)
-                            : CatWithMainCat(selectedTemplate.category.id)
-                        ) => (
-                          <SelectionCard onRemoveClick={() => setSelection()}>
-                            <Icon.Categories spaced="2" />
-                            {cat.main_category.name}
-                            <Icon.CaretRight />
-                            {cat.name}
-                          </SelectionCard>
-                        ))()}
-                      </Col>
-                      <Col sm>
-                        {selectedCategory ? (
-                          <SelectionCard>Keine Vorlage</SelectionCard>
-                        ) : (
-                          <SelectionCard onRemoveClick={resetTemplate}>
-                            <Icon.Templates spaced />
-                            {selectedTemplate.article_name ||
-                              DisplayName(selectedTemplate.model)}
-                          </SelectionCard>
-                        )}
-                      </Col>
-                    </Row>
-                  )}
+                  <Row cls="mb-3">
+                    <Let
+                      tpl={selectedTemplate}
+                      mc={selectedMainCat}
+                      cat={
+                        selectedCategory
+                          ? CatWithMainCat(selectedCategory)
+                          : selectedTemplate
+                            ? CatWithMainCat(selectedTemplate.category.id)
+                            : null
+                      }
+                    >
+                      {({ mc, cat, tpl }) => (
+                        <F>
+                          <Col sm>
+                            {!!(mc || cat) && (
+                              <SelectionCard
+                                onRemoveClick={() => setSelection()}
+                              >
+                                <Icon.Categories spaced="2" />
+                                {mc ? (
+                                  mc.name
+                                ) : (
+                                  <F>
+                                    {cat.main_category.name}
+                                    <Icon.CaretRight />
+                                    {cat.name}
+                                  </F>
+                                )}
+                              </SelectionCard>
+                            )}
+                          </Col>
+
+                          <Col sm>
+                            {hasPreselected &&
+                              (!tpl ? (
+                                <SelectionCard>Keine Vorlage</SelectionCard>
+                              ) : (
+                                <SelectionCard onRemoveClick={resetTemplate}>
+                                  <Icon.Templates spaced />
+                                  {tpl.article_name || DisplayName(tpl.model)}
+                                </SelectionCard>
+                              ))}
+                          </Col>
+                        </F>
+                      )}
+                    </Let>
+                  </Row>
 
                   {!hasPreselected && (
-                    <CategoriesTemplatesTree
-                      main_categories={data.main_categories}
-                      templates={data.templates}
+                    <Let
                       onSelectCategory={c => setSelection({ category: c.id })}
                       onSelectTemplate={t => setSelection({ template: t.id })}
-                    />
+                    >
+                      {({ onSelectCategory, onSelectTemplate }) =>
+                        selectedMainCat ? (
+                          <div className="card">
+                            <CategoryItemsList
+                              items={categoryTree[0].categories}
+                              onSelectCategory={onSelectCategory}
+                              onSelectTemplate={onSelectTemplate}
+                            />
+                          </div>
+                        ) : (
+                          <CategoriesTemplatesTree
+                            mainCategories={categoryTree}
+                            onSelectCategory={onSelectCategory}
+                            onSelectTemplate={onSelectTemplate}
+                            onSelectMaincat={m =>
+                              setSelection({ mainCategory: m.id })
+                            }
+                          />
+                        )
+                      }
+                    </Let>
                   )}
                 </FormGroup>
               </form>
+              {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
 
               {hasPreselectedAll && (
                 <NewRequestForm
@@ -355,104 +416,105 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
 )
 
 const CategoriesTemplatesTree = ({
-  main_categories,
-  templates,
+  mainCategories,
   onSelectCategory,
+  onSelectMaincat,
   onSelectTemplate
-}) => (
-  <F>
-    <ul className="list-unstyled">
-      {f.sortBy(main_categories, 'name').map(mc => (
-        <F key={mc.id}>
-          <Collapsing id={'mc' + mc.id} canToggle={true} startOpen={false}>
-            {({
-              isOpen,
-              canToggle,
-              toggleOpen,
-              togglerProps,
-              collapsedProps,
-              Caret
-            }) => (
-              <li className="card mb-3">
-                <h3
-                  className={cx('card-header h4 cursor-pointer', {
-                    'border-bottom-0': !isOpen
-                  })}
-                  {...togglerProps}
-                >
-                  <Caret spaced />
-                  {!!mc.image_url && (
-                    <ImageThumbnail
-                      className="border-0 bg-transparent"
-                      imageUrl={mc.image_url}
+}) => {
+  return (
+    <F>
+      <ul className="list-unstyled">
+        {mainCategories.map(mc => (
+          <F key={mc.id}>
+            <Collapsing
+              id={'mc' + mc.id}
+              canToggle={true}
+              startOpen={mainCategories.length === 1}
+            >
+              {({
+                isOpen,
+                canToggle,
+                toggleOpen,
+                togglerProps,
+                collapsedProps,
+                Caret
+              }) => (
+                <li className="card mb-3">
+                  <h3
+                    className={cx('card-header h4 cursor-pointer', {
+                      'border-bottom-0': !isOpen
+                    })}
+                    {...togglerProps}
+                  >
+                    <Caret spaced />
+                    {!!mc.image_url && (
+                      <ImageThumbnail
+                        className="border-0 bg-transparent"
+                        imageUrl={mc.image_url}
+                      />
+                    )}
+                    {mc.name}
+                  </h3>
+                  {isOpen && (
+                    <CategoryItemsList
+                      items={mc.categories}
+                      onSelectCategory={onSelectCategory}
+                      onSelectTemplate={onSelectTemplate}
                     />
                   )}
-                  {mc.name}
-                </h3>
-                {isOpen && (
-                  <ul className="list-group list-group-flush">
-                    {f.sortBy(mc.categories, 'name').map(sc => (
-                      <F key={sc.id}>
-                        <li className="card list-group-item p-0">
-                          <h4 className="card-header h6">{sc.name}</h4>
-                          <div className="list-group list-group-flush">
-                            {f
-                              .sortBy(
-                                f.filter(templates, {
-                                  category: { id: sc.id }
-                                }),
-                                'name'
-                              )
-                              .map(t => (
-                                <F key={t.id}>
-                                  <button
-                                    className="list-group-item list-group-item-action cursor-pointer"
-                                    onClick={e => {
-                                      e.preventDefault()
-                                      onSelectTemplate(t)
-                                    }}
-                                  >
-                                    <Icon.PlusCircle
-                                      color="success"
-                                      className="mr-3"
-                                      size="lg"
-                                    />
-                                    <Icon.Templates /> {t.article_name}{' '}
-                                    <Badge secondary>
-                                      <samp>
-                                        {formatCurrency(t.price_cents)}
-                                      </samp>
-                                    </Badge>
-                                  </button>
-                                </F>
-                              ))}
-                            <button
-                              className="list-group-item list-group-item-action cursor-pointer"
-                              onClick={e => {
-                                e.preventDefault()
-                                onSelectCategory(sc)
-                              }}
-                            >
-                              <Icon.PlusCircle
-                                color="success"
-                                className="mr-3"
-                              />
-                              {'Ohne Vorlage erstellen'}
-                            </button>
-                          </div>
-                        </li>
-                      </F>
-                    ))}
-                  </ul>
-                )}
-              </li>
+                </li>
+              )}
+            </Collapsing>
+          </F>
+        ))}
+      </ul>
+    </F>
+  )
+}
+
+const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
+  return (
+    <ul className="list-group list-group-flush">
+      {items.map(sc => (
+        <F key={sc.id}>
+          <li className="card list-group-item p-0">
+            {!f.any(sc.templates, l => !f.isEmpty(l)) ? (
+              <AddButtonLine onClick={e => onSelectCategory(sc)}>
+                {sc.name}
+              </AddButtonLine>
+            ) : (
+              <F>
+                <h4 className="card-header h5">{sc.name}</h4>
+
+                <div className="list-group list-group-flush">
+                  {sc.templates.map(t => (
+                    <AddButtonLine
+                      key={t.id}
+                      t={t}
+                      onClick={e => {
+                        e.preventDefault()
+                        onSelectTemplate(t)
+                      }}
+                    >
+                      <Icon.Templates /> {t.article_name}{' '}
+                      <Badge secondary>
+                        <samp>{formatCurrency(t.price_cents)}</samp>
+                      </Badge>
+                    </AddButtonLine>
+                  ))}
+
+                  <AddButtonLine onClick={e => onSelectCategory(sc)}>
+                    {'Ohne Vorlage erstellen'}
+                  </AddButtonLine>
+                </div>
+              </F>
             )}
-          </Collapsing>
+          </li>
         </F>
       ))}
     </ul>
-  </F>
-)
+  )
+}
 
 const SelectionCard = ({ children, onRemoveClick }) => (
   <div className="card">
@@ -466,3 +528,17 @@ const SelectionCard = ({ children, onRemoveClick }) => (
     </div>
   </div>
 )
+
+const AddButtonLine = ({ children, ...props }) => (
+  <button
+    className="list-group-item list-group-item-action cursor-pointer"
+    {...props}
+  >
+    <Icon.PlusCircle color="success" className="mr-3" size="lg" />
+    {children}
+  </button>
+)
+
+const sortByName = l => f.sortBy(l, 'name')
+
+const Let = ({ children, ...props }) => children(props)
