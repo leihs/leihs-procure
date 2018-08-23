@@ -6,6 +6,7 @@ import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 
 import t from '../../locale/translate'
+import { mutationErrorHandler } from '../../apollo-client'
 import * as fragments from '../../graphql-fragments'
 import Icon from '../../components/Icons'
 import {
@@ -22,12 +23,6 @@ import { MainWithSidebar } from '../../components/Layout'
 import { DisplayName } from '../../components/decorators'
 import { ErrorPanel } from '../../components/Error'
 import UserAutocomplete from '../../components/UserAutocomplete'
-
-const mutationErrorHandler = err => {
-  // not much we can do on backend error
-  window.confirm('Error! ' + err)
-  window.location.reload()
-}
 
 // # DATA
 //
