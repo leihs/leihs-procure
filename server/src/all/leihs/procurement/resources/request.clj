@@ -45,9 +45,10 @@
         approved-greater-equal-than-requested
           [:>= :procurement_requests.approved_quantity
            :procurement_requests.requested_quantity]
-        approved-smaller-than-requested
-          [:< :procurement_requests.approved_quantity
-           :procurement_requests.requested_quantity]
+        approved-smaller-than-requested ; but greater than zero
+          [:and [:< :procurement_requests.approved_quantity
+                 :procurement_requests.requested_quantity]
+           [:> :procurement_requests.approved_quantity 0]]
         approved-zero [:= :procurement_requests.approved_quantity 0]]
     (reduce
       (fn [or-conds state]

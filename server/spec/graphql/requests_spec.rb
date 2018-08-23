@@ -184,10 +184,20 @@ describe 'requests' do
     end
 
     before :example do
+      @bp_requesting_phase = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.tomorrow,
+                          end_date: Date.today + 1.week)
+
       @bp_inspection_phase = \
         FactoryBot.create(:budget_period,
                           inspection_start_date: Date.today,
                           end_date: Date.today + 1.week)
+
+      @bp_past = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.today - 1.month, 
+                          end_date: Date.yesterday)
 
       @bp_past = \
         FactoryBot.create(:budget_period,
@@ -208,10 +218,35 @@ describe 'requests' do
                         category_id: @category.id,
                         user_id: @inspector.id)
 
-      # request_new_inspection_phase = FactoryBot.create(:request,
-      #                                                  user_id: requester.id,
-      #                                                  budget_period_id: bp_inspection_phase.id,
-      #                                                  requested_quantity: 1)
+      # with approved entity entered already
+      @request_new_requesting_phase_with_partially_approved_quantity = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_requesting_phase.id,
+                          requested_quantity: 2,
+                          approved_quantity: 1)
+
+      # with no approved entity entered already
+      @request_new_requesting_phase = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_requesting_phase.id,
+                          requested_quantity: 2)
+
+      # no approved quantity entered
+      @request_new_inspection_phase = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          requested_quantity: 2)
+
+      # approved quantity entered
+      @request_partially_approved_inspection_phase = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          requested_quantity: 2,
+                          approved_quantity: 1)
 
       @request_denied_inspection_phase = \
         FactoryBot.create(:request,
@@ -220,22 +255,67 @@ describe 'requests' do
                           budget_period_id: @bp_inspection_phase.id,
                           requested_quantity: 1,
                           approved_quantity: 0)
+
+      @request_denied_past = \
+        FactoryBot.create(:request,
+                          category_id: @category.id,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_past.id,
+                          requested_quantity: 1,
+                          approved_quantity: 0)
+
+      @budget_periods = [@bp_requesting_phase, @bp_inspection_phase, @bp_past]
+      @bp_ids = @budget_periods.map(&:id)
     end
 
-    example 'requester' do
-      variables = { budgetPeriods: [@bp_inspection_phase.id],
-                    states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
-      result = query(q, @requester.id, variables).deep_symbolize_keys
-      requests = get_requests(result)
-      expect(requests).to be_empty
+    context 'requester' do
+      example 'ignored states `approved`, `partially_approved` and `denied` for inspection phase' do
+        variables = { budgetPeriods: @bp_ids,
+                      states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
+        result = query(q, @requester.id, variables).deep_symbolize_keys
+        requests = get_requests(result)
+        expect(requests.count).to eq(1)
+        r_ids = requests.map { |r| r[:id] }
+        expect(r_ids).to include @request_denied_past.id
+      end
+
+      example '`new` in requesting phase irrespective of approved quantity' do
+        variables = { budgetPeriods: @bp_ids,
+                      states: ['NEW'] }
+        result = query(q, @requester.id, variables).deep_symbolize_keys
+        requests = get_requests(result)
+        expect(requests.count).to eq(2)
+        r_ids = requests.map { |r| r[:id] }
+        expect(r_ids).to include @request_new_requesting_phase.id
+        expect(r_ids).to include @request_new_requesting_phase_with_partially_approved_quantity.id
+      end
+
+      example '`in_approval` in inspection phase irrespective of approved quantity' do
+        variables = { budgetPeriods: @bp_ids,
+                      states: ['IN_APPROVAL'] }
+        result = query(q, @requester.id, variables).deep_symbolize_keys
+        requests = get_requests(result)
+        expect(requests.count).to eq(3)
+        r_ids = requests.map { |r| r[:id] }
+        expect(r_ids).to include @request_new_inspection_phase.id
+        expect(r_ids).to include @request_partially_approved_inspection_phase.id
+        expect(r_ids).to include @request_denied_inspection_phase.id
+      end
     end
 
-    example 'inspector' do
-      variables = { budgetPeriods: [@bp_inspection_phase.id],
-                    states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
-      result = query(q, @inspector.id, variables).deep_symbolize_keys
-      requests = get_requests(result)
-      expect(requests.map { |r| r[:id] }).to include @request_denied_inspection_phase.id
+    context 'inspector' do
+      example 'tbd' do
+        variables = { budgetPeriods: @bp_ids,
+                      states: ['NEW', 'APPROVED', 'DENIED'] }
+        result = query(q, @inspector.id, variables).deep_symbolize_keys
+        requests = get_requests(result)
+        expect(requests.count).to eq(4)
+        r_ids = requests.map { |r| r[:id] }
+        expect(r_ids).to include @request_new_requesting_phase.id
+        expect(r_ids).to include @request_new_inspection_phase.id
+        expect(r_ids).to include @request_denied_inspection_phase.id
+        expect(r_ids).to include @request_denied_past.id
+      end
     end
   end
 end
