@@ -86,5 +86,6 @@
         "procurement_account": "Beschaffungskonto"
       }
     }
-  }
+  },
+  "ui": { "InlineSearch": { "placeholder": "Suchen" } }
 }
