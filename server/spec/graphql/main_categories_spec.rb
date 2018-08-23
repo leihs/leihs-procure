@@ -2,134 +2,197 @@ require 'spec_helper'
 require_relative 'graphql_helper'
 
 describe 'main categories' do
-  context 'mutation' do
-    before :example do
-      @users_before = [
-        { firstname: 'user_1' },
-        { firstname: 'user_2' },
-        { firstname: 'user_3' },
-        { firstname: 'user_4' },
-      ]
-      @users_before.each do |data|
-        FactoryBot.create(:user, data)
-      end
+  let(:admin_user) do
+    u = FactoryBot.create(:user)
+    FactoryBot.create(:admin, user_id: u.id)
+    u
+  end
 
-      #############################################################################
-
-      @budget_periods_before = [
-        { name: 'budget_period_1' },
-        { name: 'budget_period_2' }
-      ]
-      @budget_periods_before.each do |data|
-        FactoryBot.create(:budget_period, data)
-      end
-
-      #############################################################################
-      
-      @main_categories_before = [
-        { name: 'main_cat_1' },
-        { name: 'main_cat_2' },
-        { name: 'main_cat_to_delete' }
-      ]
-      @main_categories_before.each do |data|
-        FactoryBot.create(:main_category, name: data[:name])
-      end
-
-      #############################################################################
-      
-      @categories_before = [
-        { name: 'cat_1_for_main_cat_1',
-          parent: { name: 'main_cat_1' },
-          general_ledger_account: 'LEDG_ACC_OLD', 
-          cost_center: 'CC_OLD' },
-        { name: 'cat_to_delete',
-          parent: { name: 'main_cat_1' } },
-        { name: 'cat_1_for_main_cat_to_delete',
-          parent: { name: 'main_cat_to_delete' } }
-      ]
-      @categories_before.each do |data|
-        FactoryBot.create(
-          :category,
-          name: data[:name],
-          main_category_id: MainCategory.find(data[:parent]).id
-        )
-      end
-
-      #############################################################################
-
-      @category_inspectors_before = [
-        { user_id: User.find(firstname: 'user_1').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_2').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_3').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_1').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
-      ]
-      @category_inspectors_before.each do |data|
-        FactoryBot.create(:category_inspector, data)
-      end
-
-      #############################################################################
-
-      @category_viewers_before = [
-        { user_id: User.find(firstname: 'user_1').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_2').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_3').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_1').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
-      ]
-      @category_viewers_before.each do |data|
-        FactoryBot.create(:category_viewer, data)
-      end
-
-      #############################################################################
-
-      @budget_limits_before = [
-        { main_category: { name: 'main_cat_1' },
-          budget_period: { name: 'budget_period_1' },
-          amount_cents: 50 },
-        { main_category: { name: 'main_cat_1' },
-          budget_period: { name: 'budget_period_2' },
-          amount_cents: 100 },
-        { main_category: { name: 'main_cat_to_delete' },
-          budget_period: { name: 'budget_period_1' },
-          amount_cents: 50 },
-        { main_category: { name: 'main_cat_to_delete' },
-          budget_period: { name: 'budget_period_2' },
-          amount_cents: 100 }
-      ]
-      @budget_limits_before.each do |data|
-        FactoryBot.create(
-          :budget_limit,
-          main_category_id: MainCategory.find(data[:main_category]).id,
-          budget_period_id: BudgetPeriod.find(data[:budget_period]).id,
-          amount_cents: data[:amount_cents]
-        )
-      end
-
-      @images_before = [
-        { main_category: { name: 'main_cat_1' } }
-      ]
-      @images_before.each do |data|
-        FactoryBot.create(
-          :image,
-          filename: 'foo.jpg',
-          real_filename: 'lisp-machine.jpg',
-          main_category_id: MainCategory.find(data[:main_category]).id
-        )
-      end
-
-      @upload_1 = FactoryBot.create(:upload)
-      @upload_2 = FactoryBot.create(:upload,
-                                    real_filename: 'lisp-machine.jpg',
-                                    content_type: 'image/jpg')
+  before :example do
+    @users_before = [
+      { firstname: 'user_1' },
+      { firstname: 'user_2' },
+      { firstname: 'user_3' },
+      { firstname: 'user_4' },
+    ]
+    @users_before.each do |data|
+      FactoryBot.create(:user, data)
     end
 
+    #############################################################################
+
+    @budget_periods_before = [
+      { name: 'budget_period_1' },
+      { name: 'budget_period_2' }
+    ]
+    @budget_periods_before.each do |data|
+      FactoryBot.create(:budget_period, data)
+    end
+
+    #############################################################################
+
+    @main_categories_before = [
+      { name: 'main_cat_1' },
+      { name: 'main_cat_2' },
+      { name: 'main_cat_to_delete' }
+    ]
+    @main_categories_before.each do |data|
+      FactoryBot.create(:main_category, name: data[:name])
+    end
+
+    #############################################################################
+
+    @categories_before = [
+      { name: 'cat_1_for_main_cat_1',
+        parent: { name: 'main_cat_1' },
+        general_ledger_account: 'LEDG_ACC_OLD',
+        cost_center: 'CC_OLD' },
+        { name: 'cat_to_delete',
+          parent: { name: 'main_cat_1' } },
+          { name: 'cat_1_for_main_cat_to_delete',
+            parent: { name: 'main_cat_to_delete' } }
+          ]
+    @categories_before.each do |data|
+      FactoryBot.create(
+        :category,
+        name: data[:name],
+        main_category_id: MainCategory.find(data[:parent]).id
+      )
+    end
+
+    #############################################################################
+
+    @category_inspectors_before = [
+      { user_id: User.find(firstname: 'user_1').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+          { user_id: User.find(firstname: 'user_3').id,
+            category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+            { user_id: User.find(firstname: 'user_1').id,
+              category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
+            ]
+    @category_inspectors_before.each do |data|
+      FactoryBot.create(:category_inspector, data)
+    end
+
+    #############################################################################
+
+    @category_viewers_before = [
+      { user_id: User.find(firstname: 'user_1').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+        { user_id: User.find(firstname: 'user_2').id,
+          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+          { user_id: User.find(firstname: 'user_3').id,
+            category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+            { user_id: User.find(firstname: 'user_1').id,
+              category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
+            ]
+    @category_viewers_before.each do |data|
+      FactoryBot.create(:category_viewer, data)
+    end
+
+    #############################################################################
+
+    @budget_limits_before = [
+      { main_category: { name: 'main_cat_1' },
+      budget_period: { name: 'budget_period_1' },
+      amount_cents: 50 },
+      { main_category: { name: 'main_cat_1' },
+      budget_period: { name: 'budget_period_2' },
+      amount_cents: 100 },
+      { main_category: { name: 'main_cat_to_delete' },
+      budget_period: { name: 'budget_period_1' },
+      amount_cents: 50 },
+      { main_category: { name: 'main_cat_to_delete' },
+      budget_period: { name: 'budget_period_2' },
+      amount_cents: 100 }
+    ]
+    @budget_limits_before.each do |data|
+      FactoryBot.create(
+        :budget_limit,
+        main_category_id: MainCategory.find(data[:main_category]).id,
+        budget_period_id: BudgetPeriod.find(data[:budget_period]).id,
+        amount_cents: data[:amount_cents]
+      )
+    end
+
+    @images_before = [
+      { main_category: { name: 'main_cat_1' } }
+    ]
+    @images_before.each do |data|
+      FactoryBot.create(
+        :image,
+        filename: 'foo.jpg',
+        real_filename: 'lisp-machine.jpg',
+        main_category_id: MainCategory.find(data[:main_category]).id
+      )
+    end
+
+    @upload_1 = FactoryBot.create(:upload)
+    @upload_2 = FactoryBot.create(:upload,
+      real_filename: 'lisp-machine.jpg',
+      content_type: 'image/jpg')
+    end
+
+  context 'query' do
+    let(:q) do <<-GRAPHQL
+      query MainCategories {
+        main_categories {
+          ...MainCatProps
+        }
+      }
+      fragment MainCatProps on MainCategory {
+        id
+        name
+        can_delete
+        image_url
+        budget_limits {
+          id
+          amount_cents
+          amount_currency
+          budget_period {
+            id
+            name
+            end_date
+          }
+        }
+        categories {
+          id
+          name
+          can_delete
+          cost_center
+          general_ledger_account
+          procurement_account
+          inspectors {
+            id
+            login
+            firstname
+            lastname
+          }
+          viewers {
+            id
+            login
+            firstname
+            lastname
+          }
+        }
+      }
+    GRAPHQL
+    end
+
+    example 'successful response' do
+      all_cats = MainCategory.all
+      expect(all_cats.length).to be > 0
+
+      result = query(q, admin_user.id)
+
+      expect(result['errors']).to be_nil
+      expect(result['data']['main_categories'].length).to eq all_cats.length
+    end
+  end
+
+  context 'mutation' do
     context 'full update' do
       before :each do
         @q = <<-GRAPHQL
@@ -148,7 +211,7 @@ describe 'main categories' do
                     { id: null,
                       name: "new_cat_for_new_main_cat",
                       inspectors: ["#{User.find(firstname: 'user_1').id}",
-                                   "#{User.find(firstname: 'user_2').id}"], 
+                                   "#{User.find(firstname: 'user_2').id}"],
                       viewers: ["#{User.find(firstname: 'user_1').id}",
                                 "#{User.find(firstname: 'user_2').id}"] }
                   ]
@@ -189,14 +252,14 @@ describe 'main categories' do
               ]
             ) {
               name
-            } 
+            }
           }
         GRAPHQL
       end
 
       it 'error as inspector' do
-        user = User.find(firstname: 'user_1')
-        result = query(@q, user.id)
+        inspector_user = User.find(firstname: 'user_1')
+        result = query(@q, inspector_user.id)
 
         expect(result['data']['main_categories']).to be_empty
         expect(result['errors'].first['exception'])
@@ -250,9 +313,7 @@ describe 'main categories' do
       end
 
       it 'success as admin' do
-        user = FactoryBot.create(:user)
-        FactoryBot.create(:admin, user_id: user.id)
-        result = query(@q, user.id)
+        result = query(@q, admin_user.id)
 
         expect(result).to eq({
           'data' => {
@@ -362,6 +423,7 @@ describe 'main categories' do
           ).filename
         ).to be == 'lisp-machine.jpg'
       end
+
     end
   end
 end
