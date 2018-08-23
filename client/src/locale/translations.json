@@ -65,6 +65,7 @@
 
   "admin": {
     "categories": {
+      "main_categories": "Hauptkategorien",
       "image": "Bild",
       "budget_limits": "Budget-Limite",
       "subcats": "Subkategorien",

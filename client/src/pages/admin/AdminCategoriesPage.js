@@ -27,15 +27,15 @@ import UserAutocomplete from '../../components/UserAutocomplete'
 
 const CATEGORIES_INDEX_QUERY = gql`
   query MainCategoriesIndex {
+    # for TableOfContents
     main_categories {
       id
       name
       image_url
-      # # for TOC 2nd level
-      # categories {
-      #   id
-      #   name
-      # }
+      categories {
+        id
+        name
+      }
     }
   }
 `
@@ -145,9 +145,7 @@ const AdminCategoriesPage = ({ match }) => (
 
       return (
         <MainWithSidebar
-          sidebar={
-            <TableOfContents categories={categoriesToc} baseUrl={match.url} />
-          }
+          sidebar={<SideNav categories={categoriesToc} baseUrl={match.url} />}
         >
           <Switch>
             <Route
@@ -156,20 +154,30 @@ const AdminCategoriesPage = ({ match }) => (
               render={r => <CategoryPage {...r} />}
               foo="bar"
             />
-            {/* NOTE: dont show index for now */}
-            {/* show "index" with all content if no mainCat selected */}
-            {/* <Route exact path={match.url}>
-              <Query query={CATEGORIES_QUERY}>
-                {({ loading, error, data }) => {
-                  if (loading) return <Loading />
-                  if (error) return <ErrorPanel error={error} data={data} />
+            {/* fallback/index content: */}
+            <F>
+              {/* NOTE: dont show index for now, only a TOC */}
+              {/* <Route exact path={match.url}>
+                  <Query query={CATEGORIES_QUERY}>
+                    {({ loading, error, data }) => {
+                      if (loading) return <Loading />
+                      if (error) return <ErrorPanel error={error} data={data} />
 
-                  return data.main_categories.map(c => (
-                    <CategoryCard key={c.id} {...c} />
-                  ))
-                }}
-              </Query>
-            </Route> */}
+                      return data.main_categories.map(c => (
+                        <CategoryCard key={c.id} {...c} />
+                      ))
+                    }}
+                  </Query>
+                </Route> */}
+              {/*  show toc */}
+              <TableOfContents
+                withSubcats
+                categories={categoriesToc}
+                baseUrl={match.url}
+              />
+              {/* preload rest of content */}
+              <Query query={CATEGORIES_QUERY}>{() => false}</Query>
+            </F>
           </Switch>
         </MainWithSidebar>
       )
@@ -266,7 +274,7 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
         }
         return (
           <F>
-            <div className="card mb-3" id={`cat-${id}`}>
+            <div className="card mb-3" id={`mc${id}`}>
               <div className="card-header">
                 <h4 className="mb-0">{fields.name}</h4>
               </div>
@@ -440,33 +448,45 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
   )
 }
 
-const TableOfContents = ({ categories, baseUrl }) => (
+const SideNav = ({ categories, baseUrl, withSubcats = false }) => (
   <nav className="pt-3">
     <h5>
       <NavLink className="nav-link text-dark" to={baseUrl}>
-        Categories
+        {t('admin.categories.main_categories')}
       </NavLink>
     </h5>
-    <ul className="nav flex-column">
-      {categories.map(c => (
-        <li key={c.id} className="nav-item">
-          <NavLink
-            className="nav-link"
-            activeClassName="disabled text-dark"
-            to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
-          >
-            {c.name}
-          </NavLink>
-          {/* NOTE: dont show subcats for now */}
-          {/* <ul className="list-unstyled text-muted">
-            {c.categories.map(subcat => (
-              <li key={subcat.id}>{subcat.name}</li>
-            ))}
-          </ul> */}
-        </li>
-      ))}
-    </ul>
+    <TableOfContents
+      categories={categories}
+      baseUrl={baseUrl}
+      withSubcats={withSubcats}
+    />
   </nav>
+)
+
+const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
+  <ul className="nav flex-column">
+    {categories.map(c => (
+      <li key={c.id} className="nav-item">
+        <NavLink
+          className="nav-link"
+          activeClassName="disabled text-dark"
+          to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
+        >
+          {c.name}
+        </NavLink>
+
+        {!!withSubcats && (
+          <ul className="list-unstyled text-muted ml-3 pl-3">
+            {c.categories.map(subcat => (
+              <F key={subcat.id}>
+                <li>{subcat.name}</li>
+              </F>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
 )
 
 // see AdminUsersPage/ListOfAdmins
