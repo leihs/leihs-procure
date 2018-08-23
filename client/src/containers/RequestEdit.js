@@ -225,8 +225,10 @@ export const requestDataFromFields = (request, fields) => {
       ? { model: model.id }
       : fieldIfWritable(fields, request, 'article_name')),
 
-    ...(supplier
-      ? { supplier: supplier.id }
+    ...(!fields._supplier_as_text
+      ? supplier
+        ? { supplier: supplier.id }
+        : null
       : fieldIfWritable(fields, request, 'supplier_name')),
 
     // NOTE: no building, just room!
