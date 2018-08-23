@@ -196,7 +196,7 @@ Array [
                 <input
                     aria-describedby={null}
                     autoComplete="off"
-                    className="form-control form-control"
+                    className="form-control"
                     id={undefined}
                     name="a"
                     onChange={[Function]}

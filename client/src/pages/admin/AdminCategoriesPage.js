@@ -347,7 +347,7 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
 
                   <Row>
                     <Col>
-                      <h5 style={{ display: 'inline-block' }}>
+                      <h5 className="mt-4 mb-3">
                         {t('admin.categories.subcats')}
                       </h5>
                     </Col>

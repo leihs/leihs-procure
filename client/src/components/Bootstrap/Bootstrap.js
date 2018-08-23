@@ -1,6 +1,6 @@
 import React, { Fragment as F } from 'react'
 import PropTypes from 'prop-types'
-import cx from 'classnames'
+import cx from 'classnames/dedupe'
 import f from 'lodash'
 
 import BsButton from 'reactstrap/lib/Button'
@@ -252,9 +252,15 @@ export const FormField = ({
 
   if (type === 'text-static') {
     tag = inputProps.tag || 'span'
-    mainClass = 'form-control-plaintext'
     inputNode = (
-      <Node tag={tag} id={id} className={cx(mainClass, className)}>
+      <Node
+        tag={tag}
+        id={id}
+        {...f.omit(inputProps, 'onChange')}
+        className={cx(inputProps.className, 'form-control-plaintext', {
+          'form-control': false
+        })}
+      >
         {value}
       </Node>
     )
@@ -280,8 +286,13 @@ export const FormField = ({
   }
 
   if (type === 'checkbox') {
-    mainClass = 'custom-control-input'
-    inputProps = { ...inputProps, checked: value }
+    inputProps = {
+      ...inputProps,
+      className: cx(inputProps.className, 'custom-control-input', {
+        'form-control': false
+      }),
+      checked: value
+    }
     value = null
   }
 
@@ -295,7 +306,6 @@ export const FormField = ({
       aria-describedby={helpText ? `${id}--Help` : null}
       {...inputProps}
       tag={tag}
-      cls={mainClass}
       type={type}
       id={id}
       name={name}
