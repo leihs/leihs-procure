@@ -135,6 +135,63 @@ describe 'main categories' do
       content_type: 'image/jpg')
     end
 
+  context 'query' do
+    let(:q) do <<-GRAPHQL
+      query MainCategories {
+        main_categories {
+          ...MainCatProps
+        }
+      }
+      fragment MainCatProps on MainCategory {
+        id
+        name
+        can_delete
+        image_url
+        budget_limits {
+          id
+          amount_cents
+          amount_currency
+          budget_period {
+            id
+            name
+            end_date
+          }
+        }
+        categories {
+          id
+          name
+          can_delete
+          cost_center
+          general_ledger_account
+          procurement_account
+          inspectors {
+            id
+            login
+            firstname
+            lastname
+          }
+          viewers {
+            id
+            login
+            firstname
+            lastname
+          }
+        }
+      }
+    GRAPHQL
+    end
+
+    example 'successful response' do
+      all_cats = MainCategory.all
+      expect(all_cats.length).to be > 0
+
+      result = query(q, admin_user.id)
+
+      expect(result['errors']).to be_nil
+      expect(result['data']['main_categories'].length).to eq all_cats.length
+    end
+  end
+
   context 'mutation' do
     context 'full update' do
       before :each do
@@ -366,6 +423,7 @@ describe 'main categories' do
           ).filename
         ).to be == 'lisp-machine.jpg'
       end
+
     end
   end
 end
