@@ -166,95 +166,93 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
     isInspecting
   } = budgetPeriodDates(budgetPeriod)
 
+  const canRequest = isRequesting && me.roles.isRequester
+  const newRequestBpLink = canRequest && newRequestLink({ budgetPeriod })
+
   const children = f.some(props.children) ? props.children : false
 
   return (
     <Collapsing id={`bp_${budgetPeriod.id}`} startOpen>
-      {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => {
-        const newRequestBpLink =
-          me.roles.isRequester && newRequestLink({ budgetPeriod })
+      {({ isOpen, toggleOpen, togglerProps, collapsedProps, Caret }) => (
+        <div className={cx('card mb-3')}>
+          <div
+            className={cx('card-header cursor-pointer pl-2', {
+              'border-bottom-0': !(isOpen && children),
+              'bg-transparent': !isPast,
+              'text-muted': isPast
+            })}
+            {...togglerProps}
+          >
+            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
+              <div className="flex-grow-1 flex-sm-grow-0 w-50">
+                <h2 className="mb-0 h3 d-inline-block">
+                  <Caret spaced />
+                  {budgetPeriod.name}
+                </h2>
 
-        return (
-          <div className={cx('card mb-3')}>
-            <div
-              className={cx('card-header cursor-pointer pl-2', {
-                'border-bottom-0': !(isOpen && children),
-                'bg-transparent': !isPast,
-                'text-muted': isPast
-              })}
-              {...togglerProps}
-            >
-              <div className="d-flex flex-wrap justify-content-between align-items-baseline">
-                <div className="flex-grow-1 flex-sm-grow-0 w-50">
-                  <h2 className="mb-0 h3 d-inline-block">
-                    <Caret spaced />
-                    {budgetPeriod.name}
-                  </h2>
+                <div className="d-inline-flex flex-wrap ml-3 mt-2">
+                  <Tooltipped text="Antragsphase bis">
+                    <span
+                      id={`inspectStartDate_tt_${budgetPeriod.id}`}
+                      className={cx('mr-3', { 'text-success': isRequesting })}
+                    >
+                      <Icon.RequestingPhase className="mr-2" />
+                      {inspectStartDate.toLocaleString()}
+                    </span>
+                  </Tooltipped>
 
-                  <div className="d-inline-flex flex-wrap ml-3 mt-2">
-                    <Tooltipped text="Antragsphase bis">
-                      <span
-                        id={`inspectStartDate_tt_${budgetPeriod.id}`}
-                        className={cx('mr-3', { 'text-success': isRequesting })}
-                      >
-                        <Icon.RequestingPhase className="mr-2" />
-                        {inspectStartDate.toLocaleString()}
-                      </span>
-                    </Tooltipped>
-
-                    <Tooltipped text="Inspektionsphase bis">
-                      <span
-                        id={`endDate_tt_${budgetPeriod.id}`}
-                        className={cx('mr-3', { 'text-success': isInspecting })}
-                      >
-                        <Icon.InspectionPhase className="mr-2" />
-                        {endDate.toLocaleString()}
-                      </span>
-                    </Tooltipped>
-                  </div>
-                </div>
-
-                <div className="mr-auto">
-                  {!!budgetPeriod.total_price_cents && (
-                    <Tooltipped text={t('dashboard.bp_total_sum')}>
-                      <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
-                        <Icon.ShoppingCart className="mr-1" />
-                        <samp>
-                          {formatCurrency(budgetPeriod.total_price_cents)}
-                        </samp>
-                      </span>
-                    </Tooltipped>
-                  )}
-                </div>
-
-                <div className="ml-3 mt-2 mt-md-0">
-                  {newRequestBpLink && (
-                    <Link to={newRequestBpLink}>
-                      <Tooltipped text={t('dashboard.create_request_for_bp')}>
-                        <Icon.PlusCircle
-                          id={`tt_bp_cnr_${budgetPeriod.id}`}
-                          size="2x"
-                          color="success"
-                        />
-                      </Tooltipped>
-                    </Link>
-                  )}
+                  <Tooltipped text="Inspektionsphase bis">
+                    <span
+                      id={`endDate_tt_${budgetPeriod.id}`}
+                      className={cx('mr-3', { 'text-success': isInspecting })}
+                    >
+                      <Icon.InspectionPhase className="mr-2" />
+                      {endDate.toLocaleString()}
+                    </span>
+                  </Tooltipped>
                 </div>
               </div>
-            </div>
 
-            {isOpen &&
-              children && (
-                <ul
-                  className="list-group list-group-flush bp-cat-list"
-                  {...collapsedProps}
-                >
-                  {children}
-                </ul>
-              )}
+              <div className="mr-auto">
+                {!!budgetPeriod.total_price_cents && (
+                  <Tooltipped text={t('dashboard.bp_total_sum')}>
+                    <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
+                      <Icon.ShoppingCart className="mr-1" />
+                      <samp>
+                        {formatCurrency(budgetPeriod.total_price_cents)}
+                      </samp>
+                    </span>
+                  </Tooltipped>
+                )}
+              </div>
+
+              <div className="ml-3 mt-2 mt-md-0">
+                {newRequestBpLink && (
+                  <Link to={newRequestBpLink}>
+                    <Tooltipped text={t('dashboard.create_request_for_bp')}>
+                      <Icon.PlusCircle
+                        id={`tt_bp_cnr_${budgetPeriod.id}`}
+                        size="2x"
+                        color="success"
+                      />
+                    </Tooltipped>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
-        )
-      }}
+
+          {isOpen &&
+            children && (
+              <ul
+                className="list-group list-group-flush bp-cat-list"
+                {...collapsedProps}
+              >
+                {children}
+              </ul>
+            )}
+        </div>
+      )}
     </Collapsing>
   )
 }
@@ -313,7 +311,7 @@ const CategoryLine = ({
 
             <div className="ml-3 mt-2 mt-md-0">
               {/* TODO: decide if/how to show these links
-              {me.roles.isRequester && (
+              {canRequest && (
                 <Link
                   to={newRequestLink({ budgetPeriod, mainCategory: category })}
                 >
@@ -394,7 +392,7 @@ const SubCategoryLine = ({
               </div>
               <div className="ml-3 mt-2 mt-md-0">
                 {/* TODO: decide if/how to show these links
-                {me.roles.isRequester && (
+                {canRequest && (
                   <Link to={newRequestLink({ budgetPeriod, category })}>
                     <Tooltipped text={t('dashboard.create_request_for_subcat')}>
                       <Icon.PlusCircle
