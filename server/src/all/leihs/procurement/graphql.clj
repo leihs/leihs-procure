@@ -45,8 +45,11 @@
   (try (graphql-parser/parse-query (get-schema) query)
        (catch Throwable e*
          (let [e (get-cause e*)
-               m (.getMessage e*)]
-           (log/warn m)
+               m (.getMessage e*)
+               n (-> e*
+                     .getClass
+                     .getSimpleName)]
+           (log/warn (or m n))
            (if (env/env #{:dev :test}) (log/debug e))
            (helpers/error-as-graphql-object "API_ERROR" m)))))
 
