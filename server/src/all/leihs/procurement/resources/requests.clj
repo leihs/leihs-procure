@@ -89,12 +89,7 @@
          advanced-user? (->> rrequest
                              :authenticated-entity
                              (user-perms/advanced? tx))
-         start-sqlmap (-> advanced-user?
-                          request/requests-base-query-with-state
-                          (sql/merge-join
-                            :procurement_budget_periods
-                            [:= :procurement_budget_periods.id
-                             :procurement_requests.budget_period_id]))]
+         start-sqlmap (request/requests-base-query-with-state advanced-user?)]
      (cond-> start-sqlmap
        id (sql/merge-where [:in :procurement_requests.id id])
        category-id (sql/merge-where [:in :procurement_requests.category_id

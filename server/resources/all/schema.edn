@@ -347,7 +347,7 @@
     :RequestFieldState {:fields {:default {:type :State},
                                  :read {:type (non-null Boolean)},
                                  :required {:type (non-null Boolean)},
-                                 :value {:type :State},
+                                 :value {:type (non-null :State)},
                                  :write {:type (non-null Boolean)}}},
     :RequestFieldString {:fields {:default {:type String},
                                   :read {:type (non-null Boolean)},
