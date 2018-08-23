@@ -1,7 +1,7 @@
 (ns leihs.procurement.authorization
   (:require [leihs.procurement.env :as env]
             [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.utils.helpers :as helpers])
+            [leihs.procurement.graphql.helpers :as helpers])
   (:import leihs.procurement.UnauthorizedException))
 
 (defn wrap-ensure-one-of
