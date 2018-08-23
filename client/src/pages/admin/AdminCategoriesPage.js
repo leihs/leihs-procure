@@ -65,6 +65,9 @@ const CATEGORIES_QUERY = gql`
           firstname
           lastname
         }
+        viewers {
+          id
+        }
       }
     }
   }
