@@ -65,12 +65,18 @@ const MAINCAT_PROPS_FRAGMENT = gql`
       general_ledger_account
       procurement_account
       inspectors {
-        id
-        login
-        firstname
-        lastname
+        ...UserProps
+      }
+      viewers {
+        ...UserProps
       }
     }
+  }
+  fragment UserProps on User {
+    id
+    login
+    firstname
+    lastname
   }
 `
 
@@ -106,26 +112,31 @@ const updateCategories = {
     }
   },
   doUpdate: (mutate, mainCats) => {
-    const data = mainCats.map(mainCat => ({
-      ...f.pick(mainCat, ['id', 'name']),
-      // TODO: image: …
-      budget_limits: f.map(mainCat.budget_limits, l => ({
-        amount_cents: l.amount_cents,
-        budget_period_id: l.budget_period.id
-      })),
-      categories: f.filter(mainCat.categories, mc => !mc.toDelete).map(sc => ({
-        ...f.pick(sc, [
-          'id',
-          'name',
-          'procurement_account',
-          'general_ledger_account',
-          'cost_center'
-        ]),
-        inspectors: f.filter(sc.inspectors, u => !u.toDelete).map(i => i.id)
-        // TODO: viewers
-        // viewers: f.filter(sc.viewers, u => !u.toDelete).map(i => i.id)
-      }))
-    }))
+    const data = mainCats.map(mainCat => {
+      return {
+        ...f.pick(mainCat, ['id', 'name']),
+        // TODO: image: …
+        budget_limits: f.map(mainCat.budget_limits, l => ({
+          amount_cents: l.amount_cents,
+          budget_period_id: l.budget_period.id
+        })),
+        categories: f
+          .filter(mainCat.categories, mc => !mc.toDelete)
+          .map(sc => ({
+            ...f.pick(sc, [
+              'id',
+              'name',
+              'procurement_account',
+              'general_ledger_account',
+              'cost_center'
+            ]),
+            inspectors: f
+              .filter(sc.inspectors, u => !u.toDelete)
+              .map(i => i.id),
+            viewers: f.filter(sc.viewers, u => !u.toDelete).map(i => i.id)
+          }))
+      }
+    })
 
     mutate({
       variables: { mainCategories: data }
@@ -240,9 +251,6 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
     categories: f.sortBy(props.categories, 'name')
   }
 
-  // eslint-disable-next-line no-debugger
-  debugger
-
   return (
     <StatefulForm
       key={id + formKey}
@@ -256,22 +264,27 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
         const onMarkSubCatForDeletion = ({ id, toDelete = false }) => {
           setValue('categories', setAsDeleted(!toDelete, id, fields.categories))
         }
-        const onAddInspector = (cat, user) => {
+        const addUser = (fieldKey, cat, user) => {
           setValue(
             'categories',
             extendWhere(cat.id, fields.categories, c => ({
-              inspectors: [...c.inspectors, user]
+              [fieldKey]: [...c[fieldKey], user]
             }))
           )
         }
-        const onRemoveInspector = (cat, { id, toDelete = false }) => {
+        const removeUser = (fieldKey, cat, { id, toDelete = false }) => {
           setValue(
             'categories',
             extendWhere(cat.id, fields.categories, c => ({
-              inspectors: setAsDeleted(!toDelete, id, c.inspectors)
+              [fieldKey]: setAsDeleted(!toDelete, id, c[fieldKey])
             }))
           )
         }
+        const onAddInspector = (c, u) => addUser('inspectors', c, u)
+        const onRemoveInspector = (c, u) => removeUser('inspectors', c, u)
+        const onAddViewer = (c, u) => addUser('viewers', c, u)
+        const onRemoveViewer = (c, u) => removeUser('viewers', c, u)
+
         return (
           <F>
             <div className="card mb-3" id={`mc${id}`}>
@@ -408,6 +421,7 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
 
                           <Col lg>
                             <ListOfUsers
+                              keyName="inspectors"
                               users={cat.inspectors}
                               onAddUser={u => onAddInspector(cat, u)}
                               onRemoveUser={u => onRemoveInspector(cat, u)}
@@ -415,7 +429,12 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
                           </Col>
 
                           <Col lg>
-                            <code>TBD: Viewers</code>
+                            <ListOfUsers
+                              keyName="viewers"
+                              users={cat.viewers}
+                              onAddUser={u => onAddViewer(cat, u)}
+                              onRemoveUser={u => onRemoveViewer(cat, u)}
+                            />
                           </Col>
                         </Row>
                       )}
@@ -490,12 +509,12 @@ const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
 )
 
 // see AdminUsersPage/ListOfAdmins
-const ListOfUsers = ({ users, onAddUser, onRemoveUser }) => (
+const ListOfUsers = ({ keyName, users, onAddUser, onRemoveUser }) => (
   <React.Fragment>
     <Div>
-      <FormGroup label={t('admin.categories.inspectors')}>
+      <FormGroup label={t(`admin.categories.${keyName}`)}>
         {f.isEmpty(users) ? (
-          t('admin.categories.list_no_inspectors')
+          t('admin.categories.user_list_empty')
         ) : (
           <ul className="list-group list-group-compact">
             {users.map((user, i) => (
@@ -510,7 +529,7 @@ const ListOfUsers = ({ users, onAddUser, onRemoveUser }) => (
                   <Icon.User spaced className="mr-1" /> {DisplayName(user)}
                 </span>
                 <Button
-                  title="remove as admin"
+                  title={t(`admin.categories.remove_from_${keyName}`)}
                   color="link"
                   outline
                   size="sm"
@@ -526,7 +545,7 @@ const ListOfUsers = ({ users, onAddUser, onRemoveUser }) => (
       </FormGroup>
     </Div>
     <Div>
-      <FormGroup label="add new inspector">
+      <FormGroup label={t(`admin.categories.add_to_${keyName}`)}>
         <UserAutocomplete
           excludeIds={f.isEmpty(users) ? null : users.map(({ id }) => id)}
           onSelect={onAddUser}

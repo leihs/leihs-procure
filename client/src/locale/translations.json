@@ -73,7 +73,12 @@
       "add_subcat": "Neue Subkategorie hinzufügen",
       "delete_subcat": "Subkategorie löschen",
       "inspectors": "Inspektoren",
-      "list_no_inspectors": "(Keine)",
+      "remove_from_inspectors": "als Inspektor entfernen",
+      "add_to_inspectors": "zu Inspektoren hinzufügen",
+      "viewers": "Betrachter",
+      "remove_from_viewers": "als Betrachter entfernen",
+      "add_to_viewers": "zu Betrachtern hinzufügen",
+      "user_list_empty": "(Keine)",
       "subcategories": {
         "cost_center": "Kostenstelle",
         "general_ledger_account": "Sachkonto Ⅰ",
