@@ -108,12 +108,11 @@
 
 (defn requests-base-query-with-state
   [advanced-user?]
-  (cond-> requests-base-query
-    (not advanced-user?)
-      (-> (sql/merge-select [(state-sql advanced-user?) :state])
-          (sql/merge-join :procurement_budget_periods
-                          [:= :procurement_budget_periods.id
-                           :procurement_requests.budget_period_id]))))
+  (-> requests-base-query
+      (sql/merge-select [(state-sql advanced-user?) :state])
+      (sql/merge-join :procurement_budget_periods
+                      [:= :procurement_budget_periods.id
+                       :procurement_requests.budget_period_id])))
 
 (defn to-name-and-lower-case-priorities
   [m]
