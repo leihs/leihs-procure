@@ -42,7 +42,7 @@
 
 (defn error-as-graphql-object
   [code message]
-  {:errors [{:message message,
+  {:errors [{:message (str message), ; if message is nil convert to ""
              :extensions {:code code,
                           :timestamp (-> (clj-time/now)
                                          .toString)}}],
