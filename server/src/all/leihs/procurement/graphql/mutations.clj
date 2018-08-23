@@ -27,7 +27,7 @@
            :if-only
            #(and
               (not (and category (:template input-data))) ; template belongs to
-                                                          ; category
+              ; category
               (not (:organization input-data)) ; implicit in user
               (not (budget-period/past? tx budget-period))
               (or (and (not user-id)

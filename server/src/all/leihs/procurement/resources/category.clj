@@ -18,7 +18,7 @@
                           :request
                           :tx)
                       (category-query (or (:value value) ; for
-                                                         ; RequestFieldCategory
+                                          ; RequestFieldCategory
                                           (:category_id value))))))
   ([tx catmap]
    (let [where-clause (sql/map->where-clause :procurement_categories catmap)]

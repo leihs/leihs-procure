@@ -68,7 +68,7 @@
          tx (:tx rrequest)
          auth-entity (:authenticated-entity rrequest)
          advanced-user? (user-perms/advanced? tx auth-entity)]
-     (requests-query-map context arguments advanced-user?)))
+     (requests-query-map context arguments value advanced-user?)))
   ([context arguments value advanced-user?]
    (let [id (:id arguments)
          category-id (get-id :category arguments value)
@@ -117,15 +117,15 @@
                                                     :authenticated-entity
                                                     :user_id)])
        from-categories-of-auth-user
-       (sql/merge-where
-         [:in :procurement_requests.category_id
-          (-> (sql/select :category_id)
-              (sql/from :procurement_category_inspectors)
-              (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                (-> context
-                                    :request
-                                    :authenticated-entity
-                                    :id)]))])
+         (sql/merge-where
+           [:in :procurement_requests.category_id
+            (-> (sql/select :category_id)
+                (sql/from :procurement_category_inspectors)
+                (sql/merge-where [:= :procurement_category_inspectors.user_id
+                                  (-> context
+                                      :request
+                                      :authenticated-entity
+                                      :id)]))])
        search-term (search-query search-term)))))
 
 (defn get-requests
@@ -142,10 +142,7 @@
                   (requests-query-map <> arguments value advanced-user?)
                   (requests-perms/apply-scope tx <> auth-entity)
                   (sql/format <>))
-          proc-requests (request/query-requests
-                          tx
-                          query
-                          advanced-user?)]
+          proc-requests (request/query-requests tx query)]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
            (map (fn [proc-req]

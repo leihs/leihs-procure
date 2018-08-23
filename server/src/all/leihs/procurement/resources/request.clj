@@ -39,53 +39,50 @@
   [req]
   (exchange-attrs req (map-invert attrs-mapping)))
 
-(defn states-conds-map [advanced-user?]
+(defn states-conds-map
+  [advanced-user?]
   (let [approved-not-set [:= :procurement_requests.approved_quantity nil]
         approved-greater-equal-than-requested
-        [:>= :procurement_requests.approved_quantity
-         :procurement_requests.requested_quantity]
+          [:>= :procurement_requests.approved_quantity
+           :procurement_requests.requested_quantity]
         approved-smaller-than-requested ; but greater than zero
-        [:and [:< :procurement_requests.approved_quantity
-               :procurement_requests.requested_quantity]
-         [:> :procurement_requests.approved_quantity 0]]
+          [:and
+           [:< :procurement_requests.approved_quantity
+            :procurement_requests.requested_quantity]
+           [:> :procurement_requests.approved_quantity 0]]
         approved-zero [:= :procurement_requests.approved_quantity 0]]
     {:NEW (if advanced-user?
             approved-not-set
             [:or
-             [:and
-              [:< :procurement_budget_periods.end_date :current_date]
+             [:and [:< :procurement_budget_periods.end_date :current_date]
               approved-not-set]
              [:< :current_date
-              :procurement_budget_periods.inspection_start_date]])
+              :procurement_budget_periods.inspection_start_date]]),
      :IN_APPROVAL [:and
                    [:>= :current_date
                     :procurement_budget_periods.inspection_start_date]
-                   [:< :current_date
-                    :procurement_budget_periods.end_date]]
+                   [:< :current_date :procurement_budget_periods.end_date]],
      :APPROVED (if advanced-user?
                  approved-greater-equal-than-requested
-                 [:and
-                  [:< :procurement_budget_periods.end_date :current_date]
-                  approved-greater-equal-than-requested])
-     :PARTIALLY_APPROVED
-     (if advanced-user?
-       approved-smaller-than-requested
-       [:and [:< :procurement_budget_periods.end_date :current_date]
-        approved-smaller-than-requested])
+                 [:and [:< :procurement_budget_periods.end_date :current_date]
+                  approved-greater-equal-than-requested]),
+     :PARTIALLY_APPROVED (if advanced-user?
+                           approved-smaller-than-requested
+                           [:and
+                            [:< :procurement_budget_periods.end_date
+                             :current_date] approved-smaller-than-requested]),
      :DENIED (if advanced-user?
                approved-zero
-               [:and
-                [:< :procurement_budget_periods.end_date :current_date]
+               [:and [:< :procurement_budget_periods.end_date :current_date]
                 approved-zero])}))
 
 (defn get-where-conds-for-states
   [states advanced-user?]
-  (reduce
-    (fn [or-conds state]
-      (let [sc-map (states-conds-map advanced-user?)]
-        (->> sc-map
-             state
-             (conj or-conds))))
+  (reduce (fn [or-conds state]
+            (let [sc-map (states-conds-map advanced-user?)]
+              (->> sc-map
+                   state
+                   (conj or-conds))))
     [:or]
     states))
 
@@ -95,11 +92,12 @@
       name
       lower-case))
 
-(defn state-sql [advanced-user?]
+(defn state-sql
+  [advanced-user?]
   (let [s-map (states-conds-map advanced-user?)]
     (->> s-map
          keys
-         (map to-name-and-lower-case)
+         (map name)
          (interleave (vals s-map))
          (cons :case)
          (apply sql/call))))
@@ -108,11 +106,14 @@
   (-> (sql/select :procurement_requests.*)
       (sql/from :procurement_requests)))
 
-(defn requests-base-query-with-state [advanced-user?]
-  (-> (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
-      (sql/from :procurement_requests)))
-
-(comment (-> true requests-base-query-with-state sql/format))
+(defn requests-base-query-with-state
+  [advanced-user?]
+  (cond-> requests-base-query
+    (not advanced-user?)
+      (-> (sql/merge-select [(state-sql advanced-user?) :state])
+          (sql/merge-join :procurement_budget_periods
+                          [:= :procurement_budget_periods.id
+                           :procurement_requests.budget_period_id]))))
 
 (defn to-name-and-lower-case-priorities
   [m]
@@ -149,11 +150,12 @@
          (* quantity)
          (assoc row :total_price_cents))))
 
-(defn enum-state [row]
-  (assoc row :state (-> row
-                        :state
-                        upper-case
-                        keyword)))
+(defn enum-state
+  [row]
+  (->> row
+       :state
+       keyword
+       (assoc row :state)))
 
 (defn transform-row
   [row]
@@ -164,23 +166,17 @@
       treat-inspector-priority
       initialize-attachments-attribute))
 
-(defn query-requests
-  [tx query advanced-user?]
-  (jdbc/query tx query {:row-fn transform-row}))
+(defn query-requests [tx query] (jdbc/query tx query {:row-fn transform-row}))
 
 (defn get-request-by-id
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user? 
+    (-> advanced-user?
         requests-base-query-with-state
         (sql/where [:= :procurement_requests.id id])
         sql/format
-        (->> (query-requests tx auth-entity))
+        (->> (query-requests tx))
         first)))
-
-(comment (get-request-by-id (ds/get-ds)
-                            {:user-id "c0777d74-668b-5e01-abb5-f8277baa0ea8"}
-                            "09df3790-b630-5eb7-b50e-15bbec1c0422"))
 
 (defn get-account-perms
   [context value attr]
@@ -215,11 +211,11 @@
 (defn get-request-by-attrs
   [tx auth-entity attrs]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user? 
+    (-> advanced-user?
         requests-base-query-with-state
         (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
         sql/format
-        (->> (query-requests tx auth-entity))
+        (->> (query-requests tx))
         first)))
 
 (defn- consider-default
@@ -248,12 +244,12 @@
 (defn get-last-created-request
   [tx auth-entity]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user? 
+    (-> advanced-user?
         requests-base-query-with-state
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
         sql/format
-        (->> (query-requests tx auth-entity))
+        (->> (query-requests tx))
         first)))
 
 (defn insert!
@@ -456,7 +452,7 @@
      (-> requests-base-query
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
-         (->> (query-requests tx auth-entity))
+         (->> (query-requests tx))
          first
          :user_id)))
 
