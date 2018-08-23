@@ -9,10 +9,11 @@
   "budget_period": "Budgetperiode",
   "request_state": "Status",
 
-  "request_state_label_new": "Neu",
-  "request_state_label_approved": "Genehmigt",
-  "request_state_label_partially_approved": "Teilweise bewilligt",
-  "request_state_label_denied": "Abgelehnt",
+  "request_state_label_NEW": "Neu",
+  "request_state_label_APPROVED": "Genehmigt",
+  "request_state_label_PARTIALLY_APPROVED": "Teilweise bewilligt",
+  "request_state_label_DENIED": "Abgelehnt",
+  "request_state_label_IN_APPROVAL": "In Prüfung",
 
   "priority": "Priorität",
   "priority_label_NORMAL": "Normal",

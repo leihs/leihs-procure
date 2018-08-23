@@ -101,6 +101,9 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       </Tooltipped>
     </Col>
     <Col sm="1">
+      <code>{request.state.value}</code>
+    </Col>
+    <Col sm="1">
       <Tooltipped text={t('priority')}>
         <Badge secondary cls="mr-1" id={`prio_tt_${request.id}`}>
           {t(`priority_label_${request.priority.value}`)}

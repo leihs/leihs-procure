@@ -18,9 +18,10 @@ export const REQUEST_REPLACEMENT_VALUES = f.values(
   REQUEST_REPLACEMENT_VALUES_MAP
 )
 
+// FIXME: add 'IN_APPROVAL'
 export const REQUEST_STATES = [
-  'new',
-  'approved',
-  'partially_approved',
-  'denied'
+  'NEW',
+  'APPROVED',
+  'PARTIALLY_APPROVED',
+  'DENIED'
 ]

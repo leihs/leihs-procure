@@ -51,7 +51,7 @@ const REQUESTS_QUERY = gql`
     $budgetPeriods: [ID!]
     $categories: [ID!]
     $search: String
-    $state: [String!]
+    $state: [State!]
     $organizations: [ID!]
     $priority: [Priority!]
     $inspector_priority: [InspectorPriority!]
@@ -77,6 +77,7 @@ const REQUESTS_QUERY = gql`
 
           requests(
             search: $search
+            # FIXME: 'states'
             state: $state
             organization_id: $organizations
             priority: $priority
