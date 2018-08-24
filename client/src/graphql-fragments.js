@@ -189,9 +189,7 @@ export const RequestFieldsForEdit = gql`
       value
     }
 
-    state {
-      ...RequestFieldString
-    }
+    state
 
     article_number {
       ...RequestFieldString
