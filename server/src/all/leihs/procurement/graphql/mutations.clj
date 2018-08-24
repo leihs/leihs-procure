@@ -117,9 +117,8 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
-   :update-request
-     (-> request/update-request!
-         (authorization/wrap-ensure-one-of [request-perms/can-edit?])),
+   :update-request (-> request/update-request!
+                       (authorization/wrap-authorize-resolver request-perms/can-edit?)),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
