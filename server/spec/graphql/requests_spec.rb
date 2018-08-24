@@ -249,6 +249,13 @@ describe 'requests' do
                           requested_quantity: 2,
                           approved_quantity: 1)
 
+      @request_approved_inspection_phase = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          requested_quantity: 2,
+                          approved_quantity: 2)
+
       @request_denied_inspection_phase = \
         FactoryBot.create(:request,
                           category_id: @category.id,
@@ -313,8 +320,10 @@ describe 'requests' do
                       states: ['IN_APPROVAL'] }
         result = query(q, @requester.id, variables).deep_symbolize_keys
         requests = get_requests(result)
-        expect(requests.count).to eq(3)
+        expect(requests.count).to eq(4)
         expect(requests).to include Hash[:id, @request_new_inspection_phase.id,
+                                         :state, 'IN_APPROVAL']
+        expect(requests).to include Hash[:id, @request_approved_inspection_phase.id,
                                          :state, 'IN_APPROVAL']
         expect(requests).to include Hash[:id, @request_partially_approved_inspection_phase.id,
                                          :state, 'IN_APPROVAL']
@@ -326,16 +335,22 @@ describe 'requests' do
     context 'inspector' do
       example 'tbd' do
         variables = { budgetPeriods: @bp_ids,
-                      states: ['NEW', 'APPROVED', 'DENIED'] }
+                      states: ['NEW', 'APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
         result = query(q, @inspector.id, variables).deep_symbolize_keys
         requests = get_requests(result)
-        expect(requests.count).to eq(4)
+        expect(requests.count).to eq(7)
         expect(requests).to include Hash[:id, @request_new_requesting_phase.id,
                                          :state, 'NEW']
         expect(requests).to include Hash[:id, @request_new_inspection_phase.id,
                                          :state, 'NEW']
+        expect(requests).to include Hash[:id, @request_new_requesting_phase_with_partially_approved_quantity.id,
+                                         :state, 'PARTIALLY_APPROVED']
+        expect(requests).to include Hash[:id, @request_approved_inspection_phase.id,
+                                         :state, 'APPROVED']
         expect(requests).to include Hash[:id, @request_partially_approved_inspection_phase.id,
                                          :state, 'PARTIALLY_APPROVED']
+        expect(requests).to include Hash[:id, @request_denied_inspection_phase.id,
+                                         :state, 'DENIED']
         expect(requests).to include Hash[:id, @request_denied_past.id,
                                          :state, 'DENIED']
       end
