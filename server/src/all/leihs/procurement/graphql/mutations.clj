@@ -1,8 +1,7 @@
 (ns leihs.procurement.graphql.mutations
   (:require
     [leihs.procurement [authorization :as authorization] [env :as env]]
-    [leihs.procurement.permissions
-     [request :as request-perms]
+    [leihs.procurement.permissions [request :as request-perms]
      [user :as user-perms]]
     [leihs.procurement.resources [admins :as admins]
      [budget-period :as budget-period] [budget-periods :as budget-periods]
@@ -29,7 +28,7 @@
            :if-only
            #(and
               (not (and category (:template input-data))) ; template belongs to
-                                                          ; category
+              ; category
               (not (:organization input-data)) ; implicit in user
               (not (budget-period/past? tx budget-period))
               (or (and (not user-id)
@@ -39,31 +38,9 @@
                        (or (user-perms/inspector? tx auth-entity (:id category))
                            (user-perms/admin? tx auth-entity)))))))),
    :change-request-budget-period
-     (fn [context args value]
-       (let [rrequest (:request context)
-             tx (:tx rrequest)
-             auth-entity (:authenticated-entity rrequest)
-             input-data (:input_data args)
-             request (request/get-request-by-id tx auth-entity (:id input-data))
-             budget-period-current (budget-period/get-budget-period-by-id
-                                     tx
-                                     (:budget_period_id request))
-             budget-period-new (budget-period/get-budget-period-by-id
-                                 tx
-                                 (:budget_period_id request))]
-         (authorization/authorize-and-apply
-           #(request/change-budget-period! context args value)
-           :if-only
-           #(and
-              (not (budget-period/past? tx budget-period-current))
-              (not (budget-period/past? tx budget-period-new))
-              (or (user-perms/admin? tx auth-entity)
-                  (user-perms/inspector? tx auth-entity (:category_id request))
-                  (and (user-perms/requester? tx auth-entity)
-                       (request/requested-by? tx auth-entity request)
-                       (budget-period/in-requesting-phase?
-                         tx
-                         budget-period-current))))))),
+     (-> request/change-budget-period!
+         (authorization/wrap-authorize-resolver
+           request-perms/can-change-request-budget-period?)),
    :change-request-category
      (fn [context args value]
        (let [rrequest (:request context)
@@ -118,7 +95,8 @@
                                (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
    :update-request (-> request/update-request!
-                       (authorization/wrap-authorize-resolver request-perms/can-edit?)),
+                       (authorization/wrap-authorize-resolver
+                         request-perms/can-edit?)),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),

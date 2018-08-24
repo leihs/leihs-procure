@@ -1,8 +1,7 @@
 (ns leihs.procurement.graphql.queries
   (:require
     [leihs.procurement [authorization :as authorization] [env :as env]]
-    [leihs.procurement.permissions
-     [request :as request-perms]
+    [leihs.procurement.permissions [request :as request-perms]
      [user :as user-perms]]
     [leihs.procurement.resources [admins :as admins]
      [attachments :as attachments] [budget-limits :as budget-limits]
@@ -23,7 +22,7 @@
   []
   {:admins (-> admins/get-admins
                (authorization/wrap-ensure-one-of [user-perms/admin?])),
-   :action-permissions request-perms/action-permissions,
+   :request-action-permissions request-perms/action-permissions,
    :attachments attachments/get-attachments,
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,

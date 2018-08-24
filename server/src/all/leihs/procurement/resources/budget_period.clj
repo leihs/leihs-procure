@@ -31,18 +31,17 @@
                             (sql/merge-where where-clause)
                             sql/format))))))
 
-(defn sql-format-date [d]
+(defn sql-format-date
+  [d]
   (time-format/unparse (time-format/formatters :date) d))
 
 (defn in-requesting-phase?
   [tx budget-period]
-  (let [query (-> (sql/select
-                    [(as-> budget-period <>
-                       (:inspection_start_date <>)
-                       (sql-format-date <>)
-                       (sql/call :cast <> :date)
-                       (sql/call :< :current_date <>))
-                     :result])
+  (let [query (-> (sql/select [(as-> budget-period <>
+                                 (:inspection_start_date <>)
+                                 (sql-format-date <>)
+                                 (sql/call :cast <> :date)
+                                 (sql/call :< :current_date <>)) :result])
                   sql/format)]
     (->> query
          (jdbc/query tx)
@@ -51,13 +50,11 @@
 
 (defn past?
   [tx budget-period]
-  (let [query (-> (sql/select
-                    [(as-> budget-period <>
-                       (:end_date <>)
-                       (sql-format-date <>)
-                       (sql/call :cast <> :date)
-                       (sql/call :> :current_date <>))
-                     :result])
+  (let [query (-> (sql/select [(as-> budget-period <>
+                                 (:end_date <>)
+                                 (sql-format-date <>)
+                                 (sql/call :cast <> :date)
+                                 (sql/call :> :current_date <>)) :result])
                   sql/format)]
     (->> query
          (jdbc/query tx)

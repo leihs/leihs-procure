@@ -5,10 +5,8 @@
             [clojure.java.jdbc :as jdbc]
             [leihs.procurement.permissions [request-helpers :as request-perms]
              [requests :as requests-perms]]
-            [leihs.procurement.resources
-             [budget-period :as budget-period]
-             [budget-periods :as budget-periods]
-             [request :as request]]
+            [leihs.procurement.resources [budget-period :as budget-period]
+             [budget-periods :as budget-periods] [request :as request]]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn search-query

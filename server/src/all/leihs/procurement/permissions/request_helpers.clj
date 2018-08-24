@@ -1,5 +1,6 @@
 (ns leihs.procurement.permissions.request-helpers
-  (:require [leihs.procurement.permissions.request-fields :as request-fields-perms]))
+  (:require [leihs.procurement.permissions.request-fields :as
+             request-fields-perms]))
 
 (def attrs-to-exclude #{:id :total_price_cents})
 
