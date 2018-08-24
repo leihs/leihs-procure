@@ -87,5 +87,10 @@
       }
     }
   },
-  "ui": { "InlineSearch": { "placeholder": "Suchen" } }
+  "ui": {
+    "form": {
+      "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
+    },
+    "InlineSearch": { "placeholder": "Suchen" }
+  }
 }

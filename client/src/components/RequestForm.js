@@ -22,6 +22,8 @@ import {
 } from './Bootstrap'
 
 import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
+import * as formBlocker from './FormBlocker'
+import { ConfirmFormNav } from './FormBlocker'
 import BuildingAutocomplete from './BuildingAutocomplete'
 import RoomAutocomplete from './RoomAutocomplete'
 import ModelAutocomplete from './ModelAutocomplete'
@@ -57,11 +59,14 @@ const prepareFormValues = request => {
 const requiredLabel = (label, required) => label + (required ? `${nbsp}*` : '')
 
 class RequestForm extends React.Component {
-  state = { showValidations: false }
+  state = { showValidations: false, ...formBlocker.initialState }
   showValidations = (bool = true) => this.setState({ showValidations: bool })
   isDisabled = (p = this.props) => p.disabled || p.readOnly
   render(
-    { request, id, className, onCancel, onSubmit, ...props } = this.props
+    {
+      state,
+      props: { request, id, className, onCancel, onSubmit, ...props }
+    } = this
   ) {
     const formId = id || request.id
     if (!formId) throw new Error('missing ID!')
@@ -93,9 +98,13 @@ class RequestForm extends React.Component {
               })}
               onSubmit={e => {
                 e.preventDefault()
-                onSubmit(fields)
+                onSubmit(fields, () => formBlocker.unblock(this))
               }}
+              // NOTE: dont calculate real form diff, just set blocking on first change
+              onChange={f.once(e => formBlocker.block(this))}
             >
+              <ConfirmFormNav when={state.isBlocking} />
+
               <Row>
                 <Col lg>
                   <Let
