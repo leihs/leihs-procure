@@ -65,7 +65,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       {DisplayName(request.organization.value)}{' '}
       <Tooltipped text={t('request_form_field.state')}>
         <Badge light cls="mr-1" id={`reqst_tt_${request.id}`}>
-          <code>{request.state.value}</code>
+          <code>{request.state}</code>
         </Badge>
       </Tooltipped>
     </Col>
