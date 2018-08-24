@@ -10,9 +10,7 @@
         tx (:tx rrequest)
         auth-entity (:authenticated-entity rrequest)
         req-id (or (-> args :input_data :id) (:id value))
-        request (->> value
-                     :id
-                     (request/get-request-by-id tx auth-entity))
+        request (request/get-request-by-id tx auth-entity req-id)
         budget-period (->> request
                            :budget_period_id
                            (budget-period/get-budget-period-by-id tx))]
@@ -20,9 +18,9 @@
       (not (budget-period/past? tx budget-period))
       (or (user-perms/admin? tx auth-entity)
           (user-perms/inspector? tx auth-entity (:category_id request))
-          (and (user-perms/requester? tx auth-entity)
-               (request/requested-by? tx auth-entity request)
-               (budget-period/in-requesting-phase? tx budget-period))))))
+          (and (log/spy (user-perms/requester? tx auth-entity))
+               (log/spy (request/requested-by? tx auth-entity request))
+               (log/spy (budget-period/in-requesting-phase? tx budget-period)))))))
 
 (defn action-permissions [context args value]
   {:edit (can-edit? context args value)
