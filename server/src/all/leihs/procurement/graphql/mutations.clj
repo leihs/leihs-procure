@@ -44,27 +44,9 @@
    :change-request-category (-> request/change-category!
                                 (authorization/wrap-authorize-resolver
                                   request-perms/can-change-request-category?)),
-   :delete-request
-     (fn [context args value]
-       (let [rrequest (:request context)
-             tx (:tx rrequest)
-             auth-entity (:authenticated-entity rrequest)
-             input-data (:input_data args)
-             request (request/get-request-by-id tx auth-entity (:id input-data))
-             budget-period (budget-period/get-budget-period-by-id
-                             tx
-                             (:budget_period_id request))]
-         (authorization/authorize-and-apply
-           #(request/delete-request! context args value)
-           :if-only
-           #(and
-              (not (budget-period/past? tx budget-period))
-              (or (user-perms/admin? tx auth-entity)
-                  (user-perms/inspector? tx auth-entity (:category_id request))
-                  (and (user-perms/requester? tx auth-entity)
-                       (request/requested-by? tx auth-entity request)
-                       (budget-period/in-requesting-phase? tx
-                                                           budget-period))))))),
+   :delete-request (-> request/delete-request!
+                       (authorization/wrap-authorize-resolver
+                         request-perms/can-delete?)),
    :update-admins (-> admins/update-admins!
                       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :update-budget-periods (-> budget-periods/update-budget-periods!

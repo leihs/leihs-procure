@@ -267,11 +267,10 @@
           :total_price_cents {:type (non-null Int)},
           :user {:type :RequestFieldUser}}},
     :RequestActionPermissions {:fields
-                                 {:edit {:type (non-null Boolean)},
+                                 {:delete {:type (non-null Boolean)},
+                                  :edit {:type (non-null Boolean)},
                                   :moveBudgetPeriod {:type (non-null Boolean)},
-                                  :moveCategory {:type (non-null Boolean)},
-                                  ; :delete {:type (non-null Boolean)}
-                                  }},
+                                  :moveCategory {:type (non-null Boolean)}}},
     :RequestFieldAttachments
       {:fields {:default {:resolve :attachments, :type (list :Attachment)},
                 :read {:type (non-null Boolean)},
