@@ -235,10 +235,11 @@
         user-arg (:user args)
         req-stub (cond-> args
                    (not user-arg) (assoc :user (:user_id auth-entity)))]
-    (->> req-stub
-         (request-fields-perms/get-for-user-and-request tx auth-entity)
-         (map #(apply consider-default %))
-         (into {}))))
+    (as-> req-stub <>
+      (request-fields-perms/get-for-user-and-request tx auth-entity <>)
+      (map #(apply consider-default %) <>)
+      (into {} <>)
+      (assoc <> :state :NEW))))
 
 (defn get-last-created-request
   [tx auth-entity]

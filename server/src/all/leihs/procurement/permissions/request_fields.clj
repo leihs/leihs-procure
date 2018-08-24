@@ -263,12 +263,6 @@
                             auth-user-is-admin)),
             :default (:id (rooms/general-from-general tx)),
             :required true},
-     :state {:read (or (and auth-user-is-requester requested-by-auth-user)
-                       category-viewable-by-auth-user
-                       auth-user-is-inspector
-                       auth-user-is-admin),
-             :write false,
-             :required false},
      :supplier {:read (or (and auth-user-is-requester requested-by-auth-user)
                           category-viewable-by-auth-user
                           auth-user-is-inspector

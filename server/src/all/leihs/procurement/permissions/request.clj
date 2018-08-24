@@ -2,7 +2,7 @@
   (:require [leihs.procurement.permissions.request-fields :as
              request-fields-perms]))
 
-(def attrs-to-exclude #{:id :total_price_cents})
+(def attrs-to-exclude #{:id :state :total_price_cents})
 
 (defn- fallback-p-spec [value] {:value value, :read true, :write true})
 
