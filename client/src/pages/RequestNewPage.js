@@ -4,11 +4,11 @@ import cx from 'classnames'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import qs from 'qs'
-import { Redirect } from 'react-router-dom'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
+import { Redirect } from '../components/Router'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -368,6 +368,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                 return (
                   <Redirect
                     push // dont replace current route!
+                    scrollTop
                     to={{
                       pathname: `/requests/${mutReq.data.create_request.id}`,
                       state: {
