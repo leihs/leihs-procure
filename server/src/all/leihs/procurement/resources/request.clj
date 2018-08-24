@@ -4,7 +4,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions [request :as request-perms]
+            [leihs.procurement.permissions [request-helpers :as request-perms]
              [request-fields :as request-fields-perms] [user :as user-perms]]
             [leihs.procurement.resources [attachments :as attachments]
              [budget-period :as budget-period] [category :as category]

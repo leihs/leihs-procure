@@ -1,7 +1,9 @@
 (ns leihs.procurement.graphql.mutations
   (:require
     [leihs.procurement [authorization :as authorization] [env :as env]]
-    [leihs.procurement.permissions.user :as user-perms]
+    [leihs.procurement.permissions
+     [request :as request-perms]
+     [user :as user-perms]]
     [leihs.procurement.resources [admins :as admins]
      [budget-period :as budget-period] [budget-periods :as budget-periods]
      [category :as category] [categories :as categories]
@@ -116,26 +118,8 @@
                                (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
    :update-request
-     (fn [context args value]
-       (let [rrequest (:request context)
-             tx (:tx rrequest)
-             auth-entity (:authenticated-entity rrequest)
-             input-data (:input_data args)
-             request (request/get-request-by-id tx auth-entity (:id input-data))
-             budget-period (budget-period/get-budget-period-by-id
-                             tx
-                             (:budget_period_id request))]
-         (authorization/authorize-and-apply
-           #(request/update-request! context args value)
-           :if-only
-           #(and
-              (not (budget-period/past? tx budget-period))
-              (or (user-perms/admin? tx auth-entity)
-                  (user-perms/inspector? tx auth-entity (:category_id request))
-                  (and (user-perms/requester? tx auth-entity)
-                       (request/requested-by? tx auth-entity request)
-                       (budget-period/in-requesting-phase? tx
-                                                           budget-period))))))),
+     (-> request/update-request!
+         (authorization/wrap-ensure-one-of [request-perms/can-edit?])),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
