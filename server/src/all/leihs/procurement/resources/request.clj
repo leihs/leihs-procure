@@ -51,31 +51,32 @@
             :procurement_requests.requested_quantity]
            [:> :procurement_requests.approved_quantity 0]]
         approved-zero [:= :procurement_requests.approved_quantity 0]]
-    (cond-> {:NEW (if advanced-user?
-                    approved-not-set
-                    [:or
-                     [:and [:< :procurement_budget_periods.end_date :current_date]
-                      approved-not-set]
-                     [:< :current_date
-                      :procurement_budget_periods.inspection_start_date]]),
-             :APPROVED (if advanced-user?
-                         approved-greater-equal-than-requested
-                         [:and [:< :procurement_budget_periods.end_date :current_date]
-                          approved-greater-equal-than-requested]),
-             :PARTIALLY_APPROVED (if advanced-user?
-                                   approved-smaller-than-requested
-                                   [:and
-                                    [:< :procurement_budget_periods.end_date
-                                     :current_date] approved-smaller-than-requested]),
-             :DENIED (if advanced-user?
-                       approved-zero
-                       [:and [:< :procurement_budget_periods.end_date :current_date]
-                        approved-zero])}
+    (cond->
+      {:NEW (if advanced-user?
+              approved-not-set
+              [:or
+               [:and [:< :procurement_budget_periods.end_date :current_date]
+                approved-not-set]
+               [:< :current_date
+                :procurement_budget_periods.inspection_start_date]]),
+       :APPROVED (if advanced-user?
+                   approved-greater-equal-than-requested
+                   [:and [:< :procurement_budget_periods.end_date :current_date]
+                    approved-greater-equal-than-requested]),
+       :PARTIALLY_APPROVED (if advanced-user?
+                             approved-smaller-than-requested
+                             [:and
+                              [:< :procurement_budget_periods.end_date
+                               :current_date] approved-smaller-than-requested]),
+       :DENIED (if advanced-user?
+                 approved-zero
+                 [:and [:< :procurement_budget_periods.end_date :current_date]
+                  approved-zero])}
       (not advanced-user?)
-      (assoc :IN_APPROVAL [:and
-                           [:>= :current_date
-                            :procurement_budget_periods.inspection_start_date]
-                           [:< :current_date :procurement_budget_periods.end_date]]))))
+        (assoc :IN_APPROVAL
+          [:and
+           [:>= :current_date :procurement_budget_periods.inspection_start_date]
+           [:< :current_date :procurement_budget_periods.end_date]]))))
 
 (defn get-where-conds-for-states
   [states advanced-user?]
