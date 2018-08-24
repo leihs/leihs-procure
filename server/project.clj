@@ -43,10 +43,10 @@
   :target-path "target/%s"
   :main leihs.procurement.backend.main
   :uberjar-name "leihs-procurement.jar"
-  :profiles {:dev [:project/dev :profiles/dev],
+  :profiles {:dev [:project/dev :profiles/dev :profiles/dev+test],
              ;; including :base
              ;; (https://github.com/technomancy/leiningen/issues/1329)
-             :test [:base :project/test :profiles/test],
+             :test [:base :project/test :profiles/test :profiles/dev+test],
              :prod {:source-paths ["src/prod"],
                     :resource-paths ["resources/prod"],
                     :aot [#"leihs\..*"]},
@@ -55,6 +55,7 @@
              ;; profiles.clj
              :profiles/dev {},
              :profiles/test {},
+             :profiles/dev+test {},
              ;; -----------------------------------------------------------------
              :project/dev {:source-paths ["src/dev" "src/dev+test"],
                            :resource-paths ["resources/dev"]},
