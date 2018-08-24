@@ -9,7 +9,6 @@ export const REQUEST_INSPECTOR_PRIORITIES = [
   'MANDATORY'
 ]
 
-// TODO: ENUMs
 export const REQUEST_REPLACEMENT_VALUES_MAP = {
   true: 'replacement',
   false: 'new'
@@ -18,9 +17,9 @@ export const REQUEST_REPLACEMENT_VALUES = f.values(
   REQUEST_REPLACEMENT_VALUES_MAP
 )
 
-// FIXME: add 'IN_APPROVAL'
 export const REQUEST_STATES = [
   'NEW',
+  'IN_APPROVAL',
   'APPROVED',
   'PARTIALLY_APPROVED',
   'DENIED'
