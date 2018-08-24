@@ -85,7 +85,7 @@ export const RequestFieldsForIndex = gql`
       value
     }
 
-    state 
+    state
   }
 `
 
