@@ -6,6 +6,17 @@
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
 
+  "request": {
+    "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
+    "confirm_move_category": "In andere Kategorie verschieben?",
+    "confirm_delete": "Antrag löschen?"
+  },
+
+  "client": {
+    "mutate_error": "Bearbeitung fehlgeschlagen!",
+    "delete_error": "Löschen fehlgeschlagen!"
+  },
+
   "budget_period": "Budgetperiode",
   "request_state": "Status",
   "priority": "Priorität",

@@ -4,6 +4,7 @@ import f from 'lodash'
 import { Query, ApolloConsumer } from 'react-apollo'
 import gql from 'graphql-tag'
 
+import t from '../locale/translate'
 import * as Fragments from '../graphql-fragments'
 // import Loading from '../components/Loading'
 // import { ErrorPanel } from '../components/Error'
@@ -125,7 +126,7 @@ const doChangeBudgetPeriod = (client, requestId, newBudPeriodId, callback) => {
       variables: { input: { id: requestId, budget_period: newBudPeriodId } },
       update: callback
     })
-    .catch(error => window.alert(error))
+    .catch(error => window.alert(t('client.mutate_error') + error))
 }
 
 const doDeleteRequest = (client, request, callback) => {
@@ -135,7 +136,7 @@ const doDeleteRequest = (client, request, callback) => {
     }
   `
 
-  if (!window.confirm('Delete?')) return
+  if (!window.confirm(t('request.confirm_delete'))) return
 
   client
     .mutate({
@@ -143,7 +144,7 @@ const doDeleteRequest = (client, request, callback) => {
       variables: { input: { id: request.id } },
       update: (cache, response) => {
         if (!response.data.delete_request) {
-          window.alert('Could not delete!')
+          window.alert(t('client.delete_error'))
         }
         // NOTE: manual store update doesnt work yet, but data is this:
         // const updatedData = {
@@ -165,7 +166,7 @@ const doDeleteRequest = (client, request, callback) => {
         callback() // does a full reload :/
       }
     })
-    .catch(error => window.alert(error))
+    .catch(error => window.alert(t('client.mutate_error') + error))
 }
 
 // TODO: modularize `storageFactory`
