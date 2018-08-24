@@ -37,7 +37,11 @@ const RequestsDashboard = props => {
         <h4>
           {requestsQuery.loading || !requestsQuery.data
             ? ' '
-            : `${requests.length || 0} Requests`}
+            : `${requests.length || 0} ${
+                requests.length === 1
+                  ? t('dashboard.requests_title_singular')
+                  : t('dashboard.requests_title_plural')
+              }`}
         </h4>
       </Col>
       <Col xs="1" cls="text-right">

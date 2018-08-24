@@ -30,6 +30,22 @@
   "inspector_priority_label_MANDATORY": "Zwingend",
 
   "dashboard": {
+    "filters_title": "Filter",
+    "reset_filters": "Filter zurücksetzen",
+    "filter_titles": {
+      "search": "Suche",
+      "budget_periods": "Budgetperioden",
+      "categories": "Kategorien",
+      "special": "Spezialfilter",
+      "special_only_own_requests": "nur eigene Anträge",
+      "special_only_categories_with_requests": "nur Kategorien mit Anträgen",
+      "orgs": "Organisationen",
+      "prio": "Priorität",
+      "prio_insp": "Priorität des Prüfers",
+      "status": "Status Antrag"
+    },
+    "requests_title_singular": "Antrag",
+    "requests_title_plural": "Anträge",
     "bp_total_sum": "Aktuelles Total dieser Budgetperiode",
     "maincat_total_sum": "Aktuelles Total dieser Hauptkategorie",
     "subcat_total_sum": "Aktuelles Total dieser Kategorie",
@@ -99,6 +115,7 @@
     }
   },
   "ui": {
+    "loading_title": "Lädt…",
     "form": {
       "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
     },
