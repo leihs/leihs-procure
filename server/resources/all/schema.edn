@@ -232,6 +232,8 @@
     :Request
       {:fields
          {:accounting_type {:type :RequestFieldString},
+          :actionPermissions {:resolve :request-action-permissions,
+                              :type :RequestActionPermissions},
           :approved_quantity {:type :RequestFieldInt},
           :article_name {:type :RequestFieldString},
           :article_number {:type :RequestFieldString},
@@ -264,6 +266,11 @@
           :template {:type :RequestFieldTemplate},
           :total_price_cents {:type (non-null Int)},
           :user {:type :RequestFieldUser}}},
+    :RequestActionPermissions {:fields
+                                 {:delete {:type (non-null Boolean)},
+                                  :edit {:type (non-null Boolean)},
+                                  :moveBudgetPeriod {:type (non-null Boolean)},
+                                  :moveCategory {:type (non-null Boolean)}}},
     :RequestFieldAttachments
       {:fields {:default {:resolve :attachments, :type (list :Attachment)},
                 :read {:type (non-null Boolean)},
