@@ -269,14 +269,28 @@ describe 'requests' do
     end
 
     context 'requester' do
-      example 'ignored states `approved`, `partially_approved` and `denied` for inspection phase' do
-        variables = { budgetPeriods: @bp_ids,
-                      states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
-        result = query(q, @requester.id, variables).deep_symbolize_keys
-        requests = get_requests(result)
-        expect(requests.count).to eq(1)
-        r_ids = requests.map { |r| r[:id] }
-        expect(r_ids).to include @request_denied_past.id
+      context 'ignored states `approved`, `partially_approved` and `denied` for inspection phase' do
+        example '1' do
+          variables = { budgetPeriods: @bp_ids,
+                        states: ['APPROVED', 'PARTIALLY_APPROVED', 'DENIED'] }
+          result = query(q, @requester.id, variables).deep_symbolize_keys
+          requests = get_requests(result)
+          expect(requests.count).to eq(1)
+          r_ids = requests.map { |r| r[:id] }
+          expect(r_ids).to include @request_denied_past.id
+        end
+
+        example '2' do
+          variables = { budgetPeriods: @bp_ids,
+                        states: ['NEW', 'PARTIALLY_APPROVED', 'DENIED'] }
+          result = query(q, @requester.id, variables).deep_symbolize_keys
+          requests = get_requests(result)
+          expect(requests.count).to eq(3)
+          r_ids = requests.map { |r| r[:id] }
+          expect(r_ids).to include @request_new_requesting_phase.id
+          expect(r_ids).to include @request_new_requesting_phase_with_partially_approved_quantity.id
+          expect(r_ids).to include @request_denied_past.id
+        end
       end
 
       example '`new` in requesting phase irrespective of approved quantity' do
