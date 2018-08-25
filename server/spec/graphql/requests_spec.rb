@@ -89,14 +89,14 @@ describe 'requests' do
       variables = {}
       expected_result = {
         data: {
-          budget_periods: BudgetPeriod.all.reverse.map do |bp|
+          budget_periods: BudgetPeriod.order(:end_date).reverse.map do |bp|
             {
               id: bp.id,
               name: bp.name,
-              main_categories: Category.all.map do |cat|
+              main_categories: MainCategory.order(:name).map do |main_cat|
                 {
-                  id: cat.main_category_id,
-                  categories: [
+                  id: main_cat.id,
+                  categories: Category.where(main_category_id: main_cat.id).order(:name).map do |cat|
                     {
                       id: cat.id,
                       requests: Request.where(
@@ -105,7 +105,8 @@ describe 'requests' do
                         { id: r.id }
                       end
                     }
-                  ] }
+                  end
+                }
               end
             }
           end
