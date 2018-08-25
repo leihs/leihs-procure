@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.viewers
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
-            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.resources.users :refer [users-base-query]]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn get-viewers
@@ -9,7 +9,7 @@
   (jdbc/query (-> context
                   :request
                   :tx)
-              (-> user/user-base-query
+              (-> users-base-query
                   (sql/merge-where
                     [:in :users.id
                      (-> (sql/select :pcv.user_id)
