@@ -63,54 +63,57 @@
     (or id-from-args id-from-context)))
 
 (defn requests-query-map
-  [context arguments value]
-  (let [id (:id arguments)
-        category-id (get-id :category arguments value)
-        budget-period-id (get-id :budget-period arguments value)
-        organization-id (:organization_id arguments)
-        priority (some->> arguments
-                          :priority
-                          (map request/to-name-and-lower-case))
-        inspector-priority (some->> arguments
-                                    :inspector_priority
-                                    (map request/to-name-and-lower-case))
-        requested-by-auth-user (:requested_by_auth_user arguments)
-        from-categories-of-auth-user (:from_categories_of_auth_user arguments)
-        state (:state arguments)
-        state-set (:request-state-set context)
-        search-term (:search arguments)]
-    (cond-> request/requests-base-query
-      id (sql/merge-where [:in :procurement_requests.id id])
-      category-id (sql/merge-where [:in :procurement_requests.category_id
-                                    category-id])
-      budget-period-id (sql/merge-where [:in
-                                         :procurement_requests.budget_period_id
-                                         budget-period-id])
-      organization-id (sql/merge-where [:in
-                                        :procurement_requests.organization_id
-                                        organization-id])
-      priority (sql/merge-where [:in :procurement_requests.priority priority])
-      inspector-priority (sql/merge-where
-                           [:in :procurement_requests.inspector_priority
-                            inspector-priority])
-      state (sql/merge-where
-              [:in (request/state-sql (:state-value-range-type context)) state])
-      requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
-                                               (-> context
-                                                   :request
-                                                   :authenticated-entity
-                                                   :user_id)])
-      from-categories-of-auth-user
-        (sql/merge-where
-          [:in :procurement_requests.category_id
-           (-> (sql/select :category_id)
-               (sql/from :procurement_category_inspectors)
-               (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                 (-> context
-                                     :request
-                                     :authenticated-entity
-                                     :id)]))])
-      search-term (search-query search-term))))
+  ([context arguments value]
+   (requests-query-map context arguments value request/requests-base-query))
+  ([context arguments value base-query]
+   (let [id (:id arguments)
+         category-id (get-id :category arguments value)
+         budget-period-id (get-id :budget-period arguments value)
+         organization-id (:organization_id arguments)
+         priority (some->> arguments
+                           :priority
+                           (map request/to-name-and-lower-case))
+         inspector-priority (some->> arguments
+                                     :inspector_priority
+                                     (map request/to-name-and-lower-case))
+         requested-by-auth-user (:requested_by_auth_user arguments)
+         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
+         state (:state arguments)
+         state-set (:request-state-set context)
+         search-term (:search arguments)]
+     (cond-> base-query
+       id (sql/merge-where [:in :procurement_requests.id id])
+       category-id (sql/merge-where [:in :procurement_requests.category_id
+                                     category-id])
+       budget-period-id (sql/merge-where [:in
+                                          :procurement_requests.budget_period_id
+                                          budget-period-id])
+       organization-id (sql/merge-where [:in
+                                         :procurement_requests.organization_id
+                                         organization-id])
+       priority (sql/merge-where [:in :procurement_requests.priority priority])
+       inspector-priority (sql/merge-where
+                            [:in :procurement_requests.inspector_priority
+                             inspector-priority])
+       state (sql/merge-where [:in
+                               (request/state-sql (:state-value-range-type
+                                                    context)) state])
+       requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
+                                                (-> context
+                                                    :request
+                                                    :authenticated-entity
+                                                    :user_id)])
+       from-categories-of-auth-user
+         (sql/merge-where
+           [:in :procurement_requests.category_id
+            (-> (sql/select :category_id)
+                (sql/from :procurement_category_inspectors)
+                (sql/merge-where [:= :procurement_category_inspectors.user_id
+                                  (-> context
+                                      :request
+                                      :authenticated-entity
+                                      :id)]))])
+       search-term (search-query search-term)))))
 
 (defn valid-state-values-combination?
   [state-value-range-type state-arg]
@@ -234,7 +237,11 @@
         (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
       (cond-> <> (not-empty category-id) (assoc :category_id category-id))
       (merge <> requests-args)
-      (requests-query-map context <> nil)
+      (requests-query-map context
+                          <>
+                          nil
+                          (-> (sql/select :procurement_requests.*)
+                              (sql/from :procurement_requests)))
       (requests-perms/apply-scope tx <> auth-entity)
       (sql/select <>
                   [(->> [:order_quantity :approved_quantity :requested_quantity]
@@ -245,17 +252,17 @@
 
 (defn total-price-sqlmap
   [qty-type bp-id]
-  (-> (sql/select :pr.budget_period_id
+  (-> (sql/select :procurement_requests.budget_period_id
                   [(sql/call :sum
                              (sql/call :*
-                                       :pr.price_cents
+                                       :procurement_requests.price_cents
                                        (->> qty-type
                                             name
                                             (str "pr.")
                                             keyword))) :result])
-      (sql/from [:procurement_requests :pr])
-      (sql/merge-where [:= :pr.budget_period_id bp-id])
-      (sql/group :pr.budget_period_id)))
+      (sql/from :procurement_requests)
+      (sql/merge-where [:= :procurement_requests.budget_period_id bp-id])
+      (sql/group :procurement_requests.budget_period_id)))
 
 (defn specific-total-price-cents
   [tx qty-type bp-id]
