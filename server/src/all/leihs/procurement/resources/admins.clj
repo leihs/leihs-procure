@@ -1,6 +1,7 @@
 (ns leihs.procurement.resources.admins
   (:require [clojure.java.jdbc :as jdbc]
             [leihs.procurement.resources.user :as user]
+            [leihs.procurement.resources.users :refer [sql-order-users]]
             [leihs.procurement.utils.sql :as sql]))
 
 (def admins-base-query
@@ -8,7 +9,8 @@
       (sql/from :users)
       (sql/merge-where [:in :users.id
                         (-> (sql/select :procurement_admins.user_id)
-                            (sql/from :procurement_admins))])))
+                            (sql/from :procurement_admins))])
+      sql-order-users))
 
 (defn get-admins
   [context _ _]

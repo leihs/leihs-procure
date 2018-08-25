@@ -3,9 +3,16 @@
             [clojure.string :as clj-str]
             [leihs.procurement.utils.sql :as sql]))
 
+(defn sql-order-users
+  [sqlmap]
+  (sql/order-by
+    sqlmap
+    (sql/call :concat :users.firstname :users.lastname :users.login :users.id)))
+
 (def users-base-query
   (-> (sql/select :users.*)
-      (sql/from :users)))
+      (sql/from :users)
+      sql-order-users))
 
 (defn get-users
   [context args _]
@@ -43,9 +50,6 @@
                   (sql/merge-where [:not-in :users.id exclude-ids]) offset
                   (sql/offset offset) limit
                   (sql/limit limit))
-          (sql/order-by (sql/call :concat
-                                  :users.firstname :users.lastname
-                                  :users.login :users.id))
           sql/format))))
 
 ;#### debug ###################################################################
