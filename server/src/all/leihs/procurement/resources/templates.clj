@@ -11,11 +11,11 @@
       (sql/from :procurement_templates)
       (sql/merge-left-join :models
                            [:= :models.id :procurement_templates.model_id])
-      (sql/order-by
-        (sql/call :concat
-                  (sql/call :lower :procurement_templates.article_name)
-                  (sql/call :lower :models.product)
-                  (sql/call :lower :models.version)))))
+      (sql/order-by (->> [:procurement_templates.article_name :models.product
+                          :models.version]
+                         (map #(->> (sql/call :coalesce % "")
+                                    (sql/call :lower)))
+                         (sql/call :concat)))))
 
 (defn get-templates
   [context _ value]
