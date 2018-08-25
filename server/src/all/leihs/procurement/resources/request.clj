@@ -71,8 +71,14 @@
     (throw (Exception. "Unknown request state set."))))
 
 (def requests-base-query
-  (-> (sql/select :procurement_requests.*)
-      (sql/from :procurement_requests)))
+  (->
+    (sql/select :procurement_requests.*)
+    (sql/from :procurement_requests)
+    (sql/merge-left-join :models [:= :models.id :procurement_requests.model_id])
+    (sql/order-by (sql/call :concat
+                            (sql/call :lower :procurement_requests.article_name)
+                            (sql/call :lower :models.product)
+                            (sql/call :lower :models.version)))))
 
 (defn get-state
   [tx auth-entity row]
