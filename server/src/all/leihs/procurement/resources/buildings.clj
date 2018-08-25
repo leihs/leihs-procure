@@ -7,8 +7,7 @@
 (def buildings-base-query
   (-> (sql/select :buildings.*)
       (sql/from :buildings)
-      (sql/order-by [(sql/call := general-id :id) :desc]
-                    [:name :asc])))
+      (sql/order-by [(sql/call := general-id :id) :desc] [:name :asc])))
 
 (defn buildings-query
   [args]
