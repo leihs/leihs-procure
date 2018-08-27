@@ -110,10 +110,10 @@
                      (authorization/wrap-ensure-one-of
                        [user-perms/admin?
                         (fn [tx auth-entity]
-                          (user-perms/inspector? tx auth-entity (:id value)))])
-                     context
-                     args
-                     value))))})
+                          (user-perms/inspector? tx auth-entity (:id value)))]))
+                  context
+                  args
+                  value)))})
 
 (def resolver-map (resolver-map-fn))
 

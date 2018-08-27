@@ -9,6 +9,7 @@ import Highlighter from 'react-highlight-words'
 // import pgUnaccent from 'postgres-unaccent'
 import pgUnaccent from 'lodash/deburr'
 import logger from 'debug'
+import t from '../locale/translate'
 const log = logger('app:ui:InlineSearch')
 
 // # COMPONENT
@@ -30,9 +31,12 @@ const InlineSearch = ({
   inputProps,
   value,
   required,
+  readOnly,
+  disabled,
   ...props
 }) => {
   log('render', props)
+  const isDisabled = !!(readOnly || disabled)
   return (
     <Downshift
       {...props}
@@ -65,7 +69,8 @@ const InlineSearch = ({
             onFocus={e => e.target.select()}
             {...getInputProps({
               required,
-              placeholder: 'Search',
+              readOnly: isDisabled,
+              placeholder: isDisabled ? '' : t('ui.InlineSearch.placeholder'),
               ...inputProps
             })}
             {...inputNodeVisualProps}

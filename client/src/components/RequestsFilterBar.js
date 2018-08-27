@@ -50,7 +50,7 @@ const FilterBar = ({
 
       return (
         <div className="h-100 p-3 bg-light mh-md-100vh">
-          <h5>Filters</h5>
+          <h5>{t('dashboard.filters_title')}</h5>
           {content()}
         </div>
       )
@@ -152,18 +152,18 @@ const Filters = ({ me, data, current, onChange }) => {
                 cls="pl-0"
                 onClick={selectDefaultFilters}
               >
-                reset filters
+                {t('dashboard.reset_filters')}
               </Button>
             </FormGroup>
 
             {allowed.search && (
-              <FormGroup label="Suche">
+              <FormGroup label={t('dashboard.filter_titles.search')}>
                 <InputText {...formPropsFor('search')} />
               </FormGroup>
             )}
 
             {allowed.budgetPeriods && (
-              <FormGroup label={'Budgetperioden'}>
+              <FormGroup label={t('dashboard.filter_titles.budget_periods')}>
                 <Select
                   {...formPropsFor('budgetPeriods')}
                   multiple
@@ -174,7 +174,7 @@ const Filters = ({ me, data, current, onChange }) => {
             )}
 
             {allowed.categories && (
-              <FormGroup label={'Kategorien'}>
+              <FormGroup label={t('dashboard.filter_titles.categories')}>
                 <MultiSelect
                   {...formPropsFor('categories')}
                   multiple
@@ -185,13 +185,15 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.onlyOwnRequests &&
               allowed.onlyCategoriesWithRequests && (
-                <FormGroup label={'Spezialfilter'}>
+                <FormGroup label={t('dashboard.filter_titles.special')}>
                   {allowed.onlyOwnRequests && (
                     <FormField
                       {...formPropsFor('onlyOwnRequests')}
                       type="checkbox"
-                      inputLabel="only own Requests"
-                      label="only own Requests"
+                      inputLabel={t(
+                        'dashboard.filter_titles.special_only_own_requests'
+                      )}
+                      label=""
                       hideLabel
                     />
                   )}
@@ -199,8 +201,10 @@ const Filters = ({ me, data, current, onChange }) => {
                     <FormField
                       {...formPropsFor('onlyCategoriesWithRequests')}
                       type="checkbox"
-                      inputLabel="only Categories with Requests"
-                      label="only Categories with Requests"
+                      inputLabel={t(
+                        'dashboard.filter_titles.special_only_categories_with_requests'
+                      )}
+                      label=""
                       hideLabel
                     />
                   )}
@@ -208,7 +212,7 @@ const Filters = ({ me, data, current, onChange }) => {
               )}
 
             {allowed.organizations && (
-              <FormGroup label={'Organisationen'}>
+              <FormGroup label={t('dashboard.filter_titles.orgs')}>
                 <MultiSelect
                   {...formPropsFor('organizations')}
                   multiple
@@ -218,7 +222,7 @@ const Filters = ({ me, data, current, onChange }) => {
             )}
 
             {allowed.priority && (
-              <FormGroup label={'Priorität'}>
+              <FormGroup label={t('dashboard.filter_titles.prio')}>
                 <Select
                   {...formPropsFor('priority')}
                   multiple
@@ -229,7 +233,7 @@ const Filters = ({ me, data, current, onChange }) => {
             )}
 
             {allowed.inspector_priority && (
-              <FormGroup label={'Priorität des Prüfers'}>
+              <FormGroup label={t('dashboard.filter_titles.prio_insp')}>
                 <Select
                   {...formPropsFor('inspector_priority')}
                   multiple
@@ -239,7 +243,7 @@ const Filters = ({ me, data, current, onChange }) => {
               </FormGroup>
             )}
 
-            <FormGroup label={'Status Antrag'}>
+           <FormGroup label={t('dashboard.filter_titles.status')}>
               <Select
                 {...formPropsFor('state')}
                 multiple

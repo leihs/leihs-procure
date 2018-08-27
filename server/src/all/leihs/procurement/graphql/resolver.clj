@@ -10,15 +10,18 @@
   [resolver]
   (fn [context args value]
     (try (resolver context args value)
-         (catch Throwable _e
-           (let [e (get-cause _e)
+         (catch Throwable e*
+           (let [e (get-cause e*)
                  m (.getMessage e)
-                 n (-> _e
+                 n (-> e*
                        .getClass
                        .getSimpleName)]
-             (log/warn m)
+             (log/warn (or m n))
              (if (env/env #{:dev :test}) (log/debug e))
-             (graphql-resolve/resolve-as nil {:message m, :exception n}))))))
+             (graphql-resolve/resolve-as nil
+                                         {:message (str m), ; if message nil
+                                          ; convert to ""
+                                          :exception n}))))))
 
 (defn- wrap-map-with-error
   [arg]

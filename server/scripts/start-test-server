@@ -1,13 +1,16 @@
 #!/bin/sh -eu
 source ./scripts/.helpers.sh
 
+# for rails
+export DATABASE_URL="postgresql://localhost:5432/leihs_test_procure2?max-pool-size=5"
+
 # NOTE: profiles.cljs config broken for some reason, using ENV for now
-export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_test_procure2?max-pool-size=5"
+export LEIHS_DATABASE_URL="jdbc:${DATABASE_URL}"
 # auto find some open port
 export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
 
 cd database
-RAILS_ENV=test bundle exec rake db:environment:set db:drop db:create db:migrate
+RAILS_ENV=test bundle exec rake db:drop db:create db:environment:set db:migrate
 cd ..
 
 lein clean

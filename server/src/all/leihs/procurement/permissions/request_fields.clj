@@ -239,7 +239,7 @@
                                         budget-period-in-requesting-phase)
                                    category-inspectable-by-auth-user
                                    auth-user-is-admin)),
-                   :default true,
+                   :default nil,
                    :required true},
      :requested_quantity
        {:read (or (and auth-user-is-requester requested-by-auth-user)

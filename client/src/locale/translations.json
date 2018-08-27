@@ -6,6 +6,17 @@
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
 
+  "request": {
+    "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
+    "confirm_move_category": "In andere Kategorie verschieben?",
+    "confirm_delete": "Antrag löschen?"
+  },
+
+  "client": {
+    "mutate_error": "Bearbeitung fehlgeschlagen!",
+    "delete_error": "Löschen fehlgeschlagen!"
+  },
+
   "budget_period": "Budgetperiode",
   "request_state": "Status",
 
@@ -26,6 +37,22 @@
   "inspector_priority_label_MANDATORY": "Zwingend",
 
   "dashboard": {
+    "filters_title": "Filter",
+    "reset_filters": "Filter zurücksetzen",
+    "filter_titles": {
+      "search": "Suche",
+      "budget_periods": "Budgetperioden",
+      "categories": "Kategorien",
+      "special": "Spezialfilter",
+      "special_only_own_requests": "nur eigene Anträge",
+      "special_only_categories_with_requests": "nur Kategorien mit Anträgen",
+      "orgs": "Organisationen",
+      "prio": "Priorität",
+      "prio_insp": "Priorität des Prüfers",
+      "status": "Status Antrag"
+    },
+    "requests_title_singular": "Antrag",
+    "requests_title_plural": "Anträge",
     "bp_total_sum": "Aktuelles Total dieser Budgetperiode",
     "maincat_total_sum": "Aktuelles Total dieser Hauptkategorie",
     "subcat_total_sum": "Aktuelles Total dieser Kategorie",
@@ -68,5 +95,37 @@
     "procurement_account": "Beschaffungskonto"
   },
   "accounting_type_investment": "Investition",
-  "accounting_type_aquisition": "Beschaffung"
+  "accounting_type_aquisition": "Beschaffung",
+
+  "admin": {
+    "categories": {
+      "main_categories": "Hauptkategorien",
+      "image": "Bild",
+      "budget_limits": "Budget-Limite",
+      "subcats": "Subkategorien",
+      "upload_new_image": "Neues Bild hochladen",
+      "add_subcat": "Neue Subkategorie hinzufügen",
+      "delete_subcat": "Subkategorie löschen",
+      "inspectors": "Inspektoren",
+      "remove_from_inspectors": "als Inspektor entfernen",
+      "add_to_inspectors": "zu Inspektoren hinzufügen",
+      "viewers": "Betrachter",
+      "remove_from_viewers": "als Betrachter entfernen",
+      "add_to_viewers": "zu Betrachtern hinzufügen",
+      "user_list_empty": "(Keine)",
+      "subcategories": {
+        "cost_center": "Kostenstelle",
+        "general_ledger_account": "Sachkonto Ⅰ",
+        "?___procurement_account___?": "Sachkonto Ⅱ",
+        "procurement_account": "Beschaffungskonto"
+      }
+    }
+  },
+  "ui": {
+    "loading_title": "Lädt…",
+    "form": {
+      "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
+    },
+    "InlineSearch": { "placeholder": "Suchen" }
+  }
 }

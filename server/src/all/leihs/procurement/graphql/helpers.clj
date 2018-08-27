@@ -1,5 +1,8 @@
 (ns leihs.procurement.graphql.helpers
-  (:require [com.walmartlabs.lacinia [executor :as executor]]))
+  (:require [cheshire.core :refer [generate-string] :rename
+             {generate-string to-json}]
+            [clj-time.core :as clj-time]
+            [com.walmartlabs.lacinia [executor :as executor]]))
 
 (defn add-resource-type [m t] (assoc m :resource-type t))
 
@@ -36,3 +39,15 @@
   [context]
   (or (:requests-args context)
       (get-requests-args-from-selections-tree context)))
+
+(defn error-as-graphql-object
+  [code message]
+  {:errors [{:message (str message), ; if message is nil convert to ""
+             :extensions {:code code,
+                          :timestamp (-> (clj-time/now)
+                                         .toString)}}],
+   :data []})
+
+(defn error-as-graphql
+  [code message]
+  (to-json (error-as-graphql-object code message)))

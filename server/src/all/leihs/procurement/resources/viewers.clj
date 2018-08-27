@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.viewers
   (:require [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.resources.user :as user]
             [leihs.procurement.utils.sql :as sql]))
 

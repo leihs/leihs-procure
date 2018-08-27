@@ -37,7 +37,11 @@ const RequestsDashboard = props => {
         <h4>
           {requestsQuery.loading || !requestsQuery.data
             ? ' '
-            : `${requests.length || 0} Requests`}
+            : `${requests.length || 0} ${
+                requests.length === 1
+                  ? t('dashboard.requests_title_singular')
+                  : t('dashboard.requests_title_plural')
+              }`}
         </h4>
       </Col>
       <Col xs="1" cls="text-right">
@@ -104,9 +108,12 @@ const RequestsTree = ({
         if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
           return false
         }
+
         return (
           <CategoryLine
             key={cat.id}
+            me={me}
+            budgetPeriod={b}
             category={cat}
             requestCount={subCatReqs.length}
             isOpen={openPanels.cats.includes(cat.id)}
@@ -121,6 +128,8 @@ const RequestsTree = ({
                 <SubCategoryLine
                   key={sc.id}
                   category={sc}
+                  me={me}
+                  budgetPeriod={b}
                   requestCount={reqs.length}
                   isOpen={openPanels.cats.includes(sc.id)}
                   onToggle={isOpen => onPanelToggle(isOpen, sc.id)}
@@ -160,6 +169,9 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
     isRequesting,
     isInspecting
   } = budgetPeriodDates(budgetPeriod)
+
+  const canRequest = isRequesting && me.roles.isRequester
+  const newRequestBpLink = canRequest && newRequestLink({ budgetPeriod })
 
   const children = f.some(props.children) ? props.children : false
 
@@ -219,8 +231,8 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
               </div>
 
               <div className="ml-3 mt-2 mt-md-0">
-                {me.roles.isRequester && (
-                  <Link to={newRequestLink({ budgetPeriod })}>
+                {newRequestBpLink && (
+                  <Link to={newRequestBpLink}>
                     <Tooltipped text={t('dashboard.create_request_for_bp')}>
                       <Icon.PlusCircle
                         id={`tt_bp_cnr_${budgetPeriod.id}`}
@@ -250,6 +262,8 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
 }
 
 const CategoryLine = ({
+  me,
+  budgetPeriod,
   category,
   requestCount,
   canToggle,
@@ -298,10 +312,14 @@ const CategoryLine = ({
                 </Tooltipped>
               )}
             </div>
-            <div className="ml-auto mt-2">
-              {/* {me.roles.isRequester && (
-                <Link to={newRequestLink({ category })}>
-                  <Tooltipped text={t('dashboard.create_request_for_bp')}>
+
+            <div className="ml-3 mt-2 mt-md-0">
+              {/* TODO: decide if/how to show these links
+              {canRequest && (
+                <Link
+                  to={newRequestLink({ budgetPeriod, mainCategory: category })}
+                >
+                  <Tooltipped text={t('dashboard.create_request_for_maincat')}>
                     <Icon.PlusCircle
                       id={`tt_mc_cnr_${category.id}`}
                       size="2x"
@@ -326,6 +344,8 @@ const CategoryLine = ({
 
 const SubCategoryLine = ({
   category,
+  me,
+  budgetPeriod,
   requestCount,
   isOpen,
   onToggle,
@@ -374,6 +394,20 @@ const SubCategoryLine = ({
                   </Tooltipped>
                 )}
               </div>
+              <div className="ml-3 mt-2 mt-md-0">
+                {/* TODO: decide if/how to show these links
+                {canRequest && (
+                  <Link to={newRequestLink({ budgetPeriod, category })}>
+                    <Tooltipped text={t('dashboard.create_request_for_subcat')}>
+                      <Icon.PlusCircle
+                        id={`tt_sc_cnr_${category.id}`}
+                        size="2x"
+                        color="success"
+                      />
+                    </Tooltipped>
+                  </Link>
+                )} */}
+              </div>
             </div>
           </li>
           {showChildren(isOpen, props.children) && (
@@ -390,7 +424,17 @@ const SubCategoryLine = ({
   )
 }
 
-const newRequestLink = ({ budgetPeriod }) => ({
+const newRequestLink = ({
+  budgetPeriod = {},
+  mainCategory = {},
+  category = {}
+}) => ({
   pathname: '/requests/new',
-  search: '?' + stringifyQuery({ bp: f.dehyphenUUID(budgetPeriod.id) })
+  search:
+    '?' +
+    stringifyQuery({
+      bp: f.dehyphenUUID(budgetPeriod.id),
+      mc: f.dehyphenUUID(mainCategory.id),
+      c: f.dehyphenUUID(category.id)
+    })
 })
