@@ -73,6 +73,7 @@
     "room": "Raum",
     "motivation": "Begründung",
     "user": "Antragssteller",
+    "state": "Status",
 
     "replacement": "Ersatz / Neu",
     "request_replacement_labels_new": "Neu",

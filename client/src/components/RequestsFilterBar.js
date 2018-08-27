@@ -105,7 +105,8 @@ const Filters = ({ me, data, current, onChange }) => {
     onlyOwnRequests: !me.roles.isOnlyRequester,
     onlyCategoriesWithRequests: true,
     priority: true,
-    inspector_priority: !me.roles.isOnlyRequester
+    inspector_priority: !me.roles.isOnlyRequester,
+    state: true
   }
 
   const defaultFilters = f.pick(
@@ -243,7 +244,7 @@ const Filters = ({ me, data, current, onChange }) => {
               </FormGroup>
             )}
 
-           <FormGroup label={t('dashboard.filter_titles.status')}>
+            <FormGroup label={t('dashboard.filter_titles.status')}>
               <Select
                 {...formPropsFor('state')}
                 multiple
