@@ -8,7 +8,8 @@ const translate = key => {
   const paths = key.split('.').map((i, n, a) => a.slice(n).join('.'))
   const results = paths
     .map(k => f.get(translations, k))
+    .concat([fallback])
     .filter(r => f.isString(r) || f.isNumber(r))
-  return f.first(results) || fallback
+  return f.first(results)
 }
 export default translate
