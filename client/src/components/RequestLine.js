@@ -62,7 +62,12 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     </Col>
     <Col sm="3">
       {DisplayName(request.user.value)} /{' '}
-      {DisplayName(request.organization.value)}
+      {DisplayName(request.organization.value)}{' '}
+      <Tooltipped text={t('request_form_field.state')}>
+        <Badge light cls="mr-1" id={`reqst_tt_${request.id}`}>
+          <code>{request.state}</code>
+        </Badge>
+      </Tooltipped>
     </Col>
     <Col sm="4">
       <Tooltipped text={t('request_form_field.price_cents')}>

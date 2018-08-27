@@ -19,6 +19,13 @@
 
   "budget_period": "Budgetperiode",
   "request_state": "Status",
+
+  "request_state_label_NEW": "Neu",
+  "request_state_label_APPROVED": "Genehmigt",
+  "request_state_label_PARTIALLY_APPROVED": "Teilweise bewilligt",
+  "request_state_label_DENIED": "Abgelehnt",
+  "request_state_label_IN_APPROVAL": "In Prüfung",
+
   "priority": "Priorität",
   "priority_label_NORMAL": "Normal",
   "priority_label_HIGH": "Hoch",
@@ -66,6 +73,7 @@
     "room": "Raum",
     "motivation": "Begründung",
     "user": "Antragssteller",
+    "state": "Status",
 
     "replacement": "Ersatz / Neu",
     "request_replacement_labels_new": "Neu",

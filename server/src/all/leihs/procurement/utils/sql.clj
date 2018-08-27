@@ -58,6 +58,7 @@
 (defalias limit helpers/limit)
 (defalias merge-left-join helpers/merge-left-join)
 (defalias merge-join helpers/merge-join)
+(defalias merge-select helpers/merge-select)
 (defalias merge-where helpers/merge-where)
 (defalias modifiers helpers/modifiers)
 (defalias offset helpers/offset)

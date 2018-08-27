@@ -88,9 +88,7 @@ export const RequestFieldsForIndex = gql`
       value
     }
 
-    state {
-      value
-    }
+    state
   }
 `
 
@@ -194,9 +192,7 @@ export const RequestFieldsForEdit = gql`
       value
     }
 
-    state {
-      ...RequestFieldString
-    }
+    state
 
     article_number {
       ...RequestFieldString

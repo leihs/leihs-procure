@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.categories
   (:require [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.graphql.helpers :refer
              [add-resource-type add-to-parent-values]]

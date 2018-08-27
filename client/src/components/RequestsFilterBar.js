@@ -89,6 +89,11 @@ const Filters = ({ me, data, current, onChange }) => {
     inspector_priority: CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(value => ({
       value,
       label: t(`inspector_priority_label_${value}`)
+    })),
+
+    state: CONSTANTS.REQUEST_STATES.map(value => ({
+      value,
+      label: t(`request_state_label_${value}`)
     }))
   }
 
@@ -100,7 +105,8 @@ const Filters = ({ me, data, current, onChange }) => {
     onlyOwnRequests: !me.roles.isOnlyRequester,
     onlyCategoriesWithRequests: true,
     priority: true,
-    inspector_priority: !me.roles.isOnlyRequester
+    inspector_priority: !me.roles.isOnlyRequester,
+    state: true
   }
 
   const defaultFilters = f.pick(
@@ -239,7 +245,12 @@ const Filters = ({ me, data, current, onChange }) => {
             )}
 
             <FormGroup label={t('dashboard.filter_titles.status')}>
-              <code>TBD</code>
+              <Select
+                {...formPropsFor('state')}
+                multiple
+                emptyOption={false}
+                options={available.state}
+              />
             </FormGroup>
 
             {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
