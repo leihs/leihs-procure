@@ -120,6 +120,18 @@
         "?___procurement_account___?": "Sachkonto Ⅱ",
         "procurement_account": "Beschaffungskonto"
       }
+    },
+    "templates": {
+      "title": "Vorlagen",
+      "category_has_no_templates": "Keine Vorlagen",
+      "formfield": {
+        "model": "Bestehendes Modell",
+        "article_name": "Artikel oder Projekt",
+        "article_number": "Artikelnr. oder Herstellernr.",
+        "price_cents": "Preis CHF inkl. MwSt",
+        "supplier": "Lieferant",
+        "toDelete": ""
+      }
     }
   },
   "ui": {
