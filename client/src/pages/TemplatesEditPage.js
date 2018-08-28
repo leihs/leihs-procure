@@ -78,20 +78,20 @@ const updateTemplates = {
     }
   },
   doUpdate: (mutate, { mainCategories }) => {
-    const templates = f.flatMap(mainCategories, mc =>
-      f.flatMap(mc.categories, sc =>
-        f.flatMap(f.filter(sc.templates, tpl => !tpl.toDelete), tpl => ({
-          id: tpl.id,
-          article_name: tpl.article_name,
-          article_number: tpl.article_number,
-          price_cents: tpl.price_cents,
 
-          category_id: sc.id
-          // TODO: model/supplier
-          // ...(!!tpl.model && { model: tpl.model.id }),
-          // ...(!!tpl.supplier && { model: tpl.supplier.id }),
-        }))
-      )
+    const templates = f.flatMap(f.flatMap(mainCategories, 'categories'), sc =>
+      f.flatMap(sc.templates, tpl => ({
+        id: tpl.id,
+        article_name: tpl.article_name,
+        article_number: tpl.article_number,
+        price_cents: tpl.price_cents,
+        to_delete: tpl.toDelete,
+
+        category_id: sc.id
+        // TODO: model/supplier
+        // ...(!!tpl.model && { model: tpl.model.id }),
+        // ...(!!tpl.supplier && { model: tpl.supplier.id }),
+      }))
     )
 
     mutate({
@@ -334,22 +334,44 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
 
 const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
   const isEditing = true // TODO: edit on click
+  const inputFieldCls = cx({ 'text-strike bg-danger-light': tpl.toDelete })
   return (
     <tr className="row no-gutters" onClick={onClick}>
       {cols.map(({ key, size, required }, i) => (
         <td
           key={i}
-          className={cx('pr-1', `col-${size}`, {
+          className={cx('text-center pr-1', `col-${size}`, {
             'was-validated': isEditing && !tpl.id
           })}
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              ''
+              tpl.can_delete && (
+                <Let field={formPropsFor('toDelete')}>
+                  {({ field }) => (
+                    <label id={`btn_del_${tpl.id}`} className="pt-1">
+                      <Icon.Trash
+                        size="lg"
+                        className={cx(
+                          tpl.toDelete ? 'text-dark' : 'text-danger'
+                        )}
+                      />
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        name={field.name}
+                        checked={!!field.value}
+                        onChange={field.onChange}
+                      />
+                    </label>
+                  )}
+                </Let>
+              )
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>
                 {({ priceField }) => (
                   <InputText
+                    cls={inputFieldCls}
                     required={required}
                     value={tpl.price_cents / 100 || ''}
                     onChange={e =>
@@ -364,12 +386,16 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                 )}
               </Let>
             ) : (
-              <InputText required={required} {...formPropsFor(key)} />
+              <InputText
+                cls={inputFieldCls}
+                required={required}
+                {...formPropsFor(key)}
+              />
             )
           ) : key === 'price_cents' ? (
             <samp>{formatCurrency(tpl.price_cents)}</samp>
           ) : key === 'toDelete' ? (
-            ''
+            false
           ) : (
             tpl[key]
           )}
