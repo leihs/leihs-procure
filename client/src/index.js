@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route, BrowserRouter } from 'react-router-dom'
+import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
@@ -18,7 +18,7 @@ import AdminUsers from './pages/admin/AdminUsersPage'
 import AdminCategories from './pages/admin/AdminCategoriesPage'
 import AdminOrgs from './pages/admin/AdminOrgsPage'
 import AdminBudgetPeriods from './pages/admin/AdminBudgetPeriodsPage'
-import AdminTemplates from './pages/admin/AdminTemplatesPage'
+import TemplatesEdit from './pages/TemplatesEditPage'
 import AdminSettings from './pages/admin/AdminSettingsPage'
 
 import DevUiCatalog from './pages/_dev/UiCatalogPage'
@@ -54,8 +54,13 @@ const Root = () => (
           <Route path="/admin/categories" component={AdminCategories} />
           <Route path="/admin/organizations" component={AdminOrgs} />
           <Route path="/admin/budget-periods" component={AdminBudgetPeriods} />
-          <Route path="/admin/templates" component={AdminTemplates} />
           <Route path="/admin/settings" component={AdminSettings} />
+
+          <Route path="/templates/edit" component={TemplatesEdit} />
+          <Route
+            path="/templates**"
+            render={() => <Redirect to="/templates/edit" />}
+          />
 
           <Route strict path="/dev/playground" component={DevUiCatalog} />
           <Route strict path="/dev/console" component={DevConsole} />
