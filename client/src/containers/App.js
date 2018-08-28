@@ -10,7 +10,7 @@ import {
   RouteParams as Routed
 } from '../components/Bootstrap'
 import MainNav from '../components/MainNav'
-import { CURRENT_USER_QUERY } from './CurrentUserProvider'
+import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
 
 const MainNavWithRouter = withRouter(MainNav)
 
@@ -59,7 +59,7 @@ class App extends Component {
                     <F>
                       <MainNavWithRouter
                         isDev={isDev}
-                        me={data.current_user.user}
+                        me={UserWithShortcuts(data.current_user)}
                         contactUrl={data.settings.contact_url}
                       />
                       <div className="minh-100vh">

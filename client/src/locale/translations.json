@@ -98,6 +98,20 @@
   "accounting_type_investment": "Investition",
   "accounting_type_aquisition": "Beschaffung",
 
+  "templates": {
+    "title": "Vorlagen",
+    "title_edit": "Vorlagen bearbeiten",
+    "category_has_no_templates": "Keine Vorlagen",
+    "formfield": {
+      "model": "Bestehendes Modell",
+      "article_name": "Artikel oder Projekt",
+      "article_number": "Artikelnr. oder Herstellernr.",
+      "price_cents": "Preis CHF inkl. MwSt",
+      "supplier": "Lieferant",
+      "toDelete": ""
+    }
+  },
+
   "admin": {
     "categories": {
       "main_categories": "Hauptkategorien",
