@@ -34,26 +34,29 @@ export const CURRENT_USER_QUERY = gql`
 `
 
 // add some roles shortcutes
-const Roles = me => {
-  const p = me.user.permissions
-  const r = f.pick(p, 'isAdmin', 'isRequester')
-  r.isInspector = f.some(p.isInspectorForCategories)
-  r.isViewer = f.some(p.isViewerForCategories)
-  r.isOnlyRequester =
-    r.isRequester && !(r.isAdmin || r.isInspector || r.isViewer)
-  return r
+export const UserWithShortcuts = user => {
+  const Roles = me => {
+    const p = me.user.permissions
+    const r = f.pick(p, 'isAdmin', 'isRequester')
+    r.isInspector = f.some(p.isInspectorForCategories)
+    r.isViewer = f.some(p.isViewerForCategories)
+    r.isOnlyRequester =
+      r.isRequester && !(r.isAdmin || r.isInspector || r.isViewer)
+    return r
+  }
+  return { ...user, roles: Roles(user) }
 }
 
 class CurrentUserProvider extends Component {
-  render({ props: { children } } = this) {
+  render({ props: { children, ...props } } = this) {
     return (
-      <Query query={CURRENT_USER_QUERY}>
+      <Query query={CURRENT_USER_QUERY} {...props}>
         {({ loading, error, data }) => {
           // NOTE: never show loading spinner bc data is virtually always
           // in cache already. Do show Errors just in case to not be silent.
           if (loading) return false
           if (error) return <ErrorPanel error={error} data={data} />
-          const me = { ...data.current_user, roles: Roles(data.current_user) }
+          const me = UserWithShortcuts(data.current_user)
           return children(me)
         }}
       </Query>

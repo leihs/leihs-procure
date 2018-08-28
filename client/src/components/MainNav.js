@@ -56,7 +56,7 @@ export default class MainNav extends React.Component {
                 <Icon.Requests fixedWidth spaced /> Anträge
               </NavItemLink>
 
-              {me.permissions.isAdmin && (
+              {me.roles.isAdmin && (
                 <UncontrolledDropdown nav inNavbar>
                   <Routed path="/admin">
                     {({ isActive }) => (
@@ -102,7 +102,7 @@ export default class MainNav extends React.Component {
                 </UncontrolledDropdown>
               )}
 
-              {1 && (
+              {(me.roles.isAdmin || me.roles.isInspector) && (
                 <NavItemLink exact to="/templates/edit">
                   <Icon.Templates fixedWidth spaced /> Vorlagen
                 </NavItemLink>
@@ -167,10 +167,10 @@ export default class MainNav extends React.Component {
 
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
-                  <Icon.User size="lg" /> {DisplayName(me, { abbr: true })}
+                  <Icon.User size="lg" /> {DisplayName(me.user, { abbr: true })}
                 </DropdownToggle>
                 <DropdownMenu right>
-                  <DropdownItem>{tmpUserInfo(me)}</DropdownItem>
+                  <DropdownItem>{tmpUserInfo(me.user)}</DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
 

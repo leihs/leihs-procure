@@ -78,7 +78,6 @@ const updateTemplates = {
     }
   },
   doUpdate: (mutate, { mainCategories }) => {
-
     const templates = f.flatMap(f.flatMap(mainCategories, 'categories'), sc =>
       f.flatMap(sc.templates, tpl => ({
         id: tpl.id,
