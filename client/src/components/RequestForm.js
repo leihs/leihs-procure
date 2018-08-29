@@ -327,7 +327,6 @@ class RequestForm extends React.Component {
                       <FormField
                         {...formPropsFor('order_quantity')}
                         type="number-integer"
-                        max={fields.approved_quantity}
                       />
                     </Col>
                   </Row>
