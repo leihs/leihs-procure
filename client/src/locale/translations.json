@@ -62,13 +62,13 @@
     "create_request_for_subcat": "Antrag für diese Kategorie erfassen"
   },
 
-  "form_input_check_free_text": "Als Freitext",
-
   "request_form_field": {
     "article_name": "Artikel oder Projekt",
     "article_number": "Artikelnr. oder Herstellernr.",
+    "_model_as_id": "Bestehendes Modell",
     "supplier": "Lieferant",
     "supplier_name": "Lieferant",
+    "_supplier_as_id": "Bestehender Lieferant",
     "receiver": "Name des Empfängers",
     "building": "Gebäude",
     "room": "Raum",

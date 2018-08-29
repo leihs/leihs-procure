@@ -50,9 +50,9 @@ const prepareFormValues = request => {
   fields.room = f.get(request, 'room.value.id')
   fields.building = f.get(request, 'room.value.building.id')
 
-  // extra form controlls
-  fields._model_as_text = f.present(fields.article_name)
-  fields._supplier_as_text = f.present(fields.supplier_name)
+  // extra form controls
+  fields._model_as_id = !!f.get(request, 'model.value.id')
+  fields._supplier_as_id = !!f.get(request, 'supplier.value.id')
   return fields
 }
 
@@ -118,7 +118,7 @@ class RequestForm extends React.Component {
                       return (
                         <Row cls="no-gutters">
                           <Col sm>
-                            {fields._model_as_text ? (
+                            {!fields._model_as_id ? (
                               <FormField {...articleField} />
                             ) : (
                               <FormGroup label={articleField.label}>
@@ -132,10 +132,9 @@ class RequestForm extends React.Component {
                           </Col>
                           <Col sm="3" cls="pl-sm-3">
                             <FieldTypeToggle
-                              {...formPropsFor('_model_as_text')}
-                              checked={!!formPropsFor('_model_as_text').value}
+                              {...formPropsFor('_model_as_id')}
+                              checked={formPropsFor('_model_as_id').value}
                               disabled={articleField.readOnly}
-                              label={t('form_input_check_free_text')}
                             />
                           </Col>
                         </Row>
@@ -149,7 +148,7 @@ class RequestForm extends React.Component {
                     {supplierField => (
                       <Row cls="no-gutters">
                         <Col sm>
-                          {fields._supplier_as_text ? (
+                          {!fields._supplier_as_id ? (
                             <FormField
                               {...formPropsFor('supplier_name')}
                               readOnly={supplierField.readOnly}
@@ -162,9 +161,8 @@ class RequestForm extends React.Component {
                         </Col>
                         <Col sm="3" cls="pl-sm-3">
                           <FieldTypeToggle
-                            {...formPropsFor('_supplier_as_text')}
+                            {...formPropsFor('_supplier_as_id')}
                             disabled={supplierField.readOnly}
-                            label={t('form_input_check_free_text')}
                           />
                         </Col>
                       </Row>
