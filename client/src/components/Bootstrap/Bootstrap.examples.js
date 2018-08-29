@@ -1,6 +1,15 @@
 import React from 'react'
 
-import { Row, Col, Button, Badge, FormField, InputDate } from './index'
+import {
+  Row,
+  Col,
+  Button,
+  Badge,
+  FormGroup,
+  FormField,
+  InputDate,
+  ButtonRadio
+} from './index'
 
 const _space_ = ' '
 
@@ -77,7 +86,9 @@ export const examples = [
           c: 'some text',
           d: '23.42',
           e: '42',
-          f: true
+          f: true,
+          g: null,
+          h: null
         }
         render() {
           return (
@@ -87,6 +98,7 @@ export const examples = [
                   type="text"
                   label="type=text"
                   name="a"
+                  required
                   value={this.state.a}
                   onChange={e => this.setState({ a: e.target.value })}
                 />
@@ -94,6 +106,7 @@ export const examples = [
                   name="b"
                   type="text-static"
                   label="type=text-static"
+                  required
                   value={this.state.b}
                   onChange={e => this.setState({ b: e.target.value })}
                 />
@@ -101,6 +114,7 @@ export const examples = [
                   name="c"
                   type="textarea"
                   label="type=textarea"
+                  required
                   value={this.state.c}
                   onChange={e => this.setState({ c: e.target.value })}
                 />
@@ -110,6 +124,7 @@ export const examples = [
                   name="d"
                   type="number"
                   label="type=number"
+                  required
                   value={this.state.d}
                   onChange={e => this.setState({ d: e.target.value })}
                 />
@@ -117,6 +132,7 @@ export const examples = [
                   name="e"
                   type="number-integer"
                   label="type=number-integer"
+                  required
                   value={this.state.e}
                   onChange={e => this.setState({ e: e.target.value })}
                 />
@@ -125,6 +141,7 @@ export const examples = [
                   id="example_formfield_f"
                   type="checkbox"
                   label="type=checkbox"
+                  required
                   checked={this.state.f}
                   onChange={e => this.setState({ f: e.target.value })}
                 />
@@ -133,9 +150,25 @@ export const examples = [
                   id="example_formfield_g"
                   type="checkbox"
                   label="type=checkbox"
+                  required
                   checked={this.state.g}
                   onChange={e => this.setState({ g: e.target.value })}
                 />
+                <hr />
+                <FormGroup label="ButtonRadio Radio Button">
+                  <ButtonRadio
+                    name="h"
+                    id="example_formfield_h"
+                    label="<ButtonRadio/>"
+                    required
+                    value={this.state.h}
+                    onChange={e => this.setState({ h: e.target.value })}
+                    options={[
+                      { value: 'one', label: 'Eins' },
+                      { value: 'two', label: 'Zwei' }
+                    ]}
+                  />
+                </FormGroup>
               </Col>
               <Col>
                 <pre>{JSON.stringify(this.state, 0, 2)}</pre>
@@ -148,53 +181,10 @@ export const examples = [
         <React.Fragment>
           <h2>controlled</h2>
           <DemoForm />
-          {/* <h2>uncontrolled</h2>
-          <Row>
-            <Col>
-              <FormField
-                name="a"
-                type="text"
-                label="type=text"
-                defaultValue="some text"
-              />
-              <FormField
-                name="b"
-                type="text-static"
-                label="type=text-static"
-                defaultValue="some static text"
-              />
-              <FormField
-                name="c"
-                type="textarea"
-                label="type=textarea"
-                defaultValue="some text"
-              />
-            </Col>
-            <Col>
-              <FormField
-                name="d"
-                type="number"
-                label="type=number"
-                defaultValue="23.42"
-              />
-              <FormField
-                name="e"
-                type="number-integer"
-                label="type=number-integer"
-                defaultValue="42"
-              />
-              <FormField name="f" type="checkbox" label="type=checkbox" />
-              <FormField
-                name="g"
-                type="checkbox"
-                label="type=checkbox defaultChecked={true}"
-                defaultChecked={true}
-              />
-            </Col>
-            <Col>
-              <pre>(form state kept in DOM)</pre>
-            </Col>
-          </Row> */}
+          <h2>controlled, with validation styles</h2>
+          <div className="was-validated">
+            <DemoForm />
+          </div>
         </React.Fragment>
       )
     })()
