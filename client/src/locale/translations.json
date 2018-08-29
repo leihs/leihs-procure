@@ -9,7 +9,8 @@
   "request": {
     "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
     "confirm_move_category": "In andere Kategorie verschieben?",
-    "confirm_delete": "Antrag löschen?"
+    "confirm_delete": "Antrag löschen?",
+    "give_reason_when_partially_accepting_or_denying": "Bei Ablehnung oder Teilbewilligung muss ein Inspektionskommentar vorhanden sein"
   },
 
   "client": {

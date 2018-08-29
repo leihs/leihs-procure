@@ -309,7 +309,6 @@ class RequestForm extends React.Component {
                       </FormGroup>
                     </Col>
                   </Row>
-
                   <Row>
                     <Col sm>
                       <FormField
@@ -333,38 +332,48 @@ class RequestForm extends React.Component {
                     </Col>
                   </Row>
 
-                  <FormField
-                    {...formPropsFor('inspection_comment')}
-                    type="textarea"
-                    beforeInput={
-                      !formPropsFor('inspection_comment').readOnly && (
-                        <Select
-                          id="priority_requester"
-                          m="b-3"
-                          cls="form-control-sm"
-                          options={['foo', 'bar', 'baz'].map(s => ({
-                            value: s,
-                            label: s
-                          }))}
-                          disabled={formPropsFor('inspection_comment').readOnly}
-                          // NOTE: we dont want to keep the selected value and just use it once.
-                          // Always setting empty value makes it controlled and React resets it for us!
-                          value={''}
-                          onChange={({ target: { value } }) => {
-                            setValue(
-                              'inspection_comment',
-                              value + '\n' + getValue('inspection_comment')
-                            )
-                          }}
-                        />
-                      )
-                    }
-                  />
-
+                  <RequestInput field={formPropsFor('inspection_comment')}>
+                    {field => (
+                      <FormField
+                        type="textarea"
+                        {...field}
+                        // NOTE: Give Reason when Partially Accepting or Denying
+                        required={
+                          field.required ||
+                          fields.approved_quantity < fields.requested_quantity
+                        }
+                        invalidFeedback={t(
+                          'request.give_reason_when_partially_accepting_or_denying'
+                        )}
+                        beforeInput={
+                          !field.readOnly && (
+                            <Select
+                              id="priority_requester"
+                              m="b-3"
+                              cls="form-control-sm"
+                              options={['foo', 'bar', 'baz'].map(s => ({
+                                value: s,
+                                label: s
+                              }))}
+                              disabled={field.readOnly}
+                              // NOTE: we dont want to keep the selected value and just use it once.
+                              // Always setting empty value makes it controlled and React resets it for us!
+                              value={''}
+                              onChange={({ target: { value } }) => {
+                                setValue(
+                                  'inspection_comment',
+                                  value + '\n' + getValue('inspection_comment')
+                                )
+                              }}
+                            />
+                          )
+                        }
+                      />
+                    )}
+                  </RequestInput>
                   <FormGroup label={t('request_form_field.attachments')}>
                     <InputFileUpload {...formPropsFor('attachments')} />
                   </FormGroup>
-
                   <RequestInput field={formPropsFor('user')}>
                     {userField =>
                       // NOTE: don't show at all if not writable
@@ -375,7 +384,6 @@ class RequestForm extends React.Component {
                       )
                     }
                   </RequestInput>
-
                   <Let accTypeField={formPropsFor('accounting_type')}>
                     {({ accTypeField }) =>
                       // NOTE: don't show at all if not writable
