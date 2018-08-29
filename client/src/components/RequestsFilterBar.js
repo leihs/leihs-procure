@@ -19,7 +19,9 @@ import t from '../locale/translate'
 // import Icon from './Icons'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
+import RequestStateBadge from './RequestStateBadge'
 import CurrentUser from '../containers/CurrentUserProvider'
+
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
 
@@ -244,14 +246,45 @@ const Filters = ({ me, data, current, onChange }) => {
               </FormGroup>
             )}
 
-            <FormGroup label={t('dashboard.filter_titles.status')}>
-              <Select
-                {...formPropsFor('state')}
-                multiple
-                emptyOption={false}
-                options={available.state}
-              />
-            </FormGroup>
+            <Let field={formPropsFor('state')}>
+              {({ field }) => (
+                <FormGroup label={t('dashboard.filter_titles.status')}>
+                  {available.state &&
+                    available.state.map(({ value, label }) => (
+                      <F key={value}>
+                        <div className="custom-control custom-checkbox">
+                          <input
+                            type="checkbox"
+                            className="custom-control-input"
+                            {...field}
+                            id={field.id + value}
+                            value={value}
+                            checked={f.include(field.value, value)}
+                            onChange={e => {
+                              const add = e.target.checked
+                              const values = field.value || []
+                              setValue(
+                                'state',
+                                f.uniq(
+                                  add
+                                    ? [...values, value]
+                                    : f.without(values, value)
+                                )
+                              )
+                            }}
+                          />
+                          <label
+                            className="custom-control-label"
+                            htmlFor={field.id + value}
+                          >
+                            <RequestStateBadge state={value} />
+                          </label>
+                        </div>
+                      </F>
+                    ))}
+                </FormGroup>
+              )}
+            </Let>
 
             {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
           </F>
@@ -260,3 +293,5 @@ const Filters = ({ me, data, current, onChange }) => {
     </StatefulForm>
   )
 }
+
+const Let = ({ children, ...props }) => children(props)

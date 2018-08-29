@@ -7,6 +7,7 @@ import * as CONSTANTS from '../constants'
 import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
 import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
+import RequestStateBadge from './RequestStateBadge'
 import RequestEdit from '../containers/RequestEdit'
 
 class RequestLine extends React.Component {
@@ -63,16 +64,20 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     <Col sm="2">
       {request.article_name.value || DisplayName(request.model.value)}
     </Col>
-    <Col sm="3">
+    <Col sm="2">
       {DisplayName(request.user.value)} /{' '}
-      {DisplayName(request.organization.value)}{' '}
+      {DisplayName(request.organization.value)}
+    </Col>
+    <Col sm="1" cls="text-center">
       <Tooltipped text={t('request_form_field.state')}>
-        <Badge light cls="mr-1" id={`reqst_tt_${request.id}`}>
-          <code>{request.state}</code>
-        </Badge>
+        <RequestStateBadge
+          state={request.state}
+          id={`reqst_tt_${request.id}`}
+          className="mr-1 text-wrap"
+        />
       </Tooltipped>
     </Col>
-    <Col sm="4">
+    <Col sm="3">
       <Tooltipped text={t('request_form_field.price_cents')}>
         <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
           <Icon.PriceTag className="mr-1" />
