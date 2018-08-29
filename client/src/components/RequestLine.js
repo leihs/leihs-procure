@@ -13,6 +13,7 @@ class RequestLine extends React.Component {
     open: false
   }
   render({ props: { request, ...props }, state: { open } } = this) {
+    const closeLine = () => this.setState({ open: false })
     const isChanged = false // FIXME: detect form changed state
     const lineStyle = cx(
       { 'cursor-pointer': !open || !isChanged },
@@ -42,7 +43,8 @@ class RequestLine extends React.Component {
             <RequestEdit
               className="p-3"
               requestId={request.id}
-              onCancel={() => this.setState({ open: false })}
+              onCancel={closeLine}
+              onSuccess={closeLine}
               doChangeRequestCategory={props.doChangeRequestCategory}
               doChangeBudgetPeriod={props.doChangeBudgetPeriod}
               doDeleteRequest={props.doDeleteRequest}

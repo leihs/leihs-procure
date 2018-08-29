@@ -73,7 +73,7 @@ class RequestEdit extends React.Component {
       this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
   }
 
-  render({ requestId, onCancel, className, ...props } = this.props) {
+  render({ requestId, onCancel, onSuccess, className, ...props } = this.props) {
     if (!f.isUUID(requestId)) {
       return (
         <RoutedStatus code={400}>
@@ -120,8 +120,8 @@ class RequestEdit extends React.Component {
                       categories={data.main_categories}
                       budgetPeriods={data.budget_periods}
                       onCancel={onCancel}
-                      onSubmit={fields =>
-                        mutate({
+                      onSubmit={async fields => {
+                        await mutate({
                           variables: {
                             requestData: {
                               id: request.id,
@@ -129,7 +129,8 @@ class RequestEdit extends React.Component {
                             }
                           }
                         })
-                      }
+                        onSuccess()
+                      }}
                       // action delete
                       doDeleteRequest={
                         !!props.doDeleteRequest &&
@@ -170,7 +171,14 @@ export default RequestEdit
 RequestEdit.propTypes = {
   doChangeBudgetPeriod: PropTypes.func,
   doChangeRequestCategory: PropTypes.func,
-  doDeleteRequest: PropTypes.func
+  doDeleteRequest: PropTypes.func,
+  onCancel: PropTypes.func,
+  onSuccess: PropTypes.func
+}
+
+RequestEdit.defaultProps = {
+  onCancel: f.noop,
+  onSuccess: f.noop
 }
 
 const valueIfWritable = (fields, requestData, key) => {

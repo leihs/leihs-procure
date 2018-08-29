@@ -37,6 +37,8 @@ const DEPRECATIONS = {
   where: 'filter'
 }
 
+const noop = () => {}
+
 const lodash_try = fn => {
   try {
     return fn()
@@ -92,6 +94,7 @@ const enhyphenUUID = s =>
 
 const mixins = {
   try: lodash_try,
+  noop,
   present,
   presence,
   uniqBy,
