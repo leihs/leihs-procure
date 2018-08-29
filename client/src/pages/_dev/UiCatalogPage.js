@@ -280,8 +280,14 @@ const PAGES = [
 const UiPlayground = ({ match, location }) => {
   const baseUrl = match.url
   const flashMsg = f.get(location, 'state._flash')
+  const sidebar = (
+    <F>
+      <TableofContents baseUrl={baseUrl} />
+      <hr className="d-xl-none" />
+    </F>
+  )
   return (
-    <MainWithSidebar sidebar={<TableofContents baseUrl={baseUrl} />}>
+    <MainWithSidebar sidebar={sidebar}>
       {!!flashMsg && (
         <div className="alert alert-warning" role="alert">
           {flashMsg}
@@ -316,7 +322,7 @@ const NavItem = p => (
 )
 
 const TableofContents = ({ baseUrl }) => (
-  <ul className="p-2 nav flex-md-column">
+  <ul className="p-2 nav flex-xl-column">
     <NavItem to={baseUrl}>
       <h5>Playground</h5>
     </NavItem>
@@ -336,7 +342,7 @@ const PageById = ({ match, baseUrl }) => {
       <Redirect
         to={{
           pathname: baseUrl,
-          state: { _flash: `The page ${pageId} doesn't exist!` }
+          state: { localFlash: `The page ${pageId} doesn't exist!` }
         }}
       />
     )

@@ -153,11 +153,15 @@ const AdminCategoriesPage = ({ match }) => (
       if (error) return <ErrorPanel error={error} data={data} />
 
       const categoriesToc = data.main_categories
+      const sidebar = (
+        <F>
+          <SideNav categories={categoriesToc} baseUrl={match.url} />
+          <hr className="d-xl-none" />
+        </F>
+      )
 
       return (
-        <MainWithSidebar
-          sidebar={<SideNav categories={categoriesToc} baseUrl={match.url} />}
-        >
+        <MainWithSidebar sidebar={sidebar}>
           <Switch>
             <Route
               exact
@@ -186,6 +190,7 @@ const AdminCategoriesPage = ({ match }) => (
                 categories={categoriesToc}
                 baseUrl={match.url}
               />
+
               {/* preload rest of content */}
               <Query query={CATEGORIES_QUERY}>{() => false}</Query>
             </F>
