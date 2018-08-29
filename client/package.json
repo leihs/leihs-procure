@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "serve": "9.1.0"
+    "serve": "9.1.0",
+    "tachyons-type-scale": "^6.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
