@@ -12,7 +12,8 @@ import {
 } from './Bootstrap'
 
 // WIP:
-import MultiSelect from './Bootstrap/DownshiftMultiSelect'
+// import MultiSelect from './Bootstrap/DownshiftMultiSelect'
+import MultiSelect from './Bootstrap/MultiSelect'
 import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'

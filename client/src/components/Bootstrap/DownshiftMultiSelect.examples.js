@@ -85,6 +85,7 @@ const examplesFn = () => [
             <Col sm>
               <MultiSelect
                 {...formPropsFor('select2')}
+                value={fields.select2 || []}
                 options={exampleMultipleOptgroups.multiSelectOptions}
               />
             </Col>
