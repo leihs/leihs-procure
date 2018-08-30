@@ -11,9 +11,7 @@ import {
   Select
 } from './Bootstrap'
 
-// WIP:
-// import MultiSelect from './Bootstrap/DownshiftMultiSelect'
-import MultiSelect from './Bootstrap/MultiSelect'
+import GroupedSelect from './Bootstrap/MultiSelect'
 import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
@@ -179,9 +177,11 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.categories && (
               <FormGroup label={t('dashboard.filter_titles.categories')}>
-                <MultiSelect
+                <GroupedSelect
                   {...formPropsFor('categories')}
                   multiple
+                  size="sm"
+                  block
                   options={available.categories}
                 />
               </FormGroup>
@@ -217,8 +217,10 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.organizations && (
               <FormGroup label={t('dashboard.filter_titles.orgs')}>
-                <MultiSelect
+                <GroupedSelect
                   {...formPropsFor('organizations')}
+                  size="sm"
+                  block
                   multiple
                   options={available.organizations}
                 />

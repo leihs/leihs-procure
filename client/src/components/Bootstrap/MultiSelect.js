@@ -2,16 +2,19 @@ import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import PropTypes from 'prop-types'
 import f from 'lodash'
+import logger from 'debug'
+
 import Dropdown from 'reactstrap/lib/Dropdown'
 import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
-import logger from 'debug'
+import { Row, Col, InputText } from '.'
 const log = logger('app:ui:MultiSelect')
 
 const START_OPEN = false //true
 const txt_select_all = 'Alle auswählen'
-const txt_all_selected = 'Alle ausgewählt'
+const txt_all_selected_a = 'Alle '
+const txt_all_selected_e = ' ausgewählt'
 const txt_none_selected = 'Keine ausgewählt'
 const txt_n_selected_a = ''
 const txt_n_selected_e = ` ausgewählt`
@@ -27,7 +30,7 @@ const groupItemCls = [itemCls, 'pl-4']
 class MultiSelect extends React.PureComponent {
   constructor(props) {
     super(props)
-    this.state = { dropdownOpen: START_OPEN }
+    this.state = { dropdownOpen: START_OPEN, searchTerm: '' }
     log('init', { props, state: this.state })
   }
 
@@ -93,12 +96,15 @@ class MultiSelect extends React.PureComponent {
       value,
       onChange,
       className,
+      size,
       block,
       ...restProps
     } = props
     const selection = this.selection()
     const allOptions = this.allOptions()
     const isInactive = this.isInactive()
+    const isAllSelected = this.isAllSelected()
+    const optGroups = filterMatchingOptions(options, state.searchTerm)
     const Id = s => `${restProps.id}-${s}`
 
     return (
@@ -106,7 +112,7 @@ class MultiSelect extends React.PureComponent {
         <Dropdown
           inNavbar={true} // no `popper`/dynamic placement, just dropdown on bottom
           direction="down"
-          size="sm"
+          size={size}
           className={cx(className, baseCls)}
           {...restProps}
           isOpen={this.state.dropdownOpen}
@@ -118,7 +124,7 @@ class MultiSelect extends React.PureComponent {
             </span>
           </DropdownToggle>
 
-          <DropdownMenu className={cx(menuCls)}>
+          <DropdownMenu className={cx(menuCls, { 'w-100': block })}>
             <DropdownItem
               tag="label"
               toggle={false}
@@ -128,17 +134,34 @@ class MultiSelect extends React.PureComponent {
               <Checkbox
                 id={Id('select_all')}
                 label={txt_select_all}
-                checked={this.isAllSelected()}
+                checked={isAllSelected}
+                isIndeterminate={!f.isEmpty(selection) && !isAllSelected}
                 onChange={!isInactive && this.onSelectAllChange}
               />
             </DropdownItem>
 
             <DropdownItem divider />
 
-            {options.map((group, i) => {
-              const { label, options } = group
+            <Row xnoGutter>
+              <Col sm="12">
+                <InputText
+                  className={cx('ml-2 mr-2', {
+                    'form-control-sm': size === 'sm'
+                  })}
+                  placeholder="Suchen…"
+                  value={this.state.searchTerm}
+                  onChange={e => this.setState({ searchTerm: e.target.value })}
+                />
+              </Col>
+              {/* <Col sm="2"></Col> */}
+            </Row>
+            <DropdownItem divider />
+
+            {optGroups.map((group, i) => {
+              const { label, options, matchingOptions } = group
               const cbsaid = Id(`select_group_${label}_{i}`)
               const { someSelected, allSelected } = this.groupSelection(group)
+              const listedOptions = matchingOptions || options
 
               return (
                 <F key={i}>
@@ -161,33 +184,35 @@ class MultiSelect extends React.PureComponent {
                   </DropdownItem>
 
                   <div className={cx(groupWrapCls)}>
-                    {options.map(({ label, value, disabled, ...props }, ii) => {
-                      const cbid = Id(`${value}-checkbox-${i}${ii}`)
-                      const isSelected = selection.indexOf(value) !== -1
-                      const toggle =
-                        !isInactive &&
-                        (e => this.onOptionChange(value, !isSelected))
+                    {listedOptions.map(
+                      ({ label, value, disabled, ...props }, ii) => {
+                        const cbid = Id(`${value}-checkbox-${i}${ii}`)
+                        const isSelected = selection.indexOf(value) !== -1
+                        const toggle =
+                          !isInactive &&
+                          (e => this.onOptionChange(value, !isSelected))
 
-                      return (
-                        <DropdownItem
-                          key={ii}
-                          tag="label"
-                          toggle={false}
-                          className={cx(groupItemCls)}
-                          disabled={disabled}
-                          htmlFor={cbid}
-                        >
-                          <Checkbox
-                            {...props}
-                            id={cbid}
-                            label={label}
-                            value={value}
-                            checked={isSelected}
-                            onChange={toggle}
-                          />
-                        </DropdownItem>
-                      )
-                    })}
+                        return (
+                          <DropdownItem
+                            key={ii}
+                            tag="label"
+                            toggle={false}
+                            className={cx(groupItemCls)}
+                            disabled={disabled}
+                            htmlFor={cbid}
+                          >
+                            <Checkbox
+                              {...props}
+                              id={cbid}
+                              label={label}
+                              value={value}
+                              checked={isSelected}
+                              onChange={toggle}
+                            />
+                          </DropdownItem>
+                        )
+                      }
+                    )}
                   </div>
                 </F>
               )
@@ -247,13 +272,35 @@ const Checkbox = ({ id, className, label, isIndeterminate, ...props }) => {
   )
 }
 
+const matchesSearch = (string, searchTerm) => {
+  if (!searchTerm || !string) return
+  const tokens = String(string)
+    .toLowerCase()
+    .split(/\s/)
+  return f.all(tokens, str => f.contains(str, String(searchTerm).toLowerCase()))
+}
+
+const filterMatchingOptions = (allOptions, searchTerm) =>
+  !searchTerm
+    ? allOptions
+    : f
+        .map(allOptions, group => ({
+          ...group,
+          matchingOptions: matchesSearch(group.label, searchTerm)
+            ? group.options
+            : group.options.filter(o =>
+                f.any([o.label, o.value], s => matchesSearch(s, searchTerm))
+              )
+        }))
+        .filter(g => !f.isEmpty(g.matchingOptions))
+
 function titleBySelection(selection, allOptions) {
   // Describe None and All, List up to three by Name,
   // otherwise give a count
   const count = selection.length
   const optionsCount = allOptions.length
   if (count === optionsCount) {
-    return txt_all_selected
+    return `${txt_all_selected_a}${count}${txt_all_selected_e}`
   }
   if (count === 0) {
     return txt_none_selected
