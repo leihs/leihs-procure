@@ -163,3 +163,12 @@
 .form-group-lg .custom-select-lg {
   font-size: inherit; /* BS defined 125% for whatever reason */
 }
+
+/* dropdown multiselect */
+/* from .dropdown-item:hover, .dropdown-item:focus { */
+.dropdown-item:hover + .dropdown-item-subgroup,
+.dropdown-item:focus + .dropdown-item-subgroup {
+  color: #16181b;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
