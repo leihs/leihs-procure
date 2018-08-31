@@ -133,11 +133,9 @@ const RequestNewPage = () => (
           {({ loading, error, data }) => {
             if (loading) return <Loading />
             if (error) return <ErrorPanel error={error} data={data} />
-            const budgetPeriods = f
-              .sortBy(data.budget_periods, 'end_date')
-              .filter(
-                bp => new Date(bp.inspection_start_date).getTime() > Date.now()
-              )
+            const budgetPeriods = data.budget_periods.filter(
+              bp => new Date(bp.inspection_start_date).getTime() > Date.now()
+            )
 
             return (
               <NewRequestPreselection
@@ -219,13 +217,11 @@ class NewRequestPreselection extends React.Component {
             !selectedMainCat ? {} : { id: selectedMainCat.id }
           )
 
-          const categoryTree = sortByName(shownMainCats).map(mc => ({
+          const categoryTree = shownMainCats.map(mc => ({
             ...mc,
-            categories: sortByName(mc.categories).map(sc => ({
+            categories: mc.categories.map(sc => ({
               ...sc,
-              templates: sortByName(
-                f.filter(data.templates, { category: { id: sc.id } })
-              )
+              templates: f.filter(data.templates, { category: { id: sc.id } })
             }))
           }))
 
@@ -539,7 +535,5 @@ const AddButtonLine = ({ children, ...props }) => (
     {children}
   </button>
 )
-
-const sortByName = l => f.sortBy(l, 'name')
 
 const Let = ({ children, ...props }) => children(props)

@@ -152,7 +152,7 @@ const AdminCategoriesPage = ({ match }) => (
       if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
-      const categoriesToc = f.sortBy(data.main_categories, 'name')
+      const categoriesToc = data.main_categories
 
       return (
         <MainWithSidebar
@@ -245,11 +245,8 @@ const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
 
 const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
-  const formValues = {
-    ...f.pick(props, 'name', 'image_url'),
-    budget_limits: f.sortBy(props.budget_limits, 'endDate'),
-    categories: f.sortBy(props.categories, 'name')
-  }
+  const formProps = ['name', 'image_url', 'budget_limits', 'categories']
+  const formValues = f.pick(props, formProps)
 
   return (
     <StatefulForm

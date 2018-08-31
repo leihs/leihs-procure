@@ -63,23 +63,18 @@ export default FilterBar
 
 const Filters = ({ me, data, current, onChange }) => {
   const available = {
-    budgetPeriods: f
-      .sortBy(data.budget_periods, 'name')
-      .map(({ id, name }) => ({ value: id, label: name }))
-      .reverse(),
-
+    budgetPeriods: data.budget_periods.map(({ id, name }) => ({
+      value: id,
+      label: name
+    })),
     categories: data.main_categories.map(({ id, name, categories }) => ({
       label: name,
-      options: f
-        .sortBy(categories, 'name')
-        .map(({ id, name }) => ({ value: id, label: name }))
+      options: categories.map(({ id, name }) => ({ value: id, label: name }))
     })),
 
     organizations: data.organizations.map(({ id, name, organizations }) => ({
       label: name,
-      options: f
-        .sortBy(organizations, 'name')
-        .map(({ id, name }) => ({ value: id, label: name }))
+      options: organizations.map(({ id, name }) => ({ value: id, label: name }))
     })),
 
     priority: CONSTANTS.REQUEST_PRIORITIES.map(value => ({

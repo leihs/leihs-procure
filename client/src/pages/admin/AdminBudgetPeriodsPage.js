@@ -94,7 +94,7 @@ class AdminBudgetPeriodsPage extends React.Component {
               if (loading) return <Loading />
               if (error) return <ErrorPanel error={error} data={data} />
 
-              const budgetPeriods = f.sortBy(data.budget_periods, 'end_date')
+              const budgetPeriods = [...data.budget_periods].reverse()
 
               return (
                 <MainWithSidebar>

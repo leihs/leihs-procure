@@ -54,7 +54,7 @@ const AdminOrgsPage = () => (
       if (loading) return <Loading />
       if (error) return <ErrorPanel error={error} data={data} />
 
-      const departmentsOrgs = f.sortBy(data.organizations, 'name')
+      const departmentsOrgs = data.organizations
       const requestersByOrg = f.groupBy(
         data.requesters_organizations,
         'organization.id'
