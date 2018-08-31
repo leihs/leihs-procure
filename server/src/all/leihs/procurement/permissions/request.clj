@@ -1,49 +1,100 @@
 (ns leihs.procurement.permissions.request
-  (:require [leihs.procurement.permissions.request-fields :as
-             request-fields-perms]))
+  (:require [clojure.tools.logging :as log]
+            [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources [budget-period :as budget-period]
+             [request :as request]]))
 
-(def attrs-to-exclude #{:id :state :total_price_cents})
+(defn can-edit?
+  [context args value]
+  (let [rrequest (:request context)
+        tx (:tx rrequest)
+        auth-entity (:authenticated-entity rrequest)
+        req-id (or (-> args
+                       :input_data
+                       :id)
+                   (:id value))
+        request (request/get-request-by-id tx auth-entity req-id)
+        budget-period (->> request
+                           :budget_period_id
+                           (budget-period/get-budget-period-by-id tx))]
+    (and (not (budget-period/past? tx budget-period))
+         (or (user-perms/admin? tx auth-entity)
+             (user-perms/inspector? tx auth-entity (:category_id request))
+             (and (user-perms/requester? tx auth-entity)
+                  (request/requested-by? tx auth-entity request)
+                  (budget-period/in-requesting-phase? tx budget-period))))))
 
-(defn- fallback-p-spec [value] {:value value, :read true, :write true})
+; REFACTOR: reuse request field permissions
+(defn can-change-request-budget-period?
+  [context args value]
+  (let [rrequest (:request context)
+        tx (:tx rrequest)
+        auth-entity (:authenticated-entity rrequest)
+        req-id (or (-> args
+                       :input_data
+                       :id)
+                   (:id value))
+        request (request/get-request-by-id tx auth-entity req-id)
+        budget-period-current (->> request
+                                   :budget_period_id
+                                   (budget-period/get-budget-period-by-id tx))
+        budget-period-new (->> request
+                               :budget_period_id
+                               (budget-period/get-budget-period-by-id tx))]
+    (and
+      (not (budget-period/past? tx budget-period-current))
+      (not (budget-period/past? tx budget-period-new))
+      (or (user-perms/admin? tx auth-entity)
+          (user-perms/inspector? tx auth-entity (:category_id request))
+          (and (user-perms/requester? tx auth-entity)
+               (request/requested-by? tx auth-entity request)
+               (budget-period/in-requesting-phase? tx
+                                                   budget-period-current))))))
 
-(defn with-protected-value
-  [p-spec value]
-  (->> value
-       (if (:read p-spec))
-       (assoc p-spec :value)))
+; REFACTOR: reuse request field permissions
+(defn can-change-request-category?
+  [context args value]
+  (let [rrequest (:request context)
+        tx (:tx rrequest)
+        auth-entity (:authenticated-entity rrequest)
+        req-id (or (-> args
+                       :input_data
+                       :id)
+                   (:id value))
+        request (request/get-request-by-id tx auth-entity req-id)
+        budget-period (->> request
+                           :budget_period_id
+                           (budget-period/get-budget-period-by-id tx))]
+    (and (not (budget-period/past? tx budget-period))
+         (or (user-perms/admin? tx auth-entity)
+             (user-perms/inspector? tx auth-entity (:category_id request))
+             (and (user-perms/requester? tx auth-entity)
+                  (request/requested-by? tx auth-entity request)
+                  (budget-period/in-requesting-phase? tx budget-period))))))
 
-(defn value-with-permissions
-  [field-perms transform-fn attr value]
-  (if (attrs-to-exclude attr)
-    {attr value}
-    {attr (let [res (if-let [p-spec (attr field-perms)]
-                      (with-protected-value p-spec value)
-                      ; FIXME: this is a general whitelist fallback
-                      ; remove when all field permissions implemented
-                      (fallback-p-spec value))]
-            (transform-fn res))}))
+; REFACTOR: reuse request field permissions
+(defn can-delete?
+  [context args value]
+  (let [rrequest (:request context)
+        tx (:tx rrequest)
+        auth-entity (:authenticated-entity rrequest)
+        req-id (or (-> args
+                       :input_data
+                       :id)
+                   (:id value))
+        request (request/get-request-by-id tx auth-entity req-id)
+        budget-period (->> request
+                           :budget_period_id
+                           (budget-period/get-budget-period-by-id tx))]
+    (and (not (budget-period/past? tx budget-period))
+         (or (user-perms/admin? tx auth-entity)
+             (user-perms/inspector? tx auth-entity (:category_id request))
+             (and (user-perms/requester? tx auth-entity)
+                  (request/requested-by? tx auth-entity request)
+                  (budget-period/in-requesting-phase? tx budget-period))))))
 
-(defn apply-permissions
-  ([tx auth-user proc-request]
-   (apply-permissions tx auth-user proc-request identity))
-  ([tx auth-user proc-request transform-fn]
-   (let [field-perms (request-fields-perms/get-for-user-and-request
-                       tx
-                       auth-user
-                       proc-request)]
-     (->> proc-request
-          (map #(apply value-with-permissions field-perms transform-fn %))
-          (into {})))))
-
-(defn authorized-to-write-all-fields?
-  ([tx auth-user write-data]
-   "For creating new request"
-   (authorized-to-write-all-fields? tx auth-user write-data write-data))
-  ([tx auth-user request write-data]
-   "For updating an existing request"
-   (let [request-data-with-perms (apply-permissions tx auth-user request)]
-     (->> write-data
-          (map first)
-          (map #(% request-data-with-perms))
-          (map :write)
-          (every? true?)))))
+(defn action-permissions
+  [context args value]
+  {:edit (can-edit? context args value),
+   :moveBudgetPeriod (can-change-request-budget-period? context args value),
+   :moveCategory (can-change-request-category? context args value)})
