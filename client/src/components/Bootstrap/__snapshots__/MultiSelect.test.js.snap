@@ -97,6 +97,7 @@ exports[`MultiSelect: renders correctly 1`] = `
             aria-label="Suchen…"
             autoComplete="off"
             className="form-control"
+            name={undefined}
             onChange={[Function]}
             placeholder="Suchen…"
             type="text"
