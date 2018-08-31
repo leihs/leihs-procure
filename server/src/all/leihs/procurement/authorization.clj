@@ -42,6 +42,13 @@
                "Not authorized for this query path and arguments."
                {})))))
 
+(defn wrap-authorize-resolver
+  [resolver check]
+  (fn [context args value]
+    (authorize-and-apply #(resolver context args value)
+                         :if-only
+                         #(check context args value))))
+
 (def skip-authorization-handler-keys
   [[:attachment #{:dev :test}] [:image #{:dev :test}] :status
    [:upload #{:dev :test}]])
