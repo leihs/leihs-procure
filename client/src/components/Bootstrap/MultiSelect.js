@@ -8,10 +8,12 @@ import Dropdown from 'reactstrap/lib/Dropdown'
 import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
-import { Row, Col, InputText } from '.'
+import { InputText } from '.'
+import Icon from '../Icons'
 const log = logger('app:ui:MultiSelect')
 
-const START_OPEN = false //true
+const START_OPEN = false
+// const START_OPEN = true
 const txt_select_all = 'Alle auswählen'
 const txt_all_selected_a = 'Alle '
 const txt_all_selected_e = ' ausgewählt'
@@ -141,20 +143,14 @@ class MultiSelect extends React.PureComponent {
             </DropdownItem>
 
             <DropdownItem divider />
-
-            <Row xnoGutter>
-              <Col sm="12">
-                <InputText
-                  className={cx('ml-2 mr-2', {
-                    'form-control-sm': size === 'sm'
-                  })}
-                  placeholder="Suchen…"
-                  value={this.state.searchTerm}
-                  onChange={e => this.setState({ searchTerm: e.target.value })}
-                />
-              </Col>
-              {/* <Col sm="2"></Col> */}
-            </Row>
+            <SearchField
+              size={size}
+              label="Suchen…"
+              value={this.state.searchTerm}
+              onChange={e => this.setState({ searchTerm: e.target.value })}
+              clearLabel="Suche zurücksetzen"
+              onClear={e => this.setState({ searchTerm: '' })}
+            />
             <DropdownItem divider />
 
             {optGroups.map((group, i) => {
@@ -249,6 +245,43 @@ MultiSelect.propTypes = {
 
 export default MultiSelect
 
+const SearchField = ({ size, label, value, onChange, clearLabel, onClear }) => {
+  value = f.isString(value) && f.presence(value)
+  return (
+    <div
+      className={cx('input-group ', {
+        'px-2': !size,
+        'px-1 input-group-sm': size === 'sm',
+        'px-3 input-group-lg': size === 'lg'
+      })}
+    >
+      <div className="input-group-prepend">
+        <span className="input-group-text" title={label}>
+          <Icon.Search />
+        </span>
+      </div>
+      <InputText
+        placeholder={label}
+        aria-label={label}
+        value={value || ''}
+        onChange={onChange}
+      />
+      <div className="input-group-append">
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          disabled={!value}
+          onClick={onClear}
+          title={clearLabel}
+          aria-label={clearLabel}
+        >
+          <Icon.Cross />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 const Checkbox = ({ id, className, label, isIndeterminate, ...props }) => {
   const setCheckboxRef = checkbox => {
     if (checkbox) {
@@ -274,10 +307,10 @@ const Checkbox = ({ id, className, label, isIndeterminate, ...props }) => {
 
 const matchesSearch = (string, searchTerm) => {
   if (!searchTerm || !string) return
-  const tokens = String(string)
-    .toLowerCase()
-    .split(/\s/)
-  return f.all(tokens, str => f.contains(str, String(searchTerm).toLowerCase()))
+  string = String(string).toLowerCase()
+  searchTerm = String(searchTerm).toLowerCase()
+  const tokens = searchTerm.split(/\s/)
+  return f.all(tokens, token => f.contains(string, token))
 }
 
 const filterMatchingOptions = (allOptions, searchTerm) =>
