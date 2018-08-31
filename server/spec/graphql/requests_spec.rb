@@ -154,6 +154,24 @@ describe 'requests' do
       end
     end
 
+    pending 'price and total sums of more than 32-bit-cents do not crash' do
+      @requests = BudgetPeriod.all.map do |bp|
+        Category.all.map do |cat|
+          FactoryBot.create(
+            :request,
+            user_id: @user.id,
+            budget_period_id: bp.id,
+            category_id: cat.id,
+            price_cents: (2**32),
+            requested_quantity: 2
+          )
+        end.flatten
+      end
+
+      result = query(@query, @user.id, {withTotalSums: true})
+      expect(result['errors']).to be_nil
+    end
+
     example 'filter for budget periods and categories' do
       bps = BudgetPeriod.where(name: ['2003', '2002'])
       cats = Category.where(name: ['cat A', 'cat B'])
