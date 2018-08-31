@@ -17,13 +17,6 @@ const REQUEST_EDIT_QUERY = gql`
   query RequestForEdit($id: [ID!]!) {
     requests(id: $id) {
       ...RequestFieldsForEdit
-
-      actionPermissions {
-        edit # == request_fields.any?(&:write)
-        moveBudgetPeriod # == request_fields.budget_period.write
-        moveCategory # == request_fields.category.write
-        delete # ???
-      }
     }
     # for selecting a new category:
     main_categories {
@@ -100,7 +93,7 @@ class RequestEdit extends React.Component {
           if (loading) return <Loading />
           if (error) return <ErrorPanel error={error} data={data} />
 
-          const request = f.first(f.get(data, 'requests'))
+          const request = data.requests[0]
 
           if (!request) {
             return (
@@ -111,19 +104,6 @@ class RequestEdit extends React.Component {
               </RoutedStatus>
             )
           }
-
-          const canDo = request.actionPermissions
-          // some examples:
-          // const canDo = {
-          //   moveBudgetPeriod: request.budget_period.write,
-          //   moveCategory: request.category.write,
-          //   delete: request.category.write
-          // }
-          // const canDo = {
-          //   moveBudgetPeriod: false,
-          //   moveCategory: false,
-          //   delete: false
-          // }
 
           return (
             <Mutation mutation={UPDATE_REQUEST_MUTATION}>
@@ -151,7 +131,7 @@ class RequestEdit extends React.Component {
                       }
                       // action delete
                       doDeleteRequest={
-                        !!(canDo.delete && props.doDeleteRequest) &&
+                        !!props.doDeleteRequest &&
                         (e => props.doDeleteRequest(request))
                       }
                       // action move category
@@ -160,17 +140,14 @@ class RequestEdit extends React.Component {
                       }
                       isSelectingNewCategory={this.state.selectNewCategory}
                       doChangeRequestCategory={
-                        !!(
-                          canDo.moveCategory && props.doChangeRequestCategory
-                        ) && this.onChangeRequestCategory
+                        !!props.doChangeRequestCategory &&
+                        this.onChangeRequestCategory
                       }
                       // action move budget period
                       onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
                       isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
                       doChangeBudgetPeriod={
-                        !!(
-                          props.doChangeBudgetPeriod && canDo.moveBudgetPeriod
-                        ) && this.onChangeBudgetPeriod
+                        props.doChangeBudgetPeriod && this.onChangeBudgetPeriod
                       }
                     />
                     {window.isDebug && (
