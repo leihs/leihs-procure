@@ -42,6 +42,7 @@ import faPlusCircle from '@fortawesome/fontawesome-free-solid/faPlusCircle'
 import faStream from '@fortawesome/fontawesome-free-solid/faStream'
 import faListUl from '@fortawesome/fontawesome-free-solid/faListUl'
 import faCube from '@fortawesome/fontawesome-free-solid/faCube'
+import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
 
 const ICONS = {
   CaretUp: {
@@ -121,6 +122,9 @@ const ICONS = {
   },
   Reload: {
     src: faSyncAlt
+  },
+  Search: {
+    src: faSearch
   },
   Settings: {
     src: faCog

@@ -23,7 +23,7 @@ import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
-import { examples as MultiSelectExamples } from '../../components/Bootstrap/DownshiftMultiSelect.examples'
+import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
 import { examples as IconExamples } from '../../components/Icons.examples'
 
 const ExamplesList = ({ examples }) =>
