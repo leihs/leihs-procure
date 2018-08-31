@@ -138,7 +138,7 @@ describe 'requests' do
       expect(result).to eq(expected_result)
     end
 
-    pending 'empty array filter arguments do not crash' do
+    example 'empty array filter arguments do not crash' do
       variable_keys_to_try = [
         :budgetPeriods,
         :organizations,

@@ -89,20 +89,25 @@
                           (request/requests-base-query-with-state advanced-user?))]
      (cond-> start-sqlmap
        id (sql/merge-where [:in :procurement_requests.id id])
-       category-id (sql/merge-where [:in :procurement_requests.category_id
-                                     category-id])
-       budget-period-id (sql/merge-where [:in
-                                          :procurement_requests.budget_period_id
-                                          budget-period-id])
-       organization-id (sql/merge-where [:in
-                                         :procurement_requests.organization_id
-                                         organization-id])
-       priority (sql/merge-where [:in :procurement_requests.priority priority])
-       inspector-priority (sql/merge-where
-                            [:in :procurement_requests.inspector_priority
-                             inspector-priority])
-       state (sql/merge-where
-               (request/get-where-conds-for-states state advanced-user?))
+       category-id (-> (sql/merge-where [:in :procurement_requests.category_id category-id])
+                       (sql/merge-where-false-if-empty category-id))
+       budget-period-id (-> (sql/merge-where [:in
+                                              :procurement_requests.budget_period_id
+                                              budget-period-id])
+                            (sql/merge-where-false-if-empty budget-period-id))
+       organization-id (-> (sql/merge-where [:in
+                                             :procurement_requests.organization_id
+                                             organization-id])
+                           (sql/merge-where-false-if-empty organization-id))
+       priority (-> (sql/merge-where [:in :procurement_requests.priority priority])
+                    (sql/merge-where-false-if-empty priority))
+       inspector-priority (-> (sql/merge-where
+                                [:in :procurement_requests.inspector_priority
+                                 inspector-priority])
+                              (sql/merge-where-false-if-empty inspector-priority))
+       state (-> (sql/merge-where
+                   (request/get-where-conds-for-states state advanced-user?))
+                 (sql/merge-where-false-if-empty state))
        requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
                                                 (-> context
                                                     :request
@@ -122,26 +127,22 @@
 
 (defn get-requests
   [context arguments value]
-  (if (some #(= (% arguments) [])
-            [:id :budget_period_id :category_id :inspector_priority
-             :organization_id :priority :state :user_id])
-    []
-    (let [ring-request (:request context)
-          tx (:tx ring-request)
-          auth-entity (:authenticated-entity ring-request)
-          query (as-> context <>
-                  (requests-query-map <> arguments value)
-                  (requests-perms/apply-scope tx <> auth-entity)
-                  (sql/format <>))
-          proc-requests (request/query-requests tx query)]
-      (->> proc-requests
-           (map request/reverse-exchange-attrs)
-           (map (fn [proc-req]
-                  (request-perms/apply-permissions
-                    tx
-                    auth-entity
-                    proc-req
-                    #(assoc % :request-id (:id proc-req)))))))))
+  (let [ring-request (:request context)
+        tx (:tx ring-request)
+        auth-entity (:authenticated-entity ring-request)
+        query (as-> context <>
+                (requests-query-map <> arguments value)
+                (requests-perms/apply-scope tx <> auth-entity)
+                (sql/format <>))
+        proc-requests (request/query-requests tx query)]
+    (->> proc-requests
+         (map request/reverse-exchange-attrs)
+         (map (fn [proc-req]
+                (request-perms/apply-permissions
+                  tx
+                  auth-entity
+                  proc-req
+                  #(assoc % :request-id (:id proc-req))))))))
 
 (defn get-total-price-cents
   [tx sqlmap]
@@ -185,14 +186,18 @@
         auth-entity (:authenticated-entity ring-request)
         budget-period-id (get-id-from-resolution-context value :budget-period)
         category-id (get-category-id context value)
-        requests-args (:requests-args context)]
+        requests-args (:requests-args context)
+        base-query (-> (sql/select :procurement_requests.*)
+                       (sql/from :procurement_requests)
+                       (sql/merge-join :procurement_budget_periods
+                                       [:= :procurement_budget_periods.id
+                                        :procurement_requests.budget_period_id]))]
     (as-> {} <>
       (cond-> <>
         (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
       (cond-> <> (not-empty category-id) (assoc :category_id category-id))
       (merge <> requests-args)
-      (requests-query-map context <> nil {:base-query (-> (sql/select :procurement_requests.*)
-                                                          (sql/from :procurement_requests))})
+      (requests-query-map context <> nil {:base-query base-query})
       (requests-perms/apply-scope tx <> auth-entity)
       (sql/select <>
                   [(->> [:order_quantity :approved_quantity :requested_quantity]

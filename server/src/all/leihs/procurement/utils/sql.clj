@@ -43,6 +43,9 @@
                  (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))
           (cons :and)))))
 
+(defn merge-where-false-if-empty [m c]
+  (cond-> m (empty? c) (helpers/where [:= true false])))
+
 (defalias call types/call)
 (defalias param types/param)
 (defalias raw types/raw)
