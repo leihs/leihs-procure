@@ -98,6 +98,8 @@ describe 'requests' do
                   requested_by_auth_user: $onlyOwnRequests
                 ) {
                   id
+                  price_cents @include(if: $withTotalSums) { value }
+                  total_price_cents @include(if: $withTotalSums)
                 }
               }
             }
@@ -154,7 +156,9 @@ describe 'requests' do
       end
     end
 
-    pending 'price and total sums of more than 32-bit-cents do not crash' do
+    example 'total sums of more than 32-bit-cents do not crash' do
+      # TODO: 'price and total sums of more than 32-bit-cents do not crash'
+      #        => price_cents: (2**33),
       @requests = BudgetPeriod.all.map do |bp|
         Category.all.map do |cat|
           FactoryBot.create(
@@ -162,13 +166,16 @@ describe 'requests' do
             user_id: @user.id,
             budget_period_id: bp.id,
             category_id: cat.id,
-            price_cents: (2**32),
-            requested_quantity: 2
+            price_cents: (2**30),
+            requested_quantity: 10000
           )
         end.flatten
       end
 
       result = query(@query, @user.id, {withTotalSums: true})
+      bp_totals = result['data']['budget_periods'].map {|bp| bp['total_price_cents']}
+      # expect at least 1 sum over 32bit size AND no errors
+      expect(bp_totals.any? {|n| n.to_i > 2**33}).to be
       expect(result['errors']).to be_nil
     end
 
