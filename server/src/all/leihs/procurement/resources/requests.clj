@@ -65,8 +65,8 @@
 
 (defn requests-query-map
   ([context arguments value]
-   (requests-query-map context arguments value nil))
-  ([context arguments value advanced-user?]
+   (requests-query-map context arguments value {}))
+  ([context arguments value {advanced-user-opt :advanced-user, base-query-opt :base-query}]
    (let [id (:id arguments)
          category-id (get-id :category arguments value)
          budget-period-id (get-id :budget-period arguments value)
@@ -83,10 +83,10 @@
          search-term (:search arguments)
          rrequest (:request context)
          tx (:tx rrequest)
-         start-sqlmap (if-not (nil? advanced-user?)
-                        (request/requests-base-query-with-state advanced-user?)
-                        (-> (sql/select :procurement_requests.*)
-                            (sql/from :procurement_requests)))]
+         advanced-user? (or advanced-user-opt
+                            (user-perms/advanced? tx (:authenticated-entity rrequest)))
+         start-sqlmap (or base-query-opt
+                          (request/requests-base-query-with-state advanced-user?))]
      (cond-> start-sqlmap
        id (sql/merge-where [:in :procurement_requests.id id])
        category-id (sql/merge-where [:in :procurement_requests.category_id
@@ -109,15 +109,15 @@
                                                     :authenticated-entity
                                                     :user_id)])
        from-categories-of-auth-user
-       (sql/merge-where
-         [:in :procurement_requests.category_id
-          (-> (sql/select :category_id)
-              (sql/from :procurement_category_inspectors)
-              (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                (-> context
-                                    :request
-                                    :authenticated-entity
-                                    :id)]))])
+         (sql/merge-where
+           [:in :procurement_requests.category_id
+            (-> (sql/select :category_id)
+                (sql/from :procurement_category_inspectors)
+                (sql/merge-where [:= :procurement_category_inspectors.user_id
+                                  (-> context
+                                      :request
+                                      :authenticated-entity
+                                      :id)]))])
        search-term (search-query search-term)))))
 
 (defn get-requests
@@ -129,9 +129,8 @@
     (let [ring-request (:request context)
           tx (:tx ring-request)
           auth-entity (:authenticated-entity ring-request)
-          advanced-user? (user-perms/advanced? tx auth-entity)
           query (as-> context <>
-                  (requests-query-map <> arguments value advanced-user?)
+                  (requests-query-map <> arguments value)
                   (requests-perms/apply-scope tx <> auth-entity)
                   (sql/format <>))
           proc-requests (request/query-requests tx query)]
@@ -140,7 +139,7 @@
            (map (fn [proc-req]
                   (request-perms/apply-permissions
                     tx
-                    (:authenticated-entity ring-request)
+                    auth-entity
                     proc-req
                     #(assoc % :request-id (:id proc-req)))))))))
 
@@ -192,7 +191,8 @@
         (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
       (cond-> <> (not-empty category-id) (assoc :category_id category-id))
       (merge <> requests-args)
-      (requests-query-map context <> nil)
+      (requests-query-map context <> nil {:base-query (-> (sql/select :procurement_requests.*)
+                                                          (sql/from :procurement_requests))})
       (requests-perms/apply-scope tx <> auth-entity)
       (sql/select <>
                   [(->> [:order_quantity :approved_quantity :requested_quantity]
