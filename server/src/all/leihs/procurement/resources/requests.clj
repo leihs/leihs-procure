@@ -210,12 +210,14 @@
   [qty-type bp-id]
   (-> (sql/select :procurement_requests.budget_period_id
                   [(sql/call :sum
-                             (sql/call :*
-                                       :procurement_requests.price_cents
-                                       (->> qty-type
-                                            name
-                                            (str "pr.")
-                                            keyword))) :result])
+                             (sql/call :cast
+                                       (sql/call :*
+                                                 :procurement_requests.price_cents
+                                                 (->> qty-type
+                                                      name
+                                                      (str "pr.")
+                                                      keyword))
+                                       :bigint)) :result])
       (sql/from :procurement_requests)
       (sql/merge-where [:= :procurement_requests.budget_period_id bp-id])
       (sql/group :procurement_requests.budget_period_id)))
