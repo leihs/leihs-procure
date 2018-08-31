@@ -7,7 +7,6 @@ import { stringify as stringifyQuery } from 'qs'
 import t from '../locale/translate'
 import { Row, Col, Button, Collapsing, Tooltipped } from './Bootstrap'
 import { formatCurrency, budgetPeriodDates } from './decorators'
-// import MultiSelect from './Bootstrap/MultiSelect'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
 import Loading from './Loading'
@@ -17,10 +16,11 @@ import ImageThumbnail from './ImageThumbnail'
 
 import CurrentUser from '../containers/CurrentUserProvider'
 import FilterBar from './RequestsFilterBar'
-// import logger from 'debug'
-// const log = logger('app:ui:RequestsTreeFiltered')
+import logger from 'debug'
+const log = logger('app:ui:RequestsDashboard')
 
 const RequestsDashboard = props => {
+  log('render', { props })
   const { requestsQuery, refetchAllData } = props
 
   const requests = f.flatMap(

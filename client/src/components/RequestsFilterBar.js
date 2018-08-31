@@ -189,7 +189,10 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.onlyOwnRequests &&
               allowed.onlyCategoriesWithRequests && (
-                <FormGroup label={t('dashboard.filter_titles.special')}>
+                <FormGroup
+                  label={t('dashboard.filter_titles.special')}
+                  cls="mb-0"
+                >
                   {allowed.onlyOwnRequests && (
                     <FormField
                       {...formPropsFor('onlyOwnRequests')}

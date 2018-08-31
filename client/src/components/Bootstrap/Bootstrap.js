@@ -118,6 +118,7 @@ export const FormGroup = ({
   children,
   ...props
 }) => {
+  const cls = [props.cls, props.className, 'form-group']
   const labelContent = !!(label || labelSmall) && (
     <F>
       {label}
@@ -131,7 +132,7 @@ export const FormGroup = ({
   )
 
   return (
-    <Node {...props} cls="form-group" tag="fieldset">
+    <Node {...props} cls={cls} tag="fieldset">
       {labelContent && (
         <Label htmlFor={id} cls={{ 'sr-only': hideLabel }}>
           {labelContent}{' '}
