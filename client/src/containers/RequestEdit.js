@@ -8,6 +8,7 @@ import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 
 // import { RequestTotalAmount as TotalAmount } from '../components/decorators'
+import t from '../locale/translate'
 import { Alert, RoutedStatus } from '../components/Bootstrap'
 // import Icon from '../components/Icons'
 import RequestForm from '../components/RequestForm'
@@ -56,7 +57,7 @@ class RequestEdit extends React.Component {
   onChangeRequestCategory = newCategory => {
     const requestId = this.props.requestId
     if (!requestId || !newCategory.id) throw new Error()
-    window.confirm(`Move to category "${newCategory.name}"?`) &&
+    window.confirm(t('request.confirm_move_category')) &&
       this.props.doChangeRequestCategory(requestId, newCategory.id)
   }
 
@@ -68,11 +69,11 @@ class RequestEdit extends React.Component {
   onChangeBudgetPeriod = newBudgetPeriod => {
     const requestId = this.props.requestId
     if (!requestId || !newBudgetPeriod.id) throw new Error()
-    window.confirm(`Move to Budget Period "${newBudgetPeriod.name}"?`) &&
+    window.confirm(t('request.confirm_move_budget_period')) &&
       this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
   }
 
-  render({ requestId, onCancel, className, ...props } = this.props) {
+  render({ requestId, onCancel, onSuccess, className, ...props } = this.props) {
     if (!f.isUUID(requestId)) {
       return (
         <RoutedStatus code={400}>
@@ -119,8 +120,8 @@ class RequestEdit extends React.Component {
                       categories={data.main_categories}
                       budgetPeriods={data.budget_periods}
                       onCancel={onCancel}
-                      onSubmit={fields =>
-                        mutate({
+                      onSubmit={async fields => {
+                        await mutate({
                           variables: {
                             requestData: {
                               id: request.id,
@@ -128,7 +129,8 @@ class RequestEdit extends React.Component {
                             }
                           }
                         })
-                      }
+                        onSuccess()
+                      }}
                       // action delete
                       doDeleteRequest={
                         !!props.doDeleteRequest &&
@@ -169,7 +171,14 @@ export default RequestEdit
 RequestEdit.propTypes = {
   doChangeBudgetPeriod: PropTypes.func,
   doChangeRequestCategory: PropTypes.func,
-  doDeleteRequest: PropTypes.func
+  doDeleteRequest: PropTypes.func,
+  onCancel: PropTypes.func,
+  onSuccess: PropTypes.func
+}
+
+RequestEdit.defaultProps = {
+  onCancel: f.noop,
+  onSuccess: f.noop
 }
 
 const valueIfWritable = (fields, requestData, key) => {

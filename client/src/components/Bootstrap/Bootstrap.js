@@ -180,6 +180,7 @@ const FormFieldPropTypes = {
   beforeInput: PropTypes.node,
   afterInput: PropTypes.node,
   helpText: PropTypes.node,
+  invalidFeedback: PropTypes.string,
   id: PropTypes.string,
   children: PropTypes.oneOf([null, undefined]),
   label: PropTypes.node.isRequired,
@@ -198,6 +199,7 @@ const FormFieldPropTypes = {
 export const FormField = ({
   beforeInput,
   afterInput,
+  invalidFeedback,
   helpText,
   id,
   children,
@@ -336,6 +338,9 @@ export const FormField = ({
       {beforeInput}
       {inputNode}
       {inputLabelNode}
+      {!!invalidFeedback && (
+        <div className="invalid-feedback">{invalidFeedback}</div>
+      )}
       {afterInput}
     </FormGroup>
   )

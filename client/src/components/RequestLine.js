@@ -3,9 +3,11 @@ import cx from 'classnames'
 // import f from 'lodash'
 
 import t from '../locale/translate'
+import * as CONSTANTS from '../constants'
 import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
-import { Div, Row, Col, Badge, Tooltipped } from './Bootstrap'
+import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
+import RequestStateBadge from './RequestStateBadge'
 import RequestEdit from '../containers/RequestEdit'
 
 class RequestLine extends React.Component {
@@ -13,6 +15,7 @@ class RequestLine extends React.Component {
     open: false
   }
   render({ props: { request, ...props }, state: { open } } = this) {
+    const closeLine = () => this.setState({ open: false })
     const isChanged = false // FIXME: detect form changed state
     const lineStyle = cx(
       { 'cursor-pointer': !open || !isChanged },
@@ -42,7 +45,8 @@ class RequestLine extends React.Component {
             <RequestEdit
               className="p-3"
               requestId={request.id}
-              onCancel={() => this.setState({ open: false })}
+              onCancel={closeLine}
+              onSuccess={closeLine}
               doChangeRequestCategory={props.doChangeRequestCategory}
               doChangeBudgetPeriod={props.doChangeBudgetPeriod}
               doDeleteRequest={props.doDeleteRequest}
@@ -60,11 +64,20 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     <Col sm="2">
       {request.article_name.value || DisplayName(request.model.value)}
     </Col>
-    <Col sm="3">
+    <Col sm="2">
       {DisplayName(request.user.value)} /{' '}
       {DisplayName(request.organization.value)}
     </Col>
-    <Col sm="4">
+    <Col sm="1" cls="text-center">
+      <Tooltipped text={t('request_form_field.state')}>
+        <RequestStateBadge
+          state={request.state}
+          id={`reqst_tt_${request.id}`}
+          className="mr-1 text-wrap"
+        />
+      </Tooltipped>
+    </Col>
+    <Col sm="3">
       <Tooltipped text={t('request_form_field.price_cents')}>
         <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
           <Icon.PriceTag className="mr-1" />
@@ -102,14 +115,24 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     </Col>
     <Col sm="1">
       <Tooltipped text={t('priority')}>
-        <Badge secondary cls="mr-1" id={`prio_tt_${request.id}`}>
+        <Badge dark cls="mr-1" id={`prio_tt_${request.id}`}>
           {t(`priority_label_${request.priority.value}`)}
         </Badge>
       </Tooltipped>
     </Col>
     <Col sm="1">
-      {/* FIXME: replacement.value */}
-      <Div cls="label label-info">{request.replacement.value}</Div>
+      <Tooltipped text={t('request_form_field.replacement')}>
+        <Badge secondary id={`replcmt_tt_${request.id}`}>
+          {/* {CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[request.replacement.value]}{' '} */}
+          {t(
+            `request_form_field.request_replacement_labels_${
+              CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
+                request.replacement.value
+              ]
+            }`
+          )}{' '}
+        </Badge>
+      </Tooltipped>
     </Col>
   </Row>
 )

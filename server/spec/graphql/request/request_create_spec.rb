@@ -70,6 +70,7 @@ describe 'request' do
             approved_quantity {
               ...RequestFieldInt
             }
+            state
             supplier_name {
               ...RequestFieldString
             }
@@ -143,6 +144,7 @@ describe 'request' do
                      general: true
                    },
                  },
+                 state: 'NEW',
                  supplier_name: { value: nil, read: true, write: true },
                  user: { value: nil, read: false, write: false, default: requester.id }
                 )
@@ -187,6 +189,7 @@ describe 'request' do
                      general: true
                    },
                  },
+                 state: 'NEW',
                  supplier_name: { value: nil, read: true, write: false },
                  user: { value: nil, read: false, write: false, default: requester.id }
                 )

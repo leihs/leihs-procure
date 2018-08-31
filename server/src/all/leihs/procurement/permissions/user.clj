@@ -1,5 +1,6 @@
 (ns leihs.procurement.permissions.user
   (:require [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.permissions.categories :as categories-perms]
             [leihs.procurement.utils.sql :as sql]))
 

@@ -10,7 +10,7 @@ import {
   RouteParams as Routed
 } from '../components/Bootstrap'
 import MainNav from '../components/MainNav'
-import { CURRENT_USER_QUERY } from './CurrentUserProvider'
+import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
 
 const MainNavWithRouter = withRouter(MainNav)
 
@@ -27,16 +27,23 @@ class App extends Component {
     return (
       <Routed>
         {({ location }) => {
+          const locationKey = location.key || JSON.stringify(location)
+
           return (
             // TODO: set lang to instance default language
             <div className="ui-app" lang="de">
               <Query
+                key={locationKey}
                 query={CURRENT_USER_QUERY}
                 fetchPolicy="cache-and-network"
                 notifyOnNetworkStatusChange
               >
-                {({ error, loading, data, refetch }) => {
-                  if (loading) return <Loading />
+                {({ error, loading, data, refetch, networkStatus }) => {
+                  // refetch *in background* for every navigation,
+                  // don't flicker UI by only using `loading`!
+                  const isLoading = !(data && data.current_user) && loading
+
+                  if (isLoading) return <Loading />
 
                   if (error) {
                     return (
@@ -52,7 +59,7 @@ class App extends Component {
                     <F>
                       <MainNavWithRouter
                         isDev={isDev}
-                        me={data.current_user.user}
+                        me={UserWithShortcuts(data.current_user)}
                         contactUrl={data.settings.contact_url}
                       />
                       <div className="minh-100vh">

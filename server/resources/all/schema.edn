@@ -1,5 +1,7 @@
 {:enums {:InspectorPriority {:values [:LOW :MEDIUM :HIGH :MANDATORY]},
-         :Priority {:values [:NORMAL :HIGH]}},
+         :Priority {:values [:NORMAL :HIGH]},
+         :State {:values [:APPROVED :DENIED :IN_APPROVAL :NEW
+                          :PARTIALLY_APPROVED]}},
  :input-objects
    {:AdminInput {:fields {:user_id {:type (non-null ID)}}},
     :BudgetLimitInput {:fields {:amount_cents {:type Int},
@@ -194,7 +196,7 @@
                 :priority {:type (list :Priority)},
                 :requested_by_auth_user {:type Boolean},
                 :search {:type String},
-                :state {:type (list String)}},
+                :state {:type (list :State)}},
              :resolve :requests,
              :type (list :Request)},
           :templates {:resolve :templates, :type (list :Template)},
@@ -232,6 +234,8 @@
     :Request
       {:fields
          {:accounting_type {:type :RequestFieldString},
+          :actionPermissions {:resolve :request-action-permissions,
+                              :type :RequestActionPermissions},
           :approved_quantity {:type :RequestFieldInt},
           :article_name {:type :RequestFieldString},
           :article_number {:type :RequestFieldString},
@@ -258,12 +262,17 @@
           :replacement {:type :RequestFieldBoolean},
           :requested_quantity {:type :RequestFieldInt},
           :room {:type :RequestFieldRoom},
-          :state {:type :RequestFieldString},
+          :state {:type (non-null :State)},
           :supplier {:type :RequestFieldSupplier},
           :supplier_name {:type :RequestFieldString},
           :template {:type :RequestFieldTemplate},
           :total_price_cents {:type (non-null Int)},
           :user {:type :RequestFieldUser}}},
+    :RequestActionPermissions {:fields
+                                 {:delete {:type (non-null Boolean)},
+                                  :edit {:type (non-null Boolean)},
+                                  :moveBudgetPeriod {:type (non-null Boolean)},
+                                  :moveCategory {:type (non-null Boolean)}}},
     :RequestFieldAttachments
       {:fields {:default {:resolve :attachments, :type (list :Attachment)},
                 :read {:type (non-null Boolean)},
@@ -385,7 +394,7 @@
                             :search {:type String},
                             :sort_by {:type String},
                             :sort_dir {:type String},
-                            :states {:type (list String)}}},
+                            :states {:type (list :State)}}},
     :Supplier {:fields {:id {:type (non-null ID)},
                         :name {:type (non-null String)}}},
     :Template {:fields {:article_name {:type String},
@@ -451,7 +460,7 @@
                       :priority {:type (list :Priority)},
                       :requested_by_auth_user {:type Boolean},
                       :search {:type String},
-                      :state {:type (list String)}},
+                      :state {:type (list :State)}},
                :resolve :requests,
                :type (list :Request)},
     :rooms
