@@ -8,7 +8,6 @@ import Dropdown from 'reactstrap/lib/Dropdown'
 import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
-import { InputText } from '.'
 import Icon from '../Icons'
 const log = logger('app:ui:MultiSelect')
 
