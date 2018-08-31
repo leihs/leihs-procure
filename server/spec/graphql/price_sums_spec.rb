@@ -11,7 +11,7 @@ describe 'price sums' do
   it 'computes correctly' do
     budget_period_I = FactoryBot.create(:budget_period,
                                         name: 'budget_period_I')
-    
+
     # ----------------------------------------------------------------------
 
     main_category_1 = FactoryBot.create(:main_category,
@@ -145,25 +145,25 @@ describe 'price sums' do
       data: {
         budget_periods: [
           { id: budget_period_I.id,
-            total_price_cents: 200,
+            total_price_cents: '200',
             main_categories: [
               { id: main_category_1.id,
-                total_price_cents: 100,
+                total_price_cents: '100',
                 categories: [
                   { id: category_1_A.id,
-                    total_price_cents: 0,
+                    total_price_cents: '0',
                     requests: [
                       { id: request_I_1_A.id }
                     ]
                   },
                   { id: category_1_B.id,
-                    total_price_cents: 0,
+                    total_price_cents: '0',
                     requests: [
                       { id: request_I_1_B.id }
                     ]
                   },
                   { id: category_1_C.id,
-                    total_price_cents: 100,
+                    total_price_cents: '100',
                     requests: [
                       { id: request_I_1_C.id }
                     ]
@@ -171,20 +171,20 @@ describe 'price sums' do
                 ]
               },
               { id: main_category_2.id,
-                total_price_cents: 100,
+                total_price_cents: '100',
                 categories: [
                   { id: category_2_A.id,
-                    total_price_cents: 100,
+                    total_price_cents: '100',
                     requests: [
                       { id: request_I_2_A.id }
                     ]
                   },
                   { id: category_2_B.id,
-                    total_price_cents: 0,
+                    total_price_cents: '0',
                     requests: []
                   },
                   { id: category_2_C.id,
-                    total_price_cents: 0,
+                    total_price_cents: '0',
                     requests: []
                   }
                 ]
