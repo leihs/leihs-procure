@@ -1,7 +1,7 @@
 // import React from 'react'
 import renderer from 'react-test-renderer'
 
-import { examples } from './DownshiftMultiSelect.examples'
+import { examples } from './MultiSelect.examples'
 
 examples.forEach(({ name, content }) => {
   it(`${name}: renders correctly`, () => {
