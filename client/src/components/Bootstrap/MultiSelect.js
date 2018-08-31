@@ -29,6 +29,8 @@ const groupHeaderCls = 'py-1 px-2 mb-0 f6 font-weight-bold text-wrap'
 const groupWrapCls = 'dropdown-item-subgroup'
 const groupItemCls = [itemCls, 'pl-4']
 
+export { MultiSelectPlain } from './MultiSelectPlain'
+
 class MultiSelect extends React.PureComponent {
   constructor(props) {
     super(props)
@@ -146,10 +148,9 @@ class MultiSelect extends React.PureComponent {
             <SearchField
               size={size}
               label="Suchen…"
+              clearLabel="Suche zurücksetzen"
               value={this.state.searchTerm}
               onChange={e => this.setState({ searchTerm: e.target.value })}
-              clearLabel="Suche zurücksetzen"
-              onClear={e => this.setState({ searchTerm: '' })}
             />
             <DropdownItem divider />
 
@@ -244,9 +245,18 @@ MultiSelect.propTypes = {
 }
 
 export default MultiSelect
+MultiSelect.defaultProps = {
+  multiple: true
+}
+MultiSelect.propTypes = {
+  multiple: PropTypes.oneOf([true]).isRequired,
+  name: PropTypes.string,
+  onChange: PropTypes.func
+}
 
-const SearchField = ({ size, label, value, onChange, clearLabel, onClear }) => {
+const SearchField = ({ size, label, name, value, onChange, clearLabel }) => {
   value = f.isString(value) && f.presence(value)
+  const onClear = e => onChange({ target: { name, value: '' } })
   return (
     <div
       className={cx('input-group ', {
@@ -260,9 +270,13 @@ const SearchField = ({ size, label, value, onChange, clearLabel, onClear }) => {
           <Icon.Search />
         </span>
       </div>
-      <InputText
+      <input
+        type="text"
+        className="form-control"
+        autoComplete="off"
         placeholder={label}
         aria-label={label}
+        name={name}
         value={value || ''}
         onChange={onChange}
       />
