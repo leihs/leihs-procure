@@ -2,6 +2,7 @@
   (:require [clojure set string]
             [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.logging :as log]
             [leihs.procurement.permissions
              [request-helpers :as request-perms]
              [requests :as requests-perms]
@@ -64,12 +65,8 @@
 
 (defn requests-query-map
   ([context arguments value]
-   (let [rrequest (:request context)
-         tx (:tx rrequest)
-         auth-entity (:authenticated-entity rrequest)
-         advanced-user? (user-perms/advanced? tx auth-entity)]
-     (requests-query-map context arguments value advanced-user?)))
-  ([context arguments value advanced-user?]
+   (requests-query-map context arguments value {}))
+  ([context arguments value {advanced-user-opt :advanced-user, base-query-opt :base-query}]
    (let [id (:id arguments)
          category-id (get-id :category arguments value)
          budget-period-id (get-id :budget-period arguments value)
@@ -86,10 +83,10 @@
          search-term (:search arguments)
          rrequest (:request context)
          tx (:tx rrequest)
-         advanced-user? (->> rrequest
-                             :authenticated-entity
-                             (user-perms/advanced? tx))
-         start-sqlmap (request/requests-base-query-with-state advanced-user?)]
+         advanced-user? (or advanced-user-opt
+                            (user-perms/advanced? tx (:authenticated-entity rrequest)))
+         start-sqlmap (or base-query-opt
+                          (request/requests-base-query-with-state advanced-user?))]
      (cond-> start-sqlmap
        id (sql/merge-where [:in :procurement_requests.id id])
        category-id (sql/merge-where [:in :procurement_requests.category_id
@@ -132,9 +129,8 @@
     (let [ring-request (:request context)
           tx (:tx ring-request)
           auth-entity (:authenticated-entity ring-request)
-          advanced-user? (user-perms/advanced? tx auth-entity)
           query (as-> context <>
-                  (requests-query-map <> arguments value advanced-user?)
+                  (requests-query-map <> arguments value)
                   (requests-perms/apply-scope tx <> auth-entity)
                   (sql/format <>))
           proc-requests (request/query-requests tx query)]
@@ -143,7 +139,7 @@
            (map (fn [proc-req]
                   (request-perms/apply-permissions
                     tx
-                    (:authenticated-entity ring-request)
+                    auth-entity
                     proc-req
                     #(assoc % :request-id (:id proc-req)))))))))
 
@@ -195,7 +191,8 @@
         (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
       (cond-> <> (not-empty category-id) (assoc :category_id category-id))
       (merge <> requests-args)
-      (requests-query-map context <> nil)
+      (requests-query-map context <> nil {:base-query (-> (sql/select :procurement_requests.*)
+                                                          (sql/from :procurement_requests))})
       (requests-perms/apply-scope tx <> auth-entity)
       (sql/select <>
                   [(->> [:order_quantity :approved_quantity :requested_quantity]
@@ -206,17 +203,17 @@
 
 (defn total-price-sqlmap
   [qty-type bp-id]
-  (-> (sql/select :pr.budget_period_id
+  (-> (sql/select :procurement_requests.budget_period_id
                   [(sql/call :sum
                              (sql/call :*
-                                       :pr.price_cents
+                                       :procurement_requests.price_cents
                                        (->> qty-type
                                             name
                                             (str "pr.")
                                             keyword))) :result])
-      (sql/from [:procurement_requests :pr])
-      (sql/merge-where [:= :pr.budget_period_id bp-id])
-      (sql/group :pr.budget_period_id)))
+      (sql/from :procurement_requests)
+      (sql/merge-where [:= :procurement_requests.budget_period_id bp-id])
+      (sql/group :procurement_requests.budget_period_id)))
 
 (defn specific-total-price-cents
   [tx qty-type bp-id]

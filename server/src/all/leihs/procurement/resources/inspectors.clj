@@ -1,6 +1,6 @@
 (ns leihs.procurement.resources.inspectors
   (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.resources.user :as user]
+            [leihs.procurement.resources.users :refer [users-base-query]]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn get-inspectors
@@ -8,7 +8,7 @@
   (jdbc/query (-> context
                   :request
                   :tx)
-              (-> user/user-base-query
+              (-> users-base-query
                   (sql/merge-where
                     [:in :users.id
                      (-> (sql/select :pci.user_id)

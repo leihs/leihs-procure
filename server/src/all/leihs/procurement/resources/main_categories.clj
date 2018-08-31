@@ -13,7 +13,8 @@
 
 (def main-categories-base-query
   (-> (sql/select :procurement_main_categories.*)
-      (sql/from :procurement_main_categories)))
+      (sql/from :procurement_main_categories)
+      (sql/order-by [:procurement_main_categories.name :asc])))
 
 (defn merge-image-path
   [tx mc]

@@ -29,7 +29,6 @@
    :budget-periods budget-periods/get-budget-periods,
    :buildings buildings/get-buildings,
    :building building/get-building,
-   :building-rooms rooms/get-building-rooms,
    :can-delete-budget-period? (-> budget-period/can-delete?
                                   (authorization/wrap-ensure-one-of
                                     [user-perms/admin?])),

@@ -4,7 +4,11 @@
 
 (def budget-limits-base-query
   (-> (sql/select :procurement_budget_limits.*)
-      (sql/from :procurement_budget_limits)))
+      (sql/from :procurement_budget_limits)
+      (sql/join :procurement_budget_periods
+                [:= :procurement_budget_periods.id
+                 :procurement_budget_limits.budget_period_id])
+      (sql/order-by [:procurement_budget_periods.end_date :desc])))
 
 (defn get-budget-limits
   [context _ value]

@@ -6,7 +6,8 @@
 
 (def rooms-base-query
   (-> (sql/select :rooms.*)
-      (sql/from :rooms)))
+      (sql/from :rooms)
+      (sql/order-by [:general :desc] [:name :asc])))
 
 (defn general-from-general
   [tx]
@@ -29,12 +30,3 @@
                   :request
                   :tx)
               (sql/format (rooms-query args value))))
-
-(defn get-building-rooms
-  [context _ value]
-  (jdbc/query (-> context
-                  :request
-                  :tx)
-              (sql/format (rooms-query (-> value
-                                           :building
-                                           :id)))))

@@ -118,9 +118,9 @@ describe 'templates' do
           'update_templates' => [
             { 'name' => 'category A',
               'templates' => [
+                { 'article_name' => 'new art name category A' },
                 { 'article_name' => 'new tmpl category A' },
-                { 'article_name' => 'tmpl 1 category A' },
-                { 'article_name' => 'new art name category A' }
+                { 'article_name' => 'tmpl 1 category A' }
               ]
             },
             { 'name' => 'category B',

@@ -8,7 +8,14 @@
 
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
-      (sql/from :procurement_templates)))
+      (sql/from :procurement_templates)
+      (sql/merge-left-join :models
+                           [:= :models.id :procurement_templates.model_id])
+      (sql/order-by (->> [:procurement_templates.article_name :models.product
+                          :models.version]
+                         (map #(->> (sql/call :coalesce % "")
+                                    (sql/call :lower)))
+                         (sql/call :concat)))))
 
 (defn get-templates
   [context _ value]

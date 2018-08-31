@@ -4,7 +4,8 @@
 
 (def organizations-base-query
   (-> (sql/select :procurement_organizations.*)
-      (sql/from :procurement_organizations)))
+      (sql/from :procurement_organizations)
+      (sql/order-by [:procurement_organizations.name :asc])))
 
 (defn organizations-query
   [_ args value]
