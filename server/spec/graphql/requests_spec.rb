@@ -65,29 +65,34 @@ describe 'requests' do
         query RequestsIndexFiltered(
           $budgetPeriods: [ID]
           $categories: [ID]
+          $organizations: [ID]
           $search: String
           $priority: [Priority]
           $inspector_priority: [InspectorPriority]
           $onlyOwnRequests: Boolean
+          $withTotalSums: Boolean = false
         ) {
           budget_periods(id: $budgetPeriods) {
             id
             name
+            total_price_cents @include(if: $withTotalSums)
             # inspection_start_date
             # end_date
 
             main_categories {
               id
+              total_price_cents @include(if: $withTotalSums)
               # name
               # image_url
 
               categories(id: $categories) {
                 id
+                total_price_cents @include(if: $withTotalSums)
                 # name
 
                 requests(
-                  # TODO: organization_id: $organizations #
                   search: $search
+                  organization_id: $organizations
                   priority: $priority
                   inspector_priority: $inspector_priority
                   requested_by_auth_user: $onlyOwnRequests
@@ -131,6 +136,22 @@ describe 'requests' do
 
       result = query(@query, @user.id, variables).deep_symbolize_keys
       expect(result).to eq(expected_result)
+    end
+
+    pending 'empty array filter arguments do not crash' do
+      variable_keys_to_try = [
+        :budgetPeriods,
+        :organizations,
+        :categories,
+        :priority,
+        :inspector_priority,
+        :state,
+      ]
+
+      variable_keys_to_try.each do |var_name|
+        result = query(@query, @user.id, {var_name => [], withTotalSums: true})
+        expect(result['errors']).to be_nil
+      end
     end
 
     example 'filter for budget periods and categories' do
@@ -211,7 +232,7 @@ describe 'requests' do
 
       @bp_past = \
         FactoryBot.create(:budget_period,
-                          inspection_start_date: Date.today - 1.month, 
+                          inspection_start_date: Date.today - 1.month,
                           end_date: Date.yesterday)
 
       @bp_past = \
