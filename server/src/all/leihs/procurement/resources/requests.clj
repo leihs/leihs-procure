@@ -206,17 +206,19 @@
                         (sql/call :sum)) :result])
       (get-total-price-cents tx <>))))
 
+(defn- sql-sum [qty-type]
+  (as-> qty-type <>
+        (name <>)
+        (str "procurement_requests." <>)
+        (keyword <>)
+        (sql/call :* :procurement_requests.price_cents <>)
+        (sql/call :cast <> :bigint)
+        (sql/call :sum <>)))
+
 (defn total-price-sqlmap
   [qty-type bp-id]
   (-> (sql/select :procurement_requests.budget_period_id
-                  [(as-> qty-type <>
-                     (name <>)
-                     (str "procurement_requests." <>)
-                     (keyword <>)
-                     (sql/call :* :procurement_requests.price_cents <>)
-                     (sql/call :cast <> :bigint)
-                     (sql/call :sum <>))
-                   :result])
+                  [(sql-sum qty-type) :result])
       (sql/from :procurement_requests)
       (sql/merge-where [:= :procurement_requests.budget_period_id bp-id])
       (sql/group :procurement_requests.budget_period_id)))
