@@ -337,7 +337,7 @@ class RequestForm extends React.Component {
                         // NOTE: Give Reason when Partially Accepting or Denying
                         required={
                           field.required ||
-                          fields.approved_quantity < fields.requested_quantity
+                          isInspectedButNotFullyApproved(fields)
                         }
                         invalidFeedback={t(
                           'request.give_reason_when_partially_accepting_or_denying'
@@ -615,6 +615,12 @@ const FieldTypeToggle = ({ id, value, label, ...props }) => (
     </div>
   </FormGroup>
 )
+
+const isInspectedButNotFullyApproved = fields => {
+  const approved_quantity = parseInt(fields.approved_quantity, 10)
+  const requested_quantity = parseInt(fields.requested_quantity, 10)
+  return approved_quantity < requested_quantity
+}
 
 const Let = ({ children, ...props }) => children(props)
 const RequestInput = ({ children, field }) => (
