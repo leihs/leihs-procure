@@ -34,15 +34,24 @@ describe 'requests' do
     before do
       @user = FactoryBot.create(:user)
       FactoryBot.create(:requester_organization, user_id: @user.id)
-      budget_periods = Array.new(3) do |i|
-        FactoryBot.create(:budget_period, name: "200#{i}")
+      ['2001', '2002', '2003'].each do |name|
+        FactoryBot.create(:budget_period, name: name)
       end
-      categories = Array.new(3) do |_i|
-        mc = FactoryBot.create(:main_category)
-        FactoryBot.create(:category, main_category_id: mc.id)
+      ['main cat X', 'main cat Y', 'main cat Z'].each do |name|
+        FactoryBot.create(:main_category, name: name)
       end
-      @requests = budget_periods.map do |bp|
-        categories.map do |cat|
+      FactoryBot.create(:category,
+                        name: 'cat A',
+                        main_category_id: MainCategory.find(name: 'main cat X').id)
+      FactoryBot.create(:category,
+                        name: 'cat B',
+                        main_category_id: MainCategory.find(name: 'main cat Y').id)
+      FactoryBot.create(:category,
+                        name: 'cat C',
+                        main_category_id: MainCategory.find(name: 'main cat Z').id)
+
+      @requests = BudgetPeriod.all.map do |bp|
+        Category.all.map do |cat|
           FactoryBot.create(
             :request,
             user_id: @user.id,
@@ -125,22 +134,25 @@ describe 'requests' do
     end
 
     example 'filter for budget periods and categories' do
+      bps = BudgetPeriod.where(name: ['2003', '2002'])
+      cats = Category.where(name: ['cat A', 'cat B'])
+
       variables = {
-        budgetPeriods: BudgetPeriod.first(2).map(&:id),
-        categories: Category.first(2).map(&:id),
+        budgetPeriods: bps.map(&:id),
+        categories: cats.map(&:id),
         priority: ['NORMAL']
       }
 
       expected_result = {
         data: {
-          budget_periods: BudgetPeriod.first(2).reverse.map do |bp|
+          budget_periods: bps.order(:name).reverse.map do |bp|
             {
               id: bp.id,
               name: bp.name,
-              main_categories: Category.all.map.with_index do |cat, i|
+              main_categories: MainCategory.order(:name).map do |main_cat|
                 {
-                  id: cat.main_category_id,
-                  categories: (i > 1) ? [] : [
+                  id: main_cat.id,
+                  categories: Category.where(id: cats.map(&:id), main_category_id: main_cat.id).map do |cat|
                     {
                       id: cat.id,
                       requests: Request.where(
@@ -149,7 +161,8 @@ describe 'requests' do
                         { id: r.id }
                       end
                     }
-                  ] }
+                  end
+                }
               end
             }
           end
