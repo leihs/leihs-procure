@@ -37,7 +37,11 @@ const RequestsDashboard = props => {
         <h4>
           {requestsQuery.loading || !requestsQuery.data
             ? ' '
-            : `${requests.length || 0} Requests`}
+            : `${requests.length || 0} ${
+                requests.length === 1
+                  ? t('dashboard.requests_title_singular')
+                  : t('dashboard.requests_title_plural')
+              }`}
         </h4>
       </Col>
       <Col xs="1" cls="text-right">
@@ -166,7 +170,9 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
     isInspecting
   } = budgetPeriodDates(budgetPeriod)
 
-  const canRequest = isRequesting && me.roles.isRequester
+  const canRequest =
+    (isRequesting && me.roles.isRequester) ||
+    (isInspecting && (me.roles.isAdmin || me.roles.isInspector))
   const newRequestBpLink = canRequest && newRequestLink({ budgetPeriod })
 
   const children = f.some(props.children) ? props.children : false
@@ -183,8 +189,8 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
             })}
             {...togglerProps}
           >
-            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
-              <div className="flex-grow-1 flex-sm-grow-0 w-50">
+            <Row>
+              <Col sm="8">
                 <h2 className="mb-0 h3 d-inline-block">
                   <Caret spaced />
                   {budgetPeriod.name}
@@ -211,22 +217,31 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
                     </span>
                   </Tooltipped>
                 </div>
-              </div>
+              </Col>
 
-              <div className="mr-auto">
+              <Col
+                sm="2"
+                className="col-10 align-self-center order-last order-sm-12 text-right"
+              >
                 {!!budgetPeriod.total_price_cents && (
                   <Tooltipped text={t('dashboard.bp_total_sum')}>
-                    <span className="ml-1" id={`ordqb_tt_${budgetPeriod.id}`}>
-                      <Icon.ShoppingCart className="mr-1" />
+                    <span
+                      className="mr-2 f6"
+                      id={`ordqb_tt_${budgetPeriod.id}`}
+                    >
                       <samp>
-                        {formatCurrency(budgetPeriod.total_price_cents)}
+                        {formatCurrency(budgetPeriod.total_price_cents)}{' '}
                       </samp>
+                      <Icon.ShoppingCart />
                     </span>
                   </Tooltipped>
                 )}
-              </div>
+              </Col>
 
-              <div className="ml-3 mt-2 mt-md-0">
+              <Col
+                sm="2"
+                className="col-2 mt-2 mt-sm-0 order-sm-last text-right"
+              >
                 {newRequestBpLink && (
                   <Link to={newRequestBpLink}>
                     <Tooltipped text={t('dashboard.create_request_for_bp')}>
@@ -238,8 +253,8 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
                     </Tooltipped>
                   </Link>
                 )}
-              </div>
-            </div>
+              </Col>
+            </Row>
           </div>
 
           {isOpen &&
@@ -289,27 +304,30 @@ const CategoryLine = ({
           })}
           {...togglerProps}
         >
-          <div className="d-flex flex-wrap justify-content-between align-items-baseline">
-            <div className="w-50">
-              <h5 className="mb-0 mr-3 d-inline-block">
+          <Row>
+            <Col sm="8">
+              <h5 className="mb-0 mr-sm-3 d-inline-block">
                 <Caret spaced />
                 <ImageThumbnail imageUrl={category.image_url} />
                 {category.name} <small>({requestCount})</small>
               </h5>
-            </div>
+            </Col>
 
-            <div className="mr-auto">
+            <Col
+              sm="2"
+              className="col-10 align-self-center order-last order-sm-12 text-right"
+            >
               {!!category.total_price_cents && (
                 <Tooltipped text={t('dashboard.maincat_total_sum')}>
-                  <small id={`ordqmc_tt_${category.id}`}>
-                    <Icon.ShoppingCart className="mr-1" />
-                    <samp>{formatCurrency(category.total_price_cents)}</samp>
+                  <small className="mr-2 f6" id={`ordqmc_tt_${category.id}`}>
+                    <samp>{formatCurrency(category.total_price_cents)} </samp>
+                    <Icon.ShoppingCart />
                   </small>
                 </Tooltipped>
               )}
-            </div>
+            </Col>
 
-            <div className="ml-3 mt-2 mt-md-0">
+            <Col sm="2" className="col-2 mt-2 mt-sm-0 order-sm-last text-right">
               {/* TODO: decide if/how to show these links
               {canRequest && (
                 <Link
@@ -324,8 +342,8 @@ const CategoryLine = ({
                   </Tooltipped>
                 </Link>
               )} */}
-            </div>
-          </div>
+            </Col>
+          </Row>
         </li>
         {isOpen &&
           props.children && (
@@ -373,24 +391,30 @@ const SubCategoryLine = ({
             })}
             {...togglerProps}
           >
-            <div className="d-flex flex-wrap justify-content-between align-items-baseline">
-              <div className="w-50">
-                <h6 className="mb-0 mr-3 d-inline-block">
+            <Row>
+              <Col sm="8">
+                <h6 className="mb-0 mr-sm-3 d-inline-block">
                   <Caret spaced />
                   {category.name} <span>({requestCount})</span>
                 </h6>
-              </div>
-              <div className="mr-auto">
+              </Col>
+              <Col
+                sm="2"
+                className="col-10 align-self-center order-last order-sm-12 text-right"
+              >
                 {!!category.total_price_cents && (
                   <Tooltipped text={t('dashboard.subcat_total_sum')}>
-                    <small className="mr-3" id={`ordqsc_tt_${category.id}`}>
-                      <Icon.ShoppingCart className="mr-1" />
-                      <samp>{formatCurrency(category.total_price_cents)}</samp>
+                    <small className="mr-2 f6" id={`ordqsc_tt_${category.id}`}>
+                      <samp>{formatCurrency(category.total_price_cents)} </samp>
+                      <Icon.ShoppingCart />
                     </small>
                   </Tooltipped>
                 )}
-              </div>
-              <div className="ml-3 mt-2 mt-md-0">
+              </Col>
+              <Col
+                sm="2"
+                className="col-2 mt-2 mt-sm-0 order-sm-last text-right"
+              >
                 {/* TODO: decide if/how to show these links
                 {canRequest && (
                   <Link to={newRequestLink({ budgetPeriod, category })}>
@@ -403,8 +427,8 @@ const SubCategoryLine = ({
                     </Tooltipped>
                   </Link>
                 )} */}
-              </div>
-            </div>
+              </Col>
+            </Row>
           </li>
           {showChildren(isOpen, props.children) && (
             <li

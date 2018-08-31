@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.requests
-  (:require [clojure.tools.logging :as log]
-            [clojure set string]
+  (:require [clojure set string]
             [clojure.contrib.seq :refer [find-first]]
             [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.permissions [request-helpers :as request-perms]
-             [requests :as requests-perms]]
-            [leihs.procurement.resources [budget-period :as budget-period]
-             [budget-periods :as budget-periods] [request :as request]]
+            [leihs.procurement.permissions
+             [request-helpers :as request-perms]
+             [requests :as requests-perms]
+             [user :as user-perms]]
+            [leihs.procurement.resources.request :as request]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn search-query
@@ -63,97 +63,65 @@
     (or id-from-args id-from-context)))
 
 (defn requests-query-map
-  [context arguments value]
-  (let [id (:id arguments)
-        category-id (get-id :category arguments value)
-        budget-period-id (get-id :budget-period arguments value)
-        organization-id (:organization_id arguments)
-        priority (some->> arguments
-                          :priority
-                          (map request/to-name-and-lower-case))
-        inspector-priority (some->> arguments
-                                    :inspector_priority
-                                    (map request/to-name-and-lower-case))
-        requested-by-auth-user (:requested_by_auth_user arguments)
-        from-categories-of-auth-user (:from_categories_of_auth_user arguments)
-        state (:state arguments)
-        state-set (:request-state-set context)
-        search-term (:search arguments)]
-    (cond-> request/requests-base-query
-      id (sql/merge-where [:in :procurement_requests.id id])
-      category-id (sql/merge-where [:in :procurement_requests.category_id
-                                    category-id])
-      budget-period-id (sql/merge-where [:in
-                                         :procurement_requests.budget_period_id
-                                         budget-period-id])
-      organization-id (sql/merge-where [:in
-                                        :procurement_requests.organization_id
-                                        organization-id])
-      priority (sql/merge-where [:in :procurement_requests.priority priority])
-      inspector-priority (sql/merge-where
-                           [:in :procurement_requests.inspector_priority
-                            inspector-priority])
-      state (sql/merge-where
-              [:in (request/state-sql (:state-value-range-type context)) state])
-      requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
-                                               (-> context
-                                                   :request
-                                                   :authenticated-entity
-                                                   :user_id)])
-      from-categories-of-auth-user
-        (sql/merge-where
-          [:in :procurement_requests.category_id
-           (-> (sql/select :category_id)
-               (sql/from :procurement_category_inspectors)
-               (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                 (-> context
-                                     :request
-                                     :authenticated-entity
-                                     :id)]))])
-      search-term (search-query search-term))))
-
-(defn valid-state-values-combination?
-  [state-value-range-type state-arg]
-  (let [valid-states (state-value-range-type request/valid-state-ranges)]
-    (clojure.set/subset? (->> state-arg
-                              (map keyword)
-                              set)
-                         valid-states)))
-
-(defn sanitize-and-enhance-context
-  [context arguments value]
-  "It returns context unchanged if `state` arg not provided.
-  It throws if `state` argument is provided but `budget_period_id` is missing
-  or `state` arg has not an allowed value in combination with `budget_period_id`.
-  Otherwise it enhances the context with additional key/val pair."
-  (if-let [state-arg (:state arguments)]
-    (let [rrequest (:request context)
-          tx (:tx rrequest)
-          auth-entity (:authenticated-entity rrequest)
-          budget-period-arg (:budget_period_id arguments)
-          budget-periods (map #(budget-period/get-budget-period-by-id tx %)
-                           budget-period-arg)
-          phase-of-budget-periods
-            (budget-periods/get-phase-of-budget-periods tx budget-periods)
-          state-value-range-type (request/state-value-range-type
-                                   tx
-                                   auth-entity
-                                   phase-of-budget-periods)]
-      (cond
-        (nil? budget-period-arg)
-          (throw
-            (Exception.
-              "One must provide budget_period_id in combination with state."))
-        (= phase-of-budget-periods :mixed)
-          (throw
-            (Exception.
-              "One cannot mix past budget periods with the current or future ones in combination with state."))
-        (not (valid-state-values-combination? state-value-range-type state-arg))
-          (throw
-            (Exception.
-              "Invalid state combinations for budget_period_ids and user permissions."))
-        true (assoc context :state-value-range-type state-value-range-type)))
-    context))
+  ([context arguments value]
+   (let [rrequest (:request context)
+         tx (:tx rrequest)
+         auth-entity (:authenticated-entity rrequest)
+         advanced-user? (user-perms/advanced? tx auth-entity)]
+     (requests-query-map context arguments value advanced-user?)))
+  ([context arguments value advanced-user?]
+   (let [id (:id arguments)
+         category-id (get-id :category arguments value)
+         budget-period-id (get-id :budget-period arguments value)
+         organization-id (:organization_id arguments)
+         priority (some->> arguments
+                           :priority
+                           (map request/to-name-and-lower-case))
+         inspector-priority (some->> arguments
+                                     :inspector_priority
+                                     (map request/to-name-and-lower-case))
+         requested-by-auth-user (:requested_by_auth_user arguments)
+         from-categories-of-auth-user (:from_categories_of_auth_user arguments)
+         state (:state arguments)
+         search-term (:search arguments)
+         rrequest (:request context)
+         tx (:tx rrequest)
+         advanced-user? (->> rrequest
+                             :authenticated-entity
+                             (user-perms/advanced? tx))
+         start-sqlmap (request/requests-base-query-with-state advanced-user?)]
+     (cond-> start-sqlmap
+       id (sql/merge-where [:in :procurement_requests.id id])
+       category-id (sql/merge-where [:in :procurement_requests.category_id
+                                     category-id])
+       budget-period-id (sql/merge-where [:in
+                                          :procurement_requests.budget_period_id
+                                          budget-period-id])
+       organization-id (sql/merge-where [:in
+                                         :procurement_requests.organization_id
+                                         organization-id])
+       priority (sql/merge-where [:in :procurement_requests.priority priority])
+       inspector-priority (sql/merge-where
+                            [:in :procurement_requests.inspector_priority
+                             inspector-priority])
+       state (sql/merge-where
+               (request/get-where-conds-for-states state advanced-user?))
+       requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
+                                                (-> context
+                                                    :request
+                                                    :authenticated-entity
+                                                    :user_id)])
+       from-categories-of-auth-user
+         (sql/merge-where
+           [:in :procurement_requests.category_id
+            (-> (sql/select :category_id)
+                (sql/from :procurement_category_inspectors)
+                (sql/merge-where [:= :procurement_category_inspectors.user_id
+                                  (-> context
+                                      :request
+                                      :authenticated-entity
+                                      :id)]))])
+       search-term (search-query search-term)))))
 
 (defn get-requests
   [context arguments value]
@@ -161,22 +129,15 @@
             [:id :budget_period_id :category_id :inspector_priority
              :organization_id :priority :state :user_id])
     []
-    (let [sanitized-and-enhanced-context
-            (sanitize-and-enhance-context context arguments value)
-          ring-request (:request sanitized-and-enhanced-context)
+    (let [ring-request (:request context)
           tx (:tx ring-request)
           auth-entity (:authenticated-entity ring-request)
-          query (as-> sanitized-and-enhanced-context <>
-                  (requests-query-map <> arguments value)
+          advanced-user? (user-perms/advanced? tx auth-entity)
+          query (as-> context <>
+                  (requests-query-map <> arguments value advanced-user?)
                   (requests-perms/apply-scope tx <> auth-entity)
                   (sql/format <>))
-          proc-requests (jdbc/query tx
-                                    query
-                                    {:row-fn #(request/transform-row
-                                                tx
-                                                (:authenticated-entity
-                                                  ring-request)
-                                                %)})]
+          proc-requests (request/query-requests tx query)]
       (->> proc-requests
            (map request/reverse-exchange-attrs)
            (map (fn [proc-req]

@@ -1,16 +1,16 @@
 import f from 'lodash'
+
 import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
 
 const isDev = process.env.NODE_ENV !== 'production'
-const noop = () => {}
 
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
   // NOTE: Checks *keys* must be present, but values can be missing.
   //       Guards against forgetting to query the keys/fields (via GraphQL)!
   const expectKeys = !isDev
-    ? noop
+    ? f.noop
     : wanted => {
         if (!isDev) return
         const missing = f.difference(wanted, Object.keys(o))

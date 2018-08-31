@@ -133,11 +133,7 @@ describe 'requests' do
               }
               write
             }
-            state {
-              read
-              value
-              write
-            }
+            state 
             supplier {
               read
               value {

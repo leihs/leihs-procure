@@ -1,6 +1,10 @@
 .text-strike {
   text-decoration: line-through !important;
 }
+.text-wrap {
+  /* opposite of builtin .text-nowrap */
+  white-space: pre-wrap !important;
+}
 
 .list-group-compact > .list-group-item,
 .list-group-item-compact {

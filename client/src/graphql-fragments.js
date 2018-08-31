@@ -68,12 +68,15 @@ export const RequestFieldsForIndex = gql`
     }
 
     requested_quantity {
+      read
       value
     }
     approved_quantity {
+      read
       value
     }
     order_quantity {
+      read
       value
     }
 
@@ -85,9 +88,7 @@ export const RequestFieldsForIndex = gql`
       value
     }
 
-    state {
-      value
-    }
+    state
   }
 `
 
@@ -191,9 +192,7 @@ export const RequestFieldsForEdit = gql`
       value
     }
 
-    state {
-      ...RequestFieldString
-    }
+    state
 
     article_number {
       ...RequestFieldString
