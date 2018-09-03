@@ -97,5 +97,42 @@ describe 'request' do
         Upload.dataset.delete
       end
     end
+
+    example 'updates organization if requester is changed' do
+      inspector = FactoryBot.create(:user)
+      category = FactoryBot.create(:category)
+      FactoryBot.create(:category_inspector,
+                        user_id: inspector.id,
+                        category_id: category.id)
+
+      new_requester = FactoryBot.create(:user)
+      ro = FactoryBot.create(:requester_organization, user_id: new_requester.id)
+
+      request = FactoryBot.create(:request,
+                                  category_id: category.id)
+
+      q = <<-GRAPHQL
+        mutation {
+          request(input_data: {
+            id: "#{request.id}",
+            user: "#{new_requester.id}"
+          }) {
+            id
+            organization {
+              value {
+                id
+              }
+            }
+          }
+        }
+      GRAPHQL
+
+      result = query(q, inspector.id)
+
+      request_data = result['data']['request']
+      expect(request_data['id']).to be == request.id
+      expect(request_data['organization']['value']['id']).to be == ro.organization_id
+      expect(request.reload.organization_id).to eq(ro.organization_id)
+    end
   end
 end
