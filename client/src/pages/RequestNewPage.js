@@ -184,9 +184,9 @@ class NewRequestPreselection extends React.Component {
       <StatefulForm
         idPrefix={`request_new`}
         values={selection}
-        onChange={fields => onSelectionChange(fields)}
+        key={JSON.stringify(selection)}
       >
-        {({ fields, setValue, setValues, formPropsFor, ...formHelpers }) => {
+        {({ fields, setValue, setValues, ...formHelpers }) => {
           const selectedBudgetPeriod = fields.budgetPeriod
           const selectedCategory = fields.category
           const selectedMainCat = f.find(data.main_categories, {
@@ -198,8 +198,12 @@ class NewRequestPreselection extends React.Component {
           const hasPreselected = !!(selectedTemplate || selectedCategory)
           const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
 
+          const formPropsFor = name => ({
+            ...formHelpers.formPropsFor(name),
+            onChange: e => setSelection({ [name]: e.target.value })
+          })
           const setSelection = ({ mainCategory, category, template } = {}) => {
-            setValues({
+            onSelectionChange({
               ...f.omit(fields, ['mainCategory', 'category', 'template']),
               mainCategory,
               category,
