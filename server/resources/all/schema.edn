@@ -155,23 +155,23 @@
                            :main_category {:resolve :main-category,
                                            :type (non-null :MainCategory)}}},
     :BudgetPeriod
-      {:fields {:can_delete {:resolve :can-delete-budget-period?,
-                             :type (non-null Boolean)},
-                :end_date {:type (non-null String)},
-                :id {:type (non-null ID)},
-                :inspection_start_date {:type (non-null String)},
-                :main_categories {:resolve :main-categories,
-                                  :type (list :MainCategory)},
-                :name {:type (non-null String)},
-                :total_price_cents {:resolve :total-price-cents,
-                                    :type (non-null Int)},
-                :total_price_cents_approved_quantities
-                  {:resolve :total-price-cents-approved-quantities, :type Int},
-                :total_price_cents_order_quantities
-                  {:resolve :total-price-cents-order-quantities, :type Int},
-                :total_price_cents_requested_quantities
-                  {:resolve :total-price-cents-requested-quantities,
-                   :type Int}}},
+      {:fields
+         {:can_delete {:resolve :can-delete-budget-period?,
+                       :type (non-null Boolean)},
+          :end_date {:type (non-null String)},
+          :id {:type (non-null ID)},
+          :inspection_start_date {:type (non-null String)},
+          :main_categories {:resolve :main-categories,
+                            :type (list :MainCategory)},
+          :name {:type (non-null String)},
+          :total_price_cents {:resolve :total-price-cents,
+                              :type (non-null String)},
+          :total_price_cents_approved_quantities
+            {:resolve :total-price-cents-approved-quantities, :type String},
+          :total_price_cents_order_quantities
+            {:resolve :total-price-cents-order-quantities, :type String},
+          :total_price_cents_requested_quantities
+            {:resolve :total-price-cents-requested-quantities, :type String}}},
     :Building {:fields {:code {:type String},
                         :id {:type (non-null ID)},
                         :name {:type (non-null String)},
@@ -201,7 +201,7 @@
              :type (list :Request)},
           :templates {:resolve :templates, :type (list :Template)},
           :total_price_cents {:resolve :total-price-cents,
-                              :type (non-null Int)},
+                              :type (non-null String)},
           :viewers {:resolve :viewers, :type (list :User)}}},
     :CurrentUser {:fields {:saved_filters {:type :SavedFilters},
                            :user {:type (non-null :User)}}},
@@ -218,7 +218,7 @@
           :image_url {:type String},
           :name {:type (non-null String)},
           :total_price_cents {:resolve :total-price-cents,
-                              :type (non-null Int)}}},
+                              :type (non-null String)}}},
     :Model {:fields {:id {:type (non-null ID)},
                      :name {:type (non-null String)},
                      :product {:type (non-null String)},
@@ -266,7 +266,7 @@
           :supplier {:type :RequestFieldSupplier},
           :supplier_name {:type :RequestFieldString},
           :template {:type :RequestFieldTemplate},
-          :total_price_cents {:type (non-null Int)},
+          :total_price_cents {:type (non-null String)},
           :user {:type :RequestFieldUser}}},
     :RequestActionPermissions {:fields
                                  {:delete {:type (non-null Boolean)},
