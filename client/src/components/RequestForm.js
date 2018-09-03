@@ -345,7 +345,6 @@ class RequestForm extends React.Component {
                         beforeInput={
                           !field.readOnly && (
                             <Select
-                              id="priority_requester"
                               m="b-3"
                               cls="form-control-sm"
                               options={['foo', 'bar', 'baz'].map(s => ({
