@@ -17,42 +17,49 @@ class RequestLine extends React.Component {
   render({ props: { request, ...props }, state: { open } } = this) {
     const closeLine = () => this.setState({ open: false })
     const isChanged = false // FIXME: detect form changed state
+    const wrapperStyle = cx(
+      open ? 'border-top border-bottom' : 'bg-primary-shy-hover'
+    )
     const lineStyle = cx(
       { 'cursor-pointer': !open || !isChanged },
+
       open && [
         'border border-top-0 border-right-0 border-left-0',
         'border-style-dashed',
-        'o-50'
+        // 'o-50'
+        'bg-primary-shy'
       ]
     )
 
     return (
       <F>
-        <RequestLineClosed
-          request={request}
-          className={lineStyle}
-          onClick={
-            isChanged
-              ? null
-              : e => {
-                  e.preventDefault()
-                  this.setState({ open: !open })
-                }
-          }
-        />
-        {!!open && (
-          <F>
-            <RequestEdit
-              className="p-3"
-              requestId={request.id}
-              onCancel={closeLine}
-              onSuccess={closeLine}
-              doChangeRequestCategory={props.doChangeRequestCategory}
-              doChangeBudgetPeriod={props.doChangeBudgetPeriod}
-              doDeleteRequest={props.doDeleteRequest}
-            />
-          </F>
-        )}
+        <div className={wrapperStyle}>
+          <RequestLineClosed
+            request={request}
+            className={lineStyle}
+            onClick={
+              isChanged
+                ? null
+                : e => {
+                    e.preventDefault()
+                    this.setState({ open: !open })
+                  }
+            }
+          />
+          {!!open && (
+            <F>
+              <RequestEdit
+                className="p-3"
+                requestId={request.id}
+                onCancel={closeLine}
+                onSuccess={closeLine}
+                doChangeRequestCategory={props.doChangeRequestCategory}
+                doChangeBudgetPeriod={props.doChangeBudgetPeriod}
+                doDeleteRequest={props.doDeleteRequest}
+              />
+            </F>
+          )}
+        </div>
       </F>
     )
   }
