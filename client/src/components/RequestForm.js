@@ -526,21 +526,35 @@ class RequestForm extends React.Component {
                 </Col>
 
                 <Col lg order="first" className="mt-3 mt-lg-0">
-                  <button
-                    type="submit"
-                    className="btn m-1 btn-primary btn-massive"
-                    onClick={e => this.showValidations()}
-                  >
-                    <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-                  </button>
-                  {!!onCancel && (
-                    <button
-                      type="button"
-                      className="btn m-1 btn-outline-secondary btn-massive"
-                      onClick={onCancel}
-                    >
-                      {t('form_btn_cancel')}
-                    </button>
+                  {!onSubmit ? (
+                    !!onCancel && (
+                      <button
+                        type="button"
+                        className="btn m-1 btn-outline-secondary btn-massive"
+                        onClick={onCancel}
+                      >
+                        {t('form_btn_close')}
+                      </button>
+                    )
+                  ) : (
+                    <F>
+                      <button
+                        type="submit"
+                        className="btn m-1 btn-primary btn-massive"
+                        onClick={e => this.showValidations()}
+                      >
+                        <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+                      </button>
+                      {!!onCancel && (
+                        <button
+                          type="button"
+                          className="btn m-1 btn-outline-secondary btn-massive"
+                          onClick={onCancel}
+                        >
+                          {t('form_btn_cancel')}
+                        </button>
+                      )}
+                    </F>
                   )}
                 </Col>
               </Row>

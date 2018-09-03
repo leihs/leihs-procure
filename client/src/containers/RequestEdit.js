@@ -18,6 +18,12 @@ const REQUEST_EDIT_QUERY = gql`
   query RequestForEdit($id: [ID!]!) {
     requests(id: $id) {
       ...RequestFieldsForEdit
+      actionPermissions {
+        delete
+        edit
+        moveBudgetPeriod
+        moveCategory
+      }
     }
     # for selecting a new category:
     main_categories {
@@ -94,7 +100,8 @@ class RequestEdit extends React.Component {
           if (loading) return <Loading />
           if (error) return <ErrorPanel error={error} data={data} />
 
-          const request = data.requests[0]
+          const request = f.first(data.requests)
+          const p = f.get(request, 'actionPermissions')
 
           if (!request) {
             return (
@@ -120,20 +127,23 @@ class RequestEdit extends React.Component {
                       categories={data.main_categories}
                       budgetPeriods={data.budget_periods}
                       onCancel={onCancel}
-                      onSubmit={async fields => {
-                        await mutate({
-                          variables: {
-                            requestData: {
-                              id: request.id,
-                              ...requestDataFromFields(request, fields)
+                      onSubmit={
+                        p.edit &&
+                        (async fields => {
+                          await mutate({
+                            variables: {
+                              requestData: {
+                                id: request.id,
+                                ...requestDataFromFields(request, fields)
+                              }
                             }
-                          }
+                          })
+                          onSuccess()
                         })
-                        onSuccess()
-                      }}
+                      }
                       // action delete
                       doDeleteRequest={
-                        !!props.doDeleteRequest &&
+                        !!(p.delete && props.doDeleteRequest) &&
                         (e => props.doDeleteRequest(request))
                       }
                       // action move category
@@ -142,14 +152,15 @@ class RequestEdit extends React.Component {
                       }
                       isSelectingNewCategory={this.state.selectNewCategory}
                       doChangeRequestCategory={
-                        !!props.doChangeRequestCategory &&
+                        !!(p.moveCategory && props.doChangeRequestCategory) &&
                         this.onChangeRequestCategory
                       }
                       // action move budget period
                       onSelectNewBudgetPeriod={this.onSelectNewBudgetPeriod}
                       isSelectingNewBudgetPeriod={this.state.selectBudgetPeriod}
                       doChangeBudgetPeriod={
-                        props.doChangeBudgetPeriod && this.onChangeBudgetPeriod
+                        !!(p.moveBudgetPeriod && props.doChangeBudgetPeriod) &&
+                        this.onChangeBudgetPeriod
                       }
                     />
                     {window.isDebug && (

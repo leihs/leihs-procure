@@ -86,6 +86,9 @@ const REQUESTS_QUERY = gql`
             requested_by_auth_user: $onlyOwnRequests
           ) {
             ...RequestFieldsForIndex
+            actionPermissions {
+              edit
+            }
           }
         }
       }

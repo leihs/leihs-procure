@@ -1,6 +1,7 @@
 {
   "form_btn_save": "Speichern",
   "form_btn_cancel": "Abbrechen",
+  "form_btn_close": "Schliessen",
   "form_btn_move_category": "Kategorie ändern",
   "form_btn_change_budget_period": "Budgetperiode ändern",
   "form_btn_delete": "Löschen",
