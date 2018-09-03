@@ -151,7 +151,17 @@
 .bg-danger-light {
   background-color: rgba(220, 53, 69, 0.34) !important;
 }
+.bg-primary-shy,
+.bg-primary-shy-hover:hover {
+  /* primary, 50% desaturated, brightness like `aliceblue` */
+  /* background-color: hsla(211, 50%, 97%, 1) !important; */
 
+  /* yellow-ish, like possible 'when editing' background */
+  /* background-color: hsla(53, 36%, 95%, 1) !important; */
+
+  /* like .table-hover tbody tr:hover  */
+  background-color: rgba(0, 0, 0, 0.075);
+}
 /* workaround, .form-control-lg only for inputs, BS has nothing for labels/form-groups
   copy/paste some styles from there
 */
