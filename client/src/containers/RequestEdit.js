@@ -201,7 +201,7 @@ const valueIfWritable = (fields, requestData, key) => {
 
 const fieldIfWritable = (fields, requestData, key) => {
   const value = valueIfWritable(fields, requestData, key)
-  if (value) return { [key]: value }
+  if (!f.isUndefined(value)) return { [key]: value }
 }
 
 export const requestDataFromFields = (request, fields) => {

@@ -66,6 +66,8 @@ const presence = val => {
   }
 }
 
+const isUndefined = val => val === undefined
+
 const uniqBy = (arr, key) =>
   f.uniqWith(arr, (a, b) => f.isEqual(f.get(a, key), f.get(b, key)))
 
@@ -97,6 +99,7 @@ const mixins = {
   noop,
   present,
   presence,
+  isUndefined,
   uniqBy,
   uniqById,
   isUUID,
