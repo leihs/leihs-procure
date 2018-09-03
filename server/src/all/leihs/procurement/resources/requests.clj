@@ -214,7 +214,7 @@
                                        :procurement_requests.price_cents
                                        (->> qty-type
                                             name
-                                            (str "pr.")
+                                            (str "procurement_requests.")
                                             keyword))) :result])
       (sql/from :procurement_requests)
       (sql/merge-where [:= :procurement_requests.budget_period_id bp-id])
