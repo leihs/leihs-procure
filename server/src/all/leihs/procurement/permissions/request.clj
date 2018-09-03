@@ -96,5 +96,6 @@
 (defn action-permissions
   [context args value]
   {:edit (can-edit? context args value),
+   :delete (can-delete? context args value),
    :moveBudgetPeriod (can-change-request-budget-period? context args value),
    :moveCategory (can-change-request-category? context args value)})
