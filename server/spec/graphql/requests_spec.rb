@@ -71,6 +71,7 @@ describe 'requests' do
           $inspector_priority: [InspectorPriority]
           $onlyOwnRequests: Boolean
           $withTotalSums: Boolean = false
+          $withCacheKeys: Boolean = false
         ) {
           budget_periods(id: $budgetPeriods) {
             id
@@ -82,12 +83,14 @@ describe 'requests' do
             main_categories {
               id
               total_price_cents @include(if: $withTotalSums)
+              cacheKey @include(if: $withCacheKeys)
               # name
               # image_url
 
               categories(id: $categories) {
                 id
                 total_price_cents @include(if: $withTotalSums)
+                cacheKey @include(if: $withCacheKeys)
                 # name
 
                 requests(
@@ -153,6 +156,20 @@ describe 'requests' do
       variable_keys_to_try.each do |var_name|
         result = query(@query, @user.id, {var_name => [], withTotalSums: true})
         expect(result['errors']).to be_nil
+      end
+    end
+
+    example 'adds nested cache keys' do
+      result = query(@query, @user.id, {withCacheKeys: true})
+      expect(result['errors']).to be_nil
+      expect(result['data']['budget_periods'].length).to eq BudgetPeriod.all.length
+      result['data']['budget_periods'].each do |bp|
+        bp['main_categories'].each do |mc|
+          expect(mc['cacheKey']).to be "#{bp.id}_#{{mc.id}}"
+          mc['categories'].each do |sc|
+            expect(sc['cacheKey']).to be "#{bp.id}_#{{mc.id}}_#{{sc.id}}"
+          end
+        end
       end
     end
 
