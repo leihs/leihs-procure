@@ -3,7 +3,7 @@
             [clojure.tools.logging :as log]
             [com.walmartlabs.lacinia [resolve :as resolve]]
             [leihs.procurement.graphql.helpers :refer
-             [add-resource-type add-to-parent-values
+             [add-cache-key add-resource-type add-to-parent-values
               get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
@@ -40,6 +40,7 @@
                              (map #(-> %
                                        (add-resource-type :main-category)
                                        (add-to-parent-values value)
+                                       (add-cache-key value)
                                        (->> (merge-image-path tx)))))]
     (resolve/with-context main-categories
                           {:categories-args categories-args,
