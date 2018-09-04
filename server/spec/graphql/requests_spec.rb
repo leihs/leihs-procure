@@ -165,9 +165,9 @@ describe 'requests' do
       expect(result['data']['budget_periods'].length).to eq BudgetPeriod.all.length
       result['data']['budget_periods'].each do |bp|
         bp['main_categories'].each do |mc|
-          expect(mc['cacheKey']).to be "#{bp.id}_#{{mc.id}}"
+          expect(mc['cacheKey']).to eq "#{bp['id']}_#{mc['id']}"
           mc['categories'].each do |sc|
-            expect(sc['cacheKey']).to be "#{bp.id}_#{{mc.id}}_#{{sc.id}}"
+            expect(sc['cacheKey']).to eq "#{bp['id']}_#{mc['id']}_#{sc['id']}"
           end
         end
       end
