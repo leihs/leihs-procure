@@ -1,6 +1,5 @@
 (ns leihs.procurement.graphql.helpers
-  (:require [clojure.tools.logging :as log]
-            [cheshire.core :refer [generate-string] :rename
+  (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clj-time.core :as clj-time]
             [com.walmartlabs.lacinia [executor :as executor]]))
@@ -15,12 +14,6 @@
             (if parent-values (conj parent-values parent-value) [parent-value])]
       (merge resolved-value {:parent-values new-parent-values}))
     resolved-value))
-
-(defn add-cache-key
-  [resolved-value parent-value]
-  (log/info parent-value)
-  (log/info (:parent-values parent-value))
-  resolved-value)
 
 (defn get-categories-args-from-selections-tree
   [context]

@@ -208,6 +208,7 @@
     :MainCategory
       {:fields
          {:budget_limits {:resolve :budget-limits, :type (list :BudgetLimit)},
+          :cacheKey {:type String},
           :can_delete {:resolve :can-delete-main-category?,
                        :type (non-null Boolean)},
           :categories

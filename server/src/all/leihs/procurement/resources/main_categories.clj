@@ -1,9 +1,10 @@
 (ns leihs.procurement.resources.main-categories
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [com.walmartlabs.lacinia [resolve :as resolve]]
+  (:require [clojure.tools.logging :as log]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.string :as string]
+            [com.walmartlabs.lacinia.resolve :as resolve]
             [leihs.procurement.graphql.helpers :refer
-             [add-cache-key add-resource-type add-to-parent-values
+             [add-resource-type add-to-parent-values
               get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
@@ -27,6 +28,23 @@
       (merge mc {:image_url (path :image {:image-id image-id})})
       mc)))
 
+(defn add-cache-key
+  [row parent-value]
+  (let [parent-cache-key (or (:cacheKey parent-value) (:id parent-value))
+        id (:id row)
+        cache-key (->> [parent-cache-key id]
+                       (filter #(not (nil? %)))
+                       (string/join "_"))]
+    (assoc row :cacheKey cache-key)))
+
+(defn transform-row
+  [tx row value]
+  (as-> row <>
+    (add-resource-type <> :main-category)
+    (add-to-parent-values <> value)
+    (add-cache-key <> value)
+    (merge-image-path tx <>)))
+
 (defn get-main-categories
   [context _ value]
   (let [tx (-> context
@@ -37,11 +55,7 @@
         main-categories (->> main-categories-base-query
                              sql/format
                              (jdbc/query tx)
-                             (map #(-> %
-                                       (add-resource-type :main-category)
-                                       (add-to-parent-values value)
-                                       (add-cache-key value)
-                                       (->> (merge-image-path tx)))))]
+                             (map #(transform-row tx % value)))]
     (resolve/with-context main-categories
                           {:categories-args categories-args,
                            :requests-args requests-args})))
