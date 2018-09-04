@@ -1,10 +1,9 @@
 (ns leihs.procurement.resources.main-categories
   (:require [clojure.tools.logging :as log]
             [clojure.java.jdbc :as jdbc]
-            [clojure.string :as string]
             [com.walmartlabs.lacinia.resolve :as resolve]
             [leihs.procurement.graphql.helpers :refer
-             [add-resource-type add-to-parent-values
+             [add-cache-key add-resource-type add-to-parent-values
               get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
@@ -27,15 +26,6 @@
     (if-let [image-id (:id image)]
       (merge mc {:image_url (path :image {:image-id image-id})})
       mc)))
-
-(defn add-cache-key
-  [row parent-value]
-  (let [parent-cache-key (or (:cacheKey parent-value) (:id parent-value))
-        id (:id row)
-        cache-key (->> [parent-cache-key id]
-                       (filter #(not (nil? %)))
-                       (string/join "_"))]
-    (assoc row :cacheKey cache-key)))
 
 (defn transform-row
   [tx row value]

@@ -178,7 +178,8 @@
                         :rooms {:resolve :rooms, :type (list :Room)}}},
     :Category
       {:fields
-         {:can_delete {:resolve :can-delete-category?,
+         {:cacheKey {:type String},
+          :can_delete {:resolve :can-delete-category?,
                        :type (non-null Boolean)},
           :cost_center {:type String},
           :general_ledger_account {:type String},
