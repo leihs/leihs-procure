@@ -78,6 +78,7 @@ describe 'request' do
               attachments {
                 value {
                   id
+                  filename
                 }
               }
             }
@@ -87,7 +88,11 @@ describe 'request' do
         result = query(q, user.id)
 
         expect(result['data']['request']['id']).to be == request.id
-        expect(result['data']['request']['attachments']['value'].count).to be == 2
+        attachments = result['data']['request']['attachments']['value']
+        expect(attachments.count).to be == 2
+        attachments
+          .map { |a| a['filename'] }
+          .each { |fn| expect(fn).not_to be_empty }
         expect(Upload.all.count).to be == 0
         expect(Attachment.count).to be == 2
         expect(Attachment.all.map(&:id)).to include attachment_1.id
