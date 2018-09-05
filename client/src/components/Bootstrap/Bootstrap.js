@@ -133,7 +133,7 @@ export const FormGroup = ({
   )
 
   return (
-    <Node {...props} cls={cls} tag="fieldset">
+    <Node {...props} cls={cls}>
       {labelContent && (
         <Label htmlFor={id} cls={{ 'sr-only': hideLabel }}>
           {labelContent}{' '}
