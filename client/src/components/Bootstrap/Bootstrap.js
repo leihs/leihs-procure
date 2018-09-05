@@ -116,9 +116,10 @@ export const FormGroup = ({
   labelSmall,
   helpText,
   children,
+  row,
   ...props
 }) => {
-  const cls = [props.cls, props.className, 'form-group']
+  const cls = [{ row }, props.cls, props.className, 'form-group']
   const labelContent = !!(label || labelSmall) && (
     <F>
       {label}
@@ -176,17 +177,10 @@ export const InputText = props => (
   </StatefulInput>
 )
 
-// TODO: extract this to `InputField`, use it in `FormField` wrapper
-const FormFieldPropTypes = {
-  beforeInput: PropTypes.node,
-  afterInput: PropTypes.node,
-  helpText: PropTypes.node,
-  invalidFeedback: PropTypes.string,
+const InputFieldPropTypes = {
   id: PropTypes.string,
   children: PropTypes.oneOf([null, undefined]),
-  label: PropTypes.node.isRequired,
-  hideLabel: PropTypes.bool,
-  labelSmall: PropTypes.node,
+  label: PropTypes.node,
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string, // enum, already checked at runtime
@@ -197,27 +191,21 @@ const FormFieldPropTypes = {
     PropTypes.bool
   ])
 }
-export const FormField = ({
-  beforeInput,
-  afterInput,
-  invalidFeedback,
-  helpText,
+export const InputField = ({
   id,
   children,
-  label,
-  hideLabel,
-  labelSmall,
   inputLabel,
   name,
   placeholder,
   type = 'text',
   value,
+  label,
   autoComplete,
   minRows,
   maxRows,
   className,
   hidden,
-  ...inputProps
+  ...rest
 }) => {
   // FIXME: better hiding like html's input.hidden?
   if (hidden) return false
@@ -230,9 +218,6 @@ export const FormField = ({
     'number-integer',
     'checkbox'
   ]
-  if (children) {
-    throw new Error('`children` not supported! Use `FormGroup` instead.')
-  }
   if (type === 'checkbox' && !id) {
     throw new Error('Input `type=checkbox` is missing required `id`!')
   }
@@ -244,10 +229,11 @@ export const FormField = ({
   let tag = 'input'
   let mainClass = 'form-control'
   let inputNode
-  let inputLabelNode = false
   if (!name) name = id
-
-  inputProps.className = cx(mainClass, className)
+  let inputProps = {
+    className: cx(mainClass, className),
+    ...rest
+  }
 
   if (type === 'text') {
     tag = InputText
@@ -259,7 +245,7 @@ export const FormField = ({
       <Node
         tag={tag}
         id={id}
-        {...f.omit(inputProps, 'onChange')}
+        {...f.omit(inputProps, 'onChange', 'aria-describedby')}
         className={cx(inputProps.className, 'form-control-plaintext', {
           'form-control': false
         })}
@@ -306,7 +292,6 @@ export const FormField = ({
 
   inputNode = inputNode || (
     <Node
-      aria-describedby={helpText ? `${id}--Help` : null}
       {...inputProps}
       tag={tag}
       type={type}
@@ -323,12 +308,61 @@ export const FormField = ({
       <div className="custom-control custom-checkbox">
         {inputNode}
         <label className="custom-control-label" htmlFor={id}>
-          {inputLabel}
+          {label}
         </label>
       </div>
     )
   }
 
+  return inputNode
+}
+
+InputField.propTypes = InputFieldPropTypes
+
+const FormFieldPropTypes = {
+  beforeInput: PropTypes.node,
+  afterInput: PropTypes.node,
+  helpText: PropTypes.node,
+  invalidFeedback: PropTypes.string,
+  id: PropTypes.string,
+  children: PropTypes.oneOf([null, undefined]),
+  hideLabel: PropTypes.bool,
+  labelSmall: PropTypes.node,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  type: PropTypes.string, // enum, already checked at runtime
+  hidden: PropTypes.bool,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool
+  ])
+}
+export const FormField = ({
+  beforeInput,
+  afterInput,
+  invalidFeedback,
+  id,
+  helpText,
+  children,
+  label,
+  hideLabel,
+  labelSmall,
+  inputLabel,
+  ...restProps
+}) => {
+  if (children) {
+    throw new Error('`children` not supported! Use `FormGroup` or instead.')
+  }
+
+  const inputNode = (
+    <InputField
+      id={id}
+      label={inputLabel}
+      aria-describedby={helpText ? `${id}--Help` : null}
+      {...restProps}
+    />
+  )
   return (
     <FormGroup
       label={label}
@@ -338,7 +372,6 @@ export const FormField = ({
     >
       {beforeInput}
       {inputNode}
-      {inputLabelNode}
       {!!invalidFeedback && (
         <div className="invalid-feedback">{invalidFeedback}</div>
       )}
