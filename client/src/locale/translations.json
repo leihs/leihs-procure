@@ -22,6 +22,12 @@
   "budget_period": "Budgetperiode",
   "request_state": "Status",
 
+  "budget_period_filter_label_state": {
+    "isRequesting": "Antragsphase",
+    "isInspecting": "In Prüfung",
+    "isPast": "Beendet"
+  },
+
   "request_state_label_NEW": "Neu",
   "request_state_label_APPROVED": "Genehmigt",
   "request_state_label_PARTIALLY_APPROVED": "Teilweise bewilligt",

@@ -101,6 +101,7 @@ class MultiSelect extends React.PureComponent {
       className,
       size,
       block,
+      withSearch,
       ...restProps
     } = props
     const selection = this.selection()
@@ -143,14 +144,19 @@ class MultiSelect extends React.PureComponent {
               />
             </DropdownItem>
 
-            <DropdownItem divider />
-            <SearchField
-              size={size}
-              label="Suchen…"
-              clearLabel="Suche zurücksetzen"
-              value={this.state.searchTerm}
-              onChange={e => this.setState({ searchTerm: e.target.value })}
-            />
+            {withSearch && (
+              <F>
+                <DropdownItem divider />
+                <SearchField
+                  size={size}
+                  label="Suchen…"
+                  clearLabel="Suche zurücksetzen"
+                  value={this.state.searchTerm}
+                  onChange={e => this.setState({ searchTerm: e.target.value })}
+                />
+              </F>
+            )}
+
             <DropdownItem divider />
 
             {optGroups.map((group, i) => {
@@ -245,7 +251,8 @@ MultiSelect.propTypes = {
 
 export default MultiSelect
 MultiSelect.defaultProps = {
-  multiple: true
+  multiple: true,
+  withSearch: true
 }
 MultiSelect.propTypes = {
   multiple: PropTypes.oneOf([true]).isRequired,
