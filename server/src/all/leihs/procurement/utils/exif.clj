@@ -16,6 +16,10 @@
        string/split-lines
        (map replace-group-string)
        (map #(string/split % #":\s"))
+       ; -------------------------------------
+       ; sometimes there is nothing behind `:`
+       (map #(if (= (count %) 1) (conj % "") %))
+       ; -------------------------------------
        flatten
        (map string/trim)
        (apply hash-map)))

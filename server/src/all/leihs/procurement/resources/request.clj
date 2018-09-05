@@ -10,7 +10,8 @@
              [budget-period :as budget-period] [category :as category]
              [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads]]
-            [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
+            [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
+             [sql :as sql]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -415,6 +416,10 @@
         input-data (:input_data args)
         req-id (:id input-data)
         attachments (:attachments input-data)
+        organization-id (some->> input-data
+                                 :user
+                                 (requesters/get-organization-of-requester tx)
+                                 :id)
         update-data
           (as-> input-data <>
             (dissoc <> :id)
@@ -422,18 +427,20 @@
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority
-                                               to-name-and-lower-case)))
+                                               to-name-and-lower-case))
+            (cond-> <>
+              organization-id (assoc :organization_id organization-id)))
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(do (update! tx req-id (exchange-attrs update-data))
            (if-not (empty? attachments)
              (deal-with-attachments! tx req-id attachments)))
       :if-only
-      #(request-perms/authorized-to-write-all-fields? tx
-                                                      auth-entity
-                                                      (reverse-exchange-attrs
-                                                        proc-request)
-                                                      update-data))
+      #(request-perms/authorized-to-write-all-fields?
+         tx
+         auth-entity
+         (reverse-exchange-attrs proc-request)
+         (reject-keys input-data request-perms/attrs-to-exclude)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
       (reverse-exchange-attrs <>)
