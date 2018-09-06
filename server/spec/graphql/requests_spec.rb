@@ -3,7 +3,7 @@ require_relative 'graphql_helper'
 
 describe 'requests' do
   def get_requests(result)
-    result[:data][:budget_periods]
+    result[:data][:dashboard][:budget_periods]
       .flat_map { |el| el.fetch(:main_categories) }
       .flat_map { |el| el.fetch(:categories) }
       .flat_map { |el| el.fetch(:requests) }
@@ -73,36 +73,40 @@ describe 'requests' do
           $withTotalSums: Boolean = false
           $withCacheKeys: Boolean = false
         ) {
-          budget_periods(id: $budgetPeriods) {
-            id
-            name
-            total_price_cents @include(if: $withTotalSums)
-            # inspection_start_date
-            # end_date
-
-            main_categories {
+          dashboard(
+            budget_period_id: $budgetPeriods
+            category_id: $categories
+            search: $search
+            organization_id: $organizations
+            priority: $priority
+            inspector_priority: $inspector_priority
+            requested_by_auth_user: $onlyOwnRequests
+          ) {
+            budget_periods {
               id
+              name
               total_price_cents @include(if: $withTotalSums)
-              cacheKey @include(if: $withCacheKeys)
-              # name
-              # image_url
+              # inspection_start_date
+              # end_date
 
-              categories(id: $categories) {
+              main_categories {
                 id
                 total_price_cents @include(if: $withTotalSums)
                 cacheKey @include(if: $withCacheKeys)
                 # name
+                # image_url
 
-                requests(
-                  search: $search
-                  organization_id: $organizations
-                  priority: $priority
-                  inspector_priority: $inspector_priority
-                  requested_by_auth_user: $onlyOwnRequests
-                ) {
+                categories {
                   id
-                  price_cents @include(if: $withTotalSums) { value }
                   total_price_cents @include(if: $withTotalSums)
+                  cacheKey @include(if: $withCacheKeys)
+                  # name
+
+                  requests {
+                    id
+                    price_cents @include(if: $withTotalSums) { value }
+                    total_price_cents @include(if: $withTotalSums)
+                  }
                 }
               }
             }
@@ -115,27 +119,29 @@ describe 'requests' do
       variables = {}
       expected_result = {
         data: {
-          budget_periods: BudgetPeriod.order(:end_date).reverse.map do |bp|
-            {
-              id: bp.id,
-              name: bp.name,
-              main_categories: MainCategory.order(:name).map do |main_cat|
-                {
-                  id: main_cat.id,
-                  categories: Category.where(main_category_id: main_cat.id).order(:name).map do |cat|
-                    {
-                      id: cat.id,
-                      requests: Request.where(
-                        category_id: cat.id, budget_period_id: bp.id
-                      ).map do |r|
-                        { id: r.id }
-                      end
-                    }
-                  end
-                }
-              end
-            }
-          end
+          dashboard: {
+            budget_periods: BudgetPeriod.order(:end_date).reverse.map do |bp|
+              {
+                id: bp.id,
+                name: bp.name,
+                main_categories: MainCategory.order(:name).map do |main_cat|
+                  {
+                    id: main_cat.id,
+                    categories: Category.where(main_category_id: main_cat.id).order(:name).map do |cat|
+                      {
+                        id: cat.id,
+                        requests: Request.where(
+                          category_id: cat.id, budget_period_id: bp.id
+                        ).map do |r|
+                          { id: r.id }
+                        end
+                      }
+                    end
+                  }
+                end
+              }
+            end
+          }
         }
       }
 
@@ -162,8 +168,8 @@ describe 'requests' do
     example 'adds nested cache keys' do
       result = query(@query, @user.id, {withCacheKeys: true})
       expect(result['errors']).to be_nil
-      expect(result['data']['budget_periods'].length).to eq BudgetPeriod.all.length
-      result['data']['budget_periods'].each do |bp|
+      expect(result['data']['dashboard']['budget_periods'].length).to eq BudgetPeriod.all.length
+      result['data']['dashboard']['budget_periods'].each do |bp|
         bp['main_categories'].each do |mc|
           expect(mc['cacheKey']).to eq "#{bp['id']}_#{mc['id']}"
           mc['categories'].each do |sc|
@@ -192,7 +198,7 @@ describe 'requests' do
       end
 
       result = query(@query, @user.id, {withTotalSums: true})
-      bp_totals = result['data']['budget_periods'].map {|bp| bp['total_price_cents']}
+      bp_totals = result['data']['dashboard']['budget_periods'].map {|bp| bp['total_price_cents']}
       # expect at least 1 sum over 32bit size AND no errors
       expect(bp_totals.any? {|n| n.to_i > 2**33}).to be
       expect(result['errors']).to be_nil
@@ -210,27 +216,29 @@ describe 'requests' do
 
       expected_result = {
         data: {
-          budget_periods: bps.order(:name).reverse.map do |bp|
-            {
-              id: bp.id,
-              name: bp.name,
-              main_categories: MainCategory.order(:name).map do |main_cat|
-                {
-                  id: main_cat.id,
-                  categories: Category.where(id: cats.map(&:id), main_category_id: main_cat.id).map do |cat|
-                    {
-                      id: cat.id,
-                      requests: Request.where(
-                        category_id: cat.id, budget_period_id: bp.id
-                      ).map do |r|
-                        { id: r.id }
-                      end
-                    }
-                  end
-                }
-              end
-            }
-          end
+          dashboard: {
+            budget_periods: bps.order(:name).reverse.map do |bp|
+              {
+                id: bp.id,
+                name: bp.name,
+                main_categories: MainCategory.order(:name).map do |main_cat|
+                  {
+                    id: main_cat.id,
+                    categories: Category.where(id: cats.map(&:id), main_category_id: main_cat.id).map do |cat|
+                      {
+                        id: cat.id,
+                        requests: Request.where(
+                          category_id: cat.id, budget_period_id: bp.id
+                        ).map do |r|
+                          { id: r.id }
+                        end
+                      }
+                    end
+                  }
+                end
+              }
+            end
+          }
         }
       }
 
@@ -246,15 +254,20 @@ describe 'requests' do
           $budgetPeriods: [ID]
           $states: [State]
         ) {
-          budget_periods(id: $budgetPeriods) {
-            id
-            main_categories {
+          dashboard(
+            budget_period_id: $budgetPeriods
+            state: $states
+          ) {
+            budget_periods {
               id
-              categories {
+              main_categories {
                 id
-                requests(state: $states) {
+                categories {
                   id
-                  state
+                  requests {
+                    id
+                    state
+                  }
                 }
               }
             }

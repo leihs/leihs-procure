@@ -26,16 +26,7 @@
         tx (:tx ring-request)
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
-        cats (-> categories/categories-base-query
-                 (cond-> (not-empty cat-ids) (sql/merge-where
-                                               [:in :procurement_categories.id
-                                                cat-ids]))
-                 sql/format
-                 (->> (jdbc/query tx)))
         main-cats (-> main-categories/main-categories-base-query
-                      (cond-> cats (sql/merge-where
-                                     [:in :procurement_main_categories.id
-                                      (map :main_category_id cats)]))
                       sql/format
                       (->> (jdbc/query tx)))
         bps (if (or (not bp-ids) (not-empty bp-ids))
@@ -58,9 +49,9 @@
                          (fn [mc]
                            (let [cats*
                                    (->>
-                                     cats
-                                     (filter #(= (:main_category_id %)
-                                                 (:id mc)))
+                                     mc
+                                     :id
+                                     (categories/get-for-main-category-id tx)
                                      (map
                                        (fn [c]
                                          (let [requests*
