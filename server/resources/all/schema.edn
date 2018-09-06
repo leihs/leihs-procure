@@ -100,9 +100,9 @@
                              :price_cents {:type Int},
                              :supplier_id {:type ID},
                              :to_delete {:type Boolean}}},
-    :UploadInput {:fields {:__typename {:type (non-null String)},
-                           :id {:type ID},
-                           :to_delete {:type (non-null Boolean)}}}},
+    :UploadInput {:fields {:id {:type ID},
+                           :to_delete {:type (non-null Boolean)},
+                           :typename {:type (non-null String)}}}},
  :mutations
    {:admins {:args {:input_data {:type (list :AdminInput)}},
              :resolve :update-admins,

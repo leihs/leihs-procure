@@ -45,16 +45,16 @@
 
 (defn deal-with-image!
   [tx mc-id images]
-  (let [uploads-to-delete (filter-images {:to_delete true, :__typename "Upload"}
+  (let [uploads-to-delete (filter-images {:to_delete true, :typename "Upload"}
                                          images)
-        uploads-to-images
-          (filter-images {:to_delete false, :__typename "Upload"} images)
-        images-to-delete (filter-images {:to_delete true, :__typename "Image"}
+        uploads-to-images (filter-images {:to_delete false, :typename "Upload"}
+                                         images)
+        images-to-delete (filter-images {:to_delete true, :typename "Image"}
                                         images)
         ; NOTE: just for purpose of completeness and clarity:
         ; don't do anything with existing images
         ; images-to-retain
-        ; (filter-images {:to_delete false, :__typename "Image"}
+        ; (filter-images {:to_delete false, :typename "Image"}
         ; images)
         ]
     (if-not (empty? uploads-to-delete)

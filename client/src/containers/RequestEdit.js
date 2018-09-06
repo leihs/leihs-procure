@@ -237,7 +237,7 @@ export const requestDataFromFields = (request, fields) => {
     ),
 
     attachments: f.map(valueIfWritable(fields, request, 'attachments'), o => ({
-      ...f.pick(o, 'id', '__typename'),
+      ...f.pick(o, 'id', 'typename'),
       to_delete: !!o.toDelete
     })),
 

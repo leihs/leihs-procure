@@ -68,10 +68,10 @@ describe 'request' do
               id: "#{request.id}",
               article_name: "#{user_name}",
               attachments: [
-                { id: "#{upload_1.id}", __typename: "Upload", to_delete: false },
-                { id: "#{upload_2.id}", __typename: "Upload", to_delete: true },
-                { id: "#{attachment_1.id}", __typename: "Attachment", to_delete: false },
-                { id: "#{attachment_2.id}", __typename: "Attachment", to_delete: true }
+                { id: "#{upload_1.id}", typename: "Upload", to_delete: false },
+                { id: "#{upload_2.id}", typename: "Upload", to_delete: true },
+                { id: "#{attachment_1.id}", typename: "Attachment", to_delete: false },
+                { id: "#{attachment_2.id}", typename: "Attachment", to_delete: true }
               ]
             }) {
               id

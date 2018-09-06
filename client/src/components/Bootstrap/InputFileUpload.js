@@ -165,7 +165,7 @@ const FileObj = file => ({
   filename: file.name,
   rawFile: file,
   toDelete: false,
-  __typename: 'Upload'
+  typename: 'Upload'
 })
 
 // NOTE: based on & adapted from: <https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications#Handling_the_upload_process_for_a_file>

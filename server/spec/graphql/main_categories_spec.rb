@@ -238,13 +238,13 @@ describe 'main categories' do
                   image: [
                     { id: "#{@upload_1.id}",
                       to_delete: true,
-                      __typename: "Upload" },
+                      typename: "Upload" },
                     { id: "#{@upload_2.id}",
                       to_delete: false,
-                      __typename: "Upload" },
+                      typename: "Upload" },
                     { id: "#{Image.find(main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
                       to_delete: true,
-                      __typename: "Image" }
+                      typename: "Image" }
                   ]
                 },
                 { id: "#{MainCategory.find(name: 'main_cat_2').id}",
