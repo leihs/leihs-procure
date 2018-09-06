@@ -7,19 +7,26 @@
             [leihs.procurement.resources.requests :as requests]
             [leihs.procurement.utils.sql :as sql]))
 
-(defn get-dashboard [ctx args value]
+(defn sum-total-price
+  [coll]
+  (->> coll
+       (map :total_price_cents)
+       (reduce +)))
+
+(defn get-dashboard
+  [ctx args value]
   (let [ring-request (:request ctx)
         tx (:tx ring-request)
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
         cats (-> categories/categories-base-query
-                 (cond-> cat-ids (sql/merge-where [:in :procurement_categories.id cat-ids]))
+                 (cond-> cat-ids (sql/merge-where
+                                   [:in :procurement_categories.id cat-ids]))
                  sql/format
                  (->> (jdbc/query tx)))
         main-cats (-> main-categories/main-categories-base-query
                       (cond-> cats (sql/merge-where
-                                     [:in
-                                      :procurement_main_categories.id
+                                     [:in :procurement_main_categories.id
                                       (map :main_category_id cats)]))
                       sql/format
                       (->> (jdbc/query tx)))
@@ -29,17 +36,40 @@
                 sql/format
                 (->> (jdbc/query tx)))
         requests (requests/get-requests ctx args value)]
-    (->> bps
-         (map (fn [bp]
-                (assoc bp
-                       :main_categories
-                       (->> main-cats
-                            (map (fn [mc]
-                                   (->> cats
-                                        (filter #(= (:main_category_id %) (:id mc)))
-                                        (map (fn [c]
-                                               (->> requests
-                                                    (filter #(and (= (-> % :category :value) (:id c))
-                                                                  (= (-> % :budget_period :value) (:id bp))))
-                                                    (assoc c :requests))))
-                                        (assoc mc :categories)))))))))))
+    (->>
+      bps
+      (map
+        (fn [bp]
+          (let [main-cats*
+                  (->>
+                    main-cats
+                    (map
+                      (fn [mc]
+                        (let [cats*
+                                (->>
+                                  cats
+                                  (filter #(= (:main_category_id %) (:id mc)))
+                                  (map (fn [c]
+                                         (let [requests*
+                                                 (filter
+                                                   #(and (= (-> %
+                                                                :category
+                                                                :value)
+                                                            (:id c))
+                                                         (= (-> %
+                                                                :budget_period
+                                                                :value)
+                                                            (:id bp)))
+                                                   requests)]
+                                           (-> c
+                                               (assoc :requests requests*)
+                                               (assoc :total_price_cents
+                                                        (sum-total-price
+                                                          requests*)))))))]
+                          (-> mc
+                              (assoc :categories cats*)
+                              (assoc :total_price_cents (sum-total-price
+                                                          cats*)))))))]
+            (-> bp
+                (assoc :main_categories main-cats*)
+                (assoc :total_price_cents (sum-total-price main-cats*)))))))))
