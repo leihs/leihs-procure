@@ -58,7 +58,16 @@ const REQUESTS_QUERY = gql`
     $inspector_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
   ) {
-    budget_periods(id: $budgetPeriods) {
+    dashboard(
+      budget_period_id: $budgetPeriods
+      category_id: $categories
+      search: $search
+      state: $state
+      organization_id: $organizations
+      priority: $priority
+      inspector_priority: $inspector_priority
+      requested_by_auth_user: $onlyOwnRequests
+    ) {
       id
       name
       inspection_start_date
@@ -71,20 +80,12 @@ const REQUESTS_QUERY = gql`
         image_url
         total_price_cents
 
-        categories(id: $categories) {
+        categories {
           id
           name
           total_price_cents
 
-          requests(
-            search: $search
-            # FIXME: 'states'
-            state: $state
-            organization_id: $organizations
-            priority: $priority
-            inspector_priority: $inspector_priority
-            requested_by_auth_user: $onlyOwnRequests
-          ) {
+          requests {
             ...RequestFieldsForIndex
             actionPermissions {
               edit
