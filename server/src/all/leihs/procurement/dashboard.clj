@@ -27,8 +27,9 @@
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
         cats (-> categories/categories-base-query
-                 (cond-> cat-ids (sql/merge-where
-                                   [:in :procurement_categories.id cat-ids]))
+                 (cond-> (not-empty cat-ids) (sql/merge-where
+                                               [:in :procurement_categories.id
+                                                cat-ids]))
                  sql/format
                  (->> (jdbc/query tx)))
         main-cats (-> main-categories/main-categories-base-query
@@ -37,11 +38,13 @@
                                       (map :main_category_id cats)]))
                       sql/format
                       (->> (jdbc/query tx)))
-        bps (-> budget-periods/budget-periods-base-query
-                (cond-> bp-ids (sql/merge-where
-                                 [:in :procurement_budget_periods.id bp-ids]))
-                sql/format
-                (->> (jdbc/query tx)))
+        bps (if (or (not bp-ids) (not-empty bp-ids))
+              (-> budget-periods/budget-periods-base-query
+                  (cond-> bp-ids (sql/merge-where
+                                   [:in :procurement_budget_periods.id bp-ids]))
+                  sql/format
+                  (->> (jdbc/query tx)))
+              [])
         requests (requests/get-requests ctx args value)]
     {:budget_periods
        (->>
