@@ -224,14 +224,22 @@ describe 'requests' do
                 main_categories: MainCategory.order(:name).map do |main_cat|
                   {
                     id: main_cat.id,
-                    categories: Category.where(id: cats.map(&:id), main_category_id: main_cat.id).map do |cat|
+                    categories: Category.where(main_category_id: main_cat.id).order(:name).map do |category|
                       {
-                        id: cat.id,
-                        requests: Request.where(
-                          category_id: cat.id, budget_period_id: bp.id
-                        ).map do |r|
-                          { id: r.id }
-                        end
+                        id: category.id,
+                        requests: (
+                          if cats.map(&:id).include?(category.id)
+                            Request.where(
+                              category_id: category.id,
+                              budget_period_id: bp.id,
+                              priority: variables[:priority].map(&:downcase)
+                            ).map do |r|
+                              { id: r.id }
+                            end
+                          else
+                            []
+                          end
+                        )
                       }
                     end
                   }
