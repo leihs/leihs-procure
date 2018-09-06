@@ -110,7 +110,7 @@ const RequestsTree = ({
   //   </pre>
   // )
 
-  return f.get('data', 'dashboard.budget_periods').map(b => (
+  return f.get(data, 'dashboard.budget_periods').map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b} me={me}>
       {b.main_categories.map(cat => {
         const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')

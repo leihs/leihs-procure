@@ -42,6 +42,14 @@
       sql/format
       (->> (jdbc/query tx))))
 
+(defn get-for-main-category-id
+  [tx main-cat-id]
+  (-> categories-base-query
+      (sql/merge-where [:= :procurement_categories.main_category_id
+                        main-cat-id])
+      sql/format
+      (->> (jdbc/query tx))))
+
 (defn transform-row
   [row value]
   (-> row

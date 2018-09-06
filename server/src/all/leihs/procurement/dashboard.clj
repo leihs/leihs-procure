@@ -1,5 +1,6 @@
 (ns leihs.procurement.dashboard
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clojure.string :as string]
+            [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-periods :as budget-periods]
             [leihs.procurement.resources.categories :as categories]
@@ -12,6 +13,12 @@
   (->> coll
        (map :total_price_cents)
        (reduce +)))
+
+(defn cache-key
+  [& args]
+  (->> args
+       (map :id)
+       (string/join "_")))
 
 (defn get-dashboard
   [ctx args value]
@@ -36,20 +43,23 @@
                 sql/format
                 (->> (jdbc/query tx)))
         requests (requests/get-requests ctx args value)]
-    (->>
-      bps
-      (map
-        (fn [bp]
-          (let [main-cats*
-                  (->>
-                    main-cats
-                    (map
-                      (fn [mc]
-                        (let [cats*
-                                (->>
-                                  cats
-                                  (filter #(= (:main_category_id %) (:id mc)))
-                                  (map (fn [c]
+    {:budget_periods
+       (->>
+         bps
+         (map
+           (fn [bp]
+             (let [main-cats*
+                     (->>
+                       main-cats
+                       (map
+                         (fn [mc]
+                           (let [cats*
+                                   (->>
+                                     cats
+                                     (filter #(= (:main_category_id %)
+                                                 (:id mc)))
+                                     (map
+                                       (fn [c]
                                          (let [requests*
                                                  (filter
                                                    #(and (= (-> %
@@ -61,15 +71,22 @@
                                                                 :value)
                                                             (:id bp)))
                                                    requests)]
-                                           (-> c
-                                               (assoc :requests requests*)
-                                               (assoc :total_price_cents
-                                                        (sum-total-price
-                                                          requests*)))))))]
-                          (-> mc
-                              (assoc :categories cats*)
-                              (assoc :total_price_cents (sum-total-price
-                                                          cats*)))))))]
-            (-> bp
-                (assoc :main_categories main-cats*)
-                (assoc :total_price_cents (sum-total-price main-cats*)))))))))
+                                           (->
+                                             c
+                                             (assoc :requests requests*)
+                                             (assoc :total_price_cents
+                                                      (sum-total-price
+                                                        requests*))
+                                             (assoc :cacheKey
+                                                      (cache-key bp mc c)))))))]
+                             (-> mc
+                                 (assoc :categories cats*)
+                                 (assoc :total_price_cents (sum-total-price
+                                                             cats*))
+                                 (assoc :cacheKey (cache-key bp mc))
+                                 (->> (main-categories/merge-image-path
+                                        tx)))))))]
+               (-> bp
+                   (assoc :main_categories main-cats*)
+                   (assoc :total_price_cents (sum-total-price
+                                               main-cats*)))))))}))

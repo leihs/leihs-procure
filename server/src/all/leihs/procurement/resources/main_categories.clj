@@ -42,10 +42,17 @@
                :tx)
         requests-args (get-requests-args-from-context context)
         categories-args (get-categories-args-from-context context)
-        main-categories (->> main-categories-base-query
-                             sql/format
-                             (jdbc/query tx)
-                             (map #(transform-row tx % value)))]
+        main-categories
+          (->> main-categories-base-query
+               sql/format
+               (jdbc/query tx)
+               (map #(as-> % <>
+                      (transform-row tx <> value)
+                      (assoc <>
+                        :categories (->> %
+                                         :id
+                                         (categories/get-for-main-category-id
+                                           tx))))))]
     (resolve/with-context main-categories
                           {:categories-args categories-args,
                            :requests-args requests-args})))

@@ -68,27 +68,29 @@ const REQUESTS_QUERY = gql`
       inspector_priority: $inspector_priority
       requested_by_auth_user: $onlyOwnRequests
     ) {
-      id
-      name
-      inspection_start_date
-      end_date
-      total_price_cents
-
-      main_categories {
+      budget_periods {
         id
         name
-        image_url
+        inspection_start_date
+        end_date
         total_price_cents
 
-        categories {
+        main_categories {
           id
           name
+          image_url
           total_price_cents
 
-          requests {
-            ...RequestFieldsForIndex
-            actionPermissions {
-              edit
+          categories {
+            id
+            name
+            total_price_cents
+
+            requests {
+              ...RequestFieldsForIndex
+              actionPermissions {
+                edit
+              }
             }
           }
         }
