@@ -2,6 +2,7 @@
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clj-time.core :as clj-time]
+            [clojure.string :as string]
             [com.walmartlabs.lacinia [executor :as executor]]))
 
 (defn add-resource-type [m t] (assoc m :resource-type t))
@@ -14,6 +15,15 @@
             (if parent-values (conj parent-values parent-value) [parent-value])]
       (merge resolved-value {:parent-values new-parent-values}))
     resolved-value))
+
+(defn add-cache-key
+  [row parent-value]
+  (let [parent-cache-key (or (:cacheKey parent-value) (:id parent-value))
+        id (:id row)
+        cache-key (->> [parent-cache-key id]
+                       (filter #(not (nil? %)))
+                       (string/join "_"))]
+    (assoc row :cacheKey cache-key)))
 
 (defn get-categories-args-from-selections-tree
   [context]
