@@ -1,6 +1,7 @@
 (ns leihs.procurement.graphql.queries
   (:require
-    [leihs.procurement [authorization :as authorization] [env :as env]]
+    [leihs.procurement [authorization :as authorization]
+     [dashboard :as dashboard] [env :as env]]
     [leihs.procurement.permissions [request :as request-perms]
      [user :as user-perms]]
     [leihs.procurement.resources [admins :as admins]
@@ -45,6 +46,7 @@
    :categories categories/get-categories,
    :cost-center request/cost-center,
    :current-user current-user/get-current-user,
+   :dashboard dashboard/get-dashboard,
    :department organization/get-department,
    :general-ledger-account request/general-ledger-account,
    :inspectors (-> inspectors/get-inspectors
