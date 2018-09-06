@@ -67,19 +67,18 @@ const REQUESTS_QUERY = gql`
 
       main_categories {
         id
-        cacheKey
         name
         image_url
         total_price_cents
 
         categories(id: $categories) {
           id
-          cacheKey
           name
           total_price_cents
 
           requests(
             search: $search
+            # FIXME: 'states'
             state: $state
             organization_id: $organizations
             priority: $priority
@@ -244,12 +243,17 @@ class RequestsIndexPage extends React.Component {
     return (
       <ApolloConsumer>
         {client => (
-          <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
+          <Query
+            query={FILTERS_QUERY}
+            fetchPolicy="cache-and-network"
+            notifyOnNetworkStatusChange
+          >
             {filtersQuery => {
               return (
                 <Query
                   query={REQUESTS_QUERY}
                   variables={state.currentFilters}
+                  fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
                   {requestsQuery => {
