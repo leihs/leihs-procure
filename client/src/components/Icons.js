@@ -43,6 +43,7 @@ import faStream from '@fortawesome/fontawesome-free-solid/faStream'
 import faListUl from '@fortawesome/fontawesome-free-solid/faListUl'
 import faCube from '@fortawesome/fontawesome-free-solid/faCube'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
+import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
 
 const ICONS = {
   CaretUp: {
@@ -170,6 +171,9 @@ const ICONS = {
   },
   Templates: {
     src: faCube
+  },
+  WarningSign: {
+    src: faExclamationTriangle
   }
 }
 
