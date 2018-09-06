@@ -130,7 +130,8 @@ class InputFileUpload extends React.Component {
 
         {isDisabled || (
           <FilePicker
-            multiple
+            // FIXME: re-enable multiples when backend fixed!
+            multiple={false}
             label="Anhänge auswählen"
             onChange={e => this.onSelectFiles(e)}
           />
