@@ -1,12 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom'
+import { Switch, Route, BrowserRouter } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
 import App from './containers/App'
+import { Redirect } from './components/Router'
 
 // all the pages
 import HomePage from './pages/HomePage'
