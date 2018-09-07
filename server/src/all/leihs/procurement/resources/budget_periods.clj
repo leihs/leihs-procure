@@ -3,9 +3,6 @@
             [clj-time.format :as time-format]
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia [resolve :as resolve]]
-            [leihs.procurement.graphql.helpers :refer
-             [add-resource-type get-categories-args-from-context
-              get-requests-args-from-context]]
             [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.utils.sql :as sql]))
 
@@ -29,28 +26,12 @@
   ([context args _]
    (if (= (:id args) [])
      []
-     (let [requests-args (get-requests-args-from-context context)
-           categories-args (get-categories-args-from-context context)
-           budget-periods (->> args
-                               budget-periods-query
-                               sql/format
-                               (jdbc/query (-> context
-                                               :request
-                                               :tx))
-                               (map #(add-resource-type % :budget-period)))]
-       (resolve/with-context budget-periods
-                             {:requests-args requests-args,
-                              :categories-args categories-args})))))
-
-(defn get-phase-of-budget-periods
-  [tx budget-periods]
-  (let [past-bool-set (->> budget-periods
-                           (map #(budget-period/past? tx %))
-                           set)]
-    (case past-bool-set
-      #{true} :past
-      #{false} :current-and-future
-      :mixed)))
+     (->> args
+          budget-periods-query
+          sql/format
+          (jdbc/query (-> context
+                          :request
+                          :tx))))))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
