@@ -63,8 +63,7 @@
 
 (defn requests-query-map
   ([context arguments value] (requests-query-map context arguments value {}))
-  ([context arguments value
-    {advanced-user-opt :advanced-user, base-query-opt :base-query}]
+  ([context arguments value {advanced-user-opt :advanced-user}]
    (let [id (:id arguments)
          category-id (get-id :category arguments value)
          budget-period-id (get-id :budget-period arguments value)
@@ -84,9 +83,7 @@
          advanced-user?
            (or advanced-user-opt
                (user-perms/advanced? tx (:authenticated-entity rrequest)))
-         start-sqlmap (or base-query-opt
-                          (request/requests-base-query-with-state
-                            advanced-user?))]
+         start-sqlmap (request/requests-base-query-with-state advanced-user?)]
      (cond-> start-sqlmap
        id (sql/merge-where [:in :procurement_requests.id id])
        category-id (-> (sql/merge-where [:in :procurement_requests.category_id
@@ -180,34 +177,6 @@
                 (clojure.set/intersection (set arg-ids-from-query)
                                           (set ids-from-all-subcategories))))
       :category [(:id value)])))
-
-(defn total-price-cents
-  [context _ value]
-  (let [ring-request (:request context)
-        tx (:tx ring-request)
-        auth-entity (:authenticated-entity ring-request)
-        budget-period-id (get-id-from-resolution-context value :budget-period)
-        category-id (get-category-id context value)
-        requests-args (:requests-args context)
-        base-query (-> (sql/select :procurement_requests.*)
-                       (sql/from :procurement_requests)
-                       (sql/merge-join
-                         :procurement_budget_periods
-                         [:= :procurement_budget_periods.id
-                          :procurement_requests.budget_period_id]))]
-    (as-> {} <>
-      (cond-> <>
-        (not-empty budget-period-id) (assoc :budget_period_id budget-period-id))
-      (cond-> <> (not-empty category-id) (assoc :category_id category-id))
-      (merge <> requests-args)
-      (requests-query-map context <> nil {:base-query base-query})
-      (requests-perms/apply-scope tx <> auth-entity)
-      (sql/select <>
-                  [(->> [:order_quantity :approved_quantity :requested_quantity]
-                        (apply sql/call :coalesce)
-                        (sql/call :* :price_cents)
-                        (sql/call :sum)) :result])
-      (get-total-price-cents tx <>))))
 
 (defn- sql-sum
   [qty-type]
