@@ -247,6 +247,7 @@
                    (not user-arg) (assoc :user (:user_id auth-entity)))]
     (as-> req-stub <>
       (request-fields-perms/get-for-user-and-request tx auth-entity <>)
+      (reject-keys <> request-perms/special-perms)
       (map #(apply consider-default %) <>)
       (into {} <>)
       (assoc <> :state :NEW))))
