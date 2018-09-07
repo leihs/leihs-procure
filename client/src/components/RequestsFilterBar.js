@@ -3,6 +3,8 @@ import cx from 'classnames'
 import f from 'lodash'
 
 import {
+  Row,
+  Col,
   Button,
   FormField,
   InputText,
@@ -23,6 +25,8 @@ import CurrentUser from '../containers/CurrentUserProvider'
 
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsListFiltered')
+
+const breakPoint = 'xl' // starting with this size is shown on right side etc
 
 const FilterBar = ({
   filters: { loading, error, data, networkStatus, ...restFilters },
@@ -189,99 +193,117 @@ const Filters = ({ me, data, current, onChange }) => {
               </FormGroup>
             )}
 
-            {allowed.budgetPeriods && (
-              <FormGroup label={t('dashboard.filter_titles.budget_periods')}>
-                <MultiSelect
-                  {...formPropsFor('budgetPeriods')}
-                  withSearch={budgetPeriods.length > 24}
-                  multiple
-                  size="sm"
-                  block
-                  options={available.budgetPeriods}
-                />
-              </FormGroup>
-            )}
-
-            {allowed.categories && (
-              <FormGroup label={t('dashboard.filter_titles.categories')}>
-                <MultiSelect
-                  {...formPropsFor('categories')}
-                  multiple
-                  size="sm"
-                  block
-                  options={available.categories}
-                />
-              </FormGroup>
-            )}
-
-            {allowed.onlyOwnRequests &&
-              allowed.onlyCategoriesWithRequests && (
-                <FormGroup
-                  label={t('dashboard.filter_titles.special')}
-                  cls="mb-0"
-                >
-                  {allowed.onlyOwnRequests && (
-                    <FormField
-                      {...formPropsFor('onlyOwnRequests')}
-                      type="checkbox"
-                      inputLabel={t(
-                        'dashboard.filter_titles.special_only_own_requests'
-                      )}
-                      label=""
-                      hideLabel
+            <Row>
+              {allowed.budgetPeriods && (
+                <Col sm cls={`col-${breakPoint}-12`}>
+                  <FormGroup
+                    label={t('dashboard.filter_titles.budget_periods')}
+                  >
+                    <MultiSelect
+                      {...formPropsFor('budgetPeriods')}
+                      withSearch={budgetPeriods.length > 24}
+                      multiple
+                      size="sm"
+                      block
+                      options={available.budgetPeriods}
                     />
-                  )}
-                  {allowed.onlyCategoriesWithRequests && (
-                    <FormField
-                      {...formPropsFor('onlyCategoriesWithRequests')}
-                      type="checkbox"
-                      inputLabel={t(
-                        'dashboard.filter_titles.special_only_categories_with_requests'
-                      )}
-                      label=""
-                      hideLabel
-                    />
-                  )}
-                </FormGroup>
+                  </FormGroup>
+                </Col>
               )}
+              {allowed.categories && (
+                <Col sm cls={`col-${breakPoint}-12`}>
+                  <FormGroup label={t('dashboard.filter_titles.categories')}>
+                    <MultiSelect
+                      {...formPropsFor('categories')}
+                      multiple
+                      size="sm"
+                      block
+                      options={available.categories}
+                    />
+                  </FormGroup>
+                </Col>
+              )}
+            </Row>
 
-            {allowed.organizations && (
-              <FormGroup label={t('dashboard.filter_titles.orgs')}>
-                <MultiSelect
-                  {...formPropsFor('organizations')}
-                  size="sm"
-                  block
-                  multiple
-                  options={available.organizations}
-                />
-              </FormGroup>
-            )}
+            <Row>
+              {allowed.onlyOwnRequests &&
+                allowed.onlyCategoriesWithRequests && (
+                  <Col sm cls={`col-${breakPoint}-12`}>
+                    <FormGroup
+                      label={t('dashboard.filter_titles.special')}
+                      cls="mb-0"
+                    >
+                      {allowed.onlyOwnRequests && (
+                        <FormField
+                          {...formPropsFor('onlyOwnRequests')}
+                          type="checkbox"
+                          inputLabel={t(
+                            'dashboard.filter_titles.special_only_own_requests'
+                          )}
+                          label=""
+                          hideLabel
+                        />
+                      )}
+                      {allowed.onlyCategoriesWithRequests && (
+                        <FormField
+                          {...formPropsFor('onlyCategoriesWithRequests')}
+                          type="checkbox"
+                          inputLabel={t(
+                            'dashboard.filter_titles.special_only_categories_with_requests'
+                          )}
+                          label=""
+                          hideLabel
+                        />
+                      )}
+                    </FormGroup>
+                  </Col>
+                )}
 
-            {allowed.priority && (
-              <FormGroup label={t('dashboard.filter_titles.prio')}>
-                <MultiSelect
-                  {...formPropsFor('priority')}
-                  size="sm"
-                  block
-                  multiple
-                  withSearch={false}
-                  options={available.priority}
-                />
-              </FormGroup>
-            )}
+              {allowed.organizations && (
+                <Col sm cls={`col-${breakPoint}-12`}>
+                  <FormGroup label={t('dashboard.filter_titles.orgs')}>
+                    <MultiSelect
+                      {...formPropsFor('organizations')}
+                      size="sm"
+                      block
+                      multiple
+                      options={available.organizations}
+                    />
+                  </FormGroup>
+                </Col>
+              )}
+            </Row>
 
-            {allowed.inspector_priority && (
-              <FormGroup label={t('dashboard.filter_titles.prio_insp')}>
-                <MultiSelect
-                  {...formPropsFor('inspector_priority')}
-                  size="sm"
-                  block
-                  multiple
-                  withSearch={false}
-                  options={available.inspector_priority}
-                />
-              </FormGroup>
-            )}
+            <Row>
+              <Col sm cls={`col-${breakPoint}-12`}>
+                {allowed.priority && (
+                  <FormGroup label={t('dashboard.filter_titles.prio')}>
+                    <MultiSelect
+                      {...formPropsFor('priority')}
+                      size="sm"
+                      block
+                      multiple
+                      withSearch={false}
+                      options={available.priority}
+                    />
+                  </FormGroup>
+                )}
+              </Col>
+              <Col sm cls={`col-${breakPoint}-12`}>
+                {allowed.inspector_priority && (
+                  <FormGroup label={t('dashboard.filter_titles.prio_insp')}>
+                    <MultiSelect
+                      {...formPropsFor('inspector_priority')}
+                      size="sm"
+                      block
+                      multiple
+                      withSearch={false}
+                      options={available.inspector_priority}
+                    />
+                  </FormGroup>
+                )}
+              </Col>
+            </Row>
 
             <Let field={formPropsFor('state')}>
               {({ field }) => (
@@ -289,7 +311,13 @@ const Filters = ({ me, data, current, onChange }) => {
                   {available.state &&
                     available.state.map(({ value, label }) => (
                       <F key={value}>
-                        <div className="custom-control custom-checkbox">
+                        <div
+                          className={cx(
+                            'custom-control custom-checkbox',
+                            'mr-3 d-inline-block',
+                            `mr-${breakPoint}-0 d-${breakPoint}-block`
+                          )}
+                        >
                           <input
                             type="checkbox"
                             className="custom-control-input"
