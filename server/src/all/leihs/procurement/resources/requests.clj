@@ -27,45 +27,11 @@
          ["~~*" :rooms.name term-percent] ["~~*" :users.firstname term-percent]
          ["~~*" :users.lastname term-percent]]))))
 
-(defn get-id-from-parent-values
-  [value resource-type]
-  (some->> value
-           :parent-values (find-first #(= (:resource-type %) resource-type))
-           :id vector))
-
-(defn get-id-from-current-value
-  [value resource-type]
-  (if (= (:resource-type value) resource-type) [(:id value)]))
-
-(defn get-id-from-resolution-context
-  [value resource-type]
-  (or (get-id-from-parent-values value resource-type)
-      (get-id-from-current-value value resource-type)))
-
-(defn get-id-from-arguments
-  [arguments resource-type]
-  (some->> arguments
-           (-> resource-type
-               name
-               (clojure.string/replace "-" "_")
-               (str "_id")
-               keyword)))
-
-(defn get-id
-  [resource-type arguments value]
-  (let [id-from-args (get-id-from-arguments arguments resource-type)
-        id-from-context (get-id-from-resolution-context value resource-type)]
-    (if (and id-from-args id-from-context)
-      (throw
-        (Exception.
-          "Value can not be derived from both, resolution context and arguments.")))
-    (or id-from-args id-from-context)))
-
 (defn requests-query-map
   [context arguments value]
   (let [id (:id arguments)
-        category-id (get-id :category arguments value)
-        budget-period-id (get-id :budget-period arguments value)
+        category-id (:category_id arguments)
+        budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
         priority (some->> arguments
                           :priority
@@ -149,32 +115,6 @@
                first
                :result)
       0))
-
-(defn get-category-id
-  [context value]
-  (let [tx (-> context
-               :request
-               :tx)
-        main-category-id (get-id-from-current-value value :main-category)
-        arg-ids-from-query (some-> context
-                                   :categories-args
-                                   :id)]
-    (case (:resource-type value)
-      :budget-period arg-ids-from-query
-      :main-category
-        (let [ids-from-all-subcategories (-> (sql/select :id)
-                                             (sql/from :procurement_categories)
-                                             (sql/where [:= :main_category_id
-                                                         (:id value)])
-                                             sql/format
-                                             (->> (jdbc/query tx))
-                                             (->> (map #(-> %
-                                                            :id
-                                                            .toString))))]
-          (into []
-                (clojure.set/intersection (set arg-ids-from-query)
-                                          (set ids-from-all-subcategories))))
-      :category [(:id value)])))
 
 (defn- sql-sum
   [qty-type]
