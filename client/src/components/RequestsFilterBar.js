@@ -3,17 +3,19 @@ import cx from 'classnames'
 import f from 'lodash'
 
 import {
+  Div,
   Row,
   Col,
   Button,
   FormField,
-  InputText,
   FormGroup,
   StatefulForm,
   Collapsing
 } from './Bootstrap'
 
 import MultiSelect from './Bootstrap/MultiSelect'
+import InputTextSearch from './Bootstrap/InputTextSearch'
+
 import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
@@ -24,9 +26,9 @@ import RequestStateBadge from './RequestStateBadge'
 import CurrentUser from '../containers/CurrentUserProvider'
 
 // import logger from 'debug'
-// const log = logger('app:ui:RequestsListFiltered')
+// const log = logger('app:ui:RequestsFilterBar')
 
-const breakPoint = 'xl' // starting with this size is shown on right side etc
+const BIG = 'xl' // starting with this size is shown on right side etc
 
 const FilterBar = ({
   filters: { loading, error, data, networkStatus, ...restFilters },
@@ -145,49 +147,66 @@ const Filters = ({ me, data, current, onChange }) => {
       onChange={onChange}
     >
       {({ fields, formPropsFor, setValue, setValues }) => {
+        const hasChanges = f.any(
+          fields,
+          (val, key) => !f.isEqual(val, defaultFilters[key])
+        )
+
         const selectDefaultFilters = () => setValues(defaultFilters)
 
-        return (
-          <Collapsing id="collapse-example-1" startOpen>
-            {({ isOpen, togglerProps, collapsedProps, Caret }) => (
-              <div className={`h-100 p-3 bg-light mh-${breakPoint}-100vh`}>
-                <div
-                  className={`d-block d-${breakPoint}-none`}
-                  {...togglerProps}
-                >
-                  <h5>
-                    <Caret spaced />
-                    {heading}
-                  </h5>
-                </div>
-                <div className={`d-none d-${breakPoint}-block`}>
-                  <h5>{heading}</h5>
-                </div>
+        const resetButton = (
+          <Button
+            size="sm"
+            color="link"
+            cls="pl-0"
+            disabled={!hasChanges}
+            onClick={e => {
+              e.stopPropagation()
+              selectDefaultFilters()
+            }}
+          >
+            {t('dashboard.reset_filters')}
+          </Button>
+        )
 
-                <div
-                  className={cx('d-${breakPoint}-block', { 'd-none': !isOpen })}
-                >
+        return (
+          <Collapsing id="requests-filter-bar" startOpen>
+            {({ isOpen, togglerProps, collapsedProps, Caret }) => (
+              <Div cls={`h-100 p-3 bg-light mh-${BIG}-100vh`}>
+                {/* when on top */}
+                <Row cls={`d-${BIG}-none`} {...togglerProps}>
+                  <Col>
+                    <h5 className="d-inline-block">
+                      <Caret spaced />
+                      {heading}
+                    </h5>
+                  </Col>
+                  <Col cls="text-right">{resetButton}</Col>
+                </Row>
+                {/* when on side */}
+                <Div cls={`d-none d-${BIG}-block`}>
+                  <h5>{heading}</h5>
+                </Div>
+
+                <Div cls={cx(`mt-2 d-${BIG}-block`, { 'd-none': !isOpen })}>
                   <F>
-                    <FormGroup>
-                      <Button
-                        size="sm"
-                        color="link"
-                        cls="pl-0"
-                        onClick={selectDefaultFilters}
-                      >
-                        {t('dashboard.reset_filters')}
-                      </Button>
-                    </FormGroup>
+                    <Div cls={`mb-2 d-none d-${BIG}-block`}>{resetButton}</Div>
 
                     {allowed.search && (
-                      <FormGroup label={t('dashboard.filter_titles.search')}>
-                        <InputText {...formPropsFor('search')} />
+                      <FormGroup
+                        label={t('dashboard.filter_titles.search')}
+                        hideLabel
+                      >
+                        <InputTextSearch
+                          size="sm"
+                          {...formPropsFor('search')}
+                        />
                       </FormGroup>
                     )}
 
                     <Row>
                       {allowed.budgetPeriods && (
-                        <Col sm cls={`col-${breakPoint}-12`}>
+                        <Col sm cls={`col-${BIG}-12`}>
                           <FormGroup
                             label={t('dashboard.filter_titles.budget_periods')}
                           >
@@ -203,7 +222,7 @@ const Filters = ({ me, data, current, onChange }) => {
                         </Col>
                       )}
                       {allowed.categories && (
-                        <Col sm cls={`col-${breakPoint}-12`}>
+                        <Col sm cls={`col-${BIG}-12`}>
                           <FormGroup
                             label={t('dashboard.filter_titles.categories')}
                           >
@@ -222,7 +241,7 @@ const Filters = ({ me, data, current, onChange }) => {
                     <Row>
                       {allowed.onlyOwnRequests &&
                         allowed.onlyCategoriesWithRequests && (
-                          <Col sm cls={`col-${breakPoint}-12`}>
+                          <Col sm cls={`col-${BIG}-12`}>
                             <FormGroup
                               label={t('dashboard.filter_titles.special')}
                               cls="mb-0"
@@ -256,7 +275,7 @@ const Filters = ({ me, data, current, onChange }) => {
                         )}
 
                       {allowed.organizations && (
-                        <Col sm cls={`col-${breakPoint}-12`}>
+                        <Col sm cls={`col-${BIG}-12`}>
                           <FormGroup label={t('dashboard.filter_titles.orgs')}>
                             <MultiSelect
                               {...formPropsFor('organizations')}
@@ -271,7 +290,7 @@ const Filters = ({ me, data, current, onChange }) => {
                     </Row>
 
                     <Row>
-                      <Col sm cls={`col-${breakPoint}-12`}>
+                      <Col sm cls={`col-${BIG}-12`}>
                         {allowed.priority && (
                           <FormGroup label={t('dashboard.filter_titles.prio')}>
                             <MultiSelect
@@ -285,7 +304,7 @@ const Filters = ({ me, data, current, onChange }) => {
                           </FormGroup>
                         )}
                       </Col>
-                      <Col sm cls={`col-${breakPoint}-12`}>
+                      <Col sm cls={`col-${BIG}-12`}>
                         {allowed.inspector_priority && (
                           <FormGroup
                             label={t('dashboard.filter_titles.prio_insp')}
@@ -309,11 +328,11 @@ const Filters = ({ me, data, current, onChange }) => {
                           {available.state &&
                             available.state.map(({ value, label }) => (
                               <F key={value}>
-                                <div
-                                  className={cx(
+                                <Div
+                                  cls={cx(
                                     'custom-control custom-checkbox',
                                     'mr-3 d-inline-block',
-                                    `mr-${breakPoint}-0 d-${breakPoint}-block`
+                                    `mr-${BIG}-0 d-${BIG}-block`
                                   )}
                                 >
                                   <input
@@ -342,7 +361,7 @@ const Filters = ({ me, data, current, onChange }) => {
                                   >
                                     <RequestStateBadge state={value} />
                                   </label>
-                                </div>
+                                </Div>
                               </F>
                             ))}
                         </FormGroup>
@@ -353,8 +372,8 @@ const Filters = ({ me, data, current, onChange }) => {
                       <pre>{JSON.stringify(fields, 0, 2)}</pre>
                     )}
                   </F>
-                </div>
-              </div>
+                </Div>
+              </Div>
             )}
           </Collapsing>
         )
