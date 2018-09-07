@@ -212,7 +212,7 @@
                    :default (or (:price_cents template) 0),
                    :required true},
      :price_currency {:read true,
-                      :write request-without-template,
+                      :write false,
                       :default (or (:price_currency template) "CHF"),
                       :required true},
      :priority {:read (or (and auth-user-is-requester requested-by-auth-user)
