@@ -1,17 +1,687 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MultiSelect: renders correctly 1`] = `
+exports[`undefined: renders correctly 1`] = `
 <div
   className="row"
 >
   <div
     className="col-sm"
   >
+    <select
+      className="form-control"
+      disabled={undefined}
+      id="example-form-1.select1"
+      multiple={true}
+      name="select1"
+      onChange={[Function]}
+      value={
+        Array [
+          "1-2",
+          "1-3",
+        ]
+      }
+    >
+      <optgroup
+        label="Group 1"
+      >
+        <option
+          value="1-1"
+        >
+          Option 1.1
+        </option>
+        <option
+          value="1-2"
+        >
+          Option 1.2
+        </option>
+        <option
+          value="1-3"
+        >
+          Option 1.3
+        </option>
+      </optgroup>
+      <optgroup
+        label="Group 2"
+      >
+        <option
+          value="2-1"
+        >
+          Option 2.1
+        </option>
+        <option
+          disabled={true}
+          value="2-2"
+        >
+          Option 2.2
+        </option>
+        <option
+          disabled={true}
+          value="2-3"
+        >
+          Option 2.3
+        </option>
+      </optgroup>
+      <optgroup
+        label="Group 3"
+      >
+        <option
+          disabled={true}
+          value="3-1"
+        >
+          Option 3.1
+        </option>
+        <option
+          value="3-2"
+        >
+          Option 3.2
+        </option>
+        <option
+          value="3-3"
+        >
+          Option 3.3
+        </option>
+      </optgroup>
+    </select>
+  </div>
+  <div
+    className="col-sm"
+  >
+    <pre
+      className="my-3"
+    >
+      <mark>
+        {
+          "formProps": {
+            "name": "select1",
+            "id": "example-form-1.select1",
+            "value": [
+              "1-2",
+              "1-3"
+            ]
+          },
+          "fields": {
+            "select1": [
+              "1-2",
+              "1-3"
+            ]
+          }
+        }
+      </mark>
+    </pre>
+  </div>
+</div>
+`;
+
+exports[`undefined: renders correctly 2`] = `
+<div
+  className="row"
+>
+  <div
+    className="col-sm"
+  >
+    <label>
+      <code>
+        withSearch=false
+      </code>
+      , 
+      <code>
+        withSelectAll=false
+      </code>
+      , 
+    </label>
     <div
       className="grouped-multiselect dropdown"
       id="example-form-2.select2"
       multiple={true}
       onKeyDown={[Function]}
+      options={
+        Array [
+          Object {
+            "label": "Option 1.1",
+            "value": "1-1",
+          },
+          Object {
+            "label": "Option 1.2",
+            "value": "1-2",
+          },
+          Object {
+            "label": "Option 1.3",
+            "value": "1-3",
+          },
+        ]
+      }
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-outline-secondary"
+        onClick={[Function]}
+        type="button"
+      >
+        <span
+          className="text-wrap"
+        >
+          Option 1.2, Option 1.3
+        </span>
+      </button>
+      <div
+        aria-hidden={true}
+        className="py-2 px-0 shadow dropdown-menu"
+        role="menu"
+        tabIndex="-1"
+        x-placement={undefined}
+      >
+        <div
+          className="dropdown-item-subgroup"
+        >
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-1-checkbox-00"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select2-1-1-checkbox-00"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-1-checkbox-00"
+              >
+                Option 1.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-2-checkbox-01"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-2-checkbox-01"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-2-checkbox-01"
+              >
+                Option 1.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-3-checkbox-02"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-3-checkbox-02"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-3-checkbox-02"
+              >
+                Option 1.3
+              </label>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+    <label>
+      <code>
+        withSearch=false
+      </code>
+      , 
+      <code>
+        withSelectAll=undefined
+      </code>
+      , 
+    </label>
+    <div
+      className="grouped-multiselect dropdown"
+      id="example-form-2.select2"
+      multiple={true}
+      onKeyDown={[Function]}
+      options={
+        Array [
+          Object {
+            "label": "Option 1.1",
+            "value": "1-1",
+          },
+          Object {
+            "label": "Option 1.2",
+            "value": "1-2",
+          },
+          Object {
+            "label": "Option 1.3",
+            "value": "1-3",
+          },
+        ]
+      }
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-outline-secondary"
+        onClick={[Function]}
+        type="button"
+      >
+        <span
+          className="text-wrap"
+        >
+          Option 1.2, Option 1.3
+        </span>
+      </button>
+      <div
+        aria-hidden={true}
+        className="py-2 px-0 shadow dropdown-menu"
+        role="menu"
+        tabIndex="-1"
+        x-placement={undefined}
+      >
+        <label
+          className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+          htmlFor="example-form-2.select2-select_all"
+          onClick={[Function]}
+          tabIndex="0"
+          type={undefined}
+        >
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              checked={false}
+              className="custom-control-input"
+              id="example-form-2.select2-select_all"
+              onChange={[Function]}
+              tabIndex="-1"
+              type="checkbox"
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example-form-2.select2-select_all"
+            >
+              Alle auswählen
+            </label>
+          </div>
+        </label>
+        <div
+          className="dropdown-divider"
+          onClick={[Function]}
+          tabIndex="-1"
+          type={undefined}
+        />
+        <div
+          className="dropdown-item-subgroup"
+        >
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-1-checkbox-00"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select2-1-1-checkbox-00"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-1-checkbox-00"
+              >
+                Option 1.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-2-checkbox-01"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-2-checkbox-01"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-2-checkbox-01"
+              >
+                Option 1.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-3-checkbox-02"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-3-checkbox-02"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-3-checkbox-02"
+              >
+                Option 1.3
+              </label>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+    <label>
+      <code>
+        withSearch=undefined
+      </code>
+      , 
+      <code>
+        withSelectAll=false
+      </code>
+      , 
+    </label>
+    <div
+      className="grouped-multiselect dropdown"
+      id="example-form-2.select2"
+      multiple={true}
+      onKeyDown={[Function]}
+      options={
+        Array [
+          Object {
+            "label": "Option 1.1",
+            "value": "1-1",
+          },
+          Object {
+            "label": "Option 1.2",
+            "value": "1-2",
+          },
+          Object {
+            "label": "Option 1.3",
+            "value": "1-3",
+          },
+        ]
+      }
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-outline-secondary"
+        onClick={[Function]}
+        type="button"
+      >
+        <span
+          className="text-wrap"
+        >
+          Option 1.2, Option 1.3
+        </span>
+      </button>
+      <div
+        aria-hidden={true}
+        className="py-2 px-0 shadow dropdown-menu"
+        role="menu"
+        tabIndex="-1"
+        x-placement={undefined}
+      >
+        <div
+          className="input-group  px-2"
+        >
+          <div
+            className="input-group-prepend"
+          >
+            <span
+              className="input-group-text"
+              title="Suchen…"
+            >
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-search fa-w-16 "
+                data-icon="search"
+                data-prefix="fas"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
+                  fill="currentColor"
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+          </div>
+          <input
+            aria-label="Suchen…"
+            autoComplete="off"
+            className="form-control"
+            name={undefined}
+            onChange={[Function]}
+            placeholder="Suchen…"
+            type="text"
+            value=""
+          />
+          <div
+            className="input-group-append"
+          >
+            <button
+              aria-label="Suche zurücksetzen"
+              className="btn btn-outline-secondary"
+              disabled={true}
+              onClick={[Function]}
+              title="Suche zurücksetzen"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-times fa-w-11 "
+                data-icon="times"
+                data-prefix="fas"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 352 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                  fill="currentColor"
+                  style={Object {}}
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div
+          className="dropdown-divider"
+          onClick={[Function]}
+          tabIndex="-1"
+          type={undefined}
+        />
+        <div
+          className="dropdown-item-subgroup"
+        >
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-1-checkbox-00"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select2-1-1-checkbox-00"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-1-checkbox-00"
+              >
+                Option 1.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-2-checkbox-01"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-2-checkbox-01"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-2-checkbox-01"
+              >
+                Option 1.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select2-1-3-checkbox-02"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select2-1-3-checkbox-02"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select2-1-3-checkbox-02"
+              >
+                Option 1.3
+              </label>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+    <label>
+      <code>
+        withSearch=undefined
+      </code>
+      , 
+      <code>
+        withSelectAll=undefined
+      </code>
+      , 
+    </label>
+    <div
+      className="grouped-multiselect dropdown"
+      id="example-form-2.select2"
+      multiple={true}
+      onKeyDown={[Function]}
+      options={
+        Array [
+          Object {
+            "label": "Option 1.1",
+            "value": "1-1",
+          },
+          Object {
+            "label": "Option 1.2",
+            "value": "1-2",
+          },
+          Object {
+            "label": "Option 1.3",
+            "value": "1-3",
+          },
+        ]
+      }
     >
       <button
         aria-expanded={false}
@@ -139,37 +809,11 @@ exports[`MultiSelect: renders correctly 1`] = `
           tabIndex="-1"
           type={undefined}
         />
-        <label
-          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
-          htmlFor="example-form-2.select2-select_group_Group 1_{i}"
-          onClick={[Function]}
-          tabIndex="0"
-          type={undefined}
-        >
-          <div
-            className="custom-control custom-checkbox"
-          >
-            <input
-              checked={false}
-              className="custom-control-input"
-              id="example-form-2.select2-select_group_Group 1_{i}"
-              onChange={[Function]}
-              tabIndex="-1"
-              type="checkbox"
-            />
-            <label
-              className="custom-control-label"
-              htmlFor="example-form-2.select2-select_group_Group 1_{i}"
-            >
-              Group 1
-            </label>
-          </div>
-        </label>
         <div
           className="dropdown-item-subgroup"
         >
           <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
             disabled={undefined}
             htmlFor="example-form-2.select2-1-1-checkbox-00"
             onClick={[Function]}
@@ -197,7 +841,7 @@ exports[`MultiSelect: renders correctly 1`] = `
             </div>
           </label>
           <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
             disabled={undefined}
             htmlFor="example-form-2.select2-1-2-checkbox-01"
             onClick={[Function]}
@@ -225,7 +869,7 @@ exports[`MultiSelect: renders correctly 1`] = `
             </div>
           </label>
           <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
             disabled={undefined}
             htmlFor="example-form-2.select2-1-3-checkbox-02"
             onClick={[Function]}
@@ -249,234 +893,6 @@ exports[`MultiSelect: renders correctly 1`] = `
                 htmlFor="example-form-2.select2-1-3-checkbox-02"
               >
                 Option 1.3
-              </label>
-            </div>
-          </label>
-        </div>
-        <label
-          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
-          htmlFor="example-form-2.select2-select_group_Group 2_{i}"
-          onClick={[Function]}
-          tabIndex="0"
-          type={undefined}
-        >
-          <div
-            className="custom-control custom-checkbox"
-          >
-            <input
-              checked={false}
-              className="custom-control-input"
-              id="example-form-2.select2-select_group_Group 2_{i}"
-              onChange={[Function]}
-              tabIndex="-1"
-              type="checkbox"
-            />
-            <label
-              className="custom-control-label"
-              htmlFor="example-form-2.select2-select_group_Group 2_{i}"
-            >
-              Group 2
-            </label>
-          </div>
-        </label>
-        <div
-          className="dropdown-item-subgroup"
-        >
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
-            htmlFor="example-form-2.select2-2-1-checkbox-10"
-            onClick={[Function]}
-            tabIndex="0"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-2-1-checkbox-10"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="2-1"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-2-1-checkbox-10"
-              >
-                Option 2.1
-              </label>
-            </div>
-          </label>
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
-            disabled={true}
-            htmlFor="example-form-2.select2-2-2-checkbox-11"
-            onClick={[Function]}
-            tabIndex="-1"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-2-2-checkbox-11"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="2-2"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-2-2-checkbox-11"
-              >
-                Option 2.2
-              </label>
-            </div>
-          </label>
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
-            disabled={true}
-            htmlFor="example-form-2.select2-2-3-checkbox-12"
-            onClick={[Function]}
-            tabIndex="-1"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-2-3-checkbox-12"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="2-3"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-2-3-checkbox-12"
-              >
-                Option 2.3
-              </label>
-            </div>
-          </label>
-        </div>
-        <label
-          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
-          htmlFor="example-form-2.select2-select_group_Group 3_{i}"
-          onClick={[Function]}
-          tabIndex="0"
-          type={undefined}
-        >
-          <div
-            className="custom-control custom-checkbox"
-          >
-            <input
-              checked={false}
-              className="custom-control-input"
-              id="example-form-2.select2-select_group_Group 3_{i}"
-              onChange={[Function]}
-              tabIndex="-1"
-              type="checkbox"
-            />
-            <label
-              className="custom-control-label"
-              htmlFor="example-form-2.select2-select_group_Group 3_{i}"
-            >
-              Group 3
-            </label>
-          </div>
-        </label>
-        <div
-          className="dropdown-item-subgroup"
-        >
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
-            disabled={true}
-            htmlFor="example-form-2.select2-3-1-checkbox-20"
-            onClick={[Function]}
-            tabIndex="-1"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-3-1-checkbox-20"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="3-1"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-3-1-checkbox-20"
-              >
-                Option 3.1
-              </label>
-            </div>
-          </label>
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
-            htmlFor="example-form-2.select2-3-2-checkbox-21"
-            onClick={[Function]}
-            tabIndex="0"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-3-2-checkbox-21"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="3-2"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-3-2-checkbox-21"
-              >
-                Option 3.2
-              </label>
-            </div>
-          </label>
-          <label
-            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
-            htmlFor="example-form-2.select2-3-3-checkbox-22"
-            onClick={[Function]}
-            tabIndex="0"
-            type={undefined}
-          >
-            <div
-              className="custom-control custom-checkbox"
-            >
-              <input
-                checked={false}
-                className="custom-control-input"
-                id="example-form-2.select2-3-3-checkbox-22"
-                onChange={[Function]}
-                tabIndex="-1"
-                type="checkbox"
-                value="3-3"
-              />
-              <label
-                className="custom-control-label"
-                htmlFor="example-form-2.select2-3-3-checkbox-22"
-              >
-                Option 3.3
               </label>
             </div>
           </label>
@@ -505,88 +921,547 @@ exports[`MultiSelect: renders correctly 1`] = `
 </div>
 `;
 
-exports[`MultiSelectPlain: renders correctly 1`] = `
+exports[`undefined: renders correctly 3`] = `
 <div
   className="row"
 >
   <div
     className="col-sm"
   >
-    <select
-      className="form-control"
-      disabled={undefined}
-      id="example-form-1.select1"
+    <div
+      className="grouped-multiselect dropdown"
+      id="example-form-2.select3"
       multiple={true}
-      name="select1"
-      onChange={[Function]}
-      value={
+      onKeyDown={[Function]}
+      options={
         Array [
-          "1-2",
-          "1-3",
+          Object {
+            "label": "Group 1",
+            "options": Array [
+              Object {
+                "label": "Option 1.1",
+                "value": "1-1",
+              },
+              Object {
+                "label": "Option 1.2",
+                "value": "1-2",
+              },
+              Object {
+                "label": "Option 1.3",
+                "value": "1-3",
+              },
+            ],
+          },
+          Object {
+            "label": "Group 2",
+            "options": Array [
+              Object {
+                "label": "Option 2.1",
+                "value": "2-1",
+              },
+              Object {
+                "disabled": true,
+                "label": "Option 2.2",
+                "value": "2-2",
+              },
+              Object {
+                "disabled": true,
+                "label": "Option 2.3",
+                "value": "2-3",
+              },
+            ],
+          },
+          Object {
+            "label": "Group 3",
+            "options": Array [
+              Object {
+                "disabled": true,
+                "label": "Option 3.1",
+                "value": "3-1",
+              },
+              Object {
+                "label": "Option 3.2",
+                "value": "3-2",
+              },
+              Object {
+                "label": "Option 3.3",
+                "value": "3-3",
+              },
+            ],
+          },
         ]
       }
     >
-      <optgroup
-        label="Group 1"
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-outline-secondary"
+        onClick={[Function]}
+        type="button"
       >
-        <option
-          value="1-1"
+        <span
+          className="text-wrap"
         >
-          Option 1.1
-        </option>
-        <option
-          value="1-2"
-        >
-          Option 1.2
-        </option>
-        <option
-          value="1-3"
-        >
-          Option 1.3
-        </option>
-      </optgroup>
-      <optgroup
-        label="Group 2"
+          Option 1.2, Option 1.3
+        </span>
+      </button>
+      <div
+        aria-hidden={true}
+        className="py-2 px-0 shadow dropdown-menu"
+        role="menu"
+        tabIndex="-1"
+        x-placement={undefined}
       >
-        <option
-          value="2-1"
+        <label
+          className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
+          htmlFor="example-form-2.select3-select_all"
+          onClick={[Function]}
+          tabIndex="0"
+          type={undefined}
         >
-          Option 2.1
-        </option>
-        <option
-          disabled={true}
-          value="2-2"
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              checked={false}
+              className="custom-control-input"
+              id="example-form-2.select3-select_all"
+              onChange={[Function]}
+              tabIndex="-1"
+              type="checkbox"
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example-form-2.select3-select_all"
+            >
+              Alle auswählen
+            </label>
+          </div>
+        </label>
+        <div
+          className="dropdown-divider"
+          onClick={[Function]}
+          tabIndex="-1"
+          type={undefined}
+        />
+        <div
+          className="input-group  px-2"
         >
-          Option 2.2
-        </option>
-        <option
-          disabled={true}
-          value="2-3"
+          <div
+            className="input-group-prepend"
+          >
+            <span
+              className="input-group-text"
+              title="Suchen…"
+            >
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-search fa-w-16 "
+                data-icon="search"
+                data-prefix="fas"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
+                  fill="currentColor"
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+          </div>
+          <input
+            aria-label="Suchen…"
+            autoComplete="off"
+            className="form-control"
+            name={undefined}
+            onChange={[Function]}
+            placeholder="Suchen…"
+            type="text"
+            value=""
+          />
+          <div
+            className="input-group-append"
+          >
+            <button
+              aria-label="Suche zurücksetzen"
+              className="btn btn-outline-secondary"
+              disabled={true}
+              onClick={[Function]}
+              title="Suche zurücksetzen"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-times fa-w-11 "
+                data-icon="times"
+                data-prefix="fas"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 352 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                  fill="currentColor"
+                  style={Object {}}
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div
+          className="dropdown-divider"
+          onClick={[Function]}
+          tabIndex="-1"
+          type={undefined}
+        />
+        <label
+          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
+          htmlFor="example-form-2.select3-select_group_Group 1_{i}"
+          onClick={[Function]}
+          tabIndex="0"
+          type={undefined}
         >
-          Option 2.3
-        </option>
-      </optgroup>
-      <optgroup
-        label="Group 3"
-      >
-        <option
-          disabled={true}
-          value="3-1"
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              checked={false}
+              className="custom-control-input"
+              id="example-form-2.select3-select_group_Group 1_{i}"
+              onChange={[Function]}
+              tabIndex="-1"
+              type="checkbox"
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example-form-2.select3-select_group_Group 1_{i}"
+            >
+              Group 1
+            </label>
+          </div>
+        </label>
+        <div
+          className="dropdown-item-subgroup"
         >
-          Option 3.1
-        </option>
-        <option
-          value="3-2"
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-1-1-checkbox-00"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-1-1-checkbox-00"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-1-1-checkbox-00"
+              >
+                Option 1.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-1-2-checkbox-01"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select3-1-2-checkbox-01"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-1-2-checkbox-01"
+              >
+                Option 1.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-1-3-checkbox-02"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={true}
+                className="custom-control-input"
+                id="example-form-2.select3-1-3-checkbox-02"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="1-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-1-3-checkbox-02"
+              >
+                Option 1.3
+              </label>
+            </div>
+          </label>
+        </div>
+        <label
+          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
+          htmlFor="example-form-2.select3-select_group_Group 2_{i}"
+          onClick={[Function]}
+          tabIndex="0"
+          type={undefined}
         >
-          Option 3.2
-        </option>
-        <option
-          value="3-3"
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              checked={false}
+              className="custom-control-input"
+              id="example-form-2.select3-select_group_Group 2_{i}"
+              onChange={[Function]}
+              tabIndex="-1"
+              type="checkbox"
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example-form-2.select3-select_group_Group 2_{i}"
+            >
+              Group 2
+            </label>
+          </div>
+        </label>
+        <div
+          className="dropdown-item-subgroup"
         >
-          Option 3.3
-        </option>
-      </optgroup>
-    </select>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-2-1-checkbox-10"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-2-1-checkbox-10"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="2-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-2-1-checkbox-10"
+              >
+                Option 2.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
+            disabled={true}
+            htmlFor="example-form-2.select3-2-2-checkbox-11"
+            onClick={[Function]}
+            tabIndex="-1"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-2-2-checkbox-11"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="2-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-2-2-checkbox-11"
+              >
+                Option 2.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
+            disabled={true}
+            htmlFor="example-form-2.select3-2-3-checkbox-12"
+            onClick={[Function]}
+            tabIndex="-1"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-2-3-checkbox-12"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="2-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-2-3-checkbox-12"
+              >
+                Option 2.3
+              </label>
+            </div>
+          </label>
+        </div>
+        <label
+          className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
+          htmlFor="example-form-2.select3-select_group_Group 3_{i}"
+          onClick={[Function]}
+          tabIndex="0"
+          type={undefined}
+        >
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              checked={false}
+              className="custom-control-input"
+              id="example-form-2.select3-select_group_Group 3_{i}"
+              onChange={[Function]}
+              tabIndex="-1"
+              type="checkbox"
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example-form-2.select3-select_group_Group 3_{i}"
+            >
+              Group 3
+            </label>
+          </div>
+        </label>
+        <div
+          className="dropdown-item-subgroup"
+        >
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 disabled dropdown-item"
+            disabled={true}
+            htmlFor="example-form-2.select3-3-1-checkbox-20"
+            onClick={[Function]}
+            tabIndex="-1"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-3-1-checkbox-20"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="3-1"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-3-1-checkbox-20"
+              >
+                Option 3.1
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-3-2-checkbox-21"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-3-2-checkbox-21"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="3-2"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-3-2-checkbox-21"
+              >
+                Option 3.2
+              </label>
+            </div>
+          </label>
+          <label
+            className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
+            disabled={undefined}
+            htmlFor="example-form-2.select3-3-3-checkbox-22"
+            onClick={[Function]}
+            tabIndex="0"
+            type={undefined}
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                checked={false}
+                className="custom-control-input"
+                id="example-form-2.select3-3-3-checkbox-22"
+                onChange={[Function]}
+                tabIndex="-1"
+                type="checkbox"
+                value="3-3"
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example-form-2.select3-3-3-checkbox-22"
+              >
+                Option 3.3
+              </label>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
   <div
     className="col-sm"
@@ -596,16 +1471,8 @@ exports[`MultiSelectPlain: renders correctly 1`] = `
     >
       <mark>
         {
-          "formProps": {
-            "name": "select1",
-            "id": "example-form-1.select1",
-            "value": [
-              "1-2",
-              "1-3"
-            ]
-          },
           "fields": {
-            "select1": [
+            "select3": [
               "1-2",
               "1-3"
             ]

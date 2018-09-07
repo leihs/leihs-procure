@@ -26,7 +26,8 @@ const menuCls = 'py-2 px-0 shadow'
 const itemCls = 'py-1 px-2 mb-0 f6 text-wrap'
 const groupHeaderCls = 'py-1 px-2 mb-0 f6 font-weight-bold text-wrap'
 const groupWrapCls = 'dropdown-item-subgroup'
-const groupItemCls = [itemCls, 'pl-4']
+const groupItemCls = [itemCls]
+const groupItemGroupedCls = [groupItemCls, 'pl-4']
 
 export { MultiSelectPlain } from './MultiSelectPlain'
 
@@ -37,8 +38,11 @@ class MultiSelect extends React.PureComponent {
     log('init', { props, state: this.state })
   }
 
+  isGrouped = () => f.has(this.props, 'options.0.options')
+  optionGroups = () =>
+    this.isGrouped() ? this.props.options : [{ options: this.props.options }]
   allOptions = () =>
-    f.flatMap(this.props.options, 'options').filter(o => !o.disabled)
+    f.flatMap(this.optionGroups(), 'options').filter(o => !o.disabled)
   allValues = () => f.map(this.allOptions(), 'value')
   isInactive = () => !!(this.props.readOnly || this.props.disabled)
   selection = () => f.intersection(this.props.value, this.allValues())
@@ -94,7 +98,6 @@ class MultiSelect extends React.PureComponent {
 
   render({ props, state } = this) {
     const {
-      options,
       name,
       value,
       onChange,
@@ -102,13 +105,21 @@ class MultiSelect extends React.PureComponent {
       size,
       block,
       withSearch,
+      withSelectAll,
       ...restProps
     } = props
+
+    // debugger
+
+    const isGrouped = this.isGrouped()
     const selection = this.selection()
     const allOptions = this.allOptions()
     const isInactive = this.isInactive()
     const isAllSelected = this.isAllSelected()
-    const optGroups = filterMatchingOptions(options, state.searchTerm)
+    const optGroups = filterMatchingOptions(
+      this.optionGroups(),
+      state.searchTerm
+    )
     const Id = s => `${restProps.id}-${s}`
 
     return (
@@ -129,24 +140,28 @@ class MultiSelect extends React.PureComponent {
           </DropdownToggle>
 
           <DropdownMenu className={cx(menuCls, { 'w-100': block })}>
-            <DropdownItem
-              tag="label"
-              toggle={false}
-              className={cx(itemCls)}
-              htmlFor={Id('select_all')}
-            >
-              <Checkbox
-                id={Id('select_all')}
-                label={txt_select_all}
-                checked={isAllSelected}
-                isIndeterminate={!f.isEmpty(selection) && !isAllSelected}
-                onChange={!isInactive && this.onSelectAllChange}
-              />
-            </DropdownItem>
+            {withSelectAll && (
+              <F>
+                <DropdownItem
+                  tag="label"
+                  toggle={false}
+                  className={cx(itemCls)}
+                  htmlFor={Id('select_all')}
+                >
+                  <Checkbox
+                    id={Id('select_all')}
+                    label={txt_select_all}
+                    checked={isAllSelected}
+                    isIndeterminate={!f.isEmpty(selection) && !isAllSelected}
+                    onChange={!isInactive && this.onSelectAllChange}
+                  />
+                </DropdownItem>
+                <DropdownItem divider />
+              </F>
+            )}
 
             {withSearch && (
               <F>
-                <DropdownItem divider />
                 <SearchField
                   size={size}
                   label="Suchen…"
@@ -154,10 +169,9 @@ class MultiSelect extends React.PureComponent {
                   value={this.state.searchTerm}
                   onChange={e => this.setState({ searchTerm: e.target.value })}
                 />
+                <DropdownItem divider />
               </F>
             )}
-
-            <DropdownItem divider />
 
             {optGroups.map((group, i) => {
               const { label, options, matchingOptions } = group
@@ -167,23 +181,25 @@ class MultiSelect extends React.PureComponent {
 
               return (
                 <F key={i}>
-                  <DropdownItem
-                    className={cx(groupHeaderCls)}
-                    toggle={false}
-                    tag="label"
-                    htmlFor={cbsaid}
-                  >
-                    <Checkbox
-                      id={cbsaid}
-                      label={label}
-                      checked={allSelected}
-                      isIndeterminate={someSelected && !allSelected}
-                      onChange={
-                        !isInactive &&
-                        (e => this.onOptionGroupChange(group, !allSelected))
-                      }
-                    />
-                  </DropdownItem>
+                  {isGrouped && (
+                    <DropdownItem
+                      className={cx(groupHeaderCls)}
+                      toggle={false}
+                      tag="label"
+                      htmlFor={cbsaid}
+                    >
+                      <Checkbox
+                        id={cbsaid}
+                        label={label || i}
+                        checked={allSelected}
+                        isIndeterminate={someSelected && !allSelected}
+                        onChange={
+                          !isInactive &&
+                          (e => this.onOptionGroupChange(group, !allSelected))
+                        }
+                      />
+                    </DropdownItem>
+                  )}
 
                   <div className={cx(groupWrapCls)}>
                     {listedOptions.map(
@@ -199,7 +215,9 @@ class MultiSelect extends React.PureComponent {
                             key={ii}
                             tag="label"
                             toggle={false}
-                            className={cx(groupItemCls)}
+                            className={cx(
+                              isGrouped ? groupItemGroupedCls : groupItemCls
+                            )}
                             disabled={disabled}
                             htmlFor={cbid}
                           >
@@ -230,35 +248,43 @@ MultiSelect.defaultProps = {
   name: '',
   options: [],
   value: [],
-  onChange: f.noop
+  onChange: f.noop,
+  multiple: true,
+  withSearch: true,
+  withSelectAll: true
 }
+
+const propTypeSelectOptions = PropTypes.arrayOf(
+  PropTypes.shape({
+    value: PropTypes.string.isRequired,
+    label: PropTypes.node.isRequired
+  })
+)
 
 MultiSelect.propTypes = {
   name: PropTypes.string.isRequired,
-  value: PropTypes.arrayOf(PropTypes.string.isRequired),
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.node.isRequired,
-      options: PropTypes.arrayOf(
-        PropTypes.shape({
-          value: PropTypes.string.isRequired,
-          label: PropTypes.node.isRequired
-        })
-      )
-    })
-  ).isRequired
+  multiple: PropTypes.oneOf([true]), // only multiple supported ATM
+  withSearch: PropTypes.bool,
+  withSelectAll: PropTypes.bool,
+  onChange: PropTypes.func,
+  value: PropTypes.oneOfType([
+    PropTypes.oneOf(['']),
+    PropTypes.arrayOf(PropTypes.string.isRequired)
+  ]),
+  options: PropTypes.oneOfType([
+    // not grouped
+    propTypeSelectOptions.isRequired,
+    // grouped
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.node.isRequired,
+        options: propTypeSelectOptions.isRequired
+      })
+    ).isRequired
+  ]).isRequired
 }
 
 export default MultiSelect
-MultiSelect.defaultProps = {
-  multiple: true,
-  withSearch: true
-}
-MultiSelect.propTypes = {
-  multiple: PropTypes.oneOf([true]).isRequired,
-  name: PropTypes.string,
-  onChange: PropTypes.func
-}
 
 const SearchField = ({ size, label, name, value, onChange, clearLabel }) => {
   value = f.isString(value) && f.presence(value)
@@ -348,15 +374,16 @@ const filterMatchingOptions = (allOptions, searchTerm) =>
         .filter(g => !f.isEmpty(g.matchingOptions))
 
 function titleBySelection(selection, allOptions) {
-  // Describe None and All, List up to three by Name,
-  // otherwise give a count
+  // - Describe "None" and "All"
+  // - List up to three by name,
+  // - otherwise give a count "n/m"
   const count = selection.length
   const optionsCount = allOptions.length
+  if (count === 0 || optionsCount === 0) {
+    return txt_none_selected
+  }
   if (count === optionsCount) {
     return `${txt_all_selected_a}${count}${txt_all_selected_e}`
-  }
-  if (count === 0) {
-    return txt_none_selected
   }
   if (count > 3) {
     return `${txt_n_selected_a}${count}/${optionsCount}${txt_n_selected_e}`
