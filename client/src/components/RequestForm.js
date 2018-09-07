@@ -315,11 +315,19 @@ class RequestForm extends React.Component {
                       />
                     </Col>
                     <Col sm>
-                      <FormField
-                        {...formPropsFor('approved_quantity')}
-                        type="number-integer"
-                        max={fields.requested_quantity}
-                      />
+                      <Let field={formPropsFor('approved_quantity')}>
+                        {({ field }) => (
+                          <FormField
+                            type="number-integer"
+                            max={fields.requested_quantity}
+                            {...field}
+                            onChange={({ target: { value } }) => {
+                              setValue('approved_quantity', value)
+                              setValue('order_quantity', value)
+                            }}
+                          />
+                        )}
+                      </Let>
                     </Col>
                     <Col sm>
                       <FormField
