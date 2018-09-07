@@ -25,7 +25,10 @@ const RequestsDashboard = props => {
 
   const requests = f.flatMap(
     f.flatMap(
-      f.flatMap(f.get(requestsQuery, 'data.budget_periods'), 'main_categories'),
+      f.flatMap(
+        f.get(requestsQuery, 'data.dashboard.budget_periods'),
+        'main_categories'
+      ),
       'categories'
     ),
     'requests'
@@ -101,7 +104,13 @@ const RequestsTree = ({
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  return data.budget_periods.map(b => (
+  // return (
+  //   <pre>
+  //     <mark>{JSON.stringify(data, 0, 2)}</mark>
+  //   </pre>
+  // )
+
+  return f.get(data, 'dashboard.budget_periods').map(b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b} me={me}>
       {b.main_categories.map(cat => {
         const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')

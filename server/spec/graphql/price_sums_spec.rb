@@ -120,20 +120,24 @@ describe 'price sums' do
         $priority: [Priority]
         $onlyOwnRequests: Boolean
       ) {
-        budget_periods(id: $budgetPeriods) {
-          id
-          total_price_cents
-          main_categories {
+        dashboard(
+          budget_period_id: $budgetPeriods,
+          category_id: $categories,
+          priority: $priority,
+          requested_by_auth_user: $onlyOwnRequests
+        ) {
+          budget_periods {
             id
             total_price_cents
-            categories(id: $categories) {
+            main_categories {
               id
               total_price_cents
-              requests(
-                priority: $priority
-                requested_by_auth_user: $onlyOwnRequests
-              ) {
+              categories {
                 id
+                total_price_cents
+                requests {
+                  id
+                }
               }
             }
           }
@@ -143,55 +147,61 @@ describe 'price sums' do
 
     expected_result = {
       data: {
-        budget_periods: [
-          { id: budget_period_I.id,
-            total_price_cents: '200',
-            main_categories: [
-              { id: main_category_1.id,
-                total_price_cents: '100',
-                categories: [
-                  { id: category_1_A.id,
-                    total_price_cents: '0',
-                    requests: [
-                      { id: request_I_1_A.id }
-                    ]
-                  },
-                  { id: category_1_B.id,
-                    total_price_cents: '0',
-                    requests: [
-                      { id: request_I_1_B.id }
-                    ]
-                  },
-                  { id: category_1_C.id,
-                    total_price_cents: '100',
-                    requests: [
-                      { id: request_I_1_C.id }
-                    ]
-                  }
-                ]
-              },
-              { id: main_category_2.id,
-                total_price_cents: '100',
-                categories: [
-                  { id: category_2_A.id,
-                    total_price_cents: '100',
-                    requests: [
-                      { id: request_I_2_A.id }
-                    ]
-                  },
-                  { id: category_2_B.id,
-                    total_price_cents: '0',
-                    requests: []
-                  },
-                  { id: category_2_C.id,
-                    total_price_cents: '0',
-                    requests: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        dashboard: {
+          budget_periods: [
+            { id: budget_period_I.id,
+              total_price_cents: '200',
+              main_categories: [
+                { id: main_category_1.id,
+                  total_price_cents: '100',
+                  categories: [
+                    { id: category_1_A.id,
+                      total_price_cents: '0',
+                      requests: [
+                        { id: request_I_1_A.id }
+                      ]
+                    },
+                    { id: category_1_B.id,
+                      total_price_cents: '0',
+                      requests: [
+                        { id: request_I_1_B.id }
+                      ]
+                    },
+                    { id: category_1_C.id,
+                      total_price_cents: '100',
+                      requests: [
+                        { id: request_I_1_C.id }
+                      ]
+                    }
+                  ]
+                },
+                { id: main_category_2.id,
+                  total_price_cents: '100',
+                  categories: [
+                    { id: category_2_A.id,
+                      total_price_cents: '100',
+                      requests: [
+                        { id: request_I_2_A.id }
+                      ]
+                    },
+                    { id: category_2_B.id,
+                      total_price_cents: '0',
+                      requests: []
+                    },
+                    { id: category_2_C.id,
+                      total_price_cents: '0',
+                      requests: []
+                    },
+                    { id: category_2_D.id,
+                      total_price_cents: '0',
+                      requests: []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       }
     }
 

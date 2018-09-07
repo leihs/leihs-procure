@@ -2,9 +2,6 @@
   (:require [clojure.tools.logging :as log]
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia.resolve :as resolve]
-            [leihs.procurement.graphql.helpers :refer
-             [add-cache-key add-resource-type add-to-parent-values
-              get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
              [categories :as categories] [image :as image]
@@ -28,27 +25,23 @@
       mc)))
 
 (defn transform-row
-  [tx row value]
+  [tx row]
   (as-> row <>
-    (add-resource-type <> :main-category)
-    (add-to-parent-values <> value)
-    (add-cache-key <> value)
-    (merge-image-path tx <>)))
+    (merge-image-path tx <>)
+    (assoc <>
+      :categories (->> <>
+                       :id
+                       (categories/get-for-main-category-id tx)))))
 
 (defn get-main-categories
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)
-        requests-args (get-requests-args-from-context context)
-        categories-args (get-categories-args-from-context context)
-        main-categories (->> main-categories-base-query
-                             sql/format
-                             (jdbc/query tx)
-                             (map #(transform-row tx % value)))]
-    (resolve/with-context main-categories
-                          {:categories-args categories-args,
-                           :requests-args requests-args})))
+               :tx)]
+    (->> main-categories-base-query
+         sql/format
+         (jdbc/query tx)
+         (map #(transform-row tx %)))))
 
 (defn get-main-categories-by-names
   [tx names]

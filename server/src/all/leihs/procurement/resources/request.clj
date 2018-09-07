@@ -247,6 +247,7 @@
                    (not user-arg) (assoc :user (:user_id auth-entity)))]
     (as-> req-stub <>
       (request-fields-perms/get-for-user-and-request tx auth-entity <>)
+      (reject-keys <> request-perms/special-perms)
       (map #(apply consider-default %) <>)
       (into {} <>)
       (assoc <> :state :NEW))))
@@ -439,7 +440,7 @@
          tx
          auth-entity
          (reverse-exchange-attrs proc-request)
-         (reject-keys input-data request-perms/attrs-to-exclude)))
+         (reject-keys input-data request-perms/attrs-to-skip)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
       (reverse-exchange-attrs <>)

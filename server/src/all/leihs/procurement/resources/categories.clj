@@ -2,8 +2,6 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.graphql.helpers :refer
-             [add-cache-key add-resource-type add-to-parent-values]]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources [category :as category]
              [inspectors :as inspectors] [viewers :as viewers]]
@@ -42,12 +40,13 @@
       sql/format
       (->> (jdbc/query tx))))
 
-(defn transform-row
-  [row value]
-  (-> row
-      (add-resource-type :category)
-      (add-to-parent-values value)
-      (add-cache-key value)))
+(defn get-for-main-category-id
+  [tx main-cat-id]
+  (-> categories-base-query
+      (sql/merge-where [:= :procurement_categories.main_category_id
+                        main-cat-id])
+      sql/format
+      (->> (jdbc/query tx))))
 
 (defn get-categories
   [context arguments value]
@@ -56,8 +55,7 @@
     (->> (categories-query context arguments value)
          (jdbc/query (-> context
                          :request
-                         :tx))
-         (map #(transform-row % value)))))
+                         :tx)))))
 
 (defn delete-categories-not-in-main-category-ids!
   [tx ids]

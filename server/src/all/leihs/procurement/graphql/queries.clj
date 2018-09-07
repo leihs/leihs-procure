@@ -1,6 +1,7 @@
 (ns leihs.procurement.graphql.queries
   (:require
-    [leihs.procurement [authorization :as authorization] [env :as env]]
+    [leihs.procurement [authorization :as authorization]
+     [dashboard :as dashboard] [env :as env]]
     [leihs.procurement.permissions [request :as request-perms]
      [user :as user-perms]]
     [leihs.procurement.resources [admins :as admins]
@@ -22,7 +23,6 @@
   []
   {:admins (-> admins/get-admins
                (authorization/wrap-ensure-one-of [user-perms/admin?])),
-   :request-action-permissions request-perms/action-permissions,
    :attachments attachments/get-attachments,
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,
@@ -45,6 +45,7 @@
    :categories categories/get-categories,
    :cost-center request/cost-center,
    :current-user current-user/get-current-user,
+   :dashboard dashboard/get-dashboard,
    :department organization/get-department,
    :general-ledger-account request/general-ledger-account,
    :inspectors (-> inspectors/get-inspectors
@@ -91,7 +92,6 @@
    :suppliers suppliers/get-suppliers,
    :template template/get-template,
    :templates templates/get-templates,
-   :total-price-cents requests/total-price-cents,
    :total-price-cents-requested-quantities
      (-> requests/total-price-cents-requested-quantities
          (authorization/wrap-ensure-one-of [user-perms/admin?])),

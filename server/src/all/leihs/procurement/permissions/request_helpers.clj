@@ -1,8 +1,15 @@
 (ns leihs.procurement.permissions.request-helpers
-  (:require [leihs.procurement.permissions.request-fields :as
+  (:require [clojure.tools.logging :as log]
+            [leihs.procurement.permissions.request-fields :as
              request-fields-perms]))
 
-(def attrs-to-exclude #{:id :state :total_price_cents})
+(def attrs-to-skip #{:id :state :total_price_cents})
+
+(def special-perms #{:DELETE})
+
+(defn- include-special-perms
+  [field-perms req-vec]
+  (reduce (fn [acc el] (conj acc [el (el field-perms)])) req-vec special-perms))
 
 (defn- fallback-p-spec [value] {:value value, :read true, :write true})
 
@@ -14,7 +21,7 @@
 
 (defn value-with-permissions
   [field-perms transform-fn attr value]
-  (if (attrs-to-exclude attr)
+  (if (attrs-to-skip attr)
     {attr value}
     {attr (let [res (if-let [p-spec (attr field-perms)]
                       (with-protected-value p-spec value)
@@ -33,6 +40,7 @@
                        proc-request)]
      (->> proc-request
           (map #(apply value-with-permissions field-perms transform-fn %))
+          (include-special-perms field-perms)
           (into {})))))
 
 (defn authorized-to-write-all-fields?
@@ -47,3 +55,21 @@
           (map #(% request-data-with-perms))
           (map :write)
           (every? true?)))))
+
+(defn add-action-permissions
+  [req]
+  (let [can-edit-all-fields? (->> req
+                                  (map (fn [[k v]] (:write v)))
+                                  (every? true?))
+        can-change-budget-period? (-> req
+                                      :budget_period
+                                      :write)
+        can-change-category? (-> req
+                                 :category
+                                 :write)
+        can-delete? (:DELETE req)]
+    (assoc req
+      :actionPermissions {:edit can-edit-all-fields?,
+                          :delete can-delete?,
+                          :moveBudgetPeriod can-change-budget-period?,
+                          :moveCategory can-change-category?})))

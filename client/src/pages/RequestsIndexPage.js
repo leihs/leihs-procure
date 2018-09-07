@@ -58,37 +58,39 @@ const REQUESTS_QUERY = gql`
     $inspector_priority: [InspectorPriority!]
     $onlyOwnRequests: Boolean
   ) {
-    budget_periods(id: $budgetPeriods) {
-      id
-      name
-      inspection_start_date
-      end_date
-      total_price_cents
-
-      main_categories {
+    dashboard(
+      budget_period_id: $budgetPeriods
+      category_id: $categories
+      search: $search
+      state: $state
+      organization_id: $organizations
+      priority: $priority
+      inspector_priority: $inspector_priority
+      requested_by_auth_user: $onlyOwnRequests
+    ) {
+      budget_periods {
         id
-        cacheKey
         name
-        image_url
+        inspection_start_date
+        end_date
         total_price_cents
 
-        categories(id: $categories) {
+        main_categories {
           id
-          cacheKey
           name
+          image_url
           total_price_cents
 
-          requests(
-            search: $search
-            state: $state
-            organization_id: $organizations
-            priority: $priority
-            inspector_priority: $inspector_priority
-            requested_by_auth_user: $onlyOwnRequests
-          ) {
-            ...RequestFieldsForIndex
-            actionPermissions {
-              edit
+          categories {
+            id
+            name
+            total_price_cents
+
+            requests {
+              ...RequestFieldsForIndex
+              actionPermissions {
+                edit
+              }
             }
           }
         }
@@ -244,12 +246,17 @@ class RequestsIndexPage extends React.Component {
     return (
       <ApolloConsumer>
         {client => (
-          <Query query={FILTERS_QUERY} notifyOnNetworkStatusChange>
+          <Query
+            query={FILTERS_QUERY}
+            fetchPolicy="cache-and-network"
+            notifyOnNetworkStatusChange
+          >
             {filtersQuery => {
               return (
                 <Query
                   query={REQUESTS_QUERY}
                   variables={state.currentFilters}
+                  fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
                   {requestsQuery => {
