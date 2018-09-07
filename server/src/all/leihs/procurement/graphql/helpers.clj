@@ -16,15 +16,6 @@
       (merge resolved-value {:parent-values new-parent-values}))
     resolved-value))
 
-(defn add-cache-key
-  [row parent-value]
-  (let [parent-cache-key (or (:cacheKey parent-value) (:id parent-value))
-        id (:id row)
-        cache-key (->> [parent-cache-key id]
-                       (filter #(not (nil? %)))
-                       (string/join "_"))]
-    (assoc row :cacheKey cache-key)))
-
 (defn get-categories-args-from-selections-tree
   [context]
   (some-> context

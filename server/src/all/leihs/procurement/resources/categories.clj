@@ -3,7 +3,7 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.graphql.helpers :refer
-             [add-cache-key add-resource-type add-to-parent-values]]
+             [add-resource-type add-to-parent-values]]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources [category :as category]
              [inspectors :as inspectors] [viewers :as viewers]]
@@ -54,8 +54,7 @@
   [row value]
   (-> row
       (add-resource-type :category)
-      (add-to-parent-values value)
-      (add-cache-key value)))
+      (add-to-parent-values value)))
 
 (defn get-categories
   [context arguments value]

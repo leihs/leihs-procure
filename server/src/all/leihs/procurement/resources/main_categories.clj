@@ -3,7 +3,7 @@
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia.resolve :as resolve]
             [leihs.procurement.graphql.helpers :refer
-             [add-cache-key add-resource-type add-to-parent-values
+             [add-resource-type add-to-parent-values
               get-categories-args-from-context get-requests-args-from-context]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
@@ -32,7 +32,6 @@
   (as-> row <>
     (add-resource-type <> :main-category)
     (add-to-parent-values <> value)
-    (add-cache-key <> value)
     (merge-image-path tx <>)))
 
 (defn get-main-categories
