@@ -144,7 +144,7 @@ export default class MainNav extends React.Component {
             <Nav className="ml-auto" navbar>
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
-                  <Icon.LeihsProcurement /> Bedarfsermittlung
+                  <Icon.LeihsProcurement />
                 </DropdownToggle>
                 <DropdownMenu right>
                   <DropdownItem>
