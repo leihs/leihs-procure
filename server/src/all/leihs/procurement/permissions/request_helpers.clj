@@ -56,11 +56,16 @@
           (map :write)
           (every? true?)))))
 
+; NOTE: `edit` action means only editing the *form* fields!
+(def non-form-fields [:budget_period :category :created_at :updated_at]); TODO: why are the timestamps writable tho?
+
 (defn add-action-permissions
   [req]
-  (let [can-edit-all-fields? (->> req
+  (let [can-edit-any-fields? (->> (apply dissoc req non-form-fields)
                                   (map (fn [[k v]] (:write v)))
-                                  (every? true?))
+                                  (filter true?)
+                                  (empty?)
+                                  (not))
         can-change-budget-period? (-> req
                                       :budget_period
                                       :write)
@@ -69,7 +74,7 @@
                                  :write)
         can-delete? (:DELETE req)]
     (assoc req
-      :actionPermissions {:edit can-edit-all-fields?,
+      :actionPermissions {:edit can-edit-any-fields?,
                           :delete can-delete?,
                           :moveBudgetPeriod can-change-budget-period?,
                           :moveCategory can-change-category?})))
