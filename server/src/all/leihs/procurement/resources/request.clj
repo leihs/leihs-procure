@@ -440,7 +440,7 @@
          tx
          auth-entity
          (reverse-exchange-attrs proc-request)
-         (reject-keys input-data request-perms/attrs-to-exclude)))
+         (reject-keys input-data request-perms/attrs-to-skip)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
       (reverse-exchange-attrs <>)
