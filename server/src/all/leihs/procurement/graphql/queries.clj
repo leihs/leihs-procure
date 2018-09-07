@@ -23,7 +23,6 @@
   []
   {:admins (-> admins/get-admins
                (authorization/wrap-ensure-one-of [user-perms/admin?])),
-   :request-action-permissions request-perms/action-permissions,
    :attachments attachments/get-attachments,
    :budget-limits budget-limits/get-budget-limits,
    :budget-period budget-period/get-budget-period,

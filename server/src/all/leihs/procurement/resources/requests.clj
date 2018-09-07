@@ -98,15 +98,16 @@
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql/format <>))
         proc-requests (request/query-requests tx query)]
-    (->> proc-requests
-         (map (fn [proc-req]
-                (as-> proc-req <>
-                  (request/reverse-exchange-attrs <>)
-                  (request-perms/apply-permissions
-                    tx
-                    auth-entity
-                    <>
-                    #(assoc % :request-id (:id <>)))))))))
+    (->>
+      proc-requests
+      (map (fn [proc-req]
+             (as-> proc-req <>
+               (request/reverse-exchange-attrs <>)
+               (request-perms/apply-permissions tx
+                                                auth-entity
+                                                <>
+                                                #(assoc % :request-id (:id <>)))
+               (request-perms/add-action-permissions <>)))))))
 
 (defn get-total-price-cents
   [tx sqlmap]

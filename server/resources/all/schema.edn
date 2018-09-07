@@ -217,8 +217,7 @@
     :Request
       {:fields
          {:accounting_type {:type :RequestFieldString},
-          :actionPermissions {:resolve :request-action-permissions,
-                              :type :RequestActionPermissions},
+          :actionPermissions {:type :RequestActionPermissions},
           :approved_quantity {:type :RequestFieldInt},
           :article_name {:type :RequestFieldString},
           :article_number {:type :RequestFieldString},

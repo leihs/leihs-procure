@@ -121,6 +121,13 @@
                              auth-user-is-admin),
                    :write false,
                    :required false},
+     :DELETE (and request-exists
+                  (not budget-period-is-past)
+                  (or (and auth-user-is-requester
+                           requested-by-auth-user
+                           budget-period-in-requesting-phase)
+                      category-inspectable-by-auth-user
+                      auth-user-is-admin)),
      :general_ledger_account {:read (or category-viewable-by-auth-user
                                         auth-user-is-inspector
                                         auth-user-is-admin),

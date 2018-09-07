@@ -92,10 +92,3 @@
              (and (user-perms/requester? tx auth-entity)
                   (request/requested-by? tx auth-entity request)
                   (budget-period/in-requesting-phase? tx budget-period))))))
-
-(defn action-permissions
-  [context args value]
-  {:edit (can-edit? context args value),
-   :delete (can-delete? context args value),
-   :moveBudgetPeriod (can-change-request-budget-period? context args value),
-   :moveCategory (can-change-request-category? context args value)})
