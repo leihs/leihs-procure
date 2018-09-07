@@ -191,6 +191,10 @@ describe 'price sums' do
                     { id: category_2_C.id,
                       total_price_cents: '0',
                       requests: []
+                    },
+                    { id: category_2_D.id,
+                      total_price_cents: '0',
+                      requests: []
                     }
                   ]
                 }
