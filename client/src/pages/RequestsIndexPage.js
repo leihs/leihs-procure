@@ -68,6 +68,7 @@ const REQUESTS_QUERY = gql`
       inspector_priority: $inspector_priority
       requested_by_auth_user: $onlyOwnRequests
     ) {
+      total_count # is requestTotalCount
       budget_periods {
         id
         name
