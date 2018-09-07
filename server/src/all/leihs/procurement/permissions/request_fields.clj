@@ -178,7 +178,10 @@
                             auth-user-is-admin),
                   :write (and (not budget-period-is-past)
                               (or auth-user-is-admin
-                                  category-inspectable-by-auth-user
+                                  ; motivation can only be edited by inspectors
+                                  ; when *creating* a new request
+                                  (and (not request-exists)
+                                       category-inspectable-by-auth-user)
                                   (and auth-user-is-requester
                                        budget-period-in-requesting-phase))),
                   :required true},
