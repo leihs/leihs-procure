@@ -8,11 +8,10 @@ import Dropdown from 'reactstrap/lib/Dropdown'
 import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
-import Icon from '../Icons'
+import SearchField from './InputTextSearch'
 const log = logger('app:ui:MultiSelect')
 
 const START_OPEN = false
-// const START_OPEN = true
 const txt_select_all = 'Alle auswählen'
 const txt_all_selected_a = 'Alle '
 const txt_all_selected_e = ' ausgewählt'
@@ -163,9 +162,8 @@ class MultiSelect extends React.PureComponent {
             {withSearch && (
               <F>
                 <SearchField
+                  className="px-2"
                   size={size}
-                  label="Suchen…"
-                  clearLabel="Suche zurücksetzen"
                   value={this.state.searchTerm}
                   onChange={e => this.setState({ searchTerm: e.target.value })}
                 />
@@ -285,48 +283,6 @@ MultiSelect.propTypes = {
 }
 
 export default MultiSelect
-
-const SearchField = ({ size, label, name, value, onChange, clearLabel }) => {
-  value = f.isString(value) && f.presence(value)
-  const onClear = e => onChange({ target: { name, value: '' } })
-  return (
-    <div
-      className={cx('input-group ', {
-        'px-2': !size,
-        'px-1 input-group-sm': size === 'sm',
-        'px-3 input-group-lg': size === 'lg'
-      })}
-    >
-      <div className="input-group-prepend">
-        <span className="input-group-text" title={label}>
-          <Icon.Search />
-        </span>
-      </div>
-      <input
-        type="text"
-        className="form-control"
-        autoComplete="off"
-        placeholder={label}
-        aria-label={label}
-        name={name}
-        value={value || ''}
-        onChange={onChange}
-      />
-      <div className="input-group-append">
-        <button
-          type="button"
-          className="btn btn-outline-secondary"
-          disabled={!value}
-          onClick={onClear}
-          title={clearLabel}
-          aria-label={clearLabel}
-        >
-          <Icon.Cross />
-        </button>
-      </div>
-    </div>
-  )
-}
 
 const Checkbox = ({ id, className, label, isIndeterminate, ...props }) => {
   const setCheckboxRef = checkbox => {

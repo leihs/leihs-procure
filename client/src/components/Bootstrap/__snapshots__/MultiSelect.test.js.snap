@@ -488,7 +488,7 @@ exports[`undefined: renders correctly 2`] = `
         x-placement={undefined}
       >
         <div
-          className="input-group  px-2"
+          className="px-2 input-group"
         >
           <div
             className="input-group-prepend"
@@ -736,7 +736,7 @@ exports[`undefined: renders correctly 2`] = `
           type={undefined}
         />
         <div
-          className="input-group  px-2"
+          className="px-2 input-group"
         >
           <div
             className="input-group-prepend"
@@ -1045,7 +1045,7 @@ exports[`undefined: renders correctly 3`] = `
           type={undefined}
         />
         <div
-          className="input-group  px-2"
+          className="px-2 input-group"
         >
           <div
             className="input-group-prepend"
