@@ -25,6 +25,7 @@ import { Redirect } from '../../components/Router'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
+import { examples as CollapsingExamples } from '../../components/Bootstrap/Collapsing.examples'
 import { examples as IconExamples } from '../../components/Icons.examples'
 const Let = ({ children, ...props }) => children(props)
 
@@ -150,6 +151,17 @@ const PAGES = [
     id: 'multiselect',
     title: 'MultiSelect',
     content: MultiSelectExamples.map(({ title, content }, i) => (
+      <F key={i}>
+        <h4>{title}</h4>
+        {content}
+        <hr />
+      </F>
+    ))
+  },
+  {
+    id: 'collapsing',
+    title: 'Collapsing',
+    content: CollapsingExamples.map(({ title, content }, i) => (
       <F key={i}>
         <h4>{title}</h4>
         {content}
