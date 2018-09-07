@@ -215,7 +215,7 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
               </Col>
 
               <Col
-                sm="2"
+                sm="3"
                 className="col-10 align-self-center order-last order-sm-12 text-right"
               >
                 {!!budgetPeriod.total_price_cents && (
@@ -234,7 +234,7 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
               </Col>
 
               <Col
-                sm="2"
+                sm="1"
                 className="col-2 mt-2 mt-sm-0 order-sm-last text-right"
               >
                 {newRequestBpLink && (
@@ -309,7 +309,7 @@ const CategoryLine = ({
             </Col>
 
             <Col
-              sm="2"
+              sm="3"
               className="col-10 align-self-center order-last order-sm-12 text-right"
             >
               {!!category.total_price_cents && (
@@ -322,7 +322,7 @@ const CategoryLine = ({
               )}
             </Col>
 
-            <Col sm="2" className="col-2 mt-2 mt-sm-0 order-sm-last text-right">
+            <Col sm="1" className="col-2 mt-2 mt-sm-0 order-sm-last text-right">
               {/* TODO: decide if/how to show these links
               {canRequest && (
                 <Link
@@ -394,7 +394,7 @@ const SubCategoryLine = ({
                 </h6>
               </Col>
               <Col
-                sm="2"
+                sm="3"
                 className="col-10 align-self-center order-last order-sm-12 text-right"
               >
                 {!!category.total_price_cents && (
@@ -407,7 +407,7 @@ const SubCategoryLine = ({
                 )}
               </Col>
               <Col
-                sm="2"
+                sm="1"
                 className="col-2 mt-2 mt-sm-0 order-sm-last text-right"
               >
                 {/* TODO: decide if/how to show these links

@@ -71,11 +71,13 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     <Col sm="2">
       {request.article_name.value || DisplayName(request.model.value)}
     </Col>
+
     <Col sm="2">
       {DisplayName(request.user.value)} /{' '}
       {DisplayName(request.organization.value)}
     </Col>
-    <Col sm="1" cls="text-center">
+
+    <Col sm="1" cls="align-self-center text-center">
       <Tooltipped text={t('request_form_field.state')}>
         <RequestStateBadge
           state={request.state}
@@ -84,7 +86,28 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
         />
       </Tooltipped>
     </Col>
-    <Col sm="3">
+
+    <Col sm="1" className="align-self-center text-center">
+      <Tooltipped text={t('priority')}>
+        <Badge dark cls="mr-1" id={`prio_tt_${request.id}`}>
+          {t(`priority_label_${request.priority.value}`)}
+        </Badge>
+      </Tooltipped>
+
+      <Tooltipped text={t('request_form_field.replacement')}>
+        <Badge secondary id={`replcmt_tt_${request.id}`}>
+          {t(
+            `request_form_field.request_replacement_labels_${
+              CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
+                request.replacement.value
+              ]
+            }`
+          )}{' '}
+        </Badge>
+      </Tooltipped>
+    </Col>
+
+    <Col sm="3" className="align-self-center">
       <Tooltipped text={t('request_form_field.price_cents')}>
         <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
           <Icon.PriceTag className="mr-1" />
@@ -112,34 +135,16 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
         </Tooltipped>
       )}
     </Col>
-    <Col sm="2">
+
+    <Col sm="2" className="align-self-center text-right">
       <Tooltipped text={t('request_form_field.price_total')}>
-        <Badge id={`totalam_tt_${request.id}`}>
-          <Icon.ShoppingCart className="mr-1" />
-          <samp>{formatCurrency(RequestTotalAmount(request))}</samp>
-        </Badge>
+        <span className="mr-2 f6" id={`totalam_tt_${request.id}`}>
+          <samp>{formatCurrency(RequestTotalAmount(request))} </samp>
+          <Icon.ShoppingCart />
+        </span>
       </Tooltipped>
     </Col>
-    <Col sm="1">
-      <Tooltipped text={t('priority')}>
-        <Badge dark cls="mr-1" id={`prio_tt_${request.id}`}>
-          {t(`priority_label_${request.priority.value}`)}
-        </Badge>
-      </Tooltipped>
-    </Col>
-    <Col sm="1">
-      <Tooltipped text={t('request_form_field.replacement')}>
-        <Badge secondary id={`replcmt_tt_${request.id}`}>
-          {/* {CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[request.replacement.value]}{' '} */}
-          {t(
-            `request_form_field.request_replacement_labels_${
-              CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
-                request.replacement.value
-              ]
-            }`
-          )}{' '}
-        </Badge>
-      </Tooltipped>
-    </Col>
+
+    <Col sm="1" />
   </Row>
 )
