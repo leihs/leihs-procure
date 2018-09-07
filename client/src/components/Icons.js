@@ -1,49 +1,53 @@
 import React from 'react'
 import f from 'lodash'
 import cx from 'classnames'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-// pick & choose what we use, name & describe it, then export all in one object of components
-import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
-import faExchange from '@fortawesome/fontawesome-free-solid/faExchangeAlt'
-import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
-import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck'
-import faCalendarAlt from '@fortawesome/fontawesome-free-solid/faCalendarAlt'
-import faCalendarPlus from '@fortawesome/fontawesome-free-solid/faCalendarPlus'
-import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt'
-import faChartPie from '@fortawesome/fontawesome-free-solid/faChartPie'
-import faPaperclip from '@fortawesome/fontawesome-free-solid/faPaperclip'
-import faCircle from '@fortawesome/fontawesome-free-solid/faCircle'
-import faCheckCircle from '@fortawesome/fontawesome-free-solid/faCheckCircle'
-import faCircleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch'
-import faTag from '@fortawesome/fontawesome-free-solid/faTag'
-import faQuestion from '@fortawesome/fontawesome-free-solid/faQuestion'
-import faShoppingCart from '@fortawesome/fontawesome-free-solid/faShoppingCart'
-import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
-import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
-import faCaretUp from '@fortawesome/fontawesome-free-solid/faCaretUp'
-import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown'
-import faCaretLeft from '@fortawesome/fontawesome-free-solid/faCaretLeft'
-import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight'
-import faSyncAlt from '@fortawesome/fontawesome-free-solid/faSyncAlt'
-import faCog from '@fortawesome/fontawesome-free-solid/faCog'
-import faBars from '@fortawesome/fontawesome-free-solid/faBars'
-import faCode from '@fortawesome/fontawesome-free-solid/faCode'
-import faTasks from '@fortawesome/fontawesome-free-solid/faTasks'
-import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
-import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
-import faSitemap from '@fortawesome/fontawesome-free-solid/faSitemap'
-import faOutdent from '@fortawesome/fontawesome-free-solid/faOutdent'
-import faDolly from '@fortawesome/fontawesome-free-solid/faDolly'
-import faWrench from '@fortawesome/fontawesome-free-solid/faWrench'
-import faCogs from '@fortawesome/fontawesome-free-solid/faCogs'
-import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
-import faPlusCircle from '@fortawesome/fontawesome-free-solid/faPlusCircle'
-import faStream from '@fortawesome/fontawesome-free-solid/faStream'
-import faListUl from '@fortawesome/fontawesome-free-solid/faListUl'
-import faCube from '@fortawesome/fontawesome-free-solid/faCube'
-import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
-import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
+// pick & choose what we use, name & describe it,
+// then export all in one object of components
+
+import {
+  faCheck,
+  faExchangeAlt,
+  faCalendar,
+  faCalendarCheck,
+  faCalendarAlt,
+  faCalendarPlus,
+  faTrashAlt,
+  faChartPie,
+  faPaperclip,
+  faCircle,
+  faCheckCircle,
+  faCircleNotch,
+  faTag,
+  faQuestion,
+  faShoppingCart,
+  faUserCircle,
+  faTimes,
+  faCaretUp,
+  faCaretDown,
+  faCaretLeft,
+  faCaretRight,
+  faSyncAlt,
+  faCog,
+  faBars,
+  faCode,
+  faTasks,
+  faEnvelope,
+  faUsers,
+  faSitemap,
+  faOutdent,
+  faDolly,
+  faWrench,
+  faCogs,
+  faGlobe,
+  faPlusCircle,
+  faStream,
+  faListUl,
+  faCube,
+  faSearch,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons'
 
 const ICONS = {
   CaretUp: {
@@ -73,7 +77,7 @@ const ICONS = {
     src: faPlusCircle
   },
   Exchange: {
-    src: faExchange
+    src: faExchangeAlt
   },
   RequestingPhase: {
     src: faCalendarPlus,
