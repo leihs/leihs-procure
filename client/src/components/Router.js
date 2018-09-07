@@ -13,7 +13,7 @@ export const Redirect = ({ scrollTop = true, to, ...props }) => (
 
       // keep flash in state
       let givenState = f.get(props, 'to.state')
-      const flash = f.pick(location.state, 'flash', '_flash')
+      const flash = f.pick(location.state, 'flash', 'localFlash')
       if (!f.isEmpty(flash)) to = { ...to, state: { ...givenState, ...flash } }
 
       // handle scrolling to top

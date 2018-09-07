@@ -279,7 +279,7 @@ const PAGES = [
 //
 const UiPlayground = ({ match, location }) => {
   const baseUrl = match.url
-  const flashMsg = f.get(location, 'state._flash')
+  const flashMsg = f.get(location, 'state.localFlash')
   const sidebar = (
     <F>
       <TableofContents baseUrl={baseUrl} />
