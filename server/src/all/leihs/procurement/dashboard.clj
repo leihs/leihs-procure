@@ -82,5 +82,5 @@
                                         tx)))))))]
                (-> bp
                    (assoc :main_categories main-cats*)
-                   (assoc :total_price_cents (sum-total-price
-                                               main-cats*)))))))}))
+                   (assoc :total_price_cents (sum-total-price main-cats*))))))),
+     :total_count (count requests)}))
