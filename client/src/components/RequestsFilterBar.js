@@ -62,11 +62,18 @@ const FilterBar = ({
 export default FilterBar
 
 const Filters = ({ me, data, current, onChange }) => {
+  const budgetPeriods = data.budget_periods
+  const budgetPeriodsPyPhase = f.groupBy(budgetPeriods, bp => {
+    const d = budgetPeriodDates(bp)
+    return ['isInspecting', 'isRequesting'].filter(k => d[k])[0] || 'isPast'
+  })
+
   const available = {
-    budgetPeriods: data.budget_periods.map(({ id, name }) => ({
-      value: id,
-      label: name
+    budgetPeriods: f.map(budgetPeriodsPyPhase, (bps, phase) => ({
+      label: t(`budget_period_filter_label_state.${phase}`),
+      options: bps.map(({ id, name }) => ({ value: id, label: name }))
     })),
+
     categories: data.main_categories.map(({ id, name, categories }) => ({
       label: name,
       options: categories.map(({ id, name }) => ({ value: id, label: name }))
@@ -161,10 +168,12 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.budgetPeriods && (
               <FormGroup label={t('dashboard.filter_titles.budget_periods')}>
-                <Select
+                <GroupedSelect
                   {...formPropsFor('budgetPeriods')}
+                  withSearch={budgetPeriods.length > 24}
                   multiple
-                  emptyOption={false}
+                  size="sm"
+                  block
                   options={available.budgetPeriods}
                 />
               </FormGroup>

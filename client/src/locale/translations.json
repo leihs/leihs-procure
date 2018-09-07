@@ -7,6 +7,9 @@
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
 
+  "upload_error_click_to_show": "Hochladen fehlgeschlagen! Klicken für Details.",
+  "upload_error_click_to_retry": "Nochmals versuchen",
+
   "request": {
     "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
     "confirm_move_category": "In andere Kategorie verschieben?",
@@ -21,6 +24,12 @@
 
   "budget_period": "Budgetperiode",
   "request_state": "Status",
+
+  "budget_period_filter_label_state": {
+    "isRequesting": "Antragsphase",
+    "isInspecting": "In Prüfung",
+    "isPast": "Beendet"
+  },
 
   "request_state_label_NEW": "Neu",
   "request_state_label_APPROVED": "Genehmigt",

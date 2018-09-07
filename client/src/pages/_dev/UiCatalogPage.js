@@ -1,5 +1,5 @@
 import React, { Fragment as F } from 'react'
-import { Route, Switch, Redirect, NavLink } from 'react-router-dom'
+import { Route, Switch, NavLink } from 'react-router-dom'
 // import cx from 'classnames'
 import f from 'lodash'
 
@@ -21,10 +21,12 @@ import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
+import { Redirect } from '../../components/Router'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
 import { examples as IconExamples } from '../../components/Icons.examples'
+const Let = ({ children, ...props }) => children(props)
 
 const ExamplesList = ({ examples }) =>
   examples.map(({ name, content }, i) => (
@@ -225,6 +227,50 @@ const PAGES = [
           }}
         </StatefulForm>
       </F>
+    )
+  },
+  {
+    id: 'redirect-and-scroll-to-top',
+    title: 'Redirect And Scroll To Top',
+    content: (
+      <Let btnId={'button-way-down-on-page'}>
+        {({ btnId }) => (
+          <StatefulForm idPrefix="input-file-upload-mock-form">
+            {({ getValue, setValue }) => {
+              return (
+                <F>
+                  <p style={{ marginBottom: '300vh' }}>
+                    <a href={`#${btnId}`}>scroll down first!</a>
+                  </p>
+                  <button
+                    type="button"
+                    id={btnId}
+                    onClick={() => setValue('redirect', true)}
+                    style={{ marginBottom: '50vh' }}
+                  >
+                    click to redirect!
+                  </button>
+                  {!!getValue('redirect') && (
+                    <Redirect
+                      push
+                      scrollTop
+                      to={{
+                        pathname: '/',
+                        state: {
+                          flash: {
+                            level: 'success',
+                            message: 'Should have scrolled to top!'
+                          }
+                        }
+                      }}
+                    />
+                  )}
+                </F>
+              )
+            }}
+          </StatefulForm>
+        )}
+      </Let>
     )
   }
 ]

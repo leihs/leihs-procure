@@ -282,19 +282,18 @@
 
 (defn deal-with-attachments!
   [tx req-id attachments]
-  (let [uploads-to-delete (filter-attachments {:to_delete true,
-                                               :__typename "Upload"}
-                                              attachments)
+  (let [uploads-to-delete
+          (filter-attachments {:to_delete true, :typename "Upload"} attachments)
         uploads-to-attachments (filter-attachments {:to_delete false,
-                                                    :__typename "Upload"}
+                                                    :typename "Upload"}
                                                    attachments)
         attachments-to-delete (filter-attachments {:to_delete true,
-                                                   :__typename "Attachment"}
+                                                   :typename "Attachment"}
                                                   attachments)
         ; NOTE: just for purpose of completeness and clarity:
         ; don't do anything with existing attachments
         ; attachments-to-retain
-        ; (filter-attachments {:to_delete false, :__typename "Attachment"}
+        ; (filter-attachments {:to_delete false, :typename "Attachment"}
         ; attachments)
         ]
     (if-not (empty? uploads-to-delete)

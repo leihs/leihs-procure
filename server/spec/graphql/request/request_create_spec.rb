@@ -260,8 +260,8 @@ describe 'request' do
             requested_quantity: 1,
             room: FactoryBot.create(:room).id,
             motivation: Faker::Lorem.sentence,
-            attachments: [{ id: uploads[0].id, to_delete: false, __typename: 'Upload' },
-                          { id: uploads[1].id, to_delete: true, __typename: 'Upload' }],
+            attachments: [{ id: uploads[0].id, to_delete: false, typename: 'Upload' },
+                          { id: uploads[1].id, to_delete: true, typename: 'Upload' }],
             supplier_name: 'OBike'
           }
         }
@@ -286,8 +286,8 @@ describe 'request' do
             requested_quantity: 1,
             room: FactoryBot.create(:room).id,
             motivation: Faker::Lorem.sentence,
-            attachments: [{ id: uploads[0].id, to_delete: false, __typename: 'Upload' },
-                          { id: uploads[1].id, to_delete: true, __typename: 'Upload' }]
+            attachments: [{ id: uploads[0].id, to_delete: false, typename: 'Upload' },
+                          { id: uploads[1].id, to_delete: true, typename: 'Upload' }]
           }
         }
 

@@ -9,55 +9,80 @@ import {
   buildAuthHeaders
 } from '../../apollo-client'
 
-import { FilePicker } from '.'
+import { Button, Tooltipped, FilePicker } from '../Bootstrap'
 import Icon from '../Icons'
+import t from '../../locale/translate'
+
+import logger from 'debug'
+const log = logger('app:ui:InputFileUpload')
 
 class InputFileUpload extends React.Component {
   constructor(props) {
     super(props)
     this.state = { uploads: props.value || [] }
+    log('init', { props, state: this.state })
   }
 
   onSelectFiles(e) {
-    e.preventDefault()
     const files = [...e.target.files]
-    files.forEach(rawFile => {
-      const file = FileObj(rawFile)
+    log('onSelectFiles', { files })
+
+    // braindead async queue, recursing callbacks-based
+    const addFileToQueue = index => {
+      if (index >= files.length) return // end of queue
+      const file = FileObj(files[index])
       let isDuplicate = false
+
       this.setState(
         cs => {
-          if (f.find(cs.uploads, { key: file.key })) {
-            return (isDuplicate = true)
-          }
+          if (f.find(cs.uploads, { key: file.key })) return (isDuplicate = true)
           return { uploads: [...cs.uploads, file] }
         },
-        () =>
+        () => {
           !isDuplicate &&
-          uploadFile({
-            file,
-            onProgress: (i, n) => this.onFileProgress(i, n),
-            onFinish: i => this.onUploadedFile(i)
-          })
+            uploadFile({
+              file,
+              onProgress: (i, n) => this.onFileProgress(i, n),
+              onFinish: i => this.onUploadedFile(i)
+            })
+          addFileToQueue(index + 1) // recurse
+        }
       )
-    })
+    }
+    addFileToQueue(0, addFileToQueue)
+  }
+
+  onRetryFile(file) {
+    log('onFileProgress', { file })
+    this.setState(
+      cs => ({
+        uploads: cs.uploads.filter(u => !sameKeyOrId(u, file))
+      }),
+      () => {
+        this.onSelectFiles({ target: { files: [file.rawFile] } })
+      }
+    )
   }
 
   onFileProgress(file) {
+    log('onFileProgress', { file })
     this.setState(cs => ({
-      uploads: cs.uploads.map(u => (u.key === file.key ? file : u))
+      uploads: cs.uploads.map(u => (sameKeyOrId(u, file) ? file : u))
     }))
   }
 
   onUploadedFile(file) {
+    log('onUploadedFile', { file })
     this.setState(
       cs => ({
-        uploads: cs.uploads.map(u => (u.key === file.key ? file : u))
+        uploads: cs.uploads.map(u => (sameKeyOrId(u, file) ? file : u))
       }),
       () => this.onChangeCallback()
     )
   }
 
   onMarkForDeletion(file, toggled) {
+    log('onMarkForDeletion', { file, toDelete: toggled })
     this.setState(
       cs => ({
         uploads: cs.uploads.map(
@@ -76,14 +101,13 @@ class InputFileUpload extends React.Component {
   onChangeCallback() {
     const callback = this.props.onChange
     const value = this.state.uploads.map(u => ({ ...u, rawFile: undefined }))
-    callback({
-      target: { name: this.props.name, value }
-    })
+    callback({ target: { name: this.props.name, value } })
   }
 
   render(
     { state, props: { id, name, className, inputProps, ...props } } = this
   ) {
+    log('render', { state, props: this.props })
     if (!id) {
       throw new Error('`InputFileUpload` is missing `props.id`!')
     }
@@ -94,7 +118,13 @@ class InputFileUpload extends React.Component {
         {f.present(state.uploads) && (
           <ul className="input-file-upload-list pl-4 mb-1">
             {state.uploads.map(u => {
-              const txtCls = cx({ 'text-strike text-danger': u.toDelete })
+              const key = u.id || u.key
+              const isReady = !!u.id
+              const isFailed = !!u.error
+              const txtCls = cx({
+                'text-strike text-danger': u.toDelete,
+                'text-strike text-warning': isFailed
+              })
               const nameOrLink = !u.url ? (
                 u.filename
               ) : (
@@ -108,6 +138,7 @@ class InputFileUpload extends React.Component {
                   {u.filename}
                 </a>
               )
+
               const deleteToggle = isDisabled || (
                 <label>
                   <Icon.Trash className="text-danger" />
@@ -119,9 +150,48 @@ class InputFileUpload extends React.Component {
                   />
                 </label>
               )
+
+              const errorMarker = isFailed && (
+                <Tooltipped text={t('upload_error_click_to_show')}>
+                  <Button
+                    id={`error-button-${key.replace(/[^\w\d]/g, '')}`}
+                    color="link"
+                    size="sm"
+                    onClick={e =>
+                      alert(`Error Details:\n${JSON.stringify(u.error, 0, 2)}`)
+                    }
+                  >
+                    <Icon.WarningSign className="text-warning" />
+                  </Button>
+                </Tooltipped>
+              )
+
+              const retryButton = isFailed && (
+                <Tooltipped text={t('upload_error_click_to_retry')}>
+                  <Button
+                    id={`retry-button-${key.replace(/[^\w\d]/g, '')}`}
+                    color="link"
+                    size="sm"
+                    onClick={e => this.onRetryFile(u)}
+                  >
+                    <Icon.Reload className="text-primary" />
+                  </Button>
+                </Tooltipped>
+              )
+
+              const endOfLine = isReady ? (
+                deleteToggle
+              ) : !isFailed ? (
+                <Icon.Spinner />
+              ) : (
+                retryButton
+              )
+
               return (
-                <li key={u.id || u.key} className={txtCls}>
-                  {nameOrLink} {!u.id ? <Icon.Spinner /> : deleteToggle}
+                <li key={key} className={txtCls}>
+                  {errorMarker}{' '}
+                  <span className="d-inline-block py-2">{nameOrLink}</span>{' '}
+                  {endOfLine}
                 </li>
               )
             })}
@@ -130,7 +200,8 @@ class InputFileUpload extends React.Component {
 
         {isDisabled || (
           <FilePicker
-            multiple
+            // FIXME: re-enable multiples when backend fixed!
+            multiple={false}
             label="Anhänge auswählen"
             onChange={e => this.onSelectFiles(e)}
           />
@@ -164,11 +235,13 @@ const FileObj = file => ({
   filename: file.name,
   rawFile: file,
   toDelete: false,
-  __typename: 'Upload'
+  typename: 'Upload'
 })
 
 // NOTE: based on & adapted from: <https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications#Handling_the_upload_process_for_a_file>
+const logu = logger('app:ui:libUploadFile')
 function uploadFile({ file, onProgress, onFinish }) {
+  logu('init', { file })
   const xhr = new XMLHttpRequest()
   const formData = new FormData()
 
@@ -181,21 +254,29 @@ function uploadFile({ file, onProgress, onFinish }) {
   const onUploadProgress = e => {
     if (e.lengthComputable) {
       progress = Math.round((e.loaded * 100) / e.total)
-      onProgress({ ...file, progress })
+      logu('onUploadProgress', { progress, file })
+      return onProgress({ ...file, progress })
     }
+    logu('onUploadProgress', 'LENGTH_NOT_COMPUTABLE!')
   }
   const onUploadFinish = e => {
+    logu('onUploadFinish', { file })
     progress = 100
     onProgress({ ...file, progress })
   }
 
   // handle successful upload
   const onFileFinish = e => {
-    const result = f.try(() => JSON.parse(xhr.response))
-    if (!result || result.length !== 1) {
-      return window.alert('Upload error!')
+    let error = false
+    progress = 100
+    const response = f.try(() => JSON.parse(xhr.response))
+    if (!response || response.length !== 1) {
+      logu('onFileFinish | Upload error!', xhr)
+      error = f.get(response, 'errors') || response || true
     }
-    onFinish({ ...file, progress: 100, ...result[0] })
+    const obj = { ...file, ...f.first(response), progress, error: error }
+    logu('onFileFinish', obj)
+    onFinish(obj)
   }
 
   // attach events:
@@ -203,7 +284,7 @@ function uploadFile({ file, onProgress, onFinish }) {
   xhr.addEventListener('load', onFileFinish, false)
   xhr.upload.addEventListener(
     'progress',
-    f.throttle(onUploadProgress, 300), // dont update too often
+    f.throttle(onUploadProgress, 3000), // dont update too often
     false
   )
 
@@ -215,3 +296,5 @@ function uploadFile({ file, onProgress, onFinish }) {
   }
   xhr.send(formData)
 }
+
+const sameKeyOrId = (a, b) => !!(a.key && b.key && f.isEqual(a.key, b.key))
