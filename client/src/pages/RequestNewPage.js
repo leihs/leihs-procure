@@ -84,12 +84,9 @@ const NEW_REQUEST_QUERY = gql`
 const CREATE_REQUEST_MUTATION = gql`
   mutation createRequest($requestData: CreateRequestInput) {
     create_request(input_data: $requestData) {
-      # NOTE: only redirect for now
-      id
-      # ...RequestFieldsForEdit
+      id # NOTE: only redirecting, so just id is needed
     }
   }
-  #{Fragments.RequestFieldsForEdit}
 `
 
 const requestDataFromFields = (request, fields, preselection) => ({
@@ -143,11 +140,11 @@ const RequestNewPage = () => (
                 data={data}
                 budgetPeriods={budgetPeriods}
                 selection={readFromQueryParams(params)}
-                onSelectionChange={fields =>
+                onSelectionChange={fields => {
                   history.replace(
                     updateQueryParams({ params, location, fields })
                   )
-                }
+                }}
               />
             )
           }}
@@ -165,13 +162,6 @@ class NewRequestPreselection extends React.Component {
       props: { data, budgetPeriods, selection, onSelectionChange, formKey }
     } = this
   ) {
-    const budPeriods = budgetPeriods.map(bp => ({
-      value: bp.id,
-      label: `${bp.name} – Antragsphase bis ${new Date(
-        bp.inspection_start_date
-      ).toLocaleDateString()}`
-    }))
-
     const CatWithMainCat = catId => {
       const mc = f.find(data.main_categories, {
         categories: [{ id: catId }]
@@ -198,21 +188,28 @@ class NewRequestPreselection extends React.Component {
           const hasPreselected = !!(selectedTemplate || selectedCategory)
           const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
 
+          const availableBudgetPeriods = budgetPeriods.map(bp => ({
+            value: bp.id,
+            label: `${bp.name} – Antragsphase bis ${new Date(
+              bp.inspection_start_date
+            ).toLocaleDateString()}`
+          }))
+
+          const setSelection = selection => {
+            onSelectionChange({ ...fields, ...selection })
+          }
+
           const formPropsFor = name => ({
             ...formHelpers.formPropsFor(name),
             onChange: e => setSelection({ [name]: e.target.value })
           })
-          const setSelection = ({ mainCategory, category, template } = {}) => {
-            onSelectionChange({
-              ...f.omit(fields, ['mainCategory', 'category', 'template']),
-              mainCategory,
-              category,
-              template
-            })
-          }
+
           const resetTemplate = () => {
             if (!selectedTemplate) return setSelection()
-            setSelection({ category: selectedTemplate.category.id })
+            setSelection({
+              template: null,
+              category: selectedTemplate.category.id
+            })
           }
 
           // NOTE: if a MC is selected in params, show only it
@@ -240,7 +237,7 @@ class NewRequestPreselection extends React.Component {
                     {...formPropsFor('budgetPeriod')}
                     className="custom-select-lg"
                     required
-                    options={budPeriods}
+                    options={availableBudgetPeriods}
                   />
                 </FormGroup>
 
@@ -265,7 +262,9 @@ class NewRequestPreselection extends React.Component {
                           <Col sm>
                             {!!(mc || cat) && (
                               <SelectionCard
-                                onRemoveClick={() => setSelection()}
+                                onRemoveClick={() =>
+                                  setSelection({ category: null })
+                                }
                               >
                                 <Icon.Categories spaced="2" />
                                 {mc ? (
@@ -474,12 +473,14 @@ const CategoriesTemplatesTree = ({
 }
 
 const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
+  const hasAnyTemplates = f.any(f.map(items, 'templates'), l => !f.isEmpty(l))
+
   return (
     <ul className="list-group list-group-flush">
       {items.map(sc => (
         <F key={sc.id}>
           <li className="card list-group-item p-0">
-            {!f.any(sc.templates, l => !f.isEmpty(l)) ? (
+            {!hasAnyTemplates ? (
               <AddButtonLine onClick={e => onSelectCategory(sc)}>
                 {sc.name}
               </AddButtonLine>
