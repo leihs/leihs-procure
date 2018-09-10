@@ -1,5 +1,5 @@
 import React, { Fragment as F } from 'react'
-// import cx from 'classnames'
+import cx from 'classnames'
 import f from 'lodash'
 
 import {
@@ -7,7 +7,8 @@ import {
   FormField,
   InputText,
   FormGroup,
-  StatefulForm
+  StatefulForm,
+  Collapsing
 } from './Bootstrap'
 
 import MultiSelect from './Bootstrap/MultiSelect'
@@ -48,11 +49,31 @@ const FilterBar = ({
         )
       }
 
+      const heading = t('dashboard.filters_title')
+      const breakPoint = 'xl'
+
       return (
-        <div className="h-100 p-3 bg-light mh-md-100vh">
-          <h5>{t('dashboard.filters_title')}</h5>
-          {content()}
-        </div>
+        <Collapsing id="collapse-example-1" startOpen>
+          {({ isOpen, togglerProps, collapsedProps, Caret }) => (
+            <div className={`h-100 p-3 bg-light mh-${breakPoint}-100vh`}>
+              <div className={`d-block d-${breakPoint}-none`} {...togglerProps}>
+                <h5>
+                  <Caret spaced />
+                  {heading}
+                </h5>
+              </div>
+              <div className={`d-none d-${breakPoint}-block`}>
+                <h5>{heading}</h5>
+              </div>
+
+              <div
+                className={cx('d-${breakPoint}-block', { 'd-none': !isOpen })}
+              >
+                {content()}
+              </div>
+            </div>
+          )}
+        </Collapsing>
       )
     }}
   </CurrentUser>
