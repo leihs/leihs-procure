@@ -12,6 +12,7 @@ import { Button, StatefulForm, FormField } from '../../components/Bootstrap'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
+import { Routed } from '../../components/Router'
 
 // # DATA & ACTIONS
 //
@@ -60,7 +61,8 @@ const updateSettings = {
     }
 
     mutate({ variables: { settings } })
-  }
+  },
+  successFlash: t('form_message_save_success')
 }
 
 // # PAGE
@@ -69,39 +71,47 @@ class AdminSettingsPage extends React.Component {
   state = { formKey: Date.now() }
   render() {
     return (
-      <Mutation
-        {...updateSettings.mutation}
-        onCompleted={() => this.setState({ formKey: Date.now() })}
-      >
-        {(mutate, info) => (
-          <Query query={ADMIN_SETTINGS_PAGE_QUERY}>
-            {({ loading, error, data }) => {
-              if (loading) return <Loading />
-              if (error) return <ErrorPanel error={error} data={data} />
-
-              const settings = {
-                contact_url: data.settings.contact_url,
-                inspection_comments: data.settings.inspection_comments.join(
-                  '\n\n'
-                )
-              }
-
-              return (
-                <MainWithSidebar>
-                  <h1>Einstellungen</h1>
-                  <SettingsTable
-                    settings={settings}
-                    updateAction={fields =>
-                      updateSettings.doUpdate(mutate, fields)
-                    }
-                    key={this.state.formKey}
-                  />
-                </MainWithSidebar>
-              )
+      <Routed>
+        {({ setFlash }) => (
+          <Mutation
+            {...updateSettings.mutation}
+            onCompleted={() => {
+              this.setState({ formKey: Date.now() })
+              setFlash({ message: updateSettings.successFlash })
+              window && window.scrollTo(0, 0)
             }}
-          </Query>
+          >
+            {(mutate, info) => (
+              <Query query={ADMIN_SETTINGS_PAGE_QUERY}>
+                {({ loading, error, data }) => {
+                  if (loading) return <Loading />
+                  if (error) return <ErrorPanel error={error} data={data} />
+
+                  const settings = {
+                    contact_url: data.settings.contact_url,
+                    inspection_comments: data.settings.inspection_comments.join(
+                      '\n\n'
+                    )
+                  }
+
+                  return (
+                    <MainWithSidebar>
+                      <h1>Einstellungen</h1>
+                      <SettingsTable
+                        settings={settings}
+                        updateAction={fields =>
+                          updateSettings.doUpdate(mutate, fields)
+                        }
+                        key={this.state.formKey}
+                      />
+                    </MainWithSidebar>
+                  )
+                }}
+              </Query>
+            )}
+          </Mutation>
         )}
-      </Mutation>
+      </Routed>
     )
   }
 }

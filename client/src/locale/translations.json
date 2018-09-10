@@ -6,6 +6,7 @@
   "form_btn_change_budget_period": "Budgetperiode ändern",
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
+  "form_message_save_success": "Gespeichert!",
 
   "upload_error_click_to_show": "Hochladen fehlgeschlagen! Klicken für Details.",
   "upload_error_click_to_retry": "Nochmals versuchen",

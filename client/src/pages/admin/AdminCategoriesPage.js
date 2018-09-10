@@ -20,6 +20,7 @@ import {
   Tooltipped
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
+import { Routed } from '../../components/Router'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -141,7 +142,8 @@ const updateCategories = {
     mutate({
       variables: { mainCategories: data }
     })
-  }
+  },
+  successFlash: t('form_message_save_success')
 }
 
 // # PAGE
@@ -210,35 +212,47 @@ class CategoryPage extends React.Component {
   state = { formKey: 1 }
   render({ match } = this.props) {
     return (
-      <Mutation
-        {...updateCategories.mutation}
-        onCompleted={() => this.setState({ formKey: Date.now() })}
-      >
-        {(mutate, info) => (
-          <Query query={CATEGORIES_QUERY}>
-            {({ loading, error, data }) => {
-              if (loading) return <Loading />
-              if (error) return <ErrorPanel error={error} data={data} />
-
-              const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-              const mainCat = f.find(data.main_categories, { id: mainCatId })
-
-              return (
-                <CategoryCard
-                  {...mainCat}
-                  formKey={this.state.formKey}
-                  onSubmit={mainCat =>
-                    updateCategories.doUpdate(mutate, [
-                      mainCat,
-                      ...data.main_categories.filter(mc => mc.id !== mainCat.id)
-                    ])
-                  }
-                />
-              )
+      <Routed>
+        {({ setFlash }) => (
+          <Mutation
+            {...updateCategories.mutation}
+            onCompleted={() => {
+              this.setState({ formKey: Date.now() })
+              setFlash({ message: updateCategories.successFlash })
+              window && window.scrollTo(0, 0)
             }}
-          </Query>
+          >
+            {(mutate, info) => (
+              <Query query={CATEGORIES_QUERY}>
+                {({ loading, error, data }) => {
+                  if (loading) return <Loading />
+                  if (error) return <ErrorPanel error={error} data={data} />
+
+                  const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+                  const mainCat = f.find(data.main_categories, {
+                    id: mainCatId
+                  })
+
+                  return (
+                    <CategoryCard
+                      {...mainCat}
+                      formKey={this.state.formKey}
+                      onSubmit={mainCat =>
+                        updateCategories.doUpdate(mutate, [
+                          mainCat,
+                          ...data.main_categories.filter(
+                            mc => mc.id !== mainCat.id
+                          )
+                        ])
+                      }
+                    />
+                  )
+                }}
+              </Query>
+            )}
+          </Mutation>
         )}
-      </Mutation>
+      </Routed>
     )
   }
 }

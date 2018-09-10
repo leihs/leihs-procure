@@ -20,6 +20,7 @@ import {
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
+import { Routed } from '../../components/Router'
 import { formatCurrency } from '../../components/decorators'
 
 // # DATA & ACTIONS
@@ -58,7 +59,6 @@ const updateBudgetPeriods = {
   mutation: {
     mutation: ADMIN_UPDATE_BUDGET_PERIODS_MUTATION,
     onError: mutationErrorHandler,
-
     update: (cache, { data: { budget_periods, ...data } }) => {
       // update the internal cache with the new data we received.
       cache.writeQuery({
@@ -75,7 +75,8 @@ const updateBudgetPeriods = {
     mutate({
       variables: { budgetPeriods: data }
     })
-  }
+  },
+  successFlash: t('form_message_save_success')
 }
 
 // # PAGE
@@ -84,34 +85,42 @@ class AdminBudgetPeriodsPage extends React.Component {
   state = { formKey: Date.now() }
   render() {
     return (
-      <Mutation
-        {...updateBudgetPeriods.mutation}
-        onCompleted={() => this.setState({ formKey: Date.now() })}
-      >
-        {(mutate, info) => (
-          <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
-            {({ loading, error, data }) => {
-              if (loading) return <Loading />
-              if (error) return <ErrorPanel error={error} data={data} />
-
-              const budgetPeriods = [...data.budget_periods].reverse()
-
-              return (
-                <MainWithSidebar>
-                  <h1>Budgetperioden</h1>
-                  <BudgetPeriodsTable
-                    budgetPeriods={budgetPeriods}
-                    updateAction={fields =>
-                      updateBudgetPeriods.doUpdate(mutate, fields)
-                    }
-                    key={this.state.formKey}
-                  />
-                </MainWithSidebar>
-              )
+      <Routed>
+        {({ setFlash }) => (
+          <Mutation
+            {...updateBudgetPeriods.mutation}
+            onCompleted={() => {
+              this.setState({ formKey: Date.now() })
+              setFlash({ message: updateBudgetPeriods.successFlash })
+              window && window.scrollTo(0, 0)
             }}
-          </Query>
+          >
+            {(mutate, info) => (
+              <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
+                {({ loading, error, data }) => {
+                  if (loading) return <Loading />
+                  if (error) return <ErrorPanel error={error} data={data} />
+
+                  const budgetPeriods = [...data.budget_periods].reverse()
+
+                  return (
+                    <MainWithSidebar>
+                      <h1>Budgetperioden</h1>
+                      <BudgetPeriodsTable
+                        budgetPeriods={budgetPeriods}
+                        updateAction={fields => {
+                          updateBudgetPeriods.doUpdate(mutate, fields)
+                        }}
+                        key={this.state.formKey}
+                      />
+                    </MainWithSidebar>
+                  )
+                }}
+              </Query>
+            )}
+          </Mutation>
         )}
-      </Mutation>
+      </Routed>
     )
   }
 }
