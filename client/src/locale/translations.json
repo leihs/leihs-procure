@@ -25,6 +25,7 @@
 
   "budget_period": "Budgetperiode",
   "request_state": "Status",
+  "category": "Kategorie",
 
   "budget_period_filter_label_state": {
     "isRequesting": "Antragsphase",

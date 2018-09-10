@@ -7,11 +7,12 @@ import gql from 'graphql-tag'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 
-// import { RequestTotalAmount as TotalAmount } from '../components/decorators'
+import { DisplayName } from '../components/decorators'
 import t from '../locale/translate'
-import { Alert, RoutedStatus } from '../components/Bootstrap'
-// import Icon from '../components/Icons'
+import { Row, Col, Alert, RoutedStatus } from '../components/Bootstrap'
+import Icon from '../components/Icons'
 import RequestForm from '../components/RequestForm'
+import RequestStateBadge from '../components/RequestStateBadge'
 import * as Fragments from '../graphql-fragments'
 
 const REQUEST_EDIT_QUERY = gql`
@@ -79,7 +80,17 @@ class RequestEdit extends React.Component {
       this.props.doChangeBudgetPeriod(requestId, newBudgetPeriod.id)
   }
 
-  render({ requestId, onCancel, onSuccess, className, ...props } = this.props) {
+  render(
+    {
+      requestId,
+      onCancel,
+      onSuccess,
+      className,
+      compactView,
+      withHeader,
+      ...props
+    } = this.props
+  ) {
     if (!f.isUUID(requestId)) {
       return (
         <RoutedStatus code={400}>
@@ -121,8 +132,10 @@ class RequestEdit extends React.Component {
                   return <ErrorPanel error={mutReq.error} data={mutReq.data} />
                 return (
                   <F>
+                    {withHeader && <RequestHeader data={data} />}
                     <RequestForm
                       className={className}
+                      compactView={compactView}
                       request={request}
                       categories={data.main_categories}
                       budgetPeriods={data.budget_periods}
@@ -188,9 +201,68 @@ RequestEdit.propTypes = {
 }
 
 RequestEdit.defaultProps = {
-  onCancel: f.noop,
   onSuccess: f.noop
 }
+
+// UI
+
+const RequestHeader = ({ data }) => {
+  const r = data.requests[0]
+  const bp = f.find(data.budget_periods, {
+    id: r.budget_period.value.id
+  })
+  const mc = f.find(data.main_categories, {
+    categories: [{ id: r.category.value.id }]
+  })
+  const sc = f.find(mc.categories, { id: r.category.value.id })
+
+  return (
+    <F>
+      <dl>
+        <Row cls="mt-3">
+          <Col lg>
+            <Row>
+              <Col sm>
+                <dt>{t('budget_period')}: </dt>
+                <dd>{bp.name}</dd>
+              </Col>
+              <Col sm>
+                <dt>{t('category')}: </dt>
+                <dd>
+                  {mc.name} <Icon.CaretRight /> {sc.name}
+                </dd>
+              </Col>
+            </Row>
+          </Col>
+          <Col lg>
+            <Row>
+              <Col sm>
+                <dt>{t('request_form_field.user')}: </dt>{' '}
+                <dd>
+                  {DisplayName(r.user.value)} /{' '}
+                  {DisplayName(r.organization.value)}
+                </dd>
+              </Col>
+              <Col sm>
+                <dt>{t('request_state')}: </dt>
+                <dd>
+                  <RequestStateBadge
+                    state={r.state}
+                    id={`reqst_tt_${r.id}`}
+                    className="mr-1 text-wrap"
+                  />
+                </dd>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <hr />
+      </dl>
+    </F>
+  )
+}
+
+// helpers
 
 const valueIfWritable = (fields, requestData, key) => {
   const reqField = f.get(requestData, key)
