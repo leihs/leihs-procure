@@ -24,11 +24,16 @@ import {
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
-import { DisplayName, formatCurrency } from '../components/decorators'
+import {
+  DisplayName,
+  formatCurrency,
+  budgetPeriodDates
+} from '../components/decorators'
 import ImageThumbnail from '../components/ImageThumbnail'
 
 import RequestForm from '../components/RequestForm'
 import { requestDataFromFields as requestDataFromFieldsBase } from '../containers/RequestEdit'
+import CurrentUser from '../containers/CurrentUserProvider'
 
 const NEW_REQUEST_PRESELECTION_QUERY = gql`
   query newRequestPreselectionQuery {
@@ -120,36 +125,37 @@ const updateQueryParams = ({ fields, params, location }) => {
 const RequestNewPage = () => (
   <RouteParams>
     {({ params, location, history }) => (
-      <MainWithSidebar>
-        <h1>Antrag erstellen</h1>
+      <CurrentUser>
+        {me => (
+          <MainWithSidebar>
+            <h1>Antrag erstellen</h1>
 
-        <Query
-          query={NEW_REQUEST_PRESELECTION_QUERY}
-          fetchPolicy="cache-then-network"
-        >
-          {({ loading, error, data }) => {
-            if (loading) return <Loading />
-            if (error) return <ErrorPanel error={error} data={data} />
-            const budgetPeriods = data.budget_periods.filter(
-              bp => new Date(bp.inspection_start_date).getTime() > Date.now()
-            )
+            <Query
+              query={NEW_REQUEST_PRESELECTION_QUERY}
+              fetchPolicy="cache-then-network"
+            >
+              {({ loading, error, data }) => {
+                if (loading) return <Loading />
+                if (error) return <ErrorPanel error={error} data={data} />
 
-            return (
-              <NewRequestPreselection
-                key={location.key} // reset state on location change!
-                data={data}
-                budgetPeriods={budgetPeriods}
-                selection={readFromQueryParams(params)}
-                onSelectionChange={fields => {
-                  history.replace(
-                    updateQueryParams({ params, location, fields })
-                  )
-                }}
-              />
-            )
-          }}
-        </Query>
-      </MainWithSidebar>
+                return (
+                  <NewRequestPreselection
+                    key={location.key} // reset state on location change!
+                    me={me}
+                    data={data}
+                    selection={readFromQueryParams(params)}
+                    onChange={fields => {
+                      history.replace(
+                        updateQueryParams({ params, location, fields })
+                      )
+                    }}
+                  />
+                )
+              }}
+            </Query>
+          </MainWithSidebar>
+        )}
+      </CurrentUser>
     )}
   </RouteParams>
 )
@@ -157,11 +163,12 @@ const RequestNewPage = () => (
 export default RequestNewPage
 
 class NewRequestPreselection extends React.Component {
-  render(
-    {
-      props: { data, budgetPeriods, selection, onSelectionChange, formKey }
-    } = this
-  ) {
+  render({ props: { me, data, selection, onChange, formKey } } = this) {
+    const budgetPeriods = f.map(data.budget_periods, bp => ({
+      ...bp,
+      ...budgetPeriodDates(bp)
+    }))
+
     const CatWithMainCat = catId => {
       const mc = f.find(data.main_categories, {
         categories: [{ id: catId }]
@@ -177,7 +184,9 @@ class NewRequestPreselection extends React.Component {
         key={JSON.stringify(selection)}
       >
         {({ fields, setValue, setValues, ...formHelpers }) => {
-          const selectedBudgetPeriod = fields.budgetPeriod
+          const selectedBudgetPeriod = f.find(budgetPeriods, {
+            id: fields.budgetPeriod
+          })
           const selectedCategory = fields.category
           const selectedMainCat = f.find(data.main_categories, {
             id: fields.mainCategory
@@ -185,18 +194,14 @@ class NewRequestPreselection extends React.Component {
           const selectedTemplate = f.find(data.templates, {
             id: fields.template
           })
-          const hasPreselected = !!(selectedTemplate || selectedCategory)
-          const hasPreselectedAll = !!(selectedBudgetPeriod && hasPreselected)
 
-          const availableBudgetPeriods = budgetPeriods.map(bp => ({
-            value: bp.id,
-            label: `${bp.name} – Antragsphase bis ${new Date(
-              bp.inspection_start_date
-            ).toLocaleDateString()}`
-          }))
+          const hasPreselected = !!(
+            selectedBudgetPeriod &&
+            (selectedTemplate || selectedCategory)
+          )
 
           const setSelection = selection => {
-            onSelectionChange({ ...fields, ...selection })
+            onChange({ ...fields, ...selection })
           }
 
           const formPropsFor = name => ({
@@ -212,9 +217,26 @@ class NewRequestPreselection extends React.Component {
             })
           }
 
-          // NOTE: if a MC is selected in params, show only it
+          const shownBudgetPeriods = onlyAllowedBudgetPeriods(
+            me,
+            budgetPeriods
+          ).map(bp => {
+            const labelPost = bp.isInspecting
+              ? `Prüfungsphase bis ${fmtDate(bp.end_date)}`
+              : `Antragsphase bis ${fmtDate(bp.inspection_start_date)}`
+            return {
+              value: bp.id,
+              label: `${bp.name} – ${labelPost}`
+            }
+          })
+
+          // NOTE: if a MC is selected in params, show only it's subcats
           const shownMainCats = f.filter(
-            data.main_categories,
+            onlyAllowedCategories(
+              me,
+              selectedBudgetPeriod,
+              data.main_categories
+            ),
             !selectedMainCat ? {} : { id: selectedMainCat.id }
           )
 
@@ -237,97 +259,99 @@ class NewRequestPreselection extends React.Component {
                     {...formPropsFor('budgetPeriod')}
                     className="custom-select-lg"
                     required
-                    options={availableBudgetPeriods}
+                    options={shownBudgetPeriods}
                   />
                 </FormGroup>
 
-                <FormGroup
-                  label="Kategorie & Vorlage"
-                  className="form-group-lg"
-                >
-                  <Row cls="mb-3">
-                    <Let
-                      tpl={selectedTemplate}
-                      mc={selectedMainCat}
-                      cat={
-                        selectedCategory
-                          ? CatWithMainCat(selectedCategory)
-                          : selectedTemplate
-                            ? CatWithMainCat(selectedTemplate.category.id)
-                            : null
-                      }
-                    >
-                      {({ mc, cat, tpl }) => (
-                        <F>
-                          <Col sm>
-                            {!!(mc || cat) && (
-                              <SelectionCard
-                                onRemoveClick={() =>
-                                  setSelection({ category: null })
-                                }
-                              >
-                                <Icon.Categories spaced="2" />
-                                {mc ? (
-                                  mc.name
-                                ) : (
-                                  <F>
-                                    {cat.main_category.name}
-                                    <Icon.CaretRight />
-                                    {cat.name}
-                                  </F>
-                                )}
-                              </SelectionCard>
-                            )}
-                          </Col>
-
-                          <Col sm>
-                            {hasPreselected &&
-                              (!tpl ? (
-                                <SelectionCard>Keine Vorlage</SelectionCard>
-                              ) : (
-                                <SelectionCard onRemoveClick={resetTemplate}>
-                                  <Icon.Templates spaced />
-                                  {tpl.article_name || DisplayName(tpl.model)}
+                {selectedBudgetPeriod && (
+                  <FormGroup
+                    label="Kategorie & Vorlage"
+                    className="form-group-lg"
+                  >
+                    <Row cls="mb-3">
+                      <Let
+                        tpl={selectedTemplate}
+                        mc={selectedMainCat}
+                        cat={
+                          selectedCategory
+                            ? CatWithMainCat(selectedCategory)
+                            : selectedTemplate
+                              ? CatWithMainCat(selectedTemplate.category.id)
+                              : null
+                        }
+                      >
+                        {({ mc, cat, tpl }) => (
+                          <F>
+                            <Col sm>
+                              {!!(mc || cat) && (
+                                <SelectionCard
+                                  onRemoveClick={() =>
+                                    setSelection({ category: null })
+                                  }
+                                >
+                                  <Icon.Categories spaced="2" />
+                                  {mc ? (
+                                    mc.name
+                                  ) : (
+                                    <F>
+                                      {cat.main_category.name}
+                                      <Icon.CaretRight />
+                                      {cat.name}
+                                    </F>
+                                  )}
                                 </SelectionCard>
-                              ))}
-                          </Col>
-                        </F>
-                      )}
-                    </Let>
-                  </Row>
+                              )}
+                            </Col>
 
-                  {!hasPreselected && (
-                    <Let
-                      onSelectCategory={c => setSelection({ category: c.id })}
-                      onSelectTemplate={t => setSelection({ template: t.id })}
-                    >
-                      {({ onSelectCategory, onSelectTemplate }) =>
-                        selectedMainCat ? (
-                          <div className="card">
-                            <CategoryItemsList
-                              items={categoryTree[0].categories}
+                            <Col sm>
+                              {hasPreselected &&
+                                (!tpl ? (
+                                  <SelectionCard>Keine Vorlage</SelectionCard>
+                                ) : (
+                                  <SelectionCard onRemoveClick={resetTemplate}>
+                                    <Icon.Templates spaced />
+                                    {tpl.article_name || DisplayName(tpl.model)}
+                                  </SelectionCard>
+                                ))}
+                            </Col>
+                          </F>
+                        )}
+                      </Let>
+                    </Row>
+
+                    {!hasPreselected && (
+                      <Let
+                        onSelectCategory={c => setSelection({ category: c.id })}
+                        onSelectTemplate={t => setSelection({ template: t.id })}
+                      >
+                        {({ onSelectCategory, onSelectTemplate }) =>
+                          selectedMainCat ? (
+                            <div className="card">
+                              <CategoryItemsList
+                                items={categoryTree[0].categories}
+                                onSelectCategory={onSelectCategory}
+                                onSelectTemplate={onSelectTemplate}
+                              />
+                            </div>
+                          ) : (
+                            <CategoriesTemplatesTree
+                              mainCategories={categoryTree}
                               onSelectCategory={onSelectCategory}
                               onSelectTemplate={onSelectTemplate}
+                              onSelectMaincat={m =>
+                                setSelection({ mainCategory: m.id })
+                              }
                             />
-                          </div>
-                        ) : (
-                          <CategoriesTemplatesTree
-                            mainCategories={categoryTree}
-                            onSelectCategory={onSelectCategory}
-                            onSelectTemplate={onSelectTemplate}
-                            onSelectMaincat={m =>
-                              setSelection({ mainCategory: m.id })
-                            }
-                          />
-                        )
-                      }
-                    </Let>
-                  )}
-                </FormGroup>
+                          )
+                        }
+                      </Let>
+                    )}
+                  </FormGroup>
+                )}
               </form>
               {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
 
-              {hasPreselectedAll && (
+              {hasPreselected && (
                 <NewRequestForm
                   budgetPeriod={fields.budgetPeriod}
                   category={fields.category}
@@ -542,3 +566,27 @@ const AddButtonLine = ({ children, ...props }) => (
 )
 
 const Let = ({ children, ...props }) => children(props)
+
+const onlyAllowedBudgetPeriods = (me, bps) =>
+  bps.filter(bp => {
+    const d = budgetPeriodDates(bp)
+    return (
+      (d.isRequesting && me.roles.isRequester) ||
+      (d.isInspecting && (me.roles.isAdmin || me.roles.isInspector))
+    )
+  })
+
+const onlyAllowedCategories = (me, selectedBudgetPeriod, allCats) => {
+  const inspected = f.map(me.user.permissions.isInspectorForCategories, 'id')
+  if (!selectedBudgetPeriod) return null
+  if (selectedBudgetPeriod.isRequesting) return allCats
+  if (selectedBudgetPeriod.isInspecting)
+    return allCats
+      .map(mc => ({
+        ...mc,
+        categories: mc.categories.filter(sc => f.includes(inspected, sc.id))
+      }))
+      .filter(mc => mc.categories.length > 0)
+}
+
+const fmtDate = d => new Date(d).toLocaleDateString()
