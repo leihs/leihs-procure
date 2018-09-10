@@ -192,6 +192,7 @@ const userSavedFilters = storageFactory({ KEY: `${LOCAL_STORE_KEY}.filters` })
 const savedPanelTree = storageFactory({ KEY: `${LOCAL_STORE_KEY}.panelTree` })
 
 const viewModes = ['tree', 'table']
+const clientOnlyFilters = ['onlyCategoriesWithRequests']
 
 class RequestsIndexPage extends React.Component {
   constructor() {
@@ -256,7 +257,7 @@ class RequestsIndexPage extends React.Component {
               return (
                 <Query
                   query={REQUESTS_QUERY}
-                  variables={state.currentFilters}
+                  variables={f.omit(state.currentFilters, clientOnlyFilters)}
                   fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
