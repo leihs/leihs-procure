@@ -29,7 +29,11 @@
      [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
      [ring/ring-core "1.6.3"]]
   :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]]
-  :zprint {:width 80, :old? false, :map {:lift-ns? false}}
+  :zprint {:width 80,
+           :old? false,
+           :map {:lift-ns? false},
+           :comment {:wrap? false, :inline? false, :count? false},
+           :vector {:respect-nl? true}}
   ; jdk 9 needs ["--add-modules" "java.xml.bind"]
   :jvm-opts
     #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
