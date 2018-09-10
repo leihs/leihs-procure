@@ -7,11 +7,10 @@ import {
   FormField,
   InputText,
   FormGroup,
-  StatefulForm,
-  Select
+  StatefulForm
 } from './Bootstrap'
 
-import GroupedSelect from './Bootstrap/MultiSelect'
+import MultiSelect from './Bootstrap/MultiSelect'
 import { budgetPeriodDates } from './decorators'
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
@@ -114,6 +113,7 @@ const Filters = ({ me, data, current, onChange }) => {
 
   const defaultFilters = f.pick(
     {
+      // by default, select everything
       ...f.fromPairs(
         Object.keys(available).map(key => {
           const values = f.flatMap(
@@ -123,6 +123,7 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
+      // only select "current" BudgetPeriods
       budgetPeriods: data.budget_periods
         .filter(bp => {
           const b = budgetPeriodDates(bp)
@@ -131,6 +132,7 @@ const Filters = ({ me, data, current, onChange }) => {
           return false
         })
         .map(({ id }) => id),
+      // specific values:
       search: null,
       onlyOwnRequests: false,
       onlyCategoriesWithRequests: true
@@ -168,7 +170,7 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.budgetPeriods && (
               <FormGroup label={t('dashboard.filter_titles.budget_periods')}>
-                <GroupedSelect
+                <MultiSelect
                   {...formPropsFor('budgetPeriods')}
                   withSearch={budgetPeriods.length > 24}
                   multiple
@@ -181,7 +183,7 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.categories && (
               <FormGroup label={t('dashboard.filter_titles.categories')}>
-                <GroupedSelect
+                <MultiSelect
                   {...formPropsFor('categories')}
                   multiple
                   size="sm"
@@ -224,7 +226,7 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.organizations && (
               <FormGroup label={t('dashboard.filter_titles.orgs')}>
-                <GroupedSelect
+                <MultiSelect
                   {...formPropsFor('organizations')}
                   size="sm"
                   block
@@ -236,10 +238,12 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.priority && (
               <FormGroup label={t('dashboard.filter_titles.prio')}>
-                <Select
+                <MultiSelect
                   {...formPropsFor('priority')}
+                  size="sm"
+                  block
                   multiple
-                  emptyOption={false}
+                  withSearch={false}
                   options={available.priority}
                 />
               </FormGroup>
@@ -247,10 +251,12 @@ const Filters = ({ me, data, current, onChange }) => {
 
             {allowed.inspector_priority && (
               <FormGroup label={t('dashboard.filter_titles.prio_insp')}>
-                <Select
+                <MultiSelect
                   {...formPropsFor('inspector_priority')}
+                  size="sm"
+                  block
                   multiple
-                  emptyOption={false}
+                  withSearch={false}
                   options={available.inspector_priority}
                 />
               </FormGroup>
