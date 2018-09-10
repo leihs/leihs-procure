@@ -79,7 +79,7 @@ const UUID_REGEX_STR = [
 ].join('|')
 
 const UUID_REGEX = new RegExp(`^${UUID_REGEX_STR}$`)
-const DEHYPHENED_UUID_REGEX = /[a-fA-F0-9]{32}/
+const DEHYPHENED_UUID_REGEX = /^[a-fA-F0-9]{32}$/
 
 const isUUID = s => UUID_REGEX.test(s)
 const isDehyphenedUUID = s => DEHYPHENED_UUID_REGEX.test(s)
