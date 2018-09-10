@@ -49,6 +49,11 @@ const prepareFormValues = request => {
     f.get(request, 'inspector_priority.value')
   )
 
+  fields.attachments = fields.attachments.map(a => ({
+    ...a,
+    typename: a.__typename
+  }))
+
   fields.room = f.get(request, 'room.value.id')
   fields.building = f.get(request, 'room.value.building.id')
 

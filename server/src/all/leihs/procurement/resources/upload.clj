@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.upload
-  (:require [cheshire.core :refer [generate-string] :rename
+  (:require [clojure.string :as string]
+            [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
@@ -32,7 +33,9 @@
         (dissoc :tempfile)
         (assoc :content content)
         (assoc :metadata metadata)
-        (assoc :content-type content-type))))
+        (assoc :content-type content-type)
+        (assoc :exiftool_version exif/exiftool-version)
+        (assoc :exiftool_options (string/join " " exif/exiftool-options)))))
 
 (defn get-by-id
   [tx id]

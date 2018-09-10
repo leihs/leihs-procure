@@ -13,5 +13,7 @@ FactoryBot.define do
     content Base64.encode64(File.new(f_path).read)
     metadata me.data.to_display_hash.to_json
     request_id { create(:request).id }
+    exiftool_version MetadataExtractor::EXIFTOOL_VERSION
+    exiftool_options MetadataExtractor::EXIFTOOL_CMD_LINE_OPTIONS
   end
 end

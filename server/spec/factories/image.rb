@@ -11,6 +11,8 @@ FactoryBot.define do
     content_type 'image/jpeg'
     size 160000
     main_category_id { create(:main_category).id }
+    exiftool_version MetadataExtractor::EXIFTOOL_VERSION
+    exiftool_options MetadataExtractor::EXIFTOOL_CMD_LINE_OPTIONS
 
     after(:build) do |image, evaluator|
       file_path = "spec/files/#{evaluator.real_filename}"

@@ -1,25 +1,25 @@
 (ns leihs.procurement.utils.exif
-  (:require [clojure.java.shell :refer [sh]]
+  (:require [clojure.tools.logging :as log]
+            [clojure.java.shell :refer [sh]]
             [clojure.string :as string]))
 
-(defn- replace-group-string
-  [s]
-  "[foo] bar => foo:bar"
-  (string/replace s #"\[(.*)]\s*(.*)" "$1:$2"))
+(def exiftool-version
+  (->> ["exiftool" "-ver"]
+       (apply sh)
+       :out
+       string/trim-newline))
+
+(def exiftool-options ["-j" "-s" "-a" "-u" "-G1"])
+
+(def exiftool-command
+  (-> "exiftool"
+      (cons exiftool-options)
+      vec))
 
 (defn extract-metadata
   [^java.io.File file]
   (->> file
        .getAbsolutePath
-       (sh "exiftool" "-s" "-a" "-u" "-G1")
-       :out
-       string/split-lines
-       (map replace-group-string)
-       (map #(string/split % #":\s"))
-       ; -------------------------------------
-       ; sometimes there is nothing behind `:`
-       (map #(if (= (count %) 1) (conj % "") %))
-       ; -------------------------------------
-       flatten
-       (map string/trim)
-       (apply hash-map)))
+       (conj exiftool-command)
+       (apply sh)
+       :out))
