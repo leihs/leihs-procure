@@ -11,21 +11,24 @@
 (defn search-query
   [sql-query term]
   (let [term-percent (str "%" term "%")]
-    (->
-      sql-query
-      (sql/merge-join :rooms [:= :procurement_requests.room_id :rooms.id])
-      (sql/merge-join :buildings [:= :rooms.building_id :buildings.id])
-      (sql/merge-join :users [:= :procurement_requests.user_id :users.id])
-      (sql/merge-where
-        [:or ["~~*" :buildings.name term-percent]
-         ["~~*" :procurement_requests.article_name term-percent]
-         ["~~*" :procurement_requests.article_number term-percent]
-         ["~~*" :procurement_requests.inspection_comment term-percent]
-         ["~~*" :procurement_requests.motivation term-percent]
-         ["~~*" :procurement_requests.receiver term-percent]
-         ["~~*" :procurement_requests.supplier_name term-percent]
-         ["~~*" :rooms.name term-percent] ["~~*" :users.firstname term-percent]
-         ["~~*" :users.lastname term-percent]]))))
+    (-> sql-query
+        (sql/merge-join :rooms [:= :procurement_requests.room_id :rooms.id])
+        (sql/merge-join :buildings [:= :rooms.building_id :buildings.id])
+        (sql/merge-join :users [:= :procurement_requests.user_id :users.id])
+        ; NOTE: models are joined in the base-query already
+        (sql/merge-where
+          [:or ["~~*" :buildings.name term-percent]
+           ["~~*" :procurement_requests.article_name term-percent]
+           ["~~*" :procurement_requests.article_number term-percent]
+           ["~~*" :procurement_requests.inspection_comment term-percent]
+           ["~~*" :procurement_requests.motivation term-percent]
+           ["~~*" :procurement_requests.receiver term-percent]
+           ["~~*" :procurement_requests.supplier_name term-percent]
+           ["~~*" :rooms.name term-percent]
+           ["~~*" :models.product term-percent]
+           ["~~*" :models.version term-percent]
+           ["~~*" :users.firstname term-percent]
+           ["~~*" :users.lastname term-percent]]))))
 
 (defn requests-query-map
   [context arguments value]
