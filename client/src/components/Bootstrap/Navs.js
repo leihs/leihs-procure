@@ -55,6 +55,8 @@ export const NavbarBrand = ({ tag, to, ...p }) => (
 
 export const DropdownItemLink = p => <DropdownItem tag={RouterNavLink} {...p} />
 
+// TODO: move most of those to ../Router:
+
 // like ReactRouter.NavLink but for anything that wants to know if its "active".
 export const Routed = ({ children, ...p }) => (
   <RouterRoute {...p}>

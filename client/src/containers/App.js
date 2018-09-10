@@ -5,10 +5,8 @@ import { Query } from 'react-apollo'
 
 import Loading from '../components/Loading'
 import { ErrorPanel, FatalErrorScreen, getErrorCode } from '../components/Error'
-import {
-  AlertDismissable,
-  RouteParams as Routed
-} from '../components/Bootstrap'
+import { Alert } from '../components/Bootstrap'
+import { Routed } from '../components/Router'
 import MainNav from '../components/MainNav'
 import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
 
@@ -26,7 +24,7 @@ class App extends Component {
   render({ props: { children, isDev } } = this) {
     return (
       <Routed>
-        {({ location }) => {
+        {({ location, dismissFlash }) => {
           const locationKey = location.key || JSON.stringify(location)
 
           return (
@@ -63,7 +61,10 @@ class App extends Component {
                         contactUrl={data.settings.contact_url}
                       />
                       <div className="minh-100vh">
-                        <FlashAlert {...f.get(location, 'state.flash')} />
+                        <FlashAlert
+                          flash={f.get(location, 'state.flash')}
+                          dismiss={dismissFlash}
+                        />
                         {children}
                       </div>
                     </F>
@@ -80,11 +81,11 @@ class App extends Component {
 
 export default App
 
-const FlashAlert = ({ message, level = 'info' }) =>
+const FlashAlert = ({ flash: { message, level = 'info' } = {}, dismiss }) =>
   !!message && (
-    <AlertDismissable fade={false} color={level} className="rounded-0">
+    <Alert fade={false} color={level} className="rounded-0" toggle={dismiss}>
       {message}
-    </AlertDismissable>
+    </Alert>
   )
 
 const ErrorHandler = ({ error, data, refetch }) => {
