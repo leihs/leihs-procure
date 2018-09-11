@@ -168,6 +168,7 @@ const RequestsTree = ({
                       >
                         <RequestLine
                           request={r}
+                          compactEditForm
                           editQuery={editQuery}
                           doChangeRequestCategory={doChangeRequestCategory}
                           doChangeBudgetPeriod={doChangeBudgetPeriod}

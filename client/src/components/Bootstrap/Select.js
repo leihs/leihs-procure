@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
+import f from 'lodash'
 
 import { __Node as Node } from './Bootstrap'
 
@@ -31,6 +32,8 @@ const Select = ({
 }) => {
   const selectedValue = getSelectedValueFromProps(value, multiple)
   if (emptyOption === true) emptyOption = Select.defaultProps.emptyOption
+  if (f.isString(emptyOption))
+    emptyOption = { children: emptyOption, value: '' }
   return (
     <Node
       tag="select"
@@ -86,6 +89,7 @@ Select.propTypes = {
   ),
   emptyOption: PropTypes.oneOfType([
     PropTypes.bool,
+    PropTypes.string,
     PropTypes.shape({
       children: PropTypes.string.isRequired,
       value: PropTypes.string

@@ -14,21 +14,23 @@ class RequestLine extends React.Component {
   state = {
     open: false
   }
-  render({ props: { request, ...props }, state: { open } } = this) {
+  render(
+    { props: { request, compactEditForm, ...props }, state: { open } } = this
+  ) {
     const closeLine = () => this.setState({ open: false })
     const isChanged = false // FIXME: detect form changed state
     const wrapperStyle = cx(
       open ? 'border-top border-bottom' : 'bg-primary-shy-hover'
     )
     const lineStyle = cx(
-      { 'cursor-pointer': !open || !isChanged },
-
-      open && [
-        'border border-top-0 border-right-0 border-left-0',
-        'border-style-dashed',
-        // 'o-50'
-        'bg-primary-shy'
-      ]
+      !open
+        ? 'cursor-pointer'
+        : [
+            'border border-top-0 border-right-0 border-left-0',
+            'border-style-dashed',
+            // 'o-50'
+            'bg-primary-shy'
+          ]
     )
 
     return (
@@ -50,6 +52,7 @@ class RequestLine extends React.Component {
             <F>
               <RequestEdit
                 className="p-3"
+                compactView={compactEditForm}
                 requestId={request.id}
                 onCancel={closeLine}
                 onSuccess={closeLine}

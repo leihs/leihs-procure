@@ -114,12 +114,21 @@ export const FormGroup = ({
   label,
   hideLabel,
   labelSmall,
+  labelWidth = '4',
   helpText,
   children,
-  row,
+  horizontal,
   ...props
 }) => {
-  const cls = [{ row }, props.cls, props.className, 'form-group']
+  const cls = [
+    { 'form-row': horizontal },
+    props.cls,
+    props.className,
+    'form-group'
+  ]
+
+  const inputWrapCls = horizontal && 'col-sm'
+
   const labelContent = !!(label || labelSmall) && (
     <F>
       {label}
@@ -135,11 +144,17 @@ export const FormGroup = ({
   return (
     <Node {...props} cls={cls}>
       {labelContent && (
-        <Label htmlFor={id} cls={{ 'sr-only': hideLabel }}>
+        <Label
+          htmlFor={id}
+          cls={{
+            'sr-only': hideLabel,
+            [`col-form-label col-sm-${labelWidth}`]: horizontal
+          }}
+        >
           {labelContent}{' '}
         </Label>
       )}
-      {!!children && <Div>{children} </Div>}
+      {!!children && <Div cls={inputWrapCls}>{children} </Div>}
       {helpText && (
         <Small id={`${id}--Help`} cls="form-text text-muted">
           {f.trim(helpText)}{' '}
@@ -349,6 +364,7 @@ export const FormField = ({
   hideLabel,
   labelSmall,
   inputLabel,
+  horizontal,
   ...restProps
 }) => {
   if (children) {
@@ -369,6 +385,7 @@ export const FormField = ({
       hideLabel={hideLabel}
       labelSmall={labelSmall}
       helpText={helpText}
+      horizontal={horizontal}
     >
       {beforeInput}
       {inputNode}

@@ -2,6 +2,7 @@ import React, { Fragment as F } from 'react'
 // import PropTypes from 'prop-types'
 import cx from 'classnames'
 import f from 'lodash'
+import { Link } from 'react-router-dom'
 
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
@@ -12,6 +13,7 @@ import {
   InputFileUpload,
   FormGroup,
   FormField,
+  InputField,
   Select,
   ButtonRadio,
   StatefulForm,
@@ -65,7 +67,15 @@ class RequestForm extends React.Component {
   render(
     {
       state,
-      props: { request, id, className, onCancel, onSubmit, ...props }
+      props: {
+        request,
+        id,
+        className,
+        onCancel,
+        onSubmit,
+        compactView,
+        ...props
+      }
     } = this
   ) {
     const formId = id || request.id
@@ -80,13 +90,15 @@ class RequestForm extends React.Component {
           const formPropsFor = key => {
             const required = request[key] ? request[key].required : null
             const readOnly = request[key] ? !request[key].write : null
+            const labelTxt = t(`request_form_field.${key}`)
             return {
               ...formHelpers.formPropsFor(key),
-              // add translated labels:
-              label: requiredLabel(t(`request_form_field.${key}`), required),
+              // add translated labels, with 'required' marker if writable
+              label: readOnly ? labelTxt : requiredLabel(labelTxt, required),
               hidden: request[key] ? !request[key].read : false,
               required,
-              readOnly
+              readOnly,
+              ...(readOnly && { type: 'text-static' })
             }
           }
 
@@ -94,6 +106,7 @@ class RequestForm extends React.Component {
             <form
               id={formId}
               className={cx(className, {
+                'form-compact': compactView,
                 'was-validated': this.state.showValidations
               })}
               onSubmit={e => {
@@ -119,9 +132,15 @@ class RequestForm extends React.Component {
                         <Row cls="no-gutters">
                           <Col sm>
                             {!fields._model_as_id ? (
-                              <FormField {...articleField} />
+                              <FormField
+                                horizontal={compactView}
+                                {...articleField}
+                              />
                             ) : (
-                              <FormGroup label={articleField.label}>
+                              <FormGroup
+                                horizontal={compactView}
+                                label={articleField.label}
+                              >
                                 <ModelAutocomplete
                                   {...modelField}
                                   label={articleField.label}
@@ -130,19 +149,23 @@ class RequestForm extends React.Component {
                               </FormGroup>
                             )}
                           </Col>
-                          <Col sm="3" cls="pl-sm-3">
+                          {/* TMP  hidden */}
+                          {/* <Col sm="3" cls="pl-sm-3">
                             <FieldTypeToggle
                               {...formPropsFor('_model_as_id')}
                               checked={formPropsFor('_model_as_id').value}
                               disabled={articleField.readOnly}
                             />
-                          </Col>
+                          </Col> */}
                         </Row>
                       )
                     }}
                   </Let>
 
-                  <FormField {...formPropsFor('article_number')} />
+                  <FormField
+                    horizontal={compactView}
+                    {...formPropsFor('article_number')}
+                  />
 
                   <RequestInput field={formPropsFor('supplier')}>
                     {supplierField => (
@@ -150,31 +173,40 @@ class RequestForm extends React.Component {
                         <Col sm>
                           {!fields._supplier_as_id ? (
                             <FormField
+                              horizontal={compactView}
                               {...formPropsFor('supplier_name')}
                               readOnly={supplierField.readOnly}
                             />
                           ) : (
-                            <FormGroup label={supplierField.label}>
+                            <FormGroup
+                              horizontal={compactView}
+                              label={supplierField.label}
+                            >
                               <SupplierAutocomplete {...supplierField} />
                             </FormGroup>
                           )}
                         </Col>
-                        <Col sm="3" cls="pl-sm-3">
+                        {/* TMP  hidden */}
+                        {/* <Col sm="3" cls="pl-sm-3">
                           <FieldTypeToggle
                             {...formPropsFor('_supplier_as_id')}
                             disabled={supplierField.readOnly}
                           />
-                        </Col>
+                        </Col> */}
                       </Row>
                     )}
                   </RequestInput>
 
-                  <FormField {...formPropsFor('receiver')} />
+                  <FormField
+                    horizontal={compactView}
+                    {...formPropsFor('receiver')}
+                  />
 
                   <RequestInput field={formPropsFor('room')}>
                     {roomField => (
                       <F>
                         <FormGroup
+                          horizontal={compactView}
                           label={requiredLabel(
                             formPropsFor('building').label,
                             roomField.required
@@ -188,7 +220,10 @@ class RequestForm extends React.Component {
                           />
                         </FormGroup>
 
-                        <FormGroup label={roomField.label}>
+                        <FormGroup
+                          horizontal={compactView}
+                          label={roomField.label}
+                        >
                           <RoomAutocomplete
                             {...roomField}
                             disabled={roomField.readOnly}
@@ -200,16 +235,19 @@ class RequestForm extends React.Component {
                   </RequestInput>
 
                   <FormField
+                    horizontal={compactView}
                     type="textarea"
-                    minRows="5"
                     {...formPropsFor('motivation')}
                   />
 
-                  <Row>
-                    <RequestInput field={formPropsFor('priority')}>
-                      {field => (
-                        <Col sm>
-                          <FormGroup label={field.label}>
+                  <Let
+                    priority={
+                      <RequestInput field={formPropsFor('priority')}>
+                        {field => (
+                          <FormGroup
+                            horizontal={compactView}
+                            label={field.label}
+                          >
                             <Select
                               {...field}
                               options={CONSTANTS.REQUEST_PRIORITIES.map(v => ({
@@ -218,14 +256,16 @@ class RequestForm extends React.Component {
                               }))}
                             />
                           </FormGroup>
-                        </Col>
-                      )}
-                    </RequestInput>
-
-                    <RequestInput field={formPropsFor('inspector_priority')}>
-                      {field => (
-                        <Col sm>
-                          <FormGroup label={field.label}>
+                        )}
+                      </RequestInput>
+                    }
+                    inspectorPriority={
+                      <RequestInput field={formPropsFor('inspector_priority')}>
+                        {field => (
+                          <FormGroup
+                            horizontal={compactView}
+                            label={field.label}
+                          >
                             <Select
                               {...field}
                               options={CONSTANTS.REQUEST_INSPECTOR_PRIORITIES.map(
@@ -236,14 +276,28 @@ class RequestForm extends React.Component {
                               )}
                             />
                           </FormGroup>
-                        </Col>
-                      )}
-                    </RequestInput>
-                  </Row>
+                        )}
+                      </RequestInput>
+                    }
+                  >
+                    {({ priority, inspectorPriority }) =>
+                      compactView ? (
+                        <F>
+                          {priority}
+                          {inspectorPriority}
+                        </F>
+                      ) : (
+                        <Row>
+                          <Col sm>{priority}</Col>
+                          <Col sm>{inspectorPriority}</Col>
+                        </Row>
+                      )
+                    }
+                  </Let>
 
                   <RequestInput field={formPropsFor('replacement')}>
                     {field => (
-                      <FormGroup label={field.label}>
+                      <FormGroup horizontal={compactView} label={field.label}>
                         <ButtonRadio
                           {...formPropsFor('replacement')}
                           value={
@@ -268,121 +322,177 @@ class RequestForm extends React.Component {
                 </Col>
 
                 <Col lg>
-                  <Row>
-                    <Col sm="8">
+                  <Let
+                    price={
                       <RequestInput field={formPropsFor('price_cents')}>
-                        {priceField => (
-                          <FormField
-                            type="number-integer"
-                            {...priceField}
-                            labelSmall={t('request_form_field.price_help')}
-                            helpText="Bitte nur ganze Zahlen eingeben"
-                            value={
-                              f.isNumber(priceField.value)
-                                ? priceField.value / 100
-                                : priceField.value
-                            }
-                            onChange={e => {
-                              const val = parseInt(e.target.value, 10)
-                              const num = parseInt(val, 10)
-                              setValue(
-                                'price_cents',
-                                f.isNumber(num) && !f.isNaN(num)
-                                  ? num * 100
-                                  : val
-                              )
-                            }}
-                          />
-                        )}
+                        {priceField => {
+                          const price = f.isNumber(priceField.value)
+                            ? priceField.value / 100
+                            : priceField.value
+                          return (
+                            <FormGroup
+                              label={priceField.label}
+                              labelSmall={t('request_form_field.price_help')}
+                              helpText={
+                                !priceField.readOnly &&
+                                'Bitte nur ganze Zahlen eingeben'
+                              }
+                            >
+                              {priceField.readOnly ? (
+                                <samp className="form-control-plaintext">
+                                  {formatCurrency(price)}
+                                </samp>
+                              ) : (
+                                <InputField
+                                  {...priceField}
+                                  type="number-integer"
+                                  value={price}
+                                  onChange={e => {
+                                    const val = parseInt(e.target.value, 10)
+                                    const num = parseInt(val, 10)
+                                    setValue(
+                                      'price_cents',
+                                      f.isNumber(num) && !f.isNaN(num)
+                                        ? num * 100
+                                        : val
+                                    )
+                                  }}
+                                />
+                              )}
+                            </FormGroup>
+                          )
+                        }}
                       </RequestInput>
-                    </Col>
-
-                    <Col sm="4">
+                    }
+                    total={
                       <FormGroup
                         name="price_total"
                         label={t('request_form_field.price_total')}
                         labelSmall={t('request_form_field.price_help')}
                       >
-                        <samp>{formatCurrency(TotalAmount(fields))}</samp>
+                        <samp className="form-control-plaintext">
+                          {formatCurrency(TotalAmount(fields))}
+                        </samp>
                       </FormGroup>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col sm>
-                      <FormField
-                        {...formPropsFor('requested_quantity')}
-                        type="number-integer"
-                      />
-                    </Col>
-                    <Col sm>
-                      <Let field={formPropsFor('approved_quantity')}>
-                        {({ field }) => (
-                          <FormField
-                            type="number-integer"
-                            max={fields.requested_quantity}
-                            {...field}
-                            onChange={({ target: { value } }) => {
-                              setValue('approved_quantity', value)
-                              setValue('order_quantity', value)
-                            }}
-                          />
-                        )}
-                      </Let>
-                    </Col>
-                    <Col sm>
-                      <FormField
-                        {...formPropsFor('order_quantity')}
-                        type="number-integer"
-                      />
-                    </Col>
-                  </Row>
+                    }
+                  >
+                    {({ price, total }) => (
+                      <Row>
+                        <Col sm="6">{price}</Col>
+                        <Col sm="6">{total}</Col>
+                      </Row>
+                    )}
+                  </Let>
+
+                  <Let
+                    approved={formPropsFor('approved_quantity')}
+                    requested={formPropsFor('requested_quantity')}
+                    order={formPropsFor('order_quantity')}
+                  >
+                    {({ approved, requested, order }) => {
+                      const allRW = !f.any(
+                        [approved, requested, order],
+                        'readOnly'
+                      )
+                      // debugger
+                      const inputProps = { cls: 'text-left monospace' }
+                      const groupProps = { horizontal: allRW, labelWidth: 6 }
+                      return (
+                        <Row cls="form-row">
+                          <Col sm>
+                            <FormGroup {...groupProps} label={requested.label}>
+                              <InputField
+                                type="number-integer"
+                                {...inputProps}
+                                {...requested}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm cls="ml-2">
+                            <FormGroup {...groupProps} label={approved.label}>
+                              <InputField
+                                type="number-integer"
+                                {...inputProps}
+                                {...approved}
+                                max={fields.requested_quantity}
+                                onChange={({ target: { value } }) => {
+                                  setValue('approved_quantity', value)
+                                  setValue('order_quantity', value)
+                                }}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm cls="ml-2">
+                            <FormGroup {...groupProps} label={order.label}>
+                              <InputField
+                                type="number-integer"
+                                {...inputProps}
+                                {...order}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      )
+                    }}
+                  </Let>
 
                   <RequestInput field={formPropsFor('inspection_comment')}>
-                    {field => (
-                      <FormField
-                        type="textarea"
-                        {...field}
-                        // NOTE: Give Reason when Partially Accepting or Denying
-                        required={
-                          field.required ||
-                          isInspectedButNotFullyApproved(fields)
-                        }
-                        invalidFeedback={t(
-                          'request.give_reason_when_partially_accepting_or_denying'
-                        )}
-                        beforeInput={
-                          !field.readOnly && (
-                            <Select
-                              m="b-3"
-                              cls="form-control-sm"
-                              options={['foo', 'bar', 'baz'].map(s => ({
-                                value: s,
-                                label: s
-                              }))}
-                              disabled={field.readOnly}
-                              // NOTE: we dont want to keep the selected value and just use it once.
-                              // Always setting empty value makes it controlled and React resets it for us!
-                              value={''}
-                              onChange={({ target: { value } }) => {
-                                setValue(
-                                  'inspection_comment',
-                                  value + '\n' + getValue('inspection_comment')
-                                )
-                              }}
-                            />
-                          )
-                        }
-                      />
-                    )}
+                    {field =>
+                      !(field.readOnly && !f.present(field.value)) && (
+                        <FormField
+                          horizontal={compactView}
+                          type="textarea"
+                          {...field}
+                          // NOTE: Give Reason when Partially Accepting or Denying
+                          required={
+                            field.required ||
+                            isInspectedButNotFullyApproved(fields)
+                          }
+                          invalidFeedback={t(
+                            'request.give_reason_when_partially_accepting_or_denying'
+                          )}
+                          afterInput={
+                            !field.readOnly && (
+                              <Select
+                                m="t-3"
+                                cls="form-control-sm"
+                                emptyOption="- Textvorlage einfügen -"
+                                options={['foo', 'bar', 'baz'].map(s => ({
+                                  value: s,
+                                  label: s
+                                }))}
+                                // NOTE: we dont want to keep the selected value and just use it once.
+                                // Always setting empty value makes it controlled and React resets it for us!
+                                value={''}
+                                onChange={({ target: { value } }) => {
+                                  setValue(
+                                    'inspection_comment',
+                                    value +
+                                      '\n' +
+                                      getValue('inspection_comment')
+                                  )
+                                }}
+                              />
+                            )
+                          }
+                        />
+                      )
+                    }
                   </RequestInput>
-                  <FormGroup label={t('request_form_field.attachments')}>
+                  <FormGroup
+                    horizontal={compactView}
+                    label={t('request_form_field.attachments')}
+                  >
                     <InputFileUpload {...formPropsFor('attachments')} />
                   </FormGroup>
                   <RequestInput field={formPropsFor('user')}>
                     {userField =>
                       // NOTE: don't show at all if not writable
                       !userField.readOnly && (
-                        <FormGroup label={userField.label}>
+                        <FormGroup
+                          horizontal={compactView}
+                          label={userField.label}
+                        >
                           <UserAutocomplete onlyRequesters {...userField} />
                         </FormGroup>
                       )
@@ -393,7 +503,10 @@ class RequestForm extends React.Component {
                       // NOTE: don't show at all if not writable
                       !accTypeField.readOnly && (
                         <F>
-                          <FormGroup label={accTypeField.label}>
+                          <FormGroup
+                            horizontal={compactView}
+                            label={accTypeField.label}
+                          >
                             <ButtonRadio
                               {...accTypeField}
                               options={['aquisition', 'investment'].map(k => ({
@@ -405,45 +518,49 @@ class RequestForm extends React.Component {
                             />
                           </FormGroup>
 
-                          {!!accTypeField.value &&
-                            (accTypeField.value !== 'investment' ? (
-                              <Row>
-                                <Col>
-                                  <FormField
-                                    {...formPropsFor('cost_center')}
-                                    readOnly
-                                  />
-                                </Col>
-                                <Col>
-                                  <FormField
-                                    {...formPropsFor('procurement_account')}
-                                    readOnly
-                                  />
-                                </Col>
-                              </Row>
-                            ) : (
-                              <Row>
-                                <Col sm>
-                                  <FormField
-                                    {...formPropsFor('internal_order_number')}
-                                    // NOTE: dependent field, always required *if* shown!
-                                    required={true}
-                                    label={requiredLabel(
-                                      formPropsFor('internal_order_number')
-                                        .label,
-                                      true
-                                    )}
-                                  />
-                                </Col>
+                          {!!accTypeField.value && (
+                            <Let
+                              costCenter={formPropsFor('cost_center')}
+                              account={formPropsFor('procurement_account')}
+                              orderNr={formPropsFor('internal_order_number')}
+                              pAccount={formPropsFor('general_ledger_account')}
+                            >
+                              {({ costCenter, account, orderNr, pAccount }) =>
+                                accTypeField.value !== 'investment' ? (
+                                  <Row>
+                                    <Col>
+                                      <FormField {...costCenter} readOnly />
+                                    </Col>
+                                    <Col>
+                                      <FormField {...account} readOnly />
+                                    </Col>
+                                  </Row>
+                                ) : (
+                                  <Row>
+                                    <Col sm>
+                                      <FormField
+                                        {...orderNr}
+                                        // NOTE: dependent field, always required *if* shown!
+                                        required={true}
+                                        label={requiredLabel(
+                                          orderNr.label,
+                                          true
+                                        )}
+                                      />
+                                    </Col>
 
-                                <Col sm>
-                                  <FormField
-                                    {...formPropsFor('general_ledger_account')}
-                                    readOnly
-                                  />
-                                </Col>
-                              </Row>
-                            ))}
+                                    <Col sm>
+                                      <FormField
+                                        horizontal={compactView}
+                                        {...pAccount}
+                                        readOnly
+                                      />
+                                    </Col>
+                                  </Row>
+                                )
+                              }
+                            </Let>
+                          )}
                         </F>
                       )
                     }
@@ -451,12 +568,13 @@ class RequestForm extends React.Component {
                 </Col>
               </Row>
 
-              <hr m="mt-0" />
+              <hr className="mt-1 border-style-dashed" />
 
-              <Row m="t-5">
+              <Row m="t-3">
                 <Col lg>
                   {!!props.doChangeRequestCategory && (
                     <SelectionDropdown
+                      size="sm"
                       toggle={props.onSelectNewRequestCategory}
                       isOpen={props.isSelectingNewCategory}
                       options={props.categories.map(mc => ({
@@ -486,9 +604,9 @@ class RequestForm extends React.Component {
                       <Icon.Exchange /> {t('form_btn_move_category')}
                     </SelectionDropdown>
                   )}
-
                   {!!props.doChangeBudgetPeriod && (
                     <SelectionDropdown
+                      size="sm"
                       toggle={props.onSelectNewBudgetPeriod}
                       isOpen={props.isSelectingNewBudgetPeriod}
                       options={[
@@ -520,11 +638,10 @@ class RequestForm extends React.Component {
                       <Icon.BudgetPeriod /> {t('form_btn_change_budget_period')}
                     </SelectionDropdown>
                   )}
-
                   {!!props.doDeleteRequest && (
                     <button
                       type="button"
-                      className="btn m-1 btn-outline-danger btn-massive"
+                      className="btn btn-sm m-1 btn-outline-danger btn-massive"
                       onClick={props.doDeleteRequest}
                     >
                       <Icon.Trash /> {t('form_btn_delete')}
@@ -533,18 +650,8 @@ class RequestForm extends React.Component {
                 </Col>
 
                 <Col lg order="first" className="mt-3 mt-lg-0">
-                  {!onSubmit ? (
-                    !!onCancel && (
-                      <button
-                        type="button"
-                        className="btn m-1 btn-outline-secondary btn-massive"
-                        onClick={onCancel}
-                      >
-                        {t('form_btn_close')}
-                      </button>
-                    )
-                  ) : (
-                    <F>
+                  <F>
+                    {!!onSubmit && (
                       <button
                         type="submit"
                         className="btn m-1 btn-primary btn-massive"
@@ -552,16 +659,27 @@ class RequestForm extends React.Component {
                       >
                         <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                       </button>
-                      {!!onCancel && (
-                        <button
-                          type="button"
-                          className="btn m-1 btn-outline-secondary btn-massive"
-                          onClick={onCancel}
-                        >
-                          {t('form_btn_cancel')}
-                        </button>
-                      )}
-                    </F>
+                    )}
+                    {!!onCancel && (
+                      <button
+                        type="button"
+                        className="btn m-1 btn-outline-secondary btn-massive"
+                        onClick={onCancel}
+                      >
+                        {onSubmit ? t('form_btn_cancel') : t('form_btn_close')}
+                      </button>
+                    )}
+                  </F>
+
+                  {request.id && (
+                    <Link
+                      className="btn m-1 btn-link"
+                      to={`/requests/${request.id}`}
+                    >
+                      <small>
+                        <em>Link zum Antrag</em>
+                      </small>
+                    </Link>
                   )}
                 </Col>
               </Row>
@@ -588,13 +706,19 @@ const SelectionDropdown = ({
   isOpen,
   children,
   menuStyle,
-  options
+  options,
+  size
 }) => (
   <ButtonDropdown direction="down" toggle={toggle} isOpen={isOpen}>
-    <DropdownToggle caret className="btn m-1 btn-outline-dark btn-massive">
+    <DropdownToggle
+      size={size}
+      caret
+      className="btn m-1 btn-outline-dark btn-massive"
+    >
       {children}
     </DropdownToggle>
     <DropdownMenu
+      size={size}
       style={{
         maxHeight: '15rem',
         overflow: 'hidden',
@@ -617,25 +741,26 @@ const SelectionDropdown = ({
   </ButtonDropdown>
 )
 
-const FieldTypeToggle = ({ id, value, label, ...props }) => (
-  <FormGroup>
-    <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
-      <input
-        type="checkbox"
-        className="custom-control-input"
-        formNoValidate
-        id={id}
-        {...props}
-        checked={value}
-        value={undefined}
-        label={undefined}
-      />
-      <label className="custom-control-label" htmlFor={id}>
-        <small>{label.replace(/\s/g, nbsp)}</small>
-      </label>
-    </div>
-  </FormGroup>
-)
+// FIXME: re-enable this or make option for InlineSearch to allow plain text
+// const FieldTypeToggle = ({ id, value, label, ...props }) => (
+//   <FormGroup>
+//     <div className="custom-control custom-checkbox mt-sm-4 pt-sm-3">
+//       <input
+//         type="checkbox"
+//         className="custom-control-input"
+//         formNoValidate
+//         id={id}
+//         {...props}
+//         checked={value}
+//         value={undefined}
+//         label={undefined}
+//       />
+//       <label className="custom-control-label" htmlFor={id}>
+//         <small>{label.replace(/\s/g, nbsp)}</small>
+//       </label>
+//     </div>
+//   </FormGroup>
+// )
 
 const isInspectedButNotFullyApproved = fields => {
   const approved_quantity = parseInt(fields.approved_quantity, 10)

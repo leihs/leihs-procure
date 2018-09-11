@@ -20,5 +20,6 @@ export {
   Alert,
   UncontrolledAlert as AlertDismissable,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
+  ButtonToolbar
 } from 'reactstrap'
