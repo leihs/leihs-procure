@@ -5,7 +5,18 @@ import { Link } from 'react-router-dom'
 import { stringify as stringifyQuery } from 'qs'
 
 import t from '../locale/translate'
-import { Row, Col, Button, Collapsing, Tooltipped } from './Bootstrap'
+import {
+  Row,
+  Col,
+  Button,
+  ButtonToolbar,
+  // UncontrolledDropdown as Dropdown,
+  // DropdownToggle,
+  // DropdownMenu,
+  // DropdownItem,
+  Collapsing,
+  Tooltipped
+} from './Bootstrap'
 import { formatCurrency, budgetPeriodDates } from './decorators'
 import { MainWithSidebar } from './Layout'
 import Icon from './Icons'
@@ -19,66 +30,85 @@ import FilterBar from './RequestsFilterBar'
 import logger from 'debug'
 const log = logger('app:ui:RequestsDashboard')
 
-const RequestsDashboard = props => {
-  log('render', { props })
-  const { requestsQuery, refetchAllData } = props
+class RequestsDashboard extends React.Component {
+  render({ props } = this) {
+    log('render', { props })
+    const { requestsQuery, refetchAllData } = props
 
-  const requestTotalCount =
-    f.get(requestsQuery, 'data.dashboard.total_count') || 0
+    const requestTotalCount =
+      f.get(requestsQuery, 'data.dashboard.total_count') || 0
 
-  const pageHeader = (
-    <Row>
-      <Col>
-        <h4>
-          {requestsQuery.loading || !requestsQuery.data
-            ? ' '
-            : `${requestTotalCount} ${
-                requestTotalCount === 1
-                  ? t('dashboard.requests_title_singular')
-                  : t('dashboard.requests_title_plural')
-              }`}
-        </h4>
-      </Col>
-      <Col xs="1" cls="text-right">
-        <Button color="link" title="refresh data" onClick={refetchAllData}>
-          <Icon.Reload spin={requestsQuery.loading} />
-        </Button>
-      </Col>
-    </Row>
-  )
+    const pageHeader = (
+      <Row cls="pt-1">
+        <Col sm>
+          <h4>
+            {requestsQuery.loading || !requestsQuery.data
+              ? ' '
+              : `${requestTotalCount} ${
+                  requestTotalCount === 1
+                    ? t('dashboard.requests_title_singular')
+                    : t('dashboard.requests_title_plural')
+                }`}
+          </h4>
+        </Col>
+        <Col sm cls="d-flex justify-content-end align-items-end">
+          <ButtonToolbar size="sm" className="mb-2">
+            {/* TODO: export menu
+            <Dropdown size="sm" small className="mr-1 mb-1">
+              <DropdownToggle caret outline size="sm">
+                <Icon.FileDownload /> {'Export'}
+              </DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem>Dropdown Link</DropdownItem>
+                <DropdownItem>Dropdown Link</DropdownItem>
+              </DropdownMenu>
+            </Dropdown> */}
+            <Button
+              size="sm"
+              cls="mr-1 mb-1"
+              outline
+              title="refresh data"
+              onClick={refetchAllData}
+            >
+              <Icon.Reload spin={requestsQuery.loading} />
+            </Button>
+          </ButtonToolbar>
+        </Col>
+      </Row>
+    )
 
-  return (
-    <MainWithSidebar
-      sidebar={
-        <FilterBar
-          filters={props.filters}
-          currentFilters={props.currentFilters}
-          onFilterChange={props.onFilterChange}
-        />
-      }
-    >
-      {pageHeader}
-
-      <CurrentUser>
-        {me => (
-          <RequestsTree
-            requestsQuery={requestsQuery}
-            me={me}
-            refetchAllData={refetchAllData}
-            openPanels={props.openPanels}
-            onPanelToggle={props.onPanelToggle}
-            doChangeRequestCategory={props.doChangeRequestCategory}
-            doChangeBudgetPeriod={props.doChangeBudgetPeriod}
-            doDeleteRequest={props.doDeleteRequest}
-            editQuery={props.editQuery} //tmp?
-            filters={props.currentFilters} // tmp
+    return (
+      <MainWithSidebar
+        sidebar={
+          <FilterBar
+            filters={props.filters}
+            currentFilters={props.currentFilters}
+            onFilterChange={props.onFilterChange}
           />
-        )}
-      </CurrentUser>
-    </MainWithSidebar>
-  )
-}
+        }
+      >
+        {pageHeader}
 
+        <CurrentUser>
+          {me => (
+            <RequestsTree
+              requestsQuery={requestsQuery}
+              me={me}
+              refetchAllData={refetchAllData}
+              openPanels={props.openPanels}
+              onPanelToggle={props.onPanelToggle}
+              doChangeRequestCategory={props.doChangeRequestCategory}
+              doChangeBudgetPeriod={props.doChangeBudgetPeriod}
+              doDeleteRequest={props.doDeleteRequest}
+              editQuery={props.editQuery} //tmp?
+              filters={props.currentFilters} // tmp
+            />
+          )}
+        </CurrentUser>
+      </MainWithSidebar>
+    )
+  }
+}
 export default RequestsDashboard
 
 const RequestsTree = ({

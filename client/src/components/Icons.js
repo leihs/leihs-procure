@@ -46,7 +46,8 @@ import {
   faListUl,
   faCube,
   faSearch,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faFileDownload
 } from '@fortawesome/free-solid-svg-icons'
 
 const ICONS = {
@@ -127,6 +128,9 @@ const ICONS = {
   },
   Reload: {
     src: faSyncAlt
+  },
+  FileDownload: {
+    src: faFileDownload
   },
   Search: {
     src: faSearch
