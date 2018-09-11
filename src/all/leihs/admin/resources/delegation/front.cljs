@@ -4,14 +4,16 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.front :as users]
-    [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.utils.regex :as regex]
 
     [accountant.core :as accountant]
@@ -26,13 +28,13 @@
 
 
 (declare fetch-delegation fetch-resposible-user responsible-user-data*)
-(defonce delegation-id* (reaction (-> @state/routing-state* :route-params :delegation-id)))
+(defonce delegation-id* (reaction (-> @routing/state* :route-params :delegation-id)))
 (defonce delegation-data* (reagent/atom nil))
 
 (def fetch-delegation-id* (reagent/atom nil))
 (defn fetch-delegation []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :delegation (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :delegation (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
@@ -46,7 +48,7 @@
                      (= id @fetch-delegation-id*))
             (reset! delegation-data*
                     (merge (:body resp)
-                           (:query-params @state/routing-state*)))
+                           (:query-params @routing/state*)))
             (reset! responsible-user-data* nil)
             (fetch-resposible-user))))))
 
@@ -55,7 +57,7 @@
   (reaction
     (and (map? @delegation-data*)
          (boolean ((set '(:delegation-edit :delegation-add))
-                   (:handler-key @state/routing-state*))))))
+                   (:handler-key @routing/state*))))))
 
 
 ;;; responsible user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -178,7 +180,7 @@
       :value (:responsible_user_id @delegation-data*)
       :on-change #(swap! delegation-data* assoc :responsible_user_id (-> % .-target .-value presence))}]
     [:div.input-group-append
-     (case (:handler-key @state/routing-state*)
+     (case (:handler-key @routing/state*)
        :delegation [show-delegation-resonsible-user-input-append-component]
        :delegation-edit [edit-delegation-resonsible-user-input-append-component]
        :delegation-add [new-delegation-resonsible-user-input-append-component])]]])
@@ -193,15 +195,15 @@
              (path :delegation-edit
                    {:delegation-id @delegation-id*}
                    {:responsible_user_id (:id user)
-                    :name (-> @state/routing-state* :query-params :delegation-name)})
+                    :name (-> @routing/state* :query-params :delegation-name)})
              (path :delegation-add
                    {}
                    {:responsible_user_id (:id user)
-                    :name (-> @state/routing-state* :query-params :delegation-name)}))}
+                    :name (-> @routing/state* :query-params :delegation-name)}))}
     "Choose as responsible user"]])
 
 
-(def colconfig  
+(def colconfig
   (merge users/default-colconfig
          {:email false
           :customcols [{:key :choose
@@ -267,7 +269,7 @@
 
 (defn show-page []
   [:div.delegation
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
@@ -317,7 +319,7 @@
 
 (defn edit-page []
   [:div.edit-delegation
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
@@ -365,9 +367,9 @@
 
 (defn new-page []
   [:div.new-delegation
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount #(reset! delegation-data*
-                          (merge {} (:query-params @state/routing-state*)))}]
+                          (merge {} (:query-params @routing/state*)))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
@@ -389,7 +391,7 @@
 
 (defn delete-delegation [_]
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :delegation (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :delegation (-> @routing/state* :route-params))
                                :method :delete
                                :query-params {}}
                               {:title "Delete Delegation"
@@ -435,7 +437,7 @@
 
 (defn delete-page []
   [:div.delegation-delete
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row

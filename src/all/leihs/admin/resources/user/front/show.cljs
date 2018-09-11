@@ -4,12 +4,14 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.resources.user.front.shared :as user.shared :refer [clean-and-fetch user-id* user-data* edit-mode?*]]
 
     [accountant.core :as accountant]
@@ -25,7 +27,7 @@
 
 (defn page []
   [:div.user
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
@@ -33,8 +35,7 @@
       (breadcrumbs/admin-li)
       (breadcrumbs/users-li)
       (breadcrumbs/user-li @user-id*)]
-     [(breadcrumbs/api-tokens-li @user-id*)
-      (breadcrumbs/user-delete-li @user-id*)
+     [(breadcrumbs/user-delete-li @user-id*)
       (breadcrumbs/user-edit-li @user-id*)
       (breadcrumbs/email-li (:email @user-data*))
       (breadcrumbs/user-password-li @user-id*)])

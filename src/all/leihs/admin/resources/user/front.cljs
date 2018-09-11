@@ -8,7 +8,7 @@
     [leihs.admin.resources.user.front.shared :as user.shared]
     [leihs.admin.resources.user.front.show :as show]
     [leihs.admin.resources.user.front.password :as password]
-    [leihs.admin.utils.core :refer [keyword str presence]]))
+    [leihs.core.core :refer [keyword str presence]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

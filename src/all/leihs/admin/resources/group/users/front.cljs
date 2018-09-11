@@ -4,18 +4,19 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.admin.resources.group.users.shared :refer [group-users-filter-value]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.requests.core :as requests]
+    [leihs.core.icons :as icons]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.front.icons :as icons]
     [leihs.admin.resources.group.front :as group :refer [group-id*]]
+    [leihs.admin.resources.group.users.shared :refer [group-users-filter-value]]
     [leihs.admin.resources.users.front :as users]
-
-    [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.utils.regex :as regex]
 
     [clojure.contrib.inflect :refer [pluralize-noun]]
@@ -29,16 +30,16 @@
     [reagent.core :as reagent]))
 
 
-(def group-users-count* 
+(def group-users-count*
   (reaction (-> @users/data*
-                (get (:url @state/routing-state*) {})
+                (get (:url @routing/state*) {})
                 :group_users_count)))
 
 ;### actions ##################################################################
 
 (defn add-user [user-id]
   (let [resp-chan (async/chan)
-        id (requests/send-off 
+        id (requests/send-off
              {:url (path :group-user {:group-id @group-id* :user-id user-id})
               :method :put
               :query-params {}}
@@ -53,7 +54,7 @@
 
 (defn remove-user [user-id]
   (let [resp-chan (async/chan)
-        id (requests/send-off 
+        id (requests/send-off
              {:url (path :group-user {:group-id @group-id* :user-id user-id})
               :method :delete
               :query-params {}}
@@ -70,7 +71,7 @@
   [:th "Add or remove from this group"])
 
 (defn action-td-component [user]
-  [:td 
+  [:td
    (if (:group_id user)
      [:button.btn.btn-sm.btn-danger
       {:on-click (fn [_] (remove-user (:id user)))}
@@ -79,7 +80,7 @@
       {:on-click (fn [_] (add-user (:id user)))}
       icons/add " Add "])])
 
-(def colconfig  
+(def colconfig
   (merge users/default-colconfig
          {:email false
           :customcols [{:key :action
@@ -90,11 +91,11 @@
 ;### filter ###################################################################
 
 (defn group-users-filter-on-change [& args]
-  (accountant/navigate! 
-    (users/page-path-for-query-params 
+  (accountant/navigate!
+    (users/page-path-for-query-params
       {:page 1
-       :group-users-only (not (group-users-filter-value 
-                                     (:query-params @state/routing-state*)))})))
+       :group-users-only (not (group-users-filter-value
+                                     (:query-params @routing/state*)))})))
 
 (defn group-users-filter []
   [:div.form-group.ml-2.mr-2.mt-2
@@ -103,7 +104,7 @@
     [:input
      {:type :checkbox
       :on-change group-users-filter-on-change
-      :checked (group-users-filter-value (:query-params @state/routing-state*))
+      :checked (group-users-filter-value (:query-params @routing/state*))
       }]]])
 
 (defn filter-component []
@@ -129,7 +130,7 @@
 
 (defn main-page-component []
   [:div
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount users/escalate-query-paramas-update
      :did-update users/escalate-query-paramas-update}]
    [filter-component]
@@ -142,7 +143,7 @@
 
 (defn index-page []
   [:div.group-users
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount (fn [_] (group/clean-and-fetch))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)

@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.delegation.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
     [leihs.admin.resources.users.back :as users]
 
     [clojure.set :refer [rename-keys]]
@@ -124,5 +124,4 @@
 ;(debug/wrap-with-log-debug #'buffered-image->data-url-img)
 ;(debug/wrap-with-log-debug #'resized-img)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

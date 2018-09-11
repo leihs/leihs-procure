@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.user.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
 
     [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]
@@ -54,7 +54,7 @@
 
 
 
-    
+
 
 (def user-write-keys
   [:address
@@ -72,7 +72,6 @@
    :org_id
    :password_sign_in_enabled
    :phone
-   :pw_hash
    :url
    :zip])
 
@@ -196,8 +195,6 @@
   (catcher/with-logging
     {}
     (-> data
-        ;process-images
-        (insert-pw-hash tx)
         (select-keys user-write-keys)
         (rename-keys user-write-keymap))))
 
@@ -224,11 +221,11 @@
       sql/format))
 
 (defn inventory-pools-roles [user-id tx]
-  (->> user-id 
-       user-inventory-pools-roles-query 
+  (->> user-id
+       user-inventory-pools-roles-query
        (jdbc/query tx)))
 
-(defn user-inventory-pools-roles 
+(defn user-inventory-pools-roles
   [{tx :tx data :body {user-id :user-id} :route-params}]
   {:body
    {:inventory_pools_roles
@@ -272,5 +269,4 @@
 ;(debug/wrap-with-log-debug #'buffered-image->data-url-img)
 ;(debug/wrap-with-log-debug #'resized-img)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

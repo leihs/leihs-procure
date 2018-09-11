@@ -4,13 +4,15 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -19,9 +21,9 @@
     [reagent.core :as reagent]
     ))
 
-(def current-query-paramerters* 
-  (reaction (-> @state/routing-state* :query-params
-                (assoc :term (-> @state/routing-state* :query-params-raw :term)))))
+(def current-query-paramerters*
+  (reaction (-> @routing/state* :query-params
+                (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
 (def default-query-parameters {:is_admin nil
                                :role "any"

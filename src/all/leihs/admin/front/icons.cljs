@@ -1,10 +1,8 @@
-(ns leihs.admin.front.icons)
+(ns leihs.core.icons)
 
 (def abort [:i.fas.fa-times-circle])
 (def add [:i.fas.fa-plus-circle])
 (def admin [:i.fas.fa-wrench])
-(def api-token [:i.fas.fa-coins])
-(def api-tokens api-token)
 (def delegation [:i.fas.fa-hands-helping])
 (def delegations delegation)
 (def delete [:i.fas.fa-times])

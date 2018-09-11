@@ -5,15 +5,6 @@ feature 'Manage delegations', type: :feature do
 
   context 'an admin user and a bunch of other users and a bunch of delegations' do
 
-    let :sign_in_as_admin do
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @admin.email
-      fill_in 'password', with: @admin.password
-      click_on 'Sign in'
-    end
-
-
     before :each do
       @admins = 3.times.map do
         FactoryBot.create :admin
@@ -29,13 +20,12 @@ feature 'Manage delegations', type: :feature do
         FactoryBot.create :delegation
       end
 
-      sign_in_as_admin
+      sign_in_as @admin
     end
 
 
     scenario 'adding a new delegation ' do 
 
-      visit '/admin/'
       click_on 'Delegations'
       click_on 'Add delegation'
       fill_in 'name', with: 'Zuckerberg'

@@ -7,46 +7,16 @@ feature 'Passwords sign-in, sign-out properties ' do
       @user = FactoryBot.create :admin
     end
 
-    scenario 'changing the password as an admin does work' do
 
-      visit '/'
+    scenario 'disabling account_enabled immediatelly invalidates the session and prevents sign-in' do
 
-      click_on 'Sign in with password'
-      fill_in 'email', with: @user.email
-      fill_in 'password', with: @user.password
-      click_on 'Sign in'
+      sign_in_as @user
 
-      # set a new password in the user's edit page
-      click_on @user.email
-      click_on 'Password'
-      new_password = Faker::Internet.password(10, 20, true, true)
+      click_on "Users"
+      within '.users' do
+        click_on_first @user.lastname
+      end
 
-      fill_in 'password', with: new_password
-      click_on 'Set'
-      wait_until { not first('.modal')}
-
-      # sign in with the new password does work
-      click_on 'Sign out'
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @user.email
-      fill_in 'password', with: new_password
-      click_on 'Sign in'
-      expect(page).to have_content @user.email
-
-    end
-
-    scenario 'disabling sign_in_allowed immediatelly resets the session and prevents sign-in' do
-
-      visit '/'
-
-      click_on 'Sign in with password'
-      fill_in 'email', with: @user.email
-      fill_in 'password', with: @user.password
-      click_on 'Sign in'
-
-      # set a new password in the user's edit page
-      click_on @user.email
       click_on 'Edit'
       uncheck 'account_enabled'
       click_on 'Save'
@@ -58,27 +28,26 @@ feature 'Passwords sign-in, sign-out properties ' do
       # we are signed-out
       expect(page).not_to have_content @user.email
 
-      # we can not sign in
-      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
+      click_on 'Continue'
       fill_in 'password', with: @user.password
       click_on 'Sign in'
 
-      expect(page).not_to have_content @user.email
+      wait_until do
+        page.has_content? 'Password authentication failed!'
+      end
 
     end
 
     scenario 'disabling password_sign_in_allowed prevents password sign-in' do
 
-      visit '/'
+      sign_in_as @user
 
-      click_on 'Sign in with password'
-      fill_in 'email', with: @user.email
-      fill_in 'password', with: @user.password
-      click_on 'Sign in'
+      click_on "Users"
+      within '.users' do
+        click_on_first @user.lastname
+      end
 
-      # set a new password in the user's edit page
-      click_on @user.email
       click_on 'Edit'
       uncheck 'password_sign_in_enabled'
       click_on 'Save'
@@ -93,16 +62,16 @@ feature 'Passwords sign-in, sign-out properties ' do
       # we are signed-out
       expect(page).not_to have_content @user.email
 
-      # we can not sign in
-      click_on 'Sign in with password'
       fill_in 'email', with: @user.email
+      click_on 'Continue'
       fill_in 'password', with: @user.password
       click_on 'Sign in'
 
-      expect(page).not_to have_content @user.email
+      wait_until do
+        page.has_content? 'Password authentication failed!'
+      end
 
     end
-
   end
 end
 

@@ -4,13 +4,15 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [leihs.admin.utils.seq :refer [with-index]]
     [leihs.admin.resources.users.shared :as shared]
@@ -23,11 +25,11 @@
     [reagent.core :as reagent]
     ))
 
-(def current-query-paramerters* 
-  (reaction (-> @state/routing-state* :query-params
-                (assoc :term (-> @state/routing-state* :query-params-raw :term))))) 
+(def current-query-paramerters*
+  (reaction (-> @routing/state* :query-params
+                (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def current-url* (reaction (:url @state/routing-state*)))
+(def current-url* (reaction (:url @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
@@ -37,15 +39,15 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
-  "Fetches the the currernt url with accept/json 
-  after 1/5 second timeout if query-params have not changed in the meanwhile 
+  "Fetches the the currernt url with accept/json
+  after 1/5 second timeout if query-params have not changed in the meanwhile
   yet and stores the result in the map data* under this url."
   (let [url @current-url*
         normalized-query-params @current-query-paramerters-normalized*]
     (go (<! (timeout 200))
         (when (= url @current-url*)
           (let [resp-chan (async/chan)
-                id (requests/send-off {:url url 
+                id (requests/send-off {:url url
                                        :method :get}
                                       {:modal false
                                        :title "Fetch Users"
@@ -73,8 +75,8 @@
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn page-path-for-query-params [query-params]
-  (path (:handler-key @state/routing-state*) 
-        (:route-params @state/routing-state*)
+  (path (:handler-key @routing/state*)
+        (:route-params @routing/state*)
         (merge @current-query-paramerters-normalized*
                query-params)))
 
@@ -104,7 +106,7 @@
                                     ("true" true) nil
                                     true)]
                     (js/console.log (with-out-str (pprint new-state)))
-                    (accountant/navigate! (page-path-for-query-params 
+                    (accountant/navigate! (page-path-for-query-params
                                              {:page 1
                                               :is_admin new-state})))
       :checked (case (-> @current-query-paramerters-normalized*
@@ -120,7 +122,7 @@
       {:value type
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params 
+                      (accountant/navigate! (page-path-for-query-params
                                               {:page 1
                                                :type val}))))}
       (for [t ["any" "org" "manual"]]
@@ -134,7 +136,7 @@
       {:value role
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params 
+                      (accountant/navigate! (page-path-for-query-params
                                               {:page 1
                                                :role val}))))}
       (for [a [ "any" "customer" "group_manager" "inventory_manager" "lending_manager"]]
@@ -175,7 +177,7 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def default-colconfig 
+(def default-colconfig
   {:id true
    :org_id true
    :name true
@@ -201,18 +203,18 @@
   [:tr {:key (:id user)}
    [:td (user-link-component user (:index user))]
    [:td [:a {:href (path :user {:user-id (:id user)})}
-         [:img 
+         [:img
           {:height 32
            :width 32
            :src (or (:img32_url user)
                     (gravatar-url (:email user)))}]]]
    (when (:org_id colconfig)
      [:td [user-link-component user
-           [:span {:style {:font-family "monospace"}} 
+           [:span {:style {:font-family "monospace"}}
             (:org_id user)]]])
    (when (:name colconfig)
-     [:td [user-link-component user 
-           [:span 
+     [:td [user-link-component user
+           [:span
             [:span.firstname (some-> user :firstname str/trim presence)]
             " "
             [:span.lastname (some-> user :lastname str/trim presence)]]]])
@@ -221,7 +223,7 @@
            [:i.fas.fa-envelope] " " (:email user)]])
    (for [{td :td} (:customcols colconfig)]
      [td user])])
- 
+
 (defn users-table-component [colconfig]
   (if-not (contains? @data* @current-url*)
     [:div.text-center
@@ -249,7 +251,7 @@
        [:i.fas.fa-arrow-circle-left] " Previous " ]])
    [:div.float-right
     [:a.btn.btn-primary.btn-sm
-     {:href (page-path-for-query-params 
+     {:href (page-path-for-query-params
               {:page (inc (:page @current-query-paramerters-normalized*))})}
      " Next " [:i.fas.fa-arrow-circle-right]]]])
 
@@ -270,7 +272,7 @@
 
 (defn main-page-content-component [colconfig]
   [:div
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]

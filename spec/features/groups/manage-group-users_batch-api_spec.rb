@@ -5,30 +5,13 @@ feature 'Manage group users via API batch put', type: :feature do
 
   context 'an admin, one group and some prepared users' do
 
-    let :sign_in_as_admin do
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @admin.email
-      fill_in 'password', with: @admin.password
-      click_on 'Sign in'
-    end
-
-
     let :http_client do
       plain_faraday_client
     end
 
     let :prepare_http_client do
-      click_on_first @admin.email
-      click_on_first 'API-Tokens'
-      click_on_first 'Add API-Token'
-      fill_in 'Description', with: "My first token"
-      click_on 'Add'
-      wait_until{ page.has_content? "has been added"}
-      @token_part = find(".token_part").text
-      @token_secret = find(".token_secret").text
-      click_on 'Continue'
-      wait_until{ page.has_content? "API-Tokens"}
+      @api_token = FactoryBot.create :api_token, user_id: @admin.id
+      @token_secret = @api_token.token_secret
       http_client.headers["Authorization"] = "Token #{@token_secret}"
       http_client.headers["Content-Type"] = "application/json"
     end
@@ -56,7 +39,7 @@ feature 'Manage group users via API batch put', type: :feature do
         FactoryBot.create :user
       end.to_set
 
-      sign_in_as_admin
+      sign_in_as @admin
 
       prepare_http_client
     end

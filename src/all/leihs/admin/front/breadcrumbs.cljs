@@ -1,6 +1,11 @@
 (ns leihs.admin.front.breadcrumbs
+  (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.front.icons :as icons]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [leihs.core.user.front :as core-user]
+
+    [leihs.core.icons :as icons]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]))
 
@@ -8,32 +13,16 @@
   ([k n]
    (li k n {} {}))
   ([handler-key inner route-params query-params]
-   (let [active? (= (-> @state/routing-state* :handler-key) handler-key)]
+   (let [active? (= (-> @routing/state* :handler-key) handler-key)]
      [:li.breadcrumb-item {:key handler-key :class (if active? "active" "")}
       (if active?
         [:span inner]
         [:a {:href (path handler-key route-params query-params)} inner])])))
 
-(defn api-token-li [user-id api-token-id]
-  (li :api-token [:span icons/api-token " API-Token "] {:user-id user-id :api-token-id api-token-id} {}))
-(defn api-tokens-li [id]
-  (li :api-tokens [:span icons/api-token " API-Tokens "] {:user-id id} {}))
-(defn api-token-add-li [id]
-  (when (= id (:id @state/user*))
-    (li :api-token-add [:span icons/add " Add API-Token "] {:user-id id} {})))
-(defn api-token-edit-li [user-id api-token-id]
-  (when (= user-id (:id @state/user*))
-    (li :api-token-edit [:span icons/edit " Edit API-Token "]
-        {:user-id user-id :api-token-id api-token-id} {})))
-(defn api-token-delete-li [user-id api-token-id]
-  (when (= user-id (:id @state/user*))
-    (li :api-token-delete [:span icons/delete " Delete API-Token "]
-        {:user-id user-id :api-token-id api-token-id} {})))
-
 (defn admin-li [] (li :admin [:span icons/admin " Admin "]))
 (defn auth-li [] (li :auth "Authentication"))
 (defn auth-info-li [] (li :auth-info "Info"))
-(defn auth-password-sign-in-li [] (li :auth-password-sign-in "Password sign-in"))
+(defn auth-password-sign-in-li [] (li :password-authentication "Password sign-in"))
 (defn borrow-li [] (li :borrow "Borrow"))
 (defn debug-li [] (li :debug "Debug"))
 
@@ -41,9 +30,9 @@
 (defn delegation-edit-li [id] (li :delegation-edit [:span [:i.fas.fa-edit] " Edit "] {:delegation-id id} {}))
 (defn delegation-li [id] (li :delegation [:span icons/delegation " Delegation "] {:delegation-id id} {}))
 (defn delegation-add-li [] (li :delegation-add [:span [:i.fas.fa-plus-circle] " Add delegation "]))
-(defn delegation-users-li [delegation-id] 
-  (li :delegation-users  
-      [:span icons/users " Users "] 
+(defn delegation-users-li [delegation-id]
+  (li :delegation-users
+      [:span icons/users " Users "]
       {:delegation-id delegation-id} {}))
 (defn delegations-li [] (li :delegations [:span icons/delegations " Delegations "]))
 
@@ -53,14 +42,13 @@
 (defn group-li [id] (li :group [:span icons/group " Group "] {:group-id id} {}))
 (defn group-add-li [] (li :group-add [:span [:i.fas.fa-plus-circle] " Add group "]))
 (defn groups-li [] (li :groups [:span icons/groups " Groups "] {} {}))
-(defn group-users-li [group-id] 
-  (li :group-users  
-      [:span icons/users " Users "] 
+(defn group-users-li [group-id]
+  (li :group-users
+      [:span icons/users " Users "]
       {:group-id group-id} {}))
 
 
 (defn email-li [address] [:li.breadcrumb-item {:key (str "mailto:" address )} [:a {:href (str "mailto:" address )} [:i.fas.fa-envelope] " Email "]])
-(defn initial-admin-li [] (li :initial-admin "Initial-Admin"))
 (defn leihs-li [] (li :home [:span icons/home " Home "]))
 (defn lending-li [] (li :lending "Lending"))
 (defn procurement-li [] (li :procurement "Procurement"))
@@ -76,7 +64,7 @@
 (defn users-li [] (li :users [:span icons/users " Users "] {} {}))
 
 (defn nav-component [left right]
-  [:div.row.nav-component.mt-3 
+  [:div.row.nav-component.mt-3
    [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
     (when (seq left)
       [:ol.breadcrumb

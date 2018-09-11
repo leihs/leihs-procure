@@ -12,13 +12,12 @@ feature 'Manage users', type: :feature do
 
     scenario 'setting, seeing and then removing the user image works' do
 
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @user.email
-      fill_in 'password', with: @user.password
-      click_on 'Sign in'
+      sign_in_as @user
 
-      click_on @user.email
+      click_on "Users"
+      within '.users' do
+        click_on_first @user.lastname
+      end
       click_on 'Edit'
 
       find('label', text: 'Choose file').find('input') \

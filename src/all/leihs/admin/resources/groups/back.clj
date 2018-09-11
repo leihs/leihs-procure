@@ -1,11 +1,11 @@
 (ns leihs.admin.resources.groups.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.group.back :as group]
     [leihs.admin.resources.groups.shared :as shared]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
@@ -19,10 +19,10 @@
 
 (def groups-base-query
   (-> (apply sql/select shared/default-fields)
-      (sql/merge-select 
+      (sql/merge-select
         [(-> (sql/select :%count.*)
              (sql/from :groups_users)
-             (sql/merge-where 
+             (sql/merge-where
                [:= :groups_users.group_id :groups.id]))
          :count_users])
       (sql/from :groups)
@@ -65,14 +65,14 @@
 
 
 (defn select-fields [query request]
-  (if-let [fields (some->> request :query-params :fields 
-                           (map keyword) set 
+  (if-let [fields (some->> request :query-params :fields
+                           (map keyword) set
                            (clojure.set/intersection shared/available-fields))]
     (apply sql/select query fields)
     query))
 
 (defn groups-query [request]
-  (let [query-params (-> request :query-params 
+  (let [query-params (-> request :query-params
                          shared/normalized-query-parameters)]
     (-> groups-base-query
         (set-per-page-and-offset query-params)
@@ -97,8 +97,7 @@
     (cpj/POST (path :groups ) [] #'group/routes)))
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)
-;(logging-config/set-logger! :level :debug)
 ;(debug/wrap-with-log-debug #'groups-formated-query)
+;(logging-config/set-logger! :level :debug)
+;(logging-config/set-logger! :level :info)

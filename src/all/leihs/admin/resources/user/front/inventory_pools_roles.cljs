@@ -4,12 +4,14 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.resources.user.front.shared :as user.shared :refer [clean-and-fetch user-id* user-data* edit-mode?*]]
 
     [accountant.core :as accountant]
@@ -42,8 +44,8 @@
 
 (defn fetch-inventory-pools-roles []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user-inventory-pools-roles 
-                                          (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :user-inventory-pools-roles
+                                          (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
@@ -54,7 +56,7 @@
     (go (let [resp (<! resp-chan)]
           (when (and (= (:status resp) 200)
                      (= id @fetch-inventory-pools-roles-id*))
-            (reset! inventory-pools-roles-data* 
+            (reset! inventory-pools-roles-data*
                     (-> resp :body :inventory_pools_roles prepare-inventory-pools-data)))))))
 
 (defn clean-and-fetch-inventory-pools-roles [& args]
@@ -74,7 +76,7 @@
 
 (defn page []
   [:div.user-inventory-pools-roles
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch-inventory-pools-roles
      :did-change clean-and-fetch-inventory-pools-roles}]
    (breadcrumbs/nav-component

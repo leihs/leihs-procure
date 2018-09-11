@@ -1,19 +1,21 @@
 (ns leihs.admin.back.run
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.env]
     [leihs.admin.paths]
-    [leihs.admin.resources.status.back :as status] 
+    [leihs.admin.resources.status.back :as status]
     [leihs.admin.routes :as routes]
-    [leihs.admin.utils.ds :as ds]
-    [leihs.admin.utils.http-server :as http-server]
-    [leihs.admin.utils.url.http :as http-url]
-    [leihs.admin.utils.url.jdbc :as jdbc-url]
-    [leihs.admin.utils.url.jdbc]
+    [leihs.core.ds :as ds]
+    [leihs.core.http-server :as http-server]
+    [leihs.core.shutdown :as shutdown]
+    [leihs.core.url.http :as http-url]
+    [leihs.core.url.jdbc :as jdbc-url]
+    [leihs.core.url.jdbc]
 
     [clojure.tools.cli :as cli :refer [parse-opts]]
     [clojure.pprint :refer [pprint]]
+    [yaml.core :as yaml]
 
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
@@ -25,7 +27,7 @@
   {:LEIHS_HTTP_BASE_URL "http://localhost:3211"
    :LEIHS_SECRET (when (= leihs.admin.env/env :dev) "secret")
    :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?min-pool-size=2&max-pool-size=16"
-   })
+   :ENABLE_SHUTDOWN_ROUTE "false"})
 
 (defn run [options]
   (catcher/snatch
@@ -33,6 +35,7 @@
     (logging/info "Invoking run with options: " options)
     (when (nil? (:secret options))
       (throw (IllegalStateException. "LEIHS_SECRET resp. secret must be present!")))
+    (shutdown/init options)
     (let [status (status/init)
           ds (ds/init (:database-url options) (:health-check-registry status))
           secret (-> options :secret)
@@ -68,7 +71,13 @@
     :parse-fn #(-> % jdbc-url/dissect extend-pg-params)]
    ["-s" "--secret LEIHS_SECRET"
     (str "default: " (:LEIHS_SECRET defaults))
-    :default (env-or-default :LEIHS_SECRET)]])
+    :default (env-or-default :LEIHS_SECRET)]
+   [nil "--enable-shutdown-route YES|NO"
+    "Enable the shutdown route; primarily used for testing."
+    :parse-fn yaml/parse-string
+    :default (-> :ENABLE_SHUTDOWN_ROUTE env-or-default yaml/parse-string)
+    :validate [boolean? "Must be parsed to a boolean by yaml/parse-string"]
+    ]])
 
 (defn main-usage [options-summary & more]
   (->> ["Leihs PERM run "
@@ -94,7 +103,7 @@
       (:help options) (println (main-usage summary {:args args :options options}))
       :else (run options))))
 
-;(-main "-h")
+;(-main  "-h" "--enable-shutdown-route" "yes")
 ;(-main)
 
 

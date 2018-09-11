@@ -1,12 +1,12 @@
 (ns leihs.admin.resources.delegation.users.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.delegation.users.shared :refer [delegation-users-filter-value]]
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -20,25 +20,25 @@
 (defn users-query [{:as request
                     {delegation-id :delegation-id} :route-params}]
   (let [query (-> request users/users-query
-                  (sql/merge-left-join :delegations_users 
-                                       [:and 
+                  (sql/merge-left-join :delegations_users
+                                       [:and
                                         [:= :delegations_users.user_id :users.id]
                                         [:= :delegations_users.delegation_id delegation-id]])
                   (sql/merge-select [:delegations_users.delegation_id :delegation_id]))]
     (if-not (-> request :query-params delegation-users-filter-value)
       query
       (-> query
-          (sql/merge-where 
+          (sql/merge-where
             [:= :delegations_users.delegation_id delegation-id])))))
 
 
 (defn delegation-users-count-query [{{delegation-id :delegation-id} :route-params}]
   (-> (sql/select :%count.*)
       (sql/from :delegations_users)
-      (sql/merge-where 
+      (sql/merge-where
         [:= :delegations_users.delegation_id delegation-id])
       (sql/format)))
-  
+
 (defn users-formated-query [request]
   (-> request
       users-query
@@ -53,7 +53,7 @@
                 (jdbc/query tx))}})
 
 (defn put-user [{tx :tx :as request
-                 {delegation-id :delegation-id 
+                 {delegation-id :delegation-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
     tx :delegations_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
@@ -61,14 +61,14 @@
   {:status 204})
 
 (defn remove-user [{tx :tx :as request
-                    {delegation-id :delegation-id 
+                    {delegation-id :delegation-id
                      user-id :user-id} :route-params}]
   (if (= 1 (->> ["delegation_id = ? AND user_id = ?" delegation-id user-id]
                 (jdbc/delete! tx :delegations_users)
                 first))
     {:status 204}
     (throw (ex-info "Remove delegation-user failed" {:request request}))))
-  
+
 (def delegation-user-path
   (path :delegation-user {:delegation-id ":delegation-id" :user-id ":user-id"}))
 
@@ -82,5 +82,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

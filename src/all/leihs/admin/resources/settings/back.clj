@@ -1,10 +1,10 @@
 (ns leihs.admin.resources.settings.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
-    [leihs.admin.utils.ds :refer [ds]]
+    [leihs.core.sql :as sql]
+    [leihs.core.ds :refer [ds]]
     [leihs.admin.resources.user.back :refer [password-hash]]
 
     [clojure.java.jdbc :as jdbc]
@@ -35,5 +35,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.home.front
+(ns leihs.admin.resources.sign-in.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -20,14 +20,14 @@
     [reagent.core :as reagent]
     ))
 
-(def password-sign-in-data* (reagent/atom {}))
+(def sign-in-data* (reagent/atom {}))
 
 (defn sign-in []
   (def sign-in-id* (reagent/atom nil))
   (let [resp-chan (async/chan)
         id (requests/send-off {:url (path :password-authentication)
                                :method :post
-                               :json-params @password-sign-in-data*}
+                               :json-params @sign-in-data*}
                               {:modal true
                                :title "Sign in with password"
                                :retry-fn #'sign-in}
@@ -39,32 +39,41 @@
             (reset! core-user/state* (:body resp))
             (accountant/navigate! (path :admin)))))))
 
+(defn initialize-sign-in-data [& args]
+  (reset! sign-in-data* 
+          {:email (-> @routing/state* :query-params-raw :email)}))
+
 (defn password-sign-in-form []
-  [:div
-   [:form.form
-    {:on-submit (fn [e]
-                  (.preventDefault e)
-                  (sign-in))}
-    [:div.form-group
-     [:label " email "]
-     [:input#email.form-control
-      {:type :email
-       :value (-> @password-sign-in-data* :email)
-       :on-change #(swap! password-sign-in-data* assoc :email (-> % .-target .-value))
-       :auto-complete :email}]]
-    [:div.form-group
-     [:label " password "]
-     [:input#password.form-control
-      {:type :password
-       :value (-> @password-sign-in-data* :password)
-       :on-change #(swap! password-sign-in-data* assoc :password (-> % .-target .-value))
-       :auto-complete :current-password}]]
-    [:div.form-group.float-right
-     [:button.btn.btn-primary
-      {:type :submitt}
-      "Sign in with password"]]]
-   [:div.clearfix]
-   [:pre (with-out-str (pprint @password-sign-in-data*))]])
+  (reagent/create-class
+    {:component-did-mount initialize-sign-in-data
+     :reagent-render
+     (fn [_]
+       [:div
+        [:form.form
+         {:on-submit (fn [e]
+                       (.preventDefault e)
+                       (sign-in))}
+         [:div.form-group
+          {:style {:display :none}}
+          [:label " email "]
+          [:input#email.form-control
+           {:type :email
+            :value (-> @sign-in-data* :email)
+            :on-change #(swap! sign-in-data* assoc :email (-> % .-target .-value))
+            :auto-complete :email}]]
+         [:div.form-group
+          [:label " password "]
+          [:input#password.form-control
+           {:type :password
+            :value (-> @sign-in-data* :password)
+            :on-change #(swap! sign-in-data* assoc :password (-> % .-target .-value))
+            :auto-complete :current-password}]]
+         [:div.form-group.float-right
+          [:button.btn.btn-primary
+           {:type :submitt}
+           "Sign in with password"]]]
+        [:div.clearfix]
+        [:pre (with-out-str (pprint @sign-in-data*))]])}))
 
 
 (defn page []
@@ -78,4 +87,4 @@
         (breadcrumbs/procurement-li)]))
    [:h1 "leihs-admin Home"]
    [:p.text-danger "This page is only accessible for development and testing."]
-   ])
+   [password-sign-in-form]])

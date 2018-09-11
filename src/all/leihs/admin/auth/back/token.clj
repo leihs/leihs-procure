@@ -1,11 +1,11 @@
-(ns leihs.admin.resources.auth.back.token
+(ns leihs.admin.auth.back.token
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.utils.core :refer [keyword str presence]]
-    [leihs.admin.constants :refer [USER_SESSION_COOKIE_NAME]]
-    [leihs.admin.utils.ds :as ds]
-    [leihs.admin.utils.ring-exception :as ring-exception]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
+    [leihs.core.ds :as ds]
+    [leihs.core.ring-exception :as ring-exception]
+    [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.walk :refer [keywordize-keys]]
@@ -53,8 +53,8 @@
    :scope_admin_read true
    :scope_admin_write true
    :user_id nil
-   :is_admin true 
-   :account_enabled true 
+   :is_admin true
+   :account_enabled true
    :firstname ""
    :lastname "system-admin"
    :email "system-admin@leihs"
@@ -81,10 +81,10 @@
 
 (defn extract-token-value [request]
   (when-let [auth-header (-> request :headers :authorization)]
-    (or (some->> auth-header 
-                (re-find #"(?i)^token\s+(.*)$") 
+    (or (some->> auth-header
+                (re-find #"(?i)^token\s+(.*)$")
                 last presence)
-        (some->> auth-header 
+        (some->> auth-header
                  (re-find #"(?i)^basic\s+(.*)$")
                  last presence decode-base64
                  (#(clojure.string/split % #":" 2))
@@ -92,7 +92,7 @@
                  last))))
 
 (defn authenticate [{tx :tx
-                     sba :secret-ba 
+                     sba :secret-ba
                      :as request}
                     _handler]
   (catcher/snatch
@@ -100,8 +100,8 @@
      :return-fn (fn [e] (token-error-page e request))}
     (let [handler (ring-exception/wrap _handler)]
       (if-let [token-secret (extract-token-value request)]
-                 (let [user-auth-entity (user-auth-entity! 
-                                          token-secret (String. sba) 
+                 (let [user-auth-entity (user-auth-entity!
+                                          token-secret (String. sba)
                                                            (:settings request) tx)]
           (handler (assoc request :authenticated-entity user-auth-entity)))
         (handler request)))))
@@ -113,6 +113,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
-;(debug/debug-ns 'cider-ci.open-session.encryptor)
 ;(debug/debug-ns *ns*)

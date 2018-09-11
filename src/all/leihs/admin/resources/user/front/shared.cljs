@@ -4,13 +4,15 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -24,20 +26,20 @@
 
 
 (declare fetcher-user)
-(defonce user-id* (reaction (-> @state/routing-state* :route-params :user-id)))
+(defonce user-id* (reaction (-> @routing/state* :route-params :user-id)))
 (defonce user-data* (reagent/atom nil))
 
 (defonce edit-mode?*
   (reaction
     (and (map? @user-data*)
          (boolean ((set '(:user-edit :user-new :user-password))
-                   (:handler-key @state/routing-state*))))))
+                   (:handler-key @routing/state*))))))
 
 
 (def fetch-user-id* (reagent/atom nil))
 (defn fetch-user []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :user (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
@@ -271,7 +273,7 @@
     (let [c (:inventory_pool_roles_count @user-data*)]
       (if (< c 1)
         [:span "The user has no inventory pool roles."]
-        [:span "The user has " 
+        [:span "The user has "
          [:a {:href (path :user-inventory-pools-roles {:user-id @user-id*})}
           c " inventory pool " (pluralize-noun c "role")]  ". "]))]])
 

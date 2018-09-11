@@ -5,15 +5,6 @@ feature 'Manage users', type: :feature do
 
   context 'an admin user and a bunch of users' do
 
-    let :sign_in_as_admin do
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @admin.email
-      fill_in 'password', with: @admin.password
-      click_on 'Sign in'
-    end
-
-
     before :each do
       @admins = 3.times.map do
         FactoryBot.create :admin
@@ -25,7 +16,7 @@ feature 'Manage users', type: :feature do
         FactoryBot.create :user
       end.to_set
 
-      sign_in_as_admin
+      sign_in_as @admin
     end
 
 

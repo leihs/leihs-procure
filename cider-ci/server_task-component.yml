@@ -6,7 +6,7 @@ scripts:
         script_key: build-uberjar
       database has been created:
         script_key: create-database
-    body: java -jar target/leihs-admin.jar run
+    body: java -jar target/leihs-admin.jar run --enable-shutdown-route YES
 
   server-is-running:
     body: |

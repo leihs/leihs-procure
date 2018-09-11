@@ -4,14 +4,16 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.icons :as icons]
-    [leihs.admin.front.requests.core :as requests]
+    [leihs.core.icons :as icons]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -24,7 +26,7 @@
     ))
 
 (declare fetcher-group)
-(defonce group-id* (reaction (-> @state/routing-state* :route-params :group-id)))
+(defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
 (defonce group-data* (reagent/atom nil))
 
 
@@ -32,12 +34,12 @@
   (reaction
     (and (map? @group-data*)
          (boolean ((set '(:group-edit :group-add))
-                   (:handler-key @state/routing-state*))))))
+                   (:handler-key @routing/state*))))))
 
 (def fetch-group-id* (reagent/atom nil))
 (defn fetch-group []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :group (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
@@ -71,7 +73,7 @@
       [:div.col.col-sm-10
        [:div.input-group
         (if @edit-mode?*
-          [(:node-type opts) 
+          [(:node-type opts)
            {:class :form-control
             :id kw
             :type (:type opts)
@@ -122,15 +124,15 @@
 (defn additional-properties-component []
   (when-let [group-data @group-data*]
     [:div.additional-properties
-     [:p 
-      [:span "This group has been " 
-       [:b " created " [humanize-datetime-component (:created_at group-data)]] ", and " 
+     [:p
+      [:span "This group has been "
+       [:b " created " [humanize-datetime-component (:created_at group-data)]] ", and "
        [:b " updated " [humanize-datetime-component (:updated_at group-data)]] ". "]
       (let [users-count (:users_count group-data)]
         [:span (if (= 0 users-count)
                  "This group has no users."
-                 [:span 
-                  "This group has " 
+                 [:span
+                  "This group has "
                   [:strong users-count " " (pluralize-noun users-count "user")] "."])])]]))
 
 (defn group-component []
@@ -139,7 +141,7 @@
      [:div.text-center
       [:i.fas.fa-spinner.fa-spin.fa-5x]
       [:span.sr-only "Please wait"]]
-     [:div 
+     [:div
       [:div [basic-component]]
       [:div [additional-properties-component]]])])
 
@@ -162,7 +164,7 @@
 
 (defn show-page []
   [:div.group
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
@@ -213,7 +215,7 @@
 
 (defn edit-page []
   [:div.edit-group
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
@@ -262,7 +264,7 @@
 
 (defn add-page []
   [:div.new-group
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount #(reset! group-data* {})}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -285,7 +287,7 @@
 
 (defn delete-group [& args]
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :group (-> @routing/state* :route-params))
                                :method :delete
                                :query-params {}}
                               {:title "Delete Group"
@@ -318,7 +320,7 @@
 
 (defn delete-page []
   [:div.group-delete
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row

@@ -4,15 +4,17 @@
     [reagent.ratom :as ratom :refer [reaction]]
     )
   (:require
-    [leihs.admin.resources.auth.front :as auth]
-    [leihs.admin.anti-csrf.core :as anti-csrf]
-    [leihs.admin.front.requests.core :as requests]
-    [leihs.admin.front.requests.modal]
+    [leihs.core.anti-csrf.front :as anti-csrf]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.requests.modal]
+    [leihs.core.routing.front :as routing]
+    [leihs.core.user.front :as core-user]
+
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
-    [leihs.admin.front.state :as state :refer [routing-state*]]
+    [leihs.admin.front.state :as state]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.admin.front :as admin :refer [page] :rename {page home-page}]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [clojure.pprint :refer [pprint]]
     [accountant.core :as accountant]
@@ -20,14 +22,14 @@
     ))
 
 (defn li-navitem [handler-key display-string]
-  (let [active? (= (-> @state/routing-state* :handler-key) handler-key)]
+  (let [active? (= (-> @routing/state* :handler-key) handler-key)]
     [:li.nav-item
      {:class (if active? "active" "")}
      [:a.nav-link {:href (path handler-key)} display-string]]))
 
 (defn li-admin-navitem []
   (let [active? (boolean
-                  (when-let [current-path (-> @state/routing-state* :path)]
+                  (when-let [current-path (-> @routing/state* :path)]
                     (re-matches #"^/admin.*$" current-path)))]
     [:li.nav-item
      {:class (if active? "active" "")}
@@ -35,13 +37,13 @@
 
 (defn sign-out-nav-component []
   [:form.form-inline.ml-2
-   {:action (path :auth-sign-out {} {:target (-> @state/routing-state* :url)})
+   {:action (path :auth-sign-out {} {:target (-> @routing/state* :url)})
     :method :post}
    [:div.form-group
     [:input
      {:name :url
       :type :hidden
-      :value (-> @state/routing-state* :url)}]]
+      :value (-> @routing/state* :url)}]]
    [anti-csrf/hidden-form-group-token-component]
    [:div.form-group
     [:label.sr-only
@@ -51,45 +53,27 @@
      {:type :submit
       :style {:padding-top "0.2rem"
               :padding-bottom "0.2rem"}}
-     [:span 
+     [:span
       [:span " Sign out "]
       [:i.fas.fa-sign-out-alt]]]]])
 
-(defn navbar-user-nav []
-  (if-let [user @state/user*]
-    [:div.navbar-nav.user-nav
-     [:div
-      [:a
-       {:href (path :user {:user-id (:id user)} {})}
-       [:span
-        [:img.user-img-32
-         {:width 32
-          :height 32
-          :src (or (:img32_url user)
-                   (gravatar-url (:email user)))}]
-        [:span.sr-only (:email user)]]]]
-     [sign-out-nav-component]]
-    [:div.navbar-nav
-     [auth/nav-sign-in-component]
-     ]))
-
 (defn nav-bar []
   [:nav.navbar.navbar-expand.justify-content-between
-   {:class (if (= (-> @state/routing-state* :handler-key) :home)
+   {:class (if (= (-> @routing/state* :handler-key) :home)
              "navbar-light bg-light" "navbar-dark bg-admin")}
    [:a.navbar-brand {:href (path :home)} "leihs"]
    [:div
-    (when @state/user*
+    (when @core-user/state*
       [:ul.navbar-nav
        [li-admin-navitem]
        [li-navitem :borrow "Borrow"]
        [li-navitem :lending "Lending"]
        [li-navitem :procure "Procurement"]
        ])]
-   [navbar-user-nav]])
+   [core-user/navbar-user-nav]])
 
 (defn version-component []
-  [:span.navbar-text "Version " 
+  [:span.navbar-text "Version "
    (let [major (:version_major @state/leihs-admin-version*)
          minor (:version_minor @state/leihs-admin-version*)
          patch (:version_patch @state/leihs-admin-version*)
@@ -100,18 +84,18 @@
       "." [:span.minor minor]
       "." [:span.patch patch]
       (when pre
-        [:span "-" 
+        [:span "-"
          [:span.pre pre]])
       (when build
-        [:span "+" 
+        [:span "+"
          [:span.build build]])])])
 
 (defn current-page []
   [:div
-   [leihs.admin.front.requests.modal/modal-component]
+   [leihs.core.requests.modal/modal-component]
    [nav-bar]
    [:div
-    (if-let [page (:page @routing-state*)]
+    (if-let [page (:page @routing/state*)]
       [page]
       [:div.page
        [:h1.text-danger "Application error: the current path can not be resolved!"]])]
@@ -121,10 +105,7 @@
      [:a.navbar-brand {:href (path :admin {})} "leihs-admin"]
      [version-component]]
     [:div.col
-     [:a.navbar-text 
-      {:href (path :auth-info)} "Auth-Info"]]
-    [:div.col
-     [:a.navbar-text 
+     [:a.navbar-text
       {:href (path :status)} "Admin-Status-Info"]]
     [state/debug-toggle-navbar-component]
     [:form.form-inline {:style {:margin-left "0.5em"

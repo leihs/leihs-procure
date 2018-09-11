@@ -4,15 +4,17 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.admin.anti-csrf.core :as anti-csrf]
+    [leihs.core.anti-csrf.front :as anti-csrf]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.icons :as icons]
-    [leihs.admin.front.requests.core :as requests]
+    [leihs.core.icons :as icons]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -43,7 +45,7 @@
                               :chan resp-chan)]
     (reset! fetch-status-info-id* id)
     (go (let [resp (<! resp-chan)]
-          (when (and (= :status (-> @state/routing-state* :handler-key)) 
+          (when (and (= :status (-> @routing/state* :handler-key))
                      (or (= (:status resp) 200)
                          (>= 900(:status resp)))
                      (= id @fetch-status-info-id*))

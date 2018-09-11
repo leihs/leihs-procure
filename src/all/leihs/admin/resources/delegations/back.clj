@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.delegations.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
     [leihs.admin.resources.delegation.back :as delegation]
 
     [clojure.java.jdbc :as jdbc]
@@ -15,10 +15,10 @@
 
 
 (def delegations-base-query
-  (-> (sql/select :delegations.id, :delegations.firstname 
+  (-> (sql/select :delegations.id, :delegations.firstname
                   [(-> (sql/select :%count.*)
                        (sql/from :delegations_users)
-                       (sql/merge-where 
+                       (sql/merge-where
                          [:= :delegations_users.delegation_id :delegations.id]))
                    :count_users]
                   [(-> (sql/select :%count.*)
@@ -80,5 +80,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

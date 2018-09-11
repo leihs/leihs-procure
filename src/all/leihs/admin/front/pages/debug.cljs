@@ -7,8 +7,8 @@
     [leihs.admin.paths :as paths]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
 
-    [leihs.admin.utils.core :refer [keyword str presence]]
-    [leihs.admin.utils.url.query-params :as query-params]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.url.query-params :as query-params]
     [clojure.pprint :refer [pprint]]
     ))
 

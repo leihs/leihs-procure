@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.users.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.sql :as sql]
+    [leihs.core.sql :as sql]
     [leihs.admin.resources.user.back :as user]
     [leihs.admin.resources.users.shared :as shared]
 
@@ -23,9 +23,9 @@
       (sql/order-by :lastname :firstname)
       (sql/merge-where [:= nil :delegator_user_id])))
 
-(-> 
-  (apply sql/select 
-         (apply sql/select shared/default-fields)       
+(->
+  (apply sql/select
+         (apply sql/select shared/default-fields)
          shared/available-fields))
 
 (defn set-per-page-and-offset
@@ -82,14 +82,14 @@
       query)))
 
 (defn select-fields [query request]
-  (if-let [fields (some->> request :query-params :fields 
-                           (map keyword) set 
+  (if-let [fields (some->> request :query-params :fields
+                           (map keyword) set
                            (clojure.set/intersection shared/available-fields))]
     (apply sql/select query fields)
     query))
 
 (defn users-query [request]
-  (let [query-params (-> request :query-params 
+  (let [query-params (-> request :query-params
                          shared/normalized-query-parameters)]
     (-> users-base-query
         (set-per-page-and-offset query-params)
@@ -117,7 +117,6 @@
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)
 
 ;(logging-config/set-logger! :level :debug)

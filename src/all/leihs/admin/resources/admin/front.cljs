@@ -4,16 +4,17 @@
     [reagent.ratom :as ratom :refer [reaction]]
     )
   (:require
-    [leihs.admin.front.state :as state :refer [routing-state*]]
-    [leihs.admin.resources.auth.front :as auth]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.user.front :as core-user]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
+    [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths]
-    [leihs.admin.utils.core :refer [keyword str presence]]
     ))
 
 (defn page []
   [:div.admin
-   (when-let [user @state/user*]
+   (when-let [user @core-user/state*]
      (breadcrumbs/nav-component
        [(breadcrumbs/leihs-li)
         (breadcrumbs/admin-li)]
@@ -33,9 +34,4 @@
    [:div
     [:h1 "Admin"]
     [:p "The application to administrate this instance of "
-     [:em " leihs"]"."]]
-
-   (when-not @state/user*
-     [auth/sign-in-form-component])
-
-   ])
+     [:em " leihs"]"."]]])

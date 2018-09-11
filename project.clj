@@ -7,9 +7,9 @@
   [
    [aleph "0.4.6"]
    [bidi "2.1.3"]
+   [buddy/buddy-sign "3.0.0"]
    [camel-snake-kebab "0.4.0"]
    [cheshire "5.8.0"]
-   [cider-ci/open-session "2.0.0-beta.1"]
    [clj-http "3.9.0"]
    [cljs-http "0.1.45"]
    [cljsjs/jimp "0.2.27"]
@@ -30,6 +30,7 @@
    [io.forward/yaml "1.0.9"]
    [log4j/log4j "1.2.17" :exclusions [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
    [logbug "4.2.2"]
+   [nilenso/honeysql-postgres "0.2.4"]
    [org.clojure/clojure "1.9.0"]
    [org.clojure/clojurescript "1.10.339" :scope "provided"]
    [org.clojure/java.jdbc "0.7.7"]
@@ -37,6 +38,7 @@
    [org.clojure/tools.logging "0.4.1"]
    [org.clojure/tools.nrepl "0.2.13"]
    [org.slf4j/slf4j-log4j12 "1.7.25"]
+   [pandect "0.6.1"]
    [pg-types "2.4.0-PRE.1"]
    [reagent "0.8.1"]
    [ring "1.6.3"]
@@ -59,13 +61,13 @@
 
   :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"]
 
-  :source-paths ["src/all"]
+  :source-paths ["src/all" "leihs-clj-shared/src"]
 
   :resource-paths ["resources/all"]
 
   :test-paths ["src/test"]
 
-  :aot [#"leihs.admin.*"]
+  :aot [#"leihs\..*"]
 
   :main leihs.admin.back.main
 
@@ -75,7 +77,7 @@
             [lein-shell "0.4.2"]]
 
   :cljsbuild {:builds
-              {:min {:source-paths ["src/all" "src/prod"]
+              {:min {:source-paths ["src/all" "src/prod" "leihs-clj-shared/src"]
                      :jar true
                      :compiler
                      {:output-to "target/cljsbuild/public/admin/js/app.js"
@@ -83,7 +85,7 @@
                       :optimizations :simple
                       :pretty-print  false}}
                :app
-               {:source-paths ["src/all" "src/dev"]
+               {:source-paths ["src/all" "src/dev" "leihs-clj-shared/src"]
                 :compiler
                 {:main "leihs.admin.front.init"
                  :asset-path "/js/out"
@@ -109,13 +111,13 @@
                              [ring/ring-mock "0.3.2"]]
               :plugins [[lein-figwheel "0.5.16"]
                         [lein-sassy "1.0.8"]]
-              :source-paths ["src/all" "src/dev"]
+              :source-paths ["src/all" "src/dev" "leihs-clj-shared/src"]
               :resource-paths ["resources/all" "resources/dev" "target/cljsbuild"]
               :injections [(require 'pjstadig.humane-test-output)
                            (pjstadig.humane-test-output/activate!)]
               :env {:dev true}}
              :uberjar {:hooks [minify-assets.plugin/hooks]
-                       :source-paths ["src/all" "src/prod"]
+                       :source-paths ["src/all" "src/prod" "leihs-clj-shared/src"]
                        :prep-tasks [["shell" "./bin/build-timestamp"]
                                     "compile" ["cljsbuild" "once" "min"]]
                        :resource-paths ["resources/all" "resources/prod" "target/cljsbuild"]

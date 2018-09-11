@@ -1,32 +1,32 @@
 (ns leihs.admin.routes
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.anti-csrf.core :as anti-csrf]
+    [leihs.core.anti-csrf.back :as anti-csrf]
+    [leihs.core.constants :as constants]
+    [leihs.core.ds :as ds]
+    [leihs.core.http-cache-buster :as cache-buster :refer [wrap-resource]]
+    [leihs.core.json :as json]
+    [leihs.core.json-protocol]
+    [leihs.core.ring-exception :as ring-exception]
+    [leihs.core.shutdown :as shutdown]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.sign-out.back :as sign-out]
+
+    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.back.html :as html]
-    [leihs.admin.constants :as constants]
     [leihs.admin.env :as env]
     [leihs.admin.paths :refer [path paths]]
-    [leihs.admin.resources.api-token.back :as api-token]
-    [leihs.admin.resources.api-tokens.back :as api-tokens]
-    [leihs.admin.resources.auth.back :as auth]
     [leihs.admin.resources.delegation.back :as delegation]
     [leihs.admin.resources.delegation.users.back :as delegation-users]
     [leihs.admin.resources.delegations.back :as delegations]
     [leihs.admin.resources.group.back :as group]
     [leihs.admin.resources.group.users.back :as group-users]
     [leihs.admin.resources.groups.back :as groups]
-    [leihs.admin.resources.initial-admin.back :as initial-admin]
     [leihs.admin.resources.settings.back :as settings]
-    [leihs.admin.resources.shutdown.back :as shutdown]
     [leihs.admin.resources.status.back :as status]
     [leihs.admin.resources.user.back :as user]
     [leihs.admin.resources.users.back :as users]
-    [leihs.admin.utils.ds :as ds]
-    [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
-    [leihs.admin.utils.json :as json]
-    [leihs.admin.utils.json-protocol]
-    [leihs.admin.utils.ring-exception :as ring-exception]
 
     [bidi.bidi :as bidi]
     [bidi.ring :refer [make-handler]]
@@ -48,23 +48,17 @@
 (declare redirect-to-root-handler)
 
 (def skip-authorization-handler-keys
-  #{:auth-shib-sign-in
-    :auth-password-sign-in
+  #{:home
+    :password-authentication
     :initial-admin})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
-  #{
-    :redirect-to-root 
-    :not-found 
-    :auth-shib-sign-in})
+  #{:redirect-to-root
+    :not-found})
 
 (def handler-resolve-table
-  {:api-token api-token/routes
-   :api-tokens api-tokens/routes
-   :auth-info auth/routes
-   :auth-password-sign-in auth/routes
-   :auth-shib-sign-in auth/routes
-   :auth-sign-out auth/routes
+  {:password-authentication admin-auth/routes
+   :auth-sign-out admin-auth/routes
    :delegation delegation/routes
    :delegation-add-choose-responsible-user delegation/routes
    :delegation-edit-choose-responsible-user delegation/routes
@@ -75,10 +69,9 @@
    :group group/routes
    :group-users group-users/routes
    :group-user group-users/routes
-   :initial-admin initial-admin/routes
    :not-found html/not-found-handler
    :redirect-to-root redirect-to-root-handler
-   :shutdown shutdown/routes
+   :sign-out sign-out/ring-handler
    :status status/routes
    :user user/routes
    :user-inventory-pools-roles user/routes
@@ -98,8 +91,8 @@
 (defn dispatch-to-handler [request]
   (if-let [handler (:handler request)]
     (handler request)
-    (throw 
-      (ex-info 
+    (throw
+      (ex-info
         "There is no handler for this resource and the accepted content type."
         {:status 404}))))
 
@@ -108,7 +101,7 @@
 
 (defn browser-request-matches-javascript? [request]
   "Returns true if the accepted type is javascript or
-  if the :uri ends with .js. Note that browsers do not 
+  if the :uri ends with .js. Note that browsers do not
   use the proper accept type for javascript script tags."
   (boolean (or (= (-> request :accept :mime) :javascript)
                (re-find #".+\.js$" (or (-> request :uri presence) "")))))
@@ -126,7 +119,7 @@
      ; accept HTML and GET (or HEAD) wants allmost always the frontend
      (and (= (-> request :accept :mime) :html)
           (#{:get :head} (:request-method request))
-          (not (do-not-dispatch-to-std-frontend-handler-keys 
+          (not (do-not-dispatch-to-std-frontend-handler-keys
                  (:handler-key request)))
           (not (browser-request-matches-javascript? request))
           ) (html/html-handler request)
@@ -167,7 +160,7 @@
      ["application/json" :qs 1 :as :json
       "application/json-roa+json" :qs 1 :as :json-roa
       "image/apng" :qs 0.8 :as :apng
-      "text/css" :qs 1 :as :css 
+      "text/css" :qs 1 :as :css
       "text/html" :qs 1 :as :html]}))
 
 (defn wrap-add-vary-header [handler]
@@ -186,17 +179,17 @@
                  (if parse-json? (json/try-parse-json v) v)]))
          (into {}))))
 
-(canonicalize-params-map 
+(canonicalize-params-map
   {"email" "thomas.schank@zhdk.ch", "password" "secret"} :parse-json? false)
 
 (defn wrap-canonicalize-params-maps [handler]
   (fn [request]
     (handler (-> request
-                 (assoc :params-raw 
+                 (assoc :params-raw
                         (-> request :params-raw
                             (canonicalize-params-map :parse-json? false)))
-                 (assoc :query-params-raw 
-                        (-> request :query-params 
+                 (assoc :query-params-raw
+                        (-> request :query-params
                             (canonicalize-params-map :parse-json? false)))
                  (update-in [:params] canonicalize-params-map)
                  (update-in [:query-params] canonicalize-params-map)
@@ -217,14 +210,13 @@
 (defn init [secret]
   (I> wrap-handler-with-logging
       dispatch-to-handler
-      (auth/wrap-authorize skip-authorization-handler-keys)
+      (admin-auth/wrap-authorize skip-authorization-handler-keys)
       wrap-dispatch-content-type
       anti-csrf/wrap
       auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
       wrap-empty
       (wrap-secret-byte-array secret)
-      initial-admin/wrap
       settings/wrap
       ds/wrap-tx
       status/wrap
@@ -244,10 +236,10 @@
                   :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
                   :enabled? (= env/env :prod)})
+      shutdown/wrap
       ring-exception/wrap))
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

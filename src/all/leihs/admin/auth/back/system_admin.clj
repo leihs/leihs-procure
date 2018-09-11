@@ -1,6 +1,6 @@
-(ns leihs.admin.resources.auth.back.system-admin
+(ns leihs.admin.auth.back.system-admin
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
@@ -24,7 +24,7 @@
               :is_system_admin true
               :scope_read true
               :scope_write true
-              :scope_admin_read true 
+              :scope_admin_read true
               :scope_admin_write true})
       (throw (ex-info "Correct secret for system-admin required!"
                       {:status 401})))
@@ -37,6 +37,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
-;(debug/debug-ns 'cider-ci.open-session.encryptor)
 ;(debug/debug-ns *ns*)

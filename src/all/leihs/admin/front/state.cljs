@@ -3,60 +3,16 @@
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.admin.utils.core :refer [keyword str presence]]
-    [leihs.admin.utils.dom :as dom]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.dom :as dom]
+    [leihs.core.routing.front :as routing]
+    [leihs.core.user.front :as core-user]
 
     [clojure.pprint :refer [pprint]]
     [reagent.core :as reagent]
     [timothypratley.patchin :as patchin]
 
     ))
-
-(defonce routing-state* (reagent/atom {:debug true}))
-
-(defn hidden-state-component [handlers component-with-state]
-	(reagent/create-class
-		{:component-will-mount (fn [& args] (when-let [handler (:will-mount handlers)]
-																					(apply handler args)))
-		 :component-will-unmount (fn [& args] (when-let [handler (:will-unmount handlers)]
-																						(apply handler args)))
-		 :component-did-mount (fn [& args] (when-let [handler (:did-mount handlers)]
-																				 (apply handler args)))
-		 :component-did-update (fn [& args] (when-let [handler (:did-update handlers)]
-																					(apply handler args)))
-		 :reagent-render (fn [_]
-											 [:div.hidden-state-component
-												{:style {:display :none}}
-												[component-with-state]
-												])}))
-
-(defn hidden-routing-state-component [handlers]
-  "handlers is a map of keys to functions where the keys :will-mount,
-  :did-mount, :did-update correspond to the react lifcycle methods.
-  The custom :did-change will only fire when the routing state has changed,
-  where as :did-update can fire when other reactive monitored state changes."
-  (let [old-state* (reagent/atom nil)]
-    (reagent/create-class
-      {:component-will-mount (fn [& args] (when-let [handler (:will-mount handlers)]
-                                            (apply handler args)))
-       :component-will-unmount (fn [& args] (when-let [handler (:will-unmount handlers)]
-                                            (apply handler args)))
-       :component-did-mount (fn [& args] (when-let [handler (:did-mount handlers)]
-                                           (apply handler args)))
-       :component-did-update (fn [& args]
-                               (when-let [handler (:did-update handlers)]
-                                 (apply handler args))
-                               (when-let [handler (:did-change handlers)]
-                                 (let [old-state @old-state*
-                                       new-state @routing-state*]
-                                   (when (not= old-state new-state)
-                                     (reset! old-state* new-state)
-                                     (handler old-state (patchin/diff old-state new-state) new-state)))))
-       :reagent-render
-       (fn [_]
-         [:div.hidden-routing-state-component
-          {:style {:display :none}}
-          [:pre (with-out-str (pprint @routing-state*))]])})))
 
 (defonce global-state* (reagent/atom {:debug false
                                       :users-query-params {}
@@ -65,10 +21,6 @@
 (js/setInterval #(swap! global-state*
                        (fn [s] (merge s {:timestamp (js/moment)}))) 1000)
 
-
-(def user* (reagent/atom (dom/data-attribute "body" "user")))
-
-(def settings* (reagent/atom (dom/data-attribute "body" "settings")))
 
 (def leihs-admin-version* (reagent/atom (dom/data-attribute "body" "leihsadminversion")))
 
@@ -106,11 +58,8 @@
       [:h3 "@leihs-admin-version"]
       [:pre (with-out-str (pprint @leihs-admin-version*))]]
      [:div
-      [:h3 "@routing-state*"]
-      [:pre (with-out-str (pprint @routing-state*))]]
+      [:h3 "@routing/state*"]
+      [:pre (with-out-str (pprint @routing/state*))]]
      [:div
-      [:h3 "@settings*"]
-      [:pre (with-out-str (pprint @settings*))]]
-     [:div
-      [:h3 "@user*"]
-      [:pre (with-out-str (pprint @user*))]]]))
+      [:h3 "@core-user/state*"]
+      [:pre (with-out-str (pprint @core-user/state*))]]]))

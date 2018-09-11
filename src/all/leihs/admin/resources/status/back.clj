@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.status.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
 
-    [leihs.admin.utils.ds :as ds]
+    [leihs.core.ds :as ds]
 
     [clojure.data.json :as json]
     [compojure.core :as cpj]
@@ -31,7 +31,7 @@
 ;(.runHealthChecks @health-check-registry*)
 
 (defn health-checks []
-  (some->> @health-check-registry* 
+  (some->> @health-check-registry*
            .runHealthChecks
            (map (fn [[n r]]
                   [n (-> r HealthCheckResult->m)]))
@@ -81,7 +81,7 @@
 (defn wrap [default-handler]
   (fn [request]
     (if (and (= (:handler-key request) :status)
-             (= (-> request :accept :mime) :json)) 
+             (= (-> request :accept :mime) :json))
       (status-handler request)
       (default-handler request))))
 
@@ -91,11 +91,10 @@
 
 (defn init []
   (reset! health-check-registry* (HealthCheckRegistry.))
-  {:health-check-registry @health-check-registry*}) 
+  {:health-check-registry @health-check-registry*})
 
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

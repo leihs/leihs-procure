@@ -1,10 +1,11 @@
 (ns leihs.admin.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.utils.core :refer [keyword str presence]]
+    [leihs.core.paths]
+    [leihs.core.core :refer [keyword str presence]]
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
-    [leihs.admin.utils.url.query-params :refer [encode-query-params]]
+    [leihs.core.url.query-params :as query-params]
 
     #?@(:clj
          [[uritemplate-clj.core :as uri-templ]
@@ -50,36 +51,28 @@
                                   (param :user-id)
                                   (leaf "" :delegation-user))))))
 
-(def users-paths 
+(def users-paths
   (branch "/users"
           (branch "/"
                   (leaf "" :users)
                   (leaf "new" :user-new))
-          (branch "/" 
+          (branch "/"
                   (param :user-id)
                   (leaf "" :user)
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
                   (leaf "/inventory-pools-roles/" :user-inventory-pools-roles)
                   (leaf "/password" :user-password)
-                  (branch "/api-tokens/"
-                          (leaf "" :api-tokens)
-                          (leaf "add " :api-token-add)
-                          (branch ""
-                                  (param :api-token-id)
-                                  (leaf "" :api-token)
-                                  (leaf "/delete" :api-token-delete)
-                                  (leaf "/edit" :api-token-edit)))
                   (branch "/transfer/"
                           (param :target-user-id)
                           (leaf "" :user-transfer-data)))))
 
-(def groups-paths 
+(def groups-paths
   (branch "/groups"
           (branch "/"
                   (leaf "" :groups)
                   (leaf "add" :group-add))
-          (branch "/" 
+          (branch "/"
                   (param :group-id)
                   (leaf "" :group)
                   (leaf "/delete" :group-delete)
@@ -92,27 +85,11 @@
 
 (def paths
   (branch ""
-          (leaf "/" :home)
-          (branch "/auth"
-                  (leaf "/" :auth)
-                  (leaf "/info" :auth-info)
-                  (leaf "/shib-sign-in" :auth-shib-sign-in)
-                  (leaf "/password-sign-in" :auth-password-sign-in)
-                  (leaf "/sign-out" :auth-sign-out))
-          (leaf "/procure" :procurement)
-          (leaf "/manage" :lending)
-          (leaf "/borrow" :borrow)
+          leihs.core.paths/core-paths
           (branch "/admin"
                   (leaf "/status" :status)
                   (leaf "/shutdown" :shutdown)
-                  (leaf "/initial-admin" :initial-admin)
-                  (branch "/debug"
-                          (leaf "" :debug)
-                          (branch "/requests"
-                                  (leaf "/" :requests)
-                                  (branch "/" (param :id)
-                                          (leaf "" :request))))
-                  (leaf "/" :admin)
+                  (leaf "/debug" :debug)
                   delegation-paths
                   users-paths
                   groups-paths
@@ -128,19 +105,9 @@
                   (leaf "/suppliers" :admin-suppliers)
                   )))
 
-;(path-for (paths) :user :user-id "{user-id}")
-;(match-route (paths) "/users/512")
-;(match-route (paths) "/?x=5#7")
 
-(defn path
-  ([kw]
-   (path-for paths kw))
-  ([kw route-params]
-   (apply (partial path-for paths kw)
-          (->> route-params (into []) flatten)))
-  ([kw route-params query-params]
-   (str (path kw route-params) "?"
-        (encode-query-params query-params))))
+(reset! leihs.core.paths/paths* paths) 
 
+(def path leihs.core.paths/path)
 
 ;(path :user-inventory-pools-roles {:user-id "123"})

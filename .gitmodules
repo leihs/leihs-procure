@@ -4,3 +4,6 @@
 [submodule "vendor"]
 	path = vendor
 	url = https://github.com/leihs/leihs-admin_vendor.git
+[submodule "leihs-clj-shared"]
+	path = leihs-clj-shared
+	url = https://github.com/leihs/leihs-clj-shared.git

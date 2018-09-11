@@ -1,12 +1,12 @@
 (ns leihs.admin.resources.group.users.shared
   (:require
-    [leihs.admin.utils.json :as json]
+    [leihs.core.json :as json]
     ))
 
 (defn group-users-filter-value [query-params]
-  (if-not (contains? query-params :group-users-only) 
+  (if-not (contains? query-params :group-users-only)
     true
-    (try 
+    (try
       (-> query-params :group-users-only json/from-json)
       (catch #?(:clj Exception
                 :cljs js/Object) _

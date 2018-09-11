@@ -1,12 +1,13 @@
 (ns leihs.admin.back.html
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.admin.utils.core :refer [keyword str presence]])
+  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.http-cache-buster :as cache-buster :refer [wrap-resource]]
+    [leihs.core.json :refer [to-json]]
+    [leihs.core.url.core :as url]
+
     [leihs.admin.env :refer [env]]
     [leihs.admin.resources.user.back :as user]
-    [leihs.admin.utils.http-resources-cache-buster :as cache-buster :refer [wrap-resource]]
-    [leihs.admin.utils.json :refer [to-json]]
-    [leihs.admin.utils.url.core :as url]
     [leihs.admin.utils.release-info :as release-info]
 
     [clojure.java.jdbc :as jdbc]
@@ -35,25 +36,8 @@
    (include-site-css)
    (include-font-css)])
 
-(defn user-data [request]
-  (url/encode
-    (to-json
-      (when-let [user-id (-> request :authenticated-entity :user_id)]
-        (->> (user/user-query user-id)
-             (jdbc/query (:tx request)) first)))))
-
-(defn settings-data [request]
-  (url/encode
-    (to-json
-      (-> request
-          :settings
-          (select-keys
-            [:shibboleth_enabled
-             :shibboleth_login_path])))))
-
 (defn body-attributes [request]
-  {:data-user (user-data request)
-   :data-settings (settings-data request)
+  {:data-user  (some-> (:authenticated-entity request) to-json url/encode)
    :data-leihsadminversion (url/encode (to-json release-info/leihs-admin-version))
    :data-leihsversion (url/encode (to-json release-info/leihs-version))})
 
@@ -84,5 +68,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns 'cider-ci.utils.shutdown)
 ;(debug/debug-ns *ns*)

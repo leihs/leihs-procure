@@ -5,15 +5,6 @@ feature 'Manage groups', type: :feature do
 
   context 'an admin user and a bunch of other users and a bunch of groups' do
 
-    let :sign_in_as_admin do
-      visit '/'
-      click_on 'Sign in with password'
-      fill_in 'email', with: @admin.email
-      fill_in 'password', with: @admin.password
-      click_on 'Sign in'
-    end
-
-
     before :each do
       @admins = 3.times.map do
         FactoryBot.create :admin
@@ -29,7 +20,7 @@ feature 'Manage groups', type: :feature do
         FactoryBot.create :group
       end
 
-      sign_in_as_admin
+      sign_in_as @admin
     end
 
 

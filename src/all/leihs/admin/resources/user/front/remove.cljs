@@ -4,12 +4,14 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.requests.core :as requests]
+    [leihs.core.routing.front :as routing]
+
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
-    [leihs.admin.front.requests.core :as requests]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.core :refer [keyword str presence]]
     [leihs.admin.resources.user.front.shared :as user.shared :refer [clean-and-fetch user-id* user-data* edit-mode?*]]
 
     [accountant.core :as accountant]
@@ -26,7 +28,7 @@
 
 (defn delete-user [_]
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user (-> @state/routing-state* :route-params))
+        id (requests/send-off {:url (path :user (-> @routing/state* :route-params))
                                :method :delete
                                :query-params {}}
                               {:title "Delete User"
@@ -82,7 +84,7 @@
      "Contracts, reserverations, and orders of this user will be "
      "transferred to the user entered below. " ]
     [:p.text-danger
-     "Permissions, such as given by delegations, groups, or roles will not be 
+     "Permissions, such as given by delegations, groups, or roles will not be
      transferred! " ]
     [:p.text-danger
      "Audits will still contain references to the removed user! "]
@@ -104,7 +106,7 @@
 
 (defn page []
   [:div.user-delete
-   [state/hidden-routing-state-component
+   [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row

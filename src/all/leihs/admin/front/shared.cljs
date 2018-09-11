@@ -2,8 +2,8 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [leihs.admin.front.state :as state]
-    [leihs.admin.utils.core :refer [keyword str presence]]
-    [leihs.admin.utils.digest]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.digest]
 
     [cljsjs.moment]
     [goog.string :as gstring]))
@@ -33,7 +33,7 @@
      (let [md5 (->> email
                     clojure.string/trim
                     clojure.string/lower-case
-                    leihs.admin.utils.digest/md5-hex)]
+                    leihs.core.digest/md5-hex)]
        (gstring/format
          "https://www.gravatar.com/avatar/%s?s=%d&d=retro"
          md5 size)))))

@@ -1,18 +1,18 @@
 (ns leihs.admin.utils.release-info
   (:refer-clojure :exclude [str keyword])
-  (:require 
-    [leihs.admin.utils.core :refer [keyword str presence]]
+  (:require
+    [leihs.core.core :refer [keyword str presence]]
 
-    [clojure.java.io :as io] 
-    [clojure.string :as str] 
+    [clojure.java.io :as io]
+    [clojure.string :as str]
     [yaml.core :as yaml]
     ))
 
 
 (defn update-version-build-fn [b]
-  (if (= b "$TIMESTAMP$") 
+  (if (= b "$TIMESTAMP$")
     (some-> "public/admin/build-timestamp.txt"
-            io/resource 
+            io/resource
             slurp
             str/trim)
     b))

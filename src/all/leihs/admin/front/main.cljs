@@ -7,7 +7,7 @@
     [leihs.admin.front.html :as html]
     [leihs.admin.routes :as routes]
     [leihs.admin.paths :as paths]
-    [leihs.admin.utils.core :refer [keyword str presence]]
+    [leihs.core.core :refer [keyword str presence]]
 
     [clojure.string :as str]
     [clojure.pprint :refer [pprint]]
