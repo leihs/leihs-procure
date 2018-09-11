@@ -168,3 +168,14 @@
                                   :tx)
                               :order_quantity
                               (:id value)))
+
+(defn total-price-cents-new-requests
+  [context _ value]
+  (let [tx (-> context
+               :request
+               :tx)
+        bp-id (:id value)]
+    (-> :requested_quantity
+        (total-price-sqlmap bp-id)
+        (sql/merge-where [:= :procurement_requests.approved_quantity nil])
+        (->> (get-total-price-cents tx)))))

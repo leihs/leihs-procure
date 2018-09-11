@@ -65,7 +65,8 @@
          (authorization/authorize-and-apply
            #(request/get-new context args value)
            :if-only
-           #(and (not (and category (:template args))) ; template belongs to
+           #(and (not (and category (:template args)))
+                 ; template belongs to
                  ; category
                  (not (budget-period/past? tx budget-period))
                  (or (user-perms/admin? tx auth-entity)
@@ -92,6 +93,12 @@
    :suppliers suppliers/get-suppliers,
    :template template/get-template,
    :templates templates/get-templates,
+   :total-price-cents-new-requests (-> requests/total-price-cents-new-requests
+                                       (authorization/wrap-ensure-one-of
+                                         [user-perms/admin?])),
+   ; :total-price-cents-inspected-requests
+   ;   (-> requests/total-price-cents-inspected-requests
+   ;       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-requested-quantities
      (-> requests/total-price-cents-requested-quantities
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
