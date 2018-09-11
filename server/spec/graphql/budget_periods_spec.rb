@@ -16,9 +16,7 @@ describe 'budget periods' do
             name
             inspection_start_date
             end_date
-            total_price_cents_requested_quantities
-            total_price_cents_approved_quantities
-            total_price_cents_order_quantities
+            total_price_cents_new_requests
           }
         }
       GRAPHQL
@@ -33,8 +31,8 @@ describe 'budget periods' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector, user_id: user.id)
 
-      [:requested, :approved, :order].each do |qty_type|
-        tp = "total_price_cents_#{qty_type}_quantities"
+      [:new].each do |qty_type|
+        tp = "total_price_cents_#{qty_type}_requests"
 
         q = <<-GRAPHQL
           query {
