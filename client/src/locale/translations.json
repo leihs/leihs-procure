@@ -1,4 +1,5 @@
 {
+  "app_title": "Bedarfsermittlung",
   "form_btn_save": "Speichern",
   "form_btn_cancel": "Abbrechen",
   "form_btn_close": "Schliessen",
@@ -106,7 +107,13 @@
     "cost_center": "Kostenstelle",
     "general_ledger_account": "Sachkonto",
     "internal_order_number": "Innenauftrag",
-    "procurement_account": "Beschaffungskonto"
+    "procurement_account": "Beschaffungskonto",
+
+    "id": "ID",
+    "model": "Model",
+    "organization": "Organisation",
+    "category": "Kategorie",
+    "price_currency": "Preis Währung"
   },
   "accounting_type_investment": "Investition",
   "accounting_type_aquisition": "Beschaffung",

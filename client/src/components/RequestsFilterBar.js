@@ -28,7 +28,7 @@ import CurrentUser from '../containers/CurrentUserProvider'
 // import logger from 'debug'
 // const log = logger('app:ui:RequestsFilterBar')
 
-const BIG = 'xl' // starting with this size is shown on right side etc
+export const BIG = 'xl' // starting with this size is shown on right side etc
 
 const FilterBar = ({
   filters: { loading, error, data, networkStatus, ...restFilters },
@@ -140,11 +140,25 @@ const Filters = ({ me, data, current, onChange }) => {
     f.keys(allowed)
   )
 
+  const applyFilters = filters => {
+    // Dont send filters that have every possible value selected
+    function unlessAllOptsSelected(key, available, filters) {
+      if (!available[key]) return
+      const allCount = f.flatMap(available[key], 'options').length
+      if (filters[key].length < allCount) return { [key]: filters[key] }
+    }
+    return {
+      ...filters,
+      ...unlessAllOptsSelected('categories', available, filters),
+      ...unlessAllOptsSelected('organizations', available, filters)
+    }
+  }
+
   return (
     <StatefulForm
       idPrefix="requests_filter"
       values={current}
-      onChange={onChange}
+      onChange={d => onChange(applyFilters(d))}
     >
       {({ fields, formPropsFor, setValue, setValues }) => {
         const hasChanges = f.any(

@@ -47,6 +47,7 @@ import {
   faCube,
   faSearch,
   faExclamationTriangle,
+  faTable,
   faFileDownload
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -131,6 +132,9 @@ const ICONS = {
   },
   FileDownload: {
     src: faFileDownload
+  },
+  Table: {
+    src: faTable
   },
   Search: {
     src: faSearch

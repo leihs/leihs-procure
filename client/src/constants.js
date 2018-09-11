@@ -29,3 +29,22 @@ export const REQUEST_STATE_COLORS = f.fromPairs(
   f.map(requestStatesMap, i => [i.key, i.bsColor])
 )
 export const REQUEST_STATES = f.map(requestStatesMap, 'key')
+
+export const SPREADSHEET_EXPORT_COLS = [
+  'id',
+  'user',
+  'category',
+  'budget_period',
+  'article_name',
+  'model',
+  'receiver',
+  'organization',
+  'price_cents',
+  'price_currency',
+  'requested_quantity',
+  'approved_quantity',
+  'order_quantity',
+  'replacement',
+  'priority',
+  'state'
+]

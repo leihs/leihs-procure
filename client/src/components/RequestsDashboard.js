@@ -10,10 +10,10 @@ import {
   Col,
   Button,
   ButtonToolbar,
-  // UncontrolledDropdown as Dropdown,
-  // DropdownToggle,
-  // DropdownMenu,
-  // DropdownItem,
+  UncontrolledDropdown as Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
   Collapsing,
   Tooltipped
 } from './Bootstrap'
@@ -24,16 +24,22 @@ import Loading from './Loading'
 import { ErrorPanel } from './Error'
 import RequestLine from './RequestLine'
 import ImageThumbnail from './ImageThumbnail'
+import SpreadsheetExportProvider from './SpreadsheetExportProvider'
+import DataTable from '../components/DataTable'
 
 import CurrentUser from '../containers/CurrentUserProvider'
-import FilterBar from './RequestsFilterBar'
+import FilterBar, { BIG as filterBarBreakPoint } from './RequestsFilterBar'
 import logger from 'debug'
 const log = logger('app:ui:RequestsDashboard')
 
 class RequestsDashboard extends React.Component {
-  render({ props } = this) {
+  state = { exportView: false, showFilter: true }
+
+  render({ props, state } = this) {
     log('render', { props })
     const { requestsQuery, refetchAllData } = props
+
+    const hasData = !(requestsQuery.loading || !requestsQuery.data)
 
     const requestTotalCount =
       f.get(requestsQuery, 'data.dashboard.total_count') || 0
@@ -48,21 +54,34 @@ class RequestsDashboard extends React.Component {
                   requestTotalCount === 1
                     ? t('dashboard.requests_title_singular')
                     : t('dashboard.requests_title_plural')
-                }`}
+                }${state.exportView ? ' exportieren' : ''}`}
           </h4>
         </Col>
         <Col sm cls="d-flex justify-content-end align-items-end">
           <ButtonToolbar size="sm" className="mb-2">
-            {/* TODO: export menu
-            <Dropdown size="sm" small className="mr-1 mb-1">
-              <DropdownToggle caret outline size="sm">
-                <Icon.FileDownload /> {'Export'}
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem>Dropdown Link</DropdownItem>
-                <DropdownItem>Dropdown Link</DropdownItem>
-              </DropdownMenu>
-            </Dropdown> */}
+            <Button
+              size="sm"
+              outline
+              cls={cx('mr-1 mb-1', {
+                // NOTE: hide on smaller size, but not if currently hiding filters!
+                [`d-none d-${filterBarBreakPoint}-inline`]: state.showFilter
+              })}
+              active={state.showFilter}
+              onClick={e => this.setState(s => ({ showFilter: !s.showFilter }))}
+            >
+              {'Filter'}
+            </Button>
+
+            <Button
+              size="sm"
+              cls="mr-1 mb-1"
+              outline
+              active={state.exportView}
+              onClick={e => this.setState(s => ({ exportView: !s.exportView }))}
+            >
+              <Icon.Table /> {'Export'}
+            </Button>
+
             <Button
               size="sm"
               cls="mr-1 mb-1"
@@ -77,35 +96,88 @@ class RequestsDashboard extends React.Component {
       </Row>
     )
 
-    return (
-      <MainWithSidebar
-        sidebar={
-          <FilterBar
-            filters={props.filters}
-            currentFilters={props.currentFilters}
-            onFilterChange={props.onFilterChange}
-          />
-        }
-      >
-        {pageHeader}
+    const SpreadsheetExporter = state.exportView &&
+      hasData && (
+        <SpreadsheetExportProvider requestsData={requestsQuery.data}>
+          {({ table, download, exportFormats }) => (
+            <div>
+              <ButtonToolbar className="pb-3">
+                {/* <ButtonToolbar className="row pb-3"> */}
+                {/* <ButtonGroup className="col-auto mr-auto pt-3"> */}
+                <Dropdown className="mr-2">
+                  <DropdownToggle caret color="success">
+                    <Icon.FileDownload spaced /> {'Herunterladen'}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    {exportFormats.map(fmt => (
+                      <DropdownItem
+                        key={fmt.ext}
+                        onClick={e => download(table, fmt)}
+                      >
+                        {fmt.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
 
-        <CurrentUser>
-          {me => (
-            <RequestsTree
-              requestsQuery={requestsQuery}
-              me={me}
-              refetchAllData={refetchAllData}
-              openPanels={props.openPanels}
-              onPanelToggle={props.onPanelToggle}
-              doChangeRequestCategory={props.doChangeRequestCategory}
-              doChangeBudgetPeriod={props.doChangeBudgetPeriod}
-              doDeleteRequest={props.doDeleteRequest}
-              editQuery={props.editQuery} //tmp?
-              filters={props.currentFilters} // tmp
-            />
+                <Button
+                  outline
+                  onClick={e => this.setState(s => ({ exportView: false }))}
+                >
+                  Exportansicht schliessen
+                </Button>
+                {/* </ButtonGroup> */}
+                {/* <ButtonGroup className="col-auto ml-auto pt-3">
+                </ButtonGroup> */}
+              </ButtonToolbar>
+
+              <h5>Vorschau:</h5>
+              {<RequestTable table={table} query={requestsQuery} />}
+            </div>
           )}
-        </CurrentUser>
-      </MainWithSidebar>
+        </SpreadsheetExportProvider>
+      )
+
+    const [Wrapper, wrapProps] = !state.showFilter
+      ? ['div', { className: 'pt-3 px-3' }]
+      : [
+          MainWithSidebar,
+          {
+            sidebar: (
+              <FilterBar
+                filters={props.filters}
+                currentFilters={props.currentFilters}
+                onFilterChange={props.onFilterChange}
+              />
+            )
+          }
+        ]
+
+    return (
+      <CurrentUser>
+        {me => (
+          <Wrapper {...wrapProps}>
+            {pageHeader}
+
+            {SpreadsheetExporter}
+
+            {!state.exportView && (
+              <RequestsTree
+                requestsQuery={requestsQuery}
+                me={me}
+                refetchAllData={refetchAllData}
+                openPanels={props.openPanels}
+                onPanelToggle={props.onPanelToggle}
+                doChangeRequestCategory={props.doChangeRequestCategory}
+                doChangeBudgetPeriod={props.doChangeBudgetPeriod}
+                doDeleteRequest={props.doDeleteRequest}
+                editQuery={props.editQuery} //tmp?
+                filters={props.currentFilters} // tmp
+              />
+            )}
+          </Wrapper>
+        )}
+      </CurrentUser>
     )
   }
 }
@@ -468,6 +540,16 @@ const SubCategoryLine = ({
       )}
     </Collapsing>
   )
+}
+
+const RequestTable = ({
+  table,
+  query: { loading, error, data, networkStatus }
+}) => {
+  if (loading) return <Loading size="1" />
+  if (error) return <ErrorPanel error={error} data={data} />
+  if (!table.rows.length) return '---'
+  return <DataTable small darkHead bordered striped hover {...table} />
 }
 
 const newRequestLink = ({
