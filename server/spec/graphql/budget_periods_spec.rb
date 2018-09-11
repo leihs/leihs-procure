@@ -25,6 +25,35 @@ describe 'budget periods' do
       expect(result['errors']).to be_nil
     end
 
+    example 'correct calculation of total price new requests' do
+      bp = FactoryBot.create(:budget_period)
+      FactoryBot.create(:request,
+                        budget_period_id: bp.id,
+                        requested_quantity: nil,
+                        approved_quantity: nil,
+                        order_quantity: nil)
+      FactoryBot.create(:request,
+                        budget_period_id: bp.id,
+                        requested_quantity: 100,
+                        approved_quantity: nil,
+                        order_quantity: nil)
+      FactoryBot.create(:request,
+                        budget_period_id: bp.id,
+                        requested_quantity: nil,
+                        approved_quantity: 100,
+                        order_quantity: nil)
+      FactoryBot.create(:request,
+                        budget_period_id: bp.id,
+                        requested_quantity: 100,
+                        approved_quantity: 100,
+                        order_quantity: nil)
+      FactoryBot.create(:request,
+                        budget_period_id: bp.id,
+                        requested_quantity: 100,
+                        approved_quantity: 100,
+                        order_quantity: nil)
+    end
+
     example 'authorizes total_price_cents_* query path' do
       FactoryBot.create(:request)
 
