@@ -80,7 +80,7 @@ describe 'budget periods' do
         { requested_quantity: 1,
           approved_quantity: nil,
           order_quantity: nil },
-        # DON'T INCLUDE
+        # INCLUDE (approved_quantity)
         { requested_quantity: 1,
           approved_quantity: 0,
           order_quantity: nil },
@@ -110,14 +110,14 @@ describe 'budget periods' do
         query {
           budget_periods(id: ["#{bp.id}"]) {
             id
-            total_price_cents_any_approved_requests
+            total_price_cents_inspected_requests
           }
         }
       GRAPHQL
 
       result = query(q, user.id)
       expect(
-        result['data']['budget_periods'].first['total_price_cents_any_approved_requests']
+        result['data']['budget_periods'].first['total_price_cents_inspected_requests']
       ).to eq '400'
     end
 
@@ -127,7 +127,7 @@ describe 'budget periods' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector, user_id: user.id)
 
-      [:new, :any_approved].each do |qty_type|
+      [:new, :inspected].each do |qty_type|
         tp = "total_price_cents_#{qty_type}_requests"
 
         q = <<-GRAPHQL

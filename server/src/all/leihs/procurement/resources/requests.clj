@@ -177,7 +177,7 @@
         (sql/merge-where [:= :procurement_requests.approved_quantity nil])
         (->> (get-total-price-cents tx)))))
 
-(defn total-price-cents-any-approved-requests
+(defn total-price-cents-inspected-requests
   [context _ value]
   (let [tx (-> context
                :request
@@ -187,5 +187,5 @@
                   :procurement_requests.order_quantity
                   :procurement_requests.approved_quantity)
         (total-price-sqlmap bp-id)
-        (sql/merge-where [:> :procurement_requests.approved_quantity 0])
+        (sql/merge-where [:!= :procurement_requests.approved_quantity nil])
         (->> (get-total-price-cents tx)))))
