@@ -5,6 +5,8 @@ import f from 'lodash'
 import { Label } from './Bootstrap'
 import Icon from '../Icons'
 
+const BASE_CLASS = 'ui-btn-radio'
+
 // TODO: responsive when long labels (e.g. btn-group-vertical)
 // https://getbootstrap.com/docs/4.0/components/buttons/#checkbox-and-radio-buttons
 // TODO: a11y
@@ -42,9 +44,15 @@ class ButtonRadio extends React.PureComponent {
   ) {
     const selectedValue = this.getSelectedValueProp(value, selected)
     const isDisabled = this.isDisabled()
+    const isInvalid = !!(required && !f.find(options, { value: selectedValue }))
+
     return (
       <div
-        className="btn-group btn-group-block"
+        className={cx(
+          BASE_CLASS,
+          'btn-group btn-group-block',
+          isInvalid && `${BASE_CLASS}-state-invalid`
+        )}
         role="radiogroup"
         {...restProps}
       >
@@ -64,7 +72,7 @@ class ButtonRadio extends React.PureComponent {
             <F key={n}>
               <Label
                 cls={cx(
-                  'btn btn-block  btn-outline-secondary m-0 text-left font-weight-bold',
+                  'btn btn-block btn-outline-secondary m-0 text-left font-weight-bold',
                   {
                     'border-left-0': n !== 0,
                     active: isSelected,
