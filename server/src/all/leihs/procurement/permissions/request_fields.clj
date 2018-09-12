@@ -60,8 +60,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:article_name template),
         :required true},
      :article_number
@@ -89,8 +89,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :required false},
      :budget_period
        {:read true,
