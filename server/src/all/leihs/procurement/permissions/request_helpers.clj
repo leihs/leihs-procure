@@ -49,7 +49,9 @@
    (authorized-to-write-all-fields? tx auth-user write-data write-data))
   ([tx auth-user request write-data]
    "For updating an existing request"
-   (let [request-data-with-perms (apply-permissions tx auth-user request)]
+   (let [request* (cond-> request
+                    (not (:user request)) (assoc :user (:user_id auth-user)))
+         request-data-with-perms (apply-permissions tx auth-user request*)]
      (->> write-data
           (map first)
           (map #(% request-data-with-perms))

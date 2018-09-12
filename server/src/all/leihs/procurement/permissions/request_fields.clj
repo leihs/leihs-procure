@@ -82,7 +82,6 @@
      :attachments
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
                  (not past-phase)
                  (or admin
                      (and new-request
@@ -95,22 +94,30 @@
         :required false},
      :budget_period
        {:read true,
-        :write (and (not past-phase)
-                    (or admin
-                        (and new-request requester)
-                        (and existing-request
-                             (or (and requesting-phase requester own-request)
-                                 (and inspection-phase category-inspector))))),
+        :write (and
+                 (not past-phase)
+                 (or admin
+                     (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)))
+                     (and existing-request
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:id budget-period),
         :required true},
      :category
        {:read true,
-        :write (and (not past-phase)
-                    (or admin
-                        (and new-request requester)
-                        (and existing-request
-                             (or (and requesting-phase requester own-request)
-                                 (and inspection-phase category-inspector))))),
+        :write (and
+                 (not past-phase)
+                 (or admin
+                     (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)))
+                     (and existing-request
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default category-id,
         :required true},
      :cost_center {:read (or category-viewer inspector admin),

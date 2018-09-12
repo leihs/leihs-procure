@@ -146,7 +146,7 @@ describe 'request' do
                  },
                  state: 'NEW',
                  supplier_name: { value: nil, read: true, write: true },
-                 user: { value: nil, read: false, write: false, default: requester.id }
+                 user: { value: { id: requester.id }, read: true, write: false, default: requester.id }
                 )
       end
 
@@ -191,7 +191,7 @@ describe 'request' do
                  },
                  state: 'NEW',
                  supplier_name: { value: nil, read: true, write: false },
-                 user: { value: nil, read: false, write: false, default: requester.id }
+                 user: { value: { id: requester.id }, read: true, write: false, default: requester.id }
                 )
       end
     end
@@ -318,6 +318,7 @@ describe 'request' do
 
       it 'as inspector' do
         @auth_user = FactoryBot.create(:user)
+        FactoryBot.create(:requester_organization, user_id: @auth_user.id)
         FactoryBot.create(:category_inspector,
                           user_id: @auth_user.id,
                           category_id: @category.id)
