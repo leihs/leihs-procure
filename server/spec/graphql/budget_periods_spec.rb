@@ -26,32 +26,45 @@ describe 'budget periods' do
     end
 
     example 'correct calculation of total price new requests' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: user.id)
       bp = FactoryBot.create(:budget_period)
-      FactoryBot.create(:request,
-                        budget_period_id: bp.id,
-                        requested_quantity: nil,
-                        approved_quantity: nil,
-                        order_quantity: nil)
-      FactoryBot.create(:request,
-                        budget_period_id: bp.id,
-                        requested_quantity: 100,
-                        approved_quantity: nil,
-                        order_quantity: nil)
-      FactoryBot.create(:request,
-                        budget_period_id: bp.id,
-                        requested_quantity: nil,
-                        approved_quantity: 100,
-                        order_quantity: nil)
-      FactoryBot.create(:request,
-                        budget_period_id: bp.id,
-                        requested_quantity: 100,
-                        approved_quantity: 100,
-                        order_quantity: nil)
-      FactoryBot.create(:request,
-                        budget_period_id: bp.id,
-                        requested_quantity: 100,
-                        approved_quantity: 100,
-                        order_quantity: nil)
+      [
+        { requested_quantity: 1,
+          approved_quantity: nil,
+          order_quantity: nil },
+        { requested_quantity: 1,
+          approved_quantity: nil,
+          order_quantity: 1 },
+        { requested_quantity: 1,
+          approved_quantity: 1,
+          order_quantity: nil },
+        { requested_quantity: 1,
+          approved_quantity: 1,
+          order_quantity: 1 }
+      ].each do |qts|
+        FactoryBot.create(
+          :request,
+          qts.merge(
+            budget_period_id: bp.id,
+            price_cents: 100
+          )
+        )
+      end
+
+      q = <<-GRAPHQL
+        query {
+          budget_periods(id: ["#{bp.id}"]) {
+            id
+            total_price_cents_new_requests
+          }
+        }
+      GRAPHQL
+
+      result = query(q, user.id)
+      expect(
+        result['data']['budget_periods'].first['total_price_cents_new_requests']
+      ).to eq '200'
     end
 
     example 'authorizes total_price_cents_* query path' do
