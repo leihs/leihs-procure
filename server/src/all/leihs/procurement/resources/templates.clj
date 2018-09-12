@@ -64,7 +64,8 @@
                   (template/update-template! tx tmpl))
                 (template/insert-template! tx (dissoc tmpl :id)))
               :if-only
-              #(user-perms/inspector? tx auth-entity (:category_id tmpl)))
+              #(or (user-perms/admin? tx auth-entity)
+                   (user-perms/inspector? tx auth-entity (:category_id tmpl))))
             (->> tmpl
                  (get-template-id tx)
                  (conj tmpl-ids)
