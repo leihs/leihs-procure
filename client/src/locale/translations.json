@@ -128,6 +128,7 @@
       "article_number": "Artikelnr. oder Herstellernr.",
       "price_cents": "Preis CHF inkl. MwSt",
       "supplier": "Lieferant",
+      "supplier_name": "Lieferant",
       "toDelete": ""
     }
   },

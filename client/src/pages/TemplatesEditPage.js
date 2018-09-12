@@ -86,8 +86,9 @@ const updateTemplates = {
         price_cents: tpl.price_cents,
         to_delete: tpl.toDelete,
 
-        category_id: sc.id
+        category_id: sc.id,
         // TODO: model/supplier
+        supplier_name: f.presence(tpl.supplier_name) || null
         // ...(!!tpl.model && { model: tpl.model.id }),
         // ...(!!tpl.supplier && { model: tpl.supplier.id }),
       }))
@@ -159,7 +160,7 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
     { key: 'article_name', size: 4, required: true },
     { key: 'article_number', size: 3 },
     { key: 'price_cents', size: 2, required: true },
-    { key: 'supplier', size: 2 },
+    { key: 'supplier_name', size: 2 },
     { key: 'toDelete', size: 1 }
   ]
 
