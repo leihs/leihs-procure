@@ -201,7 +201,7 @@ describe 'requests' do
   end
 
   context 'change user' do
-    example 'not readable/writable' do
+    example 'not writable but readable' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:requester_organization, user_id: user.id)
       request = FactoryBot.create(:request, user_id: user.id)
@@ -223,7 +223,7 @@ describe 'requests' do
         { 'data' => {
           'requests' => [
             { 'user' =>
-              { 'read' => false,
+              { 'read' => true,
                 'write' => false }
             }
           ]
