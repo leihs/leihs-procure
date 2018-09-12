@@ -16,7 +16,7 @@ import {
   faTrashAlt,
   faChartPie,
   faPaperclip,
-  faCircle,
+  // faCircle,
   faCheckCircle,
   faCircleNotch,
   faTag,
@@ -50,6 +50,7 @@ import {
   faTable,
   faFileDownload
 } from '@fortawesome/free-solid-svg-icons'
+import { faCircle as faCircleEmpty } from '@fortawesome/free-regular-svg-icons'
 
 const ICONS = {
   CaretUp: {
@@ -108,7 +109,7 @@ const ICONS = {
     src: faCheckCircle
   },
   RadioCheckedOff: {
-    src: faCircle
+    src: faCircleEmpty
   },
   Spinner: {
     src: faCircleNotch,
