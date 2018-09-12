@@ -75,8 +75,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:article_number template),
         :required false},
      :attachments
@@ -177,8 +177,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:model_id template),
         :required false},
      :motivation
@@ -219,8 +219,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (or (:price_cents template) 0),
         :required true},
      :price_currency {:read true,
@@ -255,8 +255,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :required false},
      :replacement
        {:read (or (and requester own-request) category-viewer inspector admin),
@@ -268,8 +268,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default nil,
         :required true},
      :requested_quantity
@@ -297,8 +297,8 @@
                          (or (and requesting-phase (or own-request inspector))
                              (and inspection-phase category-inspector)))
                     (and existing-request
-                         (or (and requesting-phase requester own-request)
-                             (and inspection-phase category-inspector)))))),
+                         (or category-inspector
+                             (and requesting-phase requester own-request)))))),
         :default (:id (rooms/general-from-general tx)),
         :required true},
      :supplier
@@ -312,8 +312,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:supplier_id template),
         :required false},
      :supplier_name
@@ -327,8 +327,8 @@
                           (or (and requesting-phase (or own-request inspector))
                               (and inspection-phase category-inspector)))
                      (and existing-request
-                          (or (and requesting-phase requester own-request)
-                              (and inspection-phase category-inspector))))),
+                          (or category-inspector
+                              (and requesting-phase requester own-request))))),
         :default (:supplier_name template),
         :required false},
      :template {:read true,
