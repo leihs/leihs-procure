@@ -64,7 +64,9 @@
 
 (defn add-action-permissions
   [req]
-  (let [can-edit-any-fields? (->> (apply dissoc req non-form-fields)
+  (let [can-edit-any-fields? (->> [attrs-to-skip special-perms non-form-fields]
+                                  (apply concat)
+                                  (apply dissoc req)
                                   (map (fn [[k v]] (:write v)))
                                   (filter true?)
                                   empty?
