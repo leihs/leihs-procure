@@ -167,6 +167,10 @@
           :total_price_cents {:type (non-null String)},
           :total_price_cents_approved_quantities
             {:resolve :total-price-cents-approved-quantities, :type String},
+          :total_price_cents_inspected_requests
+            {:resolve :total-price-cents-inspected-requests, :type String},
+          :total_price_cents_new_requests
+            {:resolve :total-price-cents-new-requests, :type String},
           :total_price_cents_order_quantities
             {:resolve :total-price-cents-order-quantities, :type String},
           :total_price_cents_requested_quantities
