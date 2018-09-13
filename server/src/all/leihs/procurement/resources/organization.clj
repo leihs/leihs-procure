@@ -17,44 +17,6 @@
                                         organization-id]))])
       sql/format))
 
-(defn get-organization-by-id
-  [tx id]
-  (first (jdbc/query tx
-                     (-> organization-base-query
-                         (sql/merge-where [:= :procurement_organizations.id id])
-                         sql/format))))
-
-(defn get-organization
-  [context _ value]
-  (first (jdbc/query (-> context
-                         :request
-                         :tx)
-                     (-> organization-base-query
-                         (sql/merge-where [:= :procurement_organizations.id
-                                           (or (:organization_id value) ; for
-                                               ; RequesterOrganization
-                                               (:value value) ; for
-                                               ; RequestFieldOrganization
-                                             )])
-                         sql/format))))
-
-(defn get-organization-by-name-and-dep-id
-  [tx org-name dep-id]
-  (first
-    (jdbc/query
-      tx
-      (-> organization-base-query
-          (sql/merge-where [:= :procurement_organizations.name org-name])
-          (sql/merge-where [:= :procurement_organizations.parent_id dep-id])
-          sql/format))))
-
-(defn get-department
-  [context _ value]
-  (first (jdbc/query (-> context
-                         :request
-                         :tx)
-                     (department-query (:organization_id value)))))
-
 (def department-base-query
   (-> organization-base-query
       (sql/merge-where [:= :procurement_organizations.parent_id nil])))
@@ -73,11 +35,69 @@
 
 (defn get-department-by-name
   [tx dep-name]
-  (first (jdbc/query tx (department-by-name-query dep-name))))
+  (->> dep-name
+       department-by-name-query
+       (jdbc/query tx)
+       first))
 
 (defn get-department-by-id
   [tx id]
-  (first (jdbc/query tx (department-by-id-query id))))
+  (->> id
+       department-by-id-query
+       (jdbc/query tx)
+       first))
+
+(defn get-organization-by-id
+  [tx id]
+  (first (jdbc/query tx
+                     (-> organization-base-query
+                         (sql/merge-where [:= :procurement_organizations.id id])
+                         sql/format))))
+
+(defn get-organization
+  [context _ value]
+  (first (jdbc/query (-> context
+                         :request
+                         :tx)
+                     (-> organization-base-query
+                         (sql/merge-where [:= :procurement_organizations.id
+                                           (or (:organization_id value)
+                                               ; for
+                                               ; RequesterOrganization
+                                               (:value value)
+                                               ; for
+                                               ; RequestFieldOrganization
+                                             )])
+                         sql/format))))
+
+(defn get-organization-by-name-and-dep-id
+  [tx org-name dep-id]
+  (first
+    (jdbc/query
+      tx
+      (-> organization-base-query
+          (sql/merge-where [:= :procurement_organizations.name org-name])
+          (sql/merge-where [:= :procurement_organizations.parent_id dep-id])
+          sql/format))))
+
+(defn get-department-of-requester-organization
+  [context _ value]
+  (->> value
+       :organization_id
+       department-query
+       (jdbc/query (-> context
+                       :request
+                       :tx))
+       first))
+
+(defn get-department-of-organization
+  [context _ value]
+  (let [tx (-> context
+               :request
+               :tx)]
+    (->> value
+         :parent_id
+         (get-department-by-id tx))))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

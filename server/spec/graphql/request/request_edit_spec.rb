@@ -88,6 +88,9 @@ describe 'requests' do
               read
               value {
                 id
+                department {
+                  id
+                }
               }
               write
             }

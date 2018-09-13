@@ -46,7 +46,9 @@
    :cost-center request/cost-center,
    :current-user current-user/get-current-user,
    :dashboard dashboard/get-dashboard,
-   :department organization/get-department,
+   :department organization/get-department-of-organization,
+   :department-of-requester-organization
+     organization/get-department-of-requester-organization,
    :general-ledger-account request/general-ledger-account,
    :inspectors (-> inspectors/get-inspectors
                    (authorization/wrap-ensure-one-of [user-perms/admin?])),
@@ -65,7 +67,8 @@
          (authorization/authorize-and-apply
            #(request/get-new context args value)
            :if-only
-           #(and (not (and category (:template args))) ; template belongs to
+           #(and (not (and category (:template args)))
+                 ; template belongs to
                  ; category
                  (not (budget-period/past? tx budget-period))
                  (or (user-perms/admin? tx auth-entity)
