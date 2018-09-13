@@ -49,7 +49,9 @@
    (authorized-to-write-all-fields? tx auth-user write-data write-data))
   ([tx auth-user request write-data]
    "For updating an existing request"
-   (let [request-data-with-perms (apply-permissions tx auth-user request)]
+   (let [request* (cond-> request
+                    (not (:user request)) (assoc :user (:user_id auth-user)))
+         request-data-with-perms (apply-permissions tx auth-user request*)]
      (->> write-data
           (map first)
           (map #(% request-data-with-perms))
@@ -57,15 +59,18 @@
           (every? true?)))))
 
 ; NOTE: `edit` action means only editing the *form* fields!
-(def non-form-fields [:budget_period :category :created_at :updated_at]); TODO: why are the timestamps writable tho?
+(def non-form-fields
+  [:budget_period :category :created_at :organization :updated_at]); TODO: why are the timestamps writable tho?
 
 (defn add-action-permissions
   [req]
-  (let [can-edit-any-fields? (->> (apply dissoc req non-form-fields)
+  (let [can-edit-any-fields? (->> [attrs-to-skip special-perms non-form-fields]
+                                  (apply concat)
+                                  (apply dissoc req)
                                   (map (fn [[k v]] (:write v)))
                                   (filter true?)
-                                  (empty?)
-                                  (not))
+                                  empty?
+                                  not)
         can-change-budget-period? (-> req
                                       :budget_period
                                       :write)

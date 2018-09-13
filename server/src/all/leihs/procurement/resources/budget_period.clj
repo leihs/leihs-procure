@@ -20,8 +20,10 @@
    (get-budget-period-by-id (-> context
                                 :request
                                 :tx)
-                            (or (:budget_period_id value) ; for BudgetLimit
-                                (:value value) ; for RequestFieldBudgetPeriod
+                            (or (:budget_period_id value)
+                                ; for BudgetLimit
+                                (:value value)
+                                ; for RequestFieldBudgetPeriod
                               )))
   ([tx bp-map]
    (let [where-clause (sql/map->where-clause :procurement_budget_periods
@@ -43,6 +45,28 @@
                                  (sql/call :cast <> :date)
                                  (sql/call :< :current_date <>)) :result])
                   sql/format)]
+    (->> query
+         (jdbc/query tx)
+         first
+         :result)))
+
+(defn in-inspection-phase?
+  [tx budget-period]
+  (let [inspection-start-date (as-> budget-period <>
+                                (:inspection_start_date <>)
+                                (sql-format-date <>)
+                                (sql/call :cast <> :date))
+        end-date (as-> budget-period <>
+                   (:end_date <>)
+                   (sql-format-date <>)
+                   (sql/call :cast <> :date))
+        query (->
+                (sql/select
+                  [(sql/call :and
+                             (sql/call :>= :current_date inspection-start-date)
+                             (sql/call :< :current_date end-date))
+                   :result])
+                sql/format)]
     (->> query
          (jdbc/query tx)
          first

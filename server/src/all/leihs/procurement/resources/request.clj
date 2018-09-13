@@ -46,7 +46,8 @@
         approved-greater-equal-than-requested
           [:>= :procurement_requests.approved_quantity
            :procurement_requests.requested_quantity]
-        approved-smaller-than-requested ; but greater than zero
+        approved-smaller-than-requested
+          ; but greater than zero
           [:and
            [:< :procurement_requests.approved_quantity
             :procurement_requests.requested_quantity]
@@ -377,11 +378,11 @@
                    (template/get-template-by-id tx t-id))
         data-from-template (-> template
                                (dissoc :id))
-        requester-id (or (:user input-data) (:user_id auth-entity))
-        organization (requesters/get-organization-of-requester tx requester-id)
+        user-id (or (:user input-data) (:user_id auth-entity))
+        organization (requesters/get-organization-of-requester tx user-id)
         write-data (-> input-data
                        (dissoc :attachments)
-                       (assoc :user requester-id)
+                       (assoc :user user-id)
                        (assoc :organization (:id organization))
                        to-name-and-lower-case-priorities)]
     (with-local-vars [req-id nil]

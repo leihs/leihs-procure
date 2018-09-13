@@ -199,3 +199,32 @@
   max-height: 22.8rem;
   overflow-x: hidden;
 }
+
+/* WIP ButonRadio comp */
+/* NOTE selectors based on `.custom-select`, style like `.btn-outline-danger` */
+.was-validated .ui-btn-radio-state-invalid label.btn,
+.ui-btn-radio.is-invalid label.btn {
+  color: #dc3545;
+  background-color: transparent;
+  background-image: none;
+  border-color: #dc3545;
+}
+
+.was-validated .ui-btn-radio-state-invalid label.btn:hover,
+.ui-btn-radio.is-invalid label.btn:hover {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.was-validated .ui-btn-radio-state-invalid label.btn:focus,
+.ui-btn-radio.is-invalid label.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
+}
+
+.was-validated .ui-btn-radio-state-invalid ~ .invalid-feedback,
+.was-validated .ui-btn-radio-state-invalid ~ .invalid-tooltip,
+.ui-btn-radio.is-invalid ~ .invalid-feedback,
+.ui-btn-radio.is-invalid ~ .invalid-tooltip {
+  display: block;
+}
