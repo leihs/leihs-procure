@@ -23,7 +23,11 @@ import {
   DropdownItem
 } from './Bootstrap'
 
-import { RequestTotalAmount as TotalAmount, formatCurrency } from './decorators'
+import {
+  RequestTotalAmount as TotalAmount,
+  RequestFieldValue as FieldValue,
+  formatCurrency
+} from './decorators'
 import * as formBlocker from './FormBlocker'
 import { ConfirmFormNav } from './FormBlocker'
 import BuildingAutocomplete from './BuildingAutocomplete'
@@ -308,13 +312,7 @@ class RequestForm extends React.Component {
                       <FormGroup horizontal={compactView} label={field.label}>
                         <ButtonRadio
                           {...formPropsFor('replacement')}
-                          value={
-                            f.isBoolean(field.value)
-                              ? CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
-                                  field.value
-                                ]
-                              : field.value
-                          }
+                          value={FieldValue('replacement', request)}
                           options={CONSTANTS.REQUEST_REPLACEMENT_VALUES.map(
                             v => ({
                               value: v,

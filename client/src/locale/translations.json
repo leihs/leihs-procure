@@ -40,6 +40,9 @@
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
 
+  "request_replacement_labels_new": "Neu",
+  "request_replacement_labels_replacement": "Ersatz",
+
   "priority": "Priorität",
   "priority_label_NORMAL": "Normal",
   "priority_label_HIGH": "Hoch",
@@ -90,8 +93,6 @@
     "state": "Status",
 
     "replacement": "Ersatz / Neu",
-    "request_replacement_labels_new": "Neu",
-    "request_replacement_labels_replacement": "Ersatz",
     "price_cents": "Stückpreis CHF",
     "price_help": "inkl. MwSt",
     "requested_quantity": "Menge beantragt",

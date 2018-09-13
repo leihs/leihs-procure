@@ -3,6 +3,9 @@ import f from 'lodash'
 import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
 
+import * as CONSTANTS from '../constants'
+import t from '../locale/translate'
+
 const isDev = process.env.NODE_ENV !== 'production'
 
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
@@ -73,6 +76,30 @@ export const budgetPeriodDates = bp => {
   const isRequesting = !isPast && now <= inspectStartDate
   const isInspecting = !isPast && !isRequesting
   return { inspectStartDate, endDate, isPast, isRequesting, isInspecting }
+}
+
+export const RequestFieldValue = (name, request) => {
+  const r = request
+  switch (name) {
+    case 'state':
+      return t(`request_state_label_${r.state}`)
+    case 'replacement':
+      return t(
+        `request_replacement_labels_${
+          CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[r.replacement.value]
+        }`
+      )
+    case 'priority':
+      return t(`priority_label_${r.priority.value}`)
+    case 'inspector_priority':
+      return t(`inspector_priority_label_${r.inspector_priority.value}`)
+    case 'accounting_type':
+      return t(
+        `request_form_field.accounting_type_label_${r.accounting_type.value}`
+      )
+    default:
+      throw new Error(`Unknown RequestField name '${name}'`)
+  }
 }
 
 export const RequestTotalAmount = fields => {
