@@ -207,14 +207,17 @@ class RequestForm extends React.Component {
                     {...formPropsFor('receiver')}
                   />
 
-                  <RequestInput field={formPropsFor('room')}>
-                    {roomField => (
+                  <Let
+                    roomField={formPropsFor('room')}
+                    buildingField={formPropsFor('building')}
+                  >
+                    {({ roomField, buildingField }) => (
                       <F>
                         <FormGroup
                           horizontal={compactView}
                           label={requiredLabel(
-                            formPropsFor('building').label,
-                            roomField.required
+                            buildingField.label,
+                            buildingField.write && roomField.required
                           )}
                         >
                           <BuildingAutocomplete
@@ -237,7 +240,7 @@ class RequestForm extends React.Component {
                         </FormGroup>
                       </F>
                     )}
-                  </RequestInput>
+                  </Let>
 
                   <FormField
                     horizontal={compactView}
