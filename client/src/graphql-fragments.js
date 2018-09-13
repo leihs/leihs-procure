@@ -23,17 +23,24 @@ export const RequestFieldsForIndex = gql`
     }
 
     category {
+      read
+      write
+      required
       value {
         id
         name
-        # FIXME: GraphQL error: db-spec null is missing a required parameter
-        # main_category {
-        #   id
-        # }
+        main_category {
+          id
+          name
+        }
       }
     }
     budget_period {
+      read
+      write
+      required
       value {
+        name
         id
       }
     }
@@ -57,6 +64,10 @@ export const RequestFieldsForIndex = gql`
         id
         name
         shortname
+        department {
+          id
+          name
+        }
       }
     }
 
@@ -89,6 +100,56 @@ export const RequestFieldsForIndex = gql`
     }
 
     state
+
+    # from here only needed for exporting from Dashboard/Index
+    article_number {
+      value
+    }
+    supplier {
+      value {
+        name
+      }
+    }
+    supplier_name {
+      value
+    }
+    receiver {
+      value
+    }
+    room {
+      value {
+        id
+        name
+        building {
+          id
+          name
+        }
+      }
+    }
+    motivation {
+      value
+    }
+    inspection_comment {
+      value
+    }
+    inspector_priority {
+      value
+    }
+    accounting_type {
+      value
+    }
+    cost_center {
+      value
+    }
+    general_ledger_account {
+      value
+    }
+    procurement_account {
+      value
+    }
+    internal_order_number {
+      value
+    }
   }
 `
 
@@ -111,24 +172,6 @@ export const RequestFieldsForEdit = gql`
         id
         firstname
         lastname
-      }
-    }
-
-    category {
-      read
-      write
-      required
-      value {
-        id
-        name
-      }
-    }
-    budget_period {
-      read
-      write
-      required
-      value {
-        id
       }
     }
 
