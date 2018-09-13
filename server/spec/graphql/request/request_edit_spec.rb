@@ -210,7 +210,7 @@ describe 'requests' do
       result = query(@q, @user.id, variables)
       expect(result['errors']).not_to be
       expect(result['data']['budget_periods'].map { |bp| bp['id'] })
-        .to be =~ [@bp_requesting_phase.id, @bp_inspection_phase.id]
+        .to match_array [@bp_requesting_phase.id, @bp_inspection_phase.id]
     end
   end
 

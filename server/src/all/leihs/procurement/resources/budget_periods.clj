@@ -20,7 +20,7 @@
         :whereRequestsCanBeMovedTo
         empty?
         not)
-      (sql/merge-where [:> :current_date
+      (sql/merge-where [:< :current_date
                         :procurement_budget_periods.end_date])))
 
 (defn get-budget-periods
