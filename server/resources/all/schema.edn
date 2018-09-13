@@ -99,6 +99,7 @@
                              :model {:type ID},
                              :price_cents {:type Int},
                              :supplier_id {:type ID},
+                             :supplier_name {:type String},
                              :to_delete {:type Boolean}}},
     :UploadInput {:fields {:id {:type ID},
                            :to_delete {:type (non-null Boolean)},
