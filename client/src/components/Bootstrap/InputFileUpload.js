@@ -126,7 +126,7 @@ class InputFileUpload extends React.Component {
                 'text-strike text-warning': isFailed
               })
               const nameOrLink = !u.url ? (
-                u.filename
+                <span className={txtCls}>{u.filename}</span>
               ) : (
                 <a
                   href={u.url}
