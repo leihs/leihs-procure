@@ -15,7 +15,13 @@
   [args]
   (cond-> budget-periods-base-query
     (:id args) (sql/merge-where [:in :procurement_budget_periods.id
-                                 (:id args)])))
+                                 (:id args)])
+    (-> args
+        :whereRequestsCanBeMovedTo
+        empty?
+        not)
+      (sql/merge-where [:> :current_date
+                        :procurement_budget_periods.end_date])))
 
 (defn get-budget-periods
   ([tx ids]

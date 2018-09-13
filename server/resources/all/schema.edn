@@ -410,7 +410,8 @@
  :queries
    {:admins {:resolve :admins, :type (list :User)},
     :budget_limits {:resolve :budget-limits, :type (list :BudgetLimit)},
-    :budget_periods {:args {:id {:type (list ID)}},
+    :budget_periods {:args {:id {:type (list ID)},
+                            :whereRequestsCanBeMovedTo {:type (list ID)}},
                      :resolve :budget-periods,
                      :type (list :BudgetPeriod)},
     :buildings {:resolve :buildings, :type (list :Building)},
