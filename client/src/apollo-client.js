@@ -24,15 +24,10 @@ export const fetchOptions = {
 
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
-    // FIXME: workaround buggy apollo cache, dont cache certain types at all!
-    switch (object.__typename) {
-      case 'MainCategory':
-        return Math.random()
-      case 'Category':
-        return Math.random()
-      default:
-        return defaultDataIdFromObject(object) // fall back to default handling
-    }
+    // NOTE: workaround buggy apollo cache, use `cacheKey` if given,
+    //       otherwise fall back to default handling.
+    if (object.cacheKey) return `${object.__typename}:^:${object.cacheKey}`
+    return defaultDataIdFromObject(object)
   }
 })
 

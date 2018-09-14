@@ -68,9 +68,11 @@ const REQUESTS_QUERY = gql`
       inspector_priority: $inspector_priority
       requested_by_auth_user: $onlyOwnRequests
     ) {
+      cacheKey
       total_count # is requestTotalCount
       budget_periods {
         id
+        cacheKey
         name
         inspection_start_date
         end_date
@@ -78,12 +80,14 @@ const REQUESTS_QUERY = gql`
 
         main_categories {
           id
+          cacheKey
           name
           image_url
           total_price_cents
 
           categories {
             id
+            cacheKey
             name
             total_price_cents
 
@@ -250,7 +254,7 @@ class RequestsIndexPage extends React.Component {
         {client => (
           <Query
             query={FILTERS_QUERY}
-            fetchPolicy="cache-and-network"
+            // fetchPolicy="cache-and-network"
             notifyOnNetworkStatusChange
           >
             {filtersQuery => {
@@ -258,7 +262,7 @@ class RequestsIndexPage extends React.Component {
                 <Query
                   query={REQUESTS_QUERY}
                   variables={f.omit(state.currentFilters, clientOnlyFilters)}
-                  fetchPolicy="cache-and-network"
+                  // fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
                   {requestsQuery => {
