@@ -95,6 +95,12 @@
    :suppliers suppliers/get-suppliers,
    :template template/get-template,
    :templates templates/get-templates,
+   :total-price-cents-new-requests (-> requests/total-price-cents-new-requests
+                                       (authorization/wrap-ensure-one-of
+                                         [user-perms/admin?])),
+   :total-price-cents-inspected-requests
+     (-> requests/total-price-cents-inspected-requests
+         (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-requested-quantities
      (-> requests/total-price-cents-requested-quantities
          (authorization/wrap-ensure-one-of [user-perms/admin?])),

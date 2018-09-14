@@ -124,9 +124,6 @@
 (defn- sql-sum
   [qty-type]
   (as-> qty-type <>
-    (name <>)
-    (str "procurement_requests." <>)
-    (keyword <>)
     (sql/call :* :procurement_requests.price_cents <>)
     (sql/call :cast <> :bigint)
     (sql/call :sum <>)))
@@ -150,7 +147,7 @@
   (specific-total-price-cents (-> context
                                   :request
                                   :tx)
-                              :requested_quantity
+                              :procurement_requests.requested_quantity
                               (:id value)))
 
 (defn total-price-cents-approved-quantities
@@ -158,7 +155,7 @@
   (specific-total-price-cents (-> context
                                   :request
                                   :tx)
-                              :approved_quantity
+                              :procurement_requests.approved_quantity
                               (:id value)))
 
 (defn total-price-cents-order-quantities
@@ -166,5 +163,29 @@
   (specific-total-price-cents (-> context
                                   :request
                                   :tx)
-                              :order_quantity
+                              :procurement_requests.order_quantity
                               (:id value)))
+
+(defn total-price-cents-new-requests
+  [context _ value]
+  (let [tx (-> context
+               :request
+               :tx)
+        bp-id (:id value)]
+    (-> :requested_quantity
+        (total-price-sqlmap bp-id)
+        (sql/merge-where [:= :procurement_requests.approved_quantity nil])
+        (->> (get-total-price-cents tx)))))
+
+(defn total-price-cents-inspected-requests
+  [context _ value]
+  (let [tx (-> context
+               :request
+               :tx)
+        bp-id (:id value)]
+    (-> (sql/call :coalesce
+                  :procurement_requests.order_quantity
+                  :procurement_requests.approved_quantity)
+        (total-price-sqlmap bp-id)
+        (sql/merge-where [:!= :procurement_requests.approved_quantity nil])
+        (->> (get-total-price-cents tx)))))

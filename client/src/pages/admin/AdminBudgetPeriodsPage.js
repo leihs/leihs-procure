@@ -32,8 +32,8 @@ const ADMIN_BUDGET_PERIODS_PROPS_FRAGMENT = gql`
     inspection_start_date
     end_date
     can_delete
-    total_price_cents_requested_quantities
-    total_price_cents_approved_quantities
+    total_price_cents_new_requests
+    total_price_cents_inspected_requests
   }
 `
 
@@ -153,11 +153,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
               </thead>
               <tbody>
                 {fields.map(({ toDelete = false, ...bp }, n) => {
-                  // FIXME: use bp.can_delete when fixed in API
-                  const canDelete = !(
-                    bp.total_price_cents_requested_quantities > 0 ||
-                    bp.total_price_cents_approved_quantities > 0
-                  )
+                  const canDelete = bp.can_delete
                   return (
                     <tr
                       key={n}
@@ -210,23 +206,21 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                             <Tooltipped
                               text={'Total aller Anträge mit Status "Neu"'}
                             >
-                              <Badge info id={`badge_requested_${n}`}>
+                              <Badge info id={`badge_new_${n}`}>
                                 <Icon.ShoppingCart />{' '}
                                 <samp>
                                   {formatCurrency(
-                                    bp.total_price_cents_requested_quantities
+                                    bp.total_price_cents_new_requests
                                   )}
                                 </samp>
                               </Badge>
                             </Tooltipped>{' '}
-                            <Tooltipped
-                              text={'Total aller bewilligten Anträge'}
-                            >
-                              <Badge success id={`badge_approved_${n}`}>
+                            <Tooltipped text={'Total aller geprüften Anträge'}>
+                              <Badge success id={`badge_inspecten_${n}`}>
                                 <Icon.ShoppingCart />{' '}
                                 <samp>
                                   {formatCurrency(
-                                    bp.total_price_cents_approved_quantities
+                                    bp.total_price_cents_inspected_requests
                                   )}
                                 </samp>
                               </Badge>

@@ -16,9 +16,7 @@ describe 'budget periods' do
             name
             inspection_start_date
             end_date
-            total_price_cents_requested_quantities
-            total_price_cents_approved_quantities
-            total_price_cents_order_quantities
+            total_price_cents_new_requests
           }
         }
       GRAPHQL
@@ -27,14 +25,110 @@ describe 'budget periods' do
       expect(result['errors']).to be_nil
     end
 
+    example 'correct calculation of total price new requests' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: user.id)
+      bp = FactoryBot.create(:budget_period)
+      [
+        # INCLUDE
+        { requested_quantity: 1,
+          approved_quantity: nil,
+          order_quantity: nil },
+        # INCLUDE
+        { requested_quantity: 1,
+          approved_quantity: nil,
+          order_quantity: 1 },
+        # DON'T INCLUDE
+        { requested_quantity: 1,
+          approved_quantity: 1,
+          order_quantity: nil },
+        # DON'T INCLUDE
+        { requested_quantity: 1,
+          approved_quantity: 1,
+          order_quantity: 1 }
+      ].each do |qts|
+        FactoryBot.create(
+          :request,
+          qts.merge(
+            budget_period_id: bp.id,
+            price_cents: 100
+          )
+        )
+      end
+
+      q = <<-GRAPHQL
+        query {
+          budget_periods(id: ["#{bp.id}"]) {
+            id
+            total_price_cents_new_requests
+          }
+        }
+      GRAPHQL
+
+      result = query(q, user.id)
+      expect(
+        result['data']['budget_periods'].first['total_price_cents_new_requests']
+      ).to eq '200'
+    end
+
+    example 'correct calculation of total price any approved requests' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: user.id)
+      bp = FactoryBot.create(:budget_period)
+      [
+        # DON'T INCLUDE
+        { requested_quantity: 1,
+          approved_quantity: nil,
+          order_quantity: nil },
+        # INCLUDE (approved_quantity)
+        { requested_quantity: 1,
+          approved_quantity: 0,
+          order_quantity: nil },
+        # INCLUDE (approved_quantity)
+        { requested_quantity: 2,
+          approved_quantity: 1,
+          order_quantity: nil },
+        # INCLUDE (approved_quantity)
+        { requested_quantity: 2,
+          approved_quantity: 2,
+          order_quantity: nil },
+        # INCLUDE (order_quantity)
+        { requested_quantity: 2,
+          approved_quantity: 2,
+          order_quantity: 1 }
+      ].each do |qts|
+        FactoryBot.create(
+          :request,
+          qts.merge(
+            budget_period_id: bp.id,
+            price_cents: 100
+          )
+        )
+      end
+
+      q = <<-GRAPHQL
+        query {
+          budget_periods(id: ["#{bp.id}"]) {
+            id
+            total_price_cents_inspected_requests
+          }
+        }
+      GRAPHQL
+
+      result = query(q, user.id)
+      expect(
+        result['data']['budget_periods'].first['total_price_cents_inspected_requests']
+      ).to eq '400'
+    end
+
     example 'authorizes total_price_cents_* query path' do
       FactoryBot.create(:request)
 
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector, user_id: user.id)
 
-      [:requested, :approved, :order].each do |qty_type|
-        tp = "total_price_cents_#{qty_type}_quantities"
+      [:new, :inspected].each do |qty_type|
+        tp = "total_price_cents_#{qty_type}_requests"
 
         q = <<-GRAPHQL
           query {
