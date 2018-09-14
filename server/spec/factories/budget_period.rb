@@ -7,4 +7,17 @@ FactoryBot.define do
     end_date { DateTime.now + 90 }
     name { "#{Faker::Cat.name} #{Faker::Cat.breed}" }
   end
+
+  trait :requesting_phase do
+  end
+
+  trait :inspection_phase do
+    inspection_start_date { DateTime.now - 1.day }
+    end_date { DateTime.now + 90 }
+  end
+
+  trait :past do
+    inspection_start_date { DateTime.now - 1.week }
+    end_date { DateTime.now - 1.day }
+  end
 end
