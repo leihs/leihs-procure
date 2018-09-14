@@ -83,7 +83,8 @@ class ButtonRadio extends React.PureComponent {
                 tabIndex="-1"
               >
                 <input
-                  className="sr-only"
+                  // NOTE: hidden, but centered for browser-native validation messages!
+                  className="sr-only mt-4 ml-2"
                   tabIndex={n === 0 ? 0 : -1}
                   {...item}
                   type="radio"
