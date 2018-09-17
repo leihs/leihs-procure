@@ -110,7 +110,7 @@ class RequestForm extends React.Component {
           return (
             <form
               id={formId}
-              className={cx(className, {
+              className={cx('ui-request-form', className, {
                 'form-compact': compactView,
                 'was-validated': this.state.showValidations
               })}

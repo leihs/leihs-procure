@@ -409,6 +409,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                 <F>
                   <hr className="my-4" />
                   <RequestForm
+                    compactView
                     id="new_request"
                     request={request}
                     categories={data.main_categories}
