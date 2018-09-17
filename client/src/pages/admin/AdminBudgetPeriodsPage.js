@@ -105,7 +105,7 @@ class AdminBudgetPeriodsPage extends React.Component {
 
                   return (
                     <MainWithSidebar>
-                      <h1>Budgetperioden</h1>
+                      <h1 className="h2">Budgetperioden</h1>
                       <BudgetPeriodsTable
                         budgetPeriods={budgetPeriods}
                         updateAction={fields => {

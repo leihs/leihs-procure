@@ -159,12 +159,12 @@ export default AdminUsersPage
 //
 const AdminUsers = ({ data, updateAdmins, updateRequestersOrgs }) => (
   <MainWithSidebar>
-    <h2>Users</h2>
+    <h1 className="h2">Users</h1>
 
-    <h5 className="pt-4">Procurement Admins</h5>
+    <h2 className="h4 pt-4">Procurement Admins</h2>
     <ListOfAdmins admins={data.admins} updateAdmins={updateAdmins} />
 
-    <h3 className="pt-4">Requesters</h3>
+    <h2 className="h4 pt-4">Requesters</h2>
     <ListOfRequestersAndOrgs
       requesters={data.requesters_organizations}
       updateRequestersOrgs={updateRequestersOrgs}

@@ -96,7 +96,7 @@ class AdminSettingsPage extends React.Component {
 
                   return (
                     <MainWithSidebar>
-                      <h1>Einstellungen</h1>
+                      <h1 className="h2">Einstellungen</h1>
                       <SettingsTable
                         settings={settings}
                         updateAction={fields =>
