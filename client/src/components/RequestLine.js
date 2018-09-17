@@ -3,7 +3,6 @@ import cx from 'classnames'
 // import f from 'lodash'
 
 import t from '../locale/translate'
-import * as CONSTANTS from '../constants'
 import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
 import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
@@ -94,18 +93,6 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       <Tooltipped text={t('priority')}>
         <Badge dark cls="mr-1" id={`prio_tt_${request.id}`}>
           {t(`priority_label_${request.priority.value}`)}
-        </Badge>
-      </Tooltipped>
-
-      <Tooltipped text={t('request_form_field.replacement')}>
-        <Badge secondary id={`replcmt_tt_${request.id}`}>
-          {t(
-            `request_form_field.request_replacement_labels_${
-              CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
-                request.replacement.value
-              ]
-            }`
-          )}{' '}
         </Badge>
       </Tooltipped>
     </Col>
