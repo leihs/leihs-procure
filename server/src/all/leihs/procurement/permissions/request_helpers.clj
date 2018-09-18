@@ -11,6 +11,7 @@
   [field-perms req-vec]
   (reduce (fn [acc el] (conj acc [el (el field-perms)])) req-vec special-perms))
 
+; FIXME: :read false, :write false !!!
 (defn- fallback-p-spec [value] {:value value, :read true, :write true})
 
 (defn with-protected-value

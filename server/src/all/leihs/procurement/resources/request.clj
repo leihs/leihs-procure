@@ -9,7 +9,7 @@
             [leihs.procurement.resources [attachments :as attachments]
              [budget-period :as budget-period] [category :as category]
              [requesters-organizations :as requesters] [template :as template]
-             [uploads :as uploads]]
+             [uploads :as uploads] [user :as user]]
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
              [sql :as sql]]))
 
@@ -167,10 +167,34 @@
        keyword
        (assoc row :state)))
 
+(defn add-general-ledger-account
+  [row]
+  (->> row
+       :category
+       :general_ledger_account
+       (assoc row :general_ledger_account)))
+
+(defn add-cost-center
+  [row]
+  (->> row
+       :category
+       :cost-center
+       (assoc row :cost-center)))
+
+(defn add-procurement-account
+  [row]
+  (->> row
+       :category
+       :procurement_account
+       (assoc row :procurement_account)))
+
 (defn transform-row
   [row]
   (-> row
       enum-state
+      add-general-ledger-account
+      add-cost-center
+      add-procurement-account
       add-total-price
       treat-priority
       treat-inspector-priority
@@ -187,36 +211,6 @@
         sql/format
         (->> (query-requests tx))
         first)))
-
-(defn get-account-perms
-  [context value attr]
-  (let [rrequest (:request context)
-        tx (:tx rrequest)
-        auth-entity (:authenticated-entity rrequest)
-        req (get-request-by-id tx auth-entity (:id value))
-        rf-perms
-          (request-fields-perms/get-for-user-and-request tx auth-entity req)
-        attr-perms (attr rf-perms)]
-    (->> value
-         :category
-         :value
-         (category/get-category-by-id tx)
-         attr
-         (if (:read attr-perms))
-         (hash-map :value)
-         (merge (attr rf-perms)))))
-
-(defn cost-center
-  [context _ value]
-  (get-account-perms context value :cost_center))
-
-(defn general-ledger-account
-  [context _ value]
-  (get-account-perms context value :general_ledger_account))
-
-(defn procurement-account
-  [context _ value]
-  (get-account-perms context value :procurement_account))
 
 (defn get-request-by-attrs
   [tx auth-entity attrs]

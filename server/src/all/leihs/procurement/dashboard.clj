@@ -58,12 +58,14 @@
                                                  (filter
                                                    #(and (= (-> %
                                                                 :category
-                                                                :value)
-                                                            (:id c))
+                                                                :value
+                                                                :id)
+                                                            (str (:id c)))
                                                          (= (-> %
                                                                 :budget_period
-                                                                :value)
-                                                            (:id bp)))
+                                                                :value
+                                                                :id)
+                                                            (str (:id bp))))
                                                    requests)]
                                            (->
                                              c

@@ -17,7 +17,8 @@
    (first (jdbc/query (-> context
                           :request
                           :tx)
-                      (category-query (or (:value value) ; for
+                      (category-query (or (:value value)
+                                          ; for
                                           ; RequestFieldCategory
                                           (:category_id value))))))
   ([tx catmap]
@@ -27,7 +28,12 @@
                             (sql/merge-where where-clause)
                             sql/format))))))
 
-(defn get-category-by-id [tx id] (first (jdbc/query tx (category-query id))))
+(defn get-category-by-id
+  [tx id]
+  (->> id
+       category-query
+       (jdbc/query tx)
+       first))
 
 (defn can-delete?
   [context _ value]

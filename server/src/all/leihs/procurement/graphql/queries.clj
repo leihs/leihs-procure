@@ -43,13 +43,11 @@
                                [user-perms/admin? user-perms/inspector?])),
    :category category/get-category,
    :categories categories/get-categories,
-   :cost-center request/cost-center,
    :current-user current-user/get-current-user,
    :dashboard dashboard/get-dashboard,
    :department organization/get-department-of-organization,
    :department-of-requester-organization
      organization/get-department-of-requester-organization,
-   :general-ledger-account request/general-ledger-account,
    :inspectors (-> inspectors/get-inspectors
                    (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :main-category main-category/get-main-category,
@@ -87,7 +85,6 @@
      (-> requesters-organizations/get-requesters-organizations
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :permissions user-perms/get-permissions,
-   :procurement-account request/procurement-account,
    :room room/get-room,
    :rooms rooms/get-rooms,
    :settings settings/get-settings,

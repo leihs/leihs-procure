@@ -1,9 +1,11 @@
 (ns leihs.procurement.permissions.request-fields
   (:require [leihs.procurement.resources.rooms :as rooms]
+            [leihs.procurement.resources.building :as building]
             [leihs.procurement.resources.category :as category]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.template :as template]
+            [leihs.procurement.resources.user :as user]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]))
@@ -21,8 +23,11 @@
                           :template
                           (template/get-template-by-id tx))
         category-id (or (:category proc-request) (:category_id template))
+        category (category/get-category-by-id tx category-id)
         no-template (not (:template proc-request))
-        own-request (= (:user_id auth-entity) (:user proc-request))
+        user-id (:user proc-request)
+        own-request (= (:user_id auth-entity) user-id)
+        user (user/get-user-by-id tx user-id)
         requester (user-perms/requester? tx auth-entity)
         inspector (user-perms/inspector? tx auth-entity)
         admin (user-perms/admin? tx auth-entity)
@@ -104,7 +109,7 @@
                      (and existing-request
                           (or category-inspector
                               (and requesting-phase requester own-request))))),
-        :default (:id budget-period),
+        :default budget-period,
         :required true},
      :category
        {:read true,
@@ -118,7 +123,7 @@
                      (and existing-request
                           (or category-inspector
                               (and requesting-phase requester own-request))))),
-        :default category-id,
+        :default category,
         :required true},
      :cost_center {:read (or category-viewer inspector admin),
                    :write false,
@@ -299,7 +304,7 @@
                     (and existing-request
                          (or category-inspector
                              (and requesting-phase requester own-request)))))),
-        :default (:id (rooms/general-from-general tx)),
+        :default (rooms/general-from-general tx),
         :required true},
      :supplier
        {:read (or (and requester own-request) category-viewer inspector admin),
@@ -339,4 +344,4 @@
               (or (and requester own-request) category-viewer inspector admin),
             :write (and (not past-phase) (or admin category-inspector)),
             :required true,
-            :default (:user_id auth-entity)}}))
+            :default user}}))

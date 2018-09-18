@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.building
   (:require [clojure.java.jdbc :as jdbc]
+            [leihs.procurement.resources.buildings :as buildings]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn building-query
@@ -8,6 +9,15 @@
       (sql/from :buildings)
       (sql/where [:= :buildings.id id])
       sql/format))
+
+(defn get-building-by-id
+  [tx id]
+  (-> id
+      building-query
+      (->> (jdbc/query tx))
+      first))
+
+(defn get-general [tx] (get-building-by-id tx buildings/general-id))
 
 (defn get-building
   [context args value]

@@ -93,7 +93,7 @@ describe 'request' do
           read
           write
           value { id }
-          default
+          default { id }
         }
         fragment RequestFieldPriority on RequestFieldPriority { value, read, write }
         fragment RequestFieldInspectorPriority on RequestFieldInspectorPriority { value, read, write }
@@ -146,7 +146,7 @@ describe 'request' do
                  },
                  state: 'NEW',
                  supplier_name: { value: nil, read: true, write: true },
-                 user: { value: { id: requester.id }, read: true, write: false, default: requester.id }
+                 user: { value: { id: requester.id }, read: true, write: false, default: { id: requester.id } }
                 )
       end
 
@@ -191,7 +191,7 @@ describe 'request' do
                  },
                  state: 'NEW',
                  supplier_name: { value: nil, read: true, write: false },
-                 user: { value: { id: requester.id }, read: true, write: false, default: requester.id }
+                 user: { value: { id: requester.id }, read: true, write: false, default: { id: requester.id } }
                 )
       end
     end
