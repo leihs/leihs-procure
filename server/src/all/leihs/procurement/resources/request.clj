@@ -324,14 +324,10 @@
       #(request-perms/authorized-to-write-all-fields?
          tx
          auth-entity
-         (-> proc-request
-             reverse-exchange-attrs
-             submap-with-id-for-associated-resources)
+         proc-request
          {:budget_period {:id budget-period-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
-         reverse-exchange-attrs
-         submap-with-id-for-associated-resources
          (request-perms/apply-permissions tx auth-entity))))
 
 (def change-category-reset-attrs
@@ -359,17 +355,12 @@
              (sql/where [:= :procurement_requests.id req-id])
              sql/format))
       :if-only
-      #(request-perms/authorized-to-write-all-fields?
-         tx
-         auth-entity
-         (-> proc-request
-             reverse-exchange-attrs
-             submap-with-id-for-associated-resources)
-         {:category {:id cat-id}}))
+      #(request-perms/authorized-to-write-all-fields? tx
+                                                      auth-entity
+                                                      proc-request
+                                                      {:category {:id cat-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
-         reverse-exchange-attrs
-         submap-with-id-for-associated-resources
          (request-perms/apply-permissions tx auth-entity))))
 
 (defn create-request!
