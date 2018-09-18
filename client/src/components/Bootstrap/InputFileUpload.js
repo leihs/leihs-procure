@@ -261,6 +261,7 @@ function uploadFile({ file, onProgress, onFinish }) {
   }
   const onUploadFinish = e => {
     logu('onUploadFinish', { file })
+    if (progress === 100) return // no update after finish, can happen bc of throttle
     progress = 100
     onProgress({ ...file, progress })
   }
@@ -284,7 +285,7 @@ function uploadFile({ file, onProgress, onFinish }) {
   xhr.addEventListener('load', onFileFinish, false)
   xhr.upload.addEventListener(
     'progress',
-    f.throttle(onUploadProgress, 3000), // dont update too often
+    f.throttle(onUploadProgress, 100), // dont update too often
     false
   )
 
