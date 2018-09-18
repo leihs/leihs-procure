@@ -8,8 +8,9 @@
              [request-fields :as request-fields-perms] [user :as user-perms]]
             [leihs.procurement.resources [attachments :as attachments]
              [budget-period :as budget-period] [category :as category]
+             [request-helpers :as request-helpers]
              [requesters-organizations :as requesters] [template :as template]
-             [uploads :as uploads]]
+             [uploads :as uploads] [user :as user]]
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
              [sql :as sql]]))
 
@@ -39,6 +40,13 @@
 (defn reverse-exchange-attrs
   [req]
   (exchange-attrs req (map-invert attrs-mapping)))
+
+(defn submap-with-id-for-associated-resources
+  [m]
+  (->> m
+       (map (fn [[k v]]
+              (if (some #{k} (keys attrs-mapping)) [k {:id v}] [k v])))
+       (into {})))
 
 (defn states-conds-map
   [advanced-user?]
@@ -171,10 +179,34 @@
        keyword
        (assoc row :state)))
 
+(defn add-general-ledger-account
+  [row]
+  (->> row
+       :category
+       :general_ledger_account
+       (assoc row :general_ledger_account)))
+
+(defn add-cost-center
+  [row]
+  (->> row
+       :category
+       :cost-center
+       (assoc row :cost-center)))
+
+(defn add-procurement-account
+  [row]
+  (->> row
+       :category
+       :procurement_account
+       (assoc row :procurement_account)))
+
 (defn transform-row
   [row]
   (-> row
       enum-state
+      add-general-ledger-account
+      add-cost-center
+      add-procurement-account
       add-total-price
       treat-priority
       treat-inspector-priority
@@ -182,55 +214,21 @@
 
 (defn query-requests [tx query] (jdbc/query tx query {:row-fn transform-row}))
 
-(defn get-request-by-id
+(defn get-request-by-id-sqlmap
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
-        (sql/where [:= :procurement_requests.id id])
-        sql/format
-        (->> (query-requests tx))
-        first)))
+        (sql/where [:= :procurement_requests.id id]))))
 
-(defn get-account-perms
-  [context value attr]
-  (let [rrequest (:request context)
-        tx (:tx rrequest)
-        auth-entity (:authenticated-entity rrequest)
-        req (get-request-by-id tx auth-entity (:id value))
-        rf-perms
-          (request-fields-perms/get-for-user-and-request tx auth-entity req)
-        attr-perms (attr rf-perms)]
-    (->> value
-         :category
-         :value
-         (category/get-category-by-id tx)
-         attr
-         (if (:read attr-perms))
-         (hash-map :value)
-         (merge (attr rf-perms)))))
-
-(defn cost-center
-  [context _ value]
-  (get-account-perms context value :cost_center))
-
-(defn general-ledger-account
-  [context _ value]
-  (get-account-perms context value :general_ledger_account))
-
-(defn procurement-account
-  [context _ value]
-  (get-account-perms context value :procurement_account))
-
-(defn get-request-by-attrs
-  [tx auth-entity attrs]
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
-        requests-base-query-with-state
-        (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
-        sql/format
-        (->> (query-requests tx))
-        first)))
+(defn get-request-by-id
+  [tx auth-entity id]
+  (->> id
+       (get-request-by-id-sqlmap tx auth-entity)
+       request-helpers/join-and-nest-associated-resources
+       sql/format
+       (query-requests tx)
+       first))
 
 (defn- consider-default
   [attr p-spec]
@@ -251,6 +249,7 @@
         req-stub (cond-> args
                    (not user-arg) (assoc :user (:user_id auth-entity)))]
     (as-> req-stub <>
+      (submap-with-id-for-associated-resources <>)
       (request-fields-perms/get-for-user-and-request tx auth-entity <>)
       (reject-keys <> request-perms/special-perms)
       (map #(apply consider-default %) <>)
@@ -332,11 +331,10 @@
       #(request-perms/authorized-to-write-all-fields?
          tx
          auth-entity
-         (reverse-exchange-attrs proc-request)
-         {:budget_period budget-period-id}))
+         proc-request
+         {:budget_period {:id budget-period-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
-         reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-entity))))
 
 (def change-category-reset-attrs
@@ -366,12 +364,10 @@
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-entity
-                                                      (reverse-exchange-attrs
-                                                        proc-request)
-                                                      {:category cat-id}))
+                                                      proc-request
+                                                      {:category {:id cat-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
-         reverse-exchange-attrs
          (request-perms/apply-permissions tx auth-entity))))
 
 (defn create-request!
@@ -404,12 +400,11 @@
              (if-not (empty? attachments)
                (deal-with-attachments! tx (var-get req-id) attachments)))
         :if-only
-        #(request-perms/authorized-to-write-all-fields? tx
-                                                        auth-entity
-                                                        input-data))
+        #(->> input-data
+              submap-with-id-for-associated-resources
+              (request-perms/authorized-to-write-all-fields? tx auth-entity)))
       (as-> (var-get req-id) <>
         (get-request-by-id tx auth-entity <>)
-        (reverse-exchange-attrs <>)
         (request-perms/apply-permissions tx
                                          auth-entity
                                          <>
@@ -447,11 +442,12 @@
       #(request-perms/authorized-to-write-all-fields?
          tx
          auth-entity
-         (reverse-exchange-attrs proc-request)
-         (reject-keys input-data request-perms/attrs-to-skip)))
+         proc-request
+         (-> input-data
+             (reject-keys request-perms/attrs-to-skip)
+             submap-with-id-for-associated-resources)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
-      (reverse-exchange-attrs <>)
       (request-perms/apply-permissions tx
                                        auth-entity
                                        <>

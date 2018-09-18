@@ -6,15 +6,17 @@
             [leihs.procurement.permissions [request-helpers :as request-perms]
              [requests :as requests-perms] [user :as user-perms]]
             [leihs.procurement.resources.request :as request]
+            [leihs.procurement.resources.request-helpers :as request-helpers]
             [leihs.procurement.utils.sql :as sql]))
 
 (defn search-query
   [sql-query term]
   (let [term-percent (str "%" term "%")]
     (-> sql-query
-        (sql/merge-join :rooms [:= :procurement_requests.room_id :rooms.id])
-        (sql/merge-join :buildings [:= :rooms.building_id :buildings.id])
-        (sql/merge-join :users [:= :procurement_requests.user_id :users.id])
+        ; NOTE: everything merged already
+        ; (sql/merge-join :rooms [:= :procurement_requests.room_id :rooms.id])
+        ; (sql/merge-join :buildings [:= :rooms.building_id :buildings.id])
+        ; (sql/merge-join :users [:= :procurement_requests.user_id :users.id])
         ; NOTE: models are joined in the base-query already
         (sql/merge-where
           [:or ["~~*" :buildings.name term-percent]
@@ -50,7 +52,8 @@
         tx (:tx rrequest)
         advanced-user? (user-perms/advanced? tx
                                              (:authenticated-entity rrequest))
-        start-sqlmap (request/requests-base-query-with-state advanced-user?)]
+        start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
+                         request-helpers/join-and-nest-associated-resources)]
     (cond-> start-sqlmap
       id (sql/merge-where [:in :procurement_requests.id id])
       category-id (-> (sql/merge-where [:in :procurement_requests.category_id
@@ -105,7 +108,6 @@
       proc-requests
       (map (fn [proc-req]
              (as-> proc-req <>
-               (request/reverse-exchange-attrs <>)
                (request-perms/apply-permissions tx
                                                 auth-entity
                                                 <>

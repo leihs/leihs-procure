@@ -47,6 +47,18 @@
   [m c]
   (cond-> m (empty? c) (helpers/where [:= true false])))
 
+(defn select-nest
+  [sqlmap tbl nest-key]
+  (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
+
+(defn join-and-nest
+  ([sqlmap tbl join-cond nest-key]
+   (join-and-nest sqlmap tbl join-cond nest-key helpers/merge-left-join))
+  ([sqlmap tbl join-cond nest-key join-fn]
+   (-> sqlmap
+       (select-nest tbl nest-key)
+       (join-fn tbl join-cond))))
+
 (defalias call types/call)
 (defalias param types/param)
 (defalias raw types/raw)

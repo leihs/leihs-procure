@@ -1,5 +1,6 @@
 (ns leihs.procurement.resources.rooms
   (:require [clojure.tools.logging :as log]
+            [leihs.procurement.resources.building :as building]
             [leihs.procurement.resources.buildings :as buildings]
             [clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sql]))
@@ -16,7 +17,8 @@
       (sql/merge-where [:= :rooms.building_id buildings/general-id])
       sql/format
       (->> (jdbc/query tx))
-      first))
+      first
+      (assoc :building (building/get-general tx))))
 
 (defn rooms-query
   [args value]

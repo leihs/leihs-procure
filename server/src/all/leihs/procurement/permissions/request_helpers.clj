@@ -11,6 +11,7 @@
   [field-perms req-vec]
   (reduce (fn [acc el] (conj acc [el (el field-perms)])) req-vec special-perms))
 
+; FIXME: :read false, :write false !!!
 (defn- fallback-p-spec [value] {:value value, :read true, :write true})
 
 (defn with-protected-value
@@ -50,7 +51,8 @@
   ([tx auth-user request write-data]
    "For updating an existing request"
    (let [request* (cond-> request
-                    (not (:user request)) (assoc :user (:user_id auth-user)))
+                    (not (:user request)) (assoc :user
+                                            {:id (:user_id auth-user)}))
          request-data-with-perms (apply-permissions tx auth-user request*)]
      (->> write-data
           (map first)
