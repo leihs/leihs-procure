@@ -430,15 +430,17 @@ class RequestForm extends React.Component {
                               />
                             </FormGroup>
                           </Col>
-                          <Col sm cls="ml-2">
-                            <FormGroup {...groupProps} label={order.label}>
-                              <InputField
-                                type="number-integer"
-                                {...inputProps}
-                                {...order}
-                              />
-                            </FormGroup>
-                          </Col>
+                          {!!request.order_quantity.read && (
+                            <Col sm cls="ml-2">
+                              <FormGroup {...groupProps} label={order.label}>
+                                <InputField
+                                  type="number-integer"
+                                  {...inputProps}
+                                  {...order}
+                                />
+                              </FormGroup>
+                            </Col>
+                          )}
                         </Row>
                       )
                     }}
