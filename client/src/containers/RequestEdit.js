@@ -36,7 +36,7 @@ const REQUEST_EDIT_QUERY = gql`
       }
     }
     # for selecting a budget period:
-    budget_periods {
+    budget_periods(whereRequestsCanBeMovedTo: $id) {
       id
       name
     }

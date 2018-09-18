@@ -348,7 +348,7 @@ class RequestForm extends React.Component {
                             >
                               {priceField.readOnly ? (
                                 <samp className="form-control-plaintext">
-                                  {formatCurrency(price)}
+                                  {formatCurrency(priceField.value)}
                                 </samp>
                               ) : (
                                 <InputField

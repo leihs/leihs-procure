@@ -423,7 +423,7 @@ Array [
                         <input
                             aria-checked={false}
                             checked={false}
-                            className="sr-only"
+                            className="sr-only mt-4 ml-2"
                             id="example_formfield_h_radio_0"
                             name="h"
                             onChange={[Function]}
@@ -459,7 +459,7 @@ Array [
                         <input
                             aria-checked={false}
                             checked={false}
-                            className="sr-only"
+                            className="sr-only mt-4 ml-2"
                             id="example_formfield_h_radio_1"
                             name="h"
                             onChange={[Function]}
@@ -764,7 +764,7 @@ Array [
                             <input
                                 aria-checked={false}
                                 checked={false}
-                                className="sr-only"
+                                className="sr-only mt-4 ml-2"
                                 id="example_formfield_h_radio_0"
                                 name="h"
                                 onChange={[Function]}
@@ -800,7 +800,7 @@ Array [
                             <input
                                 aria-checked={false}
                                 checked={false}
-                                className="sr-only"
+                                className="sr-only mt-4 ml-2"
                                 id="example_formfield_h_radio_1"
                                 name="h"
                                 onChange={[Function]}

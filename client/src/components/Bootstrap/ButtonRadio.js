@@ -59,14 +59,13 @@ class ButtonRadio extends React.PureComponent {
         {options.map(({ label, value, ...item }, n) => {
           const inputID = `${id}_radio_${n}`
           const isSelected = value === selectedValue
-          const onRadioClick = isDisabled
-            ? null
-            : () => {
-                // if already selected, a click de-selects!
-                onChange({
-                  target: { name: name, value: isSelected ? null : value }
-                })
-              }
+          const onRadioClick = () => {
+            if (isDisabled) return false
+            // if already selected, a click de-selects!
+            onChange({
+              target: { name: name, value: isSelected ? null : value }
+            })
+          }
 
           return (
             <F key={n}>
@@ -83,7 +82,8 @@ class ButtonRadio extends React.PureComponent {
                 tabIndex="-1"
               >
                 <input
-                  className="sr-only"
+                  // NOTE: hidden, but centered for browser-native validation messages!
+                  className="sr-only mt-4 ml-2"
                   tabIndex={n === 0 ? 0 : -1}
                   {...item}
                   type="radio"
@@ -110,6 +110,10 @@ class ButtonRadio extends React.PureComponent {
       </div>
     )
   }
+}
+
+ButtonRadio.defaultProps = {
+  onChange: f.noop
 }
 
 export default ButtonRadio

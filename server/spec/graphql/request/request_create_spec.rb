@@ -432,7 +432,11 @@ describe 'request' do
         user = binding.local_variable_get(user_name)
         request = FactoryBot.create(:request,
                                     user_id: requester.id,
-                                    category_id: category.id)
+                                    category_id: category.id,
+                                    inspection_comment: Faker::Lorem.sentence,
+                                    inspector_priority: :high,
+                                    approved_quantity: 1,
+                                    order_quantity: 1)
 
         q = <<-GRAPHQL
             mutation changeRequestBudgetPeriod($input: RequestBudgetPeriodInput) {
@@ -463,6 +467,12 @@ describe 'request' do
             }
           }
         }
+
+        new_request = request.reload
+        expect(new_request.inspection_comment).to eq request.inspection_comment
+        expect(new_request.inspector_priority).to eq request.inspector_priority
+        expect(new_request.approved_quantity).to eq request.approved_quantity
+        expect(new_request.order_quantity).to eq request.order_quantity
       end
     end
   end

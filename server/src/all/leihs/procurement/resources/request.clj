@@ -114,16 +114,20 @@
          (cons :case)
          (apply sql/call))))
 
+(def sql-order-by-expr
+  (str "concat("
+       "lower(coalesce(procurement_requests.article_name, '')), "
+         "lower(coalesce(models.product, '')), "
+       "lower(coalesce(models.version, ''))" ")"))
+
 (def requests-base-query
-  (-> (sql/select :procurement_requests.*)
+  (-> (sql/select (sql/raw (str "DISTINCT ON (procurement_requests.id, "
+                                sql-order-by-expr
+                                ") procurement_requests.*")))
       (sql/from :procurement_requests)
       (sql/merge-left-join :models
                            [:= :models.id :procurement_requests.model_id])
-      (sql/order-by (->> [:procurement_requests.article_name :models.product
-                          :models.version]
-                         (map #(->> (sql/call :coalesce % "")
-                                    (sql/call :lower)))
-                         (sql/call :concat)))))
+      (sql/order-by (sql/raw sql-order-by-expr))))
 
 (defn requests-base-query-with-state
   [advanced-user?]
@@ -257,6 +261,9 @@
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
+        ; NOTE: reselect because of:
+        ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
+        (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
         sql/format

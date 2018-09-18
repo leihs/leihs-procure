@@ -157,20 +157,30 @@ describe 'requests' do
               write
             }
           }
+          budget_periods(whereRequestsCanBeMovedTo: $requestIds) {
+            id
+          }
         }
       GRAPHQL
+
+      @bp_past = FactoryBot.create(:budget_period, :past)
+      @bp_requesting_phase = FactoryBot.create(:budget_period, :requesting_phase)
+      @bp_inspection_phase = FactoryBot.create(:budget_period, :inspection_phase)
     end
 
     it 'as requester' do
       @user = FactoryBot.create(:user)
       FactoryBot.create(:requester_organization, user_id: @user.id)
-      @request = FactoryBot.create(:request, user_id: @user.id)
+      @request = FactoryBot.create(:request,
+                                   user_id: @user.id,
+                                   budget_period_id: @bp_requesting_phase.id)
     end
 
     it 'as admin' do
       @user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: @user.id)
-      @request = FactoryBot.create(:request)
+      @request = FactoryBot.create(:request,
+                                   budget_period_id: @bp_requesting_phase.id)
     end
 
     it 'as inspector' do
@@ -180,7 +190,8 @@ describe 'requests' do
                         user_id: @user.id,
                         category_id: category.id)
       @request = FactoryBot.create(:request,
-                                   category_id: category.id)
+                                   category_id: category.id,
+                                   budget_period_id: @bp_requesting_phase.id)
     end
 
     it 'as viewer' do
@@ -190,13 +201,16 @@ describe 'requests' do
                         user_id: @user.id,
                         category_id: category.id)
       @request = FactoryBot.create(:request,
-                                   category_id: category.id)
+                                   category_id: category.id,
+                                   budget_period_id: @bp_requesting_phase.id)
     end
 
     after :example do
       variables = { requestIds: ["#{@request.id}"] }
       result = query(@q, @user.id, variables)
       expect(result['errors']).not_to be
+      expect(result['data']['budget_periods'].map { |bp| bp['id'] })
+        .to match_array [@bp_requesting_phase.id, @bp_inspection_phase.id]
     end
   end
 
