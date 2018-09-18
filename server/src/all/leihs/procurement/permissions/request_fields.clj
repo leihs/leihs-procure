@@ -17,15 +17,25 @@
   (let [new-request (nil? (:id proc-request))
         existing-request (not new-request)
         budget-period (budget-period/get-budget-period-by-id tx
-                                                             (:budget_period
-                                                               proc-request))
+                                                             (-> proc-request
+                                                                 :budget_period
+                                                                 :id))
         template (some->> proc-request
                           :template
+                          :id
                           (template/get-template-by-id tx))
-        category-id (or (:category proc-request) (:category_id template))
+        category-id (or (-> proc-request
+                            :category
+                            :id)
+                        (:category_id template))
         category (category/get-category-by-id tx category-id)
-        no-template (not (:template proc-request))
-        user-id (:user proc-request)
+        no-template (-> proc-request
+                        :template
+                        :id
+                        not)
+        user-id (-> proc-request
+                    :user
+                    :id)
         own-request (= (:user_id auth-entity) user-id)
         user (user/get-user-by-id tx user-id)
         requester (user-perms/requester? tx auth-entity)
