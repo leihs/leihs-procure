@@ -40,6 +40,13 @@
   [req]
   (exchange-attrs req (map-invert attrs-mapping)))
 
+(defn submap-with-id-for-associated-resources
+  [m]
+  (->> m
+       (map (fn [[k v]]
+              (if (some #{k} (keys attrs-mapping)) [k {:id v}] [k v])))
+       (into {})))
+
 (defn states-conds-map
   [advanced-user?]
   (let [approved-not-set [:= :procurement_requests.approved_quantity nil]
@@ -241,6 +248,7 @@
         req-stub (cond-> args
                    (not user-arg) (assoc :user (:user_id auth-entity)))]
     (as-> req-stub <>
+      (submap-with-id-for-associated-resources <>)
       (request-fields-perms/get-for-user-and-request tx auth-entity <>)
       (reject-keys <> request-perms/special-perms)
       (map #(apply consider-default %) <>)
@@ -319,11 +327,14 @@
       #(request-perms/authorized-to-write-all-fields?
          tx
          auth-entity
-         (reverse-exchange-attrs proc-request)
-         {:budget_period budget-period-id}))
+         (-> proc-request
+             reverse-exchange-attrs
+             submap-with-id-for-associated-resources)
+         {:budget_period {:id budget-period-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
          reverse-exchange-attrs
+         submap-with-id-for-associated-resources
          (request-perms/apply-permissions tx auth-entity))))
 
 (def change-category-reset-attrs
@@ -351,14 +362,17 @@
              (sql/where [:= :procurement_requests.id req-id])
              sql/format))
       :if-only
-      #(request-perms/authorized-to-write-all-fields? tx
-                                                      auth-entity
-                                                      (reverse-exchange-attrs
-                                                        proc-request)
-                                                      {:category cat-id}))
+      #(request-perms/authorized-to-write-all-fields?
+         tx
+         auth-entity
+         (-> proc-request
+             reverse-exchange-attrs
+             submap-with-id-for-associated-resources)
+         {:category {:id cat-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
          reverse-exchange-attrs
+         submap-with-id-for-associated-resources
          (request-perms/apply-permissions tx auth-entity))))
 
 (defn create-request!
@@ -391,12 +405,13 @@
              (if-not (empty? attachments)
                (deal-with-attachments! tx (var-get req-id) attachments)))
         :if-only
-        #(request-perms/authorized-to-write-all-fields? tx
-                                                        auth-entity
-                                                        input-data))
+        #(->> input-data
+              submap-with-id-for-associated-resources
+              (request-perms/authorized-to-write-all-fields? tx auth-entity)))
       (as-> (var-get req-id) <>
         (get-request-by-id tx auth-entity <>)
         (reverse-exchange-attrs <>)
+        (submap-with-id-for-associated-resources <>)
         (request-perms/apply-permissions tx
                                          auth-entity
                                          <>

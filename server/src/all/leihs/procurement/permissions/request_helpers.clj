@@ -51,7 +51,8 @@
   ([tx auth-user request write-data]
    "For updating an existing request"
    (let [request* (cond-> request
-                    (not (:user request)) (assoc :user (:user_id auth-user)))
+                    (not (:user request)) (assoc :user
+                                            {:id (:user_id auth-user)}))
          request-data-with-perms (apply-permissions tx auth-user request*)]
      (->> write-data
           (map first)
