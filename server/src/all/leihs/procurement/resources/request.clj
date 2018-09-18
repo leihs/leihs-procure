@@ -8,6 +8,7 @@
              [request-fields :as request-fields-perms] [user :as user-perms]]
             [leihs.procurement.resources [attachments :as attachments]
              [budget-period :as budget-period] [category :as category]
+             [request-helpers :as request-helpers]
              [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads] [user :as user]]
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
@@ -209,25 +210,21 @@
 
 (defn query-requests [tx query] (jdbc/query tx query {:row-fn transform-row}))
 
-(defn get-request-by-id
+(defn get-request-by-id-sqlmap
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
-        (sql/where [:= :procurement_requests.id id])
-        sql/format
-        (->> (query-requests tx))
-        first)))
+        (sql/where [:= :procurement_requests.id id]))))
 
-(defn get-request-by-attrs
-  [tx auth-entity attrs]
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
-        requests-base-query-with-state
-        (sql/merge-where (sql/map->where-clause :procurement_requests attrs))
-        sql/format
-        (->> (query-requests tx))
-        first)))
+(defn get-request-by-id
+  [tx auth-entity id]
+  (->> id
+       (get-request-by-id-sqlmap tx auth-entity)
+       request-helpers/join-and-nest-associated-resources
+       sql/format
+       (query-requests tx)
+       first))
 
 (defn- consider-default
   [attr p-spec]
@@ -449,11 +446,12 @@
       #(request-perms/authorized-to-write-all-fields?
          tx
          auth-entity
-         (reverse-exchange-attrs proc-request)
-         (reject-keys input-data request-perms/attrs-to-skip)))
+         proc-request
+         (-> input-data
+             (reject-keys request-perms/attrs-to-skip)
+             submap-with-id-for-associated-resources)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
-      (reverse-exchange-attrs <>)
       (request-perms/apply-permissions tx
                                        auth-entity
                                        <>
