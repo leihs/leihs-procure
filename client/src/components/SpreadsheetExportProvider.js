@@ -86,7 +86,7 @@ const spreadSheetCols = [
   {
     key: 'total_price',
     label: 'Total inkl. MwSt',
-    fn: r => f.try(_ => RequestTotalAmount(r) / 100)
+    fn: r => f.try(_ => (RequestTotalAmount(r) || 0) / 100)
   },
   {
     key: 'state',
