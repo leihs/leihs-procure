@@ -407,8 +407,6 @@
               (request-perms/authorized-to-write-all-fields? tx auth-entity)))
       (as-> (var-get req-id) <>
         (get-request-by-id tx auth-entity <>)
-        (reverse-exchange-attrs <>)
-        (submap-with-id-for-associated-resources <>)
         (request-perms/apply-permissions tx
                                          auth-entity
                                          <>
