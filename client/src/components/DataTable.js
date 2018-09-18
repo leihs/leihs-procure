@@ -39,7 +39,7 @@ class DataTable extends React.Component {
             {rows.map((row, i) => (
               <tr key={i}>
                 {row.map((v, ii) => (
-                  <td key={ii}>{v}</td>
+                  <td key={ii}>{String(v)}</td>
                 ))}
               </tr>
             ))}
