@@ -271,9 +271,9 @@ const valueIfWritable = (fields, requestData, key) => {
   if (reqField.write) return f.get(fields, key)
 }
 
-const fieldIfWritable = (fields, requestData, key) => {
+const fieldIfWritable = (fields, requestData, key, fallback = undefined) => {
   const value = valueIfWritable(fields, requestData, key)
-  if (!f.isUndefined(value)) return { [key]: value }
+  if (!f.isUndefined(value)) return { [key]: value || fallback }
 }
 
 export const requestDataFromFields = (request, fields) => {
@@ -283,6 +283,8 @@ export const requestDataFromFields = (request, fields) => {
   const user = valueIfWritable(fields, request, 'user')
   const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room')
+  const approvedQ = valueIfWritable(fields, request, 'approved_quantity')
+  const orderQ = valueIfWritable(fields, request, 'order_quantity')
 
   const requestData = {
     ...fieldIfWritable(fields, request, 'article_number'),
@@ -290,8 +292,8 @@ export const requestDataFromFields = (request, fields) => {
     ...fieldIfWritable(fields, request, 'price_cents'),
 
     ...fieldIfWritable(fields, request, 'requested_quantity'),
-    ...fieldIfWritable(fields, request, 'approved_quantity'),
-    ...fieldIfWritable(fields, request, 'order_quantity'),
+    approved_quantity: f.presence(approvedQ) || null,
+    order_quantity: f.presence(orderQ) || null,
 
     ...fieldIfWritable(fields, request, 'motivation'),
     ...fieldIfWritable(fields, request, 'priority'),
