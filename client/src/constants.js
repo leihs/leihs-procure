@@ -17,15 +17,35 @@ export const REQUEST_REPLACEMENT_VALUES = f.values(
   REQUEST_REPLACEMENT_VALUES_MAP
 )
 
-const requestStatesMap = [
-  { key: 'NEW', bsColor: 'info' },
-  { key: 'IN_APPROVAL', bsColor: 'primary' },
-  { key: 'APPROVED', bsColor: 'success' },
-  { key: 'PARTIALLY_APPROVED', bsColor: 'warning' },
-  { key: 'DENIED', bsColor: 'danger' }
+export const REQUEST_STATES_MAP = [
+  {
+    key: 'NEW',
+    bsColor: 'info',
+    roles: ['isRequester', 'isInspector', 'isAdmin']
+  },
+  {
+    key: 'IN_APPROVAL',
+    bsColor: 'primary',
+    roles: ['isOnlyRequester']
+  },
+  {
+    key: 'APPROVED',
+    bsColor: 'success',
+    roles: ['isRequester', 'isInspector', 'isAdmin']
+  },
+  {
+    key: 'PARTIALLY_APPROVED',
+    bsColor: 'warning',
+    roles: ['isRequester', 'isInspector', 'isAdmin']
+  },
+  {
+    key: 'DENIED',
+    bsColor: 'danger',
+    roles: ['isRequester', 'isInspector', 'isAdmin']
+  }
 ]
 
 export const REQUEST_STATE_COLORS = f.fromPairs(
-  f.map(requestStatesMap, i => [i.key, i.bsColor])
+  f.map(REQUEST_STATES_MAP, i => [i.key, i.bsColor])
 )
-export const REQUEST_STATES = f.map(requestStatesMap, 'key')
+export const REQUEST_STATES = f.map(REQUEST_STATES_MAP, 'key')

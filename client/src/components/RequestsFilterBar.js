@@ -66,6 +66,9 @@ const Filters = ({ me, data, current, onChange }) => {
     const d = budgetPeriodDates(bp)
     return ['isInspecting', 'isRequesting'].filter(k => d[k])[0] || 'isPast'
   })
+  const requestStates = CONSTANTS.REQUEST_STATES_MAP.filter(s =>
+    f.any(s.roles, r => me.roles[r])
+  )
 
   const available = {
     budgetPeriods: f.map(budgetPeriodsPyPhase, (bps, phase) => ({
@@ -93,9 +96,9 @@ const Filters = ({ me, data, current, onChange }) => {
       label: t(`inspector_priority_label_${value}`)
     })),
 
-    state: CONSTANTS.REQUEST_STATES.map(value => ({
-      value,
-      label: t(`request_state_label_${value}`)
+    state: requestStates.map(({ key }) => ({
+      value: key,
+      label: t(`request_state_label_${key}`)
     }))
   }
 
