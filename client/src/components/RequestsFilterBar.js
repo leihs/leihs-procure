@@ -130,8 +130,9 @@ const Filters = ({ me, data, current, onChange }) => {
       budgetPeriods: data.budget_periods
         .filter(bp => {
           const b = budgetPeriodDates(bp)
-          if (me.roles.isRequester && b.isRequesting) return true
-          if (me.roles.isInspector && b.isInspecting) return true
+          const isAdmin = me.roles.isAdmin
+          if ((isAdmin || me.roles.isRequester) && b.isRequesting) return true
+          if ((isAdmin || me.roles.isInspector) && b.isInspecting) return true
           return false
         })
         .map(({ id }) => id),
