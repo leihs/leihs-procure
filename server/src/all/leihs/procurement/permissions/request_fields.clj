@@ -36,7 +36,10 @@
         user-id (-> proc-request
                     :user
                     :id)
-        own-request (= (:user_id auth-entity) user-id)
+        own-request (= (-> auth-entity
+                           :user_id
+                           str)
+                       (str user-id))
         user (user/get-user-by-id tx user-id)
         requester (user-perms/requester? tx auth-entity)
         inspector (user-perms/inspector? tx auth-entity)
