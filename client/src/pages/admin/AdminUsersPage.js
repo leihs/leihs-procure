@@ -159,12 +159,12 @@ export default AdminUsersPage
 //
 const AdminUsers = ({ data, updateAdmins, updateRequestersOrgs }) => (
   <MainWithSidebar>
-    <h1 className="h2">Users</h1>
+    <h1 className="h2">{t('admin.users.title')}</h1>
 
-    <h2 className="h4 pt-4">Procurement Admins</h2>
+    <h2 className="h4 pt-4">{t('admin.users.title_admins')}</h2>
     <ListOfAdmins admins={data.admins} updateAdmins={updateAdmins} />
 
-    <h2 className="h4 pt-4">Requesters</h2>
+    <h2 className="h4 pt-4">{t('admin.users.title_requesters')}</h2>
     <ListOfRequestersAndOrgs
       requesters={data.requesters_organizations}
       updateRequestersOrgs={updateRequestersOrgs}
@@ -190,7 +190,7 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
                       <Icon.User spaced className="mr-1" /> {DisplayName(user)}
                     </span>
                     <Button
-                      title="remove as admin"
+                      title={t('admin.users.btn_remove_as_admin')}
                       color="link"
                       outline
                       size="sm"
@@ -207,7 +207,7 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
             </FormGroup>
           </Col>
           <Col sm="6">
-            <FormGroup label="add new admin">
+            <FormGroup label={t('admin.users.select_add_new_admin')}>
               <UserAutocomplete
                 excludeIds={
                   f.isEmpty(admins) ? null : admins.map(({ id }) => id)
@@ -240,13 +240,13 @@ const ListOfRequestersAndOrgs = ({
           <Div cls="mt-2 form-group-lines">
             <Row form cls="d-none d-sm-flex">
               <Col>
-                <b>Name</b>
+                <b>{t('admin.users.requesters_list_heading_name')}</b>
               </Col>
               <Col>
-                <b>Departement</b>
+                <b>{t('admin.users.requesters_list_heading_department')}</b>
               </Col>
               <Col>
-                <b>Organisation</b>
+                <b>{t('admin.users.requesters_list_heading_organization')}</b>
               </Col>
               <Col sm="2" />
             </Row>
@@ -287,7 +287,12 @@ const ListOfRequestersAndOrgs = ({
                             ]}
                           >
                             <Col sm>
-                              <FormGroup label={'user'} hideLabel>
+                              <FormGroup
+                                label={t(
+                                  'admin.users.requesters_list_heading_user'
+                                )}
+                                hideLabel
+                              >
                                 {/* TODO: make and use autocomplete-style version of InlineSearch
                             - field will get 'invalid' styles if no user id present
                         */}
@@ -300,7 +305,12 @@ const ListOfRequestersAndOrgs = ({
                               </FormGroup>
                             </Col>
                             <Col sm>
-                              <FormGroup label={'department'} hideLabel>
+                              <FormGroup
+                                label={t(
+                                  'admin.users.requesters_list_heading_department'
+                                )}
+                                hideLabel
+                              >
                                 <InputText
                                   readOnly={toDelete}
                                   required
@@ -315,7 +325,12 @@ const ListOfRequestersAndOrgs = ({
                               </FormGroup>
                             </Col>
                             <Col sm>
-                              <FormGroup label={'organization'} hideLabel>
+                              <FormGroup
+                                label={t(
+                                  'admin.users.requesters_list_heading_organization'
+                                )}
+                                hideLabel
+                              >
                                 <InputText
                                   readOnly={toDelete}
                                   required
@@ -343,7 +358,9 @@ const ListOfRequestersAndOrgs = ({
                                         )
                                       }}
                                     />
-                                    {'remove'}
+                                    {t(
+                                      'admin.users.requesters_list_remove_user'
+                                    )}
                                   </label>
                                 </div>
                               </FormGroup>
@@ -352,7 +369,10 @@ const ListOfRequestersAndOrgs = ({
                         )
                       )}
 
-                    <FormGroup label="add new requester" cls="mt-2">
+                    <FormGroup
+                      label={t('admin.users.requesters_list_add_user')}
+                      cls="mt-2"
+                    >
                       <Row form>
                         <Col>
                           <UserAutocomplete

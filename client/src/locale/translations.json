@@ -135,6 +135,19 @@
   },
 
   "admin": {
+    "users": {
+      "title": "Benutzer",
+      "title_admins": "Administratoren",
+      "title_requesters": "Antragsteller/innen",
+      "btn_remove_as_admin": "von Administratoren entfernen",
+      "select_add_new_admin": "Neuen Administrator hinzufügen",
+      "requesters_list_heading_user": "Benutzer",
+      "requesters_list_heading_name": "Name",
+      "requesters_list_heading_department": "Departement",
+      "requesters_list_heading_organization": "Organisation",
+      "requesters_list_remove_user": "entfernen",
+      "requesters_list_add_user": "Neuen Antragsteller hinzufügen"
+    },
     "categories": {
       "main_categories": "Hauptkategorien",
       "image": "Bild",
