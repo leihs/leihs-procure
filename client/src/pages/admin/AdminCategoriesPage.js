@@ -106,12 +106,13 @@ const UPDATE_CATEGORIES_MUTATION = gql`
 const updateCategories = {
   mutation: {
     mutation: UPDATE_CATEGORIES_MUTATION,
-    onError: mutationErrorHandler,
+    onError: mutationErrorHandler
 
-    update: (cache, { data: { main_categories } }) => {
-      // update the internal cache with the new data we received.
-      cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
-    }
+    // TODO: better update handling
+    // update: (cache, { data: { main_categories } }) => {
+    //   // window.location.reload()
+    //   cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
+    // }
   },
   doUpdate: (mutate, mainCats) => {
     const data = mainCats.map(mainCat => {
@@ -218,26 +219,28 @@ class CategoryPage extends React.Component {
     return (
       <Routed>
         {({ setFlash }) => (
-          <Mutation
-            {...updateCategories.mutation}
-            onCompleted={() => {
-              this.setState({ formKey: Date.now() })
-              setFlash({ message: updateCategories.successFlash })
-              window && window.scrollTo(0, 0)
-            }}
-          >
-            {(mutate, info) => (
-              <Query query={CATEGORIES_QUERY}>
-                {({ loading, error, data }) => {
-                  if (loading) return <Loading />
-                  if (error) return <ErrorPanel error={error} data={data} />
+          <Query query={CATEGORIES_QUERY}>
+            {({ loading, error, data, refetch }) => {
+              if (loading) return <Loading />
+              if (error) return <ErrorPanel error={error} data={data} />
 
-                  const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-                  const mainCat = f.find(data.main_categories, {
-                    id: mainCatId
-                  })
+              const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+              const mainCat = f.find(data.main_categories, {
+                id: mainCatId
+              })
 
-                  return (
+              return (
+                <Mutation
+                  {...updateCategories.mutation}
+                  onCompleted={() => {
+                    // this.setState({ formKey: Date.now() })
+                    setFlash({ message: updateCategories.successFlash })
+                    window.location.reload()
+                    // window && window.scrollTo(0, 0)
+                    // refetch()
+                  }}
+                >
+                  {(mutate, info) => (
                     <CategoryCard
                       {...mainCat}
                       formKey={this.state.formKey}
@@ -250,11 +253,11 @@ class CategoryPage extends React.Component {
                         ])
                       }
                     />
-                  )
-                }}
-              </Query>
-            )}
-          </Mutation>
+                  )}
+                </Mutation>
+              )
+            }}
+          </Query>
         )}
       </Routed>
     )
@@ -268,7 +271,9 @@ const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
 
 const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
-  const formProps = ['name', 'image_url', 'budget_limits', 'categories']
+  // NOTE: NO_BUDGET_LIMITS
+  // const formProps = ['name', 'image_url', 'budget_limits', 'categories']
+  const formProps = ['name', 'image_url', 'categories']
   const formValues = f.pick(props, formProps)
 
   return (
