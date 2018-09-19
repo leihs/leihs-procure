@@ -40,6 +40,10 @@ const REQUEST_EDIT_QUERY = gql`
       id
       name
     }
+    # for inspection comment presets
+    settings {
+      inspection_comments
+    }
   }
   ${Fragments.RequestFieldsForEdit}
 `
@@ -139,6 +143,7 @@ class RequestEdit extends React.Component {
                       request={request}
                       categories={data.main_categories}
                       budgetPeriods={data.budget_periods}
+                      inspectionComments={data.settings.inspection_comments}
                       onCancel={onCancel}
                       onSubmit={
                         p.edit &&

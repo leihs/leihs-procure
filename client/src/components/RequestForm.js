@@ -86,6 +86,8 @@ class RequestForm extends React.Component {
     const formId = id || request.id
     if (!formId) throw new Error('missing ID!')
 
+    const inspectionComments = f.presence(props.inspectionComments)
+
     return (
       <StatefulForm
         idPrefix={`request_form_${formId}`}
@@ -467,7 +469,7 @@ class RequestForm extends React.Component {
                                 m="t-3"
                                 cls="form-control-sm"
                                 emptyOption="- Textvorlage einfügen -"
-                                options={['foo', 'bar', 'baz'].map(s => ({
+                                options={f.map(inspectionComments, s => ({
                                   value: s,
                                   label: s
                                 }))}
