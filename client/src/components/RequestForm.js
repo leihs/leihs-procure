@@ -464,6 +464,7 @@ class RequestForm extends React.Component {
                             'request.give_reason_when_partially_accepting_or_denying'
                           )}
                           afterInput={
+                            inspectionComments &&
                             !field.readOnly && (
                               <Select
                                 m="t-3"
