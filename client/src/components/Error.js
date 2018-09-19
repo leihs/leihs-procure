@@ -48,6 +48,7 @@ export const FatalErrorScreen = ({ error, children, title = 'ERROR' }) => (
 
 export const ErrorPanel = ({ error, data, errorDetails }) => {
   const apiErrors = f.presence(f.get(error, 'graphQLErrors'))
+  const networkError = f.presence(f.get(error, 'networkError'))
   errorDetails = f.presence(errorDetails)
 
   return (
@@ -64,6 +65,10 @@ export const ErrorPanel = ({ error, data, errorDetails }) => {
 
       {errorDetails && (
         <JsonDetails title="Error Details:" error={errorDetails} />
+      )}
+
+      {networkError && (
+        <JsonDetails title="Network Error:" error={networkError} />
       )}
 
       {apiErrors && (
