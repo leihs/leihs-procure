@@ -319,20 +319,23 @@
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
-        budget-period-id (:budget_period input-data)
+        new-budget-period-id (:budget_period input-data)
+        budget-period-new
+          (budget-period/get-budget-period-by-id tx new-budget-period-id)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/sset {:budget_period_id budget-period-id})
+                          (sql/sset {:budget_period_id new-budget-period-id})
                           (sql/where [:= :procurement_requests.id req-id])
                           sql/format))
       :if-only
-      #(request-perms/authorized-to-write-all-fields?
-         tx
-         auth-entity
-         proc-request
-         {:budget_period {:id budget-period-id}}))
+      #(and (not (budget-period/past? tx budget-period-new))
+            (request-perms/authorized-to-write-all-fields?
+              tx
+              auth-entity
+              proc-request
+              {:budget_period {:id new-budget-period-id}})))
     (->> req-id
          (get-request-by-id tx auth-entity)
          (request-perms/apply-permissions tx auth-entity))))
@@ -455,16 +458,25 @@
 
 (defn delete-request!
   [context args _]
-  (let [result (jdbc/execute! (-> context
-                                  :request
-                                  :tx)
-                              (-> (sql/delete-from :procurement_requests)
-                                  (sql/where [:= :procurement_requests.id
-                                              (-> args
-                                                  :input_data
-                                                  :id)])
-                                  sql/format))]
-    (= result '(1))))
+  (let [ring-request (:request context)
+        tx (:tx ring-request)
+        auth-entity (:authenticated-entity ring-request)
+        req-id (-> args
+                   :input_data
+                   :id)
+        request (get-request-by-id tx auth-entity req-id)
+        field-perms (request-fields-perms/get-for-user-and-request tx
+                                                                   auth-entity
+                                                                   request)]
+    (authorization/authorize-and-apply
+      #(let [result (jdbc/execute! tx
+                                   (-> (sql/delete-from :procurement_requests)
+                                       (sql/where [:= :procurement_requests.id
+                                                   req-id])
+                                       sql/format))]
+        (= result '(1)))
+      :if-only
+      #(:DELETE field-perms))))
 
 (defn requested-by?
   [tx auth-entity request]

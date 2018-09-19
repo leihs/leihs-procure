@@ -64,16 +64,19 @@
 (def non-form-fields
   [:budget_period :category :created_at :organization :updated_at]); TODO: why are the timestamps writable tho?
 
+(defn can-edit-any-field?
+  [req]
+  (->> [attrs-to-skip special-perms non-form-fields]
+       (apply concat)
+       (apply dissoc req)
+       (map (fn [[k v]] (:write v)))
+       (filter true?)
+       empty?
+       not))
+
 (defn add-action-permissions
   [req]
-  (let [can-edit-any-fields? (->> [attrs-to-skip special-perms non-form-fields]
-                                  (apply concat)
-                                  (apply dissoc req)
-                                  (map (fn [[k v]] (:write v)))
-                                  (filter true?)
-                                  empty?
-                                  not)
-        can-change-budget-period? (-> req
+  (let [can-change-budget-period? (-> req
                                       :budget_period
                                       :write)
         can-change-category? (-> req
@@ -81,7 +84,7 @@
                                  :write)
         can-delete? (:DELETE req)]
     (assoc req
-      :actionPermissions {:edit can-edit-any-fields?,
+      :actionPermissions {:edit (can-edit-any-field? req),
                           :delete can-delete?,
                           :moveBudgetPeriod can-change-budget-period?,
                           :moveCategory can-change-category?})))
