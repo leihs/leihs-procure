@@ -15,7 +15,7 @@ import {
   Button,
   StatefulForm,
   FormGroup,
-  InputText,
+  // InputText,
   FormField,
   Tooltipped
 } from '../../components/Bootstrap'
@@ -47,17 +47,18 @@ const MAINCAT_PROPS_FRAGMENT = gql`
     name
     can_delete
     image_url
-    # FIXME: should return all *possible* limits (if set or not!)
-    budget_limits {
-      id
-      amount_cents
-      amount_currency
-      budget_period {
-        id
-        name
-        end_date
-      }
-    }
+    # NOTE: NO_BUDGET_LIMITS: disabled for now, data is not used in App
+    # # FIXME: should return all *possible* limits (if set or not!)
+    # budget_limits {
+    #   id
+    #   amount_cents
+    #   amount_currency
+    #   budget_period {
+    #     id
+    #     name
+    #     end_date
+    #   }
+    # }
     categories {
       id
       name
@@ -117,10 +118,13 @@ const updateCategories = {
       return {
         ...f.pick(mainCat, ['id', 'name']),
         // TODO: image: …
-        budget_limits: f.map(mainCat.budget_limits, l => ({
-          amount_cents: l.amount_cents,
-          budget_period_id: l.budget_period.id
-        })),
+
+        // NOTE: NO_BUDGET_LIMITS
+        // budget_limits: f.map(mainCat.budget_limits, l => ({
+        //   amount_cents: l.amount_cents,
+        //   budget_period_id: l.budget_period.id
+        // })),
+
         categories: f
           .filter(mainCat.categories, mc => !mc.toDelete)
           .map(sc => ({
@@ -328,6 +332,8 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
                       )}
                       <code>TBD: upload new image</code>
                     </Col>
+
+                    {/* NOTE: NO_BUDGET_LIMITS
                     <Col sm>
                       <h6>{t('admin.categories.budget_limits')}</h6>
 
@@ -358,7 +364,7 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
                           <Col sm="4">{l.amount_currency}</Col>
                         </Row>
                       ))}
-                    </Col>
+                    </Col> */}
                   </Row>
 
                   <Row>
@@ -570,5 +576,3 @@ const ListOfUsers = ({ keyName, users, onAddUser, onRemoveUser }) => (
     </Div>
   </React.Fragment>
 )
-
-const Let = ({ children, ...props }) => children(props)
