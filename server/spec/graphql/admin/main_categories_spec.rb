@@ -428,5 +428,91 @@ describe 'main categories' do
       end
 
     end
+
+    context 'single update (no update if mentioned in input data)' do
+      example 'update a single category' do
+        qvariables = {
+          input: [
+            { id: "#{MainCategory.find(name: 'main_cat_2').id}",
+              name: "main_cat_2_new_name" }
+          ]
+        }.as_json
+
+        result = query(q, admin_user.id, qvariables)
+
+        expect(result).to eq({
+          'data' => {
+            'main_categories' => [
+              { 'name' => 'main_cat_2_new_name' }
+            ]
+          }
+        })
+
+        #############################################################################
+
+        main_categories_after = [
+          { name: 'main_cat_1' },
+          { name: 'main_cat_2_new_name' }
+        ]
+        expect(MainCategory.count).to be == main_categories_after.count
+        main_categories_after.each do |data|
+          expect(MainCategory.find(data)).to be
+        end
+      end
+
+      example 'add a single category' do
+        qvariables = {
+          input: [{ id: nil, name: "something_new" }]
+        }.as_json
+
+        result = query(q, admin_user.id, qvariables)
+
+        expect(result).to eq({
+          'data' => {
+            'main_categories' => [
+              { 'name' => 'something_new' }
+            ]
+          }
+        })
+
+        #############################################################################
+
+        main_categories_after = [
+          { name: 'main_cat_1' },
+          { name: 'main_cat_2' },
+          { name: 'something_new' }
+        ]
+        expect(MainCategory.count).to be == main_categories_after.count
+        main_categories_after.each do |data|
+          expect(MainCategory.find(data)).to be
+        end
+      end
+
+      example 'delete a single category' do
+        mc_to_delete = MainCategory.find(name: 'main_cat_1')
+        
+        qvariables = {
+          input: [{ toDelete: true, id: mc_to_delete.id }]
+        }.as_json
+
+        result = query(q, admin_user.id, qvariables)
+
+        expect(result).to eq({
+          'data' => { 'main_categories' => [] }
+        })
+
+        #############################################################################
+
+        main_categories_after = [
+          { name: 'main_cat_2' },
+        ]
+        expect(MainCategory.find(id: mc_to_delete.id)).to be nil
+        expect(MainCategory.count).to be == main_categories_after.count
+        main_categories_after.each do |data|
+          expect(MainCategory.find(data)).to be
+        end
+      end
+
+    end
   end
 end
