@@ -193,73 +193,76 @@ describe 'main categories' do
   end
 
   context 'mutation' do
+    let(:q) do
+      <<-GRAPHQL
+        mutation updateMainCategories($input: [MainCategoryInput]){
+          main_categories(input_data: $input) {
+            name
+          }
+        }
+      GRAPHQL
+    end
     context 'full update' do
       before :each do
-        @q = <<-GRAPHQL
-          mutation {
-            main_categories (
-              input_data: [
-                { id: null,
-                  name: "new_main_cat",
-                  budget_limits: [
-                    { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_1').id}",
-                      amount_cents: 111 },
-                    { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
-                      amount_cents: 222 }
-                  ],
-                  categories: [
-                    { id: null,
-                      name: "new_cat_for_new_main_cat",
-                      inspectors: ["#{User.find(firstname: 'user_1').id}",
-                                   "#{User.find(firstname: 'user_2').id}"],
-                      viewers: ["#{User.find(firstname: 'user_1').id}",
-                                "#{User.find(firstname: 'user_2').id}"] }
-                  ]
-                },
-                { id: "#{MainCategory.find(name: 'main_cat_1').id}",
-                  name: "main_cat_1",
-                  budget_limits: [
-                    { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_1').id}",
-                      amount_cents: 333 },
-                    { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
-                      amount_cents: 444 }
-                  ],
-                  categories: [
-                    { id: "#{Category.find(name: 'cat_1_for_main_cat_1',
-                                           main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
-                      name: "cat_1_for_main_cat_1",
-                      general_ledger_account: "LEDG_ACC_NEW",
-                      cost_center: "CC_NEW",
-                      inspectors: ["#{User.find(firstname: 'user_3').id}",
-                                   "#{User.find(firstname: 'user_4').id}"],
-                      viewers: ["#{User.find(firstname: 'user_3').id}",
-                                "#{User.find(firstname: 'user_4').id}"] }
-                  ],
-                  image: [
-                    { id: "#{@upload_1.id}",
-                      to_delete: true,
-                      typename: "Upload" },
-                    { id: "#{@upload_2.id}",
-                      to_delete: false,
-                      typename: "Upload" },
-                    { id: "#{Image.find(main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
-                      to_delete: true,
-                      typename: "Image" }
-                  ]
-                },
-                { id: "#{MainCategory.find(name: 'main_cat_2').id}",
-                  name: "main_cat_2_new_name" }
+        @qvariables = {
+          input: [
+            { id: nil,
+              name: "new_main_cat",
+              budget_limits: [
+                { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_1').id}",
+                  amount_cents: 111 },
+                { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
+                  amount_cents: 222 }
+              ],
+              categories: [
+                { id: nil,
+                  name: "new_cat_for_new_main_cat",
+                  inspectors: ["#{User.find(firstname: 'user_1').id}",
+                               "#{User.find(firstname: 'user_2').id}"],
+                  viewers: ["#{User.find(firstname: 'user_1').id}",
+                            "#{User.find(firstname: 'user_2').id}"] }
               ]
-            ) {
-              name
-            }
-          }
-        GRAPHQL
+            },
+            { id: "#{MainCategory.find(name: 'main_cat_1').id}",
+              name: "main_cat_1",
+              budget_limits: [
+                { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_1').id}",
+                  amount_cents: 333 },
+                { budget_period_id: "#{BudgetPeriod.find(name: 'budget_period_2').id}",
+                  amount_cents: 444 }
+              ],
+              categories: [
+                { id: "#{Category.find(name: 'cat_1_for_main_cat_1',
+                                       main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
+                  name: "cat_1_for_main_cat_1",
+                  general_ledger_account: "LEDG_ACC_NEW",
+                  cost_center: "CC_NEW",
+                  inspectors: ["#{User.find(firstname: 'user_3').id}",
+                               "#{User.find(firstname: 'user_4').id}"],
+                  viewers: ["#{User.find(firstname: 'user_3').id}",
+                            "#{User.find(firstname: 'user_4').id}"] }
+              ],
+              image: [
+                { id: "#{@upload_1.id}",
+                  to_delete: true,
+                  typename: "Upload" },
+                { id: "#{@upload_2.id}",
+                  to_delete: false,
+                  typename: "Upload" },
+                { id: "#{Image.find(main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
+                  to_delete: true,
+                  typename: "Image" }
+              ]
+            },
+            { id: "#{MainCategory.find(name: 'main_cat_2').id}",
+              name: "main_cat_2_new_name" }
+          ]
+        }.as_json
       end
 
       it 'error as inspector' do
         inspector_user = User.find(firstname: 'user_1')
-        result = query(@q, inspector_user.id)
+        result = query(q, inspector_user.id, @qvariables)
 
         expect(result['data']['main_categories']).to be_empty
         expect(result['errors'].first['exception'])
@@ -313,7 +316,7 @@ describe 'main categories' do
       end
 
       it 'success as admin' do
-        result = query(@q, admin_user.id)
+        result = query(q, admin_user.id, @qvariables)
 
         expect(result).to eq({
           'data' => {
