@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative 'graphql_helper'
+require_relative '../graphql_helper'
 
 describe 'requesters organizations' do
   context 'mutation' do

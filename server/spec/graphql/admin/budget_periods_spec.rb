@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative 'graphql_helper'
+require_relative '../graphql_helper'
 
 describe 'budget periods' do
   context 'query' do
