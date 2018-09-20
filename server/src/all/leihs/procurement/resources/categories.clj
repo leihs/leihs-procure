@@ -57,14 +57,6 @@
                          :request
                          :tx)))))
 
-(defn delete-categories-not-in-main-category-ids!
-  [tx ids]
-  (jdbc/execute! tx
-                 (-> (sql/delete-from :procurement_categories)
-                     (sql/where [:not-in
-                                 :procurement_categories.main_category_id ids])
-                     sql/format)))
-
 (defn delete-categories-for-main-category-id-and-not-in-ids!
   [tx mc-id ids]
   (jdbc/execute!
