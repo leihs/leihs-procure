@@ -862,7 +862,8 @@ Array [
     className="DayPickerInput"
 >
     <input
-        className="form-control"
+        autoComplete="off"
+        className="form-control is-invalid"
         name={undefined}
         onBlur={[Function]}
         onChange={[Function]}
@@ -870,7 +871,7 @@ Array [
         onFocus={[Function]}
         onKeyDown={[Function]}
         onKeyUp={[Function]}
-        placeholder=""
+        placeholder="01.01.2000"
         readOnly={undefined}
         required={undefined}
         value=""
@@ -886,6 +887,7 @@ Array [
     className="DayPickerInput"
 >
     <input
+        autoComplete="off"
         className="form-control"
         name={undefined}
         onBlur={[Function]}
@@ -894,10 +896,10 @@ Array [
         onFocus={[Function]}
         onKeyDown={[Function]}
         onKeyUp={[Function]}
-        placeholder=""
+        placeholder="01.01.2000"
         readOnly={undefined}
         required={undefined}
-        value="10/26/1985"
+        value="26.10.1985"
     />
 </div>,
 ]
