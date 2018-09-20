@@ -34,6 +34,7 @@ describe 'main categories' do
     @main_categories_before = [
       { name: 'main_cat_1' },
       { name: 'main_cat_2' },
+      { name: 'main_cat_3' },
       { name: 'main_cat_to_delete' }
     ]
     @main_categories_before.each do |data|
@@ -47,11 +48,13 @@ describe 'main categories' do
         parent: { name: 'main_cat_1' },
         general_ledger_account: 'LEDG_ACC_OLD',
         cost_center: 'CC_OLD' },
-        { name: 'cat_to_delete',
-          parent: { name: 'main_cat_1' } },
-          { name: 'cat_1_for_main_cat_to_delete',
-            parent: { name: 'main_cat_to_delete' } }
-          ]
+      { name: 'cat_to_delete',
+        parent: { name: 'main_cat_1' } },
+      { name: 'cat_1_for_main_cat_to_delete',
+        parent: { name: 'main_cat_to_delete' } },
+      { name: 'cat_1_for_main_cat_3',
+        parent: { name: 'main_cat_3' } }
+    ]
     @categories_before.each do |data|
       FactoryBot.create(
         :category,
@@ -65,13 +68,13 @@ describe 'main categories' do
     @category_inspectors_before = [
       { user_id: User.find(firstname: 'user_1').id,
         category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_2').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-          { user_id: User.find(firstname: 'user_3').id,
-            category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-            { user_id: User.find(firstname: 'user_1').id,
-              category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
-            ]
+      { user_id: User.find(firstname: 'user_2').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+      { user_id: User.find(firstname: 'user_3').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+      { user_id: User.find(firstname: 'user_1').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
+    ]
     @category_inspectors_before.each do |data|
       FactoryBot.create(:category_inspector, data)
     end
@@ -81,13 +84,13 @@ describe 'main categories' do
     @category_viewers_before = [
       { user_id: User.find(firstname: 'user_1').id,
         category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-        { user_id: User.find(firstname: 'user_2').id,
-          category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-          { user_id: User.find(firstname: 'user_3').id,
-            category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
-            { user_id: User.find(firstname: 'user_1').id,
-              category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
-            ]
+      { user_id: User.find(firstname: 'user_2').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+      { user_id: User.find(firstname: 'user_3').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_1').id },
+      { user_id: User.find(firstname: 'user_1').id,
+        category_id: Category.find(name: 'cat_1_for_main_cat_to_delete').id }
+    ]
     @category_viewers_before.each do |data|
       FactoryBot.create(:category_viewer, data)
     end
@@ -96,17 +99,17 @@ describe 'main categories' do
 
     @budget_limits_before = [
       { main_category: { name: 'main_cat_1' },
-      budget_period: { name: 'budget_period_1' },
-      amount_cents: 50 },
+        budget_period: { name: 'budget_period_1' },
+        amount_cents: 50 },
       { main_category: { name: 'main_cat_1' },
-      budget_period: { name: 'budget_period_2' },
-      amount_cents: 100 },
+        budget_period: { name: 'budget_period_2' },
+        amount_cents: 100 },
       { main_category: { name: 'main_cat_to_delete' },
-      budget_period: { name: 'budget_period_1' },
-      amount_cents: 50 },
+        budget_period: { name: 'budget_period_1' },
+        amount_cents: 50 },
       { main_category: { name: 'main_cat_to_delete' },
-      budget_period: { name: 'budget_period_2' },
-      amount_cents: 100 }
+        budget_period: { name: 'budget_period_2' },
+        amount_cents: 100 }
     ]
     @budget_limits_before.each do |data|
       FactoryBot.create(
@@ -255,7 +258,9 @@ describe 'main categories' do
               ]
             },
             { id: "#{MainCategory.find(name: 'main_cat_2').id}",
-              name: "main_cat_2_new_name" }
+              name: "main_cat_2_new_name" },
+            { id: "#{MainCategory.find(name: 'main_cat_to_delete').id}",
+              toDelete: true }
           ]
         }.as_json
       end
@@ -323,6 +328,7 @@ describe 'main categories' do
             'main_categories' => [
               { 'name' => 'main_cat_1' },
               { 'name' => 'main_cat_2_new_name' },
+              { 'name' => 'main_cat_3' },
               { 'name' => 'new_main_cat' }
             ]
           }
@@ -338,7 +344,8 @@ describe 'main categories' do
         main_categories_after = [
           { name: 'new_main_cat' },
           { name: 'main_cat_1' },
-          { name: 'main_cat_2_new_name' }
+          { name: 'main_cat_2_new_name' },
+          { name: 'main_cat_3' }
         ]
         expect(MainCategory.count).to be == main_categories_after.count
         main_categories_after.each do |data|
@@ -374,6 +381,8 @@ describe 'main categories' do
             parent: { name: 'main_cat_1' },
             general_ledger_account: 'LEDG_ACC_NEW',
             cost_center: 'CC_NEW' },
+          { name: 'cat_1_for_main_cat_3',
+            parent: { name: 'main_cat_3' } },
           { name: 'new_cat_for_new_main_cat',
             parent: { name: 'new_main_cat' } }
         ]
@@ -426,93 +435,6 @@ describe 'main categories' do
           ).filename
         ).to be == 'lisp-machine.jpg'
       end
-
-    end
-
-    context 'single update (no update if mentioned in input data)' do
-      example 'update a single category' do
-        qvariables = {
-          input: [
-            { id: "#{MainCategory.find(name: 'main_cat_2').id}",
-              name: "main_cat_2_new_name" }
-          ]
-        }.as_json
-
-        result = query(q, admin_user.id, qvariables)
-
-        expect(result).to eq({
-          'data' => {
-            'main_categories' => [
-              { 'name' => 'main_cat_2_new_name' }
-            ]
-          }
-        })
-
-        #############################################################################
-
-        main_categories_after = [
-          { name: 'main_cat_1' },
-          { name: 'main_cat_2_new_name' }
-        ]
-        expect(MainCategory.count).to be == main_categories_after.count
-        main_categories_after.each do |data|
-          expect(MainCategory.find(data)).to be
-        end
-      end
-
-      example 'add a single category' do
-        qvariables = {
-          input: [{ id: nil, name: "something_new" }]
-        }.as_json
-
-        result = query(q, admin_user.id, qvariables)
-
-        expect(result).to eq({
-          'data' => {
-            'main_categories' => [
-              { 'name' => 'something_new' }
-            ]
-          }
-        })
-
-        #############################################################################
-
-        main_categories_after = [
-          { name: 'main_cat_1' },
-          { name: 'main_cat_2' },
-          { name: 'something_new' }
-        ]
-        expect(MainCategory.count).to be == main_categories_after.count
-        main_categories_after.each do |data|
-          expect(MainCategory.find(data)).to be
-        end
-      end
-
-      example 'delete a single category' do
-        mc_to_delete = MainCategory.find(name: 'main_cat_1')
-        
-        qvariables = {
-          input: [{ toDelete: true, id: mc_to_delete.id }]
-        }.as_json
-
-        result = query(q, admin_user.id, qvariables)
-
-        expect(result).to eq({
-          'data' => { 'main_categories' => [] }
-        })
-
-        #############################################################################
-
-        main_categories_after = [
-          { name: 'main_cat_2' },
-        ]
-        expect(MainCategory.find(id: mc_to_delete.id)).to be nil
-        expect(MainCategory.count).to be == main_categories_after.count
-        main_categories_after.each do |data|
-          expect(MainCategory.find(data)).to be
-        end
-      end
-
     end
   end
 end
