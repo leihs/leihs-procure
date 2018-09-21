@@ -1,6 +1,8 @@
 (ns leihs.procurement.resources.main-category
   (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.resources [image :as image] [images :as images]
+            [clojure.tools.logging :as log]
+            [leihs.procurement.resources [budget-limits :as budget-limits]
+             [categories :as categories] [image :as image] [images :as images]
              [uploads :as uploads]]
             [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
 
@@ -39,7 +41,8 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_main_categories)
                      (sql/values [mc])
-                     sql/format)))
+                     sql/format
+                     log/spy)))
 
 (defn- filter-images [m is] (filter #(submap? m %) is))
 
@@ -108,6 +111,13 @@
         sql/format))
     first
     :result))
+
+(defn delete!
+  [tx id]
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_main_categories)
+                     (sql/where [:= :procurement_main_categories.id id])
+                     sql/format)))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
