@@ -47,7 +47,7 @@ class RequestsDashboard extends React.Component {
     const pageHeader = (
       <Row cls="pt-1">
         <Col sm>
-          <h4>
+          <h1 className="h4">
             {requestsQuery.loading || !requestsQuery.data
               ? ' '
               : `${requestTotalCount} ${
@@ -55,7 +55,7 @@ class RequestsDashboard extends React.Component {
                     ? t('dashboard.requests_title_singular')
                     : t('dashboard.requests_title_plural')
                 }${state.exportView ? ' exportieren' : ''}`}
-          </h4>
+          </h1>
         </Col>
         <Col sm cls="d-flex justify-content-end align-items-end">
           <ButtonToolbar size="sm" className="mb-2">
@@ -131,7 +131,7 @@ class RequestsDashboard extends React.Component {
                 </ButtonGroup> */}
               </ButtonToolbar>
 
-              <h5>Vorschau:</h5>
+              <h2 className="h5">Vorschau:</h2>
               {<RequestTable table={table} query={requestsQuery} />}
             </div>
           )}
@@ -292,10 +292,10 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
           >
             <Row>
               <Col sm="8">
-                <h2 className="mb-0 h3 d-inline-block">
+                <h1 className="mb-0 h4 d-inline-block">
                   <Caret spaced />
                   {budgetPeriod.name}
-                </h2>
+                </h1>
 
                 <div className="d-inline-flex flex-wrap ml-3 mt-2">
                   <Tooltipped text="Antragsphase bis">
@@ -399,7 +399,7 @@ const CategoryLine = ({
     }) => (
       <F>
         <li
-          className={cx('list-group-item ', {
+          className={cx('list-group-item py-1', {
             disabled: !canToggle,
             'cursor-pointer': canToggle
           })}
@@ -407,11 +407,11 @@ const CategoryLine = ({
         >
           <Row>
             <Col sm="8">
-              <h5 className="mb-0 mr-sm-3 d-inline-block">
+              <h2 className="h6 mb-0 mr-sm-3 d-inline-block">
                 <Caret spaced />
-                <ImageThumbnail imageUrl={category.image_url} />
+                <ImageThumbnail size={2.75} imageUrl={category.image_url} />
                 {category.name} <small>({requestCount})</small>
-              </h5>
+              </h2>
             </Col>
 
             <Col
@@ -494,10 +494,10 @@ const SubCategoryLine = ({
           >
             <Row>
               <Col sm="8">
-                <h6 className="mb-0 mr-sm-3 d-inline-block">
+                <h3 className="h6 mb-0 mr-sm-3 d-inline-block">
                   <Caret spaced />
                   {category.name} <span>({requestCount})</span>
-                </h6>
+                </h3>
               </Col>
               <Col
                 sm="3"
