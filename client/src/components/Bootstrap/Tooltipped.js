@@ -10,6 +10,9 @@ const Tooltipped = ({ children, text, delay, ...p }) => {
     throw new Error('Tooltipped child needs an `id` prop!')
   }
 
+  const ttText = f.presence(f.trim(text))
+
+  if (!ttText) return child
   return (
     <React.Fragment>
       {child}
@@ -18,7 +21,7 @@ const Tooltipped = ({ children, text, delay, ...p }) => {
         target={targetId}
         {...p}
       >
-        {text}
+        {ttText}
       </UncontrolledTooltip>
     </React.Fragment>
   )

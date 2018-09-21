@@ -17,10 +17,11 @@ import {
   FormGroup,
   // InputText,
   FormField,
+  // InputField,
   Tooltipped
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Routed } from '../../components/Router'
+import { Redirect, Routed } from '../../components/Router'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -36,6 +37,7 @@ const CATEGORIES_INDEX_QUERY = gql`
       categories {
         id
         name
+        can_delete
       }
     }
   }
@@ -106,18 +108,16 @@ const UPDATE_CATEGORIES_MUTATION = gql`
 const updateCategories = {
   mutation: {
     mutation: UPDATE_CATEGORIES_MUTATION,
-    onError: mutationErrorHandler
+    onError: mutationErrorHandler,
 
-    // TODO: better update handling
-    // update: (cache, { data: { main_categories } }) => {
-    //   // window.location.reload()
-    //   cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
-    // }
+    update: (cache, { data: { main_categories } }) => {
+      cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
+    }
   },
   doUpdate: (mutate, mainCats) => {
     const data = mainCats.map(mainCat => {
       return {
-        ...f.pick(mainCat, ['id', 'name']),
+        ...f.pick(mainCat, ['id', 'name', 'toDelete']),
         // TODO: image: …
 
         // NOTE: NO_BUDGET_LIMITS
@@ -148,7 +148,7 @@ const updateCategories = {
       variables: { mainCategories: data }
     })
   },
-  successFlash: t('form_message_save_success')
+  successFlash: 'OK!'
 }
 
 // # PAGE
@@ -163,6 +163,7 @@ const AdminCategoriesPage = ({ match }) => (
       const sidebar = (
         <F>
           <SideNav categories={categoriesToc} baseUrl={match.url} />
+
           <hr className="d-xl-none" />
         </F>
       )
@@ -173,8 +174,7 @@ const AdminCategoriesPage = ({ match }) => (
             <Route
               exact
               path={`${match.url}/:mainCatId`}
-              render={r => <CategoryPage {...r} />}
-              foo="bar"
+              render={route => <CategoryPage {...route} />}
             />
             {/* fallback/index content: */}
             <F>
@@ -218,40 +218,51 @@ class CategoryPage extends React.Component {
   render({ match } = this.props) {
     return (
       <Routed>
-        {({ setFlash }) => (
+        {({ location, history, setFlash }) => (
           <Query query={CATEGORIES_QUERY}>
             {({ loading, error, data, refetch }) => {
               if (loading) return <Loading />
               if (error) return <ErrorPanel error={error} data={data} />
 
               const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-              const mainCat = f.find(data.main_categories, {
-                id: mainCatId
-              })
+              const isNew = mainCatId === 'new'
+
+              const mainCat = isNew
+                ? { name: '', categories: [] }
+                : f.find(data.main_categories, {
+                    id: mainCatId
+                  })
+
+              if (!mainCat) {
+                // debugger
+                return <Redirect push to={'/admin/categories'} />
+              }
 
               return (
                 <Mutation
                   {...updateCategories.mutation}
-                  onCompleted={() => {
-                    // this.setState({ formKey: Date.now() })
+                  onCompleted={newData => {
+                    this.setState({ formKey: Date.now() })
                     setFlash({ message: updateCategories.successFlash })
-                    window.location.reload()
-                    // window && window.scrollTo(0, 0)
-                    // refetch()
+                    window.scrollTo(0, 0)
+                    // FIXME: redirect to new ID if created
+                    if (isNew) history.push(`/admin/categories`)
                   }}
                 >
                   {(mutate, info) => (
                     <CategoryCard
                       {...mainCat}
+                      isNew={isNew}
                       formKey={this.state.formKey}
                       onSubmit={mainCat =>
-                        updateCategories.doUpdate(mutate, [
-                          mainCat,
-                          ...data.main_categories.filter(
-                            mc => mc.id !== mainCat.id
-                          )
-                        ])
+                        updateCategories.doUpdate(mutate, [mainCat])
                       }
+                      onDelete={mainCat => {
+                        // debugger
+                        updateCategories.doUpdate(mutate, [
+                          { id: mainCat.id, toDelete: true }
+                        ])
+                      }}
                     />
                   )}
                 </Mutation>
@@ -270,75 +281,95 @@ const extendWhere = (id, list, fn) =>
 const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
 
-const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
-  // NOTE: NO_BUDGET_LIMITS
-  // const formProps = ['name', 'image_url', 'budget_limits', 'categories']
-  const formProps = ['name', 'image_url', 'categories']
-  const formValues = f.pick(props, formProps)
+class CategoryCard extends React.Component {
+  state = { showValidations: false }
+  showValidations = (bool = true) => this.setState({ showValidations: bool })
+  render(
+    {
+      state,
+      props: { id, formKey, isNew, onSubmit, onDelete, ...props }
+    } = this
+  ) {
+    // NOTE: NO_BUDGET_LIMITS
+    // const formProps = ['name', 'image_url', 'budget_limits', 'categories']
+    const formProps = ['name', 'image_url', 'categories']
+    const formValues = f.pick(props, formProps)
 
-  return (
-    <StatefulForm
-      key={id + formKey}
-      idPrefix="budgetPeriods"
-      values={formValues}
-    >
-      {({ fields, formPropsFor, getValue, setValue }) => {
-        const onAddSubCat = () => {
-          setValue('categories', [...fields.categories, {}])
-        }
-        const onMarkSubCatForDeletion = ({ id, toDelete = false }) => {
-          setValue('categories', setAsDeleted(!toDelete, id, fields.categories))
-        }
-        const addUser = (fieldKey, cat, user) => {
-          setValue(
-            'categories',
-            extendWhere(cat.id, fields.categories, c => ({
-              [fieldKey]: [...c[fieldKey], user]
-            }))
-          )
-        }
-        const removeUser = (fieldKey, cat, { id, toDelete = false }) => {
-          setValue(
-            'categories',
-            extendWhere(cat.id, fields.categories, c => ({
-              [fieldKey]: setAsDeleted(!toDelete, id, c[fieldKey])
-            }))
-          )
-        }
-        const onAddInspector = (c, u) => addUser('inspectors', c, u)
-        const onRemoveInspector = (c, u) => removeUser('inspectors', c, u)
-        const onAddViewer = (c, u) => addUser('viewers', c, u)
-        const onRemoveViewer = (c, u) => removeUser('viewers', c, u)
+    return (
+      <StatefulForm
+        key={id + formKey}
+        idPrefix="budgetPeriods"
+        values={formValues}
+      >
+        {({ fields, formPropsFor, getValue, setValue }) => {
+          const onAddSubCat = () => {
+            setValue('categories', [...fields.categories, {}])
+          }
+          const onMarkSubCatForDeletion = ({ id, toDelete = false }) => {
+            setValue(
+              'categories',
+              setAsDeleted(!toDelete, id, fields.categories)
+            )
+          }
+          const addUser = (fieldKey, cat, user) => {
+            setValue(
+              'categories',
+              extendWhere(cat.id, fields.categories, c => ({
+                [fieldKey]: [...f.get(c, fieldKey), user]
+              }))
+            )
+          }
+          const removeUser = (fieldKey, cat, { id, toDelete = false }) => {
+            setValue(
+              'categories',
+              extendWhere(cat.id, fields.categories, c => ({
+                [fieldKey]: setAsDeleted(!toDelete, id, c[fieldKey])
+              }))
+            )
+          }
+          const onAddInspector = (c, u) => addUser('inspectors', c, u)
+          const onRemoveInspector = (c, u) => removeUser('inspectors', c, u)
+          const onAddViewer = (c, u) => addUser('viewers', c, u)
+          const onRemoveViewer = (c, u) => removeUser('viewers', c, u)
 
-        return (
-          <F>
-            <div className="card mb-3" id={`mc${id}`}>
-              <div className="card-header">
-                <h4 className="mb-0">{fields.name}</h4>
-              </div>
-              <div className="card-body">
-                <form
-                  onSubmit={e => {
-                    e.preventDefault()
-                    onSubmit({ id, ...fields })
-                  }}
-                >
-                  <Row>
-                    <Col sm>
-                      <h6>{t('admin.categories.image')}</h6>
-                      {fields.image_url && (
-                        <div className="img-thumbnail-wrapper mb-3">
-                          <img
-                            className="img-thumbnail"
-                            alt={`thumbnail for category ${fields.name}`}
-                            src={fields.image_url}
-                          />
-                        </div>
-                      )}
-                      <code>TBD: upload new image</code>
-                    </Col>
+          return (
+            <F>
+              <form
+                className={cx(state.showValidations && 'was-validated')}
+                onSubmit={e => {
+                  e.preventDefault()
+                  onSubmit({ id, ...fields })
+                }}
+              >
+                <div className="card mb-3" id={`mc${id}`}>
+                  {/* <div className="card-header">
+                    <h4 className="mb-0">Hauptkategorie</h4>
+                  </div> */}
+                  <div className="card-body">
+                    <FormField
+                      label="Name"
+                      // hideLabel
+                      className="f3 py-4 font-weight-bold"
+                      required
+                      {...formPropsFor('name')}
+                    />
 
-                    {/* NOTE: NO_BUDGET_LIMITS
+                    <Row>
+                      <Col sm>
+                        <h6>{t('admin.categories.image')}</h6>
+                        {fields.image_url && (
+                          <div className="img-thumbnail-wrapper mb-3">
+                            <img
+                              className="img-thumbnail"
+                              alt={`thumbnail for category ${fields.name}`}
+                              src={fields.image_url}
+                            />
+                          </div>
+                        )}
+                        <code>TBD: upload new image</code>
+                      </Col>
+
+                      {/* NOTE: NO_BUDGET_LIMITS
                     <Col sm>
                       <h6>{t('admin.categories.budget_limits')}</h6>
 
@@ -370,131 +401,175 @@ const CategoryCard = ({ id, formKey, onSubmit, ...props }) => {
                         </Row>
                       ))}
                     </Col> */}
-                  </Row>
+                    </Row>
 
-                  <Row>
-                    <Col>
-                      <h5 className="mt-4 mb-3">
-                        {t('admin.categories.subcats')}
-                      </h5>
-                    </Col>
-                  </Row>
+                    <Row>
+                      <Col>
+                        <h5 className="mt-4 mb-3">
+                          {t('admin.categories.subcats')}
+                        </h5>
+                      </Col>
+                    </Row>
 
-                  {fields.categories.map((cat, i) => (
-                    <React.Fragment key={cat.id}>
-                      <Row>
-                        <Col sm>
-                          <FormField
-                            className={cx('font-weight-bold', {
-                              'text-danger text-strike': cat.toDelete
-                            })}
-                            label="category name"
-                            hideLabel={true}
-                            {...formPropsFor(`categories.${i}.name`)}
-                          />
-                        </Col>
-                        {cat.can_delete && (
-                          <Col sm="1">
-                            <Tooltipped
-                              text={t('admin.categories.delete_subcat')}
-                            >
-                              <label id={`btn_del_${cat.id}`} className="pt-1">
-                                <Icon.Trash
-                                  size="lg"
-                                  className={cx(
-                                    cat.toDelete ? 'text-dark' : 'text-danger'
-                                  )}
-                                />
-                                <input
-                                  type="checkbox"
-                                  className="sr-only"
-                                  checked={!!cat.toDelete}
-                                  onClick={e => onMarkSubCatForDeletion(cat)}
-                                />
-                              </label>
-                            </Tooltipped>
-                          </Col>
-                        )}
-                      </Row>
-                      {!cat.toDelete && (
+                    {fields.categories.map((cat, i) => (
+                      <React.Fragment key={cat.id}>
                         <Row>
-                          <Col lg>
+                          <Col sm>
                             <FormField
-                              className="form-control-sm"
-                              {...formPropsFor(`categories.${i}.cost_center`)}
-                              label={t(
-                                'admin.categories.subcategories.cost_center'
-                              )}
-                            />
-                            <FormField
-                              className="form-control-sm"
-                              {...formPropsFor(
-                                `categories.${i}.general_ledger_account`
-                              )}
-                              label={t(
-                                'admin.categories.subcategories.general_ledger_account'
-                              )}
-                            />
-                            <FormField
-                              className="form-control-sm"
-                              {...formPropsFor(
-                                `categories.${i}.procurement_account`
-                              )}
-                              label={t(
-                                'admin.categories.subcategories.procurement_account'
-                              )}
+                              className={cx('font-weight-bold', {
+                                'text-danger text-strike': cat.toDelete
+                              })}
+                              label="category name"
+                              hideLabel={true}
+                              required
+                              {...formPropsFor(`categories.${i}.name`)}
                             />
                           </Col>
-
-                          <Col lg>
-                            <ListOfUsers
-                              keyName="inspectors"
-                              users={cat.inspectors}
-                              onAddUser={u => onAddInspector(cat, u)}
-                              onRemoveUser={u => onRemoveInspector(cat, u)}
-                            />
-                          </Col>
-
-                          <Col lg>
-                            <ListOfUsers
-                              keyName="viewers"
-                              users={cat.viewers}
-                              onAddUser={u => onAddViewer(cat, u)}
-                              onRemoveUser={u => onRemoveViewer(cat, u)}
-                            />
-                          </Col>
+                          {cat.can_delete && (
+                            <Col sm="1">
+                              <Tooltipped
+                                text={t('admin.categories.delete_subcat')}
+                              >
+                                <label
+                                  id={`btn_del_${cat.id}`}
+                                  className="pt-1"
+                                >
+                                  <Icon.Trash
+                                    size="lg"
+                                    className={cx(
+                                      cat.toDelete ? 'text-dark' : 'text-danger'
+                                    )}
+                                  />
+                                  <input
+                                    type="checkbox"
+                                    className="sr-only"
+                                    checked={!!cat.toDelete}
+                                    onClick={e => onMarkSubCatForDeletion(cat)}
+                                  />
+                                </label>
+                              </Tooltipped>
+                            </Col>
+                          )}
                         </Row>
-                      )}
-                      <hr />
-                    </React.Fragment>
-                  ))}
+                        {!cat.toDelete && (
+                          <Row>
+                            <Col lg>
+                              <FormField
+                                className="form-control-sm"
+                                {...formPropsFor(`categories.${i}.cost_center`)}
+                                label={t(
+                                  'admin.categories.subcategories.cost_center'
+                                )}
+                              />
+                              <FormField
+                                className="form-control-sm"
+                                {...formPropsFor(
+                                  `categories.${i}.general_ledger_account`
+                                )}
+                                label={t(
+                                  'admin.categories.subcategories.general_ledger_account'
+                                )}
+                              />
+                              <FormField
+                                className="form-control-sm"
+                                {...formPropsFor(
+                                  `categories.${i}.procurement_account`
+                                )}
+                                label={t(
+                                  'admin.categories.subcategories.procurement_account'
+                                )}
+                              />
+                            </Col>
 
-                  <div>
-                    <Tooltipped text={t('admin.categories.add_subcat')}>
+                            {/* FIXME: support adding user to *NEW* subcats */}
+                            {!cat.id ? (
+                              <F>
+                                <Col lg />
+                                <Col lg />
+                              </F>
+                            ) : (
+                              <F>
+                                <Col lg>
+                                  <ListOfUsers
+                                    keyName="inspectors"
+                                    users={cat.inspectors}
+                                    onAddUser={u => onAddInspector(cat, u)}
+                                    onRemoveUser={u =>
+                                      onRemoveInspector(cat, u)
+                                    }
+                                  />
+                                </Col>
+
+                                <Col lg>
+                                  <ListOfUsers
+                                    keyName="viewers"
+                                    users={cat.viewers}
+                                    onAddUser={u => onAddViewer(cat, u)}
+                                    onRemoveUser={u => onRemoveViewer(cat, u)}
+                                  />
+                                </Col>
+                              </F>
+                            )}
+                          </Row>
+                        )}
+                        <hr />
+                      </React.Fragment>
+                    ))}
+
+                    <div>
+                      <Tooltipped text={t('admin.categories.add_subcat')}>
+                        <Button
+                          color="link"
+                          id={`add_bp_btn_${id}`}
+                          onClick={onAddSubCat}
+                        >
+                          <Icon.PlusCircle color="success" size="2x" />
+                        </Button>
+                      </Tooltipped>{' '}
                       <Button
-                        color="link"
-                        id="add_bp_btn"
-                        onClick={onAddSubCat}
+                        color="primary"
+                        type="submit"
+                        onClick={e => this.showValidations()}
                       >
-                        <Icon.PlusCircle color="success" size="2x" />
-                      </Button>
-                    </Tooltipped>{' '}
-                    <Button color="primary" type="submit">
-                      <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-                    </Button>
+                        <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+                      </Button>{' '}
+                      {!isNew && (
+                        <Tooltipped
+                          text={
+                            props.can_delete
+                              ? null
+                              : t('admin.categories.delete_btn_hint')
+                          }
+                        >
+                          {/* NOTE: span wrapper needed because disabled button does not trigger tooltip (!?!) */}
+                          <span
+                            id={`del_bp_btn_${id}`}
+                            className="d-inline-block"
+                          >
+                            <Button
+                              color="danger"
+                              disabled={!props.can_delete}
+                              onClick={e => onDelete({ id })}
+                            >
+                              <Icon.Trash /> <span>{t('form_btn_delete')}</span>
+                            </Button>
+                          </span>
+                        </Tooltipped>
+                      )}
+                    </div>
                   </div>
-                </form>
-              </div>
-            </div>
-            {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
-          </F>
-        )
-      }}
-    </StatefulForm>
-  )
+                </div>
+              </form>
+              {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
+            </F>
+          )
+        }}
+      </StatefulForm>
+    )
+  }
 }
 
-const SideNav = ({ categories, baseUrl, withSubcats = false }) => (
+const SideNav = ({ children, categories, baseUrl, withSubcats = false }) => (
   <nav className="pt-3">
     <h5>
       <NavLink className="nav-link text-dark" to={baseUrl}>
@@ -506,6 +581,7 @@ const SideNav = ({ categories, baseUrl, withSubcats = false }) => (
       baseUrl={baseUrl}
       withSubcats={withSubcats}
     />
+    {children}
   </nav>
 )
 
@@ -532,6 +608,16 @@ const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
         )}
       </li>
     ))}
+    <li className="nav-item">
+      <NavLink
+        to={`${baseUrl}/new`}
+        className="nav-link"
+        activeClassName="disabled text-dark"
+      >
+        <Icon.PlusCircle color="success" size="2x" />
+        <span className="sr-only">Neue Hauptkategorie hinzufügen</span>
+      </NavLink>
+    </li>
   </ul>
 )
 

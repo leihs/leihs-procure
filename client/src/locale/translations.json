@@ -155,6 +155,7 @@
       "subcats": "Subkategorien",
       "upload_new_image": "Neues Bild hochladen",
       "add_subcat": "Neue Subkategorie hinzufügen",
+      "delete_btn_hint": "Hauptkategorie kann nur gelöscht werden, wenn keine Anträge vorhanden sind",
       "delete_subcat": "Subkategorie löschen",
       "inspectors": "Prüfer",
       "remove_from_inspectors": "als Inspektor entfernen",

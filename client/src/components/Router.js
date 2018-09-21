@@ -1,10 +1,14 @@
 import React from 'react'
 import f from 'lodash'
-import { Route as RRRoute, Redirect as RRRedirect } from 'react-router-dom'
+import {
+  Route as RRRoute,
+  Redirect as RRRedirect,
+  Link
+} from 'react-router-dom'
 import { RouteParams } from './Bootstrap/Navs'
 import { parse as parseQuery } from 'qs'
 
-export { RouteParams }
+export { RouteParams, Link }
 
 // like ReactRouter.NavLink but for anything that wants to know if its "active".
 export const RoutedActive = ({ children, ...p }) => (
