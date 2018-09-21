@@ -36,8 +36,11 @@
                   sql/format
                   (->> (jdbc/query tx)))
               [])
-        requests (requests/get-requests ctx args value)]
-    {:budget_periods
+        requests (requests/get-requests ctx args value)
+        dashboard-cache-key {:id (hash args)}]
+    {:total_count (count requests),
+     :cacheKey (cache-key dashboard-cache-key),
+     :budget_periods
        (->>
          bps
          (map
@@ -67,22 +70,27 @@
                                                                 :id)
                                                             (str (:id bp))))
                                                    requests)]
-                                           (->
-                                             c
-                                             (assoc :requests requests*)
-                                             (assoc :total_price_cents
-                                                      (sum-total-price
-                                                        requests*))
-                                             (assoc :cacheKey
-                                                      (cache-key bp mc c)))))))]
+                                           (-> c
+                                               (assoc :requests requests*)
+                                               (assoc :total_price_cents
+                                                        (sum-total-price
+                                                          requests*))
+                                               (assoc :cacheKey
+                                                        (cache-key
+                                                          dashboard-cache-key
+                                                          bp
+                                                          mc
+                                                          c)))))))]
                              (-> mc
                                  (assoc :categories cats*)
                                  (assoc :total_price_cents (sum-total-price
                                                              cats*))
-                                 (assoc :cacheKey (cache-key bp mc))
+                                 (assoc :cacheKey
+                                          (cache-key dashboard-cache-key bp mc))
                                  (->> (main-categories/merge-image-path
                                         tx)))))))]
                (-> bp
                    (assoc :main_categories main-cats*)
-                   (assoc :total_price_cents (sum-total-price main-cats*))))))),
-     :total_count (count requests)}))
+                   (assoc :cacheKey (cache-key dashboard-cache-key bp))
+                   (assoc :total_price_cents (sum-total-price
+                                               main-cats*)))))))}))

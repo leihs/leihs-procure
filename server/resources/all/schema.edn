@@ -158,7 +158,8 @@
                                            :type (non-null :MainCategory)}}},
     :BudgetPeriod
       {:fields
-         {:can_delete {:resolve :can-delete-budget-period?,
+         {:cacheKey {:type String},
+          :can_delete {:resolve :can-delete-budget-period?,
                        :type (non-null Boolean)},
           :end_date {:type (non-null String)},
           :id {:type (non-null ID)},
@@ -198,6 +199,7 @@
     :CurrentUser {:fields {:saved_filters {:type :SavedFilters},
                            :user {:type (non-null :User)}}},
     :Dashboard {:fields {:budget_periods {:type (list :BudgetPeriod)},
+                         :cacheKey {:type String},
                          :total_count {:type (non-null Int)}}},
     :MainCategory {:fields {:budget_limits {:resolve :budget-limits,
                                             :type (list :BudgetLimit)},

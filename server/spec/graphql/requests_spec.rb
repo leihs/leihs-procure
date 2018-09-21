@@ -82,6 +82,7 @@ describe 'requests' do
             inspector_priority: $inspector_priority
             requested_by_auth_user: $onlyOwnRequests
           ) {
+            cacheKey @include(if: $withCacheKeys)
             budget_periods {
               id
               name
@@ -168,12 +169,16 @@ describe 'requests' do
     example 'adds nested cache keys' do
       result = query(@query, @user.id, {withCacheKeys: true})
       expect(result['errors']).to be_nil
+
+      dashboard_cache_key = result['data']['dashboard']['cacheKey']
+      expect(dashboard_cache_key).not_to be_empty
+
       expect(result['data']['dashboard']['budget_periods'].length).to eq BudgetPeriod.all.length
       result['data']['dashboard']['budget_periods'].each do |bp|
         bp['main_categories'].each do |mc|
-          expect(mc['cacheKey']).to eq "#{bp['id']}_#{mc['id']}"
+          expect(mc['cacheKey']).to eq "#{dashboard_cache_key}_#{bp['id']}_#{mc['id']}"
           mc['categories'].each do |sc|
-            expect(sc['cacheKey']).to eq "#{bp['id']}_#{mc['id']}_#{sc['id']}"
+            expect(sc['cacheKey']).to eq "#{dashboard_cache_key}_#{bp['id']}_#{mc['id']}_#{sc['id']}"
           end
         end
       end
