@@ -70,6 +70,19 @@ const Filters = ({ me, data, current, onChange }) => {
     f.any(s.roles, r => me.roles[r])
   )
 
+  const allowed = {
+    search: true,
+    budgetPeriods: true,
+    categories: true,
+    organizations: !me.roles.isOnlyRequester,
+    onlyOwnRequests: !me.roles.isOnlyRequester,
+    onlyCategoriesWithRequests: true,
+    onlyOwnCategories: me.roles.isInspector,
+    priority: true,
+    inspector_priority: !me.roles.isOnlyRequester,
+    state: true
+  }
+
   const available = {
     budgetPeriods: f.map(budgetPeriodsPyPhase, (bps, phase) => ({
       label: t(`budget_period_filter_label_state.${phase}`),
@@ -77,6 +90,14 @@ const Filters = ({ me, data, current, onChange }) => {
     })),
 
     categories: data.main_categories.map(({ id, name, categories }) => ({
+      label: name,
+      options: categories.map(({ id, name }) => ({ value: id, label: name }))
+    })),
+
+    _inspectedCategories: filterByInspectedCategories(
+      me,
+      data.main_categories
+    ).map(({ id, name, categories }) => ({
       label: name,
       options: categories.map(({ id, name }) => ({ value: id, label: name }))
     })),
@@ -100,18 +121,6 @@ const Filters = ({ me, data, current, onChange }) => {
       value: key,
       label: t(`request_state_label_${key}`)
     }))
-  }
-
-  const allowed = {
-    search: true,
-    budgetPeriods: true,
-    categories: true,
-    organizations: !me.roles.isOnlyRequester,
-    onlyOwnRequests: !me.roles.isOnlyRequester,
-    onlyCategoriesWithRequests: true,
-    priority: true,
-    inspector_priority: !me.roles.isOnlyRequester,
-    state: true
   }
 
   const defaultFilters = f.pick(
@@ -139,30 +148,17 @@ const Filters = ({ me, data, current, onChange }) => {
       // specific values:
       search: null,
       onlyOwnRequests: false,
+      onlyOwnCategories: me.roles.isInspector,
       onlyCategoriesWithRequests: true
     },
     f.keys(allowed)
   )
 
-  const applyFilters = filters => {
-    // Dont send filters that have every possible value selected
-    function unlessAllOptsSelected(key, available, filters) {
-      if (!available[key]) return
-      const allCount = f.flatMap(available[key], 'options').length
-      if (filters[key].length < allCount) return { [key]: filters[key] }
-    }
-    return {
-      ...filters,
-      ...unlessAllOptsSelected('categories', available, filters),
-      ...unlessAllOptsSelected('organizations', available, filters)
-    }
-  }
-
   return (
     <StatefulForm
       idPrefix="requests_filter"
       values={current}
-      onChange={d => onChange(applyFilters(d))}
+      onChange={d => onChange(d)}
     >
       {({ fields, formPropsFor, setValue, setValues }) => {
         const hasChanges = f.any(
@@ -190,7 +186,7 @@ const Filters = ({ me, data, current, onChange }) => {
         return (
           <Collapsing id="requests-filter-bar" startOpen>
             {({ isOpen, togglerProps, collapsedProps, Caret }) => (
-              <Div cls={`h-100 p-3 bg-light mh-${BIG}-100vh`}>
+              <Div cls={`form-compact h-100 p-3 bg-light mh-${BIG}-100vh`}>
                 {/* when on top */}
                 <Row cls={`d-${BIG}-none`} {...togglerProps}>
                   <Col>
@@ -239,17 +235,35 @@ const Filters = ({ me, data, current, onChange }) => {
                           </FormGroup>
                         </Col>
                       )}
+
                       {allowed.categories && (
                         <Col sm cls={`col-${BIG}-12`}>
                           <FormGroup
                             label={t('dashboard.filter_titles.categories')}
                           >
+                            {allowed.onlyOwnCategories && (
+                              <FormField
+                                {...formPropsFor('onlyOwnCategories')}
+                                type="checkbox"
+                                inputLabel={t(
+                                  'dashboard.filter_titles.only_only_own_categories'
+                                )}
+                                label=""
+                                hideLabel
+                              />
+                            )}
+
                             <MultiSelect
                               {...formPropsFor('categories')}
                               multiple
                               size="sm"
                               block
-                              options={available.categories}
+                              options={
+                                allowed.onlyOwnCategories &&
+                                current.onlyOwnCategories
+                                  ? available._inspectedCategories
+                                  : available.categories
+                              }
                             />
                           </FormGroup>
                         </Col>
@@ -401,3 +415,13 @@ const Filters = ({ me, data, current, onChange }) => {
 }
 
 const Let = ({ children, ...props }) => children(props)
+
+const filterByInspectedCategories = (me, mainCategories) => {
+  const inspected = f.map(me.user.permissions.isInspectorForCategories, 'id')
+  return mainCategories
+    .map(mc => ({
+      ...mc,
+      categories: mc.categories.filter(sc => f.include(inspected, sc.id))
+    }))
+    .filter(mc => !f.isEmpty(mc.categories))
+}

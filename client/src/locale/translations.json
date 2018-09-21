@@ -60,6 +60,7 @@
       "search": "Suche",
       "budget_periods": "Budgetperioden",
       "categories": "Kategorien",
+      "only_only_own_categories": "nur eigene (als Prüfer)",
       "special": "Spezialfilter",
       "special_only_own_requests": "nur eigene Anträge",
       "special_only_categories_with_requests": "nur Kategorien mit Anträgen",

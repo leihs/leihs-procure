@@ -9,6 +9,7 @@ import * as Fragments from '../graphql-fragments'
 // import Loading from '../components/Loading'
 // import { ErrorPanel } from '../components/Error'
 import RequestsDashboard from '../components/RequestsDashboard'
+import CurrentUser from '../containers/CurrentUserProvider'
 
 const FILTERS_QUERY = gql`
   query RequestFilters {
@@ -236,14 +237,14 @@ const storageFactory = ({ KEY }) => {
 const userSavedFilters = storageFactory({ KEY: `${LOCAL_STORE_KEY}.filters` })
 const savedPanelTree = storageFactory({ KEY: `${LOCAL_STORE_KEY}.panelTree` })
 
-const viewModes = ['tree', 'table']
-const clientOnlyFilters = ['onlyCategoriesWithRequests']
+const VIEW_MODES = ['tree', 'table']
+const CLIENT_ONLY_FILTERS = ['onlyCategoriesWithRequests']
 
 class RequestsIndexPage extends React.Component {
   constructor() {
     super()
     this.state = {
-      viewMode: viewModes[0],
+      viewMode: VIEW_MODES[0],
       openPanels: {
         cats: [],
         ...savedPanelTree.get()
@@ -286,71 +287,85 @@ class RequestsIndexPage extends React.Component {
       () => userSavedFilters.set(this.state.currentFilters)
     )
   }
-  onDataRefresh(client) {
-    client.resetStore()
-  }
+
   render({ state } = this) {
     return (
       <ApolloConsumer>
         {client => (
-          <Query
-            query={FILTERS_QUERY}
-            // fetchPolicy="cache-and-network"
-            notifyOnNetworkStatusChange
-          >
-            {filtersQuery => {
-              const variables = f.omit(state.currentFilters, clientOnlyFilters)
-              const refetchQuery = { query: REQUESTS_SUMS_QUERY, variables }
+          <CurrentUser>
+            {me => {
+              const inspectedCategories = f.map(
+                me.user.permissions.isInspectorForCategories,
+                'id'
+              )
               return (
                 <Query
-                  query={REQUESTS_QUERY}
-                  variables={variables}
+                  query={FILTERS_QUERY}
                   // fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
-                  {requestsQuery => {
-                    const refetchAllData = async () => {
-                      await filtersQuery.refetch()
-                      await requestsQuery.refetch()
+                  {filtersQuery => {
+                    const variables = prepareFilters(
+                      state.currentFilters,
+                      inspectedCategories
+                    )
+                    const refetchQuery = {
+                      query: REQUESTS_SUMS_QUERY,
+                      variables
                     }
                     return (
-                      <RequestsDashboard
-                        viewMode={state.viewMode}
-                        currentFilters={state.currentFilters}
-                        onFilterChange={this.onFilterChange}
-                        filters={filtersQuery}
-                        requestsQuery={requestsQuery}
-                        refetchAllData={refetchAllData}
-                        refetchQuery={refetchQuery}
-                        openPanels={state.openPanels}
-                        onPanelToggle={this.onPanelToggle}
-                        onSetViewMode={this.onSetViewMode}
-                        doDeleteRequest={r =>
-                          doDeleteRequest(client, r, refetchAllData)
-                        }
-                        doChangeRequestCategory={(r, categoryId) =>
-                          doChangeRequestCategory(
-                            client,
-                            r,
-                            categoryId,
-                            refetchAllData
+                      <Query
+                        query={REQUESTS_QUERY}
+                        variables={variables}
+                        // fetchPolicy="cache-and-network"
+                        notifyOnNetworkStatusChange
+                      >
+                        {requestsQuery => {
+                          const refetchAllData = async () => {
+                            await filtersQuery.refetch()
+                            await requestsQuery.refetch()
+                          }
+                          return (
+                            <RequestsDashboard
+                              viewMode={state.viewMode}
+                              currentFilters={state.currentFilters}
+                              onFilterChange={this.onFilterChange}
+                              filters={filtersQuery}
+                              requestsQuery={requestsQuery}
+                              refetchAllData={refetchAllData}
+                              refetchQuery={refetchQuery}
+                              openPanels={state.openPanels}
+                              onPanelToggle={this.onPanelToggle}
+                              onSetViewMode={this.onSetViewMode}
+                              doDeleteRequest={r =>
+                                doDeleteRequest(client, r, refetchAllData)
+                              }
+                              doChangeRequestCategory={(r, categoryId) =>
+                                doChangeRequestCategory(
+                                  client,
+                                  r,
+                                  categoryId,
+                                  refetchAllData
+                                )
+                              }
+                              doChangeBudgetPeriod={(r, budgetPerId) =>
+                                doChangeBudgetPeriod(
+                                  client,
+                                  r,
+                                  budgetPerId,
+                                  refetchAllData
+                                )
+                              }
+                            />
                           )
-                        }
-                        doChangeBudgetPeriod={(r, budgetPerId) =>
-                          doChangeBudgetPeriod(
-                            client,
-                            r,
-                            budgetPerId,
-                            refetchAllData
-                          )
-                        }
-                      />
+                        }}
+                      </Query>
                     )
                   }}
                 </Query>
               )
             }}
-          </Query>
+          </CurrentUser>
         )}
       </ApolloConsumer>
     )
@@ -358,3 +373,13 @@ class RequestsIndexPage extends React.Component {
 }
 
 export default RequestsIndexPage
+
+// prepare filters for SENDING (not saving)
+const prepareFilters = (filters, inspectedCategories) => {
+  const forAPI = f.omit(filters, CLIENT_ONLY_FILTERS)
+  forAPI.categories = !filters.onlyOwnCategories
+    ? filters.categories
+    : f.intersection(filters.categories, inspectedCategories)
+
+  return forAPI
+}
