@@ -87,6 +87,7 @@ class RequestEdit extends React.Component {
   render(
     {
       requestId,
+      refetchQuery,
       onCancel,
       onSuccess,
       className,
@@ -129,7 +130,11 @@ class RequestEdit extends React.Component {
           }
 
           return (
-            <Mutation mutation={UPDATE_REQUEST_MUTATION}>
+            <Mutation
+              mutation={UPDATE_REQUEST_MUTATION}
+              awaitRefetchQueries
+              refetchQueries={f.presence(refetchQuery) && [refetchQuery]}
+            >
               {(mutate, mutReq) => {
                 if (mutReq.loading) return <Loading />
                 if (mutReq.error)

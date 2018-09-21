@@ -14,7 +14,10 @@ class RequestLine extends React.Component {
     open: false
   }
   render(
-    { props: { request, compactEditForm, ...props }, state: { open } } = this
+    {
+      props: { request, refetchQuery, compactEditForm, ...props },
+      state: { open }
+    } = this
   ) {
     const closeLine = () => this.setState({ open: false })
     const isChanged = false // FIXME: detect form changed state
@@ -53,6 +56,7 @@ class RequestLine extends React.Component {
                 className="p-3"
                 compactView={compactEditForm}
                 requestId={request.id}
+                refetchQuery={refetchQuery}
                 onCancel={closeLine}
                 onSuccess={closeLine}
                 doChangeRequestCategory={props.doChangeRequestCategory}

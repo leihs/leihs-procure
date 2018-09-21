@@ -105,6 +105,47 @@ const REQUESTS_QUERY = gql`
   ${Fragments.RequestFieldsForIndex}
 `
 
+// for refetching total sums after request updating
+const REQUESTS_SUMS_QUERY = gql`
+  query RequestsIndexFiltered(
+    $budgetPeriods: [ID!]
+    $categories: [ID!]
+    $search: String
+    $state: [State!]
+    $organizations: [ID!]
+    $priority: [Priority!]
+    $inspector_priority: [InspectorPriority!]
+    $onlyOwnRequests: Boolean
+  ) {
+    dashboard(
+      budget_period_id: $budgetPeriods
+      category_id: $categories
+      search: $search
+      state: $state
+      organization_id: $organizations
+      priority: $priority
+      inspector_priority: $inspector_priority
+      requested_by_auth_user: $onlyOwnRequests
+    ) {
+      cacheKey
+      budget_periods {
+        cacheKey
+        total_price_cents
+
+        main_categories {
+          cacheKey
+          total_price_cents
+
+          categories {
+            cacheKey
+            total_price_cents
+          }
+        }
+      }
+    }
+  }
+`
+
 const doChangeRequestCategory = (client, requestId, newCatId, callback) => {
   const CHANGE_REQUEST_CATEGORY_MUTATION = gql`
     mutation changeRequestCategory($input: RequestCategoryInput!) {
@@ -258,10 +299,12 @@ class RequestsIndexPage extends React.Component {
             notifyOnNetworkStatusChange
           >
             {filtersQuery => {
+              const variables = f.omit(state.currentFilters, clientOnlyFilters)
+              const refetchQuery = { query: REQUESTS_SUMS_QUERY, variables }
               return (
                 <Query
                   query={REQUESTS_QUERY}
-                  variables={f.omit(state.currentFilters, clientOnlyFilters)}
+                  variables={variables}
                   // fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
@@ -278,6 +321,7 @@ class RequestsIndexPage extends React.Component {
                         filters={filtersQuery}
                         requestsQuery={requestsQuery}
                         refetchAllData={refetchAllData}
+                        refetchQuery={refetchQuery}
                         openPanels={state.openPanels}
                         onPanelToggle={this.onPanelToggle}
                         onSetViewMode={this.onSetViewMode}

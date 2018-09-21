@@ -37,7 +37,7 @@ class RequestsDashboard extends React.Component {
 
   render({ props, state } = this) {
     log('render', { props })
-    const { requestsQuery, refetchAllData } = props
+    const { requestsQuery, refetchAllData, refetchQuery } = props
 
     const hasData = !(requestsQuery.loading || !requestsQuery.data)
 
@@ -166,6 +166,7 @@ class RequestsDashboard extends React.Component {
                 requestsQuery={requestsQuery}
                 me={me}
                 refetchAllData={refetchAllData}
+                refetchQuery={refetchQuery}
                 openPanels={props.openPanels}
                 onPanelToggle={props.onPanelToggle}
                 doChangeRequestCategory={props.doChangeRequestCategory}
@@ -189,6 +190,7 @@ const RequestsTree = ({
   editQuery,
   filters,
   refetchAllData,
+  refetchQuery,
   openPanels,
   onPanelToggle,
   doChangeRequestCategory,
@@ -242,6 +244,7 @@ const RequestsTree = ({
                           request={r}
                           compactEditForm
                           editQuery={editQuery}
+                          refetchQuery={refetchQuery}
                           doChangeRequestCategory={doChangeRequestCategory}
                           doChangeBudgetPeriod={doChangeBudgetPeriod}
                           doDeleteRequest={doDeleteRequest}
