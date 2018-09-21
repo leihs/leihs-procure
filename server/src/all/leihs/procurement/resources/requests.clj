@@ -45,7 +45,6 @@
                                     :inspector_priority
                                     (map request/to-name-and-lower-case))
         requested-by-auth-user (:requested_by_auth_user arguments)
-        from-categories-of-auth-user (:from_categories_of_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
         rrequest (:request context)
@@ -82,16 +81,6 @@
                                                    :request
                                                    :authenticated-entity
                                                    :user_id)])
-      from-categories-of-auth-user
-        (sql/merge-where
-          [:in :procurement_requests.category_id
-           (-> (sql/select :category_id)
-               (sql/from :procurement_category_inspectors)
-               (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                 (-> context
-                                     :request
-                                     :authenticated-entity
-                                     :id)]))])
       search-term (search-query search-term))))
 
 (defn get-requests
