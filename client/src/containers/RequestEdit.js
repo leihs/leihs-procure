@@ -274,6 +274,7 @@ const RequestHeader = ({ data }) => {
 
 // helpers
 
+// FIXME: `valueIfWritable` not needed anymore, `withOnlyWritable` is enough
 const valueIfWritable = (fields, requestData, key) => {
   const reqField = f.get(requestData, key)
   // eslint-disable-next-line no-debugger
@@ -281,9 +282,15 @@ const valueIfWritable = (fields, requestData, key) => {
   if (reqField.write) return f.get(fields, key)
 }
 
-const fieldIfWritable = (fields, requestData, key, fallback = undefined) => {
-  const value = valueIfWritable(fields, requestData, key)
-  if (!f.isUndefined(value)) return { [key]: value || fallback }
+const getField = (fields, requestData, key, fallback = undefined) => {
+  return { [key]: f.get(fields, key) }
+}
+
+const withOnlyWritable = (formdata, requestFields) => {
+  return f.pick(
+    formdata,
+    f.filter(f.map(requestFields, (v, k) => f.get(v, 'write') === true && k))
+  )
 }
 
 export const requestDataFromFields = (request, fields) => {
@@ -297,21 +304,21 @@ export const requestDataFromFields = (request, fields) => {
   const orderQ = valueIfWritable(fields, request, 'order_quantity')
 
   const requestData = {
-    ...fieldIfWritable(fields, request, 'article_number'),
-    ...fieldIfWritable(fields, request, 'receiver'),
-    ...fieldIfWritable(fields, request, 'price_cents'),
+    ...getField(fields, request, 'article_number'),
+    ...getField(fields, request, 'receiver'),
+    ...getField(fields, request, 'price_cents'),
 
-    ...fieldIfWritable(fields, request, 'requested_quantity'),
+    ...getField(fields, request, 'requested_quantity'),
     approved_quantity: f.presence(approvedQ) || null,
     order_quantity: f.presence(orderQ) || null,
 
-    ...fieldIfWritable(fields, request, 'motivation'),
-    ...fieldIfWritable(fields, request, 'priority'),
-    ...fieldIfWritable(fields, request, 'inspector_priority'),
-    ...fieldIfWritable(fields, request, 'inspection_comment'),
+    ...getField(fields, request, 'motivation'),
+    ...getField(fields, request, 'priority'),
+    ...getField(fields, request, 'inspector_priority'),
+    ...getField(fields, request, 'inspection_comment'),
 
-    ...fieldIfWritable(fields, request, 'accounting_type'),
-    ...fieldIfWritable(fields, request, 'internal_order_number'),
+    ...getField(fields, request, 'accounting_type'),
+    ...getField(fields, request, 'internal_order_number'),
 
     ...(user ? { user: user.id } : null),
 
@@ -327,17 +334,17 @@ export const requestDataFromFields = (request, fields) => {
 
     ...(model
       ? { model: model.id }
-      : fieldIfWritable(fields, request, 'article_name')),
+      : getField(fields, request, 'article_name')),
 
     ...(!fields._supplier_as_text
       ? supplier
         ? { supplier: supplier.id }
         : null
-      : fieldIfWritable(fields, request, 'supplier_name')),
+      : getField(fields, request, 'supplier_name')),
 
     // NOTE: no building, just room!
     ...(!room ? null : { room })
   }
 
-  return requestData
+  return withOnlyWritable(requestData, request)
 }
