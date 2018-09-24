@@ -200,9 +200,9 @@ const RequestsTree = ({
   if (loading) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
-  return f.get(data, 'dashboard.budget_periods').map(b => (
+  return f.map(f.get(data, 'dashboard.budget_periods'), b => (
     <BudgetPeriodCard key={b.id} budgetPeriod={b} me={me}>
-      {b.main_categories.map(cat => {
+      {f.map(b.main_categories, cat => {
         const subCatReqs = f.flatMap(f.get(cat, 'categories'), 'requests')
         if (filters.onlyCategoriesWithRequests && f.isEmpty(subCatReqs)) {
           return false
@@ -218,7 +218,7 @@ const RequestsTree = ({
             isOpen={openPanels.cats.includes(cat.id)}
             onToggle={isOpen => onPanelToggle(isOpen, cat.id)}
           >
-            {cat.categories.map(sc => {
+            {f.map(cat.categories, sc => {
               const reqs = sc.requests
               if (filters.onlyCategoriesWithRequests && f.isEmpty(reqs)) {
                 return false
