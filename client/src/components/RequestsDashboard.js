@@ -272,8 +272,9 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
   } = budgetPeriodDates(budgetPeriod)
 
   const canRequest =
-    (isRequesting && me.roles.isRequester) ||
-    (isInspecting && (me.roles.isAdmin || me.roles.isInspector))
+    me.roles.isAdmin ||
+    ((isRequesting && me.roles.isRequester) ||
+      (isInspecting && me.roles.isInspector))
   const newRequestBpLink = canRequest && newRequestLink({ budgetPeriod })
 
   const children = f.some(props.children) ? props.children : false

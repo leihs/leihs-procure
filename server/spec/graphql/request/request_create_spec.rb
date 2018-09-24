@@ -336,14 +336,15 @@ describe 'request' do
         }
 
         q = <<-GRAPHQL
-            mutation {
-              create_request(input_data: #{hash_to_graphql attrs}) {
+            mutation createRequest($input: CreateRequestInput){
+              create_request(input_data: $input) {
                 id
               }
             }
           GRAPHQL
 
-        result = query(q, @auth_user.id)
+        variables = {input: attrs.as_json}
+        result = query(q, @auth_user.id, variables)
 
         request = Request.order(:created_at).reverse.first
         expect(result['data']['create_request']['id']).to be == request.id
