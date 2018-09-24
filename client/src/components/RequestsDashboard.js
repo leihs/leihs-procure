@@ -271,9 +271,12 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
     isInspecting
   } = budgetPeriodDates(budgetPeriod)
 
+  // requester role always needed.
+  // additional admin or inspector role needed to create in inspection phase
   const canRequest =
-    (isRequesting && me.roles.isRequester) ||
-    (isInspecting && (me.roles.isAdmin || me.roles.isInspector))
+    me.roles.isRequester &&
+    (isRequesting ||
+      (isInspecting && (me.roles.isAdmin || me.roles.isInspector)))
   const newRequestBpLink = canRequest && newRequestLink({ budgetPeriod })
 
   const children = f.some(props.children) ? props.children : false
