@@ -378,7 +378,7 @@ describe 'request' do
         User.find(id: FactoryBot.create(:admin).user_id)
       end
 
-      pending 'not allowed' do
+      example 'not allowed' do
         variables = { input: minimal_input }
         expect_error_not_authorized(query(q, requesting_user.id, variables))
       end
