@@ -301,6 +301,15 @@ describe 'request' do
         expect(Upload.count).to be == 0
         expect(Attachment.count).to be == 1
       end
+
+      example 'not allowed if past phase' do
+        variables = {
+          input: minimal_input.merge({
+            budget_period: FactoryBot.create(:budget_period, :past).id,
+          })
+        }
+        expect_error_not_authorized(query(q, requester.id, variables))
+      end
     end
 
     context 'create for another user' do
@@ -349,5 +358,195 @@ describe 'request' do
       end
     end
 
+    context 'create as inspector only' do
+      let(:requesting_user) do
+        user = FactoryBot.create(:user)
+        FactoryBot.create(:category_inspector,
+                          user_id: user.id,
+                          category_id: FactoryBot.create(:category).id)
+        user
+      end
+
+      example 'not allowed' do
+        variables = { input: minimal_input }
+        expect_error_not_authorized(query(q, requesting_user.id, variables))
+      end
+    end
+
+    context 'create as admin only' do
+      let(:requesting_user) do
+        User.find(id: FactoryBot.create(:admin).user_id)
+      end
+
+      pending 'not allowed' do
+        variables = { input: minimal_input }
+        expect_error_not_authorized(query(q, requesting_user.id, variables))
+      end
+    end
+
+
+    context 'create as inspector+requester' do
+      let(:inspected_category) { FactoryBot.create(:category) }
+      let(:other_category) { FactoryBot.create(:category) }
+      let(:requesting_user) do
+        user = FactoryBot.create(:user)
+        FactoryBot.create(:category_inspector,
+                          user_id: user.id,
+                          category_id: inspected_category.id)
+        FactoryBot.create(:requester_organization, user_id: user.id)
+        user
+      end
+      let(:input) do
+        minimal_input.merge(category: inspected_category.id)
+      end
+
+      example 'in current phase - is allowed' do
+        variables = { input: input }
+        expect_created_ok(query(q, requesting_user.id, variables))
+      end
+
+      example 'in past phase - not allowed' do
+        variables = {
+          input: input.merge({
+            budget_period: FactoryBot.create(:budget_period, :past).id,
+          })
+        }
+        expect_error_not_authorized(query(q, requesting_user.id, variables))
+      end
+
+      context 'in inspection phase' do
+        let(:r_input) do
+          input.merge({
+            budget_period: FactoryBot.create(:budget_period, :inspection_phase).id,
+          })
+        end
+
+        example 'allowed for inspected category' do
+          variables = { input: r_input.merge(category: inspected_category.id) }
+          result = query(q, requester.id, variables)
+          expect_created_ok(query(q, requesting_user.id, variables))
+        end
+
+        example 'not allowed for non-inspected category' do
+          variables = { input: r_input.merge(category: other_category.id) }
+          expect_error_not_authorized(query(q, requesting_user.id, variables))
+        end
+
+      end
+    end
+
+    context 'create as inspector+requester' do
+      let(:inspected_category) { FactoryBot.create(:category) }
+      let(:other_category) { FactoryBot.create(:category) }
+      let(:requesting_user) do
+        user = FactoryBot.create(:user)
+        FactoryBot.create(:category_inspector,
+                          user_id: user.id,
+                          category_id: inspected_category.id)
+        FactoryBot.create(:requester_organization, user_id: user.id)
+        user
+      end
+      let(:input) do
+        minimal_input.merge(category: inspected_category.id)
+      end
+
+      example 'in current phase - is allowed' do
+        variables = { input: input }
+        expect_created_ok(query(q, requesting_user.id, variables))
+      end
+
+      example 'in past phase - not allowed' do
+        variables = {
+          input: input.merge({
+            budget_period: FactoryBot.create(:budget_period, :past).id,
+          })
+        }
+        expect_error_not_authorized(query(q, requesting_user.id, variables))
+      end
+
+      context 'in inspection phase' do
+        let(:r_input) do
+          input.merge({
+            budget_period: FactoryBot.create(:budget_period, :inspection_phase).id,
+          })
+        end
+
+        example 'allowed for inspected category' do
+          variables = { input: r_input.merge(category: inspected_category.id) }
+          result = query(q, requester.id, variables)
+          expect_created_ok(query(q, requesting_user.id, variables))
+        end
+
+        example 'not allowed for non-inspected category' do
+          variables = { input: r_input.merge(category: other_category.id) }
+          expect_error_not_authorized(query(q, requesting_user.id, variables))
+        end
+
+      end
+    end
+
+    context 'create as admin+requester' do
+      let(:inspected_category) { FactoryBot.create(:category) }
+      let(:other_category) { FactoryBot.create(:category) }
+      let(:requesting_user) do
+        user = User.find(id: FactoryBot.create(:admin).user_id)
+        FactoryBot.create(:requester_organization, user_id: user.id)
+        user
+      end
+      let(:input) do
+        minimal_input.merge(category: inspected_category.id)
+      end
+
+      example 'in current phase - is allowed' do
+        variables = { input: input }
+        expect_created_ok(query(q, requesting_user.id, variables))
+      end
+
+      example 'in past phase - not allowed' do
+        variables = {
+          input: input.merge({
+            budget_period: FactoryBot.create(:budget_period, :past).id,
+          })
+        }
+        expect_error_not_authorized(query(q, requesting_user.id, variables))
+      end
+
+      context 'in inspection phase' do
+        let(:r_input) do
+          input.merge({
+            budget_period: FactoryBot.create(:budget_period, :inspection_phase).id,
+          })
+        end
+
+        example 'allowed for inspected category' do
+          variables = { input: r_input.merge(category: inspected_category.id) }
+          result = query(q, requester.id, variables)
+          expect_created_ok(query(q, requesting_user.id, variables))
+        end
+
+        example 'allowed for non-inspected category' do
+          variables = { input: r_input.merge(category: other_category.id) }
+          expect_created_ok(query(q, requesting_user.id, variables))
+        end
+
+      end
+    end
+
   end
+end
+
+
+def expect_error_not_authorized(result)
+  result = result.deep_symbolize_keys
+  result_error = result.fetch(:errors, {}).fetch(0, {})
+  expect(result_error[:message]).to include('Not authorized')
+  expect(result[:data][:create_request]).to be_nil
+end
+
+def expect_created_ok(result)
+  result = result.deep_symbolize_keys
+  expect(result[:errors]).to be_nil
+  result_request = result.fetch(:data, {}).fetch(:create_request, {})
+  expect(result_request[:id]).to be
+  expect(Request.find(id: result_request[:id])).to be_a Request
 end
