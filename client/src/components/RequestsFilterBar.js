@@ -135,15 +135,9 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
-      // only select "current" BudgetPeriods
+      // only select "not-past" BudgetPeriods
       budgetPeriods: data.budget_periods
-        .filter(bp => {
-          const b = budgetPeriodDates(bp)
-          const isAdmin = me.roles.isAdmin
-          if ((isAdmin || me.roles.isRequester) && b.isRequesting) return true
-          if ((isAdmin || me.roles.isInspector) && b.isInspecting) return true
-          return false
-        })
+        .filter(bp => !budgetPeriodDates(bp).isPast)
         .map(({ id }) => id),
       // specific values:
       search: null,
