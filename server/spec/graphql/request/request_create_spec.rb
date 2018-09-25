@@ -321,6 +321,7 @@ describe 'request' do
 
       it 'as admin' do
         @auth_user = User.find(id: FactoryBot.create(:admin).user_id)
+        FactoryBot.create(:requester_organization, user_id: @auth_user.id)
       end
 
       it 'as inspector' do
