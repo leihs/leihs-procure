@@ -215,7 +215,11 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                                 </samp>
                               </Badge>
                             </Tooltipped>{' '}
-                            <Tooltipped text={'Total aller geprüften Anträge'}>
+                            <Tooltipped
+                              text={
+                                'Total aller (teilweise und vollständig) angenommenen Anträge'
+                              }
+                            >
                               <Badge success id={`badge_inspecten_${n}`}>
                                 <Icon.ShoppingCart />{' '}
                                 <samp>

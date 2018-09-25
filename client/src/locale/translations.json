@@ -140,6 +140,7 @@
     "users": {
       "title": "Benutzer",
       "title_admins": "Administratoren",
+      "current_admins": "Aktuelle Administratoren",
       "title_requesters": "Antragsteller/innen",
       "btn_remove_as_admin": "von Administratoren entfernen",
       "select_add_new_admin": "Neuen Administrator hinzufügen",
