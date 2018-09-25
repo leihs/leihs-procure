@@ -21,7 +21,7 @@ export const REQUEST_STATES_MAP = [
   {
     key: 'NEW',
     bsColor: 'info',
-    roles: ['isRequester', 'isInspector', 'isAdmin']
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   },
   {
     key: 'IN_APPROVAL',
@@ -31,17 +31,17 @@ export const REQUEST_STATES_MAP = [
   {
     key: 'APPROVED',
     bsColor: 'success',
-    roles: ['isRequester', 'isInspector', 'isAdmin']
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   },
   {
     key: 'PARTIALLY_APPROVED',
     bsColor: 'warning',
-    roles: ['isRequester', 'isInspector', 'isAdmin']
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   },
   {
     key: 'DENIED',
     bsColor: 'danger',
-    roles: ['isRequester', 'isInspector', 'isAdmin']
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   }
 ]
 
