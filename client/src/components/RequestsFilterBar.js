@@ -75,9 +75,10 @@ const Filters = ({ me, data, current, onChange }) => {
     budgetPeriods: true,
     categories: true,
     organizations: !me.roles.isOnlyRequester,
-    onlyOwnRequests: !me.roles.isOnlyRequester,
+    onlyOwnRequests: me.roles.isRequester,
     onlyCategoriesWithRequests: true,
-    onlyOwnCategories: me.roles.isInspector,
+    onlyViewedCategories: me.roles.isViewer && !me.roles.isOnlyViewer,
+    onlyInspectedCategories: me.roles.isInspector,
     priority: true,
     inspector_priority: !me.roles.isOnlyRequester,
     state: true
@@ -94,9 +95,19 @@ const Filters = ({ me, data, current, onChange }) => {
       options: categories.map(({ id, name }) => ({ value: id, label: name }))
     })),
 
-    _inspectedCategories: filterByInspectedCategories(
+    _inspectedCategories: filterByOwnCategories(
       me,
-      data.main_categories
+      data.main_categories,
+      'Inspector'
+    ).map(({ id, name, categories }) => ({
+      label: name,
+      options: categories.map(({ id, name }) => ({ value: id, label: name }))
+    })),
+
+    _viewedCategories: filterByOwnCategories(
+      me,
+      data.main_categories,
+      'Viewer'
     ).map(({ id, name, categories }) => ({
       label: name,
       options: categories.map(({ id, name }) => ({ value: id, label: name }))
@@ -142,7 +153,8 @@ const Filters = ({ me, data, current, onChange }) => {
       // specific values:
       search: null,
       onlyOwnRequests: false,
-      onlyOwnCategories: me.roles.isInspector,
+      onlyViewedCategories: me.roles.isOnlyViewer,
+      onlyInspectedCategories: me.roles.isInspector && !me.roles.isViewer,
       onlyCategoriesWithRequests: true
     },
     f.keys(allowed)
@@ -235,12 +247,24 @@ const Filters = ({ me, data, current, onChange }) => {
                           <FormGroup
                             label={t('dashboard.filter_titles.categories')}
                           >
-                            {allowed.onlyOwnCategories && (
+                            {allowed.onlyInspectedCategories && (
                               <FormField
-                                {...formPropsFor('onlyOwnCategories')}
+                                {...formPropsFor('onlyInspectedCategories')}
                                 type="checkbox"
                                 inputLabel={t(
-                                  'dashboard.filter_titles.only_only_own_categories'
+                                  'dashboard.filter_titles.only_inspected_categories'
+                                )}
+                                label=""
+                                hideLabel
+                              />
+                            )}
+
+                            {allowed.onlyViewedCategories && (
+                              <FormField
+                                {...formPropsFor('onlyViewedCategories')}
+                                type="checkbox"
+                                inputLabel={t(
+                                  'dashboard.filter_titles.only_viewed_categories'
                                 )}
                                 label=""
                                 hideLabel
@@ -253,10 +277,11 @@ const Filters = ({ me, data, current, onChange }) => {
                               size="sm"
                               block
                               options={
-                                allowed.onlyOwnCategories &&
-                                current.onlyOwnCategories
+                                current.onlyInspectedCategories
                                   ? available._inspectedCategories
-                                  : available.categories
+                                  : current.onlyViewedCategories
+                                    ? available._viewedCategories
+                                    : available.categories
                               }
                             />
                           </FormGroup>
@@ -410,12 +435,14 @@ const Filters = ({ me, data, current, onChange }) => {
 
 const Let = ({ children, ...props }) => children(props)
 
-const filterByInspectedCategories = (me, mainCategories) => {
-  const inspected = f.map(me.user.permissions.isInspectorForCategories, 'id')
+const filterByOwnCategories = (me, mainCategories, role) => {
+  if (!f.includes(['Inspector', 'Viewer'], role)) throw new TypeError()
+
+  const ownCats = f.map(me.user.permissions[`is${role}ForCategories`], 'id')
   return mainCategories
     .map(mc => ({
       ...mc,
-      categories: mc.categories.filter(sc => f.include(inspected, sc.id))
+      categories: mc.categories.filter(sc => f.include(ownCats, sc.id))
     }))
     .filter(mc => !f.isEmpty(mc.categories))
 }
