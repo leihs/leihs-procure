@@ -283,8 +283,6 @@ describe 'request' do
       end
 
       example 'from template' do
-        pending 'fix'
-
         variables = {
           input: minimal_input.without(:article_name).merge({
             template: template.id,

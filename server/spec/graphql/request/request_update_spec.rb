@@ -701,7 +701,6 @@ describe 'request' do
         variables = { id: [request.id]}
         result = query(q, user.id, variables).deep_symbolize_keys
 
-        pending 'fields from template should not be writable'
         expected_data = expected_request_data.merge(
           article_name: { read: true, write: false, required: true, value: template.article_name },
           article_number: { read: true, write: false, required: true, value: template.article_number },
