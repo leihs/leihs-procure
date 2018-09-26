@@ -216,6 +216,11 @@ describe 'request' do
           motivation {
             value
           }
+          price_cents {
+            value
+            read
+            write
+          }
           supplier_name {
             value
           }

@@ -79,11 +79,11 @@
 (defn join-and-nest-associated-resources
   [sqlmap]
   (-> sqlmap
-      join-and-nest-suppliers
+      join-and-nest-budget-periods
       join-and-nest-categories
       join-and-nest-models
       join-and-nest-organizations
-      join-and-nest-budget-periods
-      ; NOTE: join-and-nest-templates -> no need at the moment
+      join-and-nest-templates
       join-and-nest-rooms
+      join-and-nest-suppliers
       join-and-nest-users))
