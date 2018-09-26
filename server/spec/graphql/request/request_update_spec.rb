@@ -141,8 +141,6 @@ describe 'request' do
     end
 
     it 'move to another category' do
-      pending 'fix for admin'
-
       admin = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: admin.id)
 
