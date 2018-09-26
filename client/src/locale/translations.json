@@ -60,7 +60,8 @@
       "search": "Suche",
       "budget_periods": "Budgetperioden",
       "categories": "Kategorien",
-      "only_only_own_categories": "nur eigene (als Prüfer)",
+      "only_inspected_categories": "nur eigene (als Prüfer)",
+      "only_viewed_categories": "nur eigene (als Betrachter)",
       "special": "Spezialfilter",
       "special_only_own_requests": "nur eigene Anträge",
       "special_only_categories_with_requests": "nur Kategorien mit Anträgen",
@@ -139,6 +140,7 @@
     "users": {
       "title": "Benutzer",
       "title_admins": "Administratoren",
+      "current_admins": "Aktuelle Administratoren",
       "title_requesters": "Antragsteller/innen",
       "btn_remove_as_admin": "von Administratoren entfernen",
       "select_add_new_admin": "Neuen Administrator hinzufügen",
@@ -179,5 +181,40 @@
       "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
     },
     "InlineSearch": { "placeholder": "Suchen" }
+  },
+
+  "errors": {
+    "error_title": "FEHLER",
+    "error_btn_retry": "neu versuchen",
+    "error_details": "Fehler-Details:",
+    "network_error": "Netzwerk-Fehler:",
+    "api_error_details": "API-Fehler-Details:",
+    "data_details": "Daten:",
+    "show_details": "Zeige Details",
+    "error_panel_emoticon": "¯\\_༼ ༎ຶ ෴ ༎ຶ༽_/¯",
+    "msg_offline": "Sie sind offline oder der Server ist unerreichbar!",
+    "msg_unauthorized_1": "Sind sind nicht berechtigt diese Anwendung zu nutzen!",
+    "msg_unauthorized_2a": "Versuchen sie sich auf der ",
+    "msg_unauthorized_2b": "Startseite",
+    "msg_unauthorized_2c": " einzuloggen.",
+    "msg_error_ofcode_1": "Entschuldigung, es ist ein Fehler vom Typ ",
+    "msg_error_ofcode_2": " aufgetreten."
+  },
+  "___WIP_en___errors": {
+    "error_title": "ERROR",
+    "error_btn_retry": "retry",
+    "error_details": "Error Details:",
+    "network_error": "Network Error:",
+    "api_error_details": "API Error Details:",
+    "data_details": "Data:",
+    "show_details": "Show details",
+    "error_panel_emoticon": "¯\\_༼ ༎ຶ ෴ ༎ຶ༽_/¯",
+    "msg_offline": "You are offline or the Server is down!",
+    "msg_unauthorized_1": "You are not allowed to use this application!",
+    "msg_unauthorized_2a": "Try going to the ",
+    "msg_unauthorized_2b": "home page",
+    "msg_unauthorized_2c": " and maybe log in.",
+    "msg_error_ofcode_1": "Sorry, there was an error of type ",
+    "msg_error_ofcode_2": "."
   }
 }

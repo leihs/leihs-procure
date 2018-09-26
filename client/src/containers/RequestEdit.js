@@ -218,13 +218,9 @@ RequestEdit.defaultProps = {
 
 const RequestHeader = ({ data }) => {
   const r = data.requests[0]
-  const bp = f.find(data.budget_periods, {
-    id: r.budget_period.value.id
-  })
-  const mc = f.find(data.main_categories, {
-    categories: [{ id: r.category.value.id }]
-  })
-  const sc = f.find(mc.categories, { id: r.category.value.id })
+  const bp = r.budget_period.value
+  const sc = r.category.value
+  const mc = sc.main_category
 
   return (
     <F>

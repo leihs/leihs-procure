@@ -102,7 +102,7 @@ export default class MainNav extends React.Component {
                 </UncontrolledDropdown>
               )}
 
-              {(me.roles.isAdmin || me.roles.isInspector) && (
+              {me.roles.isInspector && (
                 <NavItemLink exact to="/templates/edit">
                   <Icon.Templates fixedWidth spaced /> Vorlagen
                 </NavItemLink>

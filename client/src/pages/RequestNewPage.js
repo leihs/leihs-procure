@@ -581,6 +581,7 @@ const onlyAllowedCategories = (me, selectedBudgetPeriod, allCats) => {
   const inspected = f.map(me.user.permissions.isInspectorForCategories, 'id')
   if (!selectedBudgetPeriod) return null
   if (selectedBudgetPeriod.isRequesting) return allCats
+  if (me.roles.isAdmin) return allCats
   if (selectedBudgetPeriod.isInspecting)
     return allCats
       .map(mc => ({

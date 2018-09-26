@@ -40,6 +40,8 @@ export const UserWithShortcuts = user => {
     const r = f.pick(p, 'isAdmin', 'isRequester')
     r.isInspector = f.some(p.isInspectorForCategories)
     r.isViewer = f.some(p.isViewerForCategories)
+    r.isOnlyViewer =
+      r.isViewer && !(r.isAdmin || r.isInspector || r.isRequester)
     r.isOnlyRequester =
       r.isRequester && !(r.isAdmin || r.isInspector || r.isViewer)
     return r

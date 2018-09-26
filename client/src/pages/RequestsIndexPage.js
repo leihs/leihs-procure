@@ -298,6 +298,10 @@ class RequestsIndexPage extends React.Component {
                 me.user.permissions.isInspectorForCategories,
                 'id'
               )
+              const viewedCategories = f.map(
+                me.user.permissions.isViewerForCategories,
+                'id'
+              )
               return (
                 <Query
                   query={FILTERS_QUERY}
@@ -307,7 +311,8 @@ class RequestsIndexPage extends React.Component {
                   {filtersQuery => {
                     const variables = prepareFilters(
                       state.currentFilters,
-                      inspectedCategories
+                      inspectedCategories,
+                      viewedCategories
                     )
                     const refetchQuery = {
                       query: REQUESTS_SUMS_QUERY,
@@ -375,11 +380,13 @@ class RequestsIndexPage extends React.Component {
 export default RequestsIndexPage
 
 // prepare filters for SENDING (not saving)
-const prepareFilters = (filters, inspectedCategories) => {
+const prepareFilters = (filters, inspectedCategories, viewedCategories) => {
   const forAPI = f.omit(filters, CLIENT_ONLY_FILTERS)
-  forAPI.categories = !filters.onlyOwnCategories
-    ? filters.categories
-    : f.intersection(filters.categories, inspectedCategories)
+  forAPI.categories = filters.onlyInspectedCategories
+    ? f.intersection(filters.categories, inspectedCategories)
+    : filters.onlyViewedCategories
+      ? f.intersection(filters.categories, viewedCategories)
+      : filters.categories
 
   return forAPI
 }

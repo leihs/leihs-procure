@@ -179,7 +179,7 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
         <div className={cx('form-shade', { 'form-shade-blocked': loading })} />
         <Row cls="mt-2">
           <Col sm="6">
-            <FormGroup label="current admins">
+            <FormGroup label={t('admin.users.current_admins')} hideLabel>
               <ul className="list-group list-group-compact">
                 {admins.map(user => (
                   <li

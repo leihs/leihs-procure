@@ -3,6 +3,7 @@ import f from 'lodash'
 import { withRouter } from 'react-router'
 import { Query } from 'react-apollo'
 
+import t from '../locale/translate'
 import Loading from '../components/Loading'
 import { ErrorPanel, FatalErrorScreen, getErrorCode } from '../components/Error'
 import { Alert } from '../components/Bootstrap'
@@ -96,7 +97,7 @@ const ErrorHandler = ({ error, data, refetch }) => {
       className="btn btn-sm btn-outline-dark"
       onClick={refetch}
     >
-      retry
+      {t('errors.error_btn_retry')}
     </button>
   )
 
@@ -106,7 +107,7 @@ const ErrorHandler = ({ error, data, refetch }) => {
   ) {
     return (
       <FatalErrorScreen error={error}>
-        <p>You are offline or the Server is down!</p>
+        <p>{t('errors.msg_offline')}</p>
         <p>{retryButton}</p>
       </FatalErrorScreen>
     )
@@ -117,9 +118,11 @@ const ErrorHandler = ({ error, data, refetch }) => {
     return (
       <FatalErrorScreen error={error}>
         <p>
-          You are not allowed to use this application!
+          {t('errors.msg_unauthorized_1')}
           <br />
-          Try going to the <a href="/">home page</a> and maybe log in.
+          {t('errors.msg_unauthorized_2a')}
+          <a href="/">{t('errors.msg_unauthorized_2b')}</a>
+          {t('errors.msg_unauthorized_2c')}
         </p>
       </FatalErrorScreen>
     )
@@ -129,7 +132,9 @@ const ErrorHandler = ({ error, data, refetch }) => {
     return (
       <FatalErrorScreen error={error}>
         <p>
-          Sorry, there was an error of type <samp>{errCode}</samp>.
+          {t('errors.msg_error_ofcode_1')}
+          <samp>{errCode}</samp>
+          {t('errors.msg_error_ofcode_2')}
         </p>
         <p>{retryButton}</p>
       </FatalErrorScreen>

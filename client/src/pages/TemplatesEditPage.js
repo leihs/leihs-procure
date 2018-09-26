@@ -77,8 +77,13 @@ const updateTemplates = {
       window.location.reload()
     }
   },
-  doUpdate: (mutate, { mainCategories }) => {
-    const templates = f.flatMap(f.flatMap(mainCategories, 'categories'), sc =>
+  doUpdate: (mutate, me, { mainCategories }) => {
+    const onlyEditableCats = f.filter(
+      f.flatMap(mainCategories, 'categories'),
+      sc =>
+        !!f.find(me.user.permissions.isInspectorForCategories, { id: sc.id })
+    )
+    const templates = f.flatMap(onlyEditableCats, sc =>
       f.flatMap(sc.templates, tpl => ({
         id: tpl.id,
         article_name: tpl.article_name,
@@ -128,7 +133,7 @@ class AdminTemplates extends React.Component {
                         me={me}
                         mainCategories={data.main_categories}
                         formKey={this.state.formKey}
-                        onSubmit={d => updateTemplates.doUpdate(mutate, d)}
+                        onSubmit={d => updateTemplates.doUpdate(mutate, me, d)}
                       />
 
                       {window.isDebug && (
