@@ -351,7 +351,7 @@
         :required false},
      :template {:read true,
                 :write (not existing-request),
-                :default (:id template),
+                :default template,
                 :required true},
      :user {:read
               (or (and requester own-request) category-viewer inspector admin),
