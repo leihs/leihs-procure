@@ -205,6 +205,8 @@ describe 'request' do
           id
           article_name {
             value
+            read
+            write
           }
           attachments {
             value {
@@ -281,6 +283,8 @@ describe 'request' do
       end
 
       example 'from template' do
+        pending 'fix'
+
         variables = {
           input: minimal_input.without(:article_name).merge({
             template: template.id,
@@ -297,9 +301,16 @@ describe 'request' do
         expect(data[:id]).to be == request.id
         expect(data[:attachments][:value].count).to be == 1
         expect(data[:article_name][:value]).to eq template[:article_name]
+
         expect(data[:motivation][:value]).to eq variables[:input][:motivation]
         expect(Upload.count).to be == 0
         expect(Attachment.count).to be == 1
+
+        # fields where value comes from template and is not writable
+        expect(data[:article_name]).to eq(
+          { value: template.article_name, read: true, write: false })
+        expect(data[:price_cents]).to eq(
+          { value: template.price_cents, read: true, write: false })
       end
 
       example 'not allowed if past phase' do

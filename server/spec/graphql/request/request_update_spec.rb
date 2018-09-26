@@ -142,7 +142,7 @@ describe 'request' do
 
     it 'move to another category' do
       pending 'fix for admin'
-      
+
       admin = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: admin.id)
 
@@ -277,6 +277,441 @@ describe 'request' do
         expect(request.inspection_comment).to eq orig_request[:inspection_comment]
         expect(request.inspector_priority).to eq orig_request[:inspector_priority]
       end
+    end
+
+  end
+
+
+  context 'form editing flow' do
+    # TODO: maybe add mutation examples here as well
+
+    let(:q) do
+      # from client/src/containers/RequestEdit.js
+      <<-GRAPHQL
+        query RequestForEdit($id: [ID!]!) {
+          requests(id: $id) {
+            ...RequestFieldsForEdit
+            actionPermissions {
+              delete
+              edit
+              moveBudgetPeriod
+              moveCategory
+            }
+          }
+          main_categories {
+            id
+            name
+            categories {
+              id
+              name
+            }
+          }
+          budget_periods(whereRequestsCanBeMovedTo: $id) {
+            id
+            name
+          }
+          settings {
+            inspection_comments
+          }
+        }
+
+        fragment RequestFieldsForEdit on Request {
+          ...RequestFieldsForIndex
+          template {
+            value {
+              id
+              article_name
+            }
+          }
+          user {
+            read
+            write
+            required
+            value {
+              id
+              firstname
+              lastname
+            }
+          }
+          article_name {
+            ...RequestFieldString
+          }
+          model {
+            read
+            write
+            required
+            value {
+              id
+              product
+              version
+            }
+          }
+          supplier_name {
+            ...RequestFieldString
+          }
+          supplier {
+            read
+            write
+            required
+            value {
+              id
+              name
+            }
+          }
+          receiver {
+            ...RequestFieldString
+          }
+          price_cents {
+            ...RequestFieldInt
+          }
+          price_currency {
+            ...RequestFieldString
+          }
+          requested_quantity {
+            ...RequestFieldInt
+          }
+          approved_quantity {
+            ...RequestFieldInt
+          }
+          order_quantity {
+            ...RequestFieldInt
+          }
+          priority {
+            read
+            write
+            required
+            value
+          }
+          inspector_priority {
+            read
+            write
+            required
+            value
+          }
+          state
+          article_number {
+            ...RequestFieldString
+          }
+          motivation {
+            ...RequestFieldString
+          }
+          replacement {
+            ...RequestFieldBoolean
+          }
+          room {
+            read
+            write
+            required
+            value {
+              id
+              name
+              building {
+                id
+                name
+              }
+            }
+          }
+          inspection_comment {
+            ...RequestFieldString
+          }
+          attachments {
+            read
+            write
+            required
+            value {
+              id
+              filename
+              url
+            }
+          }
+          accounting_type {
+            ...RequestFieldString
+          }
+          cost_center {
+            read
+            write
+            required
+            value
+          }
+          procurement_account {
+            read
+            write
+            value
+          }
+          general_ledger_account {
+            read
+            value
+          }
+          internal_order_number {
+            ...RequestFieldString
+          }
+        }
+
+        fragment RequestFieldsForIndex on Request {
+          id
+          user {
+            value {
+              id
+              firstname
+              lastname
+            }
+          }
+          category {
+            read
+            write
+            required
+            value {
+              id
+              name
+              main_category {
+                id
+                name
+              }
+            }
+          }
+          budget_period {
+            read
+            write
+            required
+            value {
+              name
+              id
+            }
+          }
+          article_name {
+            value
+          }
+          model {
+            value {
+              id
+              product
+              version
+            }
+          }
+          receiver {
+            value
+          }
+          organization {
+            value {
+              id
+              name
+              shortname
+              department {
+                id
+                name
+              }
+            }
+          }
+          price_cents {
+            value
+          }
+          price_currency {
+            value
+          }
+          requested_quantity {
+            read
+            value
+          }
+          approved_quantity {
+            read
+            value
+          }
+          order_quantity {
+            read
+            value
+          }
+          replacement {
+            value
+          }
+          priority {
+            value
+          }
+          state
+          article_number {
+            value
+          }
+          supplier {
+            value {
+              name
+            }
+          }
+          supplier_name {
+            value
+          }
+          receiver {
+            value
+          }
+          room {
+            value {
+              id
+              name
+              building {
+                id
+                name
+              }
+            }
+          }
+          motivation {
+            value
+          }
+          inspection_comment {
+            value
+          }
+          inspector_priority {
+            value
+          }
+          accounting_type {
+            value
+          }
+          cost_center {
+            value
+          }
+          general_ledger_account {
+            value
+          }
+          procurement_account {
+            value
+          }
+          internal_order_number {
+            value
+          }
+        }
+
+        fragment RequestFieldString on RequestFieldString {
+          value
+          read
+          write
+          required
+        }
+
+        fragment RequestFieldInt on RequestFieldInt {
+          value
+          read
+          write
+          required
+        }
+
+        fragment RequestFieldBoolean on RequestFieldBoolean {
+          value
+          read
+          write
+          required
+        }
+      GRAPHQL
+    end
+
+    let(:user) do
+      requester = FactoryBot.create(:user)
+      FactoryBot.create(:requester_organization, user_id: requester.id)
+      requester
+    end
+
+    let(:expected_request_data) do
+      bp = BudgetPeriod.find(id: request[:budget_period_id])
+      sc = Category.find(id: request[:category_id])
+      mc = MainCategory.find(id: sc[:main_category_id])
+      org = Organization.find(id: request[:organization_id])
+      dep = Organization.find(id: org[:parent_id])
+      room = Room.find(id: request.room_id)
+      building = Building.find(id: room[:building_id])
+
+      {
+        :id=>request.id,
+        :user=>
+         {:read=>true,
+          :write=>false,
+          :required=>true,
+          :value=>user.to_hash.slice(:id, :firstname, :lastname)},
+        :category=>
+         {:read=>true,
+          :write=>true,
+          :required=>true,
+          :value=> sc.to_hash.slice(:id, :name).merge(main_category: mc.to_hash.slice(:id, :name))},
+        :budget_period=>
+         {:read=>true,
+          :write=>true,
+          :required=>true,
+          :value=>bp.to_hash.slice(:id, :name)},
+        :article_name=>{:value=>request.article_name, :read=>true, :write=>true, :required=>true},
+        :model=>{:read=>true, :write=>true, :required=>false, :value=>nil},
+        :receiver=>{:value=>nil, :read=>true, :write=>true, :required=>false},
+        :organization=>
+         {:value=>
+           org.to_hash.slice(:id, :name, :shortname).merge(department: dep.to_hash.slice(:id, :name))},
+        :price_cents=>{:value=>request.price_cents, :read=>true, :write=>true, :required=>true},
+        :price_currency=>{:value=>request.price_currency, :read=>true, :write=>false, :required=>true},
+        :requested_quantity=>{:value=>request.requested_quantity, :read=>true, :write=>true, :required=>true},
+        :approved_quantity=>{:value=>request.approved_quantity, :read=>false, :write=>false, :required=>false},
+        :order_quantity=>{:value=>request.order_quantity, :read=>false, :write=>false, :required=>false},
+        :replacement=>{:value=>request.replacement, :read=>true, :write=>true, :required=>true},
+        :priority=>{:read=>true, :write=>true, :required=>true, :value=>request.priority.upcase},
+        :state=>"NEW",
+        :article_number=>{:value=>request.article_number, :read=>true, :write=>true, :required=>false},
+        :supplier=>{:read=>true, :write=>true, :required=>false, :value=>nil},
+        :supplier_name=>{:value=>request.supplier_name, :read=>true, :write=>true, :required=>false},
+        :room=>
+         {:read=>true,
+          :write=>true,
+          :required=>true,
+          :value=>room.to_hash.slice(:id, :name).merge(building: building.to_hash.slice(:id, :name))},
+        :motivation=>{:value=>request.motivation, :read=>true, :write=>true, :required=>true},
+        :inspection_comment=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+        :inspector_priority=>{:read=>false, :write=>false, :required=>true, :value=>nil},
+        :accounting_type=>{:value=>nil, :read=>false, :write=>false, :required=>true},
+        :cost_center=>nil,
+        :general_ledger_account=>{:read=>false, :value=>nil},
+        :procurement_account=>{:read=>false, :write=>false, :value=>nil},
+        :internal_order_number=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+        :template=>nil,
+        :attachments=>{:read=>true, :write=>true, :required=>false, :value=>[]},
+        :actionPermissions=>{:delete=>true, :edit=>true, :moveBudgetPeriod=>true, :moveCategory=>true}
+      }
+    end
+
+    context 'without template' do
+      let(:request) do
+        FactoryBot.create(:request, {
+          user_id: user.id
+        })
+      end
+
+      example 'form data' do
+        variables = { id: [request.id]}
+        result = query(q, user.id, variables).deep_symbolize_keys
+
+        expect(result[:data][:requests].length).to be 1
+        expect(result[:data][:requests].first).to eq(expected_request_data)
+      end
+
+    end
+
+    context 'with template' do
+      let(:template) do
+        FactoryBot.create(:template)
+      end
+      let(:request) do
+
+        FactoryBot.create(:request, {
+          user_id: user.id,
+          template_id: template.id
+        })
+      end
+
+      example 'form data' do
+        variables = { id: [request.id]}
+        result = query(q, user.id, variables).deep_symbolize_keys
+
+        pending 'fields from template should not be writable'
+        expected_data = expected_request_data.merge(
+          article_name: { read: true, write: false, required: true, value: template.article_name },
+          article_number: { read: true, write: false, required: true, value: template.article_number },
+          price_cents: { read: true, write: false, required: true, value: template.price_cents}
+        )
+
+        expect(result[:data][:requests].length).to be 1
+        expect(result[:data][:requests].first).to eq(expected_data)
+      end
+
     end
 
   end
