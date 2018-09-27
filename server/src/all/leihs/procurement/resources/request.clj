@@ -364,9 +364,11 @@
       #(jdbc/execute!
          tx
          (-> (sql/update :procurement_requests)
-             (sql/sset (cond-> {:category_id cat-id}
-                         (not (user-perms/inspector? tx auth-entity cat-id))
-                           (merge change-category-reset-attrs)))
+             (sql/sset
+               (cond-> {:category_id cat-id}
+                 (and (not (user-perms/inspector? tx auth-entity cat-id))
+                      (not (user-perms/admin? tx auth-entity)))
+                   (merge change-category-reset-attrs)))
              (sql/where [:= :procurement_requests.id req-id])
              sql/format))
       :if-only
