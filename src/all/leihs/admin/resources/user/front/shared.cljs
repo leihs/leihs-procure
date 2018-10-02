@@ -260,6 +260,7 @@
    [:h3 "Other"]
    [field-component :url {:type :url}]
    [field-component :org_id]
+   [field-component :login]
    [field-component :badge_id]])
 
 (defn additional-properties-component []

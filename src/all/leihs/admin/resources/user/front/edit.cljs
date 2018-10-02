@@ -53,8 +53,7 @@
 (defn page []
   [:div.edit-user
    [routing/hidden-state-component
-    {:will-mount user.shared/clean-and-fetch
-     ;:did-change user.shared/clean-and-fetch
+    {:did-change user.shared/clean-and-fetch
      }]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)

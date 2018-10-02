@@ -37,6 +37,7 @@
    :img32_url
    :is_admin
    :lastname
+   :login
    :org_id
    :password_sign_in_enabled
    :phone
@@ -53,9 +54,6 @@
     :inventory_pool_roles_count]])
 
 
-
-
-
 (def user-write-keys
   [:address
    :account_enabled
@@ -69,6 +67,7 @@
    :img_digest
    :is_admin
    :lastname
+   :login
    :org_id
    :password_sign_in_enabled
    :phone
