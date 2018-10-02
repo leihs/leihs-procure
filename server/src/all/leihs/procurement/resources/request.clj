@@ -247,14 +247,19 @@
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
-                   (not user-arg) (assoc :user (:user_id auth-entity)))]
-    (as-> req-stub <>
-      (submap-with-id-for-associated-resources <>)
-      (request-fields-perms/get-for-user-and-request tx auth-entity <>)
-      (reject-keys <> request-perms/special-perms)
-      (map #(apply consider-default %) <>)
-      (into {} <>)
-      (assoc <> :state :NEW))))
+                   (not user-arg) (assoc :user (:user_id auth-entity)))
+        fields
+          (->> req-stub
+               submap-with-id-for-associated-resources
+               (request-fields-perms/get-for-user-and-request tx auth-entity))]
+    (authorization/authorize-and-apply
+      #(as-> fields <>
+        (reject-keys <> request-perms/special-perms)
+        (map (fn [f] (apply consider-default f)) <>)
+        (into {} <>)
+        (assoc <> :state :NEW))
+      :if-only
+      #(request-perms/can-write-any-field? fields))))
 
 (defn get-last-created-request
   [tx auth-entity]
