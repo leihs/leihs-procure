@@ -82,6 +82,23 @@
                           (branch "/"
                                   (param :user-id)
                                   (leaf "" :group-user))))))
+(def authentication-systems-paths
+  (branch "/authentication-systems"
+          (branch "/"
+                  (leaf "" :authentication-systems)
+                  (leaf "add" :authentication-system-add))
+          (branch "/"
+                  (param :authentication-system-id)
+                  (leaf "" :authentication-system)
+                  (leaf "/delete" :authentication-system-delete)
+                  (leaf "/edit" :authentication-system-edit)
+                  (branch "/users"
+                          (leaf "/" :authentication-system-users)
+                          (branch "/"
+                                  (param :user-id)
+                                  (leaf "" :authentication-system-user)
+                                  (leaf "/edit" :authentication-system-user-edit)
+                                  )))))
 
 (def paths
   (branch ""
@@ -90,9 +107,10 @@
                   (leaf "/status" :status)
                   (leaf "/shutdown" :shutdown)
                   (leaf "/debug" :debug)
+                  authentication-systems-paths
                   delegation-paths
-                  users-paths
                   groups-paths
+                  users-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)

@@ -1,23 +1,15 @@
 (ns leihs.admin.front.breadcrumbs
   (:refer-clojure :exclude [str keyword])
   (:require
+    [leihs.core.breadcrumbs :as core-breadcrumbs]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.icons :as icons]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
 
-    [leihs.core.icons :as icons]
-    [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]))
 
-(defn li
-  ([k n]
-   (li k n {} {}))
-  ([handler-key inner route-params query-params]
-   (let [active? (= (-> @routing/state* :handler-key) handler-key)]
-     [:li.breadcrumb-item {:key handler-key :class (if active? "active" "")}
-      (if active?
-        [:span inner]
-        [:a {:href (path handler-key route-params query-params)} inner])])))
+(def li core-breadcrumbs/li)
 
 (defn admin-li [] (li :admin [:span icons/admin " Admin "]))
 (defn auth-li [] (li :auth "Authentication"))

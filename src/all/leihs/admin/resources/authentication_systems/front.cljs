@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.groups.front
+(ns leihs.admin.resources.authentication-systems.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -13,9 +13,10 @@
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.authentication-systems.breadcrumbs :as ass-breadcrumbs]
 
     [leihs.admin.utils.seq :refer [with-index]]
-    [leihs.admin.resources.groups.shared :as shared]
+    [leihs.admin.resources.authentication-systems.shared :as shared]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -33,11 +34,11 @@
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-(def fetch-groups-id* (reagent/atom nil))
+(def fetch-authentication-systems-id* (reagent/atom nil))
 
 (def data* (reagent/atom {}))
 
-(defn fetch-groups []
+(defn fetch-authentication-systems []
   "Fetches the the currernt url with accept/json
   after 1/5 second timeout if query-params have not changed in the meanwhile
   yet and stores the result in the map data* under this url."
@@ -49,26 +50,26 @@
                 id (requests/send-off {:url url
                                        :method :get}
                                       {:modal false
-                                       :title "Fetch Groups"
-                                       :handler-key :groups
-                                       :retry-fn #'fetch-groups}
+                                       :title "Fetch Authentication-Systems"
+                                       :handler-key :authentication-systems
+                                       :retry-fn #'fetch-authentication-systems}
                                       :chan resp-chan)]
-            (reset! fetch-groups-id* id)
+            (reset! fetch-authentication-systems-id* id)
             (go (let [resp (<! resp-chan)]
                   (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-groups-id*) ;still the most recent request
+                             (= id @fetch-authentication-systems-id*) ;still the most recent request
                              (= url @current-url*)) ;query-params have still not changed yet
                     (let [body (-> resp :body)
                           page (:page normalized-query-params)
                           per-page (:per-page normalized-query-params)
                           offset (* per-page (- page 1))
-                          body-with-indexed-groups (update-in body [:groups] (partial with-index offset))]
-                      (swap! data* assoc url body-with-indexed-groups))))))))))
+                          body-with-indexed-authentication-systems (update-in body [:authentication-systems] (partial with-index offset))]
+                      (swap! data* assoc url body-with-indexed-authentication-systems))))))))))
 
 (defn escalate-query-paramas-update [_]
-  (fetch-groups)
+  (fetch-authentication-systems)
   (swap! state/global-state*
-         assoc :groups-query-params @current-query-paramerters-normalized*))
+         assoc :authentication-systems-query-params @current-query-paramerters-normalized*))
 
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,37 +83,11 @@
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn form-term-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :groups-search-term} "Search term"]
-   [:input#groups-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
-    {:type :text
-     :placeholder "Search term ..."
-     :value (or (-> @current-query-paramerters-normalized* :term presence) "")
-     :on-change (fn [e]
-                  (let [val (or (-> e .-target .-value presence) "")]
-                    (accountant/navigate! (page-path-for-query-params
-                                            {:page 1 :term val}))))}]])
-
-(defn form-type-filter []
-  (let [type (or (-> @current-query-paramerters-normalized* :type presence) "any")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :groups-filter-type} "Type"]
-     [:select#groups-filter-type.form-control
-      {:value type
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :type val}))))}
-      (for [t ["any" "org" "manual"]]
-        [:option {:key t :value t} t])]]))
-
 (defn form-per-page []
   (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :groups-filter-per-page} "Per page"]
-     [:select#groups-filter-per-page.form-control
+     [:label.mr-1 {:for :authentication-systems-filter-per-page} "Per page"]
+     [:select#authentication-systems-filter-per-page.form-control
       {:value per-page
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "12")]
@@ -124,8 +99,8 @@
 
 (defn form-reset []
   [:div.form-group.mt-2
-   [:label.sr-only {:for :groups-filter-reset} "Reset"]
-   [:a#groups-filter-reset.btn.btn-warning
+   [:label.sr-only {:for :authentication-systems-filter-reset} "Reset"]
+   [:a#authentication-systems-filter-reset.btn.btn-warning
     {:href (page-path-for-query-params shared/default-query-parameters)}
     [:i.fas.fa-times]
     " Reset "]])
@@ -134,50 +109,51 @@
   [:div.card.bg-light
    [:div.card-body
    [:div.form-inline
-    [form-term-filter]
-    [form-type-filter]
     [form-per-page]
     [form-reset]]]])
 
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn groups-thead-component []
+(defn authentication-systems-thead-component []
   [:thead
    [:tr
     [:th "Index"]
+    [:th "Id"]
+    [:th "Enabled"]
+    [:th "Type"]
+    [:th "Priority"]
     [:th "# Users"]
-    [:th "Org id"]
     [:th "Name"]]])
 
-(defn link-to-group [group inner]
-  [:a {:href (path :group {:group-id (:id group)})}
+(defn link-to-authentication-system [authentication-system inner]
+  [:a {:href (path :authentication-system {:authentication-system-id (:id authentication-system)})}
    inner])
 
-(defn group-row-component [group]
-  [:tr.group {:key (:id group)}
-   [:td (link-to-group group (:index group))]
-   [:td (:count_users group)]
-   [:td
-    (link-to-group group
-                   [:p {:style {:font-family "monospace"}}
-                    (:org_id group)])]
-   [:td (link-to-group group (:name group))]])
+(defn authentication-system-row-component [authentication-system]
+  [:tr.authentication-system {:key (:id authentication-system)}
+   [:td (link-to-authentication-system authentication-system (:index authentication-system))]
+   [:td (link-to-authentication-system authentication-system (:id authentication-system))]
+   [:td (-> authentication-system :enabled str)]
+   [:td (:type authentication-system)]
+   [:td (:priority authentication-system)]
+   [:td (:count_users authentication-system)]
+   [:td (link-to-authentication-system authentication-system (:name authentication-system))]])
 
-(defn groups-table-component []
+(defn authentication-systems-table-component []
   (if-not (contains? @data* @current-url*)
     [:div.text-center
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
-    (if-let [groups (-> @data* (get  @current-url* {}) :groups seq)]
+    (if-let [authentication-systems (-> @data* (get  @current-url* {}) :authentication-systems seq)]
       [:table.table.table-striped.table-sm
-       [groups-thead-component]
+       [authentication-systems-thead-component]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)
               per-page (:per-page @current-query-paramerters-normalized*)]
-          (doall (for [group groups]
-                   (group-row-component group))))]]
-      [:div.alert.alert-warning.text-center "No (more) groups found."])))
+          (doall (for [authentication-system authentication-systems]
+                   (authentication-system-row-component authentication-system))))]]
+      [:div.alert.alert-warning.text-center "No (more) authentication-systems found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -217,16 +193,17 @@
      :did-update escalate-query-paramas-update}]
    [filter-component]
    [pagination-component]
-   [groups-table-component]
+   [authentication-systems-table-component]
    [pagination-component]
    [debug-component]])
 
 (defn page []
-  [:div.groups
+  [:div.authentication-systems
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
-      (breadcrumbs/groups-li)]
-     [(breadcrumbs/group-add-li)])
-   [:h1 "Groups"]
-   [main-page-content-component]])
+      (ass-breadcrumbs/authentication-systems-li)]
+     [(ass-breadcrumbs/authentication-system-add-li)])
+   [:h1 "Authentication-Systems"]
+   [main-page-content-component]
+   ])

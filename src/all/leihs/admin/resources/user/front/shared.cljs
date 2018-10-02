@@ -21,6 +21,7 @@
     [cljsjs.jimp]
     [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
+    [clojure.string]
     [reagent.core :as reagent]
     ))
 
@@ -298,7 +299,11 @@
 (defn user-name-component []
   (if-not @user-data*
     [:span {:style {:font-family "monospace"}} (short-id @user-id*)]
-    [:em (str (:firstname @user-data*) " " (:lastname @user-data*))]))
+    [:em 
+     (if-let [name (-> (str (:firstname @user-data*) " " (:lastname @user-data*))
+                       clojure.string/trim presence)]
+       name
+       (:email @user-data*))]))
 
 (defn user-id-component []
   [:p "id: " [:span {:style {:font-family "monospace"}} (:id @user-data*)]])

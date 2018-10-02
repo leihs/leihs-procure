@@ -7,6 +7,7 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :as core-user]
 
+    [leihs.admin.resources.authentication-systems.breadcrumbs :as authentication-systems.breadcrumbs]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths]
@@ -19,6 +20,7 @@
        [(breadcrumbs/leihs-li)
         (breadcrumbs/admin-li)]
        [(breadcrumbs/li :admin-audits-legacy " Audits legacy ")
+        (authentication-systems.breadcrumbs/authentication-systems-li)
         (breadcrumbs/li :admin-buildings " Buildings ")
         (breadcrumbs/delegations-li)
         (breadcrumbs/li :admin-fields " Fields ")

@@ -17,6 +17,9 @@
     [leihs.admin.back.html :as html]
     [leihs.admin.env :as env]
     [leihs.admin.paths :refer [path paths]]
+    [leihs.admin.resources.authentication-system.back :as authentication-system]
+    [leihs.admin.resources.authentication-system.users.back :as authentication-system-users]
+    [leihs.admin.resources.authentication-systems.back :as authentication-systems]
     [leihs.admin.resources.delegation.back :as delegation]
     [leihs.admin.resources.delegation.users.back :as delegation-users]
     [leihs.admin.resources.delegations.back :as delegations]
@@ -59,6 +62,10 @@
 (def handler-resolve-table
   {:password-authentication admin-auth/routes
    :auth-sign-out admin-auth/routes
+   :authentication-systems authentication-systems/routes
+   :authentication-system authentication-system/routes
+   :authentication-system-users authentication-system-users/routes
+   :authentication-system-user authentication-system-users/routes
    :delegation delegation/routes
    :delegation-add-choose-responsible-user delegation/routes
    :delegation-edit-choose-responsible-user delegation/routes

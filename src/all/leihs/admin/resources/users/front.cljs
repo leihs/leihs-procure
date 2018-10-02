@@ -14,7 +14,7 @@
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
-    [leihs.admin.utils.seq :refer [with-index]]
+    [leihs.admin.utils.seq :as seq]
     [leihs.admin.resources.users.shared :as shared]
 
     [clojure.string :as str]
@@ -62,9 +62,11 @@
                     (let [body (-> resp :body)
                           page (:page normalized-query-params)
                           per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))
-                          body-with-indexed-users (update-in body [:users] (partial with-index offset))]
-                      (swap! data* assoc url body-with-indexed-users))))))))))
+                          offset (* per-page (- page 1))]
+                      (swap! data* assoc url 
+                             (-> body
+                                 (update-in [:users] (partial seq/with-index offset))
+                                 (update-in [:users] (partial seq/with-key :id)))))))))))))
 
 (defn escalate-query-paramas-update [_]
   (fetch-users)

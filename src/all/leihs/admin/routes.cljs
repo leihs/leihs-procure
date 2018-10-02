@@ -11,6 +11,9 @@
     [leihs.admin.front.pages.debug]
     [leihs.admin.paths :as paths :refer [path paths]]
     [leihs.admin.resources.admin.front :as admin]
+    [leihs.admin.resources.authentication-system.front :as authentication-system]
+    [leihs.admin.resources.authentication-system.users.front :as authentication-system-users]
+    [leihs.admin.resources.authentication-systems.front :as authentication-systems]
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
@@ -34,6 +37,13 @@
   {
    :admin #'admin/page
    :debug #'leihs.admin.front.pages.debug/page
+   :authentication-system #'authentication-system/show-page
+   :authentication-system-add #'authentication-system/add-page
+   :authentication-system-delete #'authentication-system/delete-page
+   :authentication-system-edit #'authentication-system/edit-page
+   :authentication-system-user-edit #'authentication-system-users/edit-page
+   :authentication-system-users #'authentication-system-users/index-page
+   :authentication-systems #'authentication-systems/page
    :delegation #'delegation/show-page
    :delegation-add #'delegation/new-page
    :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
