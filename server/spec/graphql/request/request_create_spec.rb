@@ -216,6 +216,11 @@ describe 'request' do
           motivation {
             value
           }
+          price_cents {
+            value
+            read
+            write
+          }
           supplier_name {
             value
           }
@@ -283,8 +288,6 @@ describe 'request' do
       end
 
       example 'from template' do
-        pending 'fix'
-
         variables = {
           input: minimal_input.without(:article_name).merge({
             template: template.id,

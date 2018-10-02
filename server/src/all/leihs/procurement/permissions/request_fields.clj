@@ -29,10 +29,6 @@
                             :id)
                         (:category_id template))
         category (category/get-category-by-id tx category-id)
-        no-template (-> proc-request
-                        :template
-                        :id
-                        not)
         user-id (-> proc-request
                     :user
                     :id)
@@ -73,7 +69,7 @@
      :article_name
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -89,7 +85,7 @@
      :article_number
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -195,7 +191,7 @@
      :model
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -239,7 +235,7 @@
      :price_cents
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -338,7 +334,7 @@
      :supplier
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -354,7 +350,7 @@
      :supplier_name
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
-                 no-template
+                 (not template)
                  (not past-phase)
                  (or (and new-request
                           requester
@@ -369,7 +365,7 @@
         :required false},
      :template {:read true,
                 :write (not existing-request),
-                :default (:id template),
+                :default template,
                 :required true},
      :user {:read
               (or (and requester own-request) category-viewer inspector admin),
