@@ -660,7 +660,6 @@ describe 'request' do
         :general_ledger_account=>{:read=>false, :value=>nil},
         :procurement_account=>{:read=>false, :write=>false, :value=>nil},
         :internal_order_number=>{:value=>nil, :read=>false, :write=>false, :required=>false},
-        :template=>nil,
         :attachments=>{:read=>true, :write=>true, :required=>false, :value=>[]},
         :actionPermissions=>{:delete=>true, :edit=>true, :moveBudgetPeriod=>true, :moveCategory=>true}
       }
@@ -678,7 +677,10 @@ describe 'request' do
         result = query(q, user.id, variables).deep_symbolize_keys
 
         expect(result[:data][:requests].length).to be 1
-        expect(result[:data][:requests].first).to eq(expected_request_data)
+        expect(result[:data][:requests].first)
+          .to eq(
+            expected_request_data.merge(template: { value: nil })
+          )
       end
 
     end
@@ -696,21 +698,22 @@ describe 'request' do
       end
 
       example 'form data' do
-        variables = { id: [request.id]}
+        variables = { id: [request.id] }
         result = query(q, user.id, variables).deep_symbolize_keys
 
-        pending 'fields from template should not be writable'
         expected_data = expected_request_data.merge(
           article_name: { read: true, write: false, required: true, value: template.article_name },
-          article_number: { read: true, write: false, required: true, value: template.article_number },
-          price_cents: { read: true, write: false, required: true, value: template.price_cents}
+          article_number: { read: true, write: false, required: false, value: template.article_number },
+          model: { read: true, write: false, required: false, value: Model.find(id: template.model_id) },
+          price_cents: { read: true, write: false, required: true, value: template.price_cents },
+          supplier: { read: true, write: false, required: false, value: Supplier.find(id: template.supplier_id) },
+          supplier_name: { read: true, write: false, required: false, value: template.supplier_name },
+          template: { value: { id: template.id, article_name: template.article_name } }
         )
 
         expect(result[:data][:requests].length).to be 1
         expect(result[:data][:requests].first).to eq(expected_data)
       end
-
     end
-
   end
 end
