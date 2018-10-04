@@ -14,7 +14,8 @@ export const endpointURL = '/procure/graphql'
 export const buildAuthHeaders = () =>
   isDev
     ? {
-        'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID')
+        'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID'),
+        'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME)
       }
     : { 'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME) }
 

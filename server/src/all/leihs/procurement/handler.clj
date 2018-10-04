@@ -5,7 +5,7 @@
             [leihs.procurement [authorization :refer [wrap-authorize]]
              [env :as env] [graphql :as graphql] [paths :refer [path paths]]
              [status :as status]]
-            [leihs.procurement.anti-csrf.core :as anti-csrf]
+            [leihs.core.anti-csrf.back :as anti-csrf]
             [leihs.procurement.auth.session :as session]
             [leihs.procurement.backend.html :as html]
             [leihs.procurement.resources [attachment :as attachment]

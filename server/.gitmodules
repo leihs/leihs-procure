@@ -1,6 +1,0 @@
-[submodule "database"]
-	path = server/database
-	url = https://github.com/leihs/leihs_database
-[submodule "client"]
-	path = server/client
-	url = https://github.com/leihs/leihs-procurement-ui

@@ -18,6 +18,7 @@
      [logbug "4.2.2"] [org.clojure/data.codec "0.1.1"]
      [io.dropwizard.metrics/metrics-core "4.0.3"]
      [io.dropwizard.metrics/metrics-healthchecks "4.0.3"]
+     [nilenso/honeysql-postgres "0.2.4"]
      [org.clojure/clojure "1.9.0"]
      [org.clojure/clojurescript "1.10.217" :scope "provided"]
      [org.clojure/java.jdbc "0.7.5"] [org.clojure/tools.cli "0.3.5"]
@@ -41,7 +42,7 @@
             []))
   ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
   :java-source-paths ["java"]
-  :source-paths ["src/all"]
+  :source-paths ["src/all" "leihs-clj-shared/src"]
   :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
   :target-path "target/%s"
