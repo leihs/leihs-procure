@@ -7,10 +7,11 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :as core-user]
 
-    [leihs.admin.resources.authentication-systems.breadcrumbs :as authentication-systems.breadcrumbs]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths]
+    [leihs.admin.resources.authentication-systems.breadcrumbs :as authentication-systems.breadcrumbs]
+    [leihs.admin.resources.system-admins.breadcrumbs :as system-admins]
     ))
 
 (defn page []
@@ -32,6 +33,8 @@
         (breadcrumbs/li :admin-settings " Settings ")
         (breadcrumbs/li :admin-statistics " Statistics ")
         (breadcrumbs/li :admin-suppliers " Suppliers ")
+        (when (:scope_system_admin_read @core-user/state*)
+          (system-admins/system-admins-li))
         (breadcrumbs/users-li)]))
    [:div
     [:h1 "Admin"]

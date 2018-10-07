@@ -1,10 +1,14 @@
 (ns leihs.admin.resources.authentication-systems.back
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.core :refer [keyword str presence]]
+
+    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.authentication-system.back :as authentication-system]
     [leihs.admin.resources.authentication-systems.shared :as shared]
+
+
     [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
@@ -74,9 +78,13 @@
       (jdbc/query (:tx request) (authentication-systems-formated-query request))}}))
 
 (def routes
-  (cpj/routes
-    (cpj/GET (path :authentication-systems) [] #'authentication-systems)
-    (cpj/POST (path :authentication-systems ) [] #'authentication-system/routes)))
+  (-> (cpj/routes
+        (cpj/GET (path :authentication-systems) [] #'authentication-systems)
+        (cpj/POST (path :authentication-systems ) [] #'authentication-system/routes))
+      (admin-auth/wrap-authorize #{} {:scope_admin_read true
+                                      :scope_admin_write true
+                                      :scope_system_admin_read true
+                                      :scope_system_admin_write true})))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

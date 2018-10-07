@@ -232,7 +232,7 @@
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
     (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
-      [:table.table.table-striped.table-sm
+      [:table.table.table-striped.table-sm.users
        [users-thead-component colconfig]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)

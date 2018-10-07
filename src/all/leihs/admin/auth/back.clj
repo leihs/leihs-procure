@@ -67,29 +67,74 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+(def HTTP-SAFE-VERBS #{:get :head :options :trace})
+
+(defn http-safe? [request] 
+  (boolean (some-> request :request-method HTTP-SAFE-VERBS)))
+
+(def HTTP-UNSAFE-VERBS #{:post :put :delete :patch})
+
+(defn http-unsafe?  [request]
+  (boolean (some-> request :request-method HTTP-UNSAFE-VERBS)))
+
+
+(defn authorize-http-unsafe [request handler required-scopes]
+  (cond 
+    ; case 1 admin and system_admin write required
+    (and (:scope_admin_write required-scopes)
+         (:scope_system_admin_write required-scopes)
+         (-> request :authenticated-entity :scope_admin_write)
+         (-> request :authenticated-entity :scope_system_admin_write))  (handler request)
+    ; case 2 system_admin write required
+    (and (:scope_system_admin_write required-scopes)
+         (-> request :authenticated-entity :scope_system_admin_write))  (handler request)
+    ; case 3 admin write required
+    (and (:scope_admin_write required-scopes)
+         (-> request :authenticated-entity :scope_admin_write))  (handler request)
+    ; Note: for now we don't allow neither admin nor system_admin write required because we have not use case so far
+    ; all other cases 
+    :else {:status 403 :body "No permission to write/modify data!"}))
+
+(defn authorize-http-safe [request handler required-scopes]
+  (cond 
+    ; case 1 admin and system_admin read required
+    (and (:scope_admin_read required-scopes)
+         (:scope_system_admin_read required-scopes)
+         (-> request :authenticated-entity :scope_admin_read)
+         (-> request :authenticated-entity :scope_system_admin_read))  (handler request)
+    ; case 2 system_admin read required
+    (and (:scope_system_admin_read required-scopes)
+         (-> request :authenticated-entity :scope_system_admin_read))  (handler request)
+    ; case 3 admin read required
+    (and (:scope_admin_read required-scopes)
+         (-> request :authenticated-entity :scope_admin_read))  (handler request)
+    ; Note: for now we don't allow neither admin nor system_admin read required because we have not use case so far
+    ; all other cases 
+    :else {:status 403 :body "No permission to read data!"}))
+
+(defn authorize [request handler required-scopes]
+  (if (http-unsafe? request)
+    (authorize-http-unsafe request handler required-scopes)
+    (authorize-http-safe request handler required-scopes)))
+
 (defn wrap-authorize
-  ([handler skip-authorization-handler-keys ]
+  ([handler skip-authorization-handler-keys required-scopes]
    (fn [request]
-     (wrap-authorize request handler skip-authorization-handler-keys)))
-  ([request handler skip-authorization-handler-keys]
-   (cond
-     (authorize/handler-is-ignored?
-       skip-authorization-handler-keys request) (handler request)
-     (authorize/admin-and-safe?
-       request) (handler request)
-     (authorize/admin-write-scope-and-unsafe?
-       request) (handler request)
-     (authorize/authenticated-entity-not-present?
-       request) {:status 401
-                 :body "Authentication required!"}
-     (authorize/is-not-admin?
-       request) {:status 403
-                 :body "Only for admins!"}
-     (authorize/violates-admin-write-scope?
-       request) {:status 403
-                 :body "No permission to write/modify data!"}
-     :else {:status 500
-            :body "Authorization check is not implement error!"})))
+     (wrap-authorize request handler skip-authorization-handler-keys required-scopes)))
+  ([handler skip-authorization-handler-keys]
+   (fn [request]
+     (wrap-authorize request handler skip-authorization-handler-keys 
+                           {:scope_admin_read true :scope_admin_write true
+                            :scope_system_admin_read false :scope_system_admin_write false})))
+  ([request handler skip-authorization-handler-keys required-scopes]
+   (if (authorize/handler-is-ignored? skip-authorization-handler-keys request) 
+     (handler request)
+     (if-not (-> request :authenticated-entity)
+       {:status 401 :body "Authentication required!"}
+       (authorize request handler required-scopes)))))
+
+     
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

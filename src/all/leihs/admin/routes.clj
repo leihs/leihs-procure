@@ -28,6 +28,9 @@
     [leihs.admin.resources.groups.back :as groups]
     [leihs.admin.resources.settings.back :as settings]
     [leihs.admin.resources.status.back :as status]
+    [leihs.admin.resources.system-admins.back :as system-admins]
+    [leihs.admin.resources.system-admins.direct-users.back :as system-admin-direct-users]
+    [leihs.admin.resources.system-admins.groups.back :as system-admin-groups]
     [leihs.admin.resources.user.back :as user]
     [leihs.admin.resources.users.back :as users]
 
@@ -62,24 +65,29 @@
 (def handler-resolve-table
   {:password-authentication admin-auth/routes
    :auth-sign-out admin-auth/routes
-   :authentication-systems authentication-systems/routes
    :authentication-system authentication-system/routes
-   :authentication-system-users authentication-system-users/routes
    :authentication-system-user authentication-system-users/routes
+   :authentication-system-users authentication-system-users/routes
+   :authentication-systems authentication-systems/routes
    :delegation delegation/routes
    :delegation-add-choose-responsible-user delegation/routes
    :delegation-edit-choose-responsible-user delegation/routes
    :delegation-user delegation-users/routes
    :delegation-users delegation-users/routes
    :delegations delegations/routes
-   :groups groups/routes
    :group group/routes
-   :group-users group-users/routes
    :group-user group-users/routes
+   :group-users group-users/routes
+   :groups groups/routes
    :not-found html/not-found-handler
    :redirect-to-root redirect-to-root-handler
    :sign-out sign-out/ring-handler
    :status status/routes
+   :system-admins system-admins/routes
+   :system-admins-direct-user system-admin-direct-users/routes
+   :system-admin-direct-users system-admin-direct-users/routes
+   :system-admins-group system-admin-groups/routes
+   :system-admin-groups system-admin-groups/routes
    :user user/routes
    :user-inventory-pools-roles user/routes
    :user-transfer-data user/routes

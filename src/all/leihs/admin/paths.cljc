@@ -1,11 +1,14 @@
 (ns leihs.admin.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.paths]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.paths]
+    [leihs.core.url.query-params :as query-params]
+
+    [leihs.admin.resources.system-admins.paths :as system-admins]
+
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
-    [leihs.core.url.query-params :as query-params]
 
     #?@(:clj
          [[uritemplate-clj.core :as uri-templ]
@@ -110,6 +113,7 @@
                   authentication-systems-paths
                   delegation-paths
                   groups-paths
+                  system-admins/paths
                   users-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
@@ -128,4 +132,5 @@
 
 (def path leihs.core.paths/path)
 
+;(path :system-admins-direct-user {:user-id "foo"})
 ;(path :user-inventory-pools-roles {:user-id "123"})

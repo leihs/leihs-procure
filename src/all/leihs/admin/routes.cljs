@@ -23,6 +23,9 @@
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.sign-in.front :as sign-in]
     [leihs.admin.resources.status.front :as status]
+    [leihs.admin.resources.system-admins.direct-users.front :as system-admin-direct-users]
+    [leihs.admin.resources.system-admins.front :as system-admins]
+    [leihs.admin.resources.system-admins.groups.front :as system-admin-groups]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
 
@@ -36,7 +39,6 @@
 (def resolve-table
   {
    :admin #'admin/page
-   :debug #'leihs.admin.front.pages.debug/page
    :authentication-system #'authentication-system/show-page
    :authentication-system-add #'authentication-system/add-page
    :authentication-system-delete #'authentication-system/delete-page
@@ -44,6 +46,7 @@
    :authentication-system-user-edit #'authentication-system-users/edit-page
    :authentication-system-users #'authentication-system-users/index-page
    :authentication-systems #'authentication-systems/page
+   :debug #'leihs.admin.front.pages.debug/page
    :delegation #'delegation/show-page
    :delegation-add #'delegation/new-page
    :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
@@ -61,6 +64,9 @@
    :home #'home/page
    :sign-in #'sign-in/page
    :status #'status/info-page
+   :system-admins #'system-admins/page
+   :system-admin-groups #'system-admin-groups/page
+   :system-admin-direct-users #'system-admin-direct-users/page
    :user #'user/show-page
    :user-delete #'user/delete-page
    :user-edit #'user/edit-page

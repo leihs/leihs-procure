@@ -10,7 +10,8 @@ feature 'Manage group users via API batch put', type: :feature do
     end
 
     let :prepare_http_client do
-      @api_token = FactoryBot.create :api_token, user_id: @admin.id
+      @api_token = FactoryBot.create :api_token, user_id: @admin.id, 
+        scope_admin_read: true, scope_admin_write: true
       @token_secret = @api_token.token_secret
       http_client.headers["Authorization"] = "Token #{@token_secret}"
       http_client.headers["Content-Type"] = "application/json"

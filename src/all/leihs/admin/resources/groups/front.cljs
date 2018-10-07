@@ -142,19 +142,21 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn groups-thead-component []
+(defn groups-thead-component [& [more-cols]]
   [:thead
    [:tr
     [:th "Index"]
     [:th "# Users"]
     [:th "Org id"]
-    [:th "Name"]]])
+    [:th "Name"]
+    (for [col more-cols]
+      col)]])
 
 (defn link-to-group [group inner]
   [:a {:href (path :group {:group-id (:id group)})}
    inner])
 
-(defn group-row-component [group]
+(defn group-row-component [group more-cols]
   [:tr.group {:key (:id group)}
    [:td (link-to-group group (:index group))]
    [:td (:count_users group)]
@@ -162,21 +164,23 @@
     (link-to-group group
                    [:p {:style {:font-family "monospace"}}
                     (:org_id group)])]
-   [:td (link-to-group group (:name group))]])
+   [:td (link-to-group group (:name group))]
+   (for [col more-cols]
+     (col group))])
 
-(defn groups-table-component []
+(defn groups-table-component [& [hds tds]]
   (if-not (contains? @data* @current-url*)
     [:div.text-center
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
     (if-let [groups (-> @data* (get  @current-url* {}) :groups seq)]
       [:table.table.table-striped.table-sm
-       [groups-thead-component]
+       [groups-thead-component hds]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)
               per-page (:per-page @current-query-paramerters-normalized*)]
           (doall (for [group groups]
-                   (group-row-component group))))]]
+                   (group-row-component group tds))))]]
       [:div.alert.alert-warning.text-center "No (more) groups found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
