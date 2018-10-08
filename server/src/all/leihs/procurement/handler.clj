@@ -3,7 +3,8 @@
   (:require [bidi.bidi :as bidi]
             [cheshire.core :refer [parse-string]]
             [clojure.tools.logging :as log]
-            [leihs.procurement [authorization :refer [wrap-authorize]]
+            [leihs.procurement
+             [authorization :refer [wrap-authenticate wrap-authorize]]
              [env :as env] [graphql :as graphql] [paths :refer [paths]]
              [status :as status]]
             [leihs.core.anti-csrf.back :as anti-csrf]
@@ -117,6 +118,7 @@
       ; FIXME:
       ; anti-csrf/wrap
       wrap-authorize
+      wrap-authenticate
       session/wrap
       wrap-cookies
       wrap-json-response
