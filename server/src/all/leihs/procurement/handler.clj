@@ -2,10 +2,13 @@
   (:refer-clojure :exclude [str keyword])
   (:require [bidi.bidi :as bidi]
             [cheshire.core :refer [parse-string]]
+            [clojure.tools.logging :as log]
             [leihs.procurement [authorization :refer [wrap-authorize]]
-             [env :as env] [graphql :as graphql] [paths :refer [path paths]]
+             [env :as env] [graphql :as graphql] [paths :refer [paths]]
              [status :as status]]
             [leihs.core.anti-csrf.back :as anti-csrf]
+            [leihs.core.sign-out.back :as sign-out]
+            [leihs.core.paths :refer [path core-paths]]
             [leihs.procurement.auth.session :as session]
             [leihs.procurement.backend.html :as html]
             [leihs.procurement.resources [attachment :as attachment]
@@ -27,6 +30,7 @@
    :graphql graphql/handler,
    :image image/routes,
    :not-found html/not-found-handler,
+   :sign-out sign-out/ring-handler,
    :status status/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,6 +53,15 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn- match-pair-with-fallback
+  [path]
+  (let [matched-pair (bidi/match-pair paths {:remainder path, :route paths})]
+    (if (-> matched-pair
+            :handler
+            (= :not-found))
+      (bidi/match-pair core-paths {:remainder path, :route core-paths})
+      matched-pair)))
+
 (defn wrap-resolve-handler
   ([handler] (fn [request] (wrap-resolve-handler handler request)))
   ([handler request]
@@ -59,7 +72,7 @@
                       :uri
                       presence))
          {route-params :route-params, handler-key :handler}
-           (bidi/match-pair paths {:remainder path, :route paths})
+           (match-pair-with-fallback path)
          handler-fn (handler-resolver handler-key)]
      (handler (assoc request
                 :route-params route-params
@@ -101,7 +114,8 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      anti-csrf/wrap
+      ; FIXME:
+      ; anti-csrf/wrap
       wrap-authorize
       session/wrap
       wrap-cookies

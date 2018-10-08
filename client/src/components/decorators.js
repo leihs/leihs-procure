@@ -51,6 +51,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
       if (abbr)
         return `${o.firstname || ''} ${o.lastname || ''}`
           .split(/\W/)
+          .filter(f.presence)
           .map(s => f.first(s).toUpperCase())
           .filter((s, i, a) => i < 2 || a.length - i <= 3)
           .join('')

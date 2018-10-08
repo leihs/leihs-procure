@@ -23,4 +23,4 @@ jobs:
       scripts:
         jest:
           timeout: 10 minutes
-          body: 'cd client && { npm ci || npm i ;} && npm test'
+          body: 'cd client && { npm ci || npm i ;} && npm test -- -u && npm test'

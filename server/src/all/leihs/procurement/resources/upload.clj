@@ -4,7 +4,7 @@
              {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
-            [leihs.procurement.paths :refer [path]]
+            [leihs.core.paths :refer [path]]
             [leihs.procurement.utils [exif :as exif] [sql :as sql]])
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))

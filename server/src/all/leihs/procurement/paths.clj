@@ -18,13 +18,3 @@
       ; workaround for the problem with hanging requests
       (branch "/images/" (param :image-id) (leaf "" :image)))
     (leaf true :not-found)))
-
-(defn path
-  ([kw] (path-for paths kw))
-  ([kw route-params]
-   (apply (partial path-for paths kw)
-     (->> route-params
-          (into [])
-          flatten)))
-  ([kw route-params query-params]
-   (str (path kw route-params) "?" (encode-query-params query-params))))

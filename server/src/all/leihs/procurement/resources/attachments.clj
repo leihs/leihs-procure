@@ -2,7 +2,7 @@
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.paths :refer [path]]
+            [leihs.core.paths :refer [path]]
             [leihs.procurement.resources [attachment :as attachment]
              [upload :as upload]]
             [leihs.procurement.utils.sql :as sql]))

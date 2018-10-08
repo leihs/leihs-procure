@@ -1,7 +1,7 @@
 (ns leihs.procurement.resources.attachment
   (:require [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
-            [leihs.procurement.paths :refer [path]]
+            [leihs.core.paths :refer [path]]
             [leihs.procurement.utils.sql :as sql])
   (:import java.util.Base64))
 

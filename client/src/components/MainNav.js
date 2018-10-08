@@ -170,6 +170,11 @@ export default class MainNav extends React.Component {
                   <Icon.User size="lg" /> {DisplayName(me.user, { abbr: true })}
                 </DropdownToggle>
                 <DropdownMenu right>
+                  <DropdownItem tag="span">
+                    <form action="/sign-out" method="POST">
+                      <button type="submit">Ausloggen</button>
+                    </form>
+                  </DropdownItem>
                   <DropdownItem>{tmpUserInfo(me.user)}</DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>

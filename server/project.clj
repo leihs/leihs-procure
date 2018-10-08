@@ -25,10 +25,10 @@
      [org.clojure/tools.logging "0.4.0"] [org.clojure/tools.nrepl "0.2.13"]
      [org.clojure/clojure-contrib "1.2.0"] [org.slf4j/slf4j-log4j12 "1.7.25"]
      [org.slf4j/slf4j-log4j12 "1.7.25"] [pg-types "2.3.0"] [reagent "0.7.0"]
-     [ring "1.6.3"] [ring-middleware-accept "2.0.3"] [ring/ring-json "0.4.0"]
+     [ring "1.7.0"] [ring-middleware-accept "2.0.3"] [ring/ring-json "0.4.0"]
      [timothypratley/patchin "0.3.5"] [threatgrid/ring-graphql-ui "0.1.1"]
      [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
-     [ring/ring-core "1.6.3"]]
+     [ring/ring-core "1.7.0"]]
   :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]]
   :zprint {:width 80,
            :old? false,
@@ -54,7 +54,8 @@
              :test [:base :project/test :profiles/test :profiles/dev+test],
              :prod {:source-paths ["src/prod"],
                     :resource-paths ["resources/prod"],
-                    :aot [#"leihs\..*"]},
+                    :aot [#"leihs\..*"],
+                    :repl-options {:timeout 120000}},
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj
