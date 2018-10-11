@@ -7,7 +7,7 @@
 (enable-console-print!)
 
 (figwheel/watch-and-reload
-  :websocket-url "ws://localhost:3212/figwheel-ws"
+  :websocket-url "ws://localhost:3222/figwheel-ws"
   :jsload-callback leihs.admin.front.html/mount)
 
 (leihs.admin.front.main/init!)

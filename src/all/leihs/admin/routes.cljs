@@ -72,7 +72,6 @@
    :user-edit #'user/edit-page
    :user-inventory-pools-roles #'user/inventory-pools-roles-page
    :user-new #'user/new-page
-   :user-password #'user/password-page
    :users #'users/page
    })
 

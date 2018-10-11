@@ -6,13 +6,16 @@ scripts:
         script_key: build-uberjar
       database has been created:
         script_key: create-database
-    body: java -jar target/leihs-admin.jar run --enable-shutdown-route YES
+    body: |
+      set -euxo 
+      env | sort
+      java -jar target/leihs-admin.jar run --enable-shutdown-route YES
 
   server-is-running:
     body: |
       until curl --silent --fail -I \
         -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        http://localhost:${LEIHS_API_HTTP_PORT}/admin/status;
+        ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/status;
         do sleep 1;
       done
     start_when:
@@ -29,7 +32,7 @@ scripts:
     body: |
       until curl --silent --fail -X POST -I \
         -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        http://localhost:${LEIHS_API_HTTP_PORT}/admin/shutdown;
+        ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/shutdown;
         do sleep 1;
       done
     start_when:

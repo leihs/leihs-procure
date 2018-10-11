@@ -88,16 +88,16 @@
                {:source-paths ["src/all" "src/dev" "leihs-clj-shared/src"]
                 :compiler
                 {:main "leihs.admin.front.init"
-                 :asset-path "/js/out"
+                 :asset-path "/admin/js/out"
                  :output-to "target/cljsbuild/public/admin/js/app.js"
-                 :output-dir "target/cljsbuild/public/js/out"
+                 :output-dir "target/cljsbuild/public/admin/js/out"
                  :source-map true
                  :optimizations :none
                  :pretty-print  true}}}}
 
   :figwheel {:http-server-root "public"
-             :server-port 3212
-             :nrepl-port 3213
+             :server-port 3222
+             :nrepl-port 3223
              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
              :css-dirs ["resources/all/public/admin/css"]}
 

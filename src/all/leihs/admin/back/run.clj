@@ -24,7 +24,7 @@
     ))
 
 (def defaults
-  {:LEIHS_HTTP_BASE_URL "http://localhost:3211"
+  {:LEIHS_ADMIN_HTTP_BASE_URL "http://localhost:3220"
    :LEIHS_SECRET (when (= leihs.admin.env/env :dev) "secret")
    :LEIHS_DATABASE_URL "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?min-pool-size=2&max-pool-size=16"
    :ENABLE_SHUTDOWN_ROUTE "false"})
@@ -61,8 +61,8 @@
 (def cli-options
   [["-h" "--help"]
    ["-b" "--http-base-url LEIHS_HTTP_BASE_URL"
-    (str "default: " (:LEIHS_HTTP_BASE_URL defaults))
-    :default (http-url/parse-base-url (env-or-default :LEIHS_HTTP_BASE_URL))
+    (str "default: " (:LEIHS_ADMIN_HTTP_BASE_URL defaults))
+    :default (http-url/parse-base-url (env-or-default :LEIHS_ADMIN_HTTP_BASE_URL))
     :parse-fn http-url/parse-base-url]
    ["-d" "--database-url LEIHS_DATABASE_URL"
     (str "default: " (:LEIHS_DATABASE_URL defaults))

@@ -7,7 +7,6 @@
     [leihs.admin.resources.user.front.remove :as remove]
     [leihs.admin.resources.user.front.shared :as user.shared]
     [leihs.admin.resources.user.front.show :as show]
-    [leihs.admin.resources.user.front.password :as password]
     [leihs.core.core :refer [keyword str presence]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -16,6 +15,4 @@
 (def new-page create/page)
 (def edit-page edit/page)
 (def show-page show/page)
-(def password-page password/page)
 (def inventory-pools-roles-page inventory-pools-roles/page)
-

@@ -18,14 +18,13 @@ jobs:
           JDK 8: true
           Leiningen 2: true
         ports:
-          LEIHS_API_HTTP_PORT:
-            min: 3200
-            max: 3300
+          LEIHS_ADMIN_HTTP_PORT:
+            min: 3220
+            max: 3229
         environment_variables:
-          API_DIR: '{{CIDER_CI_WORKING_DIR}}'
           DATABASE_NAME: leihs_api_{{CIDER_CI_TRIAL_ID}}
           LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
-          LEIHS_HTTP_BASE_URL: http://localhost:{{LEIHS_API_HTTP_PORT}}
+          LEIHS_ADMIN_HTTP_BASE_URL: http://localhost:{{LEIHS_ADMIN_HTTP_PORT}}
           LEIHS_SECRET: '{{CIDER_CI_TRIAL_ID}}'
           RAILS_ENV: test
           RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
@@ -40,6 +39,7 @@ jobs:
               #!/usr/bin/env bash
               set -eux
               export PATH=~/.rubies/$RUBY/bin:$PATH
+              env | sort
               mkdir -p log
               xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
 
