@@ -7,7 +7,7 @@
 # echo ' - - - 8< - - - '
 
 export LEIHS_SECRET="secret"
-export LEIHS_HTTP_BASE_URL="http://localhost:3003"
+export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3003"
 export LEIHS_DATABASE_URL="jdbc:postgresql://127.0.0.1:5432/leihs_procure2?max-pool-size=20"
 
 lein clean

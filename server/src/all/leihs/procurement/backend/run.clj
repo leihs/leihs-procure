@@ -1,20 +1,25 @@
 (ns leihs.procurement.backend.run
-  (:refer-clojure :exclude [str keyword])
-  (:require [clj-pid.core :as pid]
-            [clojure.pprint :refer [pprint]]
-            [clojure.tools [cli :as cli] [logging :as logging]]
-            [environ.core :as environ]
-            [leihs.procurement env [handler :as handler] [status :as status]]
-            [leihs.procurement.utils [core :refer [str]] [ds :as ds]
-             [http-server :as http-server]]
-            [leihs.procurement.utils.url [http :as http-url]
-             [jdbc :as jdbc-url]]
-            [logbug.catcher :as catcher]))
+	(:refer-clojure :exclude [str keyword])
+	(:require 
+		[leihs.core.core :refer [keyword str presence]]
+
+		[leihs.procurement env [handler :as handler] [status :as status]]
+		[leihs.procurement.utils [ds :as ds]
+		 [http-server :as http-server]]
+		[leihs.procurement.utils.url [http :as http-url]
+		 [jdbc :as jdbc-url]]
+
+		[clj-pid.core :as pid]
+		[clojure.pprint :refer [pprint]]
+		[clojure.tools [cli :as cli] [logging :as logging]]
+		[environ.core :as environ]
+
+		[logbug.catcher :as catcher]))
 
 (def defaults
-  {:leihs-http-base-url "http://localhost:3211",
-   :leihs-secret (when (= leihs.procurement.env/env :dev) "secret"),
-   :leihs-database-url
+  {:LEIHS_PROCURE_HTTP_BASE_URL "http://localhost:3230",
+   :LEIHS_SECRET (when (= leihs.procurement.env/env :dev) "secret"),
+   :LEIHS_DATABASE_URL
      "jdbc:postgresql://leihs:leihs@localhost:5432/leihs?max-pool-size=5"})
 
 (defn handle-pidfile
@@ -43,7 +48,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn env-or-default [kw] (or (environ/env kw) (get defaults kw nil)))
+(defn env-or-default [kw]
+  (or (-> (System/getenv) (get (str kw) nil) presence)
+      (get defaults kw nil)))
 
 (defn extend-pg-params
   [params]
@@ -54,25 +61,25 @@
 
 (def cli-options
   [["-h" "--help"]
-   ["-b" "--http-base-url LEIHS_HTTP_BASE_URL"
-    (str "default: " (:leihs-http-base-url defaults)) :default
-    (http-url/parse-base-url (env-or-default :leihs-http-base-url)) :parse-fn
-    http-url/parse-base-url]
+   ["-b" "--http-base-url LEIHS_PROCURE_HTTP_BASE_URL"
+    (str "default: " (:LEIHS_PROCURE_HTTP_BASE_URL defaults)) 
+    :default (http-url/parse-base-url (env-or-default :LEIHS_PROCURE_HTTP_BASE_URL)) 
+    :parse-fn http-url/parse-base-url]
    ["-d" "--database-url LEIHS_DATABASE_URL"
-    (str "default: " (:leihs-database-url defaults)) :default
-    (-> (env-or-default :leihs-database-url)
+    (str "default: " (:LEIHS_DATABASE_URL defaults)) :default
+    (-> (env-or-default :LEIHS_DATABASE_URL)
         jdbc-url/dissect
         extend-pg-params) :parse-fn
     #(-> %
          jdbc-url/dissect
          extend-pg-params)]
-   ["-s" "--secret LEIHS_SECRET" (str "default: " (:leihs-secret defaults))
-    :default (env-or-default :leihs-secret)]])
+   ["-s" "--secret LEIHS_SECRET" (str "default: " (:LEIHS_SECRET defaults))
+    :default (env-or-default :LEIHS_SECRET)]])
 
 (defn main-usage
   [options-summary & more]
   (->>
-    ["Leihs PERM run " "" "usage: leihs-perm run [<opts>] [<args>]" ""
+    ["Leihs procure run " "" "usage: leihs-procure run [<opts>] [<args>]" ""
      "Options:" options-summary "" ""
      (when more
        ["-------------------------------------------------------------------"

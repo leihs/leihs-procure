@@ -35,12 +35,11 @@
            :map {:lift-ns? false},
            :comment {:wrap? false, :inline? false, :count? false},
            :vector {:respect-nl? true}}
-  ; jdk 9 needs ["--add-modules" "java.xml.bind"]
   :jvm-opts
-    #=(eval (if (re-matches #"^9\..*" (System/getProperty "java.version"))
-            ["--add-modules" "java.xml.bind"]
-            []))
-  ; :javac-options ["-target" "1.8" "-source" "1.8" "-xlint:-options"]
+    #=(eval (if (re-matches #"^(9|10)\..*" (System/getProperty "java.version"))
+                      ["--add-modules" "java.xml.bind"]
+                      []))
+  :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"]
   :java-source-paths ["java"]
   :source-paths ["src/all" "leihs-clj-shared/src"]
   :resource-paths ["resources/all"]
@@ -56,6 +55,9 @@
                     :resource-paths ["resources/prod"],
                     :aot [#"leihs\..*"],
                     :repl-options {:timeout 120000}},
+             :uberjar {:source-paths ["src/prod"],
+                       :resource-paths ["resources/prod"],
+                       :aot [#"leihs\..*"]},
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj

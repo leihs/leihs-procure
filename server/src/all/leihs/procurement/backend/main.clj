@@ -14,7 +14,8 @@
 (defn main-usage
   [options-summary & more]
   (->>
-    ["Leihs PERM" "" "usage: leihs-perm [<opts>] SCOPE [<scope-opts>] [<args>]"
+    ["Leihs procure" "" "usage: leihs-procure [<opts>] SCOPE [<scope-opts>] [<args>]"
+     "" "Available scopes: run"
      "" "Options:" options-summary "" ""
      (when more
        ["-------------------------------------------------------------------"

@@ -19,14 +19,14 @@ jobs:
           Leiningen 2: true
           g2016: true
         ports:
-          LEIHS_PROCUREMENT_HTTP_PORT:
+          LEIHS_PROCURE_HTTP_PORT:
             min: 3200
-            max: 3300
+            max: 3299
         environment_variables:
           PROCUREMENT_DIR: '{{CIDER_CI_WORKING_DIR}}'
           DATABASE_NAME: leihs_procurement_{{CIDER_CI_TRIAL_ID}}
           LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
-          LEIHS_HTTP_BASE_URL: http://localhost:{{LEIHS_PROCUREMENT_HTTP_PORT}}
+          LEIHS_PROCURE_HTTP_BASE_URL: http://localhost:{{LEIHS_PROCURE_HTTP_PORT}}
           LEIHS_SECRET: '{{CIDER_CI_TRIAL_ID}}'
           RAILS_ENV: test
           RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
@@ -39,7 +39,8 @@ jobs:
           test:
             body: |
               #!/usr/bin/env bash
-              set -eux
+              set -euxo
+              env | sort
               export PATH=~/.rubies/$RUBY/bin:$PATH
               cd server
               mkdir -p log

@@ -6,13 +6,15 @@ scripts:
         script_key: build-uberjar
       database has been created:
         script_key: create-database
-    body: cd server && java -jar target/leihs-procurement.jar run
+    body: |
+      set -euxo
+      env | sort 
+      cd server && java -jar target/leihs-procurement.jar run -h && java -jar target/leihs-procurement.jar run
     ignore_state: true
 
   server-is-running:
     body: |
-      # until curl --silent --fail -I http://localhost:${LEIHS_PROCUREMENT_HTTP_PORT}/procure/status;
-      until curl http://localhost:${LEIHS_PROCUREMENT_HTTP_PORT}/procure/status;
+      until curl http://localhost:${LEIHS_PROCURE_HTTP_PORT}/procure/status;
         do sleep 1;
       done
     start_when:

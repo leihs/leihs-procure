@@ -2,7 +2,7 @@ require 'edn'
 require 'faraday'
 
 class GraphqlQuery
-  URL = "#{Constants::LEIHS_HTTP_BASE_URL}/procure/graphql"
+  URL = "#{Constants::LEIHS_PROCURE_HTTP_BASE_URL}/procure/graphql"
   CONN = Faraday.new(url: URL)
 
   attr_reader :response
@@ -15,7 +15,7 @@ class GraphqlQuery
 
   def perform
     @response = CONN.post do |req|
-      if @user_id 
+      if @user_id
         req.headers['X-Fake-Token-Authorization'] = @user_id
       end
       req.headers['Content-Type'] = 'application/json'

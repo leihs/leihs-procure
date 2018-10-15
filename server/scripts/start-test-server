@@ -7,7 +7,7 @@ export DATABASE_URL="postgresql://localhost:5432/leihs_test_procure2?max-pool-si
 # NOTE: profiles.cljs config broken for some reason, using ENV for now
 export LEIHS_DATABASE_URL="jdbc:${DATABASE_URL}"
 # auto find some open port
-export LEIHS_HTTP_BASE_URL="http://localhost:$(get_open_port)"
+export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:$(get_open_port)"
 
 cd database
 RAILS_ENV=test bundle exec rake db:environment:set || true # fuck that
