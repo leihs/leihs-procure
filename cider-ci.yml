@@ -28,6 +28,12 @@ jobs:
         job_key: client-specs
         states: [passed]
 
+      good to merge of the database:
+        job_key: good-to-merge
+        type: job
+        submodule: ['server/database']
+        states: [passed]
+
     run_when: *GOOD_TO_MERGE_DEPENDENCIES
 
     context:
