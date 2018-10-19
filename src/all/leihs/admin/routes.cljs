@@ -12,6 +12,7 @@
     [leihs.admin.paths :as paths :refer [path paths]]
     [leihs.admin.resources.admin.front :as admin]
     [leihs.admin.resources.authentication-system.front :as authentication-system]
+    [leihs.admin.resources.authentication-system.groups.front :as authentication-system-groups]
     [leihs.admin.resources.authentication-system.users.front :as authentication-system-users]
     [leihs.admin.resources.authentication-systems.front :as authentication-systems]
     [leihs.admin.resources.delegation.front :as delegation]
@@ -39,6 +40,7 @@
 (def resolve-table
   {
    :admin #'admin/page
+   :authentication-system-groups #'authentication-system-groups/page
    :authentication-system #'authentication-system/show-page
    :authentication-system-add #'authentication-system/add-page
    :authentication-system-delete #'authentication-system/delete-page

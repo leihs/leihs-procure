@@ -264,6 +264,6 @@
      (let [c (or @authentication-system-users-count* 0)]
        [:span c " " (pluralize-noun c "User")
         [:span " in Authentication-System "]
-        [authentication-system/authentication-system-name-component]])]
+        [authentication-system/name-component]])]
     [main-page-component]
     ]])

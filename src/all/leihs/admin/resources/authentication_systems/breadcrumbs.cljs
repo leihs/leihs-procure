@@ -15,6 +15,7 @@
 
 (def authentication-system-id* (reaction (-> @routing/state* :route-params :authentication-system-id)))
 (def user-id* (reaction (-> @routing/state* :route-params :user-id)))
+(def group-id* (reaction (-> @routing/state* :route-params :group-id)))
 
 (defn authentication-system-delete-li [] 
   (li :authentication-system-delete 
@@ -38,6 +39,11 @@
 (defn authentication-systems-li [] 
   (li :authentication-systems 
       [:span icons/authentication-systems " Authentication-Systems "] {} {}))
+
+(defn authentication-system-groups-li []
+  (li :authentication-system-groups
+      [:span icons/groups " Groups "]
+      {:authentication-system-id @authentication-system-id*} {}))
 
 (defn authentication-system-users-li []
   (li :authentication-system-users

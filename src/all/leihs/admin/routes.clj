@@ -18,6 +18,7 @@
     [leihs.admin.env :as env]
     [leihs.admin.paths :refer [path paths]]
     [leihs.admin.resources.authentication-system.back :as authentication-system]
+    [leihs.admin.resources.authentication-system.groups.back :as authentication-system-groups]
     [leihs.admin.resources.authentication-system.users.back :as authentication-system-users]
     [leihs.admin.resources.authentication-systems.back :as authentication-systems]
     [leihs.admin.resources.delegation.back :as delegation]
@@ -66,6 +67,8 @@
   {:password-authentication admin-auth/routes
    :auth-sign-out admin-auth/routes
    :authentication-system authentication-system/routes
+   :authentication-system-groups authentication-system-groups/routes
+   :authentication-system-group authentication-system-groups/routes
    :authentication-system-user authentication-system-users/routes
    :authentication-system-users authentication-system-users/routes
    :authentication-systems authentication-systems/routes

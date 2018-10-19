@@ -9,12 +9,12 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.url.shared]
 
-    [leihs.admin.front.breadcrumbs :as breadcrumbs]
+    [leihs.admin.front.breadcrumbs :as admin-breadcrumbs]
     [leihs.admin.front.components :as components]
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.authentication-systems.breadcrumbs :as ass-breadcrumbs]
+    [leihs.admin.resources.authentication-systems.breadcrumbs :as breadcrumbs]
     [leihs.core.icons :as icons]
 
     [accountant.core :as accountant]
@@ -163,7 +163,7 @@
       [:div [basic-component]]
       [:div [additional-properties-component]]])])
 
-(defn authentication-system-name-component []
+(defn name-component []
   (if-not @authentication-system-data*
     [:span {:style {:font-family "monospace"}} (short-id @authentication-system-id*)]
     [:em (str (:name @authentication-system-data*))]))
@@ -185,22 +185,23 @@
    [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (ass-breadcrumbs/authentication-systems-li)
-      (ass-breadcrumbs/authentication-system-li)
+   (admin-breadcrumbs/nav-component
+     [(admin-breadcrumbs/leihs-li)
+      (admin-breadcrumbs/admin-li)
+      (breadcrumbs/authentication-systems-li)
+      (breadcrumbs/authentication-system-li)
       ]
      [
-      (ass-breadcrumbs/authentication-system-users-li) 
-      (ass-breadcrumbs/authentication-system-delete-li) 
-      (ass-breadcrumbs/authentication-system-edit-li)
+      (breadcrumbs/authentication-system-users-li) 
+      (breadcrumbs/authentication-system-groups-li) 
+      (breadcrumbs/authentication-system-delete-li) 
+      (breadcrumbs/authentication-system-edit-li)
       ])
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Authentication-System "]
-      [authentication-system-name-component]]
+      [name-component]]
      [authentication-system-id-component]]]
    [authentication-system-component]
    [debug-component]])
@@ -239,17 +240,17 @@
    [routing/hidden-state-component
     {:will-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (ass-breadcrumbs/authentication-systems-li)
-      (ass-breadcrumbs/authentication-system-li)
-      (ass-breadcrumbs/authentication-system-edit-li)][])
+   (admin-breadcrumbs/nav-component
+     [(admin-breadcrumbs/leihs-li)
+      (admin-breadcrumbs/admin-li)
+      (breadcrumbs/authentication-systems-li)
+      (breadcrumbs/authentication-system-li)
+      (breadcrumbs/authentication-system-edit-li)][])
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Edit Authentication-System "]
-      [authentication-system-name-component]]
+      [name-component]]
      [authentication-system-id-component]]]
    [authentication-system-component]
    [patch-submit-component]
@@ -287,11 +288,11 @@
   [:div.new-authentication-system
    [routing/hidden-state-component
     {:will-mount #(reset! authentication-system-data* {})}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (ass-breadcrumbs/authentication-systems-li)
-      (ass-breadcrumbs/authentication-system-add-li)
+   (admin-breadcrumbs/nav-component
+     [(admin-breadcrumbs/leihs-li)
+      (admin-breadcrumbs/admin-li)
+      (breadcrumbs/authentication-systems-li)
+      (breadcrumbs/authentication-system-add-li)
       ][])
    [:div.row
     [:div.col-lg
@@ -340,20 +341,20 @@
      [:i.fas.fa-times] " Delete"]]])
 
 (defn delete-page []
-  [:div.authentication-system-delete
-   [routing/hidden-state-component
-    {:will-mount clean-and-fetch
-     :did-change clean-and-fetch}]
-   [:div.row
-    [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
-     [:ol.breadcrumb
-      [breadcrumbs/leihs-li]
-      [breadcrumbs/admin-li]
-      [ass-breadcrumbs/authentication-systems-li]
-      [ass-breadcrumbs/authentication-system-li]
-      [ass-breadcrumbs/authentication-system-delete-li]]]
-    [:nav.col-lg {:role :navigation}]]
-   [:h1 "Delete Authentication-System "
-    [authentication-system-name-component]]
-   [authentication-system-id-component]
-   [delete-submit-component]])
+	[:div.authentication-system-delete
+	 [routing/hidden-state-component
+		{:will-mount clean-and-fetch
+		 :did-change clean-and-fetch}]
+	 [:div.row
+		[:nav.col-lg {:aria-label :breadcrumb :role :navigation}
+		 [:ol.breadcrumb
+			[admin-breadcrumbs/leihs-li]
+			[admin-breadcrumbs/admin-li]
+			[breadcrumbs/authentication-systems-li]
+			[breadcrumbs/authentication-system-li]
+			[breadcrumbs/authentication-system-delete-li]]]
+		[:nav.col-lg {:role :navigation}]]
+	 [:h1 "Delete Authentication-System "
+		[name-component]]
+	 [authentication-system-id-component]
+	 [delete-submit-component]])

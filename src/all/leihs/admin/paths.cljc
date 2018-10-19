@@ -6,6 +6,7 @@
     [leihs.core.url.query-params :as query-params]
 
     [leihs.admin.resources.system-admins.paths :as system-admins]
+    [leihs.admin.resources.authentication-systems.paths :as authentication-systems]
 
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
@@ -84,23 +85,7 @@
                           (branch "/"
                                   (param :user-id)
                                   (leaf "" :group-user))))))
-(def authentication-systems-paths
-  (branch "/authentication-systems"
-          (branch "/"
-                  (leaf "" :authentication-systems)
-                  (leaf "add" :authentication-system-add))
-          (branch "/"
-                  (param :authentication-system-id)
-                  (leaf "" :authentication-system)
-                  (leaf "/delete" :authentication-system-delete)
-                  (leaf "/edit" :authentication-system-edit)
-                  (branch "/users"
-                          (leaf "/" :authentication-system-users)
-                          (branch "/"
-                                  (param :user-id)
-                                  (leaf "" :authentication-system-user)
-                                  (leaf "/edit" :authentication-system-user-edit)
-                                  )))))
+
 
 (def paths
   (branch ""
@@ -109,7 +94,7 @@
                   (leaf "/status" :status)
                   (leaf "/shutdown" :shutdown)
                   (leaf "/debug" :debug)
-                  authentication-systems-paths
+                  authentication-systems/paths
                   delegation-paths
                   groups-paths
                   system-admins/paths

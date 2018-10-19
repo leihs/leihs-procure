@@ -18,7 +18,7 @@
 
 
 (def groups-base-query
-  (-> (apply sql/select shared/default-fields)
+  (-> (apply sql/select (map #(keyword (str "groups." %)) shared/default-fields))
       (sql/merge-select
         [(-> (sql/select :%count.*)
              (sql/from :groups_users)
