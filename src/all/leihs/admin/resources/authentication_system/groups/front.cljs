@@ -80,7 +80,7 @@
 
 (defn action-td-component [group]
   [:td
-   (if (:system_admin_group_id group)
+   (if (:authentication_system_group_id group)
      [:span
       [:button.btn.btn-sm.btn-danger.mx-2
        {:key :delete
@@ -135,7 +135,7 @@
   [:td
    {:key :actions}
    (js/console.log (with-out-str (pprint group)))
-   (if (:system_admin_group_id group)
+   (if (:authentication_system_group_id group)
      [:span
       [:button.btn.btn-sm.btn-danger.mx-2
        {:key :delete

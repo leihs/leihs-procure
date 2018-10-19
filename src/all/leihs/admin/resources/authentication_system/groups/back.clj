@@ -27,7 +27,7 @@
   (let [query (-> request groups/groups-query
                   (sql/merge-left-join :authentication_systems_groups
                                        [:= :authentication_systems_groups.group_id :groups.id])
-                  (sql/merge-select [:authentication_systems_groups.group_id :group_id]))]
+                  (sql/merge-select [:authentication_systems_groups.group_id :authentication_system_group_id]))]
     (if-not (-> request :query-params-raw filter-value)
       query
       (sql/merge-where query [:<> :authentication_systems_groups.group_id nil]))))
