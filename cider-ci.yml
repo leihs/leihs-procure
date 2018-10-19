@@ -57,6 +57,11 @@ jobs:
         type: job
         job_key: specs
         states: [passed]
+      good to merge of the database:
+        job_key: good-to-merge
+        type: job
+        submodule: [database]
+        states: [passed]
 
     run_when: *GOOD_TO_MERGE_DEPENDENTS
 

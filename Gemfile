@@ -1,10 +1,6 @@
 eval_gemfile 'database/Gemfile'
 
-gem 'addressable'
-gem 'capybara'
-gem 'factory_bot', '~> 4.0'
-gem 'faker'
+gem 'capybara', '2.18.0'
 gem 'faraday'
 gem 'faraday_middleware'
-gem 'rspec'
 gem 'selenium-webdriver', '~> 2.53'
