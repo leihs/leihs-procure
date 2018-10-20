@@ -93,7 +93,7 @@
 (defn authentication-system-groups-filter []
   [:div.form-authentication-system.ml-2.mr-2.mt-2
    [:label
-    [:span.pr-1 "Authentication-System groups only"]
+    [:span.pr-1 "Added groups only"]
     [:input
      {:type :checkbox
       :on-change filter-on-change
@@ -122,7 +122,6 @@
 (defn td-actions-component [group]
   [:td
    {:key :actions}
-   (js/console.log (with-out-str (pprint group)))
    (if (:authentication_system_group_id group)
      [:span
       [:button.btn.btn-sm.btn-danger.mx-2

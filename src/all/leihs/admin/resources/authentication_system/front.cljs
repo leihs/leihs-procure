@@ -132,12 +132,17 @@
    [checkbox-component :send_org_id]
    [checkbox-component :send_login]
    [checkbox-component :send_auth_system_user_data]
-   [checkbox-component :shortcut_sign_in_enabled]
    [field-component :priority {:type :number}]
    [field-component :internal_private_key {:node-type :textarea}]
    [field-component :internal_public_key {:node-type :textarea}]
    [field-component :external_public_key {:node-type :textarea}]
    [field-component :external_url {}]])
+
+(defn count-component [kw noun data]
+  (let [count (kw data)]
+    [:span 
+     "This authentication-system has "
+     [:strong count " " (pluralize-noun count noun)] ". "]))
 
 (defn additional-properties-component []
   (when-let [authentication-system-data @authentication-system-data*]
@@ -146,12 +151,8 @@
       [:span "This authentication-system has been "
        [:b " created " [humanize-datetime-component (:created_at authentication-system-data)]] ", and "
        [:b " updated " [humanize-datetime-component (:updated_at authentication-system-data)]] ". "]
-      (let [users-count (:users_count authentication-system-data)]
-        [:span (if (= 0 users-count)
-                 "This authentication-system has no users."
-                 [:span
-                  "This authentication-system has "
-                  [:strong users-count " " (pluralize-noun users-count "user")] "."])])]]))
+      (count-component :users_count "user" authentication-system-data)
+      (count-component :groups_count "group" authentication-system-data)]]))
 
 (defn authentication-system-component []
   [:div.authentication-system-component
@@ -183,20 +184,16 @@
 (defn show-page []
   [:div.authentication-system
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
-     :did-change clean-and-fetch}]
+    {:did-change clean-and-fetch}]
    (admin-breadcrumbs/nav-component
      [(admin-breadcrumbs/leihs-li)
       (admin-breadcrumbs/admin-li)
       (breadcrumbs/authentication-systems-li)
-      (breadcrumbs/authentication-system-li)
-      ]
-     [
-      (breadcrumbs/authentication-system-users-li) 
+      (breadcrumbs/authentication-system-li)]
+     [(breadcrumbs/authentication-system-users-li) 
       (breadcrumbs/authentication-system-groups-li) 
       (breadcrumbs/authentication-system-delete-li) 
-      (breadcrumbs/authentication-system-edit-li)
-      ])
+      (breadcrumbs/authentication-system-edit-li)])
    [:div.row
     [:div.col-lg
      [:h1

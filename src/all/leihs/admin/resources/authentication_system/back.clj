@@ -28,9 +28,13 @@
 (def authentication-system-selects
   [:authentication-systems.*
    [(-> (sql/select :%count.*)
-        (sql/from :authentication-systems_users)
+        (sql/from :authentication_systems_users)
         (sql/merge-where [:= :authentication-systems_users.authentication-system_id :authentication-systems.id]))
-    :users_count]])
+    :users_count]
+   [(-> (sql/select :%count.*)
+        (sql/from :authentication_systems_groups)
+        (sql/merge-where [:= :authentication-systems_groups.authentication-system_id :authentication-systems.id]))
+    :groups_count]])
 
 
 ;;; authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
