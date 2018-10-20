@@ -61,35 +61,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn remove-group [group-id]
-  (let [resp-chan (async/chan)
-        url (path :authentication-systems-group
-                  {:group-id group-id})
-        id (requests/send-off
-             {:url url
-              :method :delete
-              :query-params {}}
-             {:modal true
-              :title "Remove group"}
-             :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 204))
-            (groups/fetch-groups))))))
+	(let [resp-chan (async/chan)
+				url (path :authentication-system-group 
+									{:authentication-system-id @authentication-system/authentication-system-id*
+									 :group-id group-id}{})
+				id (requests/send-off
+						 {:url url
+							:method :delete
+							:query-params {}}
+						 {:modal true
+							:title "Remove group"}
+						 :chan resp-chan)]
+		(go (let [resp (<! resp-chan)]
+					(when (and (= (:status resp) 204))
+						(groups/fetch-groups))))))
 
 (defn action-th-component []
   [:th "Action"])
-
-(defn action-td-component [group]
-  [:td
-   (if (:authentication_system_group_id group)
-     [:span
-      [:button.btn.btn-sm.btn-danger.mx-2
-       {:key :delete
-        :on-click (fn [_] (remove-group (:id group)))}
-       icons/delete " Remove "]]
-     [:span
-      [:button.btn.btn-sm.btn-primary.mx-2
-       {:on-click #(add-group (:id group))}
-       icons/add " Add "]])])
 
 
 ;### filter ###################################################################
