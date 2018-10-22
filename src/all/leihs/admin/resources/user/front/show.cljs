@@ -38,7 +38,7 @@
      [(breadcrumbs/user-delete-li @user-id*)
       (breadcrumbs/user-edit-li @user-id*)
       (breadcrumbs/email-li (:email @user-data*))
-      (breadcrumbs/user-password-li @user-id*)])
+      (breadcrumbs/user-my-li @user-id*)])
    [:div.row
     [:div.col-lg
      [:h1
