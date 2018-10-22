@@ -67,7 +67,8 @@
    (when (->> ["SELECT true AS exists FROM authentication_systems WHERE id = ?" authentication-system-id]
               (jdbc/query tx )
               first :exists)
-     (jdbc/update! tx :authentication_systems (dissoc data :id) ["id = ?" authentication-system-id])
+     (jdbc/update! tx :authentication_systems 
+                   (dissoc data :id :groups_count) ["id = ?" authentication-system-id])
      {:status 204})))
 
 
