@@ -23,32 +23,41 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn groups-query [request]
+
+(defn groups-query 
+  [{{authentication-system-id :authentication-system-id} :route-params 
+    :as request}]
   (let [query (-> request groups/groups-query
                   (sql/merge-left-join :authentication_systems_groups
-                                       [:= :authentication_systems_groups.group_id :groups.id])
+                                       [:and
+                                        [:= :authentication_systems_groups.group_id :groups.id]
+                                        [:= :authentication_systems_groups.authentication_system_id authentication-system-id]])
                   (sql/merge-select [:authentication_systems_groups.group_id :authentication_system_group_id]))]
     (if-not (-> request :query-params-raw filter-value)
       query
       (sql/merge-where query [:<> :authentication_systems_groups.group_id nil]))))
 
-
-(def system-admin-groups-count-query
-  (-> (sql/select :%count.*)
-      (sql/from :authentication_systems_groups)
-      (sql/format)))
-
 (defn groups-formated-query [request]
   (-> (groups-query request)
       sql/format))
 
+(defn authentication-system-groups-count-query 
+  [{{authentication-system-id :authentication-system-id} :route-params 
+    :as request}]
+  (-> (sql/select :%count.*)
+      (sql/from :authentication_systems_groups)
+      (sql/merge-where [:= authentication-system-id
+                        :authentication_systems_groups.authentication_system_id])
+      sql/format))
+
 (defn groups [{tx :tx :as request}]
-    {:body
-     {:system-admin_groups_count (->> system-admin-groups-count-query
-                              (jdbc/query tx)
-                              first :count)
-      :groups (->> (groups-formated-query request)
-                  (jdbc/query tx))}})
+  {:body
+   {:groups_count (->> request 
+                       authentication-system-groups-count-query
+                       (jdbc/query tx)
+                       first :count)
+    :groups (->> (groups-formated-query request)
+                 (jdbc/query tx))}})
 
 
 ;;; update-groups ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -118,8 +127,10 @@
 ;;; remove-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn remove-group [{tx :tx :as request
-                    {group-id :group-id} :route-params}]
-  (if (= 1 (->> ["group_id = ?" group-id]
+                    {group-id :group-id
+                     authentication-system-id :authentication-system-id} :route-params}]
+  (if (= 1 (->> ["group_id = ? AND authentication_system_id = ?" 
+                 group-id authentication-system-id]
                 (jdbc/delete! tx :authentication_systems_groups)
                 first))
     {:status 204}
@@ -151,5 +162,5 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
 ;(debug/debug-ns 'leihs.admin.resources.authentication-system.groups.shared)

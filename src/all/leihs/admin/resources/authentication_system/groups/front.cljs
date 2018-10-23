@@ -35,7 +35,7 @@
 (def authentication-system-groups-count*
   (reaction (-> @groups/data*
                 (get (:url @routing/state*) {})
-                :authentication-system_groups_count)))
+                :groups_count)))
 
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -158,7 +158,7 @@
 	 [:div
 		[:h1
 		 (let [c (or @authentication-system-groups-count* 0)]
-			 [:span c " " (pluralize-noun c "Authentication-System-Group")
+			 [:span c " " (pluralize-noun c "Group")
 				[:span " in Authentication-System "]
 				[authentication-system/name-component]])]
 		[main-page-component]]])
