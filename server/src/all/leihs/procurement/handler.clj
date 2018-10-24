@@ -115,8 +115,7 @@
 (defn init
   [secret]
   (-> dispatch-to-handler
-      ; FIXME:
-      ; anti-csrf/wrap
+      anti-csrf/wrap
       wrap-authorize
       wrap-authenticate
       session/wrap
