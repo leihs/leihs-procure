@@ -33,15 +33,8 @@
     :borrow
     :lending
     :procurement
-    :my-user
+    :me-user
     })
-
-(def my-paths
-  (branch "/my"
-          (branch "/user/"
-                  (param :user-id)
-                  (leaf "" :my-user))))
-
 
 (def delegation-paths
   (branch "/delegations"
@@ -97,7 +90,6 @@
 
 (def paths
   (branch ""
-          my-paths
           leihs.core.paths/core-paths
           (branch "/admin"
                   (leaf "/status" :status)

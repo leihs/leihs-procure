@@ -52,7 +52,7 @@
 (defn user-edit-li [id] (li :user-edit [:span [:i.fas.fa-edit] " Edit "] {:user-id id} {}))
 (defn user-inventory-pools-rooles-li [id] (li :user-inventory-pools-roles [:span " Inventory-Pools-Roles "] {:user-id id} {}))
 (defn user-li [id] (li :user [:span icons/user-in-admin " User "] {:user-id id} {}))
-(defn user-my-li [id] (li :my-user [:span icons/user " User-Home "] {:user-id id} {}))
+(defn user-my-li [id] (li :me-user [:span icons/user " User-Home "] {:user-id id} {}))
 (defn users-li [] (li :users [:span icons/users " Users "] {} {}))
 
 (defn nav-component [left right]
