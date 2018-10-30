@@ -204,8 +204,10 @@
    (when (->> ["SELECT true AS exists FROM users WHERE id = ?" user-id]
               (jdbc/query tx )
               first :exists)
-     (jdbc/update! tx :users data ["id = ?" user-id])
-     {:status 204})))
+     (or (= [1] (jdbc/update! tx :users data ["id = ?" user-id]))
+         (throw (ex-info "Number of updated rows does not equal one." {} )))
+     {:body
+      (first (jdbc/query tx (user-query user-id)))})))
 
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

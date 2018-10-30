@@ -36,7 +36,7 @@
                                :retry-fn #'patch}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
+          (when (= (:status resp) 200)
             (accountant/navigate!
               (path :user {:user-id @user-id*})))))))
 
