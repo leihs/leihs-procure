@@ -33,7 +33,7 @@
     :borrow
     :lending
     :procurement
-    :me-user
+    :my-user
     })
 
 (def delegation-paths
