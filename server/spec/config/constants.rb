@@ -15,7 +15,7 @@ module Constants
 
   LEIHS_PROCURE_HTTP_BASE_URL = \
     ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence ||
-    profiles_data.try(:fetch, :"leihs-http-base-url").presence
+    profiles_data.try(:fetch, :"leihs-procure-http-base-url").presence
 
   raise 'LEIHS_DATABASE_URL not set!' unless LEIHS_DATABASE_URL
   raise 'LEIHS_PROCURE_HTTP_BASE_URL not set!' unless LEIHS_PROCURE_HTTP_BASE_URL

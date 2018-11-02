@@ -428,7 +428,6 @@ describe 'request' do
           cost_center {
             read
             write
-            required
             value
           }
           procurement_account {
@@ -438,6 +437,7 @@ describe 'request' do
           }
           general_ledger_account {
             read
+            write
             value
           }
           internal_order_number {
@@ -598,12 +598,6 @@ describe 'request' do
       GRAPHQL
     end
 
-    let(:user) do
-      requester = FactoryBot.create(:user)
-      FactoryBot.create(:requester_organization, user_id: requester.id)
-      requester
-    end
-
     let(:expected_request_data) do
       bp = BudgetPeriod.find(id: request[:budget_period_id])
       sc = Category.find(id: request[:category_id])
@@ -615,11 +609,6 @@ describe 'request' do
 
       {
         :id=>request.id,
-        :user=>
-         {:read=>true,
-          :write=>false,
-          :required=>true,
-          :value=>user.to_hash.slice(:id, :firstname, :lastname)},
         :category=>
          {:read=>true,
           :write=>true,
@@ -639,8 +628,6 @@ describe 'request' do
         :price_cents=>{:value=>request.price_cents, :read=>true, :write=>true, :required=>true},
         :price_currency=>{:value=>request.price_currency, :read=>true, :write=>false, :required=>true},
         :requested_quantity=>{:value=>request.requested_quantity, :read=>true, :write=>true, :required=>true},
-        :approved_quantity=>{:value=>request.approved_quantity, :read=>false, :write=>false, :required=>false},
-        :order_quantity=>{:value=>request.order_quantity, :read=>false, :write=>false, :required=>false},
         :replacement=>{:value=>request.replacement, :read=>true, :write=>true, :required=>true},
         :priority=>{:read=>true, :write=>true, :required=>true, :value=>request.priority.upcase},
         :state=>"NEW",
@@ -653,23 +640,150 @@ describe 'request' do
           :required=>true,
           :value=>room.to_hash.slice(:id, :name).merge(building: building.to_hash.slice(:id, :name))},
         :motivation=>{:value=>request.motivation, :read=>true, :write=>true, :required=>true},
-        :inspection_comment=>{:value=>nil, :read=>false, :write=>false, :required=>false},
-        :inspector_priority=>{:read=>false, :write=>false, :required=>true, :value=>nil},
-        :accounting_type=>{:value=>nil, :read=>false, :write=>false, :required=>true},
-        :cost_center=>nil,
-        :general_ledger_account=>{:read=>false, :value=>nil},
-        :procurement_account=>{:read=>false, :write=>false, :value=>nil},
-        :internal_order_number=>{:value=>nil, :read=>false, :write=>false, :required=>false},
         :attachments=>{:read=>true, :write=>true, :required=>false, :value=>[]},
         :actionPermissions=>{:delete=>true, :edit=>true, :moveBudgetPeriod=>true, :moveCategory=>true}
       }
     end
 
-    context 'without template' do
+    context 'requester' do
+      let(:user) do
+        requester = FactoryBot.create(:user)
+        FactoryBot.create(:requester_organization, user_id: requester.id)
+        requester
+      end
+
+      let(:expected_user_info) do
+        { :user=>
+          {:read=>true,
+           :write=>false,
+           :required=>true,
+           :value=>user.to_hash.slice(:id, :firstname, :lastname)}
+        }
+      end
+
+      let(:expected_accounting_info) do
+        {
+          :cost_center=>{:read=>false, :value=>nil, :write=>false},
+          :general_ledger_account=>{:read=>false, :value=>nil, :write=>false},
+          :procurement_account=>{:read=>false, :write=>false, :value=>nil}
+        }
+      end
+
+      let(:expected_inspector_info) do
+        {
+          :accounting_type=>{:value=>nil, :read=>false, :write=>false, :required=>true},
+          :approved_quantity=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+          :internal_order_number=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+          :order_quantity=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+          :inspection_comment=>{:value=>nil, :read=>false, :write=>false, :required=>false},
+          :inspector_priority=>{:read=>false, :write=>false, :required=>true, :value=>nil},
+        }
+      end
+
+      let(:expected_request_data_complete) do
+        expected_request_data
+          .merge(template: { value: nil })
+          .merge(expected_accounting_info)
+          .merge(expected_user_info)
+          .merge(expected_inspector_info)
+      end
+
+      context 'without template' do
+        let(:request) do
+          FactoryBot.create(:request, {
+            user_id: user.id
+          })
+        end
+
+        example 'form data' do
+          variables = { id: [request.id]}
+          result = query(q, user.id, variables).deep_symbolize_keys
+
+          expect(result[:data][:requests].length).to be 1
+          expect(result[:data][:requests].first)
+            .to eq(expected_request_data_complete)
+        end
+      end
+
+      context 'with template' do
+        let(:template) do
+          FactoryBot.create(:template)
+        end
+
+        let(:request) do
+          FactoryBot.create(:request, {
+            user_id: user.id,
+            template_id: template.id
+          })
+        end
+
+        example 'form data' do
+          variables = { id: [request.id] }
+          result = query(q, user.id, variables).deep_symbolize_keys
+
+          expected_data = expected_request_data_complete.merge(
+            article_name: { read: true, write: false, required: true, value: template.article_name },
+            article_number: { read: true, write: false, required: false, value: template.article_number },
+            model: { read: true, write: false, required: false, value: Model.find(id: template.model_id) },
+            price_cents: { read: true, write: false, required: true, value: template.price_cents },
+            supplier: { read: true, write: false, required: false, value: Supplier.find(id: template.supplier_id) },
+            supplier_name: { read: true, write: false, required: false, value: template.supplier_name },
+            template: { value: { id: template.id, article_name: template.article_name } }
+          )
+
+          expect(result[:data][:requests].length).to be 1
+          expect(result[:data][:requests].first).to eq(expected_data)
+        end
+      end
+    end
+
+    context 'without template & inspector' do
+      let(:category) do
+        FactoryBot.create(:category)
+      end
+
+      let(:user) do
+        requester = FactoryBot.create(:user)
+        FactoryBot.create(:requester_organization, user_id: requester.id)
+        FactoryBot.create(:category_inspector,
+                          category_id: category.id,
+                          user_id: requester.id)
+        requester
+      end
+
       let(:request) do
         FactoryBot.create(:request, {
-          user_id: user.id
+          user_id: user.id,
+          category_id: category.id
         })
+      end
+
+      let(:expected_accounting_info) do
+        {
+          :cost_center=>{:read=>true, :value=>category.cost_center, :write=>false},
+          :general_ledger_account=>{:read=>true, :value=>category.general_ledger_account, :write=>false},
+          :procurement_account=>{:read=>true, :write=>false, :value=>category.procurement_account}
+        }
+      end
+
+      let(:expected_user_info) do
+        { :user=>
+          {:read=>true,
+           :write=>true,
+           :required=>true,
+           :value=>user.to_hash.slice(:id, :firstname, :lastname)}
+        }
+      end
+
+      let(:expected_inspector_info) do
+        {
+          :accounting_type=>{:value=>request.accounting_type, :read=>true, :write=>true, :required=>true},
+          :approved_quantity=>{:value=>request.approved_quantity, :read=>true, :write=>true, :required=>false},
+          :internal_order_number=>{:value=>request.internal_order_number, :read=>true, :write=>true, :required=>false},
+          :order_quantity=>{:value=>request.order_quantity, :read=>true, :write=>true, :required=>false},
+          :inspection_comment=>{:value=>request.inspection_comment, :read=>true, :write=>true, :required=>false},
+          :inspector_priority=>{:read=>true, :write=>true, :required=>true, :value=>request.inspector_priority.upcase},
+        }
       end
 
       example 'form data' do
@@ -679,41 +793,16 @@ describe 'request' do
         expect(result[:data][:requests].length).to be 1
         expect(result[:data][:requests].first)
           .to eq(
-            expected_request_data.merge(template: { value: nil })
+            expected_request_data
+            .merge(template: { value: nil })
+            .merge(expected_accounting_info)
+            .merge(expected_user_info)
+            .merge(expected_inspector_info)
           )
       end
 
     end
 
-    context 'with template' do
-      let(:template) do
-        FactoryBot.create(:template)
-      end
-      let(:request) do
 
-        FactoryBot.create(:request, {
-          user_id: user.id,
-          template_id: template.id
-        })
-      end
-
-      example 'form data' do
-        variables = { id: [request.id] }
-        result = query(q, user.id, variables).deep_symbolize_keys
-
-        expected_data = expected_request_data.merge(
-          article_name: { read: true, write: false, required: true, value: template.article_name },
-          article_number: { read: true, write: false, required: false, value: template.article_number },
-          model: { read: true, write: false, required: false, value: Model.find(id: template.model_id) },
-          price_cents: { read: true, write: false, required: true, value: template.price_cents },
-          supplier: { read: true, write: false, required: false, value: Supplier.find(id: template.supplier_id) },
-          supplier_name: { read: true, write: false, required: false, value: template.supplier_name },
-          template: { value: { id: template.id, article_name: template.article_name } }
-        )
-
-        expect(result[:data][:requests].length).to be 1
-        expect(result[:data][:requests].first).to eq(expected_data)
-      end
-    end
   end
 end

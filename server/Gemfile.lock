@@ -182,10 +182,10 @@ DEPENDENCIES
   pg
   pg_tasks!
   pry
-  rails (~> 5.0.0)
+  rails
   rspec
   sequel (~> 4.42, >= 4.42.1)
   uuidtools
 
 BUNDLED WITH
-   1.16.0
+   1.17.1

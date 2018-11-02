@@ -190,8 +190,8 @@
   [row]
   (->> row
        :category
-       :cost-center
-       (assoc row :cost-center)))
+       :cost_center
+       (assoc row :cost_center)))
 
 (defn add-procurement-account
   [row]
