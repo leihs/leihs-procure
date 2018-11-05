@@ -10,6 +10,7 @@
     [leihs.core.requests.modal]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
+    [leihs.core.env :refer [use-remote-navbar?]]
 
     [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
     [leihs.admin.front.state :as state]
@@ -93,7 +94,7 @@
 (defn current-page []
   [:div
    [leihs.core.requests.modal/modal-component]
-   [nav-bar]
+   (if-not (use-remote-navbar?) [nav-bar])
    [:div
     (if-let [page (:page @routing/state*)]
       [page]
