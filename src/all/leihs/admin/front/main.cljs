@@ -8,6 +8,7 @@
     [leihs.admin.routes :as routes]
     [leihs.admin.paths :as paths]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.user.front :refer [load-user-data-from-dom]]
 
     [clojure.string :as str]
     [clojure.pprint :refer [pprint]]
@@ -17,5 +18,6 @@
     ))
 
 (defn init! []
+  (load-user-data-from-dom)
   (routes/init)
   (html/mount))
