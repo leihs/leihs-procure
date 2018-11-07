@@ -108,9 +108,9 @@
     "accounting_type_label_investment": "Investition",
     "accounting_type_label_aquisition": "Beschaffung",
     "cost_center": "Kostenstelle",
-    "general_ledger_account": "Sachkonto",
+    "general_ledger_account": "Sachkonto II (IR)",
     "internal_order_number": "Innenauftrag",
-    "procurement_account": "Beschaffungskonto",
+    "procurement_account": "Sachkonto I (ER)",
 
     "id": "ID",
     "model": "Model",
@@ -169,9 +169,8 @@
       "user_list_empty": "(Keine)",
       "subcategories": {
         "cost_center": "Kostenstelle",
-        "general_ledger_account": "Sachkonto Ⅰ",
-        "?___procurement_account___?": "Sachkonto Ⅱ",
-        "procurement_account": "Beschaffungskonto"
+        "general_ledger_account": "Sachkonto ⅠI (IR)",
+        "procurement_account": "Sachkonto I (ER)"
       }
     }
   },
