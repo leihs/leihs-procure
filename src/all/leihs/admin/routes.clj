@@ -16,7 +16,7 @@
 
    [leihs.admin.auth.back :as admin-auth]
    [leihs.admin.back.html :as html]
-   [leihs.admin.env :refer [env]]
+   [leihs.admin.env :as env]
    [leihs.admin.paths :refer [path paths]]
    [leihs.admin.resources.authentication-system.back :as authentication-system]
    [leihs.admin.resources.authentication-system.groups.back :as authentication-system-groups]
@@ -60,10 +60,8 @@
     :initial-admin})
 
 (def do-not-dispatch-to-std-frontend-handler-keys
-  (cond-> #{:redirect-to-root
-            :not-found}
-    (= env :prod)
-    (conj :home)))
+  #{:redirect-to-root
+    :not-found})
 
 (def handler-resolve-table
   {:password-authentication admin-auth/routes
@@ -255,7 +253,7 @@
                                      "/admin/js/app.js"]
                   :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
-                  :enabled? (= env :prod)})
+                  :enabled? (= env/env :prod)})
       shutdown/wrap
       ring-exception/wrap))
 
