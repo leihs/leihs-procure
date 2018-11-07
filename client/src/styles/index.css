@@ -1,4 +1,4 @@
-@import '~bootstrap/dist/css/bootstrap.css';
+@import './bootstrap-leihs.css';
 @import './graphiql-fixes.css';
 
 @import '~tachyons-type-scale';

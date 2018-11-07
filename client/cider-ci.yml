@@ -6,6 +6,9 @@ jobs:
     task_defaults: &TASK_DEFAULTS
       environment_variables:
         CI: 'true'
+      git_options:
+        submodules:
+          include_match: ^.*$
       traits:
         g2016: true
     task:
