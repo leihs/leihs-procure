@@ -5,6 +5,7 @@
     [leihs.core.paths]
     [leihs.core.url.query-params :as query-params]
 
+    [leihs.admin.env :refer [env]]
     [leihs.admin.resources.system-admins.paths :as system-admins]
     [leihs.admin.resources.authentication-systems.paths :as authentication-systems]
 
@@ -20,21 +21,22 @@
           ])))
 
 (def external-handlers
-  #{:admin-audits-legacy
-    :admin-buildings
-    :admin-fields
-    :admin-inventory-pools
-    :admin-languages
-    :admin-mail-templates
-    :admin-rooms
-    :admin-settings
-    :admin-statistics
-    :admin-suppliers
-    :borrow
-    :lending
-    :procurement
-    :my-user
-    })
+  (cond-> #{:admin-audits-legacy
+            :admin-buildings
+            :admin-fields
+            :admin-inventory-pools
+            :admin-languages
+            :admin-mail-templates
+            :admin-rooms
+            :admin-settings
+            :admin-statistics
+            :admin-suppliers
+            :borrow
+            :lending
+            :procurement
+            :my-user}
+    (= env :prod)
+    (conj :home)))
 
 (def delegation-paths
   (branch "/delegations"
