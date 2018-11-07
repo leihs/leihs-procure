@@ -62,7 +62,7 @@
   [:nav.navbar.navbar-expand.justify-content-between
    {:class (if (= (-> @routing/state* :handler-key) :home)
              "navbar-light bg-light" "navbar-dark bg-admin")}
-   [:a.navbar-brand {:href (path :home)} "leihs"]
+   [:a.navbar-brand {:href (path :home), :data-trigger true} "leihs"]
    [:div
     (when @core-user/state*
       [:ul.navbar-nav
