@@ -1,5 +1,7 @@
 (ns leihs.procurement.resources.current-user
-  (:require [leihs.procurement.resources [saved-filters :as saved-filters]
+  (:require [leihs.core.remote-navbar.shared :refer [navbar-props]]
+            [leihs.core.json :refer [to-json]]
+            [leihs.procurement.resources [saved-filters :as saved-filters]
              [user :as user]]))
 
 (defn get-current-user
@@ -10,7 +12,11 @@
                     :user_id)
         user (user/get-user-by-id tx user-id)
         saved-filters (saved-filters/get-saved-filters-by-user-id tx user-id)]
-    {:user user, :saved_filters (:filter saved-filters)}))
+    {:user user,
+     :saved_filters (:filter saved-filters),
+     :navbarProps (-> request
+                      navbar-props
+                      to-json)}))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
