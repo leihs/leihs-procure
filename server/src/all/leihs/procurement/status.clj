@@ -4,7 +4,7 @@
             [clojure.tools.logging :as logging]
             [compojure.core :as cpj]
             [hiccup.page :refer [html5]]
-            [leihs.core.paths :refer [path]]
+            [leihs.procurement.paths :refer [path]]
             [leihs.procurement.utils.ds :as ds])
   (:import com.codahale.metrics.health.HealthCheckRegistry
            humanize.Humanize))

@@ -9,7 +9,7 @@
              [status :as status]]
             [leihs.core.anti-csrf.back :as anti-csrf]
             [leihs.core.sign-out.back :as sign-out]
-            [leihs.core.paths :refer [path core-paths]]
+            [leihs.procurement.paths :refer [path paths]]
             [leihs.procurement.auth.session :as session]
             [leihs.procurement.backend.html :as html]
             [leihs.procurement.resources [attachment :as attachment]
@@ -60,7 +60,7 @@
     (if (-> matched-pair
             :handler
             (= :not-found))
-      (bidi/match-pair core-paths {:remainder path, :route core-paths})
+      (bidi/match-pair paths {:remainder path, :route paths})
       matched-pair)))
 
 (defn wrap-resolve-handler

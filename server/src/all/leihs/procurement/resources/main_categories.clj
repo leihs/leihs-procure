@@ -2,7 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia.resolve :as resolve]
-            [leihs.core.paths :refer [path]]
+            [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [budget-limits :as budget-limits]
              [categories :as categories] [image :as image]
              [main-category :as main-category]]

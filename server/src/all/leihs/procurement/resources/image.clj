@@ -3,7 +3,7 @@
              {generate-string to-json}]
             [clojure.java.jdbc :as jdbc]
             [compojure.core :as cpj]
-            [leihs.core.paths :refer [path]]
+            [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
             [leihs.procurement.utils.sql :as sql])
   (:import java.util.Base64))
