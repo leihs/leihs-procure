@@ -31,6 +31,7 @@
     :admin-statistics
     :admin-suppliers
     :borrow
+    :home
     :lending
     :procurement
     :my-user
