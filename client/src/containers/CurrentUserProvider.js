@@ -9,6 +9,7 @@ import { ErrorPanel } from '../components/Error'
 export const CURRENT_USER_QUERY = gql`
   query me {
     current_user {
+      navbarProps
       user {
         id
         firstname

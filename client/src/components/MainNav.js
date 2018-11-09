@@ -3,12 +3,7 @@ import f from 'lodash'
 import cx from 'classnames'
 
 import {
-  Badge,
-  Collapse,
-  Navbar,
-  NavbarToggler,
   NavbarBrand,
-  Nav,
   NavItemLink,
   NavItemAnchor,
   UncontrolledDropdown,
@@ -19,8 +14,10 @@ import {
   Routed
 } from './Bootstrap'
 
+import { Components as LeihsUI } from '../leihs-ui/dist/leihs-ui-client-side'
+
 import Icon from './Icons'
-import { DisplayName } from './decorators'
+// import { DisplayName } from './decorators'
 
 const TITLE = 'Bedarfsermittlung'
 
@@ -41,179 +38,99 @@ export default class MainNav extends React.Component {
     })
   }
   render({ props: { me, contactUrl, isDev }, state } = this) {
+    const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
+
+    const brand = (
+      <NavbarBrand exact to="/">
+        <Brand />
+      </NavbarBrand>
+    )
+
+    const innerMenu = (
+      <F>
+        <NavItemLink exact to="/requests">
+          <Icon.Requests fixedWidth spaced /> Anträge
+        </NavItemLink>
+
+        {me.roles.isAdmin && (
+          <UncontrolledDropdown nav inNavbar>
+            <Routed path="/admin">
+              {({ isActive }) => (
+                <DropdownToggle nav caret className={cx({ active: isActive })}>
+                  <Icon.Settings /> Admin
+                </DropdownToggle>
+              )}
+            </Routed>
+
+            <DropdownMenu right>
+              <DropdownItemLink className="pl-3" to="/admin/budget-periods">
+                <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+              </DropdownItemLink>
+
+              <DropdownItemLink className="pl-3" to="/admin/categories">
+                <Icon.Categories fixedWidth spaced /> Kategorien
+              </DropdownItemLink>
+
+              <DropdownItemLink className="pl-3" to="/admin/users">
+                <Icon.Users fixedWidth spaced /> Benutzer
+              </DropdownItemLink>
+
+              <DropdownItemLink className="pl-3" to="/admin/organizations">
+                <Icon.Organizations fixedWidth spaced /> Organisationen
+              </DropdownItemLink>
+
+              <DropdownItem divider />
+
+              <DropdownItemLink className="pl-3" to="/admin/settings">
+                <Icon.Settings fixedWidth spaced /> Einstellungen
+              </DropdownItemLink>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+        )}
+
+        {me.roles.isInspector && (
+          <NavItemLink exact to="/templates/edit">
+            <Icon.Templates fixedWidth spaced /> Vorlagen
+          </NavItemLink>
+        )}
+
+        {!!contactUrl && (
+          <NavItemAnchor href={contactUrl} target="_blank">
+            <Icon.Contact fixedWidth spaced /> Kontakt
+          </NavItemAnchor>
+        )}
+
+        {!!isDev && (
+          <UncontrolledDropdown nav inNavbar>
+            <Routed path="/dev">
+              {({ isActive }) => (
+                <DropdownToggle nav caret className={cx({ active: isActive })}>
+                  <samp>
+                    <i>dev</i>
+                  </samp>
+                </DropdownToggle>
+              )}
+            </Routed>
+            <DropdownMenu right>
+              <DropdownItemLink to="/dev/playground">
+                UI Catalog
+              </DropdownItemLink>
+              <DropdownItemLink to="/dev/console">API Console</DropdownItemLink>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+        )}
+      </F>
+    )
+
     return (
-      <div>
-        <Navbar dark color="dark" expand="lg">
-          <NavbarBrand exact to="/">
-            <Brand />
-          </NavbarBrand>
-
-          <NavbarToggler onClick={e => this.toggleOpen()} />
-
-          <Collapse isOpen={state.isOpen} navbar>
-            <Nav className="mr-auto" navbar>
-              <NavItemLink exact to="/requests">
-                <Icon.Requests fixedWidth spaced /> Anträge
-              </NavItemLink>
-
-              {me.roles.isAdmin && (
-                <UncontrolledDropdown nav inNavbar>
-                  <Routed path="/admin">
-                    {({ isActive }) => (
-                      <DropdownToggle
-                        nav
-                        caret
-                        className={cx({ active: isActive })}
-                      >
-                        <Icon.Settings /> Admin
-                      </DropdownToggle>
-                    )}
-                  </Routed>
-
-                  <DropdownMenu right>
-                    <DropdownItemLink
-                      className="pl-3"
-                      to="/admin/budget-periods"
-                    >
-                      <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
-                    </DropdownItemLink>
-
-                    <DropdownItemLink className="pl-3" to="/admin/categories">
-                      <Icon.Categories fixedWidth spaced /> Kategorien
-                    </DropdownItemLink>
-
-                    <DropdownItemLink className="pl-3" to="/admin/users">
-                      <Icon.Users fixedWidth spaced /> Benutzer
-                    </DropdownItemLink>
-
-                    <DropdownItemLink
-                      className="pl-3"
-                      to="/admin/organizations"
-                    >
-                      <Icon.Organizations fixedWidth spaced /> Organisationen
-                    </DropdownItemLink>
-
-                    <DropdownItem divider />
-
-                    <DropdownItemLink className="pl-3" to="/admin/settings">
-                      <Icon.Settings fixedWidth spaced /> Einstellungen
-                    </DropdownItemLink>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              )}
-
-              {me.roles.isInspector && (
-                <NavItemLink exact to="/templates/edit">
-                  <Icon.Templates fixedWidth spaced /> Vorlagen
-                </NavItemLink>
-              )}
-
-              {!!contactUrl && (
-                <NavItemAnchor href={contactUrl} target="_blank">
-                  <Icon.Contact fixedWidth spaced /> Kontakt
-                </NavItemAnchor>
-              )}
-
-              {!!isDev && (
-                <UncontrolledDropdown nav inNavbar>
-                  <Routed path="/dev">
-                    {({ isActive }) => (
-                      <DropdownToggle
-                        nav
-                        caret
-                        className={cx({ active: isActive })}
-                      >
-                        <samp>
-                          <i>dev</i>
-                        </samp>
-                      </DropdownToggle>
-                    )}
-                  </Routed>
-                  <DropdownMenu right>
-                    <DropdownItemLink to="/dev/playground">
-                      UI Catalog
-                    </DropdownItemLink>
-                    <DropdownItemLink to="/dev/console">
-                      API Console
-                    </DropdownItemLink>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              )}
-            </Nav>
-
-            <Nav className="ml-auto" navbar>
-              <UncontrolledDropdown nav inNavbar>
-                <DropdownToggle nav caret>
-                  <Icon.LeihsProcurement />
-                </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem>
-                    <Icon.LeihsBorrow /> Ausleihen
-                  </DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem>
-                    <Icon.LeihsAdmin /> Admin
-                  </DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItemLink to="/">
-                    <Icon.LeihsProcurement /> Bedarfsermittlung
-                  </DropdownItemLink>
-                  <DropdownItem divider />
-                  <DropdownItem>
-                    <Icon.LeihsManage /> Manage
-                  </DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-
-              <UncontrolledDropdown nav inNavbar>
-                <DropdownToggle nav caret>
-                  <Icon.User size="lg" /> {DisplayName(me.user, { abbr: true })}
-                </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem tag="span">
-                    <form action="/sign-out" method="POST">
-                      <button type="submit">Ausloggen</button>
-                    </form>
-                  </DropdownItem>
-                  <DropdownItem>{tmpUserInfo(me.user)}</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-
-              <UncontrolledDropdown nav inNavbar>
-                <DropdownToggle nav caret>
-                  <Icon.Language />
-                </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem>[TODO]</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-            </Nav>
-          </Collapse>
-        </Navbar>
-      </div>
+      <LeihsUI.Navbar
+        {...sharedNavbarProps}
+        bgColor={'#343a40'} // bootstrap bg-dark
+        brand={brand}
+        tag="div"
+      >
+        {innerMenu}
+      </LeihsUI.Navbar>
     )
   }
 }
-
-const tmpUserInfo = me => (
-  <F>
-    {[
-      'isAdmin',
-      'isRequester',
-      'isInspectorForCategories',
-      'isViewerForCategories'
-    ]
-      .map(k => [k, me.permissions[k]])
-      .filter(([k, i]) => i && f.present(i))
-      .map(([k, i]) => (
-        <F key={k}>
-          <Badge dark>
-            {k.replace(/ForCategories$/, ` (${i.length} categories)`)}
-          </Badge>{' '}
-        </F>
-      ))}
-    <pre>
-      <small>{JSON.stringify(f.omit(me, 'permissions'), 0, 2)}</small>
-    </pre>
-  </F>
-)
