@@ -563,11 +563,7 @@ class RequestForm extends React.Component {
                                     </Col>
 
                                     <Col sm>
-                                      <FormField
-                                        horizontal={compactView}
-                                        {...pAccount}
-                                        readOnly
-                                      />
+                                      <FormField {...pAccount} readOnly />
                                     </Col>
                                   </Row>
                                 )
