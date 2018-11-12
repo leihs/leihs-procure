@@ -62,7 +62,7 @@ const AdminOrgsPage = () => (
 
       return (
         <MainWithSidebar>
-          <h1 className="h2">Organisations of the requesters</h1>
+          <h1 className="h2">Organisationen der Antragsteller</h1>
           <ul className="list-unstyled mt-2">
             {departmentsOrgs.map(dep => (
               <li key={dep.id}>

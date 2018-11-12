@@ -195,7 +195,7 @@
     "msg_unauthorized_1": "Sind sind nicht berechtigt diese Anwendung zu nutzen!",
     "msg_unauthorized_2a": "Versuchen sie sich auf der ",
     "msg_unauthorized_2b": "Startseite",
-    "msg_unauthorized_2c": " einzuloggen.",
+    "msg_unauthorized_2c": " anzumelden.",
     "msg_error_ofcode_1": "Entschuldigung, es ist ein Fehler vom Typ ",
     "msg_error_ofcode_2": " aufgetreten."
   },
