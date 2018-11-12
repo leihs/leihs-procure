@@ -176,7 +176,7 @@
   (when (:org_id @authentication-system-data*)
     [:div.alert.alert-warning
      [:p "The property " [:code "org_id"]
-      " is conventionally reserved for authentication-systems maintained by an automatized import or sync via the API. "
+      " is conventionally reserved for authentication-systems maintained by an automated import or sync via the API. "
       " If this instance of leihs is using such a mechanism it will likely " [:b "override any changes submitted here." ]]]))
 
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
