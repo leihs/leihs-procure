@@ -38,9 +38,10 @@ class App extends Component {
                 notifyOnNetworkStatusChange
               >
                 {({ error, loading, data, refetch, networkStatus }) => {
+                  const currentUser = f.get(data, 'current_user')
                   // refetch *in background* for every navigation,
                   // don't flicker UI by only using `loading`!
-                  const isLoading = !(data && data.current_user) && loading
+                  const isLoading = !currentUser && loading
 
                   if (isLoading) return <Loading />
 
@@ -58,8 +59,8 @@ class App extends Component {
                     <F>
                       <MainNavWithRouter
                         isDev={isDev}
-                        me={UserWithShortcuts(data.current_user)}
-                        contactUrl={data.settings.contact_url}
+                        me={UserWithShortcuts(currentUser)}
+                        contactUrl={f.get(data, 'settings.contact_url')}
                       />
                       <div className="minh-100vh">
                         <FlashAlert

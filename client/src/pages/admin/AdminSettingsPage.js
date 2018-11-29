@@ -88,10 +88,10 @@ class AdminSettingsPage extends React.Component {
                   if (error) return <ErrorPanel error={error} data={data} />
 
                   const settings = {
-                    contact_url: data.settings.contact_url,
-                    inspection_comments: data.settings.inspection_comments.join(
-                      '\n\n'
-                    )
+                    contact_url: f.get(data, 'settings.contact_url'),
+                    inspection_comments: f
+                      .get(data, 'settings.inspection_comments')
+                      .join('\n\n')
                   }
 
                   return (
