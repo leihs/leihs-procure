@@ -3,7 +3,7 @@
   (:require
     [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.password-authentication.back :as password-authentication]
+    [leihs.admin.password-authentication.back :as password-authentication]
     [leihs.core.auth.core :as auth]
     [leihs.core.sql :as sql]
 
