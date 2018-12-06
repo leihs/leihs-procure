@@ -21,10 +21,10 @@
   },
   "proxy": {
     "/(graphql|graphiql|images|attachments|status|upload|sign-out|sign-in)": {
-      "target": "http://localhost:3003"
+      "target": "http://localhost:3230"
     },
     "/procure/(graphql|graphiql|images|attachments|status|upload|sign-out|sign-in)": {
-      "target": "http://localhost:3003"
+      "target": "http://localhost:3230"
     }
   },
   "jest": {

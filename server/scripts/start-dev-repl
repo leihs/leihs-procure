@@ -1,8 +1,8 @@
 #!/bin/sh
 
 export LEIHS_SECRET="secret"
-export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3003"
-export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_procure2_test?max-pool-size=5"
+export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3230"
+export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_prod?max-pool-size=5"
 
 # cd database
 # RAILS_ENV=test bundle exec rake db:environment:set || true # fuck that

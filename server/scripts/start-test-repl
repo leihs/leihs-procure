@@ -1,9 +1,9 @@
 #!/bin/sh -eu
 # source ./scripts/.helpers.sh
 
-export DATABASE_URL="postgresql://localhost:5432/leihs_procure2_test?max-pool-size=5"
+export DATABASE_URL="postgresql://localhost:5432/leihs_test?max-pool-size=5"
 export LEIHS_DATABASE_URL="jdbc:${DATABASE_URL}"
-export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3004"
+export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3230"
 export LEIHS_SECRET=secret
 
 lein with-profile test repl
