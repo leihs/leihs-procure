@@ -133,7 +133,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
     <Col sm="2" className="align-self-center text-right">
       <Tooltipped text={t('request_form_field.price_total')}>
         <span className="mr-2 f6" id={`totalam_tt_${request.id}`}>
-          <samp>{formatCurrency(RequestTotalAmount(request))} </samp>
+          <samp>{formatCurrency(request.total_price_cents)} </samp>
           <Icon.ShoppingCart />
         </span>
       </Tooltipped>

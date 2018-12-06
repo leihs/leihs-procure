@@ -74,6 +74,7 @@ export const RequestFieldsForIndex = gql`
     price_cents {
       value
     }
+    total_price_cents 
     price_currency {
       value
     }
