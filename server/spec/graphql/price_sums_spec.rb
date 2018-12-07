@@ -25,7 +25,7 @@ describe 'price sums' do
                                           category_id: category_1_A.id,
                                           budget_period_id: budget_period_I.id,
                                           user_id: user.id,
-                                          price_cents: 100,
+                                          price_cents: 101,
                                           requested_quantity: 1,
                                           approved_quantity: 0)
 
@@ -37,7 +37,7 @@ describe 'price sums' do
                                           category_id: category_1_B.id,
                                           budget_period_id: budget_period_I.id,
                                           user_id: user.id,
-                                          price_cents: 100,
+                                          price_cents: 103,
                                           requested_quantity: 1,
                                           approved_quantity: 1,
                                           order_quantity: 0)
@@ -46,7 +46,7 @@ describe 'price sums' do
                                            category_id: category_1_B.id,
                                            budget_period_id: budget_period_I.id,
                                            user_id: user.id,
-                                           price_cents: 100,
+                                           price_cents: 107,
                                            requested_quantity: 2,
                                            approved_quantity: 1,
                                            order_quantity: 0)
@@ -59,7 +59,7 @@ describe 'price sums' do
                                           category_id: category_1_C.id,
                                           budget_period_id: budget_period_I.id,
                                           user_id: user.id,
-                                          price_cents: 100,
+                                          price_cents: 109,
                                           requested_quantity: 1)
 
     # ----------------------------------------------------------------------
@@ -75,7 +75,7 @@ describe 'price sums' do
                                           category_id: category_2_A.id,
                                         budget_period_id: budget_period_I.id,
                                         user_id: user.id,
-                                        price_cents: 100,
+                                        price_cents: 113,
                                         requested_quantity: 1,
                                         approved_quantity: 1,
                                         order_quantity: 1)
@@ -89,7 +89,7 @@ describe 'price sums' do
                                           budget_period_id: budget_period_I.id,
                                           user_id: user.id,
                                           priority: 'high',
-                                          price_cents: 100,
+                                          price_cents: 127,
                                           requested_quantity: 1)
 
       category_2_C = FactoryBot.create(:category,
@@ -99,7 +99,7 @@ describe 'price sums' do
         request_I_2_C = FactoryBot.create(:request,
                                         category_id: category_2_C.id,
                                         budget_period_id: budget_period_I.id,
-                                        price_cents: 100,
+                                        price_cents: 131,
                                         requested_quantity: 1)
 
       category_2_D = FactoryBot.create(:category,
@@ -111,7 +111,7 @@ describe 'price sums' do
                                           category_id: category_2_D.id,
                                           budget_period_id: budget_period_I.id,
                                           user_id: user.id,
-                                          price_cents: 100,
+                                          price_cents: 137,
                                           requested_quantity: 1)
 
     # =============================================================================
@@ -124,7 +124,7 @@ describe 'price sums' do
                                        category_id: category_1_A.id,
                                        budget_period_id: budget_period_II.id,
                                        user_id: user.id,
-                                       price_cents: 100,
+                                       price_cents: 139,
                                        requested_quantity: 1)
 
     query = <<-GRAPHQL
@@ -164,26 +164,26 @@ describe 'price sums' do
         dashboard: {
           budget_periods: [
             { id: budget_period_I.id,
-              total_price_cents: '600',
+              total_price_cents: '640',
               main_categories: [
                 { id: main_category_1.id,
-                  total_price_cents: '500',
+                  total_price_cents: '527',
                   categories: [
                     { id: category_1_A.id,
-                      total_price_cents: '100',
+                      total_price_cents: '101',
                       requests: [
                         { id: request_I_1_A.id }
                       ]
                     },
                     { id: category_1_B.id,
-                      total_price_cents: '300',
+                      total_price_cents: '317',
                       requests: [
                         { id: request_I_1_B.id },
                         { id: request_II_1_B.id }
                       ]
                     },
                     { id: category_1_C.id,
-                      total_price_cents: '100',
+                      total_price_cents: '109',
                       requests: [
                         { id: request_I_1_C.id }
                       ]
@@ -191,10 +191,10 @@ describe 'price sums' do
                   ]
                 },
                 { id: main_category_2.id,
-                  total_price_cents: '100',
+                  total_price_cents: '113',
                   categories: [
                     { id: category_2_A.id,
-                      total_price_cents: '100',
+                      total_price_cents: '113',
                       requests: [
                         { id: request_I_2_A.id }
                       ]
