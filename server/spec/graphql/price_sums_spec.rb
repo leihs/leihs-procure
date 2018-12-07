@@ -2,9 +2,26 @@ require 'spec_helper'
 require_relative 'graphql_helper'
 
 describe 'price sums' do
-  let :user do
+  def first_category!
+    @main_category_1 = FactoryBot.create(:main_category,
+                                         name: 'main_category_1')
+
+    @category_1_A = FactoryBot.create(:category,
+                                      main_category_id: @main_category_1.id,
+                                      name: 'category_1_A')
+  end
+
+  def requester
     user = FactoryBot.create(:user)
     FactoryBot.create(:requester_organization, user_id: user.id)
+    user
+  end
+
+  def inspector
+    user = FactoryBot.create(:user)
+    FactoryBot.create(:category_inspector,
+                      category_id: @category_1_A.id,
+                      user_id: user.id)
     user
   end
 
@@ -55,18 +72,13 @@ describe 'price sums' do
 
   def data!
     # ----------------------------------------------------------------------
+    # first main category and category assumed already to be created
 
-    @main_category_1 = FactoryBot.create(:main_category,
-                                         name: 'main_category_1')
-
-      @category_1_A = FactoryBot.create(:category,
-                                        main_category_id: @main_category_1.id,
-                                        name: 'category_1_A')
         # DENIED
         @request_I_1_A = FactoryBot.create(:request,
                                            category_id: @category_1_A.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            price_cents: 101,
                                            requested_quantity: 1,
                                            approved_quantity: 0)
@@ -79,7 +91,7 @@ describe 'price sums' do
                                            article_name: 'Anaphoric Macro',
                                            category_id: @category_1_B.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            price_cents: 103,
                                            requested_quantity: 1,
                                            approved_quantity: 1,
@@ -89,7 +101,7 @@ describe 'price sums' do
                                             article_name: 'Pandoric Macro',
                                             category_id: @category_1_B.id,
                                             budget_period_id: @budget_period_I.id,
-                                            user_id: user.id,
+                                            user_id: @user.id,
                                             price_cents: 107,
                                             requested_quantity: 2,
                                             approved_quantity: 1,
@@ -102,7 +114,7 @@ describe 'price sums' do
         @request_I_1_C = FactoryBot.create(:request,
                                            category_id: @category_1_C.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            price_cents: 109,
                                            requested_quantity: 1)
 
@@ -118,7 +130,7 @@ describe 'price sums' do
         @request_I_2_A = FactoryBot.create(:request,
                                            category_id: @category_2_A.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            price_cents: 113,
                                            requested_quantity: 1,
                                            approved_quantity: 1,
@@ -131,7 +143,7 @@ describe 'price sums' do
         @request_I_2_B = FactoryBot.create(:request,
                                            category_id: @category_2_B.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            priority: 'high',
                                            price_cents: 127,
                                            requested_quantity: 1)
@@ -139,12 +151,6 @@ describe 'price sums' do
       @category_2_C = FactoryBot.create(:category,
                                         main_category_id: @main_category_2.id,
                                         name: 'category_2_C')
-        # not visible for the user
-        @request_I_2_C = FactoryBot.create(:request,
-                                           category_id: @category_2_C.id,
-                                           budget_period_id: @budget_period_I.id,
-                                           price_cents: 131,
-                                           requested_quantity: 1)
 
       @category_2_D = FactoryBot.create(:category,
                                         main_category_id: @main_category_2.id,
@@ -154,7 +160,7 @@ describe 'price sums' do
         @request_I_2_D = FactoryBot.create(:request,
                                            category_id: @category_2_D.id,
                                            budget_period_id: @budget_period_I.id,
-                                           user_id: user.id,
+                                           user_id: @user.id,
                                            price_cents: 137,
                                            requested_quantity: 1)
 
@@ -167,7 +173,7 @@ describe 'price sums' do
     @request_II_1_A = FactoryBot.create(:request,
                                         category_id: @category_1_A.id,
                                         budget_period_id: @budget_period_II.id,
-                                        user_id: user.id,
+                                        user_id: @user.id,
                                         price_cents: 139,
                                         requested_quantity: 1)
   end
@@ -233,6 +239,10 @@ describe 'price sums' do
         }
       }
     }
+  end
+
+  before :example do
+    first_category!
   end
 
   context 'requester' do
@@ -304,8 +314,9 @@ describe 'price sums' do
         @budget_period_I = FactoryBot.create(:budget_period,
                                              :requesting_phase,
                                              name: 'budget_period_I')
+        @user = requester
         data!
-        result = query(q, user.id, variables).deep_symbolize_keys
+        result = query(q, @user.id, variables).deep_symbolize_keys
         expect(result).to eq(expected_result)
       end
 
@@ -313,8 +324,9 @@ describe 'price sums' do
         @budget_period_I = FactoryBot.create(:budget_period,
                                              :inspection_phase,
                                              name: 'budget_period_I')
+        @user = requester
         data!
-        result = query(q, user.id, variables).deep_symbolize_keys
+        result = query(q, @user.id, variables).deep_symbolize_keys
         expect(result).to eq(expected_result)
       end
     end
@@ -323,8 +335,21 @@ describe 'price sums' do
       @budget_period_I = FactoryBot.create(:budget_period,
                                            :past,
                                            name: 'budget_period_I')
+      @user = requester
       data!
-      result = query(q, user.id, variables).deep_symbolize_keys
+      result = query(q, @user.id, variables).deep_symbolize_keys
+      expect(result).to eq(expected_result_transparent)
+    end
+  end
+
+  context 'inspector' do
+    it 'budget period past' do
+      @budget_period_I = FactoryBot.create(:budget_period,
+                                           :past,
+                                           name: 'budget_period_I')
+      @user = inspector
+      data!
+      result = query(q, @user.id, variables).deep_symbolize_keys
       expect(result).to eq(expected_result_transparent)
     end
   end
