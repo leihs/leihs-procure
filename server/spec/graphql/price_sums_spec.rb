@@ -17,100 +17,102 @@ describe 'price sums' do
     main_category_1 = FactoryBot.create(:main_category,
                                         name: 'main_category_1')
 
-    category_1_A = FactoryBot.create(:category,
-                                     main_category_id: main_category_1.id,
-                                     name: 'category_1_A')
-    # DENIED
-    request_I_1_A = FactoryBot.create(:request,
-                                      category_id: category_1_A.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1,
-                                      approved_quantity: 0)
+      category_1_A = FactoryBot.create(:category,
+                                       main_category_id: main_category_1.id,
+                                       name: 'category_1_A')
+        # DENIED
+        request_I_1_A = FactoryBot.create(:request,
+                                          category_id: category_1_A.id,
+                                          budget_period_id: budget_period_I.id,
+                                          user_id: user.id,
+                                          price_cents: 100,
+                                          requested_quantity: 1,
+                                          approved_quantity: 0)
 
-    category_1_B = FactoryBot.create(:category,
-                                     main_category_id: main_category_1.id,
-                                     name: 'category_1_B')
-    # APPROVED
-    request_I_1_B = FactoryBot.create(:request,
-                                      category_id: category_1_B.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1,
-                                      approved_quantity: 1,
-                                      order_quantity: 0)
-    # PARTIALLY APPROVED
-    request_II_1_B = FactoryBot.create(:request,
-                                       category_id: category_1_B.id,
-                                       budget_period_id: budget_period_I.id,
-                                       user_id: user.id,
-                                       price_cents: 100,
-                                       requested_quantity: 2,
-                                       approved_quantity: 1,
-                                       order_quantity: 0)
+      category_1_B = FactoryBot.create(:category,
+                                       main_category_id: main_category_1.id,
+                                       name: 'category_1_B')
+        # APPROVED
+        request_I_1_B = FactoryBot.create(:request,
+                                          category_id: category_1_B.id,
+                                          budget_period_id: budget_period_I.id,
+                                          user_id: user.id,
+                                          price_cents: 100,
+                                          requested_quantity: 1,
+                                          approved_quantity: 1,
+                                          order_quantity: 0)
+        # PARTIALLY APPROVED
+        request_II_1_B = FactoryBot.create(:request,
+                                           category_id: category_1_B.id,
+                                           budget_period_id: budget_period_I.id,
+                                           user_id: user.id,
+                                           price_cents: 100,
+                                           requested_quantity: 2,
+                                           approved_quantity: 1,
+                                           order_quantity: 0)
 
+      category_1_C = FactoryBot.create(:category,
+                                       main_category_id: main_category_1.id,
+                                       name: 'category_1_C')
 
-    category_1_C = FactoryBot.create(:category,
-                                     main_category_id: main_category_1.id,
-                                     name: 'category_1_C')
-    request_I_1_C = FactoryBot.create(:request,
-                                      category_id: category_1_C.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1)
+        request_I_1_C = FactoryBot.create(:request,
+                                          category_id: category_1_C.id,
+                                          budget_period_id: budget_period_I.id,
+                                          user_id: user.id,
+                                          price_cents: 100,
+                                          requested_quantity: 1)
 
     # ----------------------------------------------------------------------
     #
     main_category_2 = FactoryBot.create(:main_category,
                                         name: 'main_category_2')
 
-    category_2_A = FactoryBot.create(:category,
-                                     main_category_id: main_category_2.id,
-                                     name: 'category_2_A')
-    request_I_2_A = FactoryBot.create(:request,
-                                      category_id: category_2_A.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1,
-                                      approved_quantity: 1,
-                                      order_quantity: 1)
+      category_2_A = FactoryBot.create(:category,
+                                       main_category_id: main_category_2.id,
+                                       name: 'category_2_A')
 
-    category_2_B = FactoryBot.create(:category,
-                                     main_category_id: main_category_2.id,
-                                     name: 'category_2_B')
-    # priority 'high'
-    request_I_2_B = FactoryBot.create(:request,
-                                      category_id: category_2_B.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      priority: 'high',
-                                      price_cents: 100,
-                                      requested_quantity: 1)
+        request_I_2_A = FactoryBot.create(:request,
+                                          category_id: category_2_A.id,
+                                        budget_period_id: budget_period_I.id,
+                                        user_id: user.id,
+                                        price_cents: 100,
+                                        requested_quantity: 1,
+                                        approved_quantity: 1,
+                                        order_quantity: 1)
 
-    category_2_C = FactoryBot.create(:category,
-                                     main_category_id: main_category_2.id,
-                                     name: 'category_2_C')
-    # not visible for the user
-    request_I_2_C = FactoryBot.create(:request,
-                                      category_id: category_2_C.id,
-                                      budget_period_id: budget_period_I.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1)
+      category_2_B = FactoryBot.create(:category,
+                                       main_category_id: main_category_2.id,
+                                       name: 'category_2_B')
+        # priority 'high'
+        request_I_2_B = FactoryBot.create(:request,
+                                          category_id: category_2_B.id,
+                                          budget_period_id: budget_period_I.id,
+                                          user_id: user.id,
+                                          priority: 'high',
+                                          price_cents: 100,
+                                          requested_quantity: 1)
 
-    category_2_D = FactoryBot.create(:category,
-                                     main_category_id: main_category_2.id,
-                                     name: 'category_2_D')
-    # from a category not set in filter
-    request_I_2_D = FactoryBot.create(:request,
-                                      category_id: category_2_D.id,
-                                      budget_period_id: budget_period_I.id,
-                                      user_id: user.id,
-                                      price_cents: 100,
-                                      requested_quantity: 1)
+      category_2_C = FactoryBot.create(:category,
+                                       main_category_id: main_category_2.id,
+                                       name: 'category_2_C')
+        # not visible for the user
+        request_I_2_C = FactoryBot.create(:request,
+                                        category_id: category_2_C.id,
+                                        budget_period_id: budget_period_I.id,
+                                        price_cents: 100,
+                                        requested_quantity: 1)
+
+      category_2_D = FactoryBot.create(:category,
+                                       main_category_id: main_category_2.id,
+                                       name: 'category_2_D')
+
+        # from a category not set in filter
+        request_I_2_D = FactoryBot.create(:request,
+                                          category_id: category_2_D.id,
+                                          budget_period_id: budget_period_I.id,
+                                          user_id: user.id,
+                                          price_cents: 100,
+                                          requested_quantity: 1)
 
     # =============================================================================
 
@@ -162,13 +164,13 @@ describe 'price sums' do
         dashboard: {
           budget_periods: [
             { id: budget_period_I.id,
-              total_price_cents: '500',
+              total_price_cents: '600',
               main_categories: [
                 { id: main_category_1.id,
-                  total_price_cents: '100',
+                  total_price_cents: '500',
                   categories: [
                     { id: category_1_A.id,
-                      total_price_cents: '0',
+                      total_price_cents: '100',
                       requests: [
                         { id: request_I_1_A.id }
                       ]
