@@ -347,6 +347,23 @@ describe 'price sums' do
       @budget_period_I = FactoryBot.create(:budget_period,
                                            :past,
                                            name: 'budget_period_I')
+    end
+
+    context 'budget period is not past' do
+      it 'requesting phase' do
+        @budget_period_I = FactoryBot.create(:budget_period,
+                                             :requesting_phase,
+                                             name: 'budget_period_I')
+      end
+
+      it 'inspection phase' do
+        @budget_period_I = FactoryBot.create(:budget_period,
+                                             :inspection_phase,
+                                             name: 'budget_period_I')
+      end
+    end
+
+    after :example do
       @user = inspector
       data!
       result = query(q, @user.id, variables).deep_symbolize_keys
