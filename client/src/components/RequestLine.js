@@ -3,7 +3,7 @@ import cx from 'classnames'
 // import f from 'lodash'
 
 import t from '../locale/translate'
-import { DisplayName, RequestTotalAmount, formatCurrency } from './decorators'
+import { DisplayName, formatCurrency } from './decorators'
 import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
 import RequestStateBadge from './RequestStateBadge'
