@@ -92,7 +92,7 @@
                 (requests-query-map <> arguments value)
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql/format <>))
-        proc-requests (request/query-requests tx query)]
+        proc-requests (request/query-requests tx auth-entity query)]
     (->>
       proc-requests
       (map (fn [proc-req]

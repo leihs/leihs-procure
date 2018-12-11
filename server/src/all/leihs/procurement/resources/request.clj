@@ -163,10 +163,16 @@
   (assoc row :attachments :unqueried))
 
 (defn add-total-price
-  [row]
-  (let [quantity (or (:order_quantity row)
-                     (:approved_quantity row)
-                     (:requested_quantity row))]
+  [row advanced-user?]
+  (let [transparent-quantity (or (:order_quantity row)
+                                 (:approved_quantity row)
+                                 (:requested_quantity row))
+        quantity
+          (if (-> row
+                  :budget_period
+                  :is_past)
+            transparent-quantity
+            (if advanced-user? transparent-quantity (:requested_quantity row)))]
     (->> row
          :price_cents
          (* quantity)
@@ -201,18 +207,21 @@
        (assoc row :procurement_account)))
 
 (defn transform-row
-  [row]
+  [row advanced-user?]
   (-> row
       enum-state
       add-general-ledger-account
       add-cost-center
       add-procurement-account
-      add-total-price
+      (add-total-price advanced-user?)
       treat-priority
       treat-inspector-priority
       initialize-attachments-attribute))
 
-(defn query-requests [tx query] (jdbc/query tx query {:row-fn transform-row}))
+(defn query-requests
+  [tx auth-entity query]
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
+    (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})))
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
@@ -227,7 +236,7 @@
        (get-request-by-id-sqlmap tx auth-entity)
        request-helpers/join-and-nest-associated-resources
        sql/format
-       (query-requests tx)
+       (query-requests tx auth-entity)
        first))
 
 (defn- consider-default
@@ -272,7 +281,7 @@
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
         sql/format
-        (->> (query-requests tx))
+        (->> (query-requests tx auth-entity))
         first)))
 
 (defn insert!
@@ -491,7 +500,7 @@
      (-> requests-base-query
          (sql/merge-where [:= :procurement_requests.id (:id request)])
          sql/format
-         (->> (query-requests tx))
+         (->> (query-requests tx auth-entity))
          first
          :user_id)))
 

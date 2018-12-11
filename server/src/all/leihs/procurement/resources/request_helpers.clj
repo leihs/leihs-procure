@@ -48,7 +48,14 @@
 
 (defn join-and-nest-budget-periods
   [sqlmap]
-  (sql/select-nest sqlmap :procurement_budget_periods :budget_period))
+  (-> sqlmap
+      (sql/select-nest :procurement_budget_periods_2 :budget_period)
+      (sql/merge-join
+        [(-> (sql/select :* [(sql/call :> :current_date :end_date) :is_past])
+             (sql/from :procurement_budget_periods))
+         :procurement_budget_periods_2]
+        [:= :procurement_budget_periods_2.id
+         :procurement_requests.budget_period_id])))
 
 (defn join-and-nest-templates
   [sqlmap]

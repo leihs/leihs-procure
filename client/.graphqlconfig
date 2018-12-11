@@ -4,7 +4,7 @@
       "schemaPath": "schema.graphql",
       "extensions": {
         "endpoints": {
-          "default": "http://localhost:3003/procure/graphql"
+          "default": "http://localhost:3230/procure/graphql"
         }
       }
     }
