@@ -305,8 +305,8 @@ export const requestDataFromFields = (request, fields) => {
     ...getField(fields, request, 'price_cents'),
 
     ...getField(fields, request, 'requested_quantity'),
-    approved_quantity: f.presence(approvedQ) || null,
-    order_quantity: f.presence(orderQ) || null,
+    approved_quantity: f.present(approvedQ) ? approvedQ : null,
+    order_quantity: f.present(orderQ) ? orderQ : null,
 
     ...getField(fields, request, 'motivation'),
     ...getField(fields, request, 'priority'),
