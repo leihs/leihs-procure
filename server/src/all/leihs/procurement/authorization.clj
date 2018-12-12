@@ -63,7 +63,7 @@
 (defn wrap-authenticate
   [handler]
   (fn [request]
-    (if (:authenticated-entity request)
+    (if (or (skip? (:handler-key request)) (:authenticated-entity request))
       (handler request)
       {:status 401,
        :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
