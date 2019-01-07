@@ -1,4 +1,5 @@
 #!/bin/sh -eu
 
-npm ci || echo 'upgrade npm! `npm i -g npm@latest`'
+test -d node_modules && npm i || { npm ci || npm i ;}
+npm run build:ui
 npm start

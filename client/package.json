@@ -7,9 +7,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "postinstall": "cd leihs-ui && { npm ci || npm i ;}",
-    "prebuild": "cd leihs-ui && npm run -s build && npm run -s build-lib",
+    "build": "npm run -s build:ui && npm run -s build:app",
+    "build:app": "react-scripts build",
+    "build:ui": "cd leihs-ui && npm run -s build",
+    "preinstall": "cd leihs-ui && { test -d node_modules && npm i || { npm ci || npm i ;} ;}",
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
     "coverage": "npm test -- --coverage",
