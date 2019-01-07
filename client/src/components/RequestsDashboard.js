@@ -1,4 +1,4 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, Suspense } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 import { Link } from 'react-router-dom'
@@ -24,13 +24,16 @@ import Loading from './Loading'
 import { ErrorPanel } from './Error'
 import RequestLine from './RequestLine'
 import ImageThumbnail from './ImageThumbnail'
-import SpreadsheetExportProvider from './SpreadsheetExportProvider'
 import DataTable from '../components/DataTable'
 
 import CurrentUser from '../containers/CurrentUserProvider'
 import FilterBar, { BIG as filterBarBreakPoint } from './RequestsFilterBar'
 import logger from 'debug'
 const log = logger('app:ui:RequestsDashboard')
+
+const SpreadsheetExportProvider = React.lazy(() =>
+  import('./SpreadsheetExportProvider')
+)
 
 class RequestsDashboard extends React.Component {
   state = { exportView: false, showFilter: true }
@@ -98,44 +101,46 @@ class RequestsDashboard extends React.Component {
 
     const SpreadsheetExporter = state.exportView &&
       hasData && (
-        <SpreadsheetExportProvider requestsData={requestsQuery.data}>
-          {({ table, download, exportFormats }) => (
-            <div>
-              <ButtonToolbar className="pb-3">
-                {/* <ButtonToolbar className="row pb-3"> */}
-                {/* <ButtonGroup className="col-auto mr-auto pt-3"> */}
-                <Dropdown className="mr-2">
-                  <DropdownToggle caret color="success">
-                    <Icon.FileDownload spaced /> {'Herunterladen'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {exportFormats.map(fmt => (
-                      <DropdownItem
-                        key={fmt.ext}
-                        onClick={e => download(table, fmt)}
-                      >
-                        {fmt.name}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                </Dropdown>
+        <Suspense fallback={<Loading size="1" />}>
+          <SpreadsheetExportProvider requestsData={requestsQuery.data}>
+            {({ table, download, exportFormats }) => (
+              <div>
+                <ButtonToolbar className="pb-3">
+                  {/* <ButtonToolbar className="row pb-3"> */}
+                  {/* <ButtonGroup className="col-auto mr-auto pt-3"> */}
+                  <Dropdown className="mr-2">
+                    <DropdownToggle caret color="success">
+                      <Icon.FileDownload spaced /> {'Herunterladen'}
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {exportFormats.map(fmt => (
+                        <DropdownItem
+                          key={fmt.ext}
+                          onClick={e => download(table, fmt)}
+                        >
+                          {fmt.name}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
 
-                <Button
-                  outline
-                  onClick={e => this.setState(s => ({ exportView: false }))}
-                >
-                  Exportansicht schliessen
-                </Button>
-                {/* </ButtonGroup> */}
-                {/* <ButtonGroup className="col-auto ml-auto pt-3">
+                  <Button
+                    outline
+                    onClick={e => this.setState(s => ({ exportView: false }))}
+                  >
+                    Exportansicht schliessen
+                  </Button>
+                  {/* </ButtonGroup> */}
+                  {/* <ButtonGroup className="col-auto ml-auto pt-3">
                 </ButtonGroup> */}
-              </ButtonToolbar>
+                </ButtonToolbar>
 
-              <h2 className="h5">Vorschau:</h2>
-              {<RequestTable table={table} query={requestsQuery} />}
-            </div>
-          )}
-        </SpreadsheetExportProvider>
+                <h2 className="h5">Vorschau:</h2>
+                {<RequestTable table={table} query={requestsQuery} />}
+              </div>
+            )}
+          </SpreadsheetExportProvider>
+        </Suspense>
       )
 
     const [Wrapper, wrapProps] = !state.showFilter
