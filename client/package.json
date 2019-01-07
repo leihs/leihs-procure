@@ -11,6 +11,8 @@
     "build:app": "react-scripts build",
     "build:ui": "cd leihs-ui && npm run -s build",
     "preinstall": "cd leihs-ui && { test -d node_modules && npm i || { npm ci || npm i ;} ;}",
+    "postinstall": "npm run -s cleanup-typescript",
+    "cleanup-typescript": "find . -name '*.ts' -delete",
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
     "coverage": "npm test -- --coverage",
@@ -20,14 +22,7 @@
     "ci:lint:json": "prettier --list-different 'src/{,**/}*.json'",
     "test": "react-scripts test --env=jsdom"
   },
-  "proxy": {
-    "/(graphql|graphiql|images|attachments|status|upload|sign-out|sign-in)": {
-      "target": "http://localhost:3230"
-    },
-    "/procure/(graphql|graphiql|images|attachments|status|upload|sign-out|sign-in)": {
-      "target": "http://localhost:3230"
-    }
-  },
+  "proxy": "http://localhost:3230",
   "jest": {
     "collectCoverageFrom": [
       "src/components/Bootstrap/*.{js,jsx}",
@@ -48,7 +43,7 @@
     "debug": "^3.2.6",
     "downshift": "^1.31.16",
     "es6-promise": "^4.2.5",
-    "eslint": "^5.12.0",
+    "eslint": "5.6.0",
     "eslint-config-prettier": "^2.10.0",
     "eslint-plugin-prettier": "^2.7.0",
     "eslint-plugin-react": "^7.12.3",
@@ -70,7 +65,7 @@
     "react-highlight-words": "^0.11.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^1.1.5",
+    "react-scripts": "2.1.3",
     "react-test-renderer": "^16.7.0",
     "reactstrap": "^6.5.0",
     "source-map-explorer": "git+https://github.com/danvk/source-map-explorer.git#b74f718",
@@ -114,5 +109,12 @@
         }
       }
     ]
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "Firefox ESR",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
