@@ -46,18 +46,18 @@ exports[`undefined: renders correctly 1`] = `
     <pre>
       <code>
         
-        &lt;Collapsing id="collapse-example-1" startOpen&gt;
-          {({ isOpen, togglerProps, collapsedProps, Caret }) =&gt; (
-            &lt;div&gt;
-              &lt;div {...togglerProps}&gt;
-                &lt;Caret spaced /&gt;
-                Collapsed Title
-              &lt;/div&gt;
-              {isOpen && &lt;div {...collapsedProps}&gt;Collapsed Content!&lt;/div&gt;}
-            &lt;/div&gt;
-          )}
-        &lt;/Collapsing&gt;
-                
+&lt;Collapsing id="collapse-example-1" startOpen&gt;
+  {({ isOpen, togglerProps, collapsedProps, Caret }) =&gt; (
+    &lt;div&gt;
+      &lt;div {...togglerProps}&gt;
+        &lt;Caret spaced /&gt;
+        Collapsed Title
+      &lt;/div&gt;
+      {isOpen && &lt;div {...collapsedProps}&gt;Collapsed Content!&lt;/div&gt;}
+    &lt;/div&gt;
+  )}
+&lt;/Collapsing&gt;
+        
       </code>
     </pre>
   </div>

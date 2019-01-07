@@ -5,167 +5,179 @@ Array [
   <h3>
     Heading 
     <span
-        className="badge badge-primary"
+      className="badge badge-primary"
     >
-        Badge
+      Badge
     </span>
-</h3>,
+  </h3>,
   <span
     className="badge badge-primary"
->
+  >
     Badge
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-primary"
->
+  >
     Badge primary
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-secondary"
->
+  >
     Badge secondary
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-success"
->
+  >
     Badge success
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-danger"
->
+  >
     Badge danger
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-warning"
->
+  >
     Badge warning
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-info"
->
+  >
     Badge info
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-light"
->
+  >
     Badge light
-</span>,
+  </span>,
   " ",
   <span
     className="badge badge-dark"
->
+  >
     Badge dark
-</span>,
+  </span>,
 ]
 `;
 
 exports[`Button: renders correctly 1`] = `
 Array [
   <button
+    aria-label={null}
     className="btn btn-secondary"
     onClick={[Function]}
     type="button"
->
+  >
     Button
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-primary"
     onClick={[Function]}
     title="test title"
     type="button"
->
+  >
     Button with title
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-primary"
     onClick={[Function]}
     type="button"
->
+  >
     Button primary
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-secondary"
     onClick={[Function]}
     type="button"
->
+  >
     Button secondary
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-success"
     onClick={[Function]}
     type="button"
->
+  >
     Button success
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-danger"
     onClick={[Function]}
     type="button"
->
+  >
     Button danger
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-warning"
     onClick={[Function]}
     type="button"
->
+  >
     Button warning
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-info"
     onClick={[Function]}
     type="button"
->
+  >
     Button info
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-light"
     onClick={[Function]}
     type="button"
->
+  >
     Button light
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="btn btn-dark"
     onClick={[Function]}
     type="button"
->
+  >
     Button dark
-</button>,
+  </button>,
   " ",
   " ",
   <button
+    aria-label={null}
     className="btn btn-secondary"
     onClick={[Function]}
     type="button"
->
+  >
     Button
-</button>,
+  </button>,
   " ",
   <button
+    aria-label={null}
     className="my-class btn btn-link"
     onClick={[Function]}
     title="test title"
     type="button"
->
+  >
     Button
-</button>,
+  </button>,
 ]
 `;
 
@@ -173,684 +185,642 @@ exports[`FormField: renders correctly 1`] = `
 Array [
   <h2>
     controlled
-</h2>,
+  </h2>,
   <div
     className="row"
->
+  >
     <div
-        className="col"
+      className="col"
     >
-        <div
-            className="form-group"
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
         >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                type=text
-                 
-            </label>
-            <div
-                className=""
-            >
-                <input
-                    aria-describedby={null}
-                    autoComplete="off"
-                    className="form-control"
-                    id={undefined}
-                    name="a"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    required={true}
-                    type="text"
-                    value="some text"
-                />
-                 
-            </div>
-        </div>
+          type=text
+           
+        </label>
         <div
-            className="form-group"
+          className=""
         >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                type=text-static
-                 
-            </label>
-            <div
-                className=""
-            >
-                <span
-                    className="form-control-plaintext"
-                    id={undefined}
-                    required={true}
-                >
-                    some static text
-                </span>
-                 
-            </div>
+          <input
+            aria-describedby={null}
+            autoComplete="off"
+            className="form-control"
+            name="a"
+            onChange={[Function]}
+            required={true}
+            type="text"
+            value="some text"
+          />
+           
         </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          type=text-static
+           
+        </label>
         <div
-            className="form-group"
+          className=""
         >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                type=textarea
-                 
-            </label>
-            <div
-                className=""
-            >
-                <textarea
-                    aria-describedby={null}
-                    autoComplete="off"
-                    className="form-control"
-                    id={undefined}
-                    name="c"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    required={true}
-                    rows={3}
-                    type={null}
-                    value="some text"
-                />
-                 
-            </div>
+          <span
+            className="form-control-plaintext"
+            required={true}
+          >
+            some static text
+          </span>
+           
         </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          type=textarea
+           
+        </label>
+        <div
+          className=""
+        >
+          <textarea
+            aria-describedby={null}
+            autoComplete="off"
+            className="form-control"
+            name="c"
+            onChange={[Function]}
+            required={true}
+            rows={3}
+            type={null}
+            value="some text"
+          />
+           
+        </div>
+      </div>
     </div>
     <div
-        className="col"
+      className="col"
     >
-        <div
-            className="form-group"
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
         >
+          type=number
+           
+        </label>
+        <div
+          className=""
+        >
+          <input
+            aria-describedby={null}
+            autoComplete="off"
+            className="form-control"
+            name="d"
+            onChange={[Function]}
+            required={true}
+            type="number"
+            value="23.42"
+          />
+           
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          type=number-integer
+           
+        </label>
+        <div
+          className=""
+        >
+          <input
+            aria-describedby={null}
+            autoComplete="off"
+            className="form-control"
+            min={0}
+            name="e"
+            onChange={[Function]}
+            required={true}
+            step={1}
+            type="number"
+            value="42"
+          />
+           
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          type=checkbox
+           
+        </label>
+        <div
+          className=""
+        >
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              aria-describedby={null}
+              autoComplete="off"
+              className="custom-control-input"
+              id="example_formfield_f"
+              name="f"
+              onChange={[Function]}
+              required={true}
+              type="checkbox"
+              value=""
+            />
             <label
-                className=""
-                htmlFor={undefined}
+              className="custom-control-label"
+              htmlFor="example_formfield_f"
+            />
+          </div>
+           
+        </div>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          type=checkbox
+           
+        </label>
+        <div
+          className=""
+        >
+          <div
+            className="custom-control custom-checkbox"
+          >
+            <input
+              aria-describedby={null}
+              autoComplete="off"
+              className="custom-control-input"
+              id="example_formfield_g"
+              name="g"
+              onChange={[Function]}
+              required={true}
+              type="checkbox"
+              value=""
+            />
+            <label
+              className="custom-control-label"
+              htmlFor="example_formfield_g"
+            />
+          </div>
+           
+        </div>
+      </div>
+      <hr />
+      <div
+        className="form-group"
+      >
+        <label
+          className=""
+        >
+          ButtonRadio Radio Button
+           
+        </label>
+        <div
+          className=""
+        >
+          <div
+            className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
+            label="<ButtonRadio/>"
+            role="radiogroup"
+          >
+            <label
+              className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold"
+              htmlFor="example_formfield_h_radio_0"
+              tabIndex="-1"
             >
-                type=number
-                 
-            </label>
-            <div
-                className=""
-            >
-                <input
-                    aria-describedby={null}
-                    autoComplete="off"
-                    className="form-control"
-                    id={undefined}
-                    name="d"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    required={true}
-                    type="number"
-                    value="23.42"
+              <input
+                aria-checked={false}
+                checked={false}
+                className="sr-only mt-4 ml-2"
+                id="example_formfield_h_radio_0"
+                name="h"
+                onChange={[Function]}
+                onClick={[Function]}
+                required={true}
+                tabIndex={0}
+                type="radio"
+                value="one"
+              />
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-circle fa-w-16 mr-2"
+                data-icon="circle"
+                data-prefix="far"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
+                  fill="currentColor"
+                  style={Object {}}
                 />
-                 
-            </div>
-        </div>
-        <div
-            className="form-group"
-        >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                type=number-integer
-                 
+              </svg>
+              Eins
             </label>
-            <div
-                className=""
+            <label
+              className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold border-left-0"
+              htmlFor="example_formfield_h_radio_1"
+              tabIndex="-1"
             >
-                <input
-                    aria-describedby={null}
-                    autoComplete="off"
-                    className="form-control"
-                    id={undefined}
-                    min={0}
-                    name="e"
-                    onChange={[Function]}
-                    placeholder={undefined}
-                    required={true}
-                    step={1}
-                    type="number"
-                    value="42"
+              <input
+                aria-checked={false}
+                checked={false}
+                className="sr-only mt-4 ml-2"
+                id="example_formfield_h_radio_1"
+                name="h"
+                onChange={[Function]}
+                onClick={[Function]}
+                required={true}
+                tabIndex={-1}
+                type="radio"
+                value="two"
+              />
+              <svg
+                aria-hidden="true"
+                className="svg-inline--fa fa-circle fa-w-16 mr-2"
+                data-icon="circle"
+                data-prefix="far"
+                role="img"
+                style={Object {}}
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
+                  fill="currentColor"
+                  style={Object {}}
                 />
-                 
-            </div>
+              </svg>
+              Zwei
+            </label>
+          </div>
+           
+        </div>
+      </div>
+    </div>
+    <div
+      className="col"
+    >
+      <pre>
+        {
+  "a": "some text",
+  "b": "some static text",
+  "c": "some text",
+  "d": "23.42",
+  "e": "42",
+  "f": true,
+  "g": null,
+  "h": null
+}
+      </pre>
+    </div>
+  </div>,
+  <h2>
+    controlled, with validation styles
+  </h2>,
+  <div
+    className="was-validated"
+  >
+    <div
+      className="row"
+    >
+      <div
+        className="col"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className=""
+          >
+            type=text
+             
+          </label>
+          <div
+            className=""
+          >
+            <input
+              aria-describedby={null}
+              autoComplete="off"
+              className="form-control"
+              name="a"
+              onChange={[Function]}
+              required={true}
+              type="text"
+              value="some text"
+            />
+             
+          </div>
         </div>
         <div
-            className="form-group"
+          className="form-group"
         >
-            <label
-                className=""
-                htmlFor={undefined}
+          <label
+            className=""
+          >
+            type=text-static
+             
+          </label>
+          <div
+            className=""
+          >
+            <span
+              className="form-control-plaintext"
+              required={true}
             >
-                type=checkbox
-                 
-            </label>
-            <div
-                className=""
-            >
-                <div
-                    className="custom-control custom-checkbox"
-                >
-                    <input
-                        aria-describedby={null}
-                        autoComplete="off"
-                        checked={undefined}
-                        className="custom-control-input"
-                        id="example_formfield_f"
-                        name="f"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        type="checkbox"
-                        value=""
-                    />
-                    <label
-                        className="custom-control-label"
-                        htmlFor="example_formfield_f"
-                    />
-                </div>
-                 
-            </div>
+              some static text
+            </span>
+             
+          </div>
         </div>
         <div
-            className="form-group"
+          className="form-group"
         >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                type=checkbox
-                 
-            </label>
+          <label
+            className=""
+          >
+            type=textarea
+             
+          </label>
+          <div
+            className=""
+          >
+            <textarea
+              aria-describedby={null}
+              autoComplete="off"
+              className="form-control"
+              name="c"
+              onChange={[Function]}
+              required={true}
+              rows={3}
+              type={null}
+              value="some text"
+            />
+             
+          </div>
+        </div>
+      </div>
+      <div
+        className="col"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className=""
+          >
+            type=number
+             
+          </label>
+          <div
+            className=""
+          >
+            <input
+              aria-describedby={null}
+              autoComplete="off"
+              className="form-control"
+              name="d"
+              onChange={[Function]}
+              required={true}
+              type="number"
+              value="23.42"
+            />
+             
+          </div>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label
+            className=""
+          >
+            type=number-integer
+             
+          </label>
+          <div
+            className=""
+          >
+            <input
+              aria-describedby={null}
+              autoComplete="off"
+              className="form-control"
+              min={0}
+              name="e"
+              onChange={[Function]}
+              required={true}
+              step={1}
+              type="number"
+              value="42"
+            />
+             
+          </div>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label
+            className=""
+          >
+            type=checkbox
+             
+          </label>
+          <div
+            className=""
+          >
             <div
-                className=""
+              className="custom-control custom-checkbox"
             >
-                <div
-                    className="custom-control custom-checkbox"
-                >
-                    <input
-                        aria-describedby={null}
-                        autoComplete="off"
-                        checked={undefined}
-                        className="custom-control-input"
-                        id="example_formfield_g"
-                        name="g"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        type="checkbox"
-                        value=""
-                    />
-                    <label
-                        className="custom-control-label"
-                        htmlFor="example_formfield_g"
-                    />
-                </div>
-                 
+              <input
+                aria-describedby={null}
+                autoComplete="off"
+                className="custom-control-input"
+                id="example_formfield_f"
+                name="f"
+                onChange={[Function]}
+                required={true}
+                type="checkbox"
+                value=""
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example_formfield_f"
+              />
             </div>
+             
+          </div>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label
+            className=""
+          >
+            type=checkbox
+             
+          </label>
+          <div
+            className=""
+          >
+            <div
+              className="custom-control custom-checkbox"
+            >
+              <input
+                aria-describedby={null}
+                autoComplete="off"
+                className="custom-control-input"
+                id="example_formfield_g"
+                name="g"
+                onChange={[Function]}
+                required={true}
+                type="checkbox"
+                value=""
+              />
+              <label
+                className="custom-control-label"
+                htmlFor="example_formfield_g"
+              />
+            </div>
+             
+          </div>
         </div>
         <hr />
         <div
-            className="form-group"
+          className="form-group"
         >
-            <label
-                className=""
-                htmlFor={undefined}
-            >
-                ButtonRadio Radio Button
-                 
-            </label>
+          <label
+            className=""
+          >
+            ButtonRadio Radio Button
+             
+          </label>
+          <div
+            className=""
+          >
             <div
-                className=""
+              className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
+              label="<ButtonRadio/>"
+              role="radiogroup"
             >
-                <div
-                    className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
-                    label="<ButtonRadio/>"
-                    role="radiogroup"
+              <label
+                className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold"
+                htmlFor="example_formfield_h_radio_0"
+                tabIndex="-1"
+              >
+                <input
+                  aria-checked={false}
+                  checked={false}
+                  className="sr-only mt-4 ml-2"
+                  id="example_formfield_h_radio_0"
+                  name="h"
+                  onChange={[Function]}
+                  onClick={[Function]}
+                  required={true}
+                  tabIndex={0}
+                  type="radio"
+                  value="one"
+                />
+                <svg
+                  aria-hidden="true"
+                  className="svg-inline--fa fa-circle fa-w-16 mr-2"
+                  data-icon="circle"
+                  data-prefix="far"
+                  role="img"
+                  style={Object {}}
+                  viewBox="0 0 512 512"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                    <label
-                        className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold"
-                        htmlFor="example_formfield_h_radio_0"
-                        tabIndex="-1"
-                    >
-                        <input
-                            aria-checked={false}
-                            checked={false}
-                            className="sr-only mt-4 ml-2"
-                            id="example_formfield_h_radio_0"
-                            name="h"
-                            onChange={[Function]}
-                            onClick={[Function]}
-                            required={true}
-                            tabIndex={0}
-                            type="radio"
-                            value="one"
-                        />
-                        <svg
-                            aria-hidden="true"
-                            className="svg-inline--fa fa-circle fa-w-16 mr-2"
-                            data-icon="circle"
-                            data-prefix="far"
-                            role="img"
-                            style={Object {}}
-                            viewBox="0 0 512 512"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
-                                fill="currentColor"
-                                style={Object {}}
-                            />
-                        </svg>
-                        Eins
-                    </label>
-                    <label
-                        className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold border-left-0"
-                        htmlFor="example_formfield_h_radio_1"
-                        tabIndex="-1"
-                    >
-                        <input
-                            aria-checked={false}
-                            checked={false}
-                            className="sr-only mt-4 ml-2"
-                            id="example_formfield_h_radio_1"
-                            name="h"
-                            onChange={[Function]}
-                            onClick={[Function]}
-                            required={true}
-                            tabIndex={-1}
-                            type="radio"
-                            value="two"
-                        />
-                        <svg
-                            aria-hidden="true"
-                            className="svg-inline--fa fa-circle fa-w-16 mr-2"
-                            data-icon="circle"
-                            data-prefix="far"
-                            role="img"
-                            style={Object {}}
-                            viewBox="0 0 512 512"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
-                                fill="currentColor"
-                                style={Object {}}
-                            />
-                        </svg>
-                        Zwei
-                    </label>
-                </div>
-                 
+                  <path
+                    d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
+                    fill="currentColor"
+                    style={Object {}}
+                  />
+                </svg>
+                Eins
+              </label>
+              <label
+                className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold border-left-0"
+                htmlFor="example_formfield_h_radio_1"
+                tabIndex="-1"
+              >
+                <input
+                  aria-checked={false}
+                  checked={false}
+                  className="sr-only mt-4 ml-2"
+                  id="example_formfield_h_radio_1"
+                  name="h"
+                  onChange={[Function]}
+                  onClick={[Function]}
+                  required={true}
+                  tabIndex={-1}
+                  type="radio"
+                  value="two"
+                />
+                <svg
+                  aria-hidden="true"
+                  className="svg-inline--fa fa-circle fa-w-16 mr-2"
+                  data-icon="circle"
+                  data-prefix="far"
+                  role="img"
+                  style={Object {}}
+                  viewBox="0 0 512 512"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
+                    fill="currentColor"
+                    style={Object {}}
+                  />
+                </svg>
+                Zwei
+              </label>
             </div>
+             
+          </div>
         </div>
-    </div>
-    <div
+      </div>
+      <div
         className="col"
-    >
+      >
         <pre>
-            {
-              "a": "some text",
-              "b": "some static text",
-              "c": "some text",
-              "d": "23.42",
-              "e": "42",
-              "f": true,
-              "g": null,
-              "h": null
-            }
+          {
+  "a": "some text",
+  "b": "some static text",
+  "c": "some text",
+  "d": "23.42",
+  "e": "42",
+  "f": true,
+  "g": null,
+  "h": null
+}
         </pre>
+      </div>
     </div>
-</div>,
-  <h2>
-    controlled, with validation styles
-</h2>,
-  <div
-    className="was-validated"
->
-    <div
-        className="row"
-    >
-        <div
-            className="col"
-        >
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=text
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <input
-                        aria-describedby={null}
-                        autoComplete="off"
-                        className="form-control"
-                        id={undefined}
-                        name="a"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        type="text"
-                        value="some text"
-                    />
-                     
-                </div>
-            </div>
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=text-static
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <span
-                        className="form-control-plaintext"
-                        id={undefined}
-                        required={true}
-                    >
-                        some static text
-                    </span>
-                     
-                </div>
-            </div>
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=textarea
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <textarea
-                        aria-describedby={null}
-                        autoComplete="off"
-                        className="form-control"
-                        id={undefined}
-                        name="c"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        rows={3}
-                        type={null}
-                        value="some text"
-                    />
-                     
-                </div>
-            </div>
-        </div>
-        <div
-            className="col"
-        >
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=number
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <input
-                        aria-describedby={null}
-                        autoComplete="off"
-                        className="form-control"
-                        id={undefined}
-                        name="d"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        type="number"
-                        value="23.42"
-                    />
-                     
-                </div>
-            </div>
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=number-integer
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <input
-                        aria-describedby={null}
-                        autoComplete="off"
-                        className="form-control"
-                        id={undefined}
-                        min={0}
-                        name="e"
-                        onChange={[Function]}
-                        placeholder={undefined}
-                        required={true}
-                        step={1}
-                        type="number"
-                        value="42"
-                    />
-                     
-                </div>
-            </div>
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=checkbox
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <div
-                        className="custom-control custom-checkbox"
-                    >
-                        <input
-                            aria-describedby={null}
-                            autoComplete="off"
-                            checked={undefined}
-                            className="custom-control-input"
-                            id="example_formfield_f"
-                            name="f"
-                            onChange={[Function]}
-                            placeholder={undefined}
-                            required={true}
-                            type="checkbox"
-                            value=""
-                        />
-                        <label
-                            className="custom-control-label"
-                            htmlFor="example_formfield_f"
-                        />
-                    </div>
-                     
-                </div>
-            </div>
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    type=checkbox
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <div
-                        className="custom-control custom-checkbox"
-                    >
-                        <input
-                            aria-describedby={null}
-                            autoComplete="off"
-                            checked={undefined}
-                            className="custom-control-input"
-                            id="example_formfield_g"
-                            name="g"
-                            onChange={[Function]}
-                            placeholder={undefined}
-                            required={true}
-                            type="checkbox"
-                            value=""
-                        />
-                        <label
-                            className="custom-control-label"
-                            htmlFor="example_formfield_g"
-                        />
-                    </div>
-                     
-                </div>
-            </div>
-            <hr />
-            <div
-                className="form-group"
-            >
-                <label
-                    className=""
-                    htmlFor={undefined}
-                >
-                    ButtonRadio Radio Button
-                     
-                </label>
-                <div
-                    className=""
-                >
-                    <div
-                        className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
-                        label="<ButtonRadio/>"
-                        role="radiogroup"
-                    >
-                        <label
-                            className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold"
-                            htmlFor="example_formfield_h_radio_0"
-                            tabIndex="-1"
-                        >
-                            <input
-                                aria-checked={false}
-                                checked={false}
-                                className="sr-only mt-4 ml-2"
-                                id="example_formfield_h_radio_0"
-                                name="h"
-                                onChange={[Function]}
-                                onClick={[Function]}
-                                required={true}
-                                tabIndex={0}
-                                type="radio"
-                                value="one"
-                            />
-                            <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-circle fa-w-16 mr-2"
-                                data-icon="circle"
-                                data-prefix="far"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 512 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
-                                    fill="currentColor"
-                                    style={Object {}}
-                                />
-                            </svg>
-                            Eins
-                        </label>
-                        <label
-                            className="btn btn-block btn-outline-secondary m-0 text-left font-weight-bold border-left-0"
-                            htmlFor="example_formfield_h_radio_1"
-                            tabIndex="-1"
-                        >
-                            <input
-                                aria-checked={false}
-                                checked={false}
-                                className="sr-only mt-4 ml-2"
-                                id="example_formfield_h_radio_1"
-                                name="h"
-                                onChange={[Function]}
-                                onClick={[Function]}
-                                required={true}
-                                tabIndex={-1}
-                                type="radio"
-                                value="two"
-                            />
-                            <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-circle fa-w-16 mr-2"
-                                data-icon="circle"
-                                data-prefix="far"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 512 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"
-                                    fill="currentColor"
-                                    style={Object {}}
-                                />
-                            </svg>
-                            Zwei
-                        </label>
-                    </div>
-                     
-                </div>
-            </div>
-        </div>
-        <div
-            className="col"
-        >
-            <pre>
-                {
-                  "a": "some text",
-                  "b": "some static text",
-                  "c": "some text",
-                  "d": "23.42",
-                  "e": "42",
-                  "f": true,
-                  "g": null,
-                  "h": null
-                }
-            </pre>
-        </div>
-    </div>
-</div>,
+  </div>,
 ]
 `;
 
@@ -860,47 +830,41 @@ Array [
   <br />,
   <div
     className="DayPickerInput"
->
+  >
     <input
-        autoComplete="off"
-        className="form-control is-invalid"
-        name={undefined}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onKeyUp={[Function]}
-        placeholder="01.01.2000"
-        readOnly={undefined}
-        required={undefined}
-        value=""
+      autoComplete="off"
+      className="form-control is-invalid"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      placeholder="01.01.2000"
+      value=""
     />
-</div>,
+  </div>,
   <hr />,
   "with value ",
   <code>
     1985-10-26T08:15:00.000Z
-</code>,
+  </code>,
   <br />,
   <div
     className="DayPickerInput"
->
+  >
     <input
-        autoComplete="off"
-        className="form-control"
-        name={undefined}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onClick={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onKeyUp={[Function]}
-        placeholder="01.01.2000"
-        readOnly={undefined}
-        required={undefined}
-        value="26.10.1985"
+      autoComplete="off"
+      className="form-control"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      placeholder="01.01.2000"
+      value="26.10.1985"
     />
-</div>,
+  </div>,
 ]
 `;

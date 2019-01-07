@@ -9,7 +9,6 @@ exports[`undefined: renders correctly 1`] = `
   >
     <select
       className="form-control"
-      disabled={undefined}
       id="example-form-1.select1"
       multiple={true}
       name="select1"
@@ -91,21 +90,21 @@ exports[`undefined: renders correctly 1`] = `
     >
       <mark>
         {
-          "formProps": {
-            "name": "select1",
-            "id": "example-form-1.select1",
-            "value": [
-              "1-2",
-              "1-3"
-            ]
-          },
-          "fields": {
-            "select1": [
-              "1-2",
-              "1-3"
-            ]
-          }
-        }
+  "formProps": {
+    "name": "select1",
+    "id": "example-form-1.select1",
+    "value": [
+      "1-2",
+      "1-3"
+    ]
+  },
+  "fields": {
+    "select1": [
+      "1-2",
+      "1-3"
+    ]
+  }
+}
       </mark>
     </pre>
   </div>
@@ -154,6 +153,7 @@ exports[`undefined: renders correctly 2`] = `
       <button
         aria-expanded={false}
         aria-haspopup={true}
+        aria-label={null}
         className="dropdown-toggle btn btn-outline-secondary"
         onClick={[Function]}
         type="button"
@@ -169,18 +169,15 @@ exports[`undefined: renders correctly 2`] = `
         className="py-2 px-0 shadow dropdown-menu"
         role="menu"
         tabIndex="-1"
-        x-placement={undefined}
       >
         <div
           className="dropdown-item-subgroup"
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-1-checkbox-00"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -204,11 +201,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-2-checkbox-01"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -232,11 +227,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-3-checkbox-02"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -296,6 +289,7 @@ exports[`undefined: renders correctly 2`] = `
       <button
         aria-expanded={false}
         aria-haspopup={true}
+        aria-label={null}
         className="dropdown-toggle btn btn-outline-secondary"
         onClick={[Function]}
         type="button"
@@ -311,14 +305,12 @@ exports[`undefined: renders correctly 2`] = `
         className="py-2 px-0 shadow dropdown-menu"
         role="menu"
         tabIndex="-1"
-        x-placement={undefined}
       >
         <label
           className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
           htmlFor="example-form-2.select2-select_all"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -343,18 +335,15 @@ exports[`undefined: renders correctly 2`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <div
           className="dropdown-item-subgroup"
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-1-checkbox-00"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -378,11 +367,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-2-checkbox-01"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -406,11 +393,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-3-checkbox-02"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -470,6 +455,7 @@ exports[`undefined: renders correctly 2`] = `
       <button
         aria-expanded={false}
         aria-haspopup={true}
+        aria-label={null}
         className="dropdown-toggle btn btn-outline-secondary"
         onClick={[Function]}
         type="button"
@@ -485,7 +471,6 @@ exports[`undefined: renders correctly 2`] = `
         className="py-2 px-0 shadow dropdown-menu"
         role="menu"
         tabIndex="-1"
-        x-placement={undefined}
       >
         <div
           className="px-2 input-group"
@@ -519,7 +504,6 @@ exports[`undefined: renders correctly 2`] = `
             aria-label="Suchen…"
             autoComplete="off"
             className="form-control"
-            name={undefined}
             onChange={[Function]}
             placeholder="Suchen…"
             type="text"
@@ -559,18 +543,15 @@ exports[`undefined: renders correctly 2`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <div
           className="dropdown-item-subgroup"
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-1-checkbox-00"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -594,11 +575,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-2-checkbox-01"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -622,11 +601,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-3-checkbox-02"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -686,6 +663,7 @@ exports[`undefined: renders correctly 2`] = `
       <button
         aria-expanded={false}
         aria-haspopup={true}
+        aria-label={null}
         className="dropdown-toggle btn btn-outline-secondary"
         onClick={[Function]}
         type="button"
@@ -701,14 +679,12 @@ exports[`undefined: renders correctly 2`] = `
         className="py-2 px-0 shadow dropdown-menu"
         role="menu"
         tabIndex="-1"
-        x-placement={undefined}
       >
         <label
           className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
           htmlFor="example-form-2.select2-select_all"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -733,7 +709,6 @@ exports[`undefined: renders correctly 2`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <div
           className="px-2 input-group"
@@ -767,7 +742,6 @@ exports[`undefined: renders correctly 2`] = `
             aria-label="Suchen…"
             autoComplete="off"
             className="form-control"
-            name={undefined}
             onChange={[Function]}
             placeholder="Suchen…"
             type="text"
@@ -807,18 +781,15 @@ exports[`undefined: renders correctly 2`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <div
           className="dropdown-item-subgroup"
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-1-checkbox-00"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -842,11 +813,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-2-checkbox-01"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -870,11 +839,9 @@ exports[`undefined: renders correctly 2`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select2-1-3-checkbox-02"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -908,13 +875,13 @@ exports[`undefined: renders correctly 2`] = `
     >
       <mark>
         {
-          "fields": {
-            "select2": [
-              "1-2",
-              "1-3"
-            ]
-          }
-        }
+  "fields": {
+    "select2": [
+      "1-2",
+      "1-3"
+    ]
+  }
+}
       </mark>
     </pre>
   </div>
@@ -995,6 +962,7 @@ exports[`undefined: renders correctly 3`] = `
       <button
         aria-expanded={false}
         aria-haspopup={true}
+        aria-label={null}
         className="dropdown-toggle btn btn-outline-secondary"
         onClick={[Function]}
         type="button"
@@ -1010,14 +978,12 @@ exports[`undefined: renders correctly 3`] = `
         className="py-2 px-0 shadow dropdown-menu"
         role="menu"
         tabIndex="-1"
-        x-placement={undefined}
       >
         <label
           className="py-1 px-2 mb-0 f6 text-wrap dropdown-item"
           htmlFor="example-form-2.select3-select_all"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -1042,7 +1008,6 @@ exports[`undefined: renders correctly 3`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <div
           className="px-2 input-group"
@@ -1076,7 +1041,6 @@ exports[`undefined: renders correctly 3`] = `
             aria-label="Suchen…"
             autoComplete="off"
             className="form-control"
-            name={undefined}
             onChange={[Function]}
             placeholder="Suchen…"
             type="text"
@@ -1116,14 +1080,12 @@ exports[`undefined: renders correctly 3`] = `
           className="dropdown-divider"
           onClick={[Function]}
           tabIndex="-1"
-          type={undefined}
         />
         <label
           className="py-1 px-2 mb-0 f6 font-weight-bold text-wrap dropdown-item"
           htmlFor="example-form-2.select3-select_group_Group 1_{i}"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -1149,11 +1111,9 @@ exports[`undefined: renders correctly 3`] = `
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-1-1-checkbox-00"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1177,11 +1137,9 @@ exports[`undefined: renders correctly 3`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-1-2-checkbox-01"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1205,11 +1163,9 @@ exports[`undefined: renders correctly 3`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-1-3-checkbox-02"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1237,7 +1193,6 @@ exports[`undefined: renders correctly 3`] = `
           htmlFor="example-form-2.select3-select_group_Group 2_{i}"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -1263,11 +1218,9 @@ exports[`undefined: renders correctly 3`] = `
         >
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-2-1-checkbox-10"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1295,7 +1248,6 @@ exports[`undefined: renders correctly 3`] = `
             htmlFor="example-form-2.select3-2-2-checkbox-11"
             onClick={[Function]}
             tabIndex="-1"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1323,7 +1275,6 @@ exports[`undefined: renders correctly 3`] = `
             htmlFor="example-form-2.select3-2-3-checkbox-12"
             onClick={[Function]}
             tabIndex="-1"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1351,7 +1302,6 @@ exports[`undefined: renders correctly 3`] = `
           htmlFor="example-form-2.select3-select_group_Group 3_{i}"
           onClick={[Function]}
           tabIndex="0"
-          type={undefined}
         >
           <div
             className="custom-control custom-checkbox"
@@ -1381,7 +1331,6 @@ exports[`undefined: renders correctly 3`] = `
             htmlFor="example-form-2.select3-3-1-checkbox-20"
             onClick={[Function]}
             tabIndex="-1"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1405,11 +1354,9 @@ exports[`undefined: renders correctly 3`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-3-2-checkbox-21"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1433,11 +1380,9 @@ exports[`undefined: renders correctly 3`] = `
           </label>
           <label
             className="py-1 px-2 mb-0 f6 text-wrap pl-4 dropdown-item"
-            disabled={undefined}
             htmlFor="example-form-2.select3-3-3-checkbox-22"
             onClick={[Function]}
             tabIndex="0"
-            type={undefined}
           >
             <div
               className="custom-control custom-checkbox"
@@ -1471,13 +1416,13 @@ exports[`undefined: renders correctly 3`] = `
     >
       <mark>
         {
-          "fields": {
-            "select3": [
-              "1-2",
-              "1-3"
-            ]
-          }
-        }
+  "fields": {
+    "select3": [
+      "1-2",
+      "1-3"
+    ]
+  }
+}
       </mark>
     </pre>
   </div>
