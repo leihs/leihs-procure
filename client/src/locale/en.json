@@ -9,7 +9,7 @@
   "form_filepicker_label": "Select File",
   "form_message_save_success": "Saved!",
 
-  "upload_error_click_to_show": "Upload did not work! Please klick for more details.",
+  "upload_error_click_to_show": "Upload did not work! Please click for more details.",
   "upload_error_click_to_retry": "Try again",
 
   "request": {
@@ -21,7 +21,7 @@
 
   "client": {
     "mutate_error": "Processing Error!",
-    "delete_error": "Deleting Error!"
+    "delete_error": "Deletion Error!"
   },
 
   "budget_period": "Budget Period",
@@ -82,7 +82,7 @@
 
   "request_form_field": {
     "article_name": "Item or Project",
-    "article_number": "Item nr. or Supplier nr.",
+    "article_number": "Item Nº or Supplier Nº",
     "_model_as_id": "Existing Model",
     "supplier": "Supplier",
     "supplier_name": "Supplier",
@@ -108,9 +108,9 @@
     "accounting_type_label_investment": "Investition",
     "accounting_type_label_aquisition": "Beschaffung",
     "cost_center": "Cost Center",
-    "general_ledger_account": "Sachkonto II (IR)",
+    "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
     "internal_order_number": "Innenauftrag",
-    "procurement_account": "Sachkonto I (ER)",
+    "procurement_account": "Sachkonto Ⅰ (ER)",
 
     "id": "ID",
     "model": "Model",
@@ -128,7 +128,7 @@
     "formfield": {
       "model": "Existing Model",
       "article_name": "Item or Project",
-      "article_number": "Item nr. or Supplier nr.",
+      "article_number": "Item Nº or Supplier Nº",
       "price_cents": "Price in CHF incl. value-added tax ",
       "supplier": "Supplier",
       "supplier_name": "Supplier",
@@ -169,8 +169,8 @@
       "user_list_empty": "(None)",
       "subcategories": {
         "cost_center": "Kostenstelle",
-        "general_ledger_account": "Sachkonto ⅠI (IR)",
-        "procurement_account": "Sachkonto I (ER)"
+        "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
+        "procurement_account": "Sachkonto Ⅰ (ER)"
       }
     }
   },
@@ -187,12 +187,12 @@
     "error_btn_retry": "try again",
     "error_details": "Error Details:",
     "network_error": "Network Error:",
-    "api_error_details": "API-Error details:",
+    "api_error_details": "API Error Details:",
     "data_details": "Data:",
     "show_details": "Show Details",
     "error_panel_emoticon": "¯\\_༼ ༎ຶ ෴ ༎ຶ༽_/¯",
     "msg_offline": "You are offline or the server is unreachable!",
-    "msg_unauthorized_1": "You do not have the priveleges to use this application!",
+    "msg_unauthorized_1": "You are not allowed to use this application!",
     "msg_unauthorized_2a": "Try going to the ",
     "msg_unauthorized_2b": "landing page",
     "msg_unauthorized_2c": " and maybe log in.",
