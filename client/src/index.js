@@ -1,3 +1,7 @@
+// polyfills first
+import 'react-app-polyfill/ie11'
+
+// non-polyfill imports
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
@@ -24,10 +28,6 @@ import AdminSettings from './pages/admin/AdminSettingsPage'
 
 import DevUiCatalog from './pages/_dev/UiCatalogPage'
 import DevConsole from './pages/_dev/ConsolePage'
-
-// env: polyfills (browser support)
-require('es6-promise').polyfill()
-require('isomorphic-fetch')
 
 // webpack: inject styles
 require('./styles/index.css')
