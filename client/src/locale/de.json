@@ -198,22 +198,5 @@
     "msg_unauthorized_2c": " anzumelden.",
     "msg_error_ofcode_1": "Entschuldigung, es ist ein Fehler vom Typ ",
     "msg_error_ofcode_2": " aufgetreten."
-  },
-  "___WIP_en___errors": {
-    "error_title": "ERROR",
-    "error_btn_retry": "retry",
-    "error_details": "Error Details:",
-    "network_error": "Network Error:",
-    "api_error_details": "API Error Details:",
-    "data_details": "Data:",
-    "show_details": "Show details",
-    "error_panel_emoticon": "¯\\_༼ ༎ຶ ෴ ༎ຶ༽_/¯",
-    "msg_offline": "You are offline or the Server is down!",
-    "msg_unauthorized_1": "You are not allowed to use this application!",
-    "msg_unauthorized_2a": "Try going to the ",
-    "msg_unauthorized_2b": "home page",
-    "msg_unauthorized_2c": " and maybe log in.",
-    "msg_error_ofcode_1": "Sorry, there was an error of type ",
-    "msg_error_ofcode_2": "."
   }
 }

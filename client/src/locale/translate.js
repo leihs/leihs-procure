@@ -1,6 +1,6 @@
 import f from 'lodash'
 
-import translations from './translations.json'
+import translations from './de.json'
 
 const translate = key => {
   const fallback = `⟪${key}⟫`
