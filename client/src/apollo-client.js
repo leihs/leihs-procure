@@ -1,12 +1,9 @@
 import ApolloClient from 'apollo-boost'
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory'
+import { isDev, store } from './env'
 
 import logger from 'debug'
 const log = logger('app:apollo')
-
-const isDev =
-  process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test'
-const store = window.sessionStorage
 
 const CSRF_COOKIE_NAME = 'leihs-anti-csrf-token'
 export const endpointURL = '/procure/graphql'

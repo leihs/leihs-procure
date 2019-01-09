@@ -12,6 +12,7 @@ import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
 import App from './containers/App'
 import { Redirect } from './components/Router'
+import { isDev, supportsHistory } from './env'
 
 // all the pages
 import HomePage from './pages/HomePage'
@@ -39,8 +40,6 @@ f.mixin(lodashMixins)
 initDevHelpers()
 
 const baseName = process.env.PUBLIC_URL // set in package.json/homepage
-const supportsHistory = 'pushState' in window.history
-const isDev = process.env.NODE_ENV === 'development'
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>

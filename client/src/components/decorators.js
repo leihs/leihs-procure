@@ -5,8 +5,7 @@ import { formatMoney } from 'accounting-js'
 
 import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
-
-const isDev = process.env.NODE_ENV !== 'production'
+import { isDev } from '../env'
 
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
