@@ -3,6 +3,7 @@ jobs:
     name: 'Frontend: Build'
     run_when:
       any branch is pushed: { type: branch, include_match: ^.*$ }
+
     task_defaults: &TASK_DEFAULTS
       environment_variables:
         CI: 'true'
@@ -11,11 +12,23 @@ jobs:
           include_match: ^.*$
       traits:
         g2016: true
+
     task:
       scripts:
         build:
           timeout: 10 minutes
           body: 'cd client && { npm ci || npm i ;} && npm run build'
+
+  client-lint:
+    name: 'Frontend: Lint'
+    run_when:
+      any branch is pushed: { type: branch, include_match: ^.*$ }
+    task_defaults: *TASK_DEFAULTS
+    task:
+      scripts:
+        lint:
+          timeout: 10 minutes
+          body: 'cd client && { npm ci || npm i ;} && npm run ci:lint'
 
   client-specs:
     name: 'Frontend: Tests'
@@ -26,4 +39,4 @@ jobs:
       scripts:
         jest:
           timeout: 10 minutes
-          body: 'cd client && { npm ci || npm i ;} && npm test -- -u && npm test'
+          body: 'cd client && { npm ci || npm i ;} && npm test'

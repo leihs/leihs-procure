@@ -276,8 +276,8 @@ class NewRequestPreselection extends React.Component {
                           selectedCategory
                             ? CatWithMainCat(selectedCategory)
                             : selectedTemplate
-                              ? CatWithMainCat(selectedTemplate.category.id)
-                              : null
+                            ? CatWithMainCat(selectedTemplate.category.id)
+                            : null
                         }
                       >
                         {({ mc, cat, tpl }) => (

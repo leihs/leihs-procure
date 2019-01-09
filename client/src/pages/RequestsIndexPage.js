@@ -385,8 +385,8 @@ const prepareFilters = (filters, inspectedCategories, viewedCategories) => {
   forAPI.categories = filters.onlyInspectedCategories
     ? f.intersection(filters.categories, inspectedCategories)
     : filters.onlyViewedCategories
-      ? f.intersection(filters.categories, viewedCategories)
-      : filters.categories
+    ? f.intersection(filters.categories, viewedCategories)
+    : filters.categories
 
   return forAPI
 }

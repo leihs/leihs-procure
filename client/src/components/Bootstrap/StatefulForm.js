@@ -167,9 +167,9 @@ function getFieldFromEvent({ target }) {
     target.type === 'checkbox'
       ? target.checked
       : target.type === 'radio'
-        ? target.selected
-        : // text, number, etc:
-          target.value
+      ? target.selected
+      : // text, number, etc:
+        target.value
 
   return { name, value: value }
 }

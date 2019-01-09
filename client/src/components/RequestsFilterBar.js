@@ -139,9 +139,8 @@ const Filters = ({ me, data, current, onChange }) => {
       // by default, select everything
       ...f.fromPairs(
         Object.keys(available).map(key => {
-          const values = f.flatMap(
-            available[key],
-            ({ value, options }) => (value ? value : f.map(options, 'value'))
+          const values = f.flatMap(available[key], ({ value, options }) =>
+            value ? value : f.map(options, 'value')
           )
           return [key, values]
         })
@@ -280,8 +279,8 @@ const Filters = ({ me, data, current, onChange }) => {
                                 current.onlyInspectedCategories
                                   ? available._inspectedCategories
                                   : current.onlyViewedCategories
-                                    ? available._viewedCategories
-                                    : available.categories
+                                  ? available._viewedCategories
+                                  : available.categories
                               }
                             />
                           </FormGroup>

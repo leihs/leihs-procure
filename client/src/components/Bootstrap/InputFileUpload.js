@@ -85,13 +85,12 @@ class InputFileUpload extends React.Component {
     log('onMarkForDeletion', { file, toDelete: toggled })
     this.setState(
       cs => ({
-        uploads: cs.uploads.map(
-          u =>
-            (file.id
-            ? u.id === file.id
-            : u.key === file.key)
-              ? { ...u, toDelete: toggled }
-              : u
+        uploads: cs.uploads.map(u =>
+          (file.id
+          ? u.id === file.id
+          : u.key === file.key)
+            ? { ...u, toDelete: toggled }
+            : u
         )
       }),
       () => this.onChangeCallback()

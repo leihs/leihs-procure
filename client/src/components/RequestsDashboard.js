@@ -99,49 +99,48 @@ class RequestsDashboard extends React.Component {
       </Row>
     )
 
-    const SpreadsheetExporter = state.exportView &&
-      hasData && (
-        <Suspense fallback={<Loading size="1" />}>
-          <SpreadsheetExportProvider requestsData={requestsQuery.data}>
-            {({ table, download, exportFormats }) => (
-              <div>
-                <ButtonToolbar className="pb-3">
-                  {/* <ButtonToolbar className="row pb-3"> */}
-                  {/* <ButtonGroup className="col-auto mr-auto pt-3"> */}
-                  <Dropdown className="mr-2">
-                    <DropdownToggle caret color="success">
-                      <Icon.FileDownload spaced /> {'Herunterladen'}
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      {exportFormats.map(fmt => (
-                        <DropdownItem
-                          key={fmt.ext}
-                          onClick={e => download(table, fmt)}
-                        >
-                          {fmt.name}
-                        </DropdownItem>
-                      ))}
-                    </DropdownMenu>
-                  </Dropdown>
+    const SpreadsheetExporter = state.exportView && hasData && (
+      <Suspense fallback={<Loading size="1" />}>
+        <SpreadsheetExportProvider requestsData={requestsQuery.data}>
+          {({ table, download, exportFormats }) => (
+            <div>
+              <ButtonToolbar className="pb-3">
+                {/* <ButtonToolbar className="row pb-3"> */}
+                {/* <ButtonGroup className="col-auto mr-auto pt-3"> */}
+                <Dropdown className="mr-2">
+                  <DropdownToggle caret color="success">
+                    <Icon.FileDownload spaced /> {'Herunterladen'}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    {exportFormats.map(fmt => (
+                      <DropdownItem
+                        key={fmt.ext}
+                        onClick={e => download(table, fmt)}
+                      >
+                        {fmt.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
 
-                  <Button
-                    outline
-                    onClick={e => this.setState(s => ({ exportView: false }))}
-                  >
-                    Exportansicht schliessen
-                  </Button>
-                  {/* </ButtonGroup> */}
-                  {/* <ButtonGroup className="col-auto ml-auto pt-3">
+                <Button
+                  outline
+                  onClick={e => this.setState(s => ({ exportView: false }))}
+                >
+                  Exportansicht schliessen
+                </Button>
+                {/* </ButtonGroup> */}
+                {/* <ButtonGroup className="col-auto ml-auto pt-3">
                 </ButtonGroup> */}
-                </ButtonToolbar>
+              </ButtonToolbar>
 
-                <h2 className="h5">Vorschau:</h2>
-                {<RequestTable table={table} query={requestsQuery} />}
-              </div>
-            )}
-          </SpreadsheetExportProvider>
-        </Suspense>
-      )
+              <h2 className="h5">Vorschau:</h2>
+              {<RequestTable table={table} query={requestsQuery} />}
+            </div>
+          )}
+        </SpreadsheetExportProvider>
+      </Suspense>
+    )
 
     const [Wrapper, wrapProps] = !state.showFilter
       ? ['div', { className: 'pt-3 px-3' }]
@@ -366,15 +365,14 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
             </Row>
           </div>
 
-          {isOpen &&
-            children && (
-              <ul
-                className="list-group list-group-flush bp-cat-list"
-                {...collapsedProps}
-              >
-                {children}
-              </ul>
-            )}
+          {isOpen && children && (
+            <ul
+              className="list-group list-group-flush bp-cat-list"
+              {...collapsedProps}
+            >
+              {children}
+            </ul>
+          )}
         </div>
       )}
     </Collapsing>
@@ -454,12 +452,11 @@ const CategoryLine = ({
             </Col>
           </Row>
         </li>
-        {isOpen &&
-          props.children && (
-            <li className="list-group-item p-0" {...collapsedProps}>
-              <ul className="list-group list-group-flush">{props.children}</ul>
-            </li>
-          )}
+        {isOpen && props.children && (
+          <li className="list-group-item p-0" {...collapsedProps}>
+            <ul className="list-group list-group-flush">{props.children}</ul>
+          </li>
+        )}
       </F>
     )}
   </Collapsing>

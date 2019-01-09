@@ -83,8 +83,8 @@ class MultiSelect extends React.PureComponent {
 
   onOptionChange = (value, isSelected) => {
     log('onOptionChange', { value, isSelected })
-    const selected = [...this.selection(), value].filter(
-      val => (val === value ? isSelected : true)
+    const selected = [...this.selection(), value].filter(val =>
+      val === value ? isSelected : true
     )
     this.onChangeCallback(selected)
   }

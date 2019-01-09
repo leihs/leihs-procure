@@ -11,8 +11,8 @@ export const getSelectedValueFromProps = (value, multiple) =>
       ? value
       : value[0]
     : multiple
-      ? [value]
-      : value
+    ? [value]
+    : value
 
 export const getSelectedValueFromEvent = ({ target }, multiple) =>
   !multiple
