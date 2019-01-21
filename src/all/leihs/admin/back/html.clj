@@ -7,7 +7,7 @@
             [leihs.admin.paths :refer [path]]
             [leihs.admin.utils.release-info :as release-info]
             [leihs.core
-             [http-cache-buster :as cache-buster]
+             [http-cache-buster2 :as cache-buster]
              [json :refer [to-json]]]
             [leihs.core.url.core :as url]))
 

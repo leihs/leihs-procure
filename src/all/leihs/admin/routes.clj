@@ -6,7 +6,7 @@
    [leihs.core.anti-csrf.back :as anti-csrf]
    [leihs.core.constants :as constants]
    [leihs.core.ds :as ds]
-   [leihs.core.http-cache-buster :as cache-buster :refer [wrap-resource]]
+   [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
    [leihs.core.json :as json]
    [leihs.core.json-protocol]
    [leihs.core.ring-exception :as ring-exception]
