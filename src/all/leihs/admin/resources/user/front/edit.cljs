@@ -9,7 +9,7 @@
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
-    [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.user.front.shared :as user.shared :refer [user-id* user-data* edit-mode?*]]

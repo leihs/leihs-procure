@@ -19,10 +19,6 @@
      (humanize-datetime (:timestamp @state/global-state*) dt)]
     [:span "NULL"]))
 
-(defn short-id [uuid]
-  [:span {:style {:font-family :monospace}}
-   (->> uuid (take 8) clojure.string/join)])
-
 (defn gravatar-url
   ([email]
    (gravatar-url email 32))

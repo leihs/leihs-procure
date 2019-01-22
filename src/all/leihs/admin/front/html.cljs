@@ -10,9 +10,10 @@
     [leihs.core.requests.modal]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
+    [leihs.core.user.shared :refer [short-id]]
     [leihs.core.env :refer [use-remote-navbar?]]
 
-    [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.admin.front :as admin :refer [page] :rename {page home-page}]

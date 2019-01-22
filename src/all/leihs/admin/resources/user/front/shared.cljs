@@ -5,12 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.user.shared :refer [user-name-html]]
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
@@ -298,13 +299,9 @@
         [additional-properties-component])])])
 
 (defn user-name-component []
-  (if-not @user-data*
-    [:span {:style {:font-family "monospace"}} (short-id @user-id*)]
-    [:em 
-     (if-let [name (-> (str (:firstname @user-data*) " " (:lastname @user-data*))
-                       clojure.string/trim presence)]
-       name
-       (:email @user-data*))]))
+  (let [user-id @user-id*
+        user-data @user-data*]
+    (user-name-html user-id user-data)))
 
 (defn user-id-component []
   [:p "id: " [:span {:style {:font-family "monospace"}} (:id @user-data*)]])

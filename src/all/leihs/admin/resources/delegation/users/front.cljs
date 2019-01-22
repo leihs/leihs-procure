@@ -7,11 +7,12 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
+    [leihs.core.user.shared :refer [short-id]]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
     [leihs.core.icons :as icons]
-    [leihs.admin.front.shared :refer [humanize-datetime-component short-id gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.delegation.front :as delegation :refer [delegation-id*]]
