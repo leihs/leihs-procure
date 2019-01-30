@@ -11,10 +11,10 @@
     [leihs.admin.front.pages.debug]
     [leihs.admin.paths :as paths :refer [path paths]]
     [leihs.admin.resources.admin.front :as admin]
-    [leihs.admin.resources.authentication-system.front :as authentication-system]
-    [leihs.admin.resources.authentication-system.groups.front :as authentication-system-groups]
-    [leihs.admin.resources.authentication-system.users.front :as authentication-system-users]
-    [leihs.admin.resources.authentication-systems.front :as authentication-systems]
+    [leihs.admin.resources.system.authentication-system.front :as authentication-system]
+    [leihs.admin.resources.system.authentication-system.groups.front :as authentication-system-groups]
+    [leihs.admin.resources.system.authentication-system.users.front :as authentication-system-users]
+    [leihs.admin.resources.system.authentication-systems.front :as authentication-systems]
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
@@ -24,9 +24,10 @@
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.sign-in.front :as sign-in]
     [leihs.admin.resources.status.front :as status]
-    [leihs.admin.resources.system-admins.direct-users.front :as system-admin-direct-users]
-    [leihs.admin.resources.system-admins.front :as system-admins]
-    [leihs.admin.resources.system-admins.groups.front :as system-admin-groups]
+    [leihs.admin.resources.system.front :as system]
+    [leihs.admin.resources.system.system-admins.direct-users.front :as system-admin-direct-users]
+    [leihs.admin.resources.system.system-admins.front :as system-admins]
+    [leihs.admin.resources.system.system-admins.groups.front :as system-admin-groups]
     [leihs.admin.resources.user.front :as user]
     [leihs.admin.resources.users.front :as users]
 
@@ -66,6 +67,7 @@
    :home #'home/page
    :sign-in #'sign-in/page
    :status #'status/info-page
+   :system #'system/page
    :system-admins #'system-admins/page
    :system-admin-groups #'system-admin-groups/page
    :system-admin-direct-users #'system-admin-direct-users/page

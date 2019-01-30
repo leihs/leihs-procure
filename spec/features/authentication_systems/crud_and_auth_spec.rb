@@ -17,6 +17,7 @@ feature 'Authentication-Systems', type: :feature do
 
       sign_in_as @system_admin
 
+      click_on 'System'
       click_on 'Authentication-Systems'
 
       click_on 'Add authentication-system'

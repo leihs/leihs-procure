@@ -10,8 +10,8 @@
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths]
-    [leihs.admin.resources.authentication-systems.breadcrumbs :as authentication-systems.breadcrumbs]
-    [leihs.admin.resources.system-admins.breadcrumbs :as system-admins]
+    [leihs.admin.resources.system.system-admins.breadcrumbs :as system-admins]
+    [leihs.admin.resources.system.breadcrumbs :as system-breadcrumbs]
     ))
 
 (defn page []
@@ -21,8 +21,7 @@
        [(breadcrumbs/leihs-li)
         (breadcrumbs/admin-li)]
        [(breadcrumbs/li :admin-audits-legacy " Audits legacy ")
-        (authentication-systems.breadcrumbs/authentication-systems-li)
-        (breadcrumbs/li :admin-buildings " Buildings ")
+         (breadcrumbs/li :admin-buildings " Buildings ")
         (breadcrumbs/delegations-li)
         (breadcrumbs/li :admin-fields " Fields ")
         (breadcrumbs/groups-li)
@@ -34,7 +33,7 @@
         (breadcrumbs/li :admin-statistics " Statistics ")
         (breadcrumbs/li :admin-suppliers " Suppliers ")
         (when (:scope_system_admin_read @core-user/state*)
-          (system-admins/system-admins-li))
+          (system-breadcrumbs/system-li))
         (breadcrumbs/users-li)]))
    [:div
     [:h1 "Admin"]

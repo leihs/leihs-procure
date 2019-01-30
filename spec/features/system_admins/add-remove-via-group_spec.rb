@@ -17,6 +17,7 @@ feature 'System-Admins', type: :feature do
     end
 
     scenario 'adding and removing a system admin-group' do 
+      click_on_first 'System'
       click_on 'System-Admins'
       expect(find("table.users").text).not_to include @user.email
       click_on 'Groups'

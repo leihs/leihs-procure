@@ -27,6 +27,7 @@ feature 'System-Admins', type: :feature do
 
       sign_in_as @system_admin
 
+      click_on_first 'System'
       click_on_first 'System-Admins'
 
       users_table_text = find("table.users").text
@@ -42,6 +43,7 @@ feature 'System-Admins', type: :feature do
     scenario 'a system-admin sees but a simple_user does not see the "System-Admins" link' do
 
       sign_in_as @system_admin
+      click_on_first 'System'
       expect(page).to have_content "System-Admins"
       click_on_first "Sign out"
 
