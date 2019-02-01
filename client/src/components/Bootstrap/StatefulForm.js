@@ -12,7 +12,7 @@ const log = logger('app:ui:StatefulForm')
   state container to handle a flat form like in plain HTML.
   input fields use `name`, `value` and `onChange`.
 
-  'name' is interpreted as a object key path in case nested data is nedded
+  'name' is interpreted as a object key path in case nested data is needed
   (`user.name=ann` == {user:{name: 'ann'}})
 
   actual form is rendered by consumer using the `render` prop,

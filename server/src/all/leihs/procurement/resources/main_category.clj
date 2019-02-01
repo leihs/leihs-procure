@@ -48,29 +48,20 @@
 
 (defn deal-with-image!
   [tx mc-id images]
-  (let [uploads-to-delete (filter-images {:to_delete true, :typename "Upload"}
-                                         images)
-        uploads-to-images (filter-images {:to_delete false, :typename "Upload"}
-                                         images)
-        images-to-delete (filter-images {:to_delete true, :typename "Image"}
-                                        images)
-        ; NOTE: just for purpose of completeness and clarity:
-        ; don't do anything with existing images
-        ; images-to-retain
-        ; (filter-images {:to_delete false, :typename "Image"}
-        ; images)
-        ]
-    (if-not (empty? uploads-to-delete)
-      (uploads/delete! tx (map :id uploads-to-delete)))
-    (if-not (empty? images-to-delete)
-      (images/delete! tx (map :id images-to-delete)))
-    (when-not (empty? uploads-to-images)
-      (if (> (count uploads-to-images) 1)
-        (throw (Exception. "Uploading of more than one image is not allowed.")))
-      (image/create-for-main-category-id-and-upload! tx
-                                                     mc-id
-                                                     (first
-                                                       uploads-to-images)))))
+  (log/info images)
+  (when-let [new-image-upload (-> {:to_delete false, :typename "Upload"}
+                                  (filter-images images)
+                                  first)]
+    (jdbc/execute! tx
+                   (-> (sql/delete-from :procurement_images)
+                       (sql/where [:= :procurement_images.main_category_id
+                                   mc-id])
+                       sql/format))
+    (image/create-for-main-category-id-and-upload! tx mc-id new-image-upload))
+  (when-let [uploads-to-delete (-> {:to_delete true, :typename "Upload"}
+                                   (filter-images images)
+                                   not-empty)]
+    (uploads/delete! tx (map :id uploads-to-delete))))
 
 (defn update!
   [tx mc]

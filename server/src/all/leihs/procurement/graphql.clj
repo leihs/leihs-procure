@@ -37,8 +37,11 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  (let [result (exec-query query request)]
-    (cond-> {:body result} (:errors result) (assoc :graphql-error true))))
+  (let [result (exec-query query request)
+        resp {:body result}]
+    (if (:errors result)
+      (do (log/debug result) (assoc resp :graphql-error true))
+      resp)))
 
 (defn parse-query-with-exception-handling
   [schema query]

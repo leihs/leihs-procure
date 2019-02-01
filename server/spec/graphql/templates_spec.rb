@@ -42,8 +42,8 @@ describe 'templates' do
       GRAPHQL
 
       result = query(q, user.id)
-      expect(result['data']['update_templates']).to be_empty
-      expect(result['errors'].first['exception'])
+      expect(result['data']['update_templates']).to be_blank
+      expect(result['errors'].first['extensions']['exception'])
         .to be == 'UnauthorizedException'
 
       expect(Template.all.count).to be == templates_before.count

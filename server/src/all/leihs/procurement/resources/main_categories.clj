@@ -72,7 +72,7 @@
                                   :name
                                   (main-category/get-main-category-by-name tx)
                                   :id))))
-              (let [image (:image mc)
+              (let [image (:new_image_url mc)
                     budget-limits
                       (->> mc
                            :budget_limits

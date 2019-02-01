@@ -245,16 +245,13 @@ describe 'main categories' do
                   viewers: ["#{User.find(firstname: 'user_3').id}",
                             "#{User.find(firstname: 'user_4').id}"] }
               ],
-              image: [
+              new_image_url: [
                 { id: "#{@upload_1.id}",
                   to_delete: true,
                   typename: "Upload" },
                 { id: "#{@upload_2.id}",
                   to_delete: false,
-                  typename: "Upload" },
-                { id: "#{Image.find(main_category_id: MainCategory.find(name: 'main_cat_1').id).id}",
-                  to_delete: true,
-                  typename: "Image" }
+                  typename: "Upload" }
               ]
             },
             { id: "#{MainCategory.find(name: 'main_cat_2').id}",
@@ -269,8 +266,8 @@ describe 'main categories' do
         inspector_user = User.find(firstname: 'user_1')
         result = query(q, inspector_user.id, @qvariables)
 
-        expect(result['data']['main_categories']).to be_empty
-        expect(result['errors'].first['exception'])
+        expect(result['data']['main_categories']).to be_blank
+        expect(result['errors'].first['extensions']['exception'])
           .to be == 'UnauthorizedException'
 
         MainCategory

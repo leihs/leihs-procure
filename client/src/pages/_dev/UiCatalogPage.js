@@ -218,6 +218,31 @@ const PAGES = [
         </form>
         <hr />
         <h5>with form (shows form data)</h5>
+        <h6>single file</h6>
+        <StatefulForm idPrefix="input-file-upload-mock-form">
+          {({ fields, formPropsFor }) => {
+            return (
+              <F>
+                <form
+                  id="input-file-upload-mock-form"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    window.alert(JSON.stringify(fields, 0, 2))
+                  }}
+                >
+                  <InputFileUpload
+                    multiple={false}
+                    {...formPropsFor('exampleAttachments')}
+                  />
+                </form>
+                <pre>
+                  <code>{JSON.stringify(fields, 0, 2)}</code>
+                </pre>
+              </F>
+            )
+          }}
+        </StatefulForm>
+        <h6>multiple files</h6>
         <StatefulForm idPrefix="input-file-upload-mock-form">
           {({ fields, formPropsFor }) => {
             return (

@@ -35,8 +35,18 @@ class InputFileUpload extends React.Component {
 
       this.setState(
         cs => {
-          if (f.find(cs.uploads, { key: file.key })) return (isDuplicate = true)
-          return { uploads: [...cs.uploads, file] }
+          let uploads2
+          const dup = f.find(cs.uploads, { key: file.key })
+
+          if (dup) {
+            isDuplicate = true
+            uploads2 = f.map(cs.uploads, u =>
+              u.id === dup.id ? f.merge(u, { toDelete: false }) : u
+            )
+          } else {
+            uploads2 = [...cs.uploads, file]
+          }
+          return { uploads: uploads2 }
         },
         () => {
           !isDuplicate &&
@@ -104,19 +114,34 @@ class InputFileUpload extends React.Component {
   }
 
   render(
-    { state, props: { id, name, className, inputProps, ...props } } = this
+    {
+      state,
+      props: {
+        id,
+        name,
+        className,
+        inputProps,
+        multiple,
+        label = 'Anhänge auswählen',
+        ...props
+      }
+    } = this
   ) {
     log('render', { state, props: this.props })
     if (!id) {
       throw new Error('`InputFileUpload` is missing `props.id`!')
     }
-    const isDisabled = !!(props.disabled || props.readOnly)
+
+    const canUpload = multiple || toKeep(state.uploads).length < 1
+    const isDisabled = !!(props.disabled || props.readOnly) || !canUpload
 
     return (
       <div id={id} className={cx('input-group input-file-upload', className)}>
         {f.present(state.uploads) && (
           <ul className="input-file-upload-list pl-4 mb-1">
             {state.uploads.map(u => {
+              //if (!multiple && u.toDelete) return false
+
               const key = u.id || u.key
               const isReady = !!u.id
               const isFailed = !!u.error
@@ -138,7 +163,7 @@ class InputFileUpload extends React.Component {
                 </a>
               )
 
-              const deleteToggle = isDisabled || (
+              const deleteToggle = (
                 <label>
                   <Icon.Trash className="text-danger" />
                   <input
@@ -178,13 +203,25 @@ class InputFileUpload extends React.Component {
                 </Tooltipped>
               )
 
-              const endOfLine = isReady ? (
-                deleteToggle
-              ) : !isFailed ? (
-                <Icon.Spinner />
-              ) : (
-                retryButton
-              )
+              const endOfLine = (function() {
+                if (isReady) {
+                  if (
+                    multiple ||
+                    !u.toDelete ||
+                    toKeep(state.uploads).length === 0
+                  ) {
+                    return deleteToggle
+                  } else {
+                    return false
+                  }
+                } else {
+                  if (!isFailed) {
+                    return <Icon.Spinner />
+                  } else {
+                    return retryButton
+                  }
+                }
+              })()
 
               return (
                 <li key={key} className={txtCls}>
@@ -201,7 +238,7 @@ class InputFileUpload extends React.Component {
           <FilePicker
             // FIXME: re-enable multiples when backend fixed!
             multiple={false}
-            label="Anhänge auswählen"
+            label={label}
             onChange={e => this.onSelectFiles(e)}
           />
         )}
@@ -213,7 +250,8 @@ class InputFileUpload extends React.Component {
 InputFileUpload.defaultProps = {
   name: 'files',
   onChange: () => {},
-  inputProps: {}
+  inputProps: {},
+  multiple: true
 }
 
 InputFileUpload.propTypes = {
@@ -298,3 +336,5 @@ function uploadFile({ file, onProgress, onFinish }) {
 }
 
 const sameKeyOrId = (a, b) => !!(a.key && b.key && f.isEqual(a.key, b.key))
+
+const toKeep = us => f.where(us, u => !u.toDelete)

@@ -18,7 +18,8 @@ import {
   // InputText,
   FormField,
   // InputField,
-  Tooltipped
+  Tooltipped,
+  InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
 import { Redirect, Routed } from '../../components/Router'
@@ -118,7 +119,11 @@ const updateCategories = {
     const data = mainCats.map(mainCat => {
       return {
         ...f.pick(mainCat, ['id', 'name', 'toDelete']),
-        // TODO: image: …
+
+        new_image_url: f.map(mainCat.new_image_url, o => ({
+          ...f.pick(o, 'id', 'typename'),
+          to_delete: !!o.toDelete
+        })),
 
         // NOTE: NO_BUDGET_LIMITS
         // budget_limits: f.map(mainCat.budget_limits, l => ({
@@ -355,7 +360,7 @@ class CategoryCard extends React.Component {
                     />
 
                     <Row>
-                      <Col sm>
+                      <Col sm="4">
                         <h6>{t('admin.categories.image')}</h6>
                         {fields.image_url && (
                           <div className="img-thumbnail-wrapper mb-3">
@@ -366,7 +371,11 @@ class CategoryCard extends React.Component {
                             />
                           </div>
                         )}
-                        <code>TBD: upload new image</code>
+                        <InputFileUpload
+                          multiple={false}
+                          label="Neues Kategoriebild auswählen"
+                          {...formPropsFor('new_image_url')}
+                        />
                       </Col>
 
                       {/* NOTE: NO_BUDGET_LIMITS
