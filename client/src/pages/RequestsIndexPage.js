@@ -94,6 +94,7 @@ const REQUESTS_QUERY = gql`
 
             requests {
               ...RequestFieldsForIndex
+              total_price_cents
               actionPermissions {
                 edit
               }
