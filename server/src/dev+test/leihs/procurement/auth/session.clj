@@ -5,14 +5,15 @@
 (defn wrap
   [handler]
   (fn [request]
-    (let [user-id
+    (let [db-user
             (some->
               request
               :headers
               (get "x-fake-token-authorization")
               (->>
-                (user/get-user-by-id (:tx request)))
-              :id)]
+                (user/get-user-by-id (:tx request))))]
       (handler
         (cond-> request
-          user-id (assoc :authenticated-entity {:user_id user-id}))))))
+          db-user
+            (assoc :authenticated-entity
+              (clojure.set/rename-keys db-user {:id :user_id})))))))
