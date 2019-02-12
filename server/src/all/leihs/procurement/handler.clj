@@ -8,6 +8,7 @@
      [env :as env] [graphql :as graphql] [paths :refer [paths]]
      [status :as status]]
     [leihs.core.anti-csrf.back :as anti-csrf]
+    [leihs.core.locale :as locale]
     [leihs.core.sign-out.back :as sign-out]
     [leihs.procurement.paths :refer [path paths]]
     [leihs.procurement.auth.session :as session]
@@ -128,6 +129,7 @@
   (->
     dispatch-to-handler
     anti-csrf/wrap
+    locale/wrap
     wrap-authorize
     wrap-authenticate
     session/wrap
