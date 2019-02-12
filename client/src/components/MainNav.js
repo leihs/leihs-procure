@@ -41,7 +41,7 @@ export default class MainNav extends React.Component {
     const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
 
     const brand = (
-      <NavbarBrand exact to="/">
+      <NavbarBrand key="brand" exact to="/">
         <Brand />
       </NavbarBrand>
     )
