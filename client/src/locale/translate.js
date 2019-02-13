@@ -12,6 +12,16 @@ import zz from './zz.json'
 const DEV_LANGS = isDev ? { xx, zz } : null
 const store = window.sessionStorage
 const SELECTED_LANG = store.getItem('LEIHS_DEV_FAKE_USER_LANG')
+
+// XXX global, forces refresh if changed!
+//     refresh is needed because we sidestep React
+const setLang = l => {
+  const old = store.getItem('LEIHS_DEV_FAKE_USER_LANG')
+  store.setItem('LEIHS_DEV_FAKE_USER_LANG', l)
+  if (l !== old) window.location.reload()
+}
+window && (window.setLang = setLang)
+
 const fakeLang = l => {
   store.setItem('LEIHS_DEV_FAKE_USER_LANG', l)
   window.location.reload()
@@ -22,7 +32,11 @@ const LANGS = { en, de, ...DEV_LANGS }
 const DEFAULT_LANG = 'de'
 
 const translate = key => {
-  const translations = LANGS[SELECTED_LANG] || LANGS[DEFAULT_LANG]
+  const translations = SELECTED_LANG
+    ? LANGS[SELECTED_LANG] ||
+      LANGS[SELECTED_LANG.split('-')[0]] ||
+      LANGS[DEFAULT_LANG]
+    : LANGS[DEFAULT_LANG]
   const fallback = `⟪${key}⟫`
   // 'foo.bar.baz' => [ 'foo.bar.baz', 'bar.baz', 'baz' ]
   const paths = key.split('.').map((i, n, a) => a.slice(n).join('.'))
