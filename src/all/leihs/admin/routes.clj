@@ -22,6 +22,7 @@
    [leihs.admin.resources.system.authentication-system.groups.back :as authentication-system-groups]
    [leihs.admin.resources.system.authentication-system.users.back :as authentication-system-users]
    [leihs.admin.resources.system.authentication-systems.back :as authentication-systems]
+   [leihs.admin.resources.system.database.audits.back :as audits]
    [leihs.admin.resources.delegation.back :as delegation]
    [leihs.admin.resources.delegation.users.back :as delegation-users]
    [leihs.admin.resources.delegations.back :as delegations]
@@ -67,11 +68,13 @@
   {:password-authentication admin-auth/routes
    :auth-sign-out admin-auth/routes
    :authentication-system authentication-system/routes
-   :authentication-system-groups authentication-system-groups/routes
    :authentication-system-group authentication-system-groups/routes
+   :authentication-system-groups authentication-system-groups/routes
    :authentication-system-user authentication-system-users/routes
    :authentication-system-users authentication-system-users/routes
    :authentication-systems authentication-systems/routes
+   :database-audits-before audits/routes
+   :database-audits-download audits/routes
    :delegation delegation/routes
    :delegation-add-choose-responsible-user delegation/routes
    :delegation-edit-choose-responsible-user delegation/routes
@@ -86,11 +89,11 @@
    :redirect-to-root redirect-to-root-handler
    :sign-out sign-out/ring-handler
    :status status/routes
+   :system-admin-direct-users system-admin-direct-users/routes
+   :system-admin-groups system-admin-groups/routes
    :system-admins system-admins/routes
    :system-admins-direct-user system-admin-direct-users/routes
-   :system-admin-direct-users system-admin-direct-users/routes
    :system-admins-group system-admin-groups/routes
-   :system-admin-groups system-admin-groups/routes
    :user user/routes
    :user-inventory-pools-roles user/routes
    :user-transfer-data user/routes
@@ -259,5 +262,5 @@
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
-(logging-config/set-logger! :level :info)
+;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns *ns*)

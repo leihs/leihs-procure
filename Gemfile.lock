@@ -179,23 +179,23 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  addressable (= 2.5.2)
+  addressable
   base32-crockford
   capybara (= 2.18.0)
   exiftool_vendored
-  factory_bot (= 4.8.2)
-  faker (= 1.8.7)
+  factory_bot
+  faker
   faraday
   faraday_middleware
   money-rails (~> 1.4)
   pg
   pg_tasks!
   pry
-  rails (= 5.0.6)
-  rspec (= 3.7.0)
+  rails
+  rspec
   selenium-webdriver (~> 2.53)
   sequel (~> 4.42, >= 4.42.1)
   uuidtools
 
 BUNDLED WITH
-   1.16.6
+   1.17.2

@@ -4,6 +4,8 @@ require 'selenium-webdriver'
 require 'faraday'
 require 'faraday_middleware'
 
+BROWSER_DONWLOAD_DIR= File.absolute_path(File.expand_path(__FILE__)  + "/../../../tmp")
+
 def base_url
   @base_url ||= ENV['LEIHS_ADMIN_HTTP_BASE_URL'].presence || 'http://localhost:3220'
 end
@@ -38,12 +40,31 @@ def set_browser(example)
 end
 
 RSpec.configure do |config|
-  Capybara.current_driver = :selenium
   set_capybara_values
 
   if ENV['FIREFOX_ESR_45_PATH'].present?
     Selenium::WebDriver::Firefox.path = ENV['FIREFOX_ESR_45_PATH']
   end
+
+  Capybara.register_driver :selenium do |app|
+
+    profile_config = {
+      'browser.helperApps.neverAsk.saveToDisk' => 'image/jpeg,application/pdf,application/json',
+      'browser.download.folderList' => 2, # custom location
+      'browser.download.dir' => BROWSER_DONWLOAD_DIR.to_s
+    }
+
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile_config.each { |k, v| profile[k] = v }
+
+    client = Selenium::WebDriver::Remote::Http::Default.new
+
+    Capybara::Selenium::Driver.new \
+      app, browser: :firefox, profile: profile, http_client: client
+
+  end
+
+  Capybara.current_driver = :selenium
 
   config.before :all do
     set_capybara_values
