@@ -55,19 +55,26 @@ class App extends Component {
                     )
                   }
 
+                  // XXX hacky getting locale from navbarprops - should be field on user
+                  const userLocale = getUserLocale(data)
+                  // XXX global variable for lang - should use props or context
+                  if (window && userLocale) window.setLang(userLocale)
+
                   return (
                     <F>
-                      <MainNavWithRouter
-                        isDev={isDev}
-                        me={UserWithShortcuts(currentUser)}
-                        contactUrl={f.get(data, 'settings.contact_url')}
-                      />
-                      <div className="minh-100vh">
-                        <FlashAlert
-                          flash={f.get(location, 'state.flash')}
-                          dismiss={dismissFlash}
+                      <div lang={userLocale}>
+                        <MainNavWithRouter
+                          isDev={isDev}
+                          me={UserWithShortcuts(currentUser)}
+                          contactUrl={f.get(data, 'settings.contact_url')}
                         />
-                        {children}
+                        <div className="minh-100vh">
+                          <FlashAlert
+                            flash={f.get(location, 'state.flash')}
+                            dismiss={dismissFlash}
+                          />
+                          {children}
+                        </div>
                       </div>
                     </F>
                   )
@@ -150,5 +157,14 @@ const ErrorHandler = ({ error, data, refetch }) => {
       </p>
       <p>{retryButton}</p>
     </FatalErrorScreen>
+  )
+}
+
+function getUserLocale(data) {
+  return f.try(
+    () =>
+      JSON.parse(data.current_user.navbarProps).config.locales.filter(
+        l => l.isSelected
+      )[0].locale_name
   )
 }
