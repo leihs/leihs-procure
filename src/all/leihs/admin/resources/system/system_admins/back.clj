@@ -54,10 +54,11 @@
 (def routes
   (-> (cpj/routes
         (cpj/GET (path :system-admins) [] #'users))
-      (admin-auth/wrap-authorize #{} {:scope_admin_read true
-                                      :scope_admin_write true
-                                      :scope_system_admin_read true
-                                      :scope_system_admin_write true})))
+      (admin-auth/wrap-authorize  
+        {:required-scopes {:scope_admin_read true
+                           :scope_admin_write true
+                           :scope_system_admin_read true
+                           :scope_system_admin_write true}})))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

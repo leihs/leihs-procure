@@ -231,7 +231,8 @@
 (defn init [secret]
   (I> wrap-handler-with-logging
       dispatch-to-handler
-      (admin-auth/wrap-authorize skip-authorization-handler-keys)
+      (admin-auth/wrap-authorize 
+        {:skip-authorization-handler-keys skip-authorization-handler-keys})
       wrap-dispatch-content-type
       anti-csrf/wrap
       auth/wrap-authenticate

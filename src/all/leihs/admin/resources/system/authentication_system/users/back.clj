@@ -3,12 +3,14 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
     [leihs.admin.resources.users.back :as users]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
+
+    [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -187,13 +189,16 @@
   (path :authentication-system-users {:authentication-system-id ":authentication-system-id"}))
 
 (def routes
-  (cpj/routes
-    (cpj/GET authentication-system-user-path [] #'user-data)
-    (cpj/PUT authentication-system-user-path [] #'put-user)
-    (cpj/DELETE authentication-system-user-path [] #'remove-user)
-    (cpj/GET authentication-system-users-path [] #'users)
-    (cpj/PUT authentication-system-users-path [] #'batch-update-users)))
-
+  (-> (cpj/routes
+        (cpj/GET authentication-system-user-path [] #'user-data)
+        (cpj/PUT authentication-system-user-path [] #'put-user)
+        (cpj/DELETE authentication-system-user-path [] #'remove-user)
+        (cpj/GET authentication-system-users-path [] #'users)
+        (cpj/PUT authentication-system-users-path [] #'batch-update-users))
+      (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
+                                                    :scope_admin_write true
+                                                    :scope_system_admin_read false 
+                                                    :scope_system_admin_write false}}))) 
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

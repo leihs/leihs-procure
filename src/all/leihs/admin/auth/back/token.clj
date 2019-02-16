@@ -36,6 +36,8 @@
         :scope_write
         :scope_admin_read
         :scope_admin_write
+        :scope_system_admin_read
+        :scope_system_admin_write
         [:users.id :user_id]
         :is_admin :account_enabled :firstname :lastname :email
         [:api_tokens.id :api_token_id]
@@ -47,17 +49,19 @@
       (sql/merge-where (sql/raw (str "now() < api_tokens.expires_at")))
       sql/format))
 
-(defn system-admin-authenticated-entity-properties []
+(defn server-admin-authenticated-entity-properties []
   {:scope_read true
    :scope_write true
    :scope_admin_read true
    :scope_admin_write true
+   :scope_system_admin_read true
+   :scope_system_admin_write true
    :user_id nil
    :is_admin true
    :account_enabled true
    :firstname ""
-   :lastname "system-admin"
-   :email "system-admin@leihs"
+   :lastname "server-admin"
+   :email "server-admin@leihs"
    :api_token_id nil
    :api_token_created_at (time/now)})
 
@@ -66,11 +70,13 @@
                         (jdbc/query (ds/get-ds)) first)
                    (when (and (= token-secret server-secret)
                               (-> settings :accept_server_secret_as_universal_password))
-                     (system-admin-authenticated-entity-properties)))]
+                     (server-admin-authenticated-entity-properties)))]
     (assoc uae
            :authentication-method :token
            :scope_admin_read (and (:scope_admin_read uae) (:is_admin uae))
-           :scope_admin_write (and (:scope_admin_write uae) (:is_admin uae)))
+           :scope_admin_write (and (:scope_admin_write uae) (:is_admin uae))
+           :scope_system_admin_read (and (:scope_system_admin_read uae) (:is_system_admin uae))
+           :scope_system_admin_write (and (:scope_system_admin_write uae) (:is_system_admin uae)))
     (throw (ex-info
              (str "No valid API-Token / User combination found! "
                   "Is the token present, not expired, and the user permitted to sign-in?"){}))))

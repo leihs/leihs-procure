@@ -51,7 +51,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
     end
 
 
-    context 'API' do
+    context 'API with full system-admin access' do
 
       let :http_client do
         plain_faraday_client
@@ -59,7 +59,8 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
 
       let :prepare_http_client do
         @api_token = FactoryBot.create :api_token, user_id: @system_admin.id, 
-          scope_admin_read: true, scope_admin_write: true
+          scope_admin_read: true, scope_admin_write: true,
+          scope_system_admin_read: true, scope_system_admin_write: true
         @token_secret = @api_token.token_secret
         http_client.headers["Authorization"] = "Token #{@token_secret}"
         http_client.headers["Content-Type"] = "application/json"
@@ -83,7 +84,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
         expect(downloaded_legacy_audits.count).to be== 1 
         expect(downloaded_legacy_audits.first['comment']).to \
           be== "This one is older than a year."
-        
+
       end
 
 
@@ -98,8 +99,45 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
         expect(audits.first[:comment]).to be== "This one is newer than a year."
       end
 
-    end
 
+      context 'API with system-admin read but not write access' do
+
+        before :each do
+          @api_token.update(scope_system_admin_write: false)
+        end
+
+        scenario 'downloading audits via API still works' do
+
+          resp = http_client.get audits_before_url  
+          expect(resp.status).to be== 200
+          downloaded_legacy_audits =  resp.body['legacy-audits']
+
+          # similar as with the browser, see there above
+          expect(downloaded_legacy_audits.count).to be== 1 
+          expect(downloaded_legacy_audits.first['comment']).to \
+            be== "This one is older than a year."
+
+        end
+
+        scenario 'deleting audits via API does not work anymore' do
+          resp = http_client.delete audits_before_url  
+          expect(resp.status).to be== 403
+        end
+
+      end
+
+      context 'API with no system-admin  access' do
+
+        before :each do
+          @api_token.update(scope_system_admin_write: false, 
+                            scope_system_admin_read: false)
+        end
+
+        scenario 'downloading audits via API is forbidden' do
+          resp = http_client.get audits_before_url  
+          expect(resp.status).to be== 403
+        end
+      end 
+    end
   end
 end
-

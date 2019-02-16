@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
-    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.core :refer [keyword str presence deep-merge]]
     [leihs.admin.password-authentication.back :as password-authentication]
     [leihs.core.auth.core :as auth]
     [leihs.core.sql :as sql]
@@ -11,7 +11,7 @@
     [leihs.admin.paths :refer [path]]
 
     [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
+    [clojure.set :refer [rename-keys subset?]]
     [clojure.walk]
     [compojure.core :as cpj]
     [pandect.core]
@@ -54,9 +54,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (def routes
   (cpj/routes
     (cpj/POST (path :password-authentication) [] #'password-authentication/ring-handler)
@@ -79,62 +76,52 @@
   (boolean (some-> request :request-method HTTP-UNSAFE-VERBS)))
 
 
-(defn authorize-http-unsafe [request handler required-scopes]
-  (cond 
-    ; case 1 admin and system_admin write required
-    (and (:scope_admin_write required-scopes)
-         (:scope_system_admin_write required-scopes)
-         (-> request :authenticated-entity :scope_admin_write)
-         (-> request :authenticated-entity :scope_system_admin_write))  (handler request)
-    ; case 2 system_admin write required
-    (and (:scope_system_admin_write required-scopes)
-         (-> request :authenticated-entity :scope_system_admin_write))  (handler request)
-    ; case 3 admin write required
-    (and (:scope_admin_write required-scopes)
-         (-> request :authenticated-entity :scope_admin_write))  (handler request)
-    ; Note: for now we don't allow neither admin nor system_admin write required because we have not use case so far
-    ; all other cases 
-    :else {:status 403 :body "No permission to write/modify data!"}))
+(defn filter-required-scopes-wrt-safe-or-unsafe [request required-scopes]
+  (if (http-safe? request)
+    (filter (fn [[k v]]
+              (#{:scope_read :scope_system_admin_read :scope_admin_read} k)) 
+            required-scopes)
+    required-scopes))
 
-(defn authorize-http-safe [request handler required-scopes]
-  (cond 
-    ; case 1 admin and system_admin read required
-    (and (:scope_admin_read required-scopes)
-         (:scope_system_admin_read required-scopes)
-         (-> request :authenticated-entity :scope_admin_read)
-         (-> request :authenticated-entity :scope_system_admin_read))  (handler request)
-    ; case 2 system_admin read required
-    (and (:scope_system_admin_read required-scopes)
-         (-> request :authenticated-entity :scope_system_admin_read))  (handler request)
-    ; case 3 admin read required
-    (and (:scope_admin_read required-scopes)
-         (-> request :authenticated-entity :scope_admin_read))  (handler request)
-    ; Note: for now we don't allow neither admin nor system_admin read required because we have not use case so far
-    ; all other cases 
-    :else {:status 403 :body "No permission to read data!"}))
 
-(defn authorize [request handler required-scopes]
-  (if (http-unsafe? request)
-    (authorize-http-unsafe request handler required-scopes)
-    (authorize-http-safe request handler required-scopes)))
+(defn authorize-scope [request handler required-scopes]
+  (let [required-scope-keys (->> required-scopes  
+                                 (filter (fn [[k v]] v)) 
+                                 (filter-required-scopes-wrt-safe-or-unsafe request)
+                                 (map first) 
+                                 set)]
+    (if (every? (fn [scope-key] (-> request :authenticated-entity scope-key)) 
+                required-scope-keys) 
+      (handler request)
+      (let [k (some (fn [scope-key] (-> request :authenticated-entity scope-key not)) 
+                    required-scope-keys)]
+        {:status 403 :body (str "Permission scope " k " is not satisfied!")}))))
+
+(def default-auth-opts 
+  {:skip-authorization-handler-keys #{}
+   :required-scopes {:scope_admin_read true 
+                     :scope_admin_write true
+                     :scope_system_admin_read false 
+                     :scope_system_admin_write false}})
+
+
+(defn authorize [request handler auth-opts]
+  (let [normalized-auth-opts (deep-merge default-auth-opts auth-opts)
+        skip-authorization-handler-keys (:skip-authorization-handler-keys normalized-auth-opts)
+        required-scopes (:required-scopes normalized-auth-opts)]
+    (cond
+      (authorize/handler-is-ignored? 
+        skip-authorization-handler-keys request) (handler request)
+      (-> request :authenticated-entity not) {:status 401 :body "Authentication required!"}
+      :else (authorize-scope request handler required-scopes))))
 
 (defn wrap-authorize
-  ([handler skip-authorization-handler-keys required-scopes]
+  ([handler auth-opts]
+   "Checks authorization continues with handler if satisfied or returns a 403 otherwise.
+   Considers also the http verb wrt save or unsafe, 
+   i.g. {:required-scopes {:scope_system_admin_write true}} will be be removed if the action is safe!"
    (fn [request]
-     (wrap-authorize request handler skip-authorization-handler-keys required-scopes)))
-  ([handler skip-authorization-handler-keys]
-   (fn [request]
-     (wrap-authorize request handler skip-authorization-handler-keys 
-                           {:scope_admin_read true :scope_admin_write true
-                            :scope_system_admin_read false :scope_system_admin_write false})))
-  ([request handler skip-authorization-handler-keys required-scopes]
-   (if (authorize/handler-is-ignored? skip-authorization-handler-keys request) 
-     (handler request)
-     (if-not (-> request :authenticated-entity)
-       {:status 401 :body "Authentication required!"}
-       (authorize request handler required-scopes)))))
-
-     
+     (authorize request handler auth-opts))))
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

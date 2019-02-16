@@ -164,10 +164,11 @@
         (cpj/DELETE system-admins-group-path [] #'remove-group)
         (cpj/GET system-admin-groups-path [] #'groups)
         (cpj/PUT system-admin-groups-path [] #'batch-update-groups))
-      (admin-auth/wrap-authorize #{} {:scope_admin_read true
-                                      :scope_admin_write true
-                                      :scope_system_admin_read true
-                                      :scope_system_admin_write true})))
+      (admin-auth/wrap-authorize  
+        {:required-scopes {:scope_admin_read true
+                           :scope_admin_write true
+                           :scope_system_admin_read true
+                           :scope_system_admin_write true}})))
 
 
 ;#### debug ###################################################################

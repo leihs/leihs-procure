@@ -153,10 +153,10 @@
         (cpj/PUT authentication-system-group-path [] #'put-group)
         (cpj/DELETE authentication-system-group-path [] #'remove-group)
         (cpj/GET authentication-system-groups-path [] #'groups))
-      (admin-auth/wrap-authorize #{} {:scope_admin_read true
-                                      :scope_admin_write true
-                                      :scope_system_admin_read true
-                                      :scope_system_admin_write true})))
+      (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
+                                                    :scope_admin_write true
+                                                    :scope_system_admin_read false
+                                                    :scope_system_admin_write false}})))
 
 
 ;#### debug ###################################################################

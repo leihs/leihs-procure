@@ -47,19 +47,27 @@
 (def ^:private before-path (path :database-audits-before {:before-date ":before-date"}))
 
 (def routes
-  (-> (cpj/routes
-        (cpj/GET before-path [] #'download)
-        (cpj/POST before-path [] #'download)
-        (cpj/DELETE before-path [] #'delete)
-        (admin-auth/wrap-authorize #{} {:scope_admin_read true
-                                        :scope_admin_write true 
-                                        :scope_system_admin_read true
-                                        :scope_system_admin_write true}))))
+  (cpj/routes 
+    (-> (cpj/routes
+          (cpj/GET before-path [] #'download)
+          (cpj/POST before-path [] #'download))
+        (admin-auth/wrap-authorize 
+          {:required-scopes {:scope_admin_read true
+                             :scope_admin_write true 
+                             :scope_system_admin_read true 
+                             :scope_system_admin_write false}}))
+    (-> (cpj/routes 
+          (cpj/DELETE before-path [] #'delete))
+        (admin-auth/wrap-authorize 
+          {:required-scopes {:scope_admin_read true
+                             :scope_admin_write true 
+                             :scope_system_admin_read true 
+                             :scope_system_admin_write true}}))))
 
 ;#### debug ###################################################################
-;(debug/debug-ns *ns*)
 ;(debug/wrap-with-log-debug #'authentication-systems-formated-query)
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
+;(debug/debug-ns *ns*)
 
 

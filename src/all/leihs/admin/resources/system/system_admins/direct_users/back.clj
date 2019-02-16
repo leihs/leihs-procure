@@ -164,14 +164,15 @@
         (cpj/DELETE system-admins-direct-user-path [] #'remove-user)
         (cpj/GET system-admin-direct-users-path [] #'users)
         (cpj/PUT system-admin-direct-users-path [] #'batch-update-users))
-      (admin-auth/wrap-authorize #{} {:scope_admin_read true
-                                      :scope_admin_write true
-                                      :scope_system_admin_read true
-                                      :scope_system_admin_write true})))
+      (admin-auth/wrap-authorize {:required-scopes 
+                                  {:scope_admin_read true
+                                   :scope_admin_write true
+                                   :scope_system_admin_read true
+                                   :scope_system_admin_write true}})))
 
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns *ns*)
 ;(debug/debug-ns 'leihs.admin.resources.system.system-admins.direct-users.shared)
+;(debug/debug-ns *ns*)

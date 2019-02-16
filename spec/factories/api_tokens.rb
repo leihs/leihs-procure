@@ -1,6 +1,7 @@
 require 'digest' 
 
 class ApiToken < Sequel::Model(:api_tokens)
+  set_primary_key :id
   attr_accessor :token_secret
 end
 
