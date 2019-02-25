@@ -294,10 +294,11 @@ export const requestDataFromFields = (request, fields) => {
 
   const model = valueIfWritable(fields, request, 'model')
   const user = valueIfWritable(fields, request, 'user')
-  const supplier = valueIfWritable(fields, request, 'supplier')
   const room = valueIfWritable(fields, request, 'room')
   const approvedQ = valueIfWritable(fields, request, 'approved_quantity')
   const orderQ = valueIfWritable(fields, request, 'order_quantity')
+  const supplierObj = valueIfWritable(fields, request, 'supplier')
+  const supplierName = valueIfWritable(fields, request, 'supplier_name')
 
   const requestData = {
     ...getField(fields, request, 'article_number'),
@@ -332,11 +333,9 @@ export const requestDataFromFields = (request, fields) => {
       ? { model: model.id }
       : getField(fields, request, 'article_name')),
 
-    ...(!fields._supplier_as_text
-      ? supplier
-        ? { supplier: supplier.id }
-        : null
-      : getField(fields, request, 'supplier_name')),
+    ...(fields._supplier_as_id
+      ? { supplier: supplierObj ? supplierObj.id : null }
+      : { supplier_name: f.present(supplierName) ? supplierName : null }),
 
     // NOTE: no building, just room!
     ...(!room ? null : { room })
