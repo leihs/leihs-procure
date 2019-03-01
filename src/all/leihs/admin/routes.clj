@@ -255,9 +255,9 @@
                   :cache-bust-paths ["/admin/css/site.css"
                                      "/admin/css/site.min.css"
                                      "/admin/js/app.js"]
-                  :never-expire-paths [#".*font-awesome-[^\/]*\d\.\d\.\d\/.*"
+                  :never-expire-paths [#".*fontawesome-[^\/]*\d+\.\d+\.\d+\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
-                  :enabled? (= env/env :prod)})
+                  :enabled? true})
       shutdown/wrap
       ring-exception/wrap))
 
