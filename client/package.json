@@ -19,8 +19,8 @@
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
     "coverage": "npm test -- --coverage",
-    "lint": "eslint --fix 'src/{,**/}*.js{,x}' && npm run -s lint:json",
-    "ci:lint": "eslint 'src/{,**/}*.js{,x}' && npm run -s ci:lint:json",
+    "lint": "eslint --fix 'src/' && npm run -s lint:json",
+    "ci:lint": "eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
     "lint:json": "prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "prettier --list-different 'src/{,**/}*.json'",
     "test": "react-scripts test --env=jsdom"
@@ -93,11 +93,11 @@
       "prettier"
     ],
     "extends": [
-      "eslint-config-react-app",
       "eslint:recommended",
       "prettier",
       "prettier/react",
-      "prettier/standard"
+      "prettier/standard",
+      "react-app"
     ],
     "rules": {
       "prettier/prettier": [

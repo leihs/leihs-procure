@@ -19,8 +19,8 @@ describe 'admins' do
           GRAPHQL
 
           result = query(q, user.id)
-          expect(result['data']['admins']).to be_empty
-          expect(result['errors'].first['exception'])
+          expect(result['data']['admins']).to be_blank
+          expect(result['errors'].first['extensions']['exception'])
             .to be == 'UnauthorizedException'
         end
       end
@@ -48,8 +48,8 @@ describe 'admins' do
           GRAPHQL
 
           result = query(q, user_1.id)
-          expect(result['data']['admins']).to be_empty
-          expect(result['errors'].first['exception'])
+          expect(result['data']['admins']).to be_blank
+          expect(result['errors'].first['extensions']['exception'])
             .to be == 'UnauthorizedException'
 
           expect(Admin.count).to be == 1

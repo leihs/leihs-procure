@@ -10,7 +10,7 @@
      [cljsjs/moment "2.17.1-1"] [clojure-humanize "0.2.2"] [clj-pid "0.1.2"]
      [com.github.mfornos/humanize-slim "1.2.2"]
      [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
-     [com.walmartlabs/lacinia "0.28.0"] [compojure "1.6.0"] [environ "1.1.0"]
+     [com.walmartlabs/lacinia "0.31.0"] [compojure "1.6.0"] [environ "1.1.0"]
      [hiccup "1.0.5"] [hickory "0.7.1"] [hikari-cp "2.6.0"] [honeysql "0.9.2"]
      [inflections "0.13.0"] [io.forward/yaml "1.0.7"]
      [log4j/log4j "1.2.17" :exclusions

@@ -128,8 +128,8 @@ describe 'requesters organizations' do
                         user_id: user.id)
       result = query(@q, user.id)
 
-      expect(result['data']['requesters_organizations']).to be_empty
-      expect(result['errors'].first['exception'])
+      expect(result['data']['requesters_organizations']).to be_blank
+      expect(result['errors'].first['extensions']['exception'])
         .to be == 'UnauthorizedException'
 
       RequesterOrganization

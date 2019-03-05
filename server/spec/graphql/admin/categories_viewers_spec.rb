@@ -83,8 +83,8 @@ describe 'categories viewers' do
 
       result = query(@q, User.find(firstname: 'inspector').id)
 
-      expect(result['data']['categories_viewers']).to be_empty
-      expect(result['errors'].first['exception']).to be == 'UnauthorizedException'
+      expect(result['data']['categories_viewers']).to be_blank
+      expect(result['errors'].first['extensions']['exception']).to be == 'UnauthorizedException'
 
       CategoryViewer
         .all

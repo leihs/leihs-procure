@@ -141,7 +141,7 @@ describe 'budget periods' do
 
         result = query(q, user.id)
         expect(result['data']['budget_periods'].first[tp]).to be_nil
-        expect(result['errors'].first['exception']).to be == 'UnauthorizedException'
+        expect(result['errors'].first['extensions']['exception']).to be == 'UnauthorizedException'
       end
     end
   end
@@ -199,8 +199,8 @@ describe 'budget periods' do
 
       result = query(@q, user.id)
 
-      expect(result['data']['budget_periods']).to be_empty
-      expect(result['errors'].first['exception'])
+      expect(result['data']['budget_periods']).to be_blank
+      expect(result['errors'].first['extensions']['exception'])
         .to be == 'UnauthorizedException'
 
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']

@@ -29,7 +29,7 @@ describe 'request' do
 
           expect(result['data']['request']).not_to be
           expect(result['errors'].length).to be 1
-          expect(result['errors'].first['exception'])
+          expect(result['errors'].first['extensions']['exception'])
             .to be == 'UnauthorizedException'
 
           expect(request).to be == request.reload
@@ -92,7 +92,7 @@ describe 'request' do
         expect(attachments.count).to be == 2
         attachments
           .map { |a| a['filename'] }
-          .each { |fn| expect(fn).not_to be_empty }
+          .each { |fn| expect(fn).not_to be_blank }
         expect(Upload.all.count).to be == 0
         expect(Attachment.count).to be == 2
         expect(Attachment.all.map(&:id)).to include attachment_1.id

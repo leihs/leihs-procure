@@ -1,27 +1,28 @@
 (ns leihs.procurement.handler
   (:refer-clojure :exclude [str keyword])
-  (:require [bidi.bidi :as bidi]
-            [cheshire.core :refer [parse-string]]
-            [clojure.tools.logging :as log]
-            [leihs.procurement
-             [authorization :refer [wrap-authenticate wrap-authorize]]
-             [env :as env] [graphql :as graphql] [paths :refer [paths]]
-             [status :as status]]
-            [leihs.core.anti-csrf.back :as anti-csrf]
-            [leihs.core.sign-out.back :as sign-out]
-            [leihs.procurement.paths :refer [path paths]]
-            [leihs.procurement.auth.session :as session]
-            [leihs.procurement.backend.html :as html]
-            [leihs.procurement.resources [attachment :as attachment]
-             [image :as image] [upload :as upload]]
-            [leihs.procurement.utils [core :refer [keyword presence]]
-             [ds :as datasource] [ring-exception :as ring-exception]]
-            [ring-graphql-ui.core :refer [wrap-graphiql]]
-            [ring.middleware [cookies :refer [wrap-cookies]]
-             [json :refer [wrap-json-body wrap-json-response]]
-             [multipart-params :refer [wrap-multipart-params]]
-             [params :refer [wrap-params]] [reload :refer [wrap-reload]]]
-            [ring.util.response :refer [redirect]]))
+  (:require
+    [bidi.bidi :as bidi]
+    [cheshire.core :refer [parse-string]]
+    [clojure.tools.logging :as log]
+    [leihs.procurement [authorization :refer [wrap-authenticate wrap-authorize]]
+     [env :as env] [graphql :as graphql] [paths :refer [paths]]
+     [status :as status]]
+    [leihs.core.anti-csrf.back :as anti-csrf]
+    [leihs.core.locale :as locale]
+    [leihs.core.sign-out.back :as sign-out]
+    [leihs.procurement.paths :refer [path paths]]
+    [leihs.procurement.auth.session :as session]
+    [leihs.procurement.backend.html :as html]
+    [leihs.procurement.resources [attachment :as attachment] [image :as image]
+     [upload :as upload]]
+    [leihs.procurement.utils [core :refer [keyword presence]]
+     [ds :as datasource] [ring-exception :as ring-exception]]
+    [ring-graphql-ui.core :refer [wrap-graphiql]]
+    [ring.middleware [cookies :refer [wrap-cookies]]
+     [json :refer [wrap-json-body wrap-json-response]]
+     [multipart-params :refer [wrap-multipart-params]]
+     [params :refer [wrap-params]] [reload :refer [wrap-reload]]]
+    [ring.util.response :refer [redirect]]))
 
 (declare redirect-to-root-handler)
 
@@ -57,28 +58,35 @@
 (defn- match-pair-with-fallback
   [path]
   (let [matched-pair (bidi/match-pair paths {:remainder path, :route paths})]
-    (if (-> matched-pair
-            :handler
-            (= :not-found))
+    (if
+      (->
+        matched-pair
+        :handler
+        (= :not-found))
       (bidi/match-pair paths {:remainder path, :route paths})
       matched-pair)))
 
 (defn wrap-resolve-handler
   ([handler] (fn [request] (wrap-resolve-handler handler request)))
   ([handler request]
-   (let [path (or (-> request
-                      :path-info
-                      presence)
-                  (-> request
-                      :uri
-                      presence))
+   (let [path
+           (or
+             (->
+               request
+               :path-info
+               presence)
+             (->
+               request
+               :uri
+               presence))
          {route-params :route-params, handler-key :handler}
            (match-pair-with-fallback path)
          handler-fn (handler-resolver handler-key)]
-     (handler (assoc request
-                :route-params route-params
-                :handler-key handler-key
-                :handler handler-fn)))))
+     (handler
+       (assoc request
+         :route-params route-params
+         :handler-key handler-key
+         :handler handler-fn)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -86,18 +94,22 @@
   [params]
   (if-not (map? params)
     params
-    (->> params
-         (map (fn [[k v]] [(keyword k)
-                           (try (parse-string v true) (catch Exception _ v))]))
-         (into {}))))
+    (->>
+      params
+      (map
+        (fn [[k v]]
+          [(keyword k) (try (parse-string v true) (catch Exception _ v))]))
+      (into {}))))
 
 (defn wrap-canonicalize-params-maps
   [handler]
   (fn [request]
-    (handler (-> request
-                 (update-in [:params] canonicalize-params-map)
-                 (update-in [:query-params] canonicalize-params-map)
-                 (update-in [:form-params] canonicalize-params-map)))))
+    (handler
+      (->
+        request
+        (update-in [:params] canonicalize-params-map)
+        (update-in [:query-params] canonicalize-params-map)
+        (update-in [:form-params] canonicalize-params-map)))))
 
 (defn wrap-empty [handler] (fn [request] (or (handler request) {:status 404})))
 
@@ -114,24 +126,26 @@
 
 (defn init
   [secret]
-  (-> dispatch-to-handler
-      anti-csrf/wrap
-      wrap-authorize
-      wrap-authenticate
-      session/wrap
-      wrap-cookies
-      wrap-json-response
-      (wrap-json-body {:keywords? true})
-      wrap-empty
-      (wrap-secret-byte-array secret)
-      datasource/wrap
-      wrap-resolve-handler
-      (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
-      wrap-canonicalize-params-maps
-      wrap-params
-      wrap-multipart-params
-      ring-exception/wrap
-      wrap-reload-if-dev-or-test))
+  (->
+    dispatch-to-handler
+    anti-csrf/wrap
+    locale/wrap
+    wrap-authorize
+    wrap-authenticate
+    session/wrap
+    wrap-cookies
+    wrap-json-response
+    (wrap-json-body {:keywords? true})
+    wrap-empty
+    (wrap-secret-byte-array secret)
+    datasource/wrap
+    wrap-resolve-handler
+    (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
+    wrap-canonicalize-params-maps
+    wrap-params
+    wrap-multipart-params
+    ring-exception/wrap
+    wrap-reload-if-dev-or-test))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

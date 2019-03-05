@@ -171,7 +171,7 @@ describe 'requests' do
       expect(result['errors']).to be_nil
 
       dashboard_cache_key = result['data']['dashboard']['cacheKey']
-      expect(dashboard_cache_key).not_to be_empty
+      expect(dashboard_cache_key).not_to be_blank
 
       expect(result['data']['dashboard']['budget_periods'].length).to eq BudgetPeriod.all.length
       result['data']['dashboard']['budget_periods'].each do |bp|

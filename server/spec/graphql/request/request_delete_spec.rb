@@ -28,7 +28,7 @@ describe 'request' do
           result = query(q, user.id, variables)
 
           expect(result['data']['delete_request']).to be_nil
-          expect(result['errors'].first['exception'])
+          expect(result['errors'].first['extensions']['exception'])
             .to be == 'UnauthorizedException'
 
           expect(request).to be == request.reload
