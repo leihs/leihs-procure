@@ -173,6 +173,10 @@ const Filters = ({ me, data, current, onChange }) => {
 
         const selectDefaultFilters = () => setValues(defaultFilters)
 
+        // set default filters if none are saved
+        // XXX refactor, defaults should be built in pages/RequestsIndexPage.js:query={FILTERS_QUERY}
+        if (f.isEmpty(current)) selectDefaultFilters()
+
         const resetButton = (
           <Button
             size="sm"

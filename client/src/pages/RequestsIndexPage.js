@@ -250,15 +250,7 @@ class RequestsIndexPage extends React.Component {
         cats: [],
         ...savedPanelTree.get()
       },
-      currentFilters: {
-        search: '',
-        budgetPeriods: [],
-        categories: [],
-        organizations: [],
-        priority: [],
-        inspector_priority: [],
-        ...userSavedFilters.get()
-      }
+      currentFilters: { ...userSavedFilters.get() }
     }
     this.onFilterChange = this.onFilterChange.bind(this)
     this.onPanelToggle = this.onPanelToggle.bind(this)
