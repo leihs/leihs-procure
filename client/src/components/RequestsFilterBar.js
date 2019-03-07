@@ -145,9 +145,10 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
-      // only select "not-past" BudgetPeriods
+      // only select "not-past" and 1 newest "past" BudgetPeriods
       budgetPeriods: data.budget_periods
         .filter(bp => !budgetPeriodDates(bp).isPast)
+        .concat(f.find(data.budget_periods, bp => budgetPeriodDates(bp).isPast))
         .map(({ id }) => id),
       // specific values:
       search: null,
