@@ -39,12 +39,20 @@ def set_browser(example)
     end
 end
 
+ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_45_PATH']
+
+def accepted_firefox_path 
+  ENV[ ACCEPTED_FIREFOX_ENV_PATHS.detect do |env_path|
+    ENV[env_path].present?
+  end || ""].tap { |path|
+    path.presence or raise "no accepted FIREFOX found"
+  }
+end
+
 RSpec.configure do |config|
   set_capybara_values
 
-  if ENV['FIREFOX_ESR_45_PATH'].present?
-    Selenium::WebDriver::Firefox.path = ENV['FIREFOX_ESR_45_PATH']
-  end
+  Selenium::WebDriver::Firefox.path = accepted_firefox_path
 
   Capybara.register_driver :selenium do |app|
 

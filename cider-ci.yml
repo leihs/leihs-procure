@@ -17,10 +17,11 @@ jobs:
         traits:
           JDK 8: true
           Leiningen 2: true
+          Firefox ESR 45: true
         ports:
           LEIHS_ADMIN_HTTP_PORT:
-            min: 3220
-            max: 3229
+            min: 3000
+            max: 3999
         environment_variables:
           DATABASE_NAME: leihs_api_{{CIDER_CI_TRIAL_ID}}
           LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
