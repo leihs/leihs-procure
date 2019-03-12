@@ -149,6 +149,7 @@ const Filters = ({ me, data, current, onChange }) => {
       budgetPeriods: data.budget_periods
         .filter(bp => !budgetPeriodDates(bp).isPast)
         .concat(f.find(data.budget_periods, bp => budgetPeriodDates(bp).isPast))
+        .filter(Boolean)
         .map(({ id }) => id),
       // specific values:
       search: null,
