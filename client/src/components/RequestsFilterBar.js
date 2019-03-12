@@ -282,6 +282,7 @@ const Filters = ({ me, data, current, onChange }) => {
                               size="sm"
                               block
                               options={
+                                allowed.onlyInspectedCategories &&
                                 current.onlyInspectedCategories
                                   ? available._inspectedCategories
                                   : current.onlyViewedCategories
