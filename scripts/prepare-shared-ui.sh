@@ -1,6 +1,9 @@
-#git submodule update --recursive --init --force leihs-ui
+# prepare:
 cd leihs-ui
-npm ci || npm i
-npm run build
-npm run build-lib
+test -d node_modules && npm i || { npm ci || npm i ;}
+
+# those can run in parallel!
+npm run build:theme
+npm run build:ssr
+
 cd -

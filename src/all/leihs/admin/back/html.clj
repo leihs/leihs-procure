@@ -8,7 +8,8 @@
             [leihs.admin.utils.release-info :as release-info]
             [leihs.core
              [http-cache-buster2 :as cache-buster]
-             [json :refer [to-json]]]
+             [json :refer [to-json]]
+             [ssr :as ssr]]
             [leihs.core.url.core :as url]))
 
 (defn include-site-css []
@@ -28,8 +29,8 @@
    (include-font-css)])
 
 (defn body-attributes [request]
-  {:data-remote-navbar (-> system-env :leihs-remote-navbar-url nil? not str)
-   :data-user  (some-> (:authenticated-entity request) to-json url/encode)
+  {:data-global-navbar (-> system-env :leihs-disable-global-navbar nil? str)
+   :data-user (some-> (:authenticated-entity request) to-json url/encode)
    :data-leihsadminversion (url/encode (to-json release-info/leihs-admin-version))
    :data-leihsversion (url/encode (to-json release-info/leihs-version))})
 
@@ -44,25 +45,21 @@
              [:h1.text-danger "Error 404 - Not Found"]]])})
 
 (defn html-handler [request]
-  (let [remote-navbar
-        (if-let [remote-navbar-url (:leihs-remote-navbar-url system-env)]
-          (-> remote-navbar-url
-              (client/get
-                (select-keys request [:cookies]))
-              :body))]
-    {:headers {"Content-Type" "text/html"}
-     :body (html5
-             (head)
-             [:body
-              (body-attributes request)
-              [:div
-               remote-navbar
-               [:div#app.container-fluid
-                [:div.alert.alert-warning
-                 [:h1 "Leihs Admin2"]
-                 [:p "This application requires Javascript."]]]]
-              (hiccup.page/include-js
-                (cache-buster/cache-busted-path "/admin/js/app.js"))])}))
+  {:headers {"Content-Type" "text/html"}
+   :body (html5
+           (head)
+           [:body (body-attributes request)
+            [:div
+             (if-not (:leihs-disable-global-navbar system-env)
+               (ssr/render-navbar request))
+             [:div#app.container-fluid
+              [:div.alert.alert-warning
+               [:h1 "Leihs Admin2"]
+               [:p "This application requires Javascript."]]]]
+            (hiccup.page/include-js (cache-buster/cache-busted-path
+                                      "/admin/leihs-shared-bundle.js"))
+            (hiccup.page/include-js
+              (cache-buster/cache-busted-path "/admin/js/app.js"))])})
 
 
 ;#### debug ###################################################################

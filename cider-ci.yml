@@ -12,7 +12,7 @@ jobs:
         include:
           - cider-ci/database_task-component.yml
           - cider-ci/ruby-bundle_task-component.yml
-          - cider-ci/server_task-component.yml
+          - cider-ci/service_task-component.yml
           - cider-ci/uberjar_task-component.yml
         traits:
           JDK 8: true
@@ -24,7 +24,9 @@ jobs:
             max: 3999
         environment_variables:
           DATABASE_NAME: leihs_api_{{CIDER_CI_TRIAL_ID}}
+          LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
           LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
+          LEIHS_DISABLE_GLOBAL_NAVBAR: 'true'
           LEIHS_ADMIN_HTTP_BASE_URL: http://localhost:{{LEIHS_ADMIN_HTTP_PORT}}
           LEIHS_SECRET: '{{CIDER_CI_TRIAL_ID}}'
           RAILS_ENV: test
@@ -44,6 +46,27 @@ jobs:
               mkdir -p log
               xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
 
+
+  build-admin-uberjar:
+    name: Build admin uberjar
+    run_when:
+      any branch has been updated:
+        type: branch
+        include_match: ^.*$
+    context:
+      task_defaults:
+        environment_variables:
+          LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
+        git_options:
+          submodules:
+            include_match: ^.*$
+      tasks:
+        build-admin-uberjar:
+          name: "Build admin uberjar"
+          include:
+            - cider-ci/uberjar_task-component.yml
+
+
   good-to-merge:
 
     name: ⚑ Good To Merge
@@ -54,14 +77,21 @@ jobs:
       Status of this job is **used by github's "branch protection"**!
 
     depends_on: &GOOD_TO_MERGE_DEPENDENTS
+
       specs have passed:
         type: job
         job_key: specs
         states: [passed]
+
       good to merge of the database:
         job_key: good-to-merge
         type: job
         submodule: [database]
+        states: [passed]
+
+      build-admin-uberjar was successful:
+        type: job
+        job_key: build-admin-uberjar
         states: [passed]
 
     run_when: *GOOD_TO_MERGE_DEPENDENTS

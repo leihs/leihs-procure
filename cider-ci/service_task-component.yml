@@ -1,18 +1,19 @@
 scripts:
 
-  run-server:
+  run-admin-service:
     start_when:
       uberjar has been built:
-        script_key: build-uberjar
+        script_key: build-admin-uberjar
       database has been created:
         script_key: create-database
     body: |
       set -euxo 
-      env | sort
+      cd $LEIHS_ADMIN_DIR
       java -jar target/leihs-admin.jar run --enable-shutdown-route YES
 
-  server-is-running:
+  admin-service-is-running:
     body: |
+      set -euxo 
       until curl --silent --fail -I \
         -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
         ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/status;
@@ -20,16 +21,17 @@ scripts:
       done
     start_when:
       run server is executing:
-        script_key: run-server
+        script_key: run-admin-service
         states: [executing]
 
   test:
     start_when:
-      server is running:
-        script_key: server-is-running
+      admin service is running:
+        script_key: admin-service-is-running
 
-  shutdown-server:
+  shutdown-admin-service:
     body: |
+      set -euxo 
       until curl --silent --fail -X POST -I \
         -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
         ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/shutdown;
@@ -40,6 +42,9 @@ scripts:
         script_key: test
         states: [aborted, defective, passed, failed, skipped]
 
-
-
+  delete-database:
+    start_when:
+       shutdown-admin-service is in termial state:
+        script_key: shutdown-admin-service
+        states: [aborted, defective, passed, failed, skipped]
 
