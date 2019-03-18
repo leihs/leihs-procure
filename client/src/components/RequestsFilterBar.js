@@ -296,8 +296,8 @@ const Filters = ({ me, data, current, onChange }) => {
                     </Row>
 
                     <Row>
-                      {allowed.onlyOwnRequests &&
-                        allowed.onlyCategoriesWithRequests && (
+                      {allowed.onlyOwnRequests ||
+                        (allowed.onlyCategoriesWithRequests && (
                           <Col sm cls={`col-${BIG}-12`}>
                             <FormGroup
                               label={t('dashboard.filter_titles.special')}
@@ -329,7 +329,7 @@ const Filters = ({ me, data, current, onChange }) => {
                               )}
                             </FormGroup>
                           </Col>
-                        )}
+                        ))}
 
                       {allowed.organizations && (
                         <Col sm cls={`col-${BIG}-12`}>
