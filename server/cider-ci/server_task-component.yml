@@ -2,15 +2,12 @@ scripts:
 
   run-server:
     start_when:
-      uberjar has been built:
-        script_key: build-uberjar
       database has been created:
         script_key: create-database
     body: |
       set -euxo
-      env | sort 
-      cd server && java -jar target/leihs-procurement.jar run -h && java -jar target/leihs-procurement.jar run
-    ignore_state: true
+      cd server
+      lein with-profile test run "run" "--enable-shutdown-route" "Yes"
 
   server-is-running:
     body: |
@@ -29,7 +26,11 @@ scripts:
 
   shutdown-server:
     body: |
-      cd server && ./scripts/kill-server
+      set -euxo 
+      until curl --silent --fail -X POST -I \
+        ${LEIHS_PROCURE_HTTP_BASE_URL}/procure/shutdown;
+        do sleep 1;
+      done
     start_when:
       test is terminal:
         script_key: test

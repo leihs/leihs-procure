@@ -44,9 +44,7 @@
   :source-paths ["src/all" "leihs-clj-shared/src"]
   :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
-  :target-path "target/%s"
   :main leihs.procurement.backend.main
-  :uberjar-name "leihs-procurement.jar"
   :profiles {:dev [:project/dev :profiles/dev :profiles/dev+test],
              ;; including :base
              ;; (https://github.com/technomancy/leiningen/issues/1329)
@@ -57,7 +55,9 @@
                     :repl-options {:timeout 120000}},
              :uberjar {:source-paths ["src/prod"],
                        :resource-paths ["resources/prod"],
-                       :aot [#"leihs\..*"]},
+                       :aot [#"leihs\..*"]
+                       :uberjar-name "leihs-procure.jar"
+                       },
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj

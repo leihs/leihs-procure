@@ -7,6 +7,7 @@ const log = logger('app:apollo')
 
 const CSRF_COOKIE_NAME = 'leihs-anti-csrf-token'
 export const endpointURL = '/procure/graphql'
+export const defaultHeaders = { accept: 'application/json' }
 
 export const buildAuthHeaders = () =>
   isDev
@@ -35,7 +36,10 @@ export const apolloClient = new ApolloClient({
   // static options for fetch requests:
   fetchOptions,
   // dynamic options for fetch requests:
-  request: operation => operation.setContext({ headers: buildAuthHeaders() })
+  request: operation =>
+    operation.setContext({
+      headers: { ...defaultHeaders, ...buildAuthHeaders() }
+    })
 })
 
 // util

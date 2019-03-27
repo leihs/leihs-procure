@@ -18,6 +18,7 @@ class GraphqlQuery
       if @user_id
         req.headers['X-Fake-Token-Authorization'] = @user_id
       end
+      req.headers['Accept'] = 'application/json'
       req.headers['Content-Type'] = 'application/json'
       req.body = { query: @query, variables: @variables }.to_json
     end

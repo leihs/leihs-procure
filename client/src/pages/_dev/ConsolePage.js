@@ -7,6 +7,7 @@ import 'codemirror/theme/dracula.css'
 import {
   endpointURL,
   fetchOptions,
+  defaultHeaders,
   buildAuthHeaders
 } from '../../apollo-client'
 
@@ -43,7 +44,11 @@ query meAndMyRequests {
 function graphQLFetcher(graphQLParams) {
   return fetch(endpointURL, {
     ...fetchOptions,
-    headers: { 'Content-Type': 'application/json', ...buildAuthHeaders() },
+    headers: {
+      'Content-Type': 'application/json',
+      ...defaultHeaders,
+      ...buildAuthHeaders()
+    },
     method: 'post',
     body: JSON.stringify(graphQLParams)
   }).then(response => response.json())

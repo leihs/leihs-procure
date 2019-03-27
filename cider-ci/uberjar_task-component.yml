@@ -1,0 +1,47 @@
+traits:
+  JDK: true
+  Leiningen 2: true
+  npm: true
+  S3-Cache: true
+
+scripts:
+  build-procure-uberjar:
+    timeout: 10 Minutes
+    exclusive_executor_resource: build-leihs-procure-jar
+    body: |
+      #!/usr/bin/env bash
+      set -euxo
+
+      cd ${LEIHS_PROCURE_DIR}
+
+      DIGEST=$(git log -n 1 HEAD --pretty=%T)
+      UBERJAR_PATH=${LEIHS_PROCURE_DIR}/server/target/leihs-procure.jar
+      S3_UBERJAR_FILE_NAME="leihs-procure_${DIGEST}.jar"
+
+      if [ -z ${S3_CI_ENDPOINT:+x} ] ; then
+        echo "WARN: S3_CI_ENDPOINT is not set; caching can not be used"
+      else
+        if [ "$(aws --endpoint $S3_CI_ENDPOINT s3 cp s3://${S3_CI_CACHE_BUCKET}/${S3_UBERJAR_FILE_NAME} ${UBERJAR_PATH})" ]; then
+          echo "INFO: Rerieved uberjar from s3 cache"
+        else
+          echo "INFO: No S3 cached uberjar found "
+        fi
+      fi
+
+      if [ ! -f ${UBERJAR_PATH} ]; then
+        echo "INFO: building uberjar now"
+        cd $LEIHS_PROCURE_DIR/client
+        export PUBLIC_URL="/procure"
+        npm ci || npm install # for building
+        npm run build
+        cd $LEIHS_PROCURE_DIR/server
+        export LEIN_SNAPSHOTS_IN_RELEASE=yes
+        lein uberjar
+      fi
+
+      if [ ! -z ${S3_CI_ENDPOINT:+x} ] ; then
+        if [ ! "$(aws --endpoint $S3_CI_ENDPOINT s3 cp s3://${S3_CI_CACHE_BUCKET}/${S3_UBERJAR_FILE_NAME} ${UBERJAR_PATH})" ]; then
+          echo "INFO: No S3 cached uberjar found; uploading ours now"
+          aws --endpoint $S3_CI_ENDPOINT s3 cp ${UBERJAR_PATH} s3://${S3_CI_CACHE_BUCKET}/${S3_UBERJAR_FILE_NAME} 
+        fi
+      fi

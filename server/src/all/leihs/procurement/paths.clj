@@ -12,6 +12,7 @@
     leihs.core.paths/core-paths
     (branch
       "/procure"
+      (leaf "/shutdown" :shutdown)
       (leaf "/upload" :upload)
       (leaf "/graphql" :graphql)
       (leaf "/status" :status)

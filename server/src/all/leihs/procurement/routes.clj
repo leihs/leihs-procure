@@ -1,6 +1,9 @@
-(ns leihs.procurement.handler
+(ns leihs.procurement.routes
   (:refer-clojure :exclude [str keyword])
   (:require
+    [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
+    [leihs.core.shutdown :as shutdown]
+
     [bidi.bidi :as bidi]
     [cheshire.core :refer [parse-string]]
     [clojure.tools.logging :as log]
@@ -18,21 +21,28 @@
     [leihs.procurement.utils [core :refer [keyword presence]]
      [ds :as datasource] [ring-exception :as ring-exception]]
     [ring-graphql-ui.core :refer [wrap-graphiql]]
+    [ring.middleware.content-type :refer [wrap-content-type]]
+    [ring.middleware.accept]
     [ring.middleware [cookies :refer [wrap-cookies]]
      [json :refer [wrap-json-body wrap-json-response]]
      [multipart-params :refer [wrap-multipart-params]]
      [params :refer [wrap-params]] [reload :refer [wrap-reload]]]
-    [ring.util.response :refer [redirect]]))
+    [ring.util.response :refer [redirect]]
+
+    [clojure.tools.logging :as logging]
+    [logbug.debug :as debug :refer [I>]]
+    [logbug.ring :refer [wrap-handler-with-logging]]
+    ))
 
 (declare redirect-to-root-handler)
 
 (def handler-resolve-table
-  {:attachment attachment/routes,
-   :upload upload/routes,
-   :graphql graphql/handler,
-   :image image/routes,
-   :not-found html/not-found-handler,
-   :sign-out sign-out/ring-handler,
+  {:attachment attachment/routes
+   :upload upload/routes
+   :graphql graphql/handler
+   :image image/routes
+   :not-found html/not-found-handler
+   :sign-out sign-out/ring-handler
    :status status/routes})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -124,31 +134,70 @@
   (cond-> handler
     (#{:dev :test} env/env) (wrap-reload {:dirs ["src" "resources"]})))
 
+(defn wrap-dispatch-frontent 
+  ([handler]
+   (fn [request]
+     (wrap-dispatch-frontent handler request)))
+  ([handler request]
+   (logging/debug 'wrap-dispatch-frontent request)
+   (if (and 
+         (:handler-key request)
+         (= :html (-> request :accept :mime))
+         ; some extra logic: when it comes to js browsers don't set the accept header properly
+         (not (re-matches #".*\.js$" (:uri request))))
+     (let [frontent-request (assoc request 
+                                   :uri "/procure/index.html"
+                                   :handler-key nil
+                                   :handler nil)]
+       (logging/debug 'frontent-request frontent-request)
+       (handler frontent-request))
+     (handler request))))
+
+(defn wrap-accept [handler]
+  (ring.middleware.accept/wrap-accept
+    handler
+    {:mime
+     ["application/json" :qs 1 :as :json
+      "application/javascript" :qs 1 :as :javascript
+      "image/apng" :qs 1 :as :apng
+      "image/*" :qs 1 :as :image
+      "text/css" :qs 1 :as :css
+      "text/html" :qs 1 :as :html]}))
+
 (defn init
   [secret]
-  (->
-    dispatch-to-handler
-    anti-csrf/wrap
-    locale/wrap
-    wrap-authorize
-    wrap-authenticate
-    session/wrap
-    wrap-cookies
-    wrap-json-response
-    (wrap-json-body {:keywords? true})
-    wrap-empty
-    (wrap-secret-byte-array secret)
-    datasource/wrap
-    wrap-resolve-handler
-    (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
-    wrap-canonicalize-params-maps
-    wrap-params
-    wrap-multipart-params
-    ring-exception/wrap
-    wrap-reload-if-dev-or-test))
+  (I> wrap-handler-with-logging
+      dispatch-to-handler
+      anti-csrf/wrap
+      locale/wrap
+      wrap-authorize
+      wrap-authenticate
+      session/wrap
+      wrap-cookies
+      wrap-json-response
+      (wrap-json-body {:keywords? true})
+      wrap-empty
+      (wrap-secret-byte-array secret)
+      datasource/wrap
+      (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
+      wrap-canonicalize-params-maps
+      wrap-params
+      wrap-multipart-params
+      wrap-content-type
+      (wrap-resource
+        "public" {:allow-symlinks? true
+                  :cache-bust-paths []
+                  :never-expire-paths []
+                  :cache-enabled? true})
+      wrap-dispatch-frontent
+      wrap-resolve-handler
+      wrap-accept
+      shutdown/wrap
+      ring-exception/wrap
+      wrap-reload-if-dev-or-test))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
 ; (logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
-; (debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)

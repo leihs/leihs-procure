@@ -3,6 +3,27 @@ include:
   - client/cider-ci.yml
 
 jobs:
+
+  build-procure-uberjar: 
+
+    name: Build prod ready uberjar
+
+    run_when:
+      any branch is pushed: { type: branch, include_match: ^.*$ }
+
+    context:
+      task_defaults: 
+        environment_variables:
+          LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+        git_options:
+          submodules:
+            include_match: ^.*$
+      tasks: 
+        build-procure-uberjar:
+          include:
+            - cider-ci/uberjar_task-component.yml
+
+
   good-to-merge:
 
     name: Good To Merge
@@ -28,6 +49,11 @@ jobs:
         job_key: client-specs
         states: [passed]
 
+      build-procure-uberjar was successful:
+        type: job
+        job_key: build-procure-uberjar
+        states: [passed]
+
       good to merge of the database:
         job_key: good-to-merge
         type: job
@@ -45,3 +71,4 @@ jobs:
           scripts:
             main:
               body: echo 'All relevant tests have passed' ; exit 0
+

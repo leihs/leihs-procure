@@ -2,13 +2,16 @@
 	(:refer-clojure :exclude [str keyword])
 	(:require 
 		[leihs.core.core :refer [keyword str presence]]
+    [leihs.core.shutdown :as shutdown]
 
-		[leihs.procurement env [handler :as handler] [status :as status]]
+    [leihs.procurement.routes :as routes]
+		[leihs.procurement env [status :as status]]
 		[leihs.procurement.utils [ds :as ds]
 		 [http-server :as http-server]]
 		[leihs.procurement.utils.url [http :as http-url]
 		 [jdbc :as jdbc-url]]
 
+    [yaml.core :as yaml]
 		[clj-pid.core :as pid]
 		[clojure.pprint :refer [pprint]]
 		[clojure.tools [cli :as cli] [logging :as logging]]
@@ -41,8 +44,9 @@
                              (:health-check-registry status)))
                   (let [secret (-> options
                                    :secret)
-                        app-handler (handler/init secret)]
+                        app-handler (routes/init secret)]
                     (http-server/start (:http-base-url options) app-handler))
+                  (shutdown/init options)
                   (handle-pidfile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,7 +78,15 @@
          jdbc-url/dissect
          extend-pg-params)]
    ["-s" "--secret LEIHS_SECRET" (str "default: " (:LEIHS_SECRET defaults))
-    :default (env-or-default :LEIHS_SECRET)]])
+    :default (env-or-default :LEIHS_SECRET)]
+   
+   [nil "--enable-shutdown-route YES|NO"
+    "Enable the shutdown route; primarily used for testing."
+    :parse-fn yaml/parse-string
+    :default false
+    :validate [boolean? "Must be parsed to a boolean by yaml/parse-string"]
+    ]
+   ])
 
 (defn main-usage
   [options-summary & more]
