@@ -145,9 +145,11 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
-      // only select "not-past" BudgetPeriods
+      // only select "not-past" and 1 newest "past" BudgetPeriods
       budgetPeriods: data.budget_periods
         .filter(bp => !budgetPeriodDates(bp).isPast)
+        .concat(f.find(data.budget_periods, bp => budgetPeriodDates(bp).isPast))
+        .filter(Boolean)
         .map(({ id }) => id),
       // specific values:
       search: null,
@@ -172,6 +174,10 @@ const Filters = ({ me, data, current, onChange }) => {
         )
 
         const selectDefaultFilters = () => setValues(defaultFilters)
+
+        // set default filters if none are saved
+        // XXX refactor, defaults should be built in pages/RequestsIndexPage.js:query={FILTERS_QUERY}
+        if (f.isEmpty(current)) selectDefaultFilters()
 
         const resetButton = (
           <Button
@@ -276,6 +282,7 @@ const Filters = ({ me, data, current, onChange }) => {
                               size="sm"
                               block
                               options={
+                                allowed.onlyInspectedCategories &&
                                 current.onlyInspectedCategories
                                   ? available._inspectedCategories
                                   : current.onlyViewedCategories
@@ -289,8 +296,8 @@ const Filters = ({ me, data, current, onChange }) => {
                     </Row>
 
                     <Row>
-                      {allowed.onlyOwnRequests &&
-                        allowed.onlyCategoriesWithRequests && (
+                      {allowed.onlyOwnRequests ||
+                        (allowed.onlyCategoriesWithRequests && (
                           <Col sm cls={`col-${BIG}-12`}>
                             <FormGroup
                               label={t('dashboard.filter_titles.special')}
@@ -322,7 +329,7 @@ const Filters = ({ me, data, current, onChange }) => {
                               )}
                             </FormGroup>
                           </Col>
-                        )}
+                        ))}
 
                       {allowed.organizations && (
                         <Col sm cls={`col-${BIG}-12`}>
