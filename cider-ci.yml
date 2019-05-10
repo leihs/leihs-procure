@@ -1,10 +1,35 @@
 jobs:
-  specs:
-    name: Run specs
+
+
+  build-admin-uberjar:
+    name: Build admin uberjar
     run_when:
       any branch has been updated:
         type: branch
         include_match: ^.*$
+    context:
+      task_defaults:
+        environment_variables:
+          LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
+          RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+          RUBY_ENGINE: ruby
+          RUBY_VERSION: 2.6.0
+        git_options:
+          submodules:
+            include_match: ^.*$
+      tasks:
+        build-admin-uberjar:
+          name: "Build admin uberjar"
+          include:
+            - cider-ci/uberjar_task-component.yml
+  specs:
+    name: Run specs
+    depends_on: &SPEC_DEPENDENTS
+      uberjar ash passed:
+        type: job
+        job_key: build-admin-uberjar
+        states: [passed]
+    run_when: *SPEC_DEPENDENTS
     context:
       generate_tasks:
         include_match: spec/.*_spec.rb
@@ -45,26 +70,6 @@ jobs:
               env | sort
               mkdir -p log
               xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
-
-
-  build-admin-uberjar:
-    name: Build admin uberjar
-    run_when:
-      any branch has been updated:
-        type: branch
-        include_match: ^.*$
-    context:
-      task_defaults:
-        environment_variables:
-          LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
-        git_options:
-          submodules:
-            include_match: ^.*$
-      tasks:
-        build-admin-uberjar:
-          name: "Build admin uberjar"
-          include:
-            - cider-ci/uberjar_task-component.yml
 
 
   good-to-merge:
