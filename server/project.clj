@@ -10,16 +10,16 @@
      [cljsjs/moment "2.17.1-1"] [clojure-humanize "0.2.2"] [clj-pid "0.1.2"]
      [com.github.mfornos/humanize-slim "1.2.2"]
      [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
-     [com.walmartlabs/lacinia "0.31.0"] [compojure "1.6.0"] [environ "1.1.0"]
-     [hiccup "1.0.5"] [hickory "0.7.1"] [hikari-cp "2.6.0"] [honeysql "0.9.2"]
+     [com.walmartlabs/lacinia "0.31.0"] [compojure "1.6.0"]
+     [me.raynes/conch "0.8.0"] [environ "1.1.0"] [hiccup "1.0.5"]
+     [hickory "0.7.1"] [hikari-cp "2.6.0"] [honeysql "0.9.2"]
      [inflections "0.13.0"] [io.forward/yaml "1.0.7"]
      [log4j/log4j "1.2.17" :exclusions
       [javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri]]
      [logbug "4.2.2"] [org.clojure/data.codec "0.1.1"]
      [io.dropwizard.metrics/metrics-core "4.0.3"]
      [io.dropwizard.metrics/metrics-healthchecks "4.0.3"]
-     [nilenso/honeysql-postgres "0.2.4"]
-     [org.clojure/clojure "1.9.0"]
+     [nilenso/honeysql-postgres "0.2.4"] [org.clojure/clojure "1.9.0"]
      [org.clojure/clojurescript "1.10.217" :scope "provided"]
      [org.clojure/java.jdbc "0.7.5"] [org.clojure/tools.cli "0.3.5"]
      [org.clojure/tools.logging "0.4.0"] [org.clojure/tools.nrepl "0.2.13"]
@@ -30,11 +30,6 @@
      [uritemplate-clj "1.1.1"] [venantius/accountant "0.2.4"]
      [ring/ring-core "1.7.0"]]
   :plugins [[lein-zprint "0.3.8"] [lein-environ "1.1.0"]]
-  :zprint {:width 80,
-           :old? false,
-           :map {:lift-ns? false},
-           :comment {:wrap? false, :inline? false, :count? false},
-           :vector {:respect-nl? true}}
   :jvm-opts
     #=(eval (if (re-matches #"^(9|10)\..*" (System/getProperty "java.version"))
                       ["--add-modules" "java.xml.bind"]
@@ -55,9 +50,8 @@
                     :repl-options {:timeout 120000}},
              :uberjar {:source-paths ["src/prod"],
                        :resource-paths ["resources/prod"],
-                       :aot [#"leihs\..*"]
-                       :uberjar-name "leihs-procure.jar"
-                       },
+                       :aot [#"leihs\..*"],
+                       :uberjar-name "leihs-procure.jar"},
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj
