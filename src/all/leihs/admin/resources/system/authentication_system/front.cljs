@@ -138,7 +138,8 @@
    [field-component :internal_private_key {:node-type :textarea}]
    [field-component :internal_public_key {:node-type :textarea}]
    [field-component :external_public_key {:node-type :textarea}]
-   [field-component :external_url {}]])
+   [field-component :external_sign_in_url {}]
+   [field-component :external_sign_out_url {}]])
 
 (defn count-component [kw noun data]
   (let [count (kw data)]

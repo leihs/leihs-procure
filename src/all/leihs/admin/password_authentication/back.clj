@@ -4,6 +4,8 @@
   (:require
     [leihs.core.auth.session :as session]
     [leihs.core.password-authentication.back :refer [password-check-query]]
+    [leihs.core.constants :refer [PASSWORD_AUTHENTICATION_SYSTEM_ID]]
+
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as str]))
 
@@ -16,7 +18,8 @@
                      (apply password-check-query)
                      (jdbc/query tx)
                      first)]
-    (let [user-session (session/create-user-session user request)]
+    (let [user-session (session/create-user-session 
+                         user PASSWORD_AUTHENTICATION_SYSTEM_ID request)]
       {:body user
        :status 200
        :cookies {leihs.core.constants/USER_SESSION_COOKIE_NAME
