@@ -4,11 +4,12 @@ module Helpers
 
     def sign_in_as user
       visit '/'
-      fill_in 'email', with: user.email
-      click_on 'Continue'
+      fill_in 'user', with: user.email
+      click_on 'Login'
       fill_in 'password', with: user.password
-      click_on 'Sign in'
-      expect(page).to have_content user.email
+      click_on 'Weiter'
+      find('.fa-user-circle').click
+      expect(page).to have_content user.lastname
       visit '/admin/'
     end
 

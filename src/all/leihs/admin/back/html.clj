@@ -29,8 +29,7 @@
    (include-font-css)])
 
 (defn body-attributes [request]
-  {:data-global-navbar (-> system-env :leihs-disable-global-navbar nil? str)
-   :data-user (some-> (:authenticated-entity request) to-json url/encode)
+  {:data-user (some-> (:authenticated-entity request) to-json url/encode)
    :data-leihsadminversion (url/encode (to-json release-info/leihs-admin-version))
    :data-leihsversion (url/encode (to-json release-info/leihs-version))})
 

@@ -1,10 +1,9 @@
 (ns leihs.admin.auth.back
   (:refer-clojure :exclude [str keyword])
   (:require
+    [leihs.core.auth.core :as auth]
     [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
     [leihs.core.core :refer [keyword str presence deep-merge]]
-    [leihs.admin.password-authentication.back :as password-authentication]
-    [leihs.core.auth.core :as auth]
     [leihs.core.sql :as sql]
 
     [leihs.admin.auth.back.authorize :as authorize]
@@ -27,40 +26,6 @@
 (defn redirect-target [{{query-target :target} :query-params}]
   (or (presence query-target)
       (path :home)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn user-sign-in-base-query [email]
-  (-> (sql/select :users.id :is_admin :account_enabled :firstname :lastname :email)
-      (sql/from :users)
-      (sql/merge-where [:= (sql/call :lower :users.email) (sql/call :lower email)])
-      (sql/merge-where [:= :users.account_enabled true])))
-
-
-(defn password-sign-in [request]
-  (let [resp (password-authentication/ring-handler request)]
-    (case (:status resp)
-      200
-      )))
-
-(defn sign-out [request]
-  (-> (redirect (path :home {} {:target (redirect-target request)}) :see-other)
-      (assoc-in [:cookies (str USER_SESSION_COOKIE_NAME)]
-                {:value ""
-                 :http-only true
-                 :max-age -1
-                 :path "/"
-                 :secure false})))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def routes
-  (cpj/routes
-    (cpj/POST (path :password-authentication) [] #'password-authentication/ring-handler)
-    ; TODO to be removed with legacy (which uses GET to sign out)
-    (cpj/GET (path :auth-sign-out) [] #'sign-out)
-    (cpj/POST (path :auth-sign-out) [] #'sign-out)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -126,4 +91,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

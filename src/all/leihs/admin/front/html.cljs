@@ -59,20 +59,7 @@
       [:span " Sign out "]
       [:i.fas.fa-sign-out-alt]]]]])
 
-(defn nav-bar []
-  [:nav.navbar.navbar-expand.justify-content-between
-   {:class (if (= (-> @routing/state* :handler-key) :home)
-             "navbar-light bg-light" "navbar-dark bg-admin")}
-   [:a.navbar-brand {:href (path :home), :data-trigger true} "leihs"]
-   [:div
-    (when @core-user/state*
-      [:ul.navbar-nav
-       [li-admin-navitem]
-       [li-navitem :borrow "Borrow"]
-       [li-navitem :lending "Lending"]
-       [li-navitem :procure "Procurement"]
-       ])]
-   [core-user/navbar-user-nav]])
+
 
 (defn version-component []
   [:span.navbar-text "Version "
@@ -95,7 +82,6 @@
 (defn current-page []
   [:div
    [leihs.core.requests.modal/modal-component]
-   (if-not (use-global-navbar?) [nav-bar])
    [:div
     (if-let [page (:page @routing/state*)]
       [page]

@@ -23,7 +23,7 @@ feature 'Manage users', type: :feature do
     describe 'searching and filtering users' do
 
       before :each do
-        click_on_first 'Admin'
+        visit '/admin/'
         click_on 'Users'
 
         # set 100 per page so we see all

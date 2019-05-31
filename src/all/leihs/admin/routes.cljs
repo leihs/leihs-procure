@@ -22,7 +22,6 @@
     [leihs.admin.resources.group.users.front :as group-users]
     [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.resources.home.front :as home]
-    [leihs.admin.resources.sign-in.front :as sign-in]
     [leihs.admin.resources.status.front :as status]
     [leihs.admin.resources.system.front :as system]
     [leihs.admin.resources.system.database.front :as database]
@@ -70,7 +69,6 @@
    :group-users #'group-users/index-page
    :groups #'groups/page
    :home #'home/page
-   :sign-in #'sign-in/page
    :status #'status/info-page
    :system #'system/page
    :system-admin-direct-users #'system-admin-direct-users/page

@@ -45,7 +45,9 @@ feature 'System-Admins', type: :feature do
       sign_in_as @system_admin
       click_on_first 'System'
       expect(page).to have_content "System-Admins"
-      click_on_first "Sign out"
+
+      find('.fa-user-circle').click
+      click_on 'Logout'
 
       sign_in_as @simple_user
       expect(page).to have_content "Users"
