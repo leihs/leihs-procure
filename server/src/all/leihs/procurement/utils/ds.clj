@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [str keyword])
   (:require [clojure.tools.logging :as log]
             [hikari-cp.core :as hikari]
+            [leihs.core.ds :refer [check-pending-migrations]]
             [leihs.procurement.utils.core :refer [presence str]])
   (:import com.codahale.metrics.MetricRegistry))
 
@@ -112,6 +113,8 @@
   (when @ds-without-pooler (close-ds-without-pooler!))
   (initialize-ds! params health-check-registry)
   (initialize-ds-without-pooler! params)
+  (check-pending-migrations @ds)
+  (check-pending-migrations @ds-without-pooler)
   @ds)
 
 ;;### Debug
