@@ -10,6 +10,7 @@
    [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
    [leihs.core.json :as json]
    [leihs.core.json-protocol]
+   [leihs.core.ring-audits :as ring-audits]
    [leihs.core.ring-exception :as ring-exception]
    [leihs.core.routes :as core-routes]
    [leihs.core.routing.back :as routing]
@@ -178,6 +179,7 @@
       (admin-auth/wrap-authorize 
         {:skip-authorization-handler-keys skip-authorization-handler-keys})
       wrap-dispatch-content-type
+      ring-audits/wrap
       anti-csrf/wrap
       auth/wrap-authenticate
       ring.middleware.cookies/wrap-cookies
@@ -208,4 +210,4 @@
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
