@@ -1,4 +1,4 @@
-(load-file "./leihs-clj-shared/deps.clj")
+(load-file "./shared-clj/deps.clj")
 
 (defproject leihs-procurement "0.1.0-SNAPSHOT"
   :url "https://github.com/leihs/leihs-procure"
@@ -30,7 +30,7 @@
             []))
   :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"]
   :java-source-paths ["java"]
-  :source-paths ["src/all" "leihs-clj-shared/src"]
+  :source-paths ["src/all" "shared-clj/src"]
   :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
   :main leihs.procurement.backend.main
