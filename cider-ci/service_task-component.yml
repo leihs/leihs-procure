@@ -9,7 +9,8 @@ scripts:
     body: |
       set -euxo 
       cd $LEIHS_PROCURE_DIR/server
-      java -jar target/leihs-procure.jar run --enable-shutdown-route YES
+      mkdir tmp
+      java -jar target/leihs-procure.jar run
 
   procure-service-is-running:
     body: |
@@ -32,11 +33,10 @@ scripts:
   shutdown-procure-service:
     body: |
       set -euxo 
-      until curl --silent --fail -X POST -I \
-        -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        ${LEIHS_PROCURE_HTTP_BASE_URL}/procure/shutdown;
-        do sleep 1;
-      done
+      cd $LEIHS_PROCURE_DIR/server
+      export PID=$(cat tmp/service.pid)
+      kill $PID 
+      tail --pid=$PID -f /dev/null
     start_when:
       test is terminal:
         script_key: test

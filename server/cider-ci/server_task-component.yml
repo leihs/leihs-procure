@@ -7,7 +7,8 @@ scripts:
     body: |
       set -euxo
       cd server
-      lein with-profile test run "run" "--enable-shutdown-route" "Yes"
+      mkdir tmp
+      lein with-profile test run "run" 
 
   server-is-running:
     body: |
@@ -27,10 +28,10 @@ scripts:
   shutdown-server:
     body: |
       set -euxo 
-      until curl --silent --fail -X POST -I \
-        ${LEIHS_PROCURE_HTTP_BASE_URL}/procure/shutdown;
-        do sleep 1;
-      done
+      cd server
+      export PID=$(cat tmp/service.pid)
+      kill $PID 
+      tail --pid=$PID -f /dev/null
     start_when:
       test is terminal:
         script_key: test

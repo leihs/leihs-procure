@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
-    [leihs.core.shutdown :as shutdown]
 
     [bidi.bidi :as bidi]
     [cheshire.core :refer [parse-string]]
@@ -192,7 +191,6 @@
       wrap-dispatch-frontent
       wrap-resolve-handler
       wrap-accept
-      shutdown/wrap
       ring-exception/wrap
       wrap-reload-if-dev-or-test))
 

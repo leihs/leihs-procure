@@ -79,13 +79,7 @@
          extend-pg-params)]
    ["-s" "--secret LEIHS_SECRET" (str "default: " (:LEIHS_SECRET defaults))
     :default (env-or-default :LEIHS_SECRET)]
-   
-   [nil "--enable-shutdown-route YES|NO"
-    "Enable the shutdown route; primarily used for testing."
-    :parse-fn yaml/parse-string
-    :default false
-    :validate [boolean? "Must be parsed to a boolean by yaml/parse-string"]
-    ]
+   shutdown/pid-file-option
    ])
 
 (defn main-usage
