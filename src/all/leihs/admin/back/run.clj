@@ -72,12 +72,8 @@
    ["-s" "--secret LEIHS_SECRET"
     (str "default: " (:LEIHS_SECRET defaults))
     :default (env-or-default :LEIHS_SECRET)]
-   [nil "--enable-shutdown-route YES|NO"
-    "Enable the shutdown route; primarily used for testing."
-    :parse-fn yaml/parse-string
-    :default (-> :ENABLE_SHUTDOWN_ROUTE env-or-default yaml/parse-string)
-    :validate [boolean? "Must be parsed to a boolean by yaml/parse-string"]
-    ]])
+   shutdown/pid-file-option
+   ])
 
 (defn main-usage [options-summary & more]
   (->> ["Leihs PERM run "
@@ -103,7 +99,7 @@
       (:help options) (println (main-usage summary {:args args :options options}))
       :else (run options))))
 
-;(-main  "-h" "--enable-shutdown-route" "yes")
+;(-main  "-h")
 ;(-main)
 
 

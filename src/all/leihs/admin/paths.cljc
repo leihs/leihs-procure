@@ -93,7 +93,6 @@
           leihs.core.paths/core-paths
           (branch "/admin"
                   (leaf "/status" :status)
-                  (leaf "/shutdown" :shutdown)
                   (leaf "/debug" :debug)
                   delegation-paths
                   groups-paths

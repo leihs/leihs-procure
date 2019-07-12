@@ -15,7 +15,6 @@
    [leihs.core.routes :as core-routes]
    [leihs.core.routing.back :as routing]
    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
-   [leihs.core.shutdown :as shutdown]
 
    [leihs.admin.auth.back :as admin-auth]
    [leihs.admin.back.html :as html]
@@ -204,7 +203,6 @@
                   :never-expire-paths [#".*fontawesome-[^\/]*\d+\.\d+\.\d+\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
                   :enabled? true})
-      shutdown/wrap
       ring-exception/wrap))
 
 ;#### debug ###################################################################

@@ -9,7 +9,8 @@ scripts:
     body: |
       set -euxo 
       cd $LEIHS_ADMIN_DIR
-      java -jar target/leihs-admin.jar run --enable-shutdown-route YES
+      mkdir -p $LEIHS_ADMIN_DIR/tmp
+      java -jar target/leihs-admin.jar run 
 
   admin-service-is-running:
     body: |
@@ -32,11 +33,10 @@ scripts:
   shutdown-admin-service:
     body: |
       set -euxo 
-      until curl --silent --fail -X POST -I \
-        -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/shutdown;
-        do sleep 1;
-      done
+      cd $LEIHS_ADMIN_DIR
+      export PID=$(cat tmp/service.pid)
+      kill $PID 
+      tail --pid=$PID -f /dev/null
     start_when:
       test is terminal:
         script_key: test
