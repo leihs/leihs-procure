@@ -29,6 +29,8 @@
             [lein-environ "1.1.0"]
             [lein-shell "0.4.2"]]
 
+  :aliases {"auto-reset" ["auto" "exec" "-p" "scripts/lein-exec-reset.clj"]}
+
   :cljsbuild {:builds
               {:min {:source-paths ["src/all" "src/prod" "shared-clj/src"]
                      :jar true
@@ -54,7 +56,7 @@
              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
              :css-dirs ["resources/all/public/admin/css"]}
 
-  :profiles {:dev 
+  :profiles {:dev-common
              {:dependencies [[com.cemerick/piggieback "0.2.2"]
                              [figwheel-sidecar "0.5.16"]
                              [org.clojure/tools.nrepl "0.2.13"]
@@ -62,13 +64,17 @@
                              [prone "1.6.0"]
                              [ring/ring-devel "1.6.3"]
                              [ring/ring-mock "0.3.2"]]
-              :plugins [[lein-figwheel "0.5.16"]
+              :plugins [[lein-auto "0.1.3"]
+                        [lein-exec "0.3.7"]
+                        [lein-figwheel "0.5.16"]
                         [lein-sassy "1.0.8"]]
               :source-paths ["src/all" "src/dev" "shared-clj/src"]
               :resource-paths ["resources/all" "resources/dev" "target/cljsbuild"]
               :injections [(require 'pjstadig.humane-test-output)
                            (pjstadig.humane-test-output/activate!)]
               :env {:dev true}}
+             :dev-overrides {} ; defined if needed in profiles.clj file
+             :dev [:dev-common :dev-overrides]
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["src/all" "src/prod" "shared-clj/src"]
                        :prep-tasks [["shell" "./bin/build-timestamp"]

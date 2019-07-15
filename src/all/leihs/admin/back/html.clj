@@ -50,7 +50,7 @@
            [:body (body-attributes request)
             [:div
              (if-not (:leihs-disable-global-navbar system-env)
-               (ssr/render-navbar request))
+               (ssr/render-navbar request {:admin false}))
              [:div#app.container-fluid
               [:div.alert.alert-warning
                [:h1 "Leihs Admin2"]
