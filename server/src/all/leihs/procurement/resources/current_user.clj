@@ -15,7 +15,7 @@
     {:user user,
      :saved_filters (:filter saved-filters),
      :navbarProps (-> request
-                      navbar-props
+                      (navbar-props {:procure false})
                       to-json)}))
 
 ;#### debug ###################################################################

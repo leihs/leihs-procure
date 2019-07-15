@@ -54,7 +54,9 @@
              :profiles/dev+test {},
              ;; -----------------------------------------------------------------
              :project/dev {:source-paths ["src/dev" "src/dev+test"],
-                           :resource-paths ["resources/dev"]},
+                           :resource-paths ["resources/dev"],
+                           :plugins [[lein-auto "0.1.3"]
+                                     [lein-exec "0.3.7"]]},
              :project/test {:source-paths ["src/test" "src/dev+test"],
                             :resource-paths ["resources/test"],
                             :aot [#"leihs\..*"],
