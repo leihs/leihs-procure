@@ -13,5 +13,17 @@ export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_prod?max-pool-
 test -f resources/dev/log4j.properties \
   || cp resources/dev/log4j.properties.template resources/dev/log4j.properties
 
+REPL_PORT_FILE="./.nrepl-port"
+
+rm -f $REPL_PORT_FILE
 lein clean
-lein with-profile dev run "run"
+
+# start REPL in background, wait for file with port info
+lein repl :headless &
+until test -e $REPL_PORT_FILE; do sleep 1; done
+
+# start the watcher
+lein auto-reset
+
+# when exiting this script, kill our process tree (child and grand-child processes etc)
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
