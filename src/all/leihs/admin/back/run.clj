@@ -32,6 +32,10 @@
 (defn run [options]
   (catcher/snatch
     {:return-fn (fn [e] (System/exit -1))}
+    ; ---------------------------------------------------
+    ; provide implementation fo render-page-base function
+    (require 'leihs.admin.back.ssr)
+    ; ---------------------------------------------------
     (logging/info "Invoking run with options: " options)
     (when (nil? (:secret options))
       (throw (IllegalStateException. "LEIHS_SECRET resp. secret must be present!")))
