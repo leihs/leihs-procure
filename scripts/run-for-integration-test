@@ -1,0 +1,4 @@
+#!/bin/sh -exu
+
+./scripts/build-uberjar
+java -jar server/target/leihs-procure.jar run

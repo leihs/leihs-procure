@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo
+
+export LEIHS_PROCURE_DIR=$(pwd)
+source cider-ci/scripts/procure-build-uberjar.sh
+build_uberjar

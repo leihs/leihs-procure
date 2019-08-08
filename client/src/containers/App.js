@@ -47,11 +47,16 @@ class App extends Component {
 
                   if (error) {
                     return (
-                      <ErrorHandler
-                        error={error}
-                        data={data}
-                        refetch={e => window.location.reload()}
-                      />
+                      <F>
+                        <div className="minh-100vh">
+                          <MainNavWithRouter isDev={isDev} me={false} />
+                          <ErrorHandler
+                            error={error}
+                            data={data}
+                            refetch={e => window.location.reload()}
+                          />
+                        </div>
+                      </F>
                     )
                   }
 

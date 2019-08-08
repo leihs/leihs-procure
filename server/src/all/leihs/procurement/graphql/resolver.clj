@@ -17,9 +17,10 @@
                        .getClass
                        .getSimpleName)]
              (log/warn (or m n))
-             (if (env/env #{:dev :test}) (log/debug e))
+             (log/debug e)
              (graphql-resolve/resolve-as nil
-                                         {:message (str m), ; if message nil
+                                         {:message (str m),
+                                          ; if message nil
                                           ; convert to ""
                                           :exception n}))))))
 
@@ -27,17 +28,10 @@
   [arg]
   (into {} (for [[k v] arg] [k (wrap-resolver-with-error v)])))
 
-(defn resolver-map-fn
-  []
-  (-> (queries/get-resolver-map)
-      (merge (mutations/get-resolver-map))
+(def resolvers
+  (-> queries/resolvers
+      (merge mutations/resolvers)
       wrap-map-with-error))
-
-(def resolver-map (resolver-map-fn))
-
-(defn get-resolver-map
-  []
-  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)

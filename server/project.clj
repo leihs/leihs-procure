@@ -34,30 +34,17 @@
   :resource-paths ["resources/all"]
   :aot [#"leihs.procurement.*"]
   :main leihs.procurement.backend.main
-  :profiles {:dev [:project/dev :profiles/dev :profiles/dev+test],
-             ;; including :base
-             ;; (https://github.com/technomancy/leiningen/issues/1329)
-             :test [:base :project/test :profiles/test :profiles/dev+test],
-             :prod {:source-paths ["src/prod"],
-                    :resource-paths ["resources/prod"],
-                    :aot [#"leihs\..*"],
-                    :repl-options {:timeout 120000}},
-             :uberjar {:source-paths ["src/prod"],
-                       :resource-paths ["resources/prod"],
-                       :aot [#"leihs\..*"],
-                       :uberjar-name "leihs-procure.jar"},
+  :profiles {:dev [:project/dev :profiles/dev],
              ;; -----------------------------------------------------------------
              ;; for local specific settings only edit :profiles/* in
              ;; profiles.clj
              :profiles/dev {},
-             :profiles/test {},
-             :profiles/dev+test {},
              ;; -----------------------------------------------------------------
-             :project/dev {:source-paths ["src/dev" "src/dev+test"],
+             :project/dev {:source-paths ["src/dev"],
                            :resource-paths ["resources/dev"],
                            :plugins [[lein-auto "0.1.3"]
                                      [lein-exec "0.3.7"]]},
-             :project/test {:source-paths ["src/test" "src/dev+test"],
-                            :resource-paths ["resources/test"],
-                            :aot [#"leihs\..*"],
-                            :env {:leihs-secret "secret"}}})
+             :uberjar {:source-paths ["src/prod"],
+                       :resource-paths ["resources/prod"],
+                       :aot [#"leihs\..*"],
+                       :uberjar-name "leihs-procure.jar"}})

@@ -10,8 +10,7 @@
      [settings :as settings] [templates :as templates]]))
 
 ; NOTE: some resolvers perform authorization by themselves
-(defn resolver-map-fn
-  []
+(def resolvers
   {:create-request request/create-request!,
    :change-request-budget-period request/change-budget-period!,
    :change-request-category request/change-category!,
@@ -36,9 +35,3 @@
    :update-templates (-> templates/update-templates!
                          (authorization/wrap-ensure-one-of
                            [user-perms/admin? user-perms/inspector?]))})
-
-(def resolver-map (resolver-map-fn))
-
-(defn get-resolver-map
-  []
-  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))

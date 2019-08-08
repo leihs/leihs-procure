@@ -36,8 +36,7 @@
              [users :as users]
              [viewers :as viewers]]))
 
-(defn resolver-map-fn
-  []
+(def resolvers
   {:admins (-> admins/get-admins
                (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :attachments attachments/get-attachments,
@@ -115,9 +114,3 @@
                   context
                   args
                   value)))})
-
-(def resolver-map (resolver-map-fn))
-
-(defn get-resolver-map
-  []
-  (if (#{:dev :test} env/env) (resolver-map-fn) resolver-map))

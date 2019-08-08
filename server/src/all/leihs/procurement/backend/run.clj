@@ -1,23 +1,19 @@
 (ns leihs.procurement.backend.run
-	(:refer-clojure :exclude [str keyword])
-	(:require 
-		[leihs.core.core :refer [keyword str presence]]
-    [leihs.core.shutdown :as shutdown]
-
-    [leihs.procurement.routes :as routes]
-		[leihs.procurement env [status :as status]]
-		[leihs.procurement.utils [ds :as ds]
-		 [http-server :as http-server]]
-		[leihs.procurement.utils.url [http :as http-url]
-		 [jdbc :as jdbc-url]]
-
-    [yaml.core :as yaml]
-		[clj-pid.core :as pid]
-		[clojure.pprint :refer [pprint]]
-		[clojure.tools [cli :as cli] [logging :as logging]]
-		[environ.core :as environ]
-
-		[logbug.catcher :as catcher]))
+  (:refer-clojure :exclude [str keyword])
+  (:require [leihs.core.core :refer [keyword str presence]]
+            [leihs.core.shutdown :as shutdown]
+            [leihs.procurement.routes :as routes]
+            [leihs.procurement env [status :as status]]
+            [leihs.procurement.utils [ds :as ds]
+             [http-server :as http-server]]
+            [leihs.procurement.utils.url [http :as http-url]
+             [jdbc :as jdbc-url]]
+            [yaml.core :as yaml]
+            [clj-pid.core :as pid]
+            [clojure.pprint :refer [pprint]]
+            [clojure.tools [cli :as cli] [logging :as logging]]
+            [environ.core :as environ]
+            [logbug.catcher :as catcher]))
 
 (def defaults
   {:LEIHS_PROCURE_HTTP_BASE_URL "http://localhost:3230",
@@ -35,6 +31,10 @@
 (defn run
   [options]
   (catcher/snatch {:return-fn (fn [e] (System/exit -1))}
+                  ; ---------------------------------------------------
+                  ; provide implementation fo render-page-base function
+                  (require 'leihs.procurement.ssr)
+                  ; ---------------------------------------------------
                   (logging/info "Invoking run with options: " options)
                   (when (nil? (:secret options))
                     (throw (IllegalStateException.
@@ -52,8 +52,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn env-or-default [kw]
-  (or (-> (System/getenv) (get (str kw) nil) presence)
+(defn env-or-default
+  [kw]
+  (or (-> (System/getenv)
+          (get (str kw) nil)
+          presence)
       (get defaults kw nil)))
 
 (defn extend-pg-params
@@ -66,8 +69,9 @@
 (def cli-options
   [["-h" "--help"]
    ["-b" "--http-base-url LEIHS_PROCURE_HTTP_BASE_URL"
-    (str "default: " (:LEIHS_PROCURE_HTTP_BASE_URL defaults)) 
-    :default (http-url/parse-base-url (env-or-default :LEIHS_PROCURE_HTTP_BASE_URL)) 
+    (str "default: " (:LEIHS_PROCURE_HTTP_BASE_URL defaults))
+    :default
+    (http-url/parse-base-url (env-or-default :LEIHS_PROCURE_HTTP_BASE_URL))
     :parse-fn http-url/parse-base-url]
    ["-d" "--database-url LEIHS_DATABASE_URL"
     (str "default: " (:LEIHS_DATABASE_URL defaults)) :default
@@ -80,7 +84,7 @@
    ["-s" "--secret LEIHS_SECRET" (str "default: " (:LEIHS_SECRET defaults))
     :default (env-or-default :LEIHS_SECRET)]
    shutdown/pid-file-option
-   ])
+  ])
 
 (defn main-usage
   [options-summary & more]

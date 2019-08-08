@@ -1,5 +1,6 @@
 (ns leihs.procurement.authorization
-  (:require [leihs.procurement.env :as env]
+  (:require [clojure.tools.logging :as log]
+            [leihs.procurement.env :as env]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.graphql.helpers :as helpers])
   (:import leihs.procurement.UnauthorizedException))
@@ -50,15 +51,18 @@
                          #(check context args value))))
 
 (def skip-authorization-handler-keys
-  [[:attachment #{:dev :test}] [:image #{:dev :test}] :status
-   [:upload #{:dev :test}]])
+  [:attachment
+   :image
+   :home ; leads to not-found-handler
+   :not-found ; leads to not-found-handler
+   :procurement ; leads to not-found-handler
+   :sign-in
+   :status
+   :upload])
 
 (defn- skip?
   [handler-key]
-  (some #(if (coll? %)
-          (and (= (first %) handler-key) (env/env (second %)))
-          (= handler-key %))
-        skip-authorization-handler-keys))
+  (some #(= handler-key %) skip-authorization-handler-keys))
 
 (defn wrap-authenticate
   [handler]

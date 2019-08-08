@@ -13,8 +13,8 @@ export const FatalErrorScreen = ({ error, children, title }) => {
       style={{
         background: 'blue',
         padding: '1rem',
-        height: '100vh',
-        width: '100vw',
+        height: 'calc(100vh - 3rem)',
+        width: '100%',
         boxSizing: 'border-box',
         display: 'table',
         tableLayout: 'fixed'

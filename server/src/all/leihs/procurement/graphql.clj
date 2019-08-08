@@ -15,12 +15,10 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (graphql-util/attach-resolvers (resolver/get-resolver-map))
+      (graphql-util/attach-resolvers resolver/resolvers)
       graphql-schema/compile))
 
 (def schema (load-schema))
-
-(defn get-schema [] (if (#{:dev :test} env/env) (load-schema) schema))
 
 (defn exec-query
   [query-string request]
@@ -28,7 +26,7 @@
              "with variables" (-> request
                                   :body
                                   :variables))
-  (lacinia/execute (get-schema)
+  (lacinia/execute schema
                    query-string
                    (-> request
                        :body
@@ -45,7 +43,7 @@
 
 (defn parse-query-with-exception-handling
   [schema query]
-  (try (graphql-parser/parse-query (get-schema) query)
+  (try (graphql-parser/parse-query schema query)
        (catch Throwable e*
          (let [e (get-cause e*)
                m (.getMessage e*)
@@ -53,13 +51,13 @@
                      .getClass
                      .getSimpleName)]
            (log/warn (or m n))
-           (if (env/env #{:dev :test}) (log/debug e))
+           (log/debug e)
            (helpers/error-as-graphql-object "API_ERROR" m)))))
 
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
-                       (parse-query-with-exception-handling (get-schema))
+                       (parse-query-with-exception-handling schema)
                        graphql-parser/operations
                        :type
                        (= :mutation))]

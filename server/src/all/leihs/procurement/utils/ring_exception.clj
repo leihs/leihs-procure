@@ -24,7 +24,7 @@
       (catch Throwable _e
         (let [e (get-cause _e)]
           (logging/warn (thrown/to-string e))
-          (if (env/env #{:dev :test}) (logging/debug e))
+          (logging/debug e)
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)
                  (contains? (ex-data e) :status))

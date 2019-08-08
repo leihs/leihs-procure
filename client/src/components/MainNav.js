@@ -48,56 +48,64 @@ export default class MainNav extends React.Component {
 
     const innerMenu = (
       <F>
-        <NavItemLink exact to="/requests">
-          <Icon.Requests fixedWidth spaced /> Anträge
-        </NavItemLink>
+        {!f.isEmpty(me) && (
+          <F>
+            <NavItemLink exact to="/requests">
+              <Icon.Requests fixedWidth spaced /> Anträge
+            </NavItemLink>
 
-        {me.roles.isAdmin && (
-          <UncontrolledDropdown nav inNavbar>
-            <Routed path="/admin">
-              {({ isActive }) => (
-                <DropdownToggle nav caret className={cx({ active: isActive })}>
-                  <Icon.Settings /> Admin
-                </DropdownToggle>
-              )}
-            </Routed>
+            {me.roles.isAdmin && (
+              <UncontrolledDropdown nav inNavbar>
+                <Routed path="/admin">
+                  {({ isActive }) => (
+                    <DropdownToggle
+                      nav
+                      caret
+                      className={cx({ active: isActive })}
+                    >
+                      <Icon.Settings /> Admin
+                    </DropdownToggle>
+                  )}
+                </Routed>
 
-            <DropdownMenu right>
-              <DropdownItemLink className="pl-3" to="/admin/budget-periods">
-                <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
-              </DropdownItemLink>
+                <DropdownMenu right>
+                  <DropdownItemLink className="pl-3" to="/admin/budget-periods">
+                    <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+                  </DropdownItemLink>
 
-              <DropdownItemLink className="pl-3" to="/admin/categories">
-                <Icon.Categories fixedWidth spaced /> Kategorien
-              </DropdownItemLink>
+                  <DropdownItemLink className="pl-3" to="/admin/categories">
+                    <Icon.Categories fixedWidth spaced /> Kategorien
+                  </DropdownItemLink>
 
-              <DropdownItemLink className="pl-3" to="/admin/users">
-                <Icon.Users fixedWidth spaced /> Benutzer
-              </DropdownItemLink>
+                  <DropdownItemLink className="pl-3" to="/admin/users">
+                    <Icon.Users fixedWidth spaced /> Benutzer
+                  </DropdownItemLink>
 
-              <DropdownItemLink className="pl-3" to="/admin/organizations">
-                <Icon.Organizations fixedWidth spaced /> Organisationen
-              </DropdownItemLink>
+                  <DropdownItemLink className="pl-3" to="/admin/organizations">
+                    <Icon.Organizations fixedWidth spaced /> Organisationen
+                  </DropdownItemLink>
 
-              <DropdownItem divider />
+                  <DropdownItem divider />
 
-              <DropdownItemLink className="pl-3" to="/admin/settings">
-                <Icon.Settings fixedWidth spaced /> Einstellungen
-              </DropdownItemLink>
-            </DropdownMenu>
-          </UncontrolledDropdown>
-        )}
+                  <DropdownItemLink className="pl-3" to="/admin/settings">
+                    <Icon.Settings fixedWidth spaced /> Einstellungen
+                  </DropdownItemLink>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            )}
 
-        {me.roles.isInspector && (
-          <NavItemLink exact to="/templates/edit">
-            <Icon.Templates fixedWidth spaced /> Vorlagen
-          </NavItemLink>
-        )}
+            {me.roles.isInspector && (
+              <NavItemLink exact to="/templates/edit">
+                <Icon.Templates fixedWidth spaced /> Vorlagen
+              </NavItemLink>
+            )}
 
-        {!!contactUrl && (
-          <NavItemAnchor href={contactUrl} target="_blank">
-            <Icon.Contact fixedWidth spaced /> Kontakt
-          </NavItemAnchor>
+            {!!contactUrl && (
+              <NavItemAnchor href={contactUrl} target="_blank">
+                <Icon.Contact fixedWidth spaced /> Kontakt
+              </NavItemAnchor>
+            )}
+          </F>
         )}
 
         {!!isDev && (

@@ -24,7 +24,7 @@ You can mock the authenticated user by setting request's header: `Authorization:
 
 ### Running tests locally
 
-1. run the server by `lein with-profile test run "run"`
+1. run the server by `lein with-profile run "run"`
 2. bundle exec rspec path-to-file
 
 You can also work with environmental variables instead of `profiles.clj` if prefered. If used both, the

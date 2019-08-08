@@ -44,6 +44,6 @@ scripts:
 
   delete-database:
     start_when:
-       shutdown-procure-service is in termial state:
+       shutdown-procure-service is in terminal state:
         script_key: shutdown-procure-service
         states: [aborted, defective, passed, failed, skipped]
