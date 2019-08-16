@@ -23,11 +23,6 @@
       (sql/order-by :lastname :firstname)
       (sql/merge-where [:= nil :delegator_user_id])))
 
-(->
-  (apply sql/select
-         (apply sql/select shared/default-fields)
-         shared/available-fields))
-
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]
    (when (or (-> per-page presence not)
