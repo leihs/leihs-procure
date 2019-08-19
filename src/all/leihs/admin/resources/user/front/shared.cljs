@@ -76,7 +76,10 @@
               :autoComplete (or (:autoComplete opts) :off)
               :type (:type opts)
               :value (or (kw @user-data*) "")
-              :on-change #(swap! user-data* assoc kw (-> % .-target .-value presence))
+              :on-change (fn [e] 
+                           (swap! user-data* assoc kw (-> e .-target .-value presence))
+                           (when-let [hook (:on-change opts)]
+                             (apply hook [e])))
               :disabled (not @edit-mode?*)}]
             [:div
              (if-let [value (-> @user-data* kw presence)]
@@ -87,7 +90,8 @@
                   :email [:a {:href (str "mailto:" value)}
                           [:i.fas.fa-envelope] " " value]
                   :url [:a {:href value} value]
-                  value)])])]]]))))
+                  value)])])]
+         [:small (:remark opts)]]]))))
 
 (defn checkbox-component [kw]
   [:div.form-check.form-check-inline
@@ -113,6 +117,19 @@
 
 
 ;;; image ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn update-img-digest [& args]
+  "sets img_digest to the md5 hex of the concatenated img256_url and img32_url
+  or to nil if both are empty; call this if either the fields :img256_url or :img32_url 
+  have been updated via the form; or via imgae drop"
+  (swap! user-data* 
+         (fn [user-data]
+           (assoc user-data
+                  :img_digest (some-> (str (:img256_url user-data) 
+                                           " " 
+                                           (:img32_url user-data))
+                                      presence
+                                      leihs.core.digest/md5-hex)))))
 
 (def img-processing* (reagent/atom {}))
 
@@ -152,7 +169,8 @@
                          (fn [err b64]
                            (if err
                              (swap! img-processing* assoc :error err)
-                             (swap! user-data* assoc (keyword (str "img" res "_url")) b64))))))))
+                             (swap! user-data* assoc (keyword (str "img" res "_url")) b64)))))))
+  (update-img-digest))
 
 (defn handle-img-drop [evt]
   (reset! img-processing* {})
@@ -200,38 +218,46 @@
           {:href "#"
            :on-click #(swap! user-data* assoc :img256_url nil :img32_url nil)}
           [:i.fas.fa-times] " Remove image "]])]]]
-   (if-let [img-data (:img256_url @user-data*)]
-           [:img {:width 256
-                  :height 256
-                  :src img-data
-                  :style {:position :absolute
-                          :left 0
-                          :top 0
-                          :width "256px"
-                          :height "256px"
-                          :opacity 0.3
-                          :z-index -1}}]
-           [:div.bg-light
-            {:style {:position :absolute
+   [:div 
+    (if-let [img-data (:img256_url @user-data*)]
+      [:img {:src img-data
+             :style {
+                     :position :absolute
                      :left 0
                      :top 0
-                     :width "256px"
-                     :height "256px"
-                     :z-index -1 }}])])
+                     :max-width "256px"
+                     :max-height "256px"
+                     :opacity 0.3
+                     :z-index -1}}]
+      [:div.bg-light
+       {:style {:position :absolute
+                :left 0
+                :top 0
+                :width "256px"
+                :height "256px"
+                :z-index -1 }}])]])
 
 (defn image-component []
   [:div.clearfix
    [:h3 "User-Image"]
    (if-not @edit-mode?*
-     [:img.bg-light.user-image-256.mb-2
-      {:src (if-let [data (:img256_url @user-data*)]
-              data
-              (gravatar-url (:email @user-data*) 256))
-       :width 256
-       :height 256}]
+     [:div 
+      {:style {:width 256 :height 256}}
+      [:img.bg-light.user-image-256.mb-2
+       {:src (if-let [data (:img256_url @user-data*)]
+               data
+               (gravatar-url (:email @user-data*) 256))
+        :style {:max-width 256
+                :max-height 256}}]]
      [file-upload])
-   [field-component :img256_url {:type :url}]
-   [field-component :img32_url {:type :url}]])
+   ; custom handler here? 
+   [field-component :img256_url {:type :url :on-change update-img-digest}]
+   [field-component :img32_url {:type :url :on-change update-img-digest}]
+   [field-component :img_digest 
+    {:type :text 
+     :remark [:strong
+              "Proceed judiciously when overriding this field manually!"
+              " Set this value explicitly when using the API! "]}]])
 
 
 ;; user components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

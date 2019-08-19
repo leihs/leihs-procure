@@ -35,6 +35,7 @@
    :id
    :img256_url
    :img32_url
+   :img_digest
    :is_admin
    :lastname
    :login
