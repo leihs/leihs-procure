@@ -20,7 +20,7 @@
 (def users-base-query
   (-> (apply sql/select (map #(keyword (str "users." %)) shared/default-fields))
       (sql/from :users)
-      (sql/order-by :lastname :firstname)
+      (sql/order-by :lastname :firstname :id)
       (sql/merge-where [:= nil :delegator_user_id])))
 
 (defn set-per-page-and-offset
