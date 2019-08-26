@@ -121,7 +121,7 @@
 (defn update-img-digest [& args]
   "sets img_digest to the md5 hex of the concatenated img256_url and img32_url
   or to nil if both are empty; call this if either the fields :img256_url or :img32_url 
-  have been updated via the form; or via imgae drop"
+  have been updated via the form; or via image drop or delete"
   (swap! user-data* 
          (fn [user-data]
            (assoc user-data
@@ -216,7 +216,7 @@
         [:p {:style {:margin-top "1em"}}
          [:a.btn.btn-sm.btn-dark
           {:href "#"
-           :on-click #(swap! user-data* assoc :img256_url nil :img32_url nil)}
+           :on-click #(swap! user-data* assoc :img256_url nil :img32_url nil :img_digest nil)}
           [:i.fas.fa-times] " Remove image "]])]]]
    [:div 
     (if-let [img-data (:img256_url @user-data*)]
