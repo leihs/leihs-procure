@@ -31,6 +31,7 @@
    :country
    :created_at
    :email
+   :extended_info
    :firstname
    :id
    :img256_url
@@ -62,6 +63,7 @@
    :city
    :country
    :email
+   :extended_info
    :firstname
    :img256_url
    :img32_url

@@ -53,7 +53,10 @@
     (go (let [resp (<! resp-chan)]
           (when (and (= (:status resp) 200)
                      (= id @fetch-user-id*))
-            (reset! user-data* (:body resp)))))))
+            (reset! user-data* 
+                    (-> resp :body (update-in 
+                                     [:extended_info] 
+                                     (fn [json] (.stringify js/JSON (clj->js json)))))))))))
 
 (defn clean-and-fetch [& args]
   (reset! user-data* nil)
@@ -92,6 +95,47 @@
                   :url [:a {:href value} value]
                   value)])])]
          [:small (:remark opts)]]]))))
+
+(defn json-component
+  [kw opts]
+  (let [expanded* (reagent/atom false) 
+        is-valid* (reaction 
+                    (try 
+                      (.parse js/JSON (get @user-data* kw))
+                      true
+                      (catch :default _ false)))
+        opts (merge {} opts)]
+    (fn []
+      (when (or @edit-mode?* (not= kw :password))
+        [:div.form-group.row
+         [:label.col.col-form-label.col-sm-2 {:for kw} kw]
+         [:div.col.col-sm-10
+          [:div.input-group
+           (if @edit-mode?*
+             [:textarea.form-control
+              {:id kw
+               :class (clojure.string/join 
+                        " " [(if @is-valid* "is-valid" "is-invalid")])
+               :autoComplete (or (:autoComplete opts) :off)
+               :value (or (kw @user-data*) "")
+               :on-change (fn [e] 
+                            (swap! user-data* assoc kw (-> e .-target .-value presence))
+                            (when-let [hook (:on-change opts)]
+                              (apply hook [e])))
+               :disabled (not @edit-mode?*)}]
+             [:div
+              (if-let [value (-> @user-data* kw presence)]
+                (if-not @expanded*
+                  [:span [:span.form-control-plaintext.text-truncate
+                          {:style {:max-width "20em"}} value]
+                   [:button.btn-link 
+                    {:on-click #(reset! expanded* true)}
+                    [:i.fa.fa-expand-arrows-alt]]]
+                  [:pre.form-control-plaintext 
+                   (.stringify js/JSON
+                               (.parse js/JSON value) nil 2)]))])]
+          [:small (:remark opts)]]]))))
+
 
 (defn checkbox-component [kw]
   [:div.form-check.form-check-inline
@@ -288,7 +332,9 @@
    [field-component :url {:type :url}]
    [field-component :org_id]
    [field-component :login]
-   [field-component :badge_id]])
+   [field-component :badge_id]
+   [json-component :extended_info {:type :json}]
+   ])
 
 (defn additional-properties-component []
   [:div.additional-properties

@@ -20,6 +20,7 @@
     :country
     :created_at
     :email
+    :extended_info
     :firstname
     :id
     :img256_url

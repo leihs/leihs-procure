@@ -29,7 +29,10 @@
   (let [resp-chan (async/chan)
         id (requests/send-off {:url (path :users)
                                :method :post
-                               :json-params  @user-data*}
+                               :json-params (-> @user-data*
+                                                 (update-in 
+                                                   [:extended_info]
+                                                   (fn [s] (.parse js/JSON s))))}
                               {:modal true
                                :title "Create User"
                                :handler-key :user-new
