@@ -103,14 +103,48 @@
 
 ;;; transfer data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn- transfer-entitlement-groups [tx user-id target-user-id]
+  (let [target-entitlemens-ids (->> (-> (sql/select :*)
+                                        (sql/from :entitlement_groups_users)
+                                        (sql/merge-where [:= :user_id target-user-id])
+                                        sql/format)
+                                    (jdbc/query tx)
+                                    (map :entitlement_group_id))
+        source-entitlements-ids (->> (-> (sql/select :*)
+                                         (sql/from :entitlement_groups_users)
+                                         (sql/merge-where [:= :user_id user-id])
+                                         sql/format)
+                                     (jdbc/query tx)
+                                     (map :entitlement_group_id))
+        to-be-transfered-ids (clojure.set/difference (set source-entitlements-ids)
+                                                     (set target-entitlemens-ids))]
+    (when (seq to-be-transfered-ids)
+      (->>
+        (-> (sql/update :entitlement_groups_users)
+            (sql/set {:user_id target-user-id})
+            (sql/merge-where [:= :user_id user-id])
+            (sql/merge-where [:in :entitlement_group_id to-be-transfered-ids])
+            sql/format)
+        (jdbc/execute! tx)))
+    (->>
+       (-> (sql/delete-from :entitlement_groups_users)
+           (sql/merge-where [:= :user_id user-id])
+           sql/format)
+       (jdbc/execute! tx))))
+
 (defn transfer-data
   ([{tx :tx {user-id :user-id target-user-id :target-user-id} :route-params}]
    (transfer-data user-id target-user-id tx))
   ([user-id target-user-id tx]
-   (doseq [table [:reservations :contracts :orders]]
-     (jdbc/update! tx table
-                   {:user_id target-user-id}
-                   ["user_id = ?" user-id]))
+   (doseq [[table fields] [[:audited_requests [:user_id]]
+                           [:contracts [:user_id]] 
+                           [:orders [:user_id]] 
+                           [:reservations [:user_id :handed_over_by_user_id :returned_to_user_id :delegated_user_id]]]]
+     (doseq [field fields]
+       (jdbc/update! tx table
+                     {(str field) target-user-id}
+                     [(str field " = ?") user-id])))
+   (transfer-entitlement-groups tx user-id target-user-id)
    {:status 204}))
 
 (defn transfer-data-and-delete-user
