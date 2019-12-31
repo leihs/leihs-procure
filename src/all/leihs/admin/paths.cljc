@@ -6,6 +6,7 @@
     [leihs.core.url.query-params :as query-params]
 
     [leihs.admin.resources.system.paths :as system]
+    [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
 
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
@@ -22,7 +23,6 @@
   #{:admin-audits-legacy
     :admin-buildings
     :admin-fields
-    :admin-inventory-pools
     :admin-languages
     :admin-mail-templates
     :admin-rooms
@@ -97,11 +97,11 @@
                   delegation-paths
                   groups-paths
                   system/paths
+                  inventory-pools/paths
                   users-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)
-                  (leaf "/inventory_pools" :admin-inventory-pools)
                   (leaf "/languages" :admin-languages)
                   (leaf "/mail_templates" :admin-mail-templates)
                   (leaf "/rooms" :admin-rooms)

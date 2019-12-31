@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.groups.shared)
 
-(def default-fields 
+(def default-fields
   #{
     :name
-    :id 
+    :id
     :org_id
     })
 
@@ -11,7 +11,7 @@
   #{
     :created_at
     :description
-    :id 
+    :id
     :name
     :org_id
     })

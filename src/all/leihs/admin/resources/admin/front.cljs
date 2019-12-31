@@ -25,7 +25,7 @@
         (breadcrumbs/delegations-li)
         (breadcrumbs/li :admin-fields " Fields ")
         (breadcrumbs/groups-li)
-        (breadcrumbs/li :admin-inventory-pools " Inventory Pools ")
+        (breadcrumbs/inventory-pools-li)
         (breadcrumbs/li :admin-languages " Languages ")
         (breadcrumbs/li :admin-mail-templates " Mail templates ")
         (breadcrumbs/li :admin-rooms " Rooms ")

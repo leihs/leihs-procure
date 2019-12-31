@@ -11,10 +11,6 @@
     [leihs.admin.front.pages.debug]
     [leihs.admin.paths :as paths :refer [path paths]]
     [leihs.admin.resources.admin.front :as admin]
-    [leihs.admin.resources.system.authentication-system.front :as authentication-system]
-    [leihs.admin.resources.system.authentication-system.groups.front :as authentication-system-groups]
-    [leihs.admin.resources.system.authentication-system.users.front :as authentication-system-users]
-    [leihs.admin.resources.system.authentication-systems.front :as authentication-systems]
     [leihs.admin.resources.delegation.front :as delegation]
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
@@ -22,10 +18,20 @@
     [leihs.admin.resources.group.users.front :as group-users]
     [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.resources.home.front :as home]
+    [leihs.admin.resources.inventory-pools.front :as inventory-pools]
+    [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.front :as inventory-pool-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.front :as inventory-pool-user]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as inventory-pool-user-roles]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.front :as inventory-pool-user-suspension]
     [leihs.admin.resources.status.front :as status]
-    [leihs.admin.resources.system.front :as system]
-    [leihs.admin.resources.system.database.front :as database]
+    [leihs.admin.resources.system.authentication-system.front :as authentication-system]
+    [leihs.admin.resources.system.authentication-system.groups.front :as authentication-system-groups]
+    [leihs.admin.resources.system.authentication-system.users.front :as authentication-system-users]
+    [leihs.admin.resources.system.authentication-systems.front :as authentication-systems]
     [leihs.admin.resources.system.database.audits.front :as database-audits]
+    [leihs.admin.resources.system.database.front :as database]
+    [leihs.admin.resources.system.front :as system]
     [leihs.admin.resources.system.system-admins.direct-users.front :as system-admin-direct-users]
     [leihs.admin.resources.system.system-admins.front :as system-admins]
     [leihs.admin.resources.system.system-admins.groups.front :as system-admin-groups]
@@ -69,6 +75,15 @@
    :group-users #'group-users/index-page
    :groups #'groups/page
    :home #'home/page
+   :inventory-pool #'inventory-pool/show-page
+   :inventory-pool-add #'inventory-pool/add-page
+   :inventory-pool-delete #'inventory-pool/delete-page
+   :inventory-pool-edit #'inventory-pool/edit-page
+   :inventory-pools #'inventory-pools/page
+   :inventory-pool-user #'inventory-pool-user/page
+   :inventory-pool-user-roles #'inventory-pool-user-roles/page
+   :inventory-pool-user-suspension #'inventory-pool-user-suspension/page
+   :inventory-pool-users #'inventory-pool-users/index-page
    :status #'status/info-page
    :system #'system/page
    :system-admin-direct-users #'system-admin-direct-users/page

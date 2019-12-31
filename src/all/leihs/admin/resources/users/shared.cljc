@@ -1,13 +1,13 @@
 (ns leihs.admin.resources.users.shared)
 
-(def default-fields 
+(def default-fields
   #{
-    :email 
-    :firstname 
-    :id 
-    :img32_url 
-    :lastname 
-    :login 
+    :email
+    :firstname
+    :id
+    :img32_url
+    :lastname
+    :login
     :org_id
     })
 
@@ -38,7 +38,6 @@
     })
 
 (def default-query-parameters {:is_admin nil
-                               :role "any"
                                :page 1
                                :per-page 12
                                :term ""

@@ -137,8 +137,8 @@
    (transfer-data user-id target-user-id tx))
   ([user-id target-user-id tx]
    (doseq [[table fields] [[:audited_requests [:user_id]]
-                           [:contracts [:user_id]] 
-                           [:orders [:user_id]] 
+                           [:contracts [:user_id]]
+                           [:orders [:user_id]]
                            [:reservations [:user_id :handed_over_by_user_id :returned_to_user_id :delegated_user_id]]]]
      (doseq [field fields]
        (jdbc/update! tx table
@@ -253,7 +253,6 @@
   (-> (sql/select :iprs.* [:inventory_pools.name :inventory_pool_name])
       (sql/from [:access_rights :iprs])
       (sql/merge-where [:= :user_id user-id])
-      (sql/merge-where [:= nil :deleted_at])
       (sql/merge-where [:or [:= nil :suspended_until] [:> :suspended_until (sql/raw "now()")]])
       (sql/merge-join :inventory_pools [:= :iprs.inventory_pool_id :inventory_pools.id])
       sql/format))

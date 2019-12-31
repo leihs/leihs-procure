@@ -26,7 +26,6 @@
     [reagent.core :as reagent]
     ))
 
-(declare fetcher-group)
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
 (defonce group-data* (reagent/atom nil))
 

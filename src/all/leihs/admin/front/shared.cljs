@@ -16,7 +16,7 @@
     [:span.datetime
      {:data-iso8601 (.format dt)}
      ;[:pre (with-out-str (pprint dt))]
-     (humanize-datetime (:timestamp @state/global-state*) dt)]
+     [humanize-datetime (:timestamp @state/global-state*) dt]]
     [:span "NULL"]))
 
 (defn gravatar-url

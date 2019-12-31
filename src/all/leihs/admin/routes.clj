@@ -24,15 +24,20 @@
    [leihs.admin.resources.system.authentication-system.groups.back :as authentication-system-groups]
    [leihs.admin.resources.system.authentication-system.users.back :as authentication-system-users]
    [leihs.admin.resources.system.authentication-systems.back :as authentication-systems]
-   [leihs.admin.resources.system.database.audits.back :as audits]
+
    [leihs.admin.resources.delegation.back :as delegation]
    [leihs.admin.resources.delegation.users.back :as delegation-users]
    [leihs.admin.resources.delegations.back :as delegations]
    [leihs.admin.resources.group.back :as group]
    [leihs.admin.resources.group.users.back :as group-users]
    [leihs.admin.resources.groups.back :as groups]
+   [leihs.admin.resources.inventory-pools.back :as inventory-pools]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.back :as inventory-pool-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.back :as inventory-pool-user-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.back :as inventory-pool-user-suspension]
    [leihs.admin.resources.settings.back :as settings]
    [leihs.admin.resources.status.back :as status]
+   [leihs.admin.resources.system.database.audits.back :as audits]
    [leihs.admin.resources.system.system-admins.back :as system-admins]
    [leihs.admin.resources.system.system-admins.direct-users.back :as system-admin-direct-users]
    [leihs.admin.resources.system.system-admins.groups.back :as system-admin-groups]
@@ -58,12 +63,12 @@
 (declare redirect-to-root-handler)
 
 (def skip-authorization-handler-keys
-  (clojure.set/union 
+  (clojure.set/union
     core-routes/skip-authorization-handler-keys
     #{:home}))
 
 (def no-spa-handler-keys
-  (clojure.set/union 
+  (clojure.set/union
     core-routes/no-spa-handler-keys
     #{:redirect-to-root
       :not-found}))
@@ -88,6 +93,11 @@
           :group-user group-users/routes
           :group-users group-users/routes
           :groups groups/routes
+          :inventory-pool inventory-pools/routes
+          :inventory-pool-user-roles inventory-pool-user-roles/routes
+          :inventory-pool-user-suspension inventory-pool-user-suspension/routes
+          :inventory-pool-users inventory-pool-users/routes
+          :inventory-pools inventory-pools/routes
           :not-found html/not-found-handler
           :redirect-to-root redirect-to-root-handler
           :status status/routes
@@ -175,7 +185,7 @@
   (routing/init paths resolve-table)
   (I> wrap-handler-with-logging
       routing/dispatch-to-handler
-      (admin-auth/wrap-authorize 
+      (admin-auth/wrap-authorize
         {:skip-authorization-handler-keys skip-authorization-handler-keys})
       wrap-dispatch-content-type
       ring-audits/wrap

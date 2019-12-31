@@ -115,8 +115,6 @@
    [:div.form-inline
     [system-admin-groups-filter]
     [groups/form-term-filter]
-    ;[groups/form-admins-filter]
-    ;[groups/form-role-filter]
     [groups/form-type-filter]
     [groups/form-per-page]
     [groups/form-reset]]]])

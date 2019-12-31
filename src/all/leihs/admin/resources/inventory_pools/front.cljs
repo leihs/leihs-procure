@@ -1,10 +1,12 @@
-(ns leihs.admin.resources.users.front
+(ns leihs.admin.resources.inventory-pools.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.icons :as icons]
+    [leihs.core.json :as json]
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
@@ -14,8 +16,8 @@
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
-    [leihs.admin.utils.seq :as seq]
-    [leihs.admin.resources.users.shared :as shared]
+    [leihs.admin.utils.seq :as seq :refer [with-index]]
+    [leihs.admin.resources.inventory-pools.shared :as shared]
 
     [clojure.string :as str]
     [accountant.core :as accountant]
@@ -27,18 +29,20 @@
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
-                (assoc :term (-> @routing/state* :query-params-raw :term)))))
+                (assoc :term (-> @routing/state* :query-params-raw :term)
+                       :order (some-> @routing/state* :query-params
+                                      :order clj->js json/to-json)))))
 
 (def current-url* (reaction (:url @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-(def fetch-users-id* (reagent/atom nil))
+(def fetch-inventory-pools-id* (reagent/atom nil))
 
 (def data* (reagent/atom {}))
 
-(defn fetch-users []
+(defn fetch-inventory-pools []
   "Fetches the the currernt url with accept/json
   after 1/5 second timeout if query-params have not changed in the meanwhile
   yet and stores the result in the map data* under this url."
@@ -50,28 +54,26 @@
                 id (requests/send-off {:url url
                                        :method :get}
                                       {:modal false
-                                       :title "Fetch Users"
-                                       :handler-key :users
-                                       :retry-fn #'fetch-users}
+                                       :title "Fetch Inventory-Pools"
+                                       :handler-key :inventory-pools
+                                       :retry-fn #'fetch-inventory-pools}
                                       :chan resp-chan)]
-            (reset! fetch-users-id* id)
+            (reset! fetch-inventory-pools-id* id)
             (go (let [resp (<! resp-chan)]
                   (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-users-id*) ;still the most recent request
+                             (= id @fetch-inventory-pools-id*) ;still the most recent request
                              (= url @current-url*)) ;query-params have still not changed yet
                     (let [body (-> resp :body)
                           page (:page normalized-query-params)
                           per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))]
-                      (swap! data* assoc url
-                             (-> body
-                                 (update-in [:users] (partial seq/with-index offset))
-                                 (update-in [:users] (partial seq/with-key :id)))))))))))))
+                          offset (* per-page (- page 1))
+                          body-with-indexed-inventory-pools (update-in body [:inventory-pools] (partial with-index offset))]
+                      (swap! data* assoc url body-with-indexed-inventory-pools))))))))))
 
 (defn escalate-query-paramas-update [_]
-  (fetch-users)
+  (fetch-inventory-pools)
   (swap! state/global-state*
-         assoc :users-query-params @current-query-paramerters-normalized*))
+         assoc :inventory-pools-query-params @current-query-paramerters-normalized*))
 
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,8 +89,8 @@
 
 (defn form-term-filter []
   [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :users-search-term} "Search term"]
-   [:input#users-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
+   [:label.sr-only {:for :inventory-pools-search-term} "Search term"]
+   [:input#inventory-pools-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
      :placeholder "Search term ..."
      :value (or (-> @current-query-paramerters-normalized* :term presence) "")
@@ -97,44 +99,27 @@
                     (accountant/navigate! (page-path-for-query-params
                                             {:page 1 :term val}))))}]])
 
-(defn form-admins-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label
-    [:span.pr-1 "Admins only"]
-    [:input
-     {:type :checkbox
-      :on-change #(let [new-state (case (-> @current-query-paramerters-normalized*
-                                            :is_admin presence)
-                                    ("true" true) nil
-                                    true)]
-                    (js/console.log (with-out-str (pprint new-state)))
-                    (accountant/navigate! (page-path-for-query-params
-                                             {:page 1
-                                              :is_admin new-state})))
-      :checked (case (-> @current-query-paramerters-normalized*
-                         :is_admin presence)
-                 (nil false "false") false
-                 ("true" true) true)}]]])
 
-(defn form-type-filter []
-  (let [type (or (-> @current-query-paramerters-normalized* :type presence) "any")]
+
+(defn form-is-active-filter []
+  (let [active (or (-> @current-query-paramerters-normalized* :is-active presence) "all")]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-type} "Type"]
-     [:select#users-filter-type.form-control
-      {:value type
+     [:label.mr-1 {:for :inventory-pools-filter-type} "Active"]
+     [:select#inventory-pools-filter-type.form-control
+      {:value active
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
-                                               :type val}))))}
-      (for [t ["any" "org" "manual"]]
+                                               :is-active val}))))}
+      (for [t ["all" "active" "inactive"]]
         [:option {:key t :value t} t])]]))
 
 (defn form-per-page []
   (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-per-page} "Per page"]
-     [:select#users-filter-per-page.form-control
+     [:label.mr-1 {:for :inventory-pools-filter-per-page} "Per page"]
+     [:select#inventory-pools-filter-per-page.form-control
       {:value per-page
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "12")]
@@ -146,8 +131,8 @@
 
 (defn form-reset []
   [:div.form-group.mt-2
-   [:label.sr-only {:for :users-filter-reset} "Reset"]
-   [:a#users-filter-reset.btn.btn-warning
+   [:label.sr-only {:for :inventory-pools-filter-reset} "Reset"]
+   [:a#inventory-pools-filter-reset.btn.btn-warning
     {:href (page-path-for-query-params shared/default-query-parameters)}
     [:i.fas.fa-times]
     " Reset "]])
@@ -157,74 +142,55 @@
    [:div.card-body
    [:div.form-inline
     [form-term-filter]
-    [form-admins-filter]
-    [form-type-filter]
+    [form-is-active-filter]
     [form-per-page]
     [form-reset]]]])
 
+
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def default-colconfig
-  {:id true
-   :org_id true
-   :name true
-   :email true
-   :customcols []})
-
-(defn user-link-component [user inner-component]
-  [:a {:href (path :user {:user-id (:id user)})}
-   inner-component])
-
-(defn users-thead-component [colconfig]
+(defn inventory-pools-thead-component [& [more-cols]]
   [:thead
    [:tr
     [:th "Index"]
-    [:th "Image" ]
-    (when (:org_id colconfig) [:th "Org id"])
-    (when (:name colconfig) [:th "Name"])
-    (when (:email colconfig) [:th "Email"])
-    (for [{th :th key :key} (:customcols colconfig)]
-      [th {:key key}])]])
+    [:th "#Users " [:a {:href (page-path-for-query-params
+                                {:order (-> [[:users_count :desc] [:id :asc]]
+                                            clj->js json/to-json)})} "↓"]]
+    [:th "Active"]
+    [:th "Name " [:a {:href (page-path-for-query-params
+                                {:order (-> [[:name :asc] [:id :asc]]
+                                            clj->js json/to-json)})} "↓"]]
+    (for [col more-cols]
+      col)]])
 
-(defn user-row-component [colconfig user]
-  [:tr {:key (:id user)}
-   [:td (user-link-component user (:index user))]
-   [:td [:a {:href (path :user {:user-id (:id user)})}
-         [:img
-          {:height 32
-           :width 32
-           :src (or (:img32_url user)
-                    (gravatar-url (:email user)))}]]]
-   (when (:org_id colconfig)
-     [:td [user-link-component user
-           [:span {:style {:font-family "monospace"}}
-            (:org_id user)]]])
-   (when (:name colconfig)
-     [:td [user-link-component user
-           [:span
-            [:span.firstname (some-> user :firstname str/trim presence)]
-            " "
-            [:span.lastname (some-> user :lastname str/trim presence)]]]])
-   (when (:email colconfig)
-     [:td [:a {:href (str "mailto:" (:email user))}
-           [:i.fas.fa-envelope] " " (:email user)]])
-   (for [{td :td} (:customcols colconfig)]
-     [td user])])
+(defn link-to-inventory-pool [inventory-pool inner]
+  [:a {:href (path :inventory-pool {:inventory-pool-id (:id inventory-pool)})}
+   inner])
 
-(defn users-table-component [colconfig]
+(defn inventory-pool-row-component [inventory-pool more-cols]
+  [:tr.inventory-pool {:key (:id inventory-pool)}
+   [:td (link-to-inventory-pool inventory-pool (:index inventory-pool))]
+   [:td (:users_count inventory-pool)]
+   [:td [:p {:style {:font-family "monospace"}}
+         (str (:is_active inventory-pool))]]
+   [:td (link-to-inventory-pool inventory-pool (:name inventory-pool))]
+   (for [col more-cols]
+     (col inventory-pool))])
+
+(defn inventory-pools-table-component [& [hds tds]]
   (if-not (contains? @data* @current-url*)
     [:div.text-center
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
-    (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
-      [:table.table.table-striped.table-sm.users
-       [users-thead-component colconfig]
+    (if-let [inventory-pools (-> @data* (get  @current-url* {}) :inventory-pools seq)]
+      [:table.table.table-striped.table-sm
+       [inventory-pools-thead-component hds]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)
               per-page (:per-page @current-query-paramerters-normalized*)]
-          (doall (for [user users]
-                   (user-row-component colconfig user))))]]
-      [:div.alert.alert-warning.text-center "No (more) users found."])))
+          (doall (for [inventory-pool inventory-pools]
+                   (inventory-pool-row-component inventory-pool tds))))]]
+      [:div.alert.alert-warning.text-center "No (more) inventory-pools found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -257,23 +223,23 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn main-page-content-component [colconfig]
+(defn main-page-content-component []
   [:div
    [routing/hidden-state-component
     {:will-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
    [pagination-component]
-   [users-table-component colconfig]
+   [inventory-pools-table-component]
    [pagination-component]
    [debug-component]])
 
 (defn page []
-  [:div.users
+  [:div.inventory-pools
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
-      (breadcrumbs/users-li)]
-     [(breadcrumbs/user-add-li)])
-   [:h1 "Users"]
-   [main-page-content-component default-colconfig]])
+      (breadcrumbs/inventory-pools-li)]
+     [(breadcrumbs/inventory-pool-add-li)])
+   [:h1 icons/inventory-pools " Inventory-Pools"]
+   [main-page-content-component]])

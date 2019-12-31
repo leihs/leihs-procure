@@ -58,18 +58,6 @@
     "manual" (-> query
                  (sql/merge-where [:= nil :org_id]))))
 
-(defn role-filter [query request]
-  (let [role (-> request :query-params :role)]
-    (case role
-      (nil "any") query
-      (-> query
-          (sql/merge-where
-            [:exists
-             (-> (sql/select true)
-                 (sql/from :access_rights)
-                 (sql/merge-where [:= :access_rights.role role])
-                 (sql/merge-where [:= :access_rights.user_id :users.id]))])))))
-
 (defn admins-filter [query request]
   (let [is-admin (-> request :query-params :is_admin)]
     (case is-admin
@@ -90,7 +78,6 @@
         (set-per-page-and-offset query-params)
         (term-filter request)
         (type-filter request)
-        (role-filter request)
         (admins-filter request)
         (select-fields request))))
 

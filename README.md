@@ -100,7 +100,7 @@ changes so far:
 TODOs
 -----
 
-* Add constraint: account_enabeled requires non null email 
+* Add constraint: account_enabeled requires non null email
 * try to fix text-warning visibility problem with css
 
 ### External and PM
@@ -146,7 +146,7 @@ Last two, can come later. The other have interdependencies in some way.
 For ZHdK and also proof of concept.
 
 
-# ZAPI 
+# ZAPI
 
 ## Example
 
@@ -191,7 +191,7 @@ WIDbg6hFVPYzghyDUi4tH1jk03AIgt1TpuBbsO84ydPPsKoPiFXqMAg/
 
 ## LDAP
 
-### Security 
+### Security
 
 Writing a secure LDAP authentication is not simple!
 
@@ -205,7 +205,7 @@ OWASP Recommendation
 > can be to simply attempt an LDAP bind as the user that is trying to
 > authenticate, using the password provided by the user. This process often
 > does not require the use of LDAP filter expressions and avoids the risk of
-> search filter injection. 
+> search filter injection.
 
 https://www.owasp.org/index.php/Projects/OWASP_Framework_Security_Project/Secure_LDAP_API_Standard#Documents_LDAP_Bind_Authentication_Without_Filter_Queries
 

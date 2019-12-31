@@ -114,7 +114,6 @@
     [group-users-filter]
     [users/form-term-filter]
     [users/form-admins-filter]
-    [users/form-role-filter]
     [users/form-type-filter]
     [users/form-per-page]
     [users/form-reset]]]])
