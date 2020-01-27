@@ -43,7 +43,7 @@
                                        (filter #(= roles (second %)))
                                        first first)]
       (do (jdbc/delete! tx :access_rights ["inventory_pool_id = ? AND user_id =? " inventory-pool-id user-id])
-          (when (not= allowed-role-key :noe)
+          (when (not= allowed-role-key :none)
             (jdbc/insert! tx :access_rights {:inventory_pool_id inventory-pool-id
                                              :user_id user-id
                                              :role (str allowed-role-key)}))

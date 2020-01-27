@@ -45,6 +45,28 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(page.find("table.users")).to have_content "lending_manager"
       expect(page.find("table.users")).to have_content "inventory_manager"
 
+
+      # now remove all roles again
+      visit @user_overview_page
+      click_on "Manage Direct Roles"
+      expect(page).to have_field('customer', checked: true)
+      expect(page).to have_field('group_manager', checked: true)
+      expect(page).to have_field('lending_manager', checked: true)
+      expect(page).to have_field('inventory_manager', checked: true)
+      uncheck "customer"
+      # this uses the hierarchy
+      expect(page).to have_field('customer', checked: false)
+      expect(page).to have_field('group_manager', checked: false)
+      expect(page).to have_field('lending_manager', checked: false)
+      expect(page).to have_field('inventory_manager', checked: false)
+
+      click_on "Save"
+      wait_until { current_path == @user_overview_page }
+      click_on "Users"
+      fill_in 'users-search-term', with: @users.first.lastname
+      wait_until { all("table.users tbody tr").count == 1 }
+      expect(page.find("table.users")).not_to have_content "customer"
+
     end
   end
 end
