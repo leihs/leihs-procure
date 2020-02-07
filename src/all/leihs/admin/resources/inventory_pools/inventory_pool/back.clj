@@ -37,7 +37,10 @@
   (if-let [inventory-pool (first (jdbc/insert!
                                    tx :inventory_pools
                                    (select-keys data fields)))]
-    {:body inventory-pool}
+    (do
+      (jdbc/insert! tx :workdays
+                    {:inventory_pool_id (:id inventory-pool)})
+      {:body inventory-pool})
     {:status 422
      :body "No inventory-pool has been created."}))
 
