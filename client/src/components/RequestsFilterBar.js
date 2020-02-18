@@ -145,9 +145,10 @@ const Filters = ({ me, data, current, onChange }) => {
           return [key, values]
         })
       ),
-      // only select "not-past" and 1 newest "past" BudgetPeriods
+      // only select 2 earliest "not-past" + 1 newest "past" BudgetPeriods
       budgetPeriods: data.budget_periods
         .filter(bp => !budgetPeriodDates(bp).isPast)
+        .slice(-2)
         .concat(f.find(data.budget_periods, bp => budgetPeriodDates(bp).isPast))
         .filter(Boolean)
         .map(({ id }) => id),
