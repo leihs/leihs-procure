@@ -1,8 +1,12 @@
 (ns leihs.procurement.authorization
   (:require [clojure.tools.logging :as log]
+            [leihs.core.core :refer [presence]]
+            [leihs.core.sign-in.external-authentication.back :as ext-auth]
             [leihs.procurement.env :as env]
+            [leihs.procurement.paths :refer [path]]
             [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.graphql.helpers :as helpers])
+            [leihs.procurement.graphql.helpers :as helpers]
+            [ring.util.response :as response])
   (:import leihs.procurement.UnauthorizedException))
 
 (defn wrap-ensure-one-of
@@ -51,14 +55,12 @@
                          #(check context args value))))
 
 (def skip-authorization-handler-keys
-  [:attachment
-   :image
-   :home ; leads to not-found-handler
-   :not-found ; leads to not-found-handler
-   :procurement ; leads to not-found-handler
-   :sign-in
-   :status
-   :upload])
+  (clojure.set/union #{:attachment
+                       :image
+                       :sign-in
+                       :status
+                       :upload}
+                     ext-auth/skip-authorization-handler-keys))
 
 (defn- skip?
   [handler-key]
@@ -66,12 +68,21 @@
 
 (defn wrap-authenticate
   [handler]
-  (fn [request]
-    (if (or (skip? (:handler-key request)) (:authenticated-entity request))
-      (handler request)
-      {:status 401,
-       :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
-                                              "Not authenticated!")})))
+  (fn [{:keys [uri query-string handler-key] :as request}]
+    (cond
+      (or (skip? handler-key) (:authenticated-entity request))
+        (handler request)
+      (= handler-key :graphql)
+        {:status 401,
+         :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
+                                                "Not authenticated!")}
+      :else
+        (response/redirect
+          (path :sign-in
+                nil
+                {:return-to (cond-> uri
+                              (presence query-string)
+                              (str "?" query-string))})))))
 
 (defn wrap-authorize
   [handler]

@@ -48,8 +48,7 @@ step "I see :txt" do |txt|
 end
 
 step "I log in with the email :email" do |email|
-  visit '/'
-  click_on 'Login'
+  visit '/sign-in'
   within('.ui-form-signin') do
     step "I enter '#{email}' in the 'user' field"
     find('button[type="submit"]').click

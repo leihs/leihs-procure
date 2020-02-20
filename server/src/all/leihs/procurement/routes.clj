@@ -143,7 +143,6 @@
       wrap-empty
       (wrap-secret-byte-array secret)
       datasource/wrap
-      (wrap-graphiql {:path "/procure/graphiql", :endpoint "/procure/graphql"})
       core-routing/wrap-canonicalize-params-maps
       wrap-params
       wrap-multipart-params
