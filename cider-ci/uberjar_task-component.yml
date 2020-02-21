@@ -1,3 +1,5 @@
+include: ['cider-ci/ui_task_component.yml']
+
 traits:
   JDK: true
   Leiningen 2: true
@@ -7,11 +9,14 @@ scripts:
   build-admin-uberjar:
     exclusive_executor_resource: build-admin-jar
     timeout: 5 Minutes
+    start_when:
+      shared ui was built:
+        script_key: prepare-shared-ui
     body: |
       #!/usr/bin/env bash
       set -euxo
 
-      # custom stuff for this project 
+      # custom stuff for this project
       #
       export PROJECT_DIR="$LEIHS_ADMIN_DIR"
       export UBERJAR_NAME="leihs-admin"
@@ -20,8 +25,7 @@ scripts:
         echo "INFO: building the ${UBERJAR_NAME} uberjar now"
         export LEIN_SNAPSHOTS_IN_RELEASE=yes
         cd $PROJECT_DIR
-        sh scripts/prepare-shared-ui.sh 
-        lein uberjar 
+        lein uberjar
       }
 
       # the reminder should be pretty much the same for all our projects resulting in an uberjar
