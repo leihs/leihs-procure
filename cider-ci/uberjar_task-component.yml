@@ -1,3 +1,5 @@
+include: ['cider-ci/ui_task_component.yml']
+
 traits:
   JDK: true
   Leiningen 2: true
@@ -12,11 +14,14 @@ scripts:
       RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
       RUBY_ENGINE: ruby
       RUBY_VERSION: 2.6.0
+    start_when:
+      shared ui was built:
+        script_key: prepare-shared-ui
     body: |
       #!/usr/bin/env bash
       set -euxo
 
-      # custom stuff for this project 
+      # custom stuff for this project
       #
       cd $LEIHS_PROCURE_DIR
       source cider-ci/scripts/procure-build-uberjar.sh

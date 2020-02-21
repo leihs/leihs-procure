@@ -7,7 +7,7 @@ function build_uberjar() {
   cd $LEIHS_PROCURE_DIR/client
   export PUBLIC_URL="/procure"
   npm ci || npm install # for building
-  npm run build
+  npm run ci-build
   cd $LEIHS_PROCURE_DIR/server
   export LEIN_SNAPSHOTS_IN_RELEASE=yes
   lein uberjar

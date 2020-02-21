@@ -4,7 +4,7 @@ include:
 
 jobs:
 
-  build-procure-uberjar: 
+  build-procure-uberjar:
 
     name: Build prod ready uberjar
 
@@ -12,7 +12,7 @@ jobs:
       any branch is pushed: { type: branch, include_match: ^.*$ }
 
     context:
-      task_defaults: 
+      task_defaults:
         include:
           - cider-ci/environment_variables.yml
         environment_variables:
@@ -20,7 +20,7 @@ jobs:
         git_options:
           submodules:
             include_match: ^.*$
-      tasks: 
+      tasks:
         build-procure-uberjar:
           include:
             - cider-ci/uberjar_task-component.yml
@@ -65,7 +65,7 @@ jobs:
             include_match: ^.*$
         scripts:
           test:
-            start_when: 
+            start_when:
               procure service is running:
                 script_key: procure-service-is-running
                 states: [passed]
@@ -94,11 +94,6 @@ jobs:
       backend-specs was successful:
         type: job
         job_key: backend-specs
-        states: [passed]
-
-      client-build was successful:
-        type: job
-        job_key: client-build
         states: [passed]
 
       client-specs was successful:
