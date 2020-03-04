@@ -38,6 +38,7 @@
                      {:output-to "target/cljsbuild/public/admin/js/app.js"
                       :output-dir "target/uberjar"
                       :optimizations :simple
+                      :npm-deps false
                       :pretty-print  false}}
                :app
                {:source-paths ["src/all" "src/dev" "shared-clj/src"]
@@ -47,6 +48,7 @@
                  :output-to "target/cljsbuild/public/admin/js/app.js"
                  :output-dir "target/cljsbuild/public/admin/js/out"
                  :source-map true
+                 :npm-deps false
                  :optimizations :none
                  :pretty-print  true}}}}
 
