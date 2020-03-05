@@ -48,6 +48,8 @@
        [:input
         {:id kw
          :type :checkbox
-         :checked (get-in @state ks)
+         :checked (-> @state (get-in ks) boolean)
+         :value nil
          :on-change #(swap! state assoc-in ks (-> @state (get-in ks) boolean not))
-         :disabled (not @edit-mode?)}]]]]))
+         :disabled (not @edit-mode?)
+         :readOnly (not @edit-mode?)}]]]]))

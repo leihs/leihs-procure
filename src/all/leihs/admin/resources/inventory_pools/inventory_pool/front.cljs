@@ -83,8 +83,7 @@
    [field-component [:shortname] inventory-pool-data* edit-mode?* {}]
    [checkbox-component [:is_active] inventory-pool-data* edit-mode?*]
    [field-component [:email] inventory-pool-data* edit-mode?* {:type :email}]
-   [field-component [:description] inventory-pool-data* edit-mode?* {:node-type :textarea}]
-   ])
+   [field-component [:description] inventory-pool-data* edit-mode?* {:node-type :textarea}]])
 
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -116,7 +115,7 @@
 (defn edit-page []
   [:div.edit-inventory-pool
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -164,7 +163,7 @@
 (defn add-page []
   [:div.new-inventory-pool
    [routing/hidden-state-component
-    {:will-mount #(reset! inventory-pool-data* {})}]
+    {:did-mount #(reset! inventory-pool-data* {})}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
@@ -210,7 +209,7 @@
 (defn delete-page []
   [:div.inventory-pool-delete
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row
     [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
@@ -231,7 +230,7 @@
 (defn show-page []
   [:div.inventory-pool
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -240,8 +239,8 @@
       (breadcrumbs/inventory-pool-li @inventory-pool-id*)]
      [(breadcrumbs/inventory-pool-delete-li @inventory-pool-id*)
       (breadcrumbs/inventory-pool-edit-li @inventory-pool-id*)
-      (breadcrumbs/inventory-pool-users-li @inventory-pool-id*)]
-     )
+      (breadcrumbs/inventory-pool-users-li @inventory-pool-id*)
+      (breadcrumbs/inventory-pool-groups-li @inventory-pool-id*)])
    [:div.row
     [:div.col-lg
      [:h1

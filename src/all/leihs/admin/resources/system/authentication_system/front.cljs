@@ -239,7 +239,7 @@
 (defn edit-page []
   [:div.edit-authentication-system
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (admin-breadcrumbs/nav-component
      [(admin-breadcrumbs/leihs-li)
@@ -289,7 +289,7 @@
 (defn add-page []
   [:div.new-authentication-system
    [routing/hidden-state-component
-    {:will-mount #(reset! authentication-system-data* {})}]
+    {:did-mount #(reset! authentication-system-data* {})}]
    (admin-breadcrumbs/nav-component
      [(admin-breadcrumbs/leihs-li)
       (admin-breadcrumbs/admin-li)
@@ -346,7 +346,7 @@
 (defn delete-page []
 	[:div.authentication-system-delete
 	 [routing/hidden-state-component
-		{:will-mount clean-and-fetch
+		{:did-mount clean-and-fetch
 		 :did-change clean-and-fetch}]
 	 [:div.row
 		[:nav.col-lg {:aria-label :breadcrumb :role :navigation}

@@ -15,7 +15,7 @@
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [roles-hierarchy]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy]]
     [leihs.admin.resources.users.front :as users]
     [leihs.admin.utils.regex :as regex]
 
@@ -38,12 +38,13 @@
 ;### roles ####################################################################
 
 (defn roles-th-component []
-  [:th " Roles "])
+  [:th {:key :roles} " Roles "])
 
 (defn roles-td-component [user]
-  [:td
+  [:td {:key :roles}
    [:a
-    {:href (path :inventory-pool-user {:inventory-pool-id @inventory-pool-id* :user-id (:id user)})}
+    {:href (path :inventory-pool-user
+                 {:inventory-pool-id @inventory-pool-id* :user-id (:id user)})}
     (or (->> user :roles
              (into [])
              (filter second)
@@ -51,7 +52,7 @@
              (map str)
              (clojure.string/join ", ")
              presence)
-        "none" )]])
+        "none")]])
 
 
 ;### suspended ################################################################
@@ -93,7 +94,7 @@
 
 
 (defn form-role-filter []
-  (let [role (or (-> @users/current-query-paramerters-normalized* :role presence) nil)]
+  (let [role (or (-> @users/current-query-paramerters-normalized* :role presence) " ")]
     [:div.form-group.ml-2.mr-2.mt-2
      [:label.mr-1 {:for :users-filter-role} " Role "]
      [:select#users-filter-role.form-control
@@ -103,8 +104,10 @@
                       (accountant/navigate! (users/page-path-for-query-params
                                               {:page 1
                                                :role val}))))}
-      (for [a  (concat [nil] roles-hierarchy)]
-        [:option {:key a :value a} a])]]))
+      ;(console.log (clj->js roles-hierarchy))
+      (doall (for [a (concat [" "] roles-hierarchy)]
+               [:option {:key a :value a} a]))]]))
+
 
 (defn form-suspension-filter []
   (let [suspended (-> @users/current-query-paramerters-normalized* :suspended presence boolean)]
@@ -140,7 +143,7 @@
 (defn main-page-component []
   [:div
    [routing/hidden-state-component
-    {:will-mount users/escalate-query-paramas-update
+    {:did-mount users/escalate-query-paramas-update
      :did-update users/escalate-query-paramas-update}]
    [filter-component]
    [users/pagination-component]
@@ -152,7 +155,7 @@
 (defn index-page []
   [:div.inventory-pool-users
    [routing/hidden-state-component
-    {:will-mount (fn [_] (inventory-pool/clean-and-fetch))}]
+    {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
@@ -166,4 +169,4 @@
        [:span c " " (pluralize-noun c "User")
         [:span " in Inventory-Pool "]
         [inventory-pool/inventory-pool-name-component]])]
-    [main-page-component] ]])
+    [main-page-component]]])

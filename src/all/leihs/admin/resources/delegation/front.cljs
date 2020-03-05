@@ -271,7 +271,7 @@
 (defn show-page []
   [:div.delegation
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -321,7 +321,7 @@
 (defn edit-page []
   [:div.edit-delegation
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -369,7 +369,7 @@
 (defn new-page []
   [:div.new-delegation
    [routing/hidden-state-component
-    {:will-mount #(reset! delegation-data*
+    {:did-mount #(reset! delegation-data*
                           (merge {} (:query-params @routing/state*)))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -439,7 +439,7 @@
 (defn delete-page []
   [:div.delegation-delete
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row
     [:nav.col-lg {:aria-label :breadcrumb :role :navigation}

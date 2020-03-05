@@ -107,7 +107,7 @@
 (defn page []
   [:div.user-delete
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row
     [:nav.col-lg {:aria-label :breadcrumb :role :navigation}

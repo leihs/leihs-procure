@@ -165,7 +165,7 @@
 (defn show-page []
   [:div.group
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -216,7 +216,7 @@
 (defn edit-page []
   [:div.edit-group
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -265,7 +265,7 @@
 (defn add-page []
   [:div.new-group
    [routing/hidden-state-component
-    {:will-mount #(reset! group-data* {})}]
+    {:did-mount #(reset! group-data* {})}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
@@ -321,7 +321,7 @@
 (defn delete-page []
   [:div.group-delete
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.row
     [:nav.col-lg {:aria-label :breadcrumb :role :navigation}

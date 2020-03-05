@@ -16,7 +16,6 @@
      [leihs.admin.front.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer []]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
      [leihs.admin.utils.regex :as regex]
 
@@ -146,7 +145,7 @@
 (defn suspension-component []
   [:div.suspension
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [:div.form.edit
     [humanized-suspended-until-component]

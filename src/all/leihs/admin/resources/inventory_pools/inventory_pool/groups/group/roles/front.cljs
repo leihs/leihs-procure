@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front
+(ns leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -14,7 +14,7 @@
      [leihs.admin.front.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-     [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
+     [leihs.admin.resources.group.front :as group :refer [group-id* group-data*]]
      [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
@@ -24,11 +24,11 @@
      [reagent.core :as reagent]))
 
 
-(defonce inventory-pool-user-roles-data* (reagent/atom nil))
+(defonce inventory-pool-group-roles-data* (reagent/atom nil))
 
 (def edit-mode?*
   (reaction
-    (= (-> @routing/state* :handler-key) :inventory-pool-user-roles)))
+    (= (-> @routing/state* :handler-key) :inventory-pool-group-roles)))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -36,33 +36,33 @@
      [:hr]
      [:h2 "Page Debug"]
      [:div
-      [:h3 "@inventory-pool-user-roles-data*"]
-      [:pre (with-out-str (pprint @inventory-pool-user-roles-data*))]]]))
+      [:h3 "@inventory-pool-group-roles-data*"]
+      [:pre (with-out-str (pprint @inventory-pool-group-roles-data*))]]]))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def fetch-inventory-pool-user-roles-id* (reagent/atom nil))
-(defn fetch-inventory-pool-user-roles []
+(def fetch-inventory-pool-group-roles-id* (reagent/atom nil))
+(defn fetch-inventory-pool-group-roles []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-user-roles (-> @routing/state* :route-params))
+        id (requests/send-off {:url (path :inventory-pool-group-roles (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
                                :title "Fetch Inventory-Pool UserRoles"
-                               :handler-key :inventory-pool-user-roles
-                               :retry-fn #'fetch-inventory-pool-user-roles}
+                               :handler-key :inventory-pool-group-roles
+                               :retry-fn #'fetch-inventory-pool-group-roles}
                               :chan resp-chan)]
-    (reset! fetch-inventory-pool-user-roles-id* id)
+    (reset! fetch-inventory-pool-group-roles-id* id)
     (go (let [resp (<! resp-chan)]
           (when (and (= (:status resp) 200)
-                     (= id @fetch-inventory-pool-user-roles-id*))
-            (reset! inventory-pool-user-roles-data* (:body resp)))))))
+                     (= id @fetch-inventory-pool-group-roles-id*))
+            (reset! inventory-pool-group-roles-data* (:body resp)))))))
 
 
 (defn clean-and-fetch []
-  (reset! inventory-pool-user-roles-data* nil)
-  (fetch-inventory-pool-user-roles)
-  (user/clean-and-fetch)
+  (reset! inventory-pool-group-roles-data* nil)
+  (fetch-inventory-pool-group-roles)
+  (group/clean-and-fetch)
   (inventory-pool/clean-and-fetch))
 
 
@@ -70,18 +70,16 @@
 
 (defn put [_]
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-user-roles {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})
+        id (requests/send-off {:url (path :inventory-pool-group-roles {:inventory-pool-id @inventory-pool-id* :group-id @group-id*})
                                :method :put
-                               :json-params  @inventory-pool-user-roles-data*}
+                               :json-params  @inventory-pool-group-roles-data*}
                               {:modal true
                                :title "Update Roles"
                                :handler-key :inventory-pool-edit
                                :retry-fn #'put}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pool-user {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})))))))
+          (clean-and-fetch)))))
 
 (defn put-submit-component []
   [:div
@@ -93,7 +91,7 @@
    [:div.clearfix]])
 
 (defn on-change-handler [role]
-  (swap! inventory-pool-user-roles-data*
+  (swap! inventory-pool-group-roles-data*
          (fn [data role]
            (console.log (clj->js role))
            (let [new-role-state (-> data
@@ -112,8 +110,8 @@
          role))
 
 (defn header-component []
-  [:h1 "Direct Roles for "
-   [user/user-name-component]
+  [:h1 "Group Roles for "
+   [group/group-name-component]
    " in "
    [inventory-pool/inventory-pool-name-component]])
 
@@ -126,7 +124,7 @@
               [:input.formp-check-input
                {:id role
                 :type :checkbox
-                :checked (get-in @inventory-pool-user-roles-data* [:roles role])
+                :checked (get-in @inventory-pool-group-roles-data* [:roles role])
                 :on-change (fn [e] (on-change-handler role))
                 :disabled (not @edit-mode?*)
                 }]
@@ -136,7 +134,7 @@
 
 
 (defn page []
-  [:div.inventory-pool-user-roles
+  [:div.inventory-pool-group-roles
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
@@ -145,9 +143,8 @@
      (breadcrumbs/admin-li)
      (breadcrumbs/inventory-pools-li)
      (breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*)
-     (breadcrumbs/inventory-pool-users-li @inventory-pool/inventory-pool-id*)
-     [breadcrumbs/inventory-pool-user-li @inventory-pool-id* @user-id*]
-     [breadcrumbs/inventory-pool-user-roles-li @inventory-pool-id* @user-id*]]
+     (breadcrumbs/inventory-pool-groups-li @inventory-pool/inventory-pool-id*)
+     [breadcrumbs/inventory-pool-group-roles-li @inventory-pool-id* @group-id*]]
     []]
    [header-component]
    [:div.form

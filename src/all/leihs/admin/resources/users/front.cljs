@@ -183,8 +183,9 @@
     (when (:org_id colconfig) [:th "Org id"])
     (when (:name colconfig) [:th "Name"])
     (when (:email colconfig) [:th "Email"])
-    (for [{th :th key :key} (:customcols colconfig)]
-      [th {:key key}])]])
+    (doall
+      (for [{th :th key :key} (:customcols colconfig)]
+        [th {:key key}]))]])
 
 (defn user-row-component [colconfig user]
   [:tr {:key (:id user)}
@@ -208,8 +209,8 @@
    (when (:email colconfig)
      [:td [:a {:href (str "mailto:" (:email user))}
            [:i.fas.fa-envelope] " " (:email user)]])
-   (for [{td :td} (:customcols colconfig)]
-     [td user])])
+   (for [[idx {td :td}] (map-indexed vector (:customcols colconfig))]
+     ^{:key idx} [td user])])
 
 (defn users-table-component [colconfig]
   (if-not (contains? @data* @current-url*)
@@ -260,7 +261,7 @@
 (defn main-page-content-component [colconfig]
   [:div
    [routing/hidden-state-component
-    {:will-mount escalate-query-paramas-update
+    {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
    [pagination-component]

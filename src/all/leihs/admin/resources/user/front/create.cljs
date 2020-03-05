@@ -30,7 +30,7 @@
         id (requests/send-off {:url (path :users)
                                :method :post
                                :json-params (-> @user-data*
-                                                 (update-in 
+                                                 (update-in
                                                    [:extended_info]
                                                    (fn [s] (.parse js/JSON s))))}
                               {:modal true
@@ -54,7 +54,7 @@
 (defn page []
   [:div.new-user
    [routing/hidden-state-component
-    {:will-mount #(reset! user-data* {:account_enabled true
+    {:did-mount #(reset! user-data* {:account_enabled true
                                       :password_sign_in_enabled true})}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)

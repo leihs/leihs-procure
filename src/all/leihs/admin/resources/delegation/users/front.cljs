@@ -131,7 +131,7 @@
 (defn main-page-component []
   [:div
    [routing/hidden-state-component
-    {:will-mount users/escalate-query-paramas-update
+    {:did-mount users/escalate-query-paramas-update
      :did-update users/escalate-query-paramas-update}]
    [filter-component]
    [:p "To add users disable the \"Delegation users only\" filter."]
@@ -144,7 +144,7 @@
 (defn index-page []
   [:div.delegation-users
    [routing/hidden-state-component
-    {:will-mount (fn [_] (delegation/clean-and-fetch))}]
+    {:did-mount (fn [_] (delegation/clean-and-fetch))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)

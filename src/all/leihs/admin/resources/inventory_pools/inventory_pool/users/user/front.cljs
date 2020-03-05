@@ -14,7 +14,7 @@
      [leihs.admin.front.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [roles-hierarchy allowed-roles-states]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.front :as suspension]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
@@ -43,7 +43,7 @@
 (defn direct-roles-component []
   [:div.direct-roles
    [routing/hidden-state-component
-    {:will-mount roles/clean-and-fetch
+    {:did-mount roles/clean-and-fetch
      :did-change roles/clean-and-fetch}]
    [:h2 [:a {:href (path :inventory-pool-user-roles
                          {:inventory-pool-id @inventory-pool-id*
@@ -79,7 +79,7 @@
 (defn page []
   [:div.user-roles
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [breadcrumbs/nav-component
     [(breadcrumbs/leihs-li)

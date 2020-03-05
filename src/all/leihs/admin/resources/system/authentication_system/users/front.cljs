@@ -131,7 +131,7 @@
 (defn edit-page []
   [:div.authentication-system-users-edit
    [routing/hidden-state-component
-    {:will-mount edit-clean-and-fetch
+    {:did-mount edit-clean-and-fetch
      :did-change edit-clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
@@ -238,7 +238,7 @@
 (defn main-page-component []
   [:div
    [routing/hidden-state-component
-    {:will-mount users/escalate-query-paramas-update
+    {:did-mount users/escalate-query-paramas-update
      :did-update users/escalate-query-paramas-update}]
    [filter-component]
    [:p "To add users disable the \"Authentication-System users only\" filter."]
@@ -251,7 +251,7 @@
 (defn index-page []
   [:div.authentication-system-users
    [routing/hidden-state-component
-    {:will-mount (fn [_] (authentication-system/clean-and-fetch))}]
+    {:did-mount (fn [_] (authentication-system/clean-and-fetch))}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)

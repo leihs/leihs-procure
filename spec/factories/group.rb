@@ -3,7 +3,7 @@ end
 
 FactoryBot.define do
   factory :group do
-    name { Faker::Name.last_name }
+    name { Faker::Company.unique.name }
     description { Faker::Lorem.sentence }
   end
 end

@@ -22,4 +22,9 @@
                                   (leaf "" :inventory-pool-user)
                                   (leaf "/roles" :inventory-pool-user-roles)
                                   (leaf "/suspension" :inventory-pool-user-suspension)))
-                  (branch "/groups/"))))
+                  (branch "/groups/"
+                          (leaf "" :inventory-pool-groups)
+                          (branch ""
+                                  (param :group-id)
+                                  (leaf "" :inventory-pool-group)
+                                  (leaf "/roles" :inventory-pool-group-roles))))))

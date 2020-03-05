@@ -32,6 +32,8 @@
    [leihs.admin.resources.group.users.back :as group-users]
    [leihs.admin.resources.groups.back :as groups]
    [leihs.admin.resources.inventory-pools.back :as inventory-pools]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.back :as inventory-pool-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.back :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.back :as inventory-pool-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.back :as inventory-pool-user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.back :as inventory-pool-user-suspension]
@@ -94,6 +96,8 @@
           :group-users group-users/routes
           :groups groups/routes
           :inventory-pool inventory-pools/routes
+          :inventory-pool-groups inventory-pool-groups/routes
+          :inventory-pool-group-roles inventory-pool-group-roles/routes
           :inventory-pool-user-roles inventory-pool-user-roles/routes
           :inventory-pool-user-suspension inventory-pool-user-suspension/routes
           :inventory-pool-users inventory-pool-users/routes

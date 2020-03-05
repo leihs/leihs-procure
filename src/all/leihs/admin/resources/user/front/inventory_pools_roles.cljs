@@ -77,7 +77,7 @@
 (defn page []
   [:div.user-inventory-pools-roles
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch-inventory-pools-roles
+    {:did-mount clean-and-fetch-inventory-pools-roles
      :did-change clean-and-fetch-inventory-pools-roles}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)

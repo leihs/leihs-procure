@@ -3,7 +3,7 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [expand-role-to-hierarchy roles-to-map]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy roles-to-map]]
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]

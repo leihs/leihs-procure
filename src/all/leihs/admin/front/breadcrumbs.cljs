@@ -38,11 +38,14 @@
 (defn inventory-pool-add-li [] (li :inventory-pool-add [:span [:i.fas.fa-plus-circle] " Add Inventory-Pool "]))
 (defn inventory-pool-delete-li [id] (li :inventory-pool-delete [:span [:i.fas.fa-times] " Delete "] {:inventory-pool-id id} {}))
 (defn inventory-pool-edit-li [id] (li :inventory-pool-edit [:span [:i.fas.fa-edit] " Edit "] {:inventory-pool-id id} {}))
+(defn inventory-pool-group-li [inventory-pool-id group-id] (li :inventory-pool-group [:span icons/group " Group "] {:inventory-pool-id inventory-pool-id :group-id group-id} {}))
+(defn inventory-pool-group-roles-li [inventory-pool-id group-id] (li :inventory-pool-group-roles [:span icons/edit " Manage Group Roles "] {:inventory-pool-id inventory-pool-id :group-id group-id} {}))
+(defn inventory-pool-groups-li [inventory-pool-id] (li :inventory-pool-groups [:span icons/groups " Groups "] {:inventory-pool-id inventory-pool-id} {}))
 (defn inventory-pool-li [id] (li :inventory-pool [:span icons/inventory-pool " Inventory-Pool "] {:inventory-pool-id id} {}))
-(defn inventory-pool-users-li [inventory-pool-id] (li :inventory-pool-users [:span icons/users " Users "] {:inventory-pool-id inventory-pool-id} {}))
 (defn inventory-pool-user-li [inventory-pool-id user-id] (li :inventory-pool-user [:span icons/user " User "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}))
 (defn inventory-pool-user-roles-li [inventory-pool-id user-id] (li :inventory-pool-user-roles [:span icons/edit " Manage Direct Roles "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}))
 (defn inventory-pool-user-suspension-li [inventory-pool-id user-id] (li :inventory-pool-user-suspension [:span icons/edit " Manage Suspension"] {:inventory-pool-id inventory-pool-id :user-id user-id} {}))
+(defn inventory-pool-users-li [inventory-pool-id] (li :inventory-pool-users [:span icons/users " Users "] {:inventory-pool-id inventory-pool-id} {}))
 (defn inventory-pools-li [] (li :inventory-pools [:span icons/inventory-pools " Inventory-Pools "]))
 
 (defn email-li [address] [:li.breadcrumb-item {:key (str "mailto:" address )} [:a {:href (str "mailto:" address )} [:i.fas.fa-envelope] " Email "]])
@@ -62,11 +65,11 @@
 
 (defn nav-component [left right]
   [:div.row.nav-component.mt-3
-   [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
+   [:nav.col-lg {:key :nav-left :aria-label :breadcrumb :role :navigation}
     (when (seq left)
       [:ol.breadcrumb
        (for [li left] li) ])]
-   [:nav.col-lg {:role :navigation}
+   [:nav.col-lg {:key :nav-right :role :navigation}
     (when (seq right)
       [:ol.breadcrumb.leihs-nav-right
        (for [li right] li)])]])

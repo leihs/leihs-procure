@@ -145,10 +145,10 @@
 (defn groups-thead-component [& [more-cols]]
   [:thead
    [:tr
-    [:th "Index"]
-    [:th "# Users"]
-    [:th "Org id"]
-    [:th "Name"]
+    [:th {:key :index} "Index"]
+    [:th {:key :count_users} "# Users"]
+    [:th {:key :org_id} "Org id"]
+    [:th {:key :name} "Name"]
     (for [col more-cols]
       col)]])
 
@@ -158,15 +158,15 @@
 
 (defn group-row-component [group more-cols]
   [:tr.group {:key (:id group)}
-   [:td (link-to-group group (:index group))]
-   [:td (:count_users group)]
-   [:td
+   [:td {:key :index} (link-to-group group (:index group))]
+   [:td {:key :users_count} (:count_users group)]
+   [:td {:key :org_id}
     (link-to-group group
                    [:p {:style {:font-family "monospace"}}
                     (:org_id group)])]
-   [:td (link-to-group group (:name group))]
-   (for [col more-cols]
-     (col group))])
+   [:td {:key :name} (link-to-group group (:name group))]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col group])])
 
 (defn groups-table-component [& [hds tds]]
   (if-not (contains? @data* @current-url*)
@@ -174,7 +174,7 @@
      [:i.fas.fa-spinner.fa-spin.fa-5x]
      [:span.sr-only "Please wait"]]
     (if-let [groups (-> @data* (get  @current-url* {}) :groups seq)]
-      [:table.table.table-striped.table-sm
+      [:table.groups.table.table-striped.table-sm
        [groups-thead-component hds]
        [:tbody
         (let [page (:page @current-query-paramerters-normalized*)
@@ -217,7 +217,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:will-mount escalate-query-paramas-update
+    {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
    [pagination-component]

@@ -190,7 +190,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:will-mount escalate-query-paramas-update
+    {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
    [pagination-component]

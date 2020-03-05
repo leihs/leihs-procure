@@ -20,6 +20,8 @@
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.inventory-pools.front :as inventory-pools]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.groups.front :as inventory-pool-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.front :as inventory-pool-group-roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.front :as inventory-pool-users]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.front :as inventory-pool-user]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as inventory-pool-user-roles]
@@ -80,6 +82,8 @@
    :inventory-pool-delete #'inventory-pool/delete-page
    :inventory-pool-edit #'inventory-pool/edit-page
    :inventory-pools #'inventory-pools/page
+   :inventory-pool-group-roles #'inventory-pool-group-roles/page
+   :inventory-pool-groups #'inventory-pool-groups/index-page
    :inventory-pool-user #'inventory-pool-user/page
    :inventory-pool-user-roles #'inventory-pool-user-roles/page
    :inventory-pool-user-suspension #'inventory-pool-user-suspension/page

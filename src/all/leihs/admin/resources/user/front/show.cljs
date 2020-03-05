@@ -28,7 +28,7 @@
 (defn page []
   [:div.user
    [routing/hidden-state-component
-    {:will-mount clean-and-fetch
+    {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
