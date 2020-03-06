@@ -7,6 +7,7 @@
 
     [leihs.admin.resources.system.paths :as system]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
+    [leihs.admin.resources.inventory.paths :as inventory]
 
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
@@ -31,9 +32,13 @@
     :admin-suppliers
     :borrow
     :home
+    :inventory-csv
+    :inventory-excel
+    :inventory-quick-csv
+    :inventory-quick-excel
     :lending
-    :procurement
     :my-user
+    :procurement
     })
 
 (def delegation-paths
@@ -97,6 +102,7 @@
                   delegation-paths
                   groups-paths
                   system/paths
+                  inventory/paths
                   inventory-pools/paths
                   users-paths
                   (leaf "/audits" :admin-audits-legacy)

@@ -12,6 +12,7 @@
     [leihs.admin.paths :as paths]
     [leihs.admin.resources.system.system-admins.breadcrumbs :as system-admins]
     [leihs.admin.resources.system.breadcrumbs :as system-breadcrumbs]
+    [leihs.admin.resources.inventory.breadcrumbs :as inventory-breadcrumbs]
     ))
 
 (defn page []
@@ -25,6 +26,7 @@
         (breadcrumbs/delegations-li)
         (breadcrumbs/li :admin-fields " Fields ")
         (breadcrumbs/groups-li)
+        (inventory-breadcrumbs/inventory-li)
         (breadcrumbs/inventory-pools-li)
         (breadcrumbs/li :admin-languages " Languages ")
         (breadcrumbs/li :admin-mail-templates " Mail templates ")

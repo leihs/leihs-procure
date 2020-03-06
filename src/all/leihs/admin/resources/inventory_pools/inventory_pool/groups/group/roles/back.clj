@@ -65,4 +65,4 @@
 ;(logging-config/set-logger! :level :info)
 ;(debug/wrap-with-log-debug #'filter-by-access-right)
 ;(debug/wrap-with-log-debug #'groups-formated-query)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
