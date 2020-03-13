@@ -22,7 +22,7 @@ feature 'Manage users', type: :feature do
     end
 
 
-    scenario 'showing user properties on the user show page' do 
+    scenario 'showing user properties on the user show page' do
 
       visit '/admin/'
       click_on 'Users'
