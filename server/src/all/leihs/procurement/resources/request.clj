@@ -206,6 +206,9 @@
        :procurement_account
        (assoc row :procurement_account)))
 
+(defn dissoc-foreign-keys [row]
+  (apply dissoc row (vals attrs-mapping)))
+
 (defn transform-row
   [row advanced-user?]
   (-> row
@@ -216,7 +219,8 @@
       (add-total-price advanced-user?)
       treat-priority
       treat-inspector-priority
-      initialize-attachments-attribute))
+      initialize-attachments-attribute
+      dissoc-foreign-keys))
 
 (defn query-requests
   [tx auth-entity query]
