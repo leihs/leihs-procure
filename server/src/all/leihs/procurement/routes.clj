@@ -38,14 +38,14 @@
 
 (def handler-resolve-table
   (merge core-routes/resolve-table
-         {:attachment attachment/routes,
-          :upload upload/routes,
-          :graphql graphql/handler,
-          :home html/not-found-handler,
-          :image image/routes,
-          :not-found html/not-found-handler,
-          :procurement html/not-found-handler,
-          :status status/routes}))
+         {:attachment {:handler attachment/routes},
+          :upload {:handler upload/routes},
+          :graphql {:handler graphql/handler},
+          :home {:handler html/not-found-handler},
+          :image {:handler image/routes},
+          :not-found {:handler html/not-found-handler},
+          :procurement {:handler html/not-found-handler},
+          :status {:handler status/routes}}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -53,7 +53,10 @@
 
 (defn handler-resolver
   [handler-key]
-  (get handler-resolve-table handler-key nil))
+  (-> handler-resolve-table
+      (get handler-key)
+      (#(if (map? %)
+          (:handler %)))))
 
 (defn dispatch-to-handler
   [request]

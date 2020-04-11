@@ -6,7 +6,10 @@
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.graphql.helpers :as helpers]
-            [ring.util.response :as response])
+            [ring.util.response :as response]
+
+            [logbug.debug :as debug :refer [I>]]
+            )
   (:import leihs.procurement.UnauthorizedException))
 
 (defn wrap-ensure-one-of
@@ -66,34 +69,47 @@
   [handler-key]
   (some #(= handler-key %) skip-authorization-handler-keys))
 
+(defn authenticate [handler {:keys [uri query-string handler-key] :as request}]
+  (cond
+    (or (skip? handler-key) (:authenticated-entity request))
+    (handler request)
+    (= handler-key :graphql)
+    {:status 401,
+     :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
+                                            "Not authenticated!")}
+    :else
+    (response/redirect
+      (path :sign-in
+            nil
+            {:return-to (cond-> uri
+                          (presence query-string)
+                          (str "?" query-string))}))))
+
 (defn wrap-authenticate
   [handler]
-  (fn [{:keys [uri query-string handler-key] :as request}]
-    (cond
-      (or (skip? handler-key) (:authenticated-entity request))
-        (handler request)
-      (= handler-key :graphql)
-        {:status 401,
-         :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
-                                                "Not authenticated!")}
-      :else
-        (response/redirect
-          (path :sign-in
-                nil
-                {:return-to (cond-> uri
-                              (presence query-string)
-                              (str "?" query-string))})))))
+  (fn [request]
+    (authenticate handler request)))
+
+(defn authorize [handler request]
+  (if (or (skip? (:handler-key request))
+          (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+                user-perms/requester?]
+               (map #(% (:tx request) (:authenticated-entity request)))
+               (some true?)))
+    (handler request)
+    {:status 403,
+     :body (helpers/error-as-graphql-object
+             "NOT_AUTHORIZED_FOR_APP"
+             "Not authorized to access procurement!")}))
 
 (defn wrap-authorize
   [handler]
   (fn [request]
-    (if (or (skip? (:handler-key request))
-            (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
-                  user-perms/requester?]
-                 (map #(% (:tx request) (:authenticated-entity request)))
-                 (some true?)))
-      (handler request)
-      {:status 403,
-       :body (helpers/error-as-graphql-object
-               "NOT_AUTHORIZED_FOR_APP"
-               "Not authorized to access procurement!")})))
+    (authorize handler request)))
+
+
+;#### debug ###################################################################
+; (logging-config/set-logger! :level :debug)
+; (logging-config/set-logger! :level :info)
+; (debug/debug-ns 'cider-ci.utils.shutdown)
+; (debug/debug-ns *ns*)
