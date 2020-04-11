@@ -22,7 +22,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on "unsuspended"
       @user_overview_page = current_path
 
-      click_on "Suspension"
+      click_on_first "Suspension"
       fill_in 'suspended_until', with: Date.today.iso8601
       fill_in 'suspended_reason', with: 'Some reason'
       click_on 'Save'
@@ -34,7 +34,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(page).to have_content 'Not suspended'
 
 
-      click_on 'Manage Suspension'
+      click_on_first 'Suspension'
       fill_in 'suspended_until', with: (Date.today + 100.years).iso8601
       click_on 'Save'
       click_on 'Users'
@@ -45,8 +45,3 @@ feature 'Manage inventory-pool users ', type: :feature do
     end
   end
 end
-
-
-
-
-

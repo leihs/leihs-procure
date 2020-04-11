@@ -4,7 +4,6 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.system-admins.groups.shared :refer [filter-value]]
     [leihs.admin.resources.groups.back :as groups]
@@ -159,16 +158,11 @@
   (path :system-admin-groups {}))
 
 (def routes
-  (-> (cpj/routes
-        (cpj/PUT system-admins-group-path [] #'put-group)
-        (cpj/DELETE system-admins-group-path [] #'remove-group)
-        (cpj/GET system-admin-groups-path [] #'groups)
-        (cpj/PUT system-admin-groups-path [] #'batch-update-groups))
-      (admin-auth/wrap-authorize  
-        {:required-scopes {:scope_admin_read true
-                           :scope_admin_write true
-                           :scope_system_admin_read true
-                           :scope_system_admin_write true}})))
+  (cpj/routes
+    (cpj/PUT system-admins-group-path [] #'put-group)
+    (cpj/DELETE system-admins-group-path [] #'remove-group)
+    (cpj/GET system-admin-groups-path [] #'groups)
+    (cpj/PUT system-admin-groups-path [] #'batch-update-groups)))
 
 
 ;#### debug ###################################################################

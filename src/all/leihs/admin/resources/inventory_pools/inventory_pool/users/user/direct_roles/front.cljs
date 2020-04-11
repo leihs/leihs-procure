@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front
+(ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -24,11 +24,11 @@
      [reagent.core :as reagent]))
 
 
-(defonce inventory-pool-user-roles-data* (reagent/atom nil))
+(defonce inventory-pool-user-direct-roles-data* (reagent/atom nil))
 
 (def edit-mode?*
   (reaction
-    (= (-> @routing/state* :handler-key) :inventory-pool-user-roles)))
+    (= (-> @routing/state* :handler-key) :inventory-pool-user-direct-roles)))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -36,32 +36,32 @@
      [:hr]
      [:h2 "Page Debug"]
      [:div
-      [:h3 "@inventory-pool-user-roles-data*"]
-      [:pre (with-out-str (pprint @inventory-pool-user-roles-data*))]]]))
+      [:h3 "@inventory-pool-user-direct-roles-data*"]
+      [:pre (with-out-str (pprint @inventory-pool-user-direct-roles-data*))]]]))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def fetch-inventory-pool-user-roles-id* (reagent/atom nil))
-(defn fetch-inventory-pool-user-roles []
+(def fetch-inventory-pool-user-direct-roles-id* (reagent/atom nil))
+(defn fetch-inventory-pool-user-direct-roles []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-user-roles (-> @routing/state* :route-params))
+        id (requests/send-off {:url (path :inventory-pool-user-direct-roles (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
                               {:modal false
-                               :title "Fetch Inventory-Pool UserRoles"
-                               :handler-key :inventory-pool-user-roles
-                               :retry-fn #'fetch-inventory-pool-user-roles}
+                               :title "Fetch Inventory-Pool UserDirectRoles"
+                               :handler-key :inventory-pool-user-direct-roles
+                               :retry-fn #'fetch-inventory-pool-user-direct-roles}
                               :chan resp-chan)]
-    (reset! fetch-inventory-pool-user-roles-id* id)
+    (reset! fetch-inventory-pool-user-direct-roles-id* id)
     (go (let [resp (<! resp-chan)]
           (when (and (= (:status resp) 200)
-                     (= id @fetch-inventory-pool-user-roles-id*))
-            (reset! inventory-pool-user-roles-data* (:body resp)))))))
+                     (= id @fetch-inventory-pool-user-direct-roles-id*))
+            (reset! inventory-pool-user-direct-roles-data* (:body resp)))))))
 
 
 (defn clean-and-fetch []
-  (reset! inventory-pool-user-roles-data* nil)
-  (fetch-inventory-pool-user-roles)
+  (reset! inventory-pool-user-direct-roles-data* nil)
+  (fetch-inventory-pool-user-direct-roles)
   (user/clean-and-fetch)
   (inventory-pool/clean-and-fetch))
 
@@ -70,9 +70,9 @@
 
 (defn put [_]
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-user-roles {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})
+        id (requests/send-off {:url (path :inventory-pool-user-direct-roles {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})
                                :method :put
-                               :json-params  @inventory-pool-user-roles-data*}
+                               :json-params  @inventory-pool-user-direct-roles-data*}
                               {:modal true
                                :title "Update Roles"
                                :handler-key :inventory-pool-edit
@@ -93,7 +93,7 @@
    [:div.clearfix]])
 
 (defn on-change-handler [role]
-  (swap! inventory-pool-user-roles-data*
+  (swap! inventory-pool-user-direct-roles-data*
          (fn [data role]
            (console.log (clj->js role))
            (let [new-role-state (-> data
@@ -112,20 +112,10 @@
          role))
 
 (defn header-component []
-  [:h1 "Roles for "
+  [:h1 "Direct Roles for "
    [user/user-name-component]
    " in "
    [inventory-pool/inventory-pool-name-component]])
-
-(defn remarks-component []
-  [:div
-   [:p "These roles represent an " [:strong  "aggregate"] " state derived from "
-    [:strong " direct roles"] ", " " e.i. inventory-pool to user roles, and roles given "
-    [:strong "through groups"] "."
-    " The resource behind these roles is for " [:strong  " compatibility reasons writable"]
-    " as long as the aggregate is backed soly by direct roles. "
-    " The ability to write to this resource is " [:strong  "deprecated" ]
-    " and will be removed in future versions of leihs. "]])
 
 (defn roles-component []
   [:div
@@ -136,7 +126,7 @@
               [:input.formp-check-input
                {:id role
                 :type :checkbox
-                :checked (get-in @inventory-pool-user-roles-data* [:roles role])
+                :checked (get-in @inventory-pool-user-direct-roles-data* [:roles role])
                 :on-change (fn [e] (on-change-handler role))
                 :disabled (not @edit-mode?*)
                 }]
@@ -146,7 +136,7 @@
 
 
 (defn page []
-  [:div.inventory-pool-user-roles
+  [:div.inventory-pool-user-direct-roles
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
@@ -157,10 +147,9 @@
      (breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*)
      (breadcrumbs/inventory-pool-users-li @inventory-pool/inventory-pool-id*)
      [breadcrumbs/inventory-pool-user-li @inventory-pool-id* @user-id*]
-     [breadcrumbs/inventory-pool-user-roles-li @inventory-pool-id* @user-id*]]
+     [breadcrumbs/inventory-pool-user-direct-roles-li @inventory-pool-id* @user-id*]]
     []]
    [header-component]
-   [remarks-component]
    [:div.form
     [roles-component]
     [put-submit-component]]

@@ -4,7 +4,6 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-system.groups.shared :refer [filter-value]]
     [leihs.admin.resources.groups.back :as groups]
@@ -152,11 +151,7 @@
   (-> (cpj/routes
         (cpj/PUT authentication-system-group-path [] #'put-group)
         (cpj/DELETE authentication-system-group-path [] #'remove-group)
-        (cpj/GET authentication-system-groups-path [] #'groups))
-      (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
-                                                    :scope_admin_write true
-                                                    :scope_system_admin_read false
-                                                    :scope_system_admin_write false}})))
+        (cpj/GET authentication-system-groups-path [] #'groups))))
 
 
 ;#### debug ###################################################################

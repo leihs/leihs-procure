@@ -3,8 +3,9 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states]]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.back :refer [group-roles]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :refer [protect-inventory-manager-escalation-by-lending-manager! protect-inventory-manager-restriction-by-lending-manager!]]
     [leihs.admin.resources.groups.back :as groups]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
@@ -36,6 +37,8 @@
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id group-id :group-id} :route-params
     tx :tx data :body :as request}]
+  (protect-inventory-manager-escalation-by-lending-manager! request)
+  (protect-inventory-manager-restriction-by-lending-manager! role-query request)
   (let [roles (:roles data)]
     (logging/debug 'roles roles)
     (if-let [allowed-role-key (some->> allowed-roles-states
@@ -45,8 +48,8 @@
       (do (jdbc/delete! tx :group_access_rights ["inventory_pool_id = ? AND group_id =? " inventory-pool-id group-id])
           (when (not= allowed-role-key :none)
             (jdbc/insert! tx :group_access_rights {:inventory_pool_id inventory-pool-id
-                                             :group_id group-id
-                                             :role (str allowed-role-key)}))
+                                                   :group_id group-id
+                                                   :role (str allowed-role-key)}))
           {:status 204})
       {:status 422 :data {:message "Submitted combination of roles is not allowed!"}})))
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

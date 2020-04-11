@@ -3,7 +3,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
 
     [leihs.core.sql :as sql]
@@ -25,17 +24,11 @@
 (defn command [request]
   )
 
-(def ^:private sql-path (path :sql {})) 
+(def ^:private sql-path (path :sql {}))
 
 (def routes
-  (cpj/routes 
-    (-> (cpj/routes 
-          (cpj/GET sql-path [] #'query)
-          (cpj/POST sql-path [] #'command))
-        (admin-auth/wrap-authorize 
-          {:required-scopes {:scope_admin_read true
-                             :scope_admin_write true 
-                             :scope_system_admin_read true 
-                             :scope_system_admin_write true}}))))
+  (cpj/routes
+    (cpj/GET sql-path [] #'query)
+    (cpj/POST sql-path [] #'command)))
 
 

@@ -39,7 +39,6 @@
     (and ((:request-method request) HTTP-UNSAFE-VERBS)
          (-> request :authenticated-entity :is_admin))))
 
-;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
-;(logging-config/set-logger! :level :info)
-;(debug/debug-ns *ns*)
+
+
+

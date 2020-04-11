@@ -21,6 +21,8 @@
                                   (param :user-id)
                                   (leaf "" :inventory-pool-user)
                                   (leaf "/roles" :inventory-pool-user-roles)
+                                  (leaf "/direct-roles" :inventory-pool-user-direct-roles)
+                                  (leaf "/groups-roles/" :inventory-pool-user-groups-roles)
                                   (leaf "/suspension" :inventory-pool-user-suspension)))
                   (branch "/groups/"
                           (leaf "" :inventory-pool-groups)

@@ -5,16 +5,19 @@ require 'pry'
 
 feature 'Manage inventory-pool users ', type: :feature do
 
-  context ' an admin, a pool, and  several users ' do
+  context ' an admin, a pool, an inventory_manager, and  several users ' do
 
     before :each do
       @admin = FactoryBot.create :admin
       @pool =  FactoryBot.create :inventory_pool
+      @inventory_manager = FactoryBot.create :user
+      FactoryBot.create :access_right, user: @inventory_manager,
+        inventory_pool: @pool, role: 'inventory_manager'
       @users = 10.times.map{ FactoryBot.create :user }
-      sign_in_as @admin
     end
 
-    scenario ' managing roles of a user' do
+    scenario ' managing roles of a user as an inventory_manager' do
+      sign_in_as @inventory_manager
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Users"
@@ -25,11 +28,11 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on "none"
       @user_overview_page = current_path
 
-      click_on "Direct Roles"
+      click_on_first "Direct Roles"
       check "customer"
       click_on "Save"
       wait_until { current_path == @user_overview_page }
-      click_on "Manage Direct Roles"
+      click_on_first "Direct Roles"
       check "inventory_manager"
       click_on "Save"
 
@@ -37,7 +40,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       visit current_path # force full reload to make sure we not only see a fiction of the SPA
       # test filtering by role:
       select 'inventory_manager', from: 'Role'
-      wait_until { all("table.users tbody tr").count == 1 }
+      wait_until { all("table.users tbody tr").count == 2 }
       # the following also tests the current hierarchy within roles and will
       # break once we change that
       expect(page.find("table.users")).to have_content "customer"
@@ -48,7 +51,7 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       # now remove all roles again
       visit @user_overview_page
-      click_on "Manage Direct Roles"
+      click_on_first "Direct Roles"
       expect(page).to have_field('customer', checked: true)
       expect(page).to have_field('group_manager', checked: true)
       expect(page).to have_field('lending_manager', checked: true)

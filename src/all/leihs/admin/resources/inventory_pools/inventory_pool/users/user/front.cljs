@@ -16,6 +16,8 @@
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
      [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as roles]
+     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.front :as direct-roles]
+     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.front :as groups-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.front :as suspension]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
      [leihs.admin.utils.regex :as regex]
@@ -40,31 +42,6 @@
   (user/clean-and-fetch)
   (inventory-pool/clean-and-fetch))
 
-(defn direct-roles-component []
-  [:div.direct-roles
-   [routing/hidden-state-component
-    {:did-mount roles/clean-and-fetch
-     :did-change roles/clean-and-fetch}]
-   [:h2 [:a {:href (path :inventory-pool-user-roles
-                         {:inventory-pool-id @inventory-pool-id*
-                          :user-id @user-id*})}
-         "Direct Roles"]]
-   [roles/roles-component]])
-
-(defn roles-via-groups-component []
-  [:div.roles-via-groups
-   [:h2 "Roles assigned via Groups"]
-   [:p "This feature is not implemented yet."]
-   ])
-
-(defn effective-roles-component []
-  [:div.effective-roles
-   [:h2 "Effective Roles"]
-   [:p "This section will show the effective roles derived from "
-    "direct assignment and roles assigned via groups in the future. "
-    "For the time being the roles given via direct assignment are excactly "
-    " equal to the the effective roles."]])
-
 (defn suspension-component []
   [:div.suspension
    [:h2
@@ -76,27 +53,58 @@
    [suspension/suspension-component]
    [suspension/remove-suspension-component]])
 
+
+(defn effective-roles-component []
+  [:div.effective-roles
+   [routing/hidden-state-component
+    {:did-mount roles/clean-and-fetch
+     :did-change roles/clean-and-fetch}]
+   [:h2 [:a {:href (path :inventory-pool-user-roles
+                         {:inventory-pool-id @inventory-pool-id*
+                          :user-id @user-id*})}
+         "Roles"]]
+   [:p "This section shows the roles aggregated from "
+    "direct roles, and those via groups. "]
+   [roles/roles-component]])
+
+
+(defn direct-roles-component []
+  [:div.direct-roles
+   [routing/hidden-state-component
+    {:did-mount direct-roles/clean-and-fetch
+     :did-change direct-roles/clean-and-fetch}]
+   [:h2 [:a {:href (path :inventory-pool-user-direct-roles
+                         {:inventory-pool-id @inventory-pool-id*
+                          :user-id @user-id*})}
+         "Direct Roles"]]
+   [direct-roles/roles-component]])
+
+
+(defn roles-via-groups-component []
+  [:div.roles-via-groups
+   [:h2 "Roles assigned via Groups"]
+   [groups-roles/groups-roles-component]])
+
 (defn page []
   [:div.user-roles
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    [breadcrumbs/nav-component
-    [(breadcrumbs/leihs-li)
-     (breadcrumbs/admin-li)
-     (breadcrumbs/inventory-pools-li)
-     (breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*)
-     (breadcrumbs/inventory-pool-users-li @inventory-pool/inventory-pool-id*)
+    [[breadcrumbs/leihs-li]
+     [breadcrumbs/admin-li]
+     [breadcrumbs/inventory-pools-li]
+     [breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*]
+     [breadcrumbs/inventory-pool-users-li @inventory-pool/inventory-pool-id*]
      [breadcrumbs/inventory-pool-user-li @inventory-pool-id* @user-id*]]
-    [[breadcrumbs/inventory-pool-user-roles-li @inventory-pool-id* @user-id*]
-     [breadcrumbs/inventory-pool-user-suspension-li @inventory-pool-id* @user-id*]
-     ]]
+    [[breadcrumbs/inventory-pool-user-direct-roles-li @inventory-pool-id* @user-id*]
+     [breadcrumbs/inventory-pool-user-suspension-li @inventory-pool-id* @user-id*]]]
    [:h1 "Details for "
     [user/user-name-component]
     " in "
     [inventory-pool/inventory-pool-name-component]]
-   [suspension-component]
-   [effective-roles-component]
-   [direct-roles-component]
-   [roles-via-groups-component]
+    [suspension-component]
+    [effective-roles-component]
+    [direct-roles-component]
+    [roles-via-groups-component]
    [debug-component]])

@@ -3,7 +3,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
 
     [leihs.core.sql :as sql]
@@ -30,7 +29,7 @@
 
 (defn download [{{before-date :before-date} :route-params
                  tx :tx :as request}]
-  (let [legacy-audits (->> before-date 
+  (let [legacy-audits (->> before-date
                            extend-date-to-iso8601
                            legacy-audits-downaload-query
                            (jdbc/query tx))]
@@ -47,22 +46,10 @@
 (def ^:private before-path (path :database-audits-before {:before-date ":before-date"}))
 
 (def routes
-  (cpj/routes 
-    (-> (cpj/routes
-          (cpj/GET before-path [] #'download)
-          (cpj/POST before-path [] #'download))
-        (admin-auth/wrap-authorize 
-          {:required-scopes {:scope_admin_read true
-                             :scope_admin_write true 
-                             :scope_system_admin_read true 
-                             :scope_system_admin_write false}}))
-    (-> (cpj/routes 
-          (cpj/DELETE before-path [] #'delete))
-        (admin-auth/wrap-authorize 
-          {:required-scopes {:scope_admin_read true
-                             :scope_admin_write true 
-                             :scope_system_admin_read true 
-                             :scope_system_admin_write true}}))))
+  (cpj/routes
+    (cpj/GET before-path [] #'download)
+    (cpj/POST before-path [] #'download)
+    (cpj/DELETE before-path [] #'delete)))
 
 ;#### debug ###################################################################
 ;(debug/wrap-with-log-debug #'authentication-systems-formated-query)

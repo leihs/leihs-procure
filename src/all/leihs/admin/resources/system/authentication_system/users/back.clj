@@ -3,7 +3,6 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
     [leihs.admin.resources.users.back :as users]
@@ -194,11 +193,7 @@
         (cpj/PUT authentication-system-user-path [] #'put-user)
         (cpj/DELETE authentication-system-user-path [] #'remove-user)
         (cpj/GET authentication-system-users-path [] #'users)
-        (cpj/PUT authentication-system-users-path [] #'batch-update-users))
-      (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
-                                                    :scope_admin_write true
-                                                    :scope_system_admin_read false 
-                                                    :scope_system_admin_write false}}))) 
+        (cpj/PUT authentication-system-users-path [] #'batch-update-users))))
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

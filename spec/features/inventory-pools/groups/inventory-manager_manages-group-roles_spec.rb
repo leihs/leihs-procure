@@ -1,8 +1,6 @@
 require 'spec_helper'
 require 'pry'
 
-
-
 feature 'Manage inventory-pool users ', type: :feature do
 
   context ' an admin, a pool, and groups' do
@@ -10,11 +8,14 @@ feature 'Manage inventory-pool users ', type: :feature do
     before :each do
       @admin = FactoryBot.create :admin
       @pool =  FactoryBot.create :inventory_pool
+      @inventory_manager = FactoryBot.create :user
+      FactoryBot.create :access_right, user: @inventory_manager,
+        inventory_pool: @pool, role: 'inventory_manager'
       @groups = 10.times.map{ FactoryBot.create :group}
-      sign_in_as @admin
     end
 
-    scenario ' managing roles of a groups' do
+    scenario ' managing roles of a groups as an inventory_manager' do
+      sign_in_as @inventory_manager
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Groups"

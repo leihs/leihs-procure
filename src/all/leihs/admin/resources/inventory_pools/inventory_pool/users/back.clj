@@ -79,7 +79,7 @@
       sql/format))
 
 (defn role-query [inventory-pool-id user-id]
-  (-> (sql/select :role)
+  (-> (sql/select :role :origin_table)
       (sql/from :access_rights)
       (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
       (sql/merge-where [:= :user_id user-id])))

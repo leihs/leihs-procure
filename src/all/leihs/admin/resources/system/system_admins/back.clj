@@ -5,7 +5,6 @@
     [leihs.core.sql :as sql]
     [leihs.core.system-admin :refer [system-admin-sql-expr]]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.resources.system.system-admins.shared :as shared]
@@ -49,16 +48,9 @@
       :users (->> (users-formated-query request)
                   (jdbc/query tx))}})
 
-
-
 (def routes
-  (-> (cpj/routes
-        (cpj/GET (path :system-admins) [] #'users))
-      (admin-auth/wrap-authorize  
-        {:required-scopes {:scope_admin_read true
-                           :scope_admin_write true
-                           :scope_system_admin_read true
-                           :scope_system_admin_write true}})))
+  (cpj/routes
+    (cpj/GET (path :system-admins) [] #'users)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

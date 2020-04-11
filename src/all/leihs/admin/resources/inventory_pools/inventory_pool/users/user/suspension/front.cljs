@@ -149,8 +149,10 @@
      :did-change clean-and-fetch}]
    [:div.form.edit
     [humanized-suspended-until-component]
-    [field-component [:suspended_until] data* edit-mode?* {:type :date}]
-    [field-component [:suspended_reason] data* edit-mode?* {:node-type :textarea}]
+    (when (or @edit-mode?* (-> @data* :suspended_until))
+      [field-component [:suspended_until] data* edit-mode?* {:type :date}])
+    (when  (or @edit-mode?* (-> @data* :suspended_reason))
+      [field-component [:suspended_reason] data* edit-mode?* {:node-type :textarea}])
     (when @edit-mode?* [put-submit-component])]])
 
 (defn page []

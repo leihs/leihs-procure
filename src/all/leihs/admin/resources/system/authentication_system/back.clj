@@ -4,7 +4,6 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
 
     [clojure.set :refer [rename-keys]]
@@ -92,16 +91,12 @@
                              :target-authentication-system-id ":target-authentication-system-id"}))
 
 (def routes
-  (-> 
+  (->
     (cpj/routes
         (cpj/GET authentication-system-path [] #'authentication-system)
         (cpj/PATCH authentication-system-path [] #'patch-authentication-system)
         (cpj/DELETE authentication-system-path [] #'delete-authentication-system)
-        (cpj/POST (path :authentication-systems) [] #'create-authentication-system))
-      (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
-                                                    :scope_admin_write true
-                                                    :scope_system_admin_read true
-                                                    :scope_system_admin_write true}})))
+        (cpj/POST (path :authentication-systems) [] #'create-authentication-system))))
 
 
 ;#### debug ###################################################################

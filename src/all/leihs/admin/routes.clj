@@ -12,11 +12,11 @@
    [leihs.core.json-protocol]
    [leihs.core.ring-audits :as ring-audits]
    [leihs.core.ring-exception :as ring-exception]
-   [leihs.core.routes :as core-routes]
+   [leihs.core.routes :as core-routes :refer [all-granted]]
    [leihs.core.routing.back :as routing]
    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
 
-   [leihs.admin.auth.back :as admin-auth]
+   [leihs.admin.auth.authorization :as authorization]
    [leihs.admin.back.html :as html]
    [leihs.admin.env :as env]
    [leihs.admin.paths :refer [path paths]]
@@ -31,10 +31,13 @@
    [leihs.admin.resources.group.back :as group]
    [leihs.admin.resources.group.users.back :as group-users]
    [leihs.admin.resources.groups.back :as groups]
+   [leihs.admin.resources.inventory-pools.authorization :as inventory-pools-authorization :refer [http-safe-and-some-pools-lending-manger? pool-lending-manager?]]
    [leihs.admin.resources.inventory-pools.back :as inventory-pools]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.back :as inventory-pool-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.back :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.back :as inventory-pool-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.back :as inventory-pool-user-direct-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.back :as inventory-pool-user-groups-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.back :as inventory-pool-user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.back :as inventory-pool-user-suspension]
    [leihs.admin.resources.settings.back :as settings]
@@ -75,46 +78,64 @@
     #{:redirect-to-root
       :not-found}))
 
+
+(def admin-scopes?
+  (authorization/scope-authorizer
+    {:scope_admin_read true
+     :scope_admin_write true
+     :scope_system_admin_read false
+     :scope_system_admin_write false}))
+
+(def system-admin-scopes?
+  (authorization/scope-authorizer
+    {:scope_admin_read true
+     :scope_admin_write true
+     :scope_system_admin_read true
+     :scope_system_admin_write true}))
+
+
 (def resolve-table
   (merge core-routes/resolve-table
-         {:authentication-system authentication-system/routes
-          :authentication-system-group authentication-system-groups/routes
-          :authentication-system-groups authentication-system-groups/routes
-          :authentication-system-user authentication-system-users/routes
-          :authentication-system-users authentication-system-users/routes
-          :authentication-systems authentication-systems/routes
-          :database-audits-before audits/routes
-          :database-audits-download audits/routes
-          :delegation delegation/routes
-          :delegation-add-choose-responsible-user delegation/routes
-          :delegation-edit-choose-responsible-user delegation/routes
-          :delegation-user delegation-users/routes
-          :delegation-users delegation-users/routes
-          :delegations delegations/routes
-          :group group/routes
-          :group-user group-users/routes
-          :group-users group-users/routes
-          :groups groups/routes
-          :inventory-pool inventory-pools/routes
-          :inventory-pool-groups inventory-pool-groups/routes
-          :inventory-pool-group-roles inventory-pool-group-roles/routes
-          :inventory-pool-user-roles inventory-pool-user-roles/routes
-          :inventory-pool-user-suspension inventory-pool-user-suspension/routes
-          :inventory-pool-users inventory-pool-users/routes
-          :inventory-pools inventory-pools/routes
-          :not-found html/not-found-handler
-          :redirect-to-root redirect-to-root-handler
-          :status status/routes
-          :system-admin-direct-users system-admin-direct-users/routes
-          :system-admin-groups system-admin-groups/routes
-          :system-admins system-admins/routes
-          :system-admins-direct-user system-admin-direct-users/routes
-          :system-admins-group system-admin-groups/routes
-          :user user/routes
-          :user-inventory-pools-roles user/routes
-          :user-transfer-data user/routes
-          :users users/routes }))
-
+         {:authentication-system {:handler authentication-system/routes :authorizers [system-admin-scopes?]}
+          :authentication-system-group {:handler authentication-system-groups/routes  :authorizers [admin-scopes?]}
+          :authentication-system-groups {:handler authentication-system-groups/routes :authorizers [admin-scopes?]}
+          :authentication-system-user {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
+          :authentication-system-users {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
+          :authentication-systems {:handler authentication-systems/routes :authorizers [system-admin-scopes?]}
+          :database-audits-before {:handler audits/routes :authorizers [system-admin-scopes?]}
+          :database-audits-download {:handler audits/routes :authorizers [system-admin-scopes?]}
+          :delegation {:handler delegation/routes :authorizers [admin-scopes?]}
+          :delegation-add-choose-responsible-user {:handler delegation/routes :authorizers [admin-scopes?]}
+          :delegation-edit-choose-responsible-user {:handler delegation/routes :authorizers [admin-scopes?]}
+          :delegation-user {:handler delegation-users/routes :authorizers [admin-scopes?]}
+          :delegation-users {:handler delegation-users/routes :authorizers [admin-scopes?]}
+          :delegations {:handler delegations/routes :authorizers [admin-scopes?]}
+          :group {:handler group/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :group-user {:handler group-users/routes :authorizers [admin-scopes?]}
+          :group-users {:handler group-users/routes :authorizers [admin-scopes?]}
+          :groups {:handler groups/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :inventory-pool {:handler inventory-pools/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-user-roles {:handler inventory-pool-user-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-user-suspension {:handler inventory-pool-user-suspension/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pool-users {:handler inventory-pool-users/routes :authorizers [admin-scopes? pool-lending-manager?]}
+          :inventory-pools {:handler inventory-pools/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :not-found {:handler html/not-found-handler :authorizers [all-granted]}
+          :redirect-to-root {:handler redirect-to-root-handler :authorizers [all-granted]}
+          :status {:handler status/routes :authorizers [all-granted]}
+          :system-admin-direct-users {:handler system-admin-direct-users/routes :authorizers [admin-scopes?]}
+          :system-admin-groups {:handler system-admin-groups/routes :authorizers [admin-scopes?]}
+          :system-admins {:handler system-admins/routes :authorizers [admin-scopes?]}
+          :system-admins-direct-user {:handler system-admin-direct-users/routes :authorizers [admin-scopes?]}
+          :system-admins-group {:handler system-admin-groups/routes :authorizers [admin-scopes?]}
+          :user {:handler user/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :user-inventory-pools-roles {:handler user/routes :authorizers [admin-scopes?]}
+          :user-transfer-data {:handler user/routes :authorizers [admin-scopes?]}
+          :users {:handler users/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          }))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,8 +210,7 @@
   (routing/init paths resolve-table)
   (I> wrap-handler-with-logging
       routing/dispatch-to-handler
-      (admin-auth/wrap-authorize
-        {:skip-authorization-handler-keys skip-authorization-handler-keys})
+      (authorization/wrap resolve-table)
       wrap-dispatch-content-type
       ring-audits/wrap
       anti-csrf/wrap

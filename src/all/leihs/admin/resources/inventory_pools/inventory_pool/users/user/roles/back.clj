@@ -3,8 +3,8 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.back :refer [user-roles]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states roles-to-map]]
+    ;[leihs.admin.resources.inventory-pools.inventory-pool.users.back :refer [user-roles]]
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
@@ -21,8 +21,8 @@
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn role-query [inventory-pool-id user-id]
-  (-> (sql/select :role)
+(defn access-rights-query [inventory-pool-id user-id]
+  (-> (sql/select :role :origin_table)
       (sql/from :access_rights)
       (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
       (sql/merge-where [:= :user_id user-id])))
@@ -30,7 +30,13 @@
 (defn roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
     tx :tx :as request}]
-  {:body {:roles (user-roles tx inventory-pool-id user-id)}})
+  (let [access-rights (->> (access-rights-query inventory-pool-id user-id)
+                           sql/format (jdbc/query tx) first)
+        roles (-> access-rights :role keyword
+                  expand-role-to-hierarchy
+                  roles-to-map)]
+    {:body {:roles roles
+            :origin_table (:origin_table access-rights)}}))
 
 
 (defn set-roles

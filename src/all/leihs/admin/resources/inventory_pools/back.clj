@@ -4,12 +4,10 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.back :as inventory-pool]
     [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
 
-    [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
 
@@ -109,11 +107,7 @@
     (cpj/routes
       (cpj/GET (path :inventory-pools) [] #'inventory-pools)
       (cpj/POST (path :inventory-pools) [] inventory-pool/routes)
-      (cpj/ANY inventory-pool-path [] inventory-pool/routes))
-    (admin-auth/wrap-authorize {:required-scopes {:scope_admin_read true
-                                                  :scope_admin_write true
-                                                  :scope_system_admin_read false
-                                                  :scope_system_admin_write false}})))
+      (cpj/ANY inventory-pool-path [] inventory-pool/routes))))
 
 
 ;#### debug ###################################################################

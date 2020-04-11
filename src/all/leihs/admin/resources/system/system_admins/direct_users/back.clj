@@ -4,7 +4,6 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.system-admins.direct-users.shared :refer [filter-value]]
     [leihs.admin.resources.users.back :as users]
@@ -159,16 +158,11 @@
   (path :system-admin-direct-users {}))
 
 (def routes
-  (-> (cpj/routes
-        (cpj/PUT system-admins-direct-user-path [] #'put-user)
-        (cpj/DELETE system-admins-direct-user-path [] #'remove-user)
-        (cpj/GET system-admin-direct-users-path [] #'users)
-        (cpj/PUT system-admin-direct-users-path [] #'batch-update-users))
-      (admin-auth/wrap-authorize {:required-scopes 
-                                  {:scope_admin_read true
-                                   :scope_admin_write true
-                                   :scope_system_admin_read true
-                                   :scope_system_admin_write true}})))
+  (cpj/routes
+    (cpj/PUT system-admins-direct-user-path [] #'put-user)
+    (cpj/DELETE system-admins-direct-user-path [] #'remove-user)
+    (cpj/GET system-admin-direct-users-path [] #'users)
+    (cpj/PUT system-admin-direct-users-path [] #'batch-update-users)))
 
 
 ;#### debug ###################################################################

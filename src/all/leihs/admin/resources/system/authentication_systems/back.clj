@@ -3,7 +3,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
 
-    [leihs.admin.auth.back :as admin-auth]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-system.back :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.shared :as shared]
@@ -80,11 +79,7 @@
 (def routes
   (-> (cpj/routes
         (cpj/GET (path :authentication-systems) [] #'authentication-systems)
-        (cpj/POST (path :authentication-systems ) [] #'authentication-system/routes))
-      (admin-auth/wrap-authorize  {:required-scopes {:scope_admin_read true
-                                                     :scope_admin_write true
-                                                     :scope_system_admin_read true
-                                                     :scope_system_admin_write true}})))
+        (cpj/POST (path :authentication-systems ) [] #'authentication-system/routes))))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)
