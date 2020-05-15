@@ -14,7 +14,7 @@
      [leihs.admin.front.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-     [leihs.admin.resources.group.front :as group :refer [group-id* group-data*]]
+     [leihs.admin.resources.group.front.shared :as group :refer [group-id* group-data*]]
      [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
@@ -111,9 +111,12 @@
 
 (defn header-component []
   [:h1 "Group Roles for "
-   [group/group-name-component]
+   [:a {:href (path :group {:group-id @group-id*})}
+    [group/group-name-component]]
    " in "
-   [inventory-pool/inventory-pool-name-component]])
+   [:a {:href (path :inventory-pool
+                    {:inventory-pool-id @inventory-pool/inventory-pool-id*})}
+    [inventory-pool/inventory-pool-name-component]]])
 
 (defn roles-component []
   [:div

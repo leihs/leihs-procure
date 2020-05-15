@@ -247,7 +247,7 @@
       (first (jdbc/query tx (user-query user-id)))})))
 
 
-;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn user-inventory-pools-roles-query [user-id]
   (-> (sql/select :iprs.* [:inventory_pools.name :inventory_pool_name])

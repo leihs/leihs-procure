@@ -15,18 +15,19 @@
     [leihs.admin.resources.delegation.users.front :as delegation-users]
     [leihs.admin.resources.delegations.front :as delegations]
     [leihs.admin.resources.group.front :as group]
+    [leihs.admin.resources.group.front.inventory-pools-roles :as group-inventory-pools-roles]
     [leihs.admin.resources.group.users.front :as group-users]
     [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.resources.home.front :as home]
-    [leihs.admin.resources.inventory.front :as inventory]
     [leihs.admin.resources.inventory-pools.front :as inventory-pools]
+    [leihs.admin.resources.inventory.front :as inventory]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.front :as inventory-pool-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.front :as inventory-pool-group-roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.front :as inventory-pool-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.front :as inventory-pool-user-direct-roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.front :as inventory-pool-user]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as inventory-pool-user-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.front :as inventory-pool-user-direct-roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.front :as inventory-pool-user-suspension]
     [leihs.admin.resources.status.front :as status]
     [leihs.admin.resources.system.authentication-system.front :as authentication-system]
@@ -76,6 +77,7 @@
    :group-add #'group/add-page
    :group-delete #'group/delete-page
    :group-edit #'group/edit-page
+   :group-inventory-pools-roles  #'group-inventory-pools-roles/page
    :group-users #'group-users/index-page
    :groups #'groups/page
    :home #'home/page

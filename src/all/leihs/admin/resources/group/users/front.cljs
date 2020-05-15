@@ -14,7 +14,7 @@
     [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.group.front :as group :refer [group-id*]]
+    [leihs.admin.resources.group.front.shared :as group :refer [group-id*]]
     [leihs.admin.resources.group.users.shared :refer [group-users-filter-value]]
     [leihs.admin.resources.users.front :as users]
     [leihs.admin.utils.regex :as regex]

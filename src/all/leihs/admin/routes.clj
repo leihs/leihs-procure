@@ -111,6 +111,7 @@
           :delegation-users {:handler delegation-users/routes :authorizers [admin-scopes?]}
           :delegations {:handler delegations/routes :authorizers [admin-scopes?]}
           :group {:handler group/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :group-inventory-pools-roles {:handler group/routes :authorizers [admin-scopes?]}
           :group-user {:handler group-users/routes :authorizers [admin-scopes?]}
           :group-users {:handler group-users/routes :authorizers [admin-scopes?]}
           :groups {:handler groups/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}

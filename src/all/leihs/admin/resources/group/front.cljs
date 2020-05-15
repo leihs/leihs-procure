@@ -7,7 +7,7 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
+    [leihs.admin.resources.group.front.shared :refer [group-id* group-data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
@@ -26,39 +26,6 @@
     [reagent.core :as reagent]
     ))
 
-(defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
-(defonce group-data* (reagent/atom nil))
-
-
-(defonce edit-mode?*
-  (reaction
-    (and (map? @group-data*)
-         (boolean ((set '(:group-edit :group-add))
-                   (:handler-key @routing/state*))))))
-
-(def fetch-group-id* (reagent/atom nil))
-(defn fetch-group []
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Group"
-                               :handler-key :group
-                               :retry-fn #'fetch-group}
-                              :chan resp-chan)]
-    (reset! fetch-group-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-group-id*))
-            (reset! group-data* (:body resp)))))))
-
-
-;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn clean-and-fetch [& args]
-  (reset! group-data* nil)
-  (fetch-group))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,17 +67,6 @@
       :disabled (not @edit-mode?*)}]
     [:span.ml-2 kw]]])
 
-(defn debug-component []
-  (when (:debug @state/global-state*)
-    [:div.group-debug
-     [:hr]
-     [:div.edit-mode?*
-      [:h3 "@edit-mode?*"]
-      [:pre (with-out-str (pprint @edit-mode?*))]]
-     [:div.group-data
-      [:h3 "@group-data*"]
-      [:pre (with-out-str (pprint @group-data*))]]]))
-
 
 ;; group components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -123,17 +79,25 @@
 
 (defn additional-properties-component []
   (when-let [group-data @group-data*]
-    [:div.additional-properties
-     [:p
-      [:span "This group has been "
-       [:b " created " [humanize-datetime-component (:created_at group-data)]] ", and "
-       [:b " updated " [humanize-datetime-component (:updated_at group-data)]] ". "]
-      (let [users-count (:users_count group-data)]
+    (let [users-count (:users_count group-data)
+          inventory-pools-roles-count (:inventory_pools_roles_count group-data)]
+      [:div.additional-properties
+       [:p
+        [:span "This group has been "
+         [:b " created " [humanize-datetime-component (:created_at group-data)]] ", and "
+         [:b " updated " [humanize-datetime-component (:updated_at group-data)]] ". "]
         [:span (if (= 0 users-count)
                  "This group has no users."
                  [:span
                   "This group has "
-                  [:strong users-count " " (pluralize-noun users-count "user")] "."])])]]))
+                  [:strong users-count " "
+                   (pluralize-noun users-count "user")] ". "])]
+        [:span "It grants its users "
+         [:a {:href (path :group-inventory-pools-roles {:group-id (:id group-data)})}
+          [:strong " roles to "
+           inventory-pools-roles-count " "
+           (pluralize-noun inventory-pools-roles-count "inventory-pool")
+           ]]". "]]])))
 
 (defn group-component []
   [:div.group-component
@@ -144,14 +108,6 @@
      [:div
       [:div [basic-component]]
       [:div [additional-properties-component]]])])
-
-(defn group-name-component []
-  (if-not @group-data*
-    [:span {:style {:font-family "monospace"}} (short-id @group-id*)]
-    [:em (str (:name @group-data*))]))
-
-(defn group-id-component []
-  [:p "id: " [:span {:style {:font-family "monospace"}} (:id @group-data*)]])
 
 (defn org-warning-component []
   (when (:org_id @group-data*)
@@ -168,13 +124,14 @@
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/groups-li)
-      (breadcrumbs/group-li @group-id*)]
-     [(breadcrumbs/group-users-li @group-id*)
-      (breadcrumbs/group-delete-li @group-id*)
-      (breadcrumbs/group-edit-li @group-id*)])
+     [[breadcrumbs/leihs-li]
+      [breadcrumbs/admin-li]
+      [breadcrumbs/groups-li]
+      [breadcrumbs/group-li @group-id*]]
+     [[breadcrumbs/group-users-li @group-id*]
+      [breadcrumbs/group-delete-li @group-id*]
+      [breadcrumbs/group-edit-li @group-id*]
+      [breadcrumbs/group-inventory-pools-rooles-li @group-id*]])
    [:div.row
     [:div.col-lg
      [:h1
@@ -330,7 +287,9 @@
       [breadcrumbs/admin-li]
       [breadcrumbs/groups-li]
       [breadcrumbs/group-li @group-id*]
-      [breadcrumbs/group-delete-li @group-id*]]]
+      [breadcrumbs/group-delete-li @group-id*]
+      ;[breadcrumbs/inventory-pool-group-roles-li @group-id*]
+      ]]
     [:nav.col-lg {:role :navigation}]]
    [:h1 "Delete Group "
     [group-name-component]]

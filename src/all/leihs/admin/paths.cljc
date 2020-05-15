@@ -86,6 +86,7 @@
                   (leaf "" :group)
                   (leaf "/delete" :group-delete)
                   (leaf "/edit" :group-edit)
+                  (leaf "/inventory-pools-roles/" :group-inventory-pools-roles)
                   (branch "/users"
                           (leaf "/" :group-users)
                           (branch "/"

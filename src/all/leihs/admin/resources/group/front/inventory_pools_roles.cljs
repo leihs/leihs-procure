@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.user.front.inventory-pools-roles
+(ns leihs.admin.resources.group.front.inventory-pools-roles
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -13,7 +13,7 @@
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
-    [leihs.admin.resources.user.front.shared :as user.shared :refer [clean-and-fetch user-id* user-data* edit-mode?*]]
+    [leihs.admin.resources.group.front.shared :as group.shared :refer [clean-and-fetch group-id* group-data* edit-mode?*]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -28,11 +28,25 @@
 
 (defonce inventory-pools-roles-data* (reagent/atom nil))
 
+(defn prepare-inventory-pools-data [data]
+  (->> data
+       (reduce (fn [roles role]
+                 (-> roles
+                     (assoc-in [(:inventory_pool_id role) :name] (:inventory_pool_name role))
+                     (assoc-in [(:inventory_pool_id role) :id] (:inventory_pool_id role))
+                     (assoc-in [(:inventory_pool_id role) :key] (:inventory_pool_id role))
+                    ; (assoc-in [(:inventory_pool_id role) :role (:role role)] role)
+                     ))
+               {})
+       (map (fn [[_ v]] v))
+       (sort-by :name)
+       (into [])))
+
 (defonce fetch-inventory-pools-roles-id* (reagent/atom nil))
 
 (defn fetch-inventory-pools-roles []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user-inventory-pools-roles
+        id (requests/send-off {:url (path :group-inventory-pools-roles
                                           (-> @routing/state* :route-params))
                                :method :get
                                :query-params {}}
@@ -45,7 +59,8 @@
           (when (and (= (:status resp) 200)
                      (= id @fetch-inventory-pools-roles-id*))
             (reset! inventory-pools-roles-data*
-                    (-> resp :body :inventory_pools_roles)))))))
+                    (-> resp :body :inventory_pools_roles ;prepare-inventory-pools-data
+                        )))))))
 
 (defn clean-and-fetch-inventory-pools-roles [& args]
   (clean-and-fetch)
@@ -60,7 +75,7 @@
       [:div.inventory-pools-roles-data
        [:h3 "@inventory-pools-roles-data*"]
        [:pre (with-out-str (pprint @inventory-pools-roles-data*))]]])
-   [user.shared/debug-component]])
+   [group.shared/debug-component]])
 
 (defn roles-table-component []
   [:div
@@ -76,32 +91,32 @@
                           {:inventory-pool-id (:inventory_pool_id row)})}
           [:em (:inventory_pool_name row )]] ""]
         [:td
-         [:a {:href (path :inventory-pool-user
+         [:a {:href (path :inventory-pool-group-roles
                           {:inventory-pool-id (:inventory_pool_id row)
-                           :user-id (:user_id row)})}
+                           :group-id (:group_id row)})}
           (->> row :role roles/expand-role-to-hierarchy
                (map str)
                (clojure.string/join ", "))]]])]]])
 
 
 (defn page []
-  [:div.user-inventory-pools-roles
+  [:div.group-inventory-pools-roles
    [routing/hidden-state-component
     {:did-mount clean-and-fetch-inventory-pools-roles
      :did-change clean-and-fetch-inventory-pools-roles}]
    (breadcrumbs/nav-component
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
-      (breadcrumbs/users-li)
-      (breadcrumbs/user-li @user-id*)
-      (breadcrumbs/user-inventory-pools-rooles-li @user-id*)]
+      (breadcrumbs/groups-li)
+      (breadcrumbs/group-li @group-id*)
+      (breadcrumbs/group-inventory-pools-rooles-li @group-id*)]
      [])
    [:div.row
     [:div.col-lg
      [:h1
-      [:span " User "]
-      [user.shared/user-name-component]
+      [:span " Group "]
+      [group.shared/group-name-component]
       " Inventory-Pools-Roles"]
-     [user.shared/user-id-component]]]
+     [group.shared/group-id-component]]]
    [roles-table-component]
    [inventory-pools-roles-debug-component]])

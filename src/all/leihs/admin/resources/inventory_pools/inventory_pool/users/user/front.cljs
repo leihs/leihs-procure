@@ -100,9 +100,12 @@
     [[breadcrumbs/inventory-pool-user-direct-roles-li @inventory-pool-id* @user-id*]
      [breadcrumbs/inventory-pool-user-suspension-li @inventory-pool-id* @user-id*]]]
    [:h1 "Details for "
-    [user/user-name-component]
+    [:a {:href (path :user {:user-id @user-id*})}
+     [user/user-name-component]]
     " in "
-    [inventory-pool/inventory-pool-name-component]]
+    [:a {:href (path :inventory-pool
+                     {:inventory-pool-id @inventory-pool-id*})}
+     [inventory-pool/inventory-pool-name-component]]]
     [suspension-component]
     [effective-roles-component]
     [direct-roles-component]

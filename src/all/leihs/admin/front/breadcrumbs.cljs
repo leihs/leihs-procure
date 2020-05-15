@@ -31,6 +31,7 @@
 (defn group-add-li [] [li :group-add [:span [:i.fas.fa-plus-circle] " Add group "]])
 (defn group-delete-li [id] [li :group-delete [:span [:i.fas.fa-times] " Delete "] {:group-id id} {}])
 (defn group-edit-li [id] [li :group-edit [:span [:i.fas.fa-edit] " Edit "] {:group-id id} {}])
+(defn group-inventory-pools-rooles-li [id] [li :group-inventory-pools-roles [:span " Inventory-Pools-Roles "] {:group-id id} {}])
 (defn group-li [id] [li :group [:span icons/group " Group "] {:group-id id} {}])
 (defn group-users-li [group-id] [li :group-users [:span icons/users " Users "] {:group-id group-id} {}])
 (defn groups-li [] [li :groups [:span icons/groups " Groups "] {} {}])

@@ -27,7 +27,6 @@
     ))
 
 
-(declare fetcher-user)
 (defonce user-id* (reaction (-> @routing/state* :route-params :user-id)))
 (defonce user-data* (reagent/atom nil))
 
@@ -53,9 +52,9 @@
     (go (let [resp (<! resp-chan)]
           (when (and (= (:status resp) 200)
                      (= id @fetch-user-id*))
-            (reset! user-data* 
-                    (-> resp :body (update-in 
-                                     [:extended_info] 
+            (reset! user-data*
+                    (-> resp :body (update-in
+                                     [:extended_info]
                                      (fn [json] (.stringify js/JSON (clj->js json)))))))))))
 
 (defn clean-and-fetch [& args]
@@ -79,7 +78,7 @@
               :autoComplete (or (:autoComplete opts) :off)
               :type (:type opts)
               :value (or (kw @user-data*) "")
-              :on-change (fn [e] 
+              :on-change (fn [e]
                            (swap! user-data* assoc kw (-> e .-target .-value presence))
                            (when-let [hook (:on-change opts)]
                              (apply hook [e])))
@@ -98,9 +97,9 @@
 
 (defn json-component
   [kw opts]
-  (let [expanded* (reagent/atom false) 
-        is-valid* (reaction 
-                    (try 
+  (let [expanded* (reagent/atom false)
+        is-valid* (reaction
+                    (try
                       (.parse js/JSON (get @user-data* kw))
                       true
                       (catch :default _ false)))
@@ -114,11 +113,11 @@
            (if @edit-mode?*
              [:textarea.form-control
               {:id kw
-               :class (clojure.string/join 
+               :class (clojure.string/join
                         " " [(if @is-valid* "is-valid" "is-invalid")])
                :autoComplete (or (:autoComplete opts) :off)
                :value (or (kw @user-data*) "")
-               :on-change (fn [e] 
+               :on-change (fn [e]
                             (swap! user-data* assoc kw (-> e .-target .-value presence))
                             (when-let [hook (:on-change opts)]
                               (apply hook [e])))
@@ -128,10 +127,10 @@
                 (if-not @expanded*
                   [:span [:span.form-control-plaintext.text-truncate
                           {:style {:max-width "20em"}} value]
-                   [:button.btn-link 
+                   [:button.btn-link
                     {:on-click #(reset! expanded* true)}
                     [:i.fa.fa-expand-arrows-alt]]]
-                  [:pre.form-control-plaintext 
+                  [:pre.form-control-plaintext
                    (.stringify js/JSON
                                (.parse js/JSON value) nil 2)]))])]
           [:small (:remark opts)]]]))))
@@ -164,13 +163,13 @@
 
 (defn update-img-digest [& args]
   "sets img_digest to the md5 hex of the concatenated img256_url and img32_url
-  or to nil if both are empty; call this if either the fields :img256_url or :img32_url 
+  or to nil if both are empty; call this if either the fields :img256_url or :img32_url
   have been updated via the form; or via image drop or delete"
-  (swap! user-data* 
+  (swap! user-data*
          (fn [user-data]
            (assoc user-data
-                  :img_digest (some-> (str (:img256_url user-data) 
-                                           " " 
+                  :img_digest (some-> (str (:img256_url user-data)
+                                           " "
                                            (:img32_url user-data))
                                       presence
                                       leihs.core.digest/md5-hex)))))
@@ -262,7 +261,7 @@
           {:href "#"
            :on-click #(swap! user-data* assoc :img256_url nil :img32_url nil :img_digest nil)}
           [:i.fas.fa-times] " Remove image "]])]]]
-   [:div 
+   [:div
     (if-let [img-data (:img256_url @user-data*)]
       [:img {:src img-data
              :style {
@@ -285,7 +284,7 @@
   [:div.clearfix
    [:h3 "User-Image"]
    (if-not @edit-mode?*
-     [:div 
+     [:div
       {:style {:width 256 :height 256}}
       [:img.bg-light.user-image-256.mb-2
        {:src (if-let [data (:img256_url @user-data*)]
@@ -294,11 +293,11 @@
         :style {:max-width 256
                 :max-height 256}}]]
      [file-upload])
-   ; custom handler here? 
+   ; custom handler here?
    [field-component :img256_url {:type :url :on-change update-img-digest}]
    [field-component :img32_url {:type :url :on-change update-img-digest}]
-   [field-component :img_digest 
-    {:type :text 
+   [field-component :img_digest
+    {:type :text
      :remark [:strong
               "Proceed judiciously when overriding this field manually!"
               " Set this value explicitly when using the API! "]}]])

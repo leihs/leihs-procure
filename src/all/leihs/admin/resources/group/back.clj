@@ -4,10 +4,11 @@
   (:require
     [leihs.admin.paths :refer [path]]
     [leihs.core.sql :as sql]
-
     [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
+
+
 
     [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
@@ -32,6 +33,10 @@
         (sql/from :groups_users)
         (sql/merge-where [:= :groups_users.group_id :groups.id]))
     :users_count]
+   [(-> (sql/select :%count.*)
+        (sql/from :group_access_rights)
+        (sql/merge-where [:= :groups.id :group_access_rights.group_id]))
+    :inventory_pools_roles_count]
    :created_at
    :updated_at])
 
@@ -95,6 +100,29 @@
      {:status 422
       :body "No group has been created."})))
 
+
+;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn group-inventory-pools-roles-query [group-id]
+  (-> (sql/select :iprs.* [:inventory_pools.name :inventory_pool_name])
+      (sql/from [:group_access_rights :iprs])
+      (sql/merge-where [:= :group_id group-id])
+      (sql/merge-join :inventory_pools [:= :iprs.inventory_pool_id :inventory_pools.id])
+      sql/format))
+
+(defn inventory-pools-roles [group-id tx]
+  (->> group-id
+       group-inventory-pools-roles-query
+       (jdbc/query tx)))
+
+(defn group-inventory-pools-roles
+  [{tx :tx data :body {group-id :group-id} :route-params}]
+  {:body
+   {:inventory_pools_roles
+    (inventory-pools-roles group-id tx)
+    }})
+
+
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def group-path (path :group {:group-id ":group-id"}))
@@ -106,6 +134,7 @@
 (def routes
   (cpj/routes
     (cpj/GET group-path [] #'group)
+    (cpj/GET (path :group-inventory-pools-roles {:group-id ":group-id"}) [] #'group-inventory-pools-roles)
     (cpj/PATCH group-path [] #'patch-group)
     (cpj/DELETE group-path [] #'delete-group)
     (cpj/POST (path :groups) [] #'create-group)))
