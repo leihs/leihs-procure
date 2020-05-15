@@ -31,14 +31,15 @@
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
    (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/users-li)
-      (breadcrumbs/user-li @user-id*)]
-     [(breadcrumbs/user-delete-li @user-id*)
-      (breadcrumbs/user-edit-li @user-id*)
-      (breadcrumbs/email-li (:email @user-data*))
-      (breadcrumbs/user-my-li @user-id*)])
+     [[breadcrumbs/leihs-li]
+      [breadcrumbs/admin-li]
+      [breadcrumbs/users-li]
+      [breadcrumbs/user-li @user-id*]]
+     [[breadcrumbs/user-delete-li @user-id*]
+      [breadcrumbs/user-edit-li @user-id*]
+      [breadcrumbs/email-li (:email @user-data*)]
+      [breadcrumbs/user-my-li @user-id*]
+      [breadcrumbs/user-inventory-pools-rooles-li @user-id*]])
    [:div.row
     [:div.col-lg
      [:h1

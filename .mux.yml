@@ -4,6 +4,7 @@ windows:
     name: app
     command: |
       export LEIHS_ADMIN_HTTP_BASE_URL=http://localhost:3220
+      jenv shell 1.8
       lein do clean, repl
     post_command_send_keys: |
       (-main "run")
