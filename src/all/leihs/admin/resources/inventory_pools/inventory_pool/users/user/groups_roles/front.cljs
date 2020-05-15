@@ -85,7 +85,15 @@
    (doall
      (for [group-roles @inventory-pool-user-groups-roles-data*]
        [:div {:key (:group_id group-roles)}
-        [:h3 [:span "Group "  [:em "\"" (:group_name group-roles) "\""]]]
+        [:h3 [:span
+              [:a {:href (path :inventory-pool-group-roles
+                               {:inventory-pool-id  @inventory-pool/inventory-pool-id*
+                                :group-id (:group_id group-roles)})}
+               "Roles " icons/edit]
+              " via group "
+              [:a {:href (path :group {:group-id (:group_id group-roles)})}
+               [:em (:group_name group-roles)]]
+              ]]
         [:div
          (doall
           (for [role roles-hierarchy]
