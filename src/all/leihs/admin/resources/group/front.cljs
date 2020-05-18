@@ -78,7 +78,7 @@
    [field-component :org_id]])
 
 (defn additional-properties-component []
-  (when-let [group-data @group-data*]
+  (when-let [group-data (and (not @edit-mode?*) @group-data*)]
     (let [users-count (:users_count group-data)
           inventory-pools-roles-count (:inventory_pools_roles_count group-data)]
       [:div.additional-properties
@@ -92,12 +92,13 @@
                   "This group has "
                   [:strong users-count " "
                    (pluralize-noun users-count "user")] ". "])]
-        [:span "It grants its users "
-         [:a {:href (path :group-inventory-pools-roles {:group-id (:id group-data)})}
-          [:strong " roles to "
-           inventory-pools-roles-count " "
-           (pluralize-noun inventory-pools-roles-count "inventory-pool")
-           ]]". "]]])))
+        (when @group-id*
+          [:span "It grants its users "
+           [:a {:href (path :group-inventory-pools-roles {:group-id @group-id*})}
+            [:strong " roles to "
+             inventory-pools-roles-count " "
+             (pluralize-noun inventory-pools-roles-count "inventory-pool")
+             ]]". "])]])))
 
 (defn group-component []
   [:div.group-component
