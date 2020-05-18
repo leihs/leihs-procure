@@ -59,10 +59,7 @@
    [routing/hidden-state-component
     {:did-mount roles/clean-and-fetch
      :did-change roles/clean-and-fetch}]
-   [:h2 [:a {:href (path :inventory-pool-user-roles
-                         {:inventory-pool-id @inventory-pool-id*
-                          :user-id @user-id*})}
-         "Roles"]]
+   [:h2 "Roles"]
    [:p "This section shows the roles aggregated from "
     "direct roles, and those via groups. "]
    [roles/roles-component]])
@@ -106,8 +103,11 @@
     [:a {:href (path :inventory-pool
                      {:inventory-pool-id @inventory-pool-id*})}
      [inventory-pool/inventory-pool-name-component]]]
-    [suspension-component]
-    [effective-roles-component]
-    [direct-roles-component]
-    [roles-via-groups-component]
+   [:hr]
+   [suspension-component]
+   [:hr]
+   [effective-roles-component]
+   [:hr]
+   [direct-roles-component]
+   [roles-via-groups-component]
    [debug-component]])

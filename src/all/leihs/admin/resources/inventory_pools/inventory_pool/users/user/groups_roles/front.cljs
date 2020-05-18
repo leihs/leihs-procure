@@ -96,18 +96,18 @@
               ]]
         [:div
          (doall
-          (for [role roles-hierarchy]
-            [:div.form-groups
-             {:key role}
-             [:div.form-check
-              [:input.formp-check-input
-               {:id role
-                :type :checkbox
-                :checked (get-in group-roles [:role role])
-                ;:on-change (fn [e] (on-change-handler role))
-                :disabled true }]
-              [:label.form-check-label
-               {:for role}
-               [:span " " role]]]]))]]))])
+           (for [role roles-hierarchy]
+             [:div.form-group
+              {:key role}
+              [:div.form-check
+               [:input.formp-check-input
+                {:id role
+                 :type :checkbox
+                 :checked (get-in group-roles [:role role])
+                 ;:on-change (fn [e] (on-change-handler role))
+                 :disabled true }]
+               [:label.form-check-label
+                {:for role}
+                [:span " " role]]]]))]]))])
 
 
