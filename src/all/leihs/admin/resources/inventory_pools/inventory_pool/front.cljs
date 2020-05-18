@@ -7,6 +7,7 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
+    [leihs.core.user.front :as core-user]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components :refer [field-component checkbox-component]]
@@ -27,6 +28,12 @@
 
 (defonce inventory-pool-id* (reaction (-> @routing/state* :route-params :inventory-pool-id)))
 (defonce inventory-pool-data* (reagent/atom nil))
+(defonce role-for-inventory-pool* (reaction
+                                    (some->> @core-user/state* :access-rights
+                                             (filter #(=(:inventory_pool_id %) @inventory-pool-id*))
+                                             first
+                                             :role
+                                             keyword)))
 
 (defonce edit-mode?*
   (reaction
@@ -225,6 +232,15 @@
    [delete-submit-component]])
 
 
+(defn link-to-legacy-component []
+  [:div
+   (when (= @role-for-inventory-pool* :inventory_manager)
+     [:p
+      (when true
+        [:a {:href (str "/manage/inventory_pools/" @inventory-pool-id* "/edit")}
+         "Edit " [inventory-pool-name-component]
+         " in the leihs-legacy interface. "])])])
+
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn show-page []
@@ -246,5 +262,6 @@
      [:h1
       [:span " Inventory-Pool "]
       [inventory-pool-name-component]]]]
+   [link-to-legacy-component]
    [inventory-pool-component]
    [debug-component]])
