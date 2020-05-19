@@ -120,7 +120,7 @@
    [:div
     [:h1
      (let [c (or @inventory-pool-groups-count* 0)]
-       [:span c " " (pluralize-noun c "User")
+       [:span c " " (pluralize-noun c "Group")
         [:span " in Inventory-Pool "]
         [inventory-pool/inventory-pool-name-component]])]
     [main-page-component] ]])
