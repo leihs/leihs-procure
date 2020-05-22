@@ -34,7 +34,6 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       # remove all access_rights
       uncheck :customer
-      binding.pry
       click_on "Save"
       wait_until do
         GroupAccessRight.find(inventory_pool_id: inventory_pool_id, group_id: group_id).nil?

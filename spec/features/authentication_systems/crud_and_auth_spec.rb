@@ -32,8 +32,6 @@ feature 'Authentication-Systems', type: :feature do
       fill_in 'external_sign_in_url', with: 'http://exsys/sign-in'
       fill_in 'external_sign_out_url', with: 'http://exsys/sign-out'
 
-      binding.pry
-
       click_on 'Add'
       wait_until do
         current_path.match /authentication-systems\/test-auth-system$/
