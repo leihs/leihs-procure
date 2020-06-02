@@ -305,7 +305,7 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
                 </h1>
 
                 <div className="d-inline-flex flex-wrap ml-3 mt-2">
-                  <Tooltipped text="Antragsphase bis">
+                  <Tooltipped text={t('dashboard.requesting_phase_until')}>
                     <span
                       id={`inspectStartDate_tt_${budgetPeriod.id}`}
                       className={cx('mr-3', { 'text-success': isRequesting })}
@@ -315,7 +315,7 @@ const BudgetPeriodCard = ({ budgetPeriod, me, ...props }) => {
                     </span>
                   </Tooltipped>
 
-                  <Tooltipped text="Inspektionsphase bis">
+                  <Tooltipped text={t('dashboard.inspection_phase_until')}>
                     <span
                       id={`endDate_tt_${budgetPeriod.id}`}
                       className={cx('mr-3', { 'text-success': isInspecting })}

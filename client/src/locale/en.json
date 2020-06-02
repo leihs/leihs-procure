@@ -72,6 +72,8 @@
     },
     "requests_title_singular": "Request",
     "requests_title_plural": "Requests",
+    "requesting_phase_until": "Requesting Phase until",
+    "inspection_phase_until": "Inspection Phase until",
     "bp_total_sum": "Total of Budget Period",
     "maincat_total_sum": "Total of Main Category",
     "subcat_total_sum": "Total of Sub-Category",

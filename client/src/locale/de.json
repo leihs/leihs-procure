@@ -72,6 +72,8 @@
     },
     "requests_title_singular": "Antrag",
     "requests_title_plural": "Anträge",
+    "requesting_phase_until": "Antragsphase bis",
+    "inspection_phase_until": "Inspektionsphase bis",
     "bp_total_sum": "Aktuelles Total dieser Budgetperiode",
     "maincat_total_sum": "Aktuelles Total dieser Hauptkategorie",
     "subcat_total_sum": "Aktuelles Total dieser Kategorie",
