@@ -97,6 +97,9 @@ class RequestForm extends React.Component {
           const formPropsFor = key => {
             const required = request[key] ? request[key].required : null
             const readOnly = request[key] ? !request[key].write : null
+            const readOrWrite = request[key]
+              ? request[key].read || request[key].write
+              : null
             const labelTxt = t(`request_form_field.${key}`)
             return {
               ...formHelpers.formPropsFor(key),
@@ -105,6 +108,7 @@ class RequestForm extends React.Component {
               hidden: request[key] ? !request[key].read : false,
               required,
               readOnly,
+              readOrWrite,
               ...(readOnly && { type: 'text-static' })
             }
           }
@@ -513,8 +517,7 @@ class RequestForm extends React.Component {
                   </RequestInput>
                   <Let accTypeField={formPropsFor('accounting_type')}>
                     {({ accTypeField }) =>
-                      // NOTE: don't show at all if not writable
-                      !accTypeField.readOnly && (
+                      accTypeField.readOrWrite && (
                         <F>
                           <FormGroup
                             horizontal={compactView}

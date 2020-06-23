@@ -46,7 +46,10 @@
         category-inspector (user-perms/inspector? tx auth-entity category-id)
         category-viewer (user-perms/viewer? tx auth-entity category-id)]
     {:accounting_type
-       {:read (or category-viewer inspector admin),
+       {:read (or (and requester own-request (or inspection-phase past-phase))
+                  category-viewer
+                  inspector
+                  admin),
         :write (and (not past-phase)
                     (or (and new-request
                              requester

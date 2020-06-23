@@ -1,6 +1,7 @@
 scripts:
 
   run-procure-service:
+    timeout: 6 Minutes
     start_when:
       uberjar has been built:
         script_key: build-procure-uberjar

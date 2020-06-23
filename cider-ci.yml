@@ -63,8 +63,13 @@ jobs:
         git_options:
           submodules:
             include_match: ^.*$
+        trial_attachments:
+          screenshots:
+            include_match: tmp\/(.*-|)screenshots\/.*\.png$
+            content_type: image/png
         scripts:
           test:
+            timeout: 6 Minutes
             start_when:
               procure service is running:
                 script_key: procure-service-is-running
