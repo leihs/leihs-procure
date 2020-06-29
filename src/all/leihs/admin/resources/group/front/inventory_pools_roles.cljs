@@ -51,7 +51,7 @@
                                :method :get
                                :query-params {}}
                               {:modal false
-                               :title "Fetch Inventory-Pools-Roles"
+                               :title "Fetch Inventory Pool Roles"
                                :retry-fn #'fetch-inventory-pools-roles}
                               :chan resp-chan)]
     (reset! fetch-inventory-pools-roles-id* id)
@@ -116,7 +116,7 @@
      [:h1
       [:span " Group "]
       [group.shared/group-name-component]
-      " Inventory-Pools-Roles"]
+      " Inventory Pool Roles"]
      [group.shared/group-id-component]]]
    [roles-table-component]
    [inventory-pools-roles-debug-component]])
