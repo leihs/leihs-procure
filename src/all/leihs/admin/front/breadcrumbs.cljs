@@ -45,7 +45,7 @@
 (defn inventory-pool-li [id] [li :inventory-pool [:span icons/inventory-pool " Inventory-Pool "] {:inventory-pool-id id} {}])
 (defn inventory-pool-user-li [inventory-pool-id user-id] [li :inventory-pool-user [:span icons/user " User "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}])
 (defn inventory-pool-user-roles-li [inventory-pool-id user-id] [li :inventory-pool-user-roles [:span icons/edit " Manage Roles "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}])
-(defn inventory-pool-user-direct-roles-li [inventory-pool-id user-id] [li :inventory-pool-user-roles [:span icons/edit " Direct Roles "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}])
+(defn inventory-pool-user-direct-roles-li [inventory-pool-id user-id] [li :inventory-pool-user-direct-roles [:span icons/edit " Direct Roles "] {:inventory-pool-id inventory-pool-id :user-id user-id} {}])
 (defn inventory-pool-user-suspension-li [inventory-pool-id user-id] [li :inventory-pool-user-suspension [:span icons/edit " Suspension"] {:inventory-pool-id inventory-pool-id :user-id user-id} {}])
 (defn inventory-pool-users-li [inventory-pool-id] [li :inventory-pool-users [:span icons/users " Users "] {:inventory-pool-id inventory-pool-id} {}])
 (defn inventory-pools-li [] [li :inventory-pools [:span icons/inventory-pools " Inventory-Pools "]])
