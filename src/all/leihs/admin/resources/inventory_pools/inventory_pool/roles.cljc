@@ -38,6 +38,10 @@
        (drop-while #(not= (keyword role) %))
        reverse))
 
+(defn expand-to-hierarchy-up-and-include [role]
+  (->> roles-hierarchy
+       (drop-while #(not= (keyword role) %))))
+
 (defn roles-to-map [roles]
   (->> roles-hierarchy
        (map (fn [r] [r (.contains roles r)]))

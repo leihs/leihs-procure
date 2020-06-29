@@ -3,7 +3,7 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy roles-to-map]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
     [leihs.admin.resources.users.back :as users]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
@@ -47,7 +47,8 @@
                         [:and
                          [:= :access_rights.user_id :users.id]
                          [:= :access_rights.inventory_pool_id inventory-pool-id]])
-        (sql/merge-where [:= :access_rights.role role]))
+        (sql/merge-where [:in :access_rights.role
+                          (map str (roles/expand-to-hierarchy-up-and-include role))]))
     query))
 
 (defn filter-suspended [query inventory-pool-id {:as request}]
@@ -90,8 +91,8 @@
                      (jdbc/query tx)
                      first :role keyword)]
     (-> role-kw
-        expand-role-to-hierarchy
-        roles-to-map)))
+        roles/expand-role-to-hierarchy
+        roles/roles-to-map)))
 
 (defn user-add-roles [tx inventory-pool-id user]
   (assoc user :roles (user-roles tx inventory-pool-id (:id  user))))
