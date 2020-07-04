@@ -133,7 +133,6 @@
    [checkbox-component :send_email]
    [checkbox-component :send_org_id]
    [checkbox-component :send_login]
-   [checkbox-component :send_auth_system_user_data]
    [field-component :priority {:type :number}]
    [field-component :internal_private_key {:node-type :textarea}]
    [field-component :internal_public_key {:node-type :textarea}]
