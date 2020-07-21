@@ -145,7 +145,10 @@
                               (and requesting-phase requester own-request))))),
         :default category,
         :required true},
-     :cost_center {:read (or category-viewer inspector admin),
+     :cost_center {:read (or (and requester own-request (or inspection-phase past-phase))
+                             category-viewer
+                             inspector
+                             admin),
                    :write false,
                    :required false},
      :DELETE (and existing-request
@@ -153,7 +156,10 @@
                   (or admin
                       (and requesting-phase requester own-request)
                       category-inspector)),
-     :general_ledger_account {:read (or category-viewer inspector admin),
+     :general_ledger_account {:read  (or (and requester own-request (or inspection-phase past-phase))
+                                         category-viewer
+                                         inspector
+                                         admin),
                               :write false,
                               :required false},
      :inspection_comment
@@ -182,7 +188,10 @@
         :default "MEDIUM",
         :required true},
      :internal_order_number
-       {:read (or category-viewer inspector admin),
+       {:read (or (and requester own-request (or inspection-phase past-phase))
+                  category-viewer
+                  inspector
+                  admin),
         :write (and (not past-phase)
                     (or (and new-request
                              requester
@@ -272,7 +281,10 @@
                                    category-inspector))))),
         :default "NORMAL",
         :required true},
-     :procurement_account {:read (or category-viewer inspector admin),
+     :procurement_account {:read (or (and requester own-request (or inspection-phase past-phase))
+                                     category-viewer
+                                     inspector
+                                     admin),
                            :write false},
      :receiver
        {:read (or (and requester own-request) category-viewer inspector admin),
