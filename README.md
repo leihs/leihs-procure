@@ -1,7 +1,5 @@
-
-Administriers - leihs-admin  (working title)
+Leihs Admin
 ============================================
-
 
 Development
 -----------
