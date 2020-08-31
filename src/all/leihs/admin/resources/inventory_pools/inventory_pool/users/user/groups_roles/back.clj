@@ -22,7 +22,7 @@
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn groups-roles-query [inventory-pool-id user-id]
-  (-> (sql/select [:group_access_rights.role :role]
+  (-> (sql/select [:group_access_rights.role :roles]
                   [:groups.name :group_name]
                   [:groups.id :group_id])
       (sql/from :group_access_rights)
@@ -36,7 +36,7 @@
     tx :tx :as request}]
   (let [groups-roles (->> (groups-roles-query inventory-pool-id user-id)
                           sql/format (jdbc/query tx)
-                          (map #(update-in % [:role]
+                          (map #(update-in % [:roles]
                                            (fn [role]
                                              (-> role keyword
                                                  expand-role-to-hierarchy roles-to-map)))))]

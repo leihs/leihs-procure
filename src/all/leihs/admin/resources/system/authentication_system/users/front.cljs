@@ -12,7 +12,7 @@
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.system.authentication-system.front :as authentication-system :refer [authentication-system-id*]]
@@ -143,9 +143,7 @@
      [])
    [:h1 "Edit Authentication-System Data for User " [user-shared/user-name-component]]
    (if-not (contains? @edit-data* :data)
-     [:div.text-center
-      [:i.fas.fa-spinner.fa-spin.fa-5x]
-      [:span.sr-only "Please wait"]]
+     [wait-component]
      [edit-form-component])])
 
 
@@ -222,9 +220,9 @@
     [authentication-system-users-filter]
     [users/form-term-filter]
     [users/form-admins-filter]
-    [users/form-type-filter]
-    [users/form-per-page]
-    [users/form-reset]]]])
+    [users/form-org-filter]
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;### main #####################################################################
@@ -242,9 +240,9 @@
      :did-update users/escalate-query-paramas-update}]
    [filter-component]
    [:p "To add users disable the \"Authentication-System users only\" filter."]
-   [users/pagination-component]
+   [routing/pagination-component]
    [users/users-table-component colconfig]
-   [users/pagination-component]
+   [routing/pagination-component]
    [debug-component]
    [users/debug-component]])
 

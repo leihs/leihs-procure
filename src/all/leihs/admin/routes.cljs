@@ -11,8 +11,9 @@
     [leihs.admin.front.pages.debug]
     [leihs.admin.paths :as paths :refer [path paths]]
     [leihs.admin.resources.admin.front :as admin]
-    [leihs.admin.resources.delegation.front :as delegation]
-    [leihs.admin.resources.delegation.users.front :as delegation-users]
+    [leihs.admin.resources.delegations.delegation.front :as delegation]
+    [leihs.admin.resources.delegations.delegation.users.front :as delegation-users]
+    [leihs.admin.resources.delegations.delegation.groups.front :as delegation-groups]
     [leihs.admin.resources.delegations.front :as delegations]
     [leihs.admin.resources.group.front :as group]
     [leihs.admin.resources.group.front.inventory-pools-roles :as group-inventory-pools-roles]
@@ -21,6 +22,10 @@
     [leihs.admin.resources.home.front :as home]
     [leihs.admin.resources.inventory-pools.front :as inventory-pools]
     [leihs.admin.resources.inventory.front :as inventory]
+    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.front :as inventory-pool-entitlement-group]
+    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.front :as inventory-pool-entitlement-group-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.groups.front :as inventory-pool-entitlement-group-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.front :as inventory-pool-entitlement-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.front :as inventory-pool-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.front :as inventory-pool-group-roles]
@@ -72,6 +77,7 @@
    :delegation-edit #'delegation/edit-page
    :delegation-edit-choose-responsible-user #'delegation/choose-responsible-user-page
    :delegation-users #'delegation-users/index-page
+   :delegation-groups #'delegation-groups/page
    :delegations #'delegations/page
    :group #'group/show-page
    :group-add #'group/add-page
@@ -86,6 +92,10 @@
    :inventory-pool-add #'inventory-pool/add-page
    :inventory-pool-delete #'inventory-pool/delete-page
    :inventory-pool-edit #'inventory-pool/edit-page
+   :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/index-page
+   :inventory-pool-entitlement-group #'inventory-pool-entitlement-group/page
+   :inventory-pool-entitlement-group-users #'inventory-pool-entitlement-group-users/page
+   :inventory-pool-entitlement-group-groups #'inventory-pool-entitlement-group-groups/page
    :inventory-pool-group-roles #'inventory-pool-group-roles/page
    :inventory-pool-groups #'inventory-pool-groups/index-page
    :inventory-pool-user #'inventory-pool-user/page

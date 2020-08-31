@@ -121,9 +121,9 @@
     [system-admin-users-filter]
     [users/form-term-filter]
     [users/form-admins-filter]
-    [users/form-type-filter]
-    [users/form-per-page]
-    [users/form-reset]]]])
+    [users/form-org-filter]
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;### main #####################################################################
@@ -139,9 +139,9 @@
    [routing/hidden-state-component
     {:did-change users/escalate-query-paramas-update}]
    [filter-component]
-   [users/pagination-component]
+   [routing/pagination-component]
    [users/users-table-component colconfig]
-   [users/pagination-component]
+   [routing/pagination-component]
    [debug-component]
    [users/debug-component]])
 

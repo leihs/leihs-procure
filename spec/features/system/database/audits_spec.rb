@@ -29,7 +29,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
       # By default we download audits older than one year, check this:
       expect(File.exists? audits_file).to be true
       file_content = JSON.parse(File.read audits_file)
-      expect(file_content['legacy-audits'].count).to be== 1 
+      expect(file_content['legacy-audits'].count).to be== 1
       expect(file_content['legacy-audits'].first['comment']).to be== "This one is older than a year."
     end
 
@@ -58,7 +58,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
       end
 
       let :prepare_http_client do
-        @api_token = FactoryBot.create :api_token, user_id: @system_admin.id, 
+        @api_token = FactoryBot.create :api_token, user_id: @system_admin.id,
           scope_admin_read: true, scope_admin_write: true,
           scope_system_admin_read: true, scope_system_admin_write: true
         @token_secret = @api_token.token_secret
@@ -76,12 +76,12 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
       end
 
       scenario 'downloading audits via API' do
-        resp = http_client.get audits_before_url  
+        resp = http_client.get audits_before_url
         expect(resp.status).to be== 200
         downloaded_legacy_audits =  resp.body['legacy-audits']
 
         # similar as with the browser, see there above
-        expect(downloaded_legacy_audits.count).to be== 1 
+        expect(downloaded_legacy_audits.count).to be== 1
         expect(downloaded_legacy_audits.first['comment']).to \
           be== "This one is older than a year."
 
@@ -89,7 +89,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
 
 
       scenario 'deleting audits via API' do
-        resp = http_client.delete audits_before_url  
+        resp = http_client.delete audits_before_url
         expect(resp.status).to be== 204
 
         audits = LegacyAudit.all
@@ -108,19 +108,19 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
 
         scenario 'downloading audits via API still works' do
 
-          resp = http_client.get audits_before_url  
+          resp = http_client.get audits_before_url
           expect(resp.status).to be== 200
           downloaded_legacy_audits =  resp.body['legacy-audits']
 
           # similar as with the browser, see there above
-          expect(downloaded_legacy_audits.count).to be== 1 
+          expect(downloaded_legacy_audits.count).to be== 1
           expect(downloaded_legacy_audits.first['comment']).to \
             be== "This one is older than a year."
 
         end
 
         scenario 'deleting audits via API does not work anymore' do
-          resp = http_client.delete audits_before_url  
+          resp = http_client.delete audits_before_url
           expect(resp.status).to be== 403
         end
 
@@ -129,15 +129,15 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
       context 'API with no system-admin  access' do
 
         before :each do
-          @api_token.update(scope_system_admin_write: false, 
+          @api_token.update(scope_system_admin_write: false,
                             scope_system_admin_read: false)
         end
 
         scenario 'downloading audits via API is forbidden' do
-          resp = http_client.get audits_before_url  
+          resp = http_client.get audits_before_url
           expect(resp.status).to be== 403
         end
-      end 
+      end
     end
   end
 end

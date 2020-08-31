@@ -105,12 +105,12 @@
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
+   [:div.form-row
     [authentication-system-groups-filter]
     [groups/form-term-filter]
-    [groups/form-type-filter]
-    [groups/form-per-page]
-    [groups/form-reset]]]])
+    [groups/form-org-filter]
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;### main #####################################################################
@@ -140,11 +140,11 @@
    [routing/hidden-state-component
     {:did-change groups/escalate-query-paramas-update}]
    [filter-component]
-   [groups/pagination-component]
+   [routing/pagination-component]
    [groups/groups-table-component
     [[:th {:key :actions} "Actions"]]
     [td-actions-component]]
-   [groups/pagination-component]
+   [routing/pagination-component]
    [debug-component]
    [groups/debug-component]])
 

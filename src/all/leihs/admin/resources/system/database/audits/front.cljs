@@ -45,7 +45,6 @@
      {:type :date
       :value @before-date*
       :on-change (fn [e]
-                   (console.log (-> e .-target .-value))
                    (reset! before-date* (-> e .-target .-value)))}]]
    [:div.form-group.float-right
     [:button.btn.btn-primary
@@ -118,8 +117,8 @@
 (defn section-delete []
   [:section
    [:h2 "Delete"]
-   [:p.text-danger 
-    "If archiving audits is a requirement make sure the download has completed and that the data is stored in a safe place 
+   [:p.text-danger
+    "If archiving audits is a requirement make sure the download has completed and that the data is stored in a safe place
     before deleting it."]
    [delete-form]])
 

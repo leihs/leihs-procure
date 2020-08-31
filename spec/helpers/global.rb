@@ -17,5 +17,14 @@ module Helpers
       wait_until(3) { first(:link_or_button, locator, options) }
       first(:link_or_button, locator, options).click
     end
+
+    def within_first(locator, options = {}, &block)
+      wait_until(3){first(locator, options)}
+      within(first(locator, options)) do
+        block.call
+      end
+    end
+
+
   end
 end

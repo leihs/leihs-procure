@@ -12,7 +12,7 @@
 
     [leihs.admin.front.breadcrumbs :as admin-breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.breadcrumbs :as breadcrumbs]
@@ -94,7 +94,9 @@
                 :email [:a {:href (str "mailto:" value)}
                         [:i.fas.fa-envelope] " " value]
                 :url [:a {:href value} value]
-                value)])])]]])))
+                (if (clojure.string/ends-with? (str kw) "key")
+                  [:span (apply str  (take 40 value)) " ..."]
+                  value ))])])]]])))
 
 (defn checkbox-component [kw]
   [:div.form-check.form-check-inline
@@ -159,9 +161,7 @@
 (defn authentication-system-component []
   [:div.authentication-system-component
    (if (nil?  @authentication-system-data*)
-     [:div.text-center
-      [:i.fas.fa-spinner.fa-spin.fa-5x]
-      [:span.sr-only "Please wait"]]
+     [wait-component]
      [:div
       [:div [basic-component]]
       [:div [additional-properties-component]]])])

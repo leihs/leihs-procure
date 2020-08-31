@@ -2,9 +2,10 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
     [leihs.core.sql :as sql]
-    [leihs.admin.resources.delegation.back :as delegation]
+
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.delegations.delegation.back :as delegation]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]

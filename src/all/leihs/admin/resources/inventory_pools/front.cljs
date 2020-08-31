@@ -10,9 +10,10 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
@@ -89,7 +90,7 @@
 
 (defn form-term-filter []
   [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :inventory-pools-search-term} "Search term"]
+   [:label {:for :inventory-pools-search-term} "Fuzzy search"]
    [:input#inventory-pools-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
      :placeholder "Search term ..."
@@ -115,36 +116,15 @@
       (for [t ["all" "active" "inactive"]]
         [:option {:key t :value t} t])]]))
 
-(defn form-per-page []
-  (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :inventory-pools-filter-per-page} "Per page"]
-     [:select#inventory-pools-filter-per-page.form-control
-      {:value per-page
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "12")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :per-page val}))))}
-      (for [p [12 25 50 100 250 500 1000]]
-        [:option {:key p :value p} p])]]))
-
-(defn form-reset []
-  [:div.form-group.mt-2
-   [:label.sr-only {:for :inventory-pools-filter-reset} "Reset"]
-   [:a#inventory-pools-filter-reset.btn.btn-warning
-    {:href (page-path-for-query-params shared/default-query-parameters)}
-    [:i.fas.fa-times]
-    " Reset "]])
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
+   [:div.form-row
     [form-term-filter]
     [form-is-active-filter]
-    [form-per-page]
-    [form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -179,9 +159,7 @@
 
 (defn inventory-pools-table-component [& [hds tds]]
   (if-not (contains? @data* @current-url*)
-    [:div.text-center
-     [:i.fas.fa-spinner.fa-spin.fa-5x]
-     [:span.sr-only "Please wait"]]
+    [wait-component]
     (if-let [inventory-pools (-> @data* (get  @current-url* {}) :inventory-pools seq)]
       [:table.table.table-striped.table-sm
        [inventory-pools-thead-component hds]
@@ -193,20 +171,6 @@
       [:div.alert.alert-warning.text-center "No (more) inventory-pools found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn pagination-component []
-  [:div.clearfix.mt-2.mb-2
-   (let [page (dec (:page @current-query-paramerters-normalized*))]
-     [:div.float-left
-      [:a.btn.btn-primary.btn-sm
-       {:class (when (< page 1) "disabled")
-        :href (page-path-for-query-params {:page page})}
-       [:i.fas.fa-arrow-circle-left] " Previous " ]])
-   [:div.float-right
-    [:a.btn.btn-primary.btn-sm
-     {:href (page-path-for-query-params
-              {:page (inc (:page @current-query-paramerters-normalized*))})}
-     " Next " [:i.fas.fa-arrow-circle-right]]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -229,9 +193,9 @@
     {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
-   [pagination-component]
+   [routing/pagination-component]
    [inventory-pools-table-component]
-   [pagination-component]
+   [routing/pagination-component]
    [debug-component]])
 
 (defn page []

@@ -9,7 +9,7 @@
      [leihs.core.routing.front :as routing]
      [leihs.core.icons :as icons]
 
-     [leihs.admin.front.shared :refer [humanize-datetime-component]]
+     [leihs.admin.front.shared :refer [wait-component]]
      [leihs.admin.front.breadcrumbs :as breadcrumbs]
      [leihs.admin.front.components :as components :refer [field-component checkbox-component]]
      [leihs.admin.front.components :as components]
@@ -25,7 +25,23 @@
      [reagent.core :as reagent]))
 
 
+
 (defonce data* (reagent/atom nil))
+
+(def suspended-until*
+  (reaction
+    (some-> @data* :suspended_until presence)))
+
+(def suspended?*
+  (reaction
+    (if-not @suspended-until*
+      false
+      (if (.isAfter
+            (.add (js/moment @suspended-until*) 1 "days")
+            (:timestamp @state/global-state*))
+        true
+        false))))
+
 
 (def edit-mode?*
   (reaction
@@ -38,7 +54,10 @@
      [:h2 "Page Debug"]
      [:div
       [:h3 "@data*"]
-      [:pre (with-out-str (pprint @data*))]]]))
+      [:pre (with-out-str (pprint @data*))]]
+     [:div
+      [:h3 "@suspended-until*"]
+      [:pre (with-out-str (pprint @suspended-until*))]]]))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -67,6 +86,21 @@
   (inventory-pool/clean-and-fetch))
 
 
+;;; cancel ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn cancel [user & [cb & more]]
+  (let  [user-suspension-path (path :inventory-pool-user-suspension
+                                    {:user-id (:id user)
+                                     :inventory-pool-id @inventory-pool-id*})]
+    (let [resp-chan (async/chan)
+          id (requests/send-off {:url user-suspension-path
+                                 :method :delete }
+                                {:modal true
+                                 :title "Cancel suspension"}
+                                :chan resp-chan)]
+      (go (let [resp (<! resp-chan)]
+            (when cb (cb resp)))))))
+
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def delete-inventory-pool-user-suspension-id* (reagent/atom nil))
@@ -94,7 +128,7 @@
        [:button.btn.btn-warning
         {:on-click delete-inventory-pool-user-suspension}
         [:i.fas.fa-times]
-        " Remove Suspension "]]
+      " suspend "  " cancel supension"]]
       [:div.clearfix]])])
 
 
@@ -111,9 +145,8 @@
                                :retry-fn #'put}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pool-user {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})))))))
+          (when (< (:status resp) 400)
+            (clean-and-fetch))))))
 
 (defn put-submit-component []
   [:div
@@ -129,31 +162,29 @@
   [:h1 "Suspension of "
    [user/user-name-component]
    " in "
-   [inventory-pool/inventory-pool-name-component]])
+   [inventory-pool/name-component]])
 
 (defn humanized-suspended-until-component []
   [:div
-   (if-let [suspended-until (some-> @data* :suspended_until js/moment)]
-     (if (.isAfter (.add suspended-until 1 "days") (:timestamp @state/global-state*))
-       [:span.text-danger "This users is suspended for "
-        (.to (:timestamp @state/global-state*) suspended-until true)
-        "."]
-       [:span.text-success "Not suspended."])
-     [:span.text-success "Not suspended."]
-     )])
+   (if @suspended?*
+     [:span.text-danger "This user is suspended for "
+      (.to (:timestamp @state/global-state*) @suspended-until* true) "."]
+     [:span.text-success "Not suspended."])])
 
 (defn suspension-component []
   [:div.suspension
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   [:div.form.edit
-    [humanized-suspended-until-component]
-    (when (or @edit-mode?* (-> @data* :suspended_until))
-      [field-component [:suspended_until] data* edit-mode?* {:type :date}])
-    (when  (or @edit-mode?* (-> @data* :suspended_reason))
-      [field-component [:suspended_reason] data* edit-mode?* {:node-type :textarea}])
-    (when @edit-mode?* [put-submit-component])]])
+   (if-not @data*
+     [wait-component]
+     [:div.form.edit
+      [humanized-suspended-until-component]
+      (when (or @edit-mode?* (-> @data* :suspended_until))
+        [field-component [:suspended_until] data* edit-mode?* {:type :date}])
+      (when  (or @edit-mode?* (-> @data* :suspended_reason))
+        [field-component [:suspended_reason] data* edit-mode?* {:node-type :textarea}])
+      (when @edit-mode?* [put-submit-component])])])
 
 (defn page []
   [:div.inventory-pool-user-suspension

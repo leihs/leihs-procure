@@ -45,7 +45,7 @@ feature 'Manage users', type: :feature do
 
       scenario 'filtering by admins' do
 
-        check 'Admins only'
+        select 'yes', from: 'Is admin'
 
         wait_until { not page.has_content? "Please wait" }
 
@@ -67,7 +67,7 @@ feature 'Manage users', type: :feature do
         end
 
         scenario 'searching by email works' do
-          fill_in 'Search term', with: @search_user.email
+          fill_in 'search', with: @search_user.email
           wait_until { not page.has_content? "Please wait" }
 
           expect(page).to have_content @search_user.email
@@ -78,7 +78,7 @@ feature 'Manage users', type: :feature do
         end
 
         scenario 'searching with small spelling error works' do
-          fill_in 'Search term', with: "#{@search_user.firstname}X #{@search_user.lastname}"
+          fill_in 'search', with: "#{@search_user.firstname}X #{@search_user.lastname}"
           wait_until { not page.has_content? "Please wait" }
 
           expect(page).to have_content @search_user.email

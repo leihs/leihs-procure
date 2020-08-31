@@ -23,7 +23,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       wait_until { all("table.groups tbody tr").count == 1 }
       expect(page.find("table.groups ")).not_to have_content "customer"
       expect(page.find("table.groups ")).not_to have_content "inventory_manager"
-      click_on "none"
+      click_on "add"
       wait_until{ current_path.match? %r"/admin/inventory-pools/[^/]+/groups/[^/]+/roles" }
       _, _, _, inventory_pool_id, _, group_id, _  = current_path.split('/')
 

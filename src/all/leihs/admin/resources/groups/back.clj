@@ -5,6 +5,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.group.back :as group]
     [leihs.admin.resources.groups.shared :as shared]
+    [leihs.admin.utils.regex :refer [uuid-pattern]]
     [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
@@ -55,14 +56,36 @@
                           ["~~*" :searchable (str "%" term "%")]]))
     query))
 
-(defn type-filter [query request]
-  (case (-> request :query-params :type)
-    (nil "any") query
-    "org" (-> query
-              (sql/merge-where [:<> nil :org_id]))
-    "manual" (-> query
-                 (sql/merge-where [:= nil :org_id]))))
+(defn org-filter [query request]
+  (let [qp (presence (or (some-> request :query-params-raw :org_id)
+               (some-> request :query-params-raw :type)))]
+    (case qp
+      (nil "any") query
+      ("true" "org") (sql/merge-where query [:<> nil :org_id])
+      ("false" "manual") (sql/merge-where query [:= nil :org_id])
+      (sql/merge-where query [:= :org_id (str qp)]))))
 
+(defn filter-for-including-user-by-email [query email-term]
+  (-> query
+      (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
+      (sql/merge-join :users [:= :groups_users.user_id :users.id])
+      (sql/merge-where [:= (sql/call :lower email-term) (sql/call :lower :users.email)])))
+
+(defn filter-for-including-user-by-id [query id-term]
+  (-> query
+      (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
+      (sql/merge-join :users [:= :groups_users.user_id :users.id])
+      (sql/merge-where [:= (sql/call :cast id-term :uuid) :users.id])))
+
+(defn filter-for-including-user
+  [query {{user-term :including-user} :query-params :as request}]
+  (cond
+    (nil? (presence user-term)) query
+    (clojure.string/includes? user-term "@") (filter-for-including-user-by-email
+                                               query user-term)
+    (re-matches uuid-pattern user-term) (filter-for-including-user-by-id
+                                          query user-term)
+    :else (sql/merge-where query false)))
 
 (defn select-fields [query request]
   (if-let [fields (some->> request :query-params :fields
@@ -77,7 +100,8 @@
     (-> groups-base-query
         (set-per-page-and-offset query-params)
         (term-fitler request)
-        (type-filter request)
+        (org-filter request)
+        (filter-for-including-user request)
         (select-fields request))))
 
 (defn groups-formated-query [request]

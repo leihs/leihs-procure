@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.delegation.front
+(ns leihs.admin.resources.delegations.delegation.front
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -11,7 +11,7 @@
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.front :as users]
@@ -213,16 +213,15 @@
 
 (defn choose-responsible-user-page []
   [:div
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/delegations-li)
+   [breadcrumbs/nav-component
+     [[breadcrumbs/leihs-li]
+      [breadcrumbs/admin-li]
+      [breadcrumbs/delegations-li]
       (when @delegation-id*
-        (breadcrumbs/delegation-li @delegation-id*))
+        [breadcrumbs/delegation-li @delegation-id*])
       (if @delegation-id*
-        (breadcrumbs/delegation-edit-li @delegation-id*)
-        (breadcrumbs/delegation-add-li))]
-     [])
+        [breadcrumbs/delegation-edit-li @delegation-id*]
+        [breadcrumbs/delegation-add-li])][]]
    [:h1 "Choose Responsible User"]
    [users/main-page-content-component colconfig]])
 
@@ -248,9 +247,7 @@
 (defn delegation-component []
   [:div.delegation-component
    (if (nil?  @delegation-data*)
-     [:div.text-center
-      [:i.fas.fa-spinner.fa-spin.fa-5x]
-      [:span.sr-only "Please wait"]]
+     [wait-component]
      [:div
       [:div.row.mt-4
        [:div.col-lg-12.mt-2 [basic-component]]]
@@ -258,7 +255,7 @@
       (when-not @edit-mode?*
         [additional-properties-component])])])
 
-(defn delegation-name-component []
+(defn name-component []
   (if-not @delegation-data*
     [:span {:style {:font-family "monospace"}} (short-id @delegation-id*)]
     [:em (str (:name @delegation-data*))]))
@@ -273,19 +270,20 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/delegations-li)
-      (breadcrumbs/delegation-li @delegation-id*)]
-     [(breadcrumbs/delegation-users-li @delegation-id*)
-      (breadcrumbs/delegation-delete-li @delegation-id*)
-      (breadcrumbs/delegation-edit-li @delegation-id*)])
+   [breadcrumbs/nav-component
+     [[breadcrumbs/leihs-li]
+      [breadcrumbs/admin-li]
+      [breadcrumbs/delegations-li]
+      [breadcrumbs/delegation-li @delegation-id*]]
+     [[breadcrumbs/delegation-users-li @delegation-id*]
+      [breadcrumbs/delegation-groups-li @delegation-id*]
+      [breadcrumbs/delegation-delete-li @delegation-id*]
+      [breadcrumbs/delegation-edit-li @delegation-id*]]]
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Delegation "]
-      [delegation-name-component]]
+      [name-component]]
      [delegation-id-component]]]
    [delegation-component]
    [debug-component]])
@@ -323,17 +321,17 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/delegations-li)
-      (breadcrumbs/delegation-li @delegation-id*)
-      (breadcrumbs/delegation-edit-li @delegation-id*)][])
+   [breadcrumbs/nav-component
+    [(breadcrumbs/leihs-li)
+     (breadcrumbs/admin-li)
+     (breadcrumbs/delegations-li)
+     (breadcrumbs/delegation-li @delegation-id*)
+     (breadcrumbs/delegation-edit-li @delegation-id*)][]]
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Edit Delegation "]
-      [delegation-name-component]]
+      [name-component]]
      [delegation-id-component]]]
    [delegation-component]
    [patch-submit-component]
@@ -451,7 +449,7 @@
       [breadcrumbs/delegation-delete-li @delegation-id*]]]
     [:nav.col-lg {:role :navigation}]]
    [:h1 "Delete Delegation "
-    [delegation-name-component]]
+    [name-component]]
    [delegation-id-component]
    [delete-without-reasignment-component]
    ])

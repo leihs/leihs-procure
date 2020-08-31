@@ -12,7 +12,7 @@
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
     [leihs.core.icons :as icons]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
@@ -103,9 +103,7 @@
 (defn group-component []
   [:div.group-component
    (if (nil?  @group-data*)
-     [:div.text-center
-      [:i.fas.fa-spinner.fa-spin.fa-5x]
-      [:span.sr-only "Please wait"]]
+     [wait-component]
      [:div
       [:div [basic-component]]
       [:div [additional-properties-component]]])])

@@ -42,7 +42,7 @@ jobs:
         traits:
           JDK 8: true
           Leiningen 2: true
-          Firefox ESR 45: true
+          Firefox ESR 78: true
         ports:
           LEIHS_ADMIN_HTTP_PORT:
             min: 3000

@@ -24,7 +24,7 @@ feature 'Manage delegations', type: :feature do
     end
 
 
-    scenario 'adding a new delegation ' do 
+    scenario 'adding a new delegation ' do
 
       click_on 'Delegations'
       click_on 'Add delegation'
@@ -32,17 +32,17 @@ feature 'Manage delegations', type: :feature do
 
       click_on 'Choose responsible user'
 
-      #there should be many to coose from 
-      wait_until do 
+      #there should be many to coose from
+      wait_until do
         all('a', text: 'Choose as responsible user').count > 1
       end
 
       @delegator = @users.first
 
-      # test filtering by term 
-      fill_in 'term', with: "#{@delegator.firstname} #{@delegator.lastname}"
+      # test filtering by term
+      fill_in 'Fuzzy and email search', with: "#{@delegator.firstname} #{@delegator.lastname}"
 
-      wait_until do 
+      wait_until do
         all('a', text: 'Choose as responsible user').count == 1
       end
       click_on 'Choose as responsible user'
@@ -50,10 +50,10 @@ feature 'Manage delegations', type: :feature do
 
       # the delegator has been added to the users of the delegation by default
       click_on 'Users'
-      expect(page).to have_content '1 User in Delegation Zuckerberg'
+      wait_until { all("tbody.users tr.user").count == 1} # exactly 1 user
       expect(page).to have_content @delegator.firstname
       expect(page).to have_content @delegator.lastname
-      expect(page).to have_content 'Remove'
+      expect(page).to have_content 'remove'
 
       # the delegation can be found by filtering
       click_on_first ('Delegations')

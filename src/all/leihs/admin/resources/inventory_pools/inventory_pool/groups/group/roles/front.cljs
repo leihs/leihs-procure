@@ -15,7 +15,7 @@
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
      [leihs.admin.resources.group.front.shared :as group :refer [group-id* group-data*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
      [accountant.core :as accountant]
@@ -23,6 +23,9 @@
      [cljs.pprint :refer [pprint]]
      [reagent.core :as reagent]))
 
+
+
+(defonce changed?* (reagent/atom false))
 
 (defonce inventory-pool-group-roles-data* (reagent/atom nil))
 
@@ -60,6 +63,7 @@
 
 
 (defn clean-and-fetch []
+  (reset! changed?* false)
   (reset! inventory-pool-group-roles-data* nil)
   (fetch-inventory-pool-group-roles)
   (group/clean-and-fetch)
@@ -79,21 +83,23 @@
                                :retry-fn #'put}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
-          (clean-and-fetch)))))
+          (when (= (:status resp) 204)
+            (reset! changed?* false))))))
 
 (defn put-submit-component []
   [:div
    [:div.float-right
     [:button.btn.btn-warning
-     {:on-click put}
+     {:on-click put
+      :disabled (not @changed?*)}
      [:i.fas.fa-save]
      " Save "]]
    [:div.clearfix]])
 
 (defn on-change-handler [role]
+  (reset! changed?* true)
   (swap! inventory-pool-group-roles-data*
          (fn [data role]
-           (console.log (clj->js role))
            (let [new-role-state (-> data
                                     (get-in [:roles role])
                                     boolean not)]
@@ -110,30 +116,19 @@
          role))
 
 (defn header-component []
-  [:h1 "Group Roles for "
+  [:h1 "Roles for the group "
    [:a {:href (path :group {:group-id @group-id*})}
     [group/group-name-component]]
-   " in "
+   " in the inventory-pool "
    [:a {:href (path :inventory-pool
                     {:inventory-pool-id @inventory-pool/inventory-pool-id*})}
-    [inventory-pool/inventory-pool-name-component]]])
+    [inventory-pool/name-component]]])
 
 (defn roles-component []
-  [:div
-   (doall (for [role roles-hierarchy]
-            [:div.form-group
-             {:key role}
-             [:div.form-check
-              [:input.formp-check-input
-               {:id role
-                :type :checkbox
-                :checked (get-in @inventory-pool-group-roles-data* [:roles role])
-                :on-change (fn [e] (on-change-handler role))
-                :disabled (not @edit-mode?*)
-                }]
-              [:label.form-check-label
-               {:for role}
-               [:span " " role]]]]))])
+  [roles/roles-component
+   @inventory-pool-group-roles-data*
+   {:edit-mode?  @edit-mode?*
+    :on-change-handler on-change-handler}])
 
 
 (defn page []

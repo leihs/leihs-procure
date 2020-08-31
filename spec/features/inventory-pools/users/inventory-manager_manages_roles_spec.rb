@@ -21,60 +21,45 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Users"
-      fill_in 'users-search-term', with: @users.first.lastname
+      fill_in 'users-search-term', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
-      click_on "none"
-      @user_overview_page = current_path
+      within_first("td.direct-roles", text: 'add'){ click_on 'add' }
 
-      click_on_first "Direct Roles"
       check "customer"
       click_on "Save"
-      wait_until { current_path == @user_overview_page }
-      click_on_first "Direct Roles"
+
+      # check on user page
+      find("i.fa-user").click
+      within ".effective-roles" do
+        expect(find_field('customer', disabled: true)).to be_checked
+      end
+      within ".direct-roles" do
+        expect(find_field('customer', disabled: true)).to be_checked
+      end
+
+      # role to inventory_manager
+      within(".direct-roles"){ click_on "edit"}
       check "inventory_manager"
       click_on "Save"
+      find("i.fa-user").click
+      within ".direct-roles" do
+        ['customer', 'group_manager', 'lending_manager', 'inventory_manager'].each do |role|
+          expect(find_field(role, disabled: true)).to be_checked
+        end
+      end
 
       click_on "Users"
-      visit current_path # force full reload to make sure we not only see a fiction of the SPA
-      # test filtering by role:
-      select 'inventory_manager', from: 'Role'
-      wait_until { all("table.users tbody tr").count == 2 }
-      # the following also tests the current hierarchy within roles and will
-      # break once we change that
-      expect(page.find("table.users")).to have_content "customer"
-      expect(page.find("table.users")).to have_content "group_manager"
-      expect(page.find("table.users")).to have_content "lending_manager"
-      expect(page.find("table.users")).to have_content "inventory_manager"
-
-
-      # now remove all roles again
-      visit @user_overview_page
-      click_on_first "Direct Roles"
-      expect(page).to have_field('customer', checked: true)
-      expect(page).to have_field('group_manager', checked: true)
-      expect(page).to have_field('lending_manager', checked: true)
-      expect(page).to have_field('inventory_manager', checked: true)
-      uncheck "customer"
-      # this uses the hierarchy
-      expect(page).to have_field('customer', checked: false)
-      expect(page).to have_field('group_manager', checked: false)
-      expect(page).to have_field('lending_manager', checked: false)
-      expect(page).to have_field('inventory_manager', checked: false)
-
-      click_on "Save"
-      wait_until { current_path == @user_overview_page }
-      click_on "Users"
-      fill_in 'users-search-term', with: @users.first.lastname
+      fill_in 'users-search-term', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
-      expect(page.find("table.users")).not_to have_content "customer"
+      expect(find("table.users")).to have_content "customer"
+      # quick remove all roles
+      within("table.users") { click_on 'remove' }
+      wait_until do
+        not find("table.users").has_content? "customer"
+      end
 
     end
   end
 end
-
-
-
-
-

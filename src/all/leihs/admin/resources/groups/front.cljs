@@ -8,13 +8,14 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
-    [leihs.admin.utils.seq :refer [with-index]]
+    [leihs.admin.utils.seq :as seq]
     [leihs.admin.resources.groups.shared :as shared]
 
     [accountant.core :as accountant]
@@ -61,9 +62,12 @@
                     (let [body (-> resp :body)
                           page (:page normalized-query-params)
                           per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))
-                          body-with-indexed-groups (update-in body [:groups] (partial with-index offset))]
-                      (swap! data* assoc url body-with-indexed-groups))))))))))
+                          offset (* per-page (- page 1))]
+                      (swap! data* assoc url
+                             (-> body
+                                 (update-in [:groups] (partial seq/with-index offset))
+                                 (update-in [:groups] (partial seq/with-page-index))
+                                 (update-in [:groups] #(into [] %)))))))))))))
 
 (defn escalate-query-paramas-update [_]
   (fetch-groups)
@@ -84,7 +88,7 @@
 
 (defn form-term-filter []
   [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :groups-search-term} "Search term"]
+   [:label {:for :groups-search-term} "Search term"]
    [:input#groups-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
      :placeholder "Search term ..."
@@ -94,50 +98,41 @@
                     (accountant/navigate! (page-path-for-query-params
                                             {:page 1 :term val}))))}]])
 
-(defn form-type-filter []
-  (let [type (or (-> @current-query-paramerters-normalized* :type presence) "any")]
+(defn form-including-user-filter []
+[:div.form-group.ml-2.mr-2.mt-2
+   [:label {:for :groups-including-user} "Including User"]
+   [:input#groups-including-user.form-control.mb-1.mr-sm-1.mb-sm-0
+    {:type :text
+     :placeholder "ID or E-Mail Address"
+     :value (or (-> @current-query-paramerters-normalized* :including-user presence) "")
+     :on-change (fn [e]
+                  (let [val (or (-> e .-target .-value presence) "")]
+                    (accountant/navigate! (page-path-for-query-params
+                                            {:page 1 :including-user val}))))}]])
+
+(defn form-org-filter []
+  (let [org-id (some-> @current-query-paramerters-normalized* :org_id)]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :groups-filter-type} "Type"]
-     [:select#groups-filter-type.form-control
-      {:value type
+     [:label.mr-1 {:for :groups-filter-org-id} "Org id"]
+     [:input#groups-filter-org-id.form-control
+      {:type :text
+       :value org-id
+       :placeholder "org_id or true or false"
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
-                                               :type val}))))}
-      (for [t ["any" "org" "manual"]]
-        [:option {:key t :value t} t])]]))
-
-(defn form-per-page []
-  (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :groups-filter-per-page} "Per page"]
-     [:select#groups-filter-per-page.form-control
-      {:value per-page
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "12")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :per-page val}))))}
-      (for [p [12 25 50 100 250 500 1000]]
-        [:option {:key p :value p} p])]]))
-
-(defn form-reset []
-  [:div.form-group.mt-2
-   [:label.sr-only {:for :groups-filter-reset} "Reset"]
-   [:a#groups-filter-reset.btn.btn-warning
-    {:href (page-path-for-query-params shared/default-query-parameters)}
-    [:i.fas.fa-times]
-    " Reset "]])
+                                               :org_id val}))))}]]))
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
-    [form-term-filter]
-    [form-type-filter]
-    [form-per-page]
-    [form-reset]]]])
+   [:div.form-row
+    [:div.col-auto [form-term-filter]]
+    [:div.col-auto [form-including-user-filter]]
+    [:div.col-auto [form-org-filter]]
+    [:div.col-auto [routing/form-per-page-component]]
+    [:div.col-auto [routing/form-reset-component]]]]])
 
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -170,9 +165,7 @@
 
 (defn groups-table-component [& [hds tds]]
   (if-not (contains? @data* @current-url*)
-    [:div.text-center
-     [:i.fas.fa-spinner.fa-spin.fa-5x]
-     [:span.sr-only "Please wait"]]
+    [wait-component]
     (if-let [groups (-> @data* (get  @current-url* {}) :groups seq)]
       [:table.groups.table.table-striped.table-sm
        [groups-thead-component hds]
@@ -184,20 +177,6 @@
       [:div.alert.alert-warning.text-center "No (more) groups found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn pagination-component []
-  [:div.clearfix.mt-2.mb-2
-   (let [page (dec (:page @current-query-paramerters-normalized*))]
-     [:div.float-left
-      [:a.btn.btn-primary.btn-sm
-       {:class (when (< page 1) "disabled")
-        :href (page-path-for-query-params {:page page})}
-       [:i.fas.fa-arrow-circle-left] " Previous " ]])
-   [:div.float-right
-    [:a.btn.btn-primary.btn-sm
-     {:href (page-path-for-query-params
-              {:page (inc (:page @current-query-paramerters-normalized*))})}
-     " Next " [:i.fas.fa-arrow-circle-right]]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -220,9 +199,9 @@
     {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
-   [pagination-component]
+   [routing/pagination-component]
    [groups-table-component]
-   [pagination-component]
+   [routing/pagination-component]
    [debug-component]])
 
 (defn page []

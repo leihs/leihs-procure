@@ -1,4 +1,6 @@
-(ns leihs.admin.resources.users.shared)
+(ns leihs.admin.resources.users.shared
+  (:require
+    [leihs.admin.defaults :as defaults]))
 
 (def default-fields
   #{
@@ -38,11 +40,13 @@
     :zip
     })
 
-(def default-query-parameters {:is_admin nil
-                               :page 1
-                               :per-page 12
-                               :term ""
-                               :type "any" })
+(def default-query-params
+  {:account_enabled nil
+   :is_admin nil
+   :org_id nil
+   :page 1
+   :per-page defaults/PER-PAGE
+   :term "" })
 
 (defn normalized-query-parameters [query-params]
-  (merge default-query-parameters query-params))
+  (merge default-query-params query-params))

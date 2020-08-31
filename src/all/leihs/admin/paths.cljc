@@ -5,6 +5,7 @@
     [leihs.core.paths]
     [leihs.core.url.query-params :as query-params]
 
+    [leihs.admin.resources.delegations.paths :as delegations]
     [leihs.admin.resources.system.paths :as system]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
     [leihs.admin.resources.inventory.paths :as inventory]
@@ -40,26 +41,6 @@
     :my-user
     :procurement
     })
-
-(def delegation-paths
-  (branch "/delegations"
-          (leaf "/" :delegations)
-          (branch "/add"
-                  (leaf "" :delegation-add)
-                  (leaf "/choose-responsible-user" :delegation-add-choose-responsible-user))
-          (branch "/"
-                  (param :delegation-id)
-                  (leaf "" :delegation)
-                  (leaf "/delete" :delegation-delete)
-                  (branch "/edit"
-                          (leaf "" :delegation-edit)
-                          (leaf "/choose-responsible-user" :delegation-edit-choose-responsible-user))
-                  (branch "/users"
-                          (leaf "/" :delegation-users)
-                          (leaf "/add" :delegation-users-add)
-                          (branch "/"
-                                  (param :user-id)
-                                  (leaf "" :delegation-user))))))
 
 (def users-paths
   (branch "/users"
@@ -100,11 +81,11 @@
           (branch "/admin"
                   (leaf "/status" :status)
                   (leaf "/debug" :debug)
-                  delegation-paths
+                  delegations/paths
                   groups-paths
-                  system/paths
-                  inventory/paths
                   inventory-pools/paths
+                  inventory/paths
+                  system/paths
                   users-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)

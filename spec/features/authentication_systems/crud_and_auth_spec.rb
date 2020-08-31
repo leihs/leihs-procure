@@ -42,8 +42,8 @@ feature 'Authentication-Systems', type: :feature do
       expect(page).to have_content /internal_private_key\s+INT PRIV-KEY/
       expect(page).to have_content /internal_public_key\s+INT PUB-KEY/
       expect(page).to have_content /external_public_key\s+EXT PUB-KEY/
-      expect(page).to have_content %{external_sign_in_url http://exsys/sign-in}
-      expect(page).to have_content %{external_sign_out_url http://exsys/sign-out}
+      expect(page).to have_content %r{external_sign_in_url\s+http://exsys/sign-in}
+      expect(page).to have_content %r{external_sign_out_url\s+http://exsys/sign-out}
 
       click_on 'Edit'
       fill_in 'description', with: 'baz bar foo'

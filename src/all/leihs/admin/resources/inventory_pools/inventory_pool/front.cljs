@@ -41,9 +41,7 @@
          (boolean ((set '(:inventory-pool-edit :inventory-pool-add))
                    (:handler-key @routing/state*))))))
 
-(defn inventory-pool-name-component []
-  (when @inventory-pool-data*
-    [:em (str (:name @inventory-pool-data*))]))
+
 
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,6 +81,13 @@
 
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn name-component []
+  [:span
+   {:did-mount fetch-inventory-pool
+    :did-change fetch-inventory-pool}
+   (when @inventory-pool-data*
+     [:em (str (:name @inventory-pool-data*))])])
 
 (defn inventory-pool-component []
   [:div.inventory-pool
@@ -134,7 +139,7 @@
     [:div.col-lg
      [:h1
       [:span " Edit Inventory-Pool "]
-      [inventory-pool-name-component]]]]
+      [name-component]]]]
    [:div.form
     [inventory-pool-component]
     [patch-submit-component]]
@@ -228,7 +233,7 @@
       [breadcrumbs/inventory-pool-delete-li @inventory-pool-id*]]]
     [:nav.col-lg {:role :navigation}]]
    [:h1 "Delete Inventory-Pool "
-    [inventory-pool-name-component]]
+    [name-component]]
    [delete-submit-component]])
 
 
@@ -238,7 +243,7 @@
      [:p
       (when true
         [:a {:href (str "/manage/inventory_pools/" @inventory-pool-id* "/edit")}
-         "Edit " [inventory-pool-name-component]
+         "Edit " [name-component]
          " in the leihs-legacy interface. "])])])
 
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -256,12 +261,14 @@
      [(breadcrumbs/inventory-pool-delete-li @inventory-pool-id*)
       (breadcrumbs/inventory-pool-edit-li @inventory-pool-id*)
       (breadcrumbs/inventory-pool-users-li @inventory-pool-id*)
-      (breadcrumbs/inventory-pool-groups-li @inventory-pool-id*)])
+      (breadcrumbs/inventory-pool-groups-li @inventory-pool-id*)
+      (breadcrumbs/inventory-pool-entitlement-groups-li @inventory-pool-id*)
+      ])
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Inventory-Pool "]
-      [inventory-pool-name-component]]]]
+      [name-component]]]]
    [link-to-legacy-component]
    [inventory-pool-component]
    [debug-component]])

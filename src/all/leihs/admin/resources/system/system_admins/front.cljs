@@ -39,8 +39,8 @@
   [:div.card.bg-light
    [:div.card-body
    [:div.form-inline
-    [users/form-per-page]
-    [users/form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;### main #####################################################################
@@ -56,9 +56,9 @@
    [routing/hidden-state-component
     {:did-change users/escalate-query-paramas-update}]
    [filter-component]
-   [users/pagination-component]
+   [routing/pagination-component]
    [users/users-table-component colconfig]
-   [users/pagination-component]
+   [routing/pagination-component]
    [debug-component]
    [users/debug-component]])
 

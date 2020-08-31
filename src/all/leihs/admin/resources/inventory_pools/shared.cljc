@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.paths :refer [path]]))
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.defaults :as defaults]))
 
 (def default-fields
   #{
@@ -35,9 +36,14 @@
     })
 
 
-(def default-query-parameters {:page 1 :per-page 12 :is-active :all :order [["name" "asc"] ["id" "asc"]] :term nil})
+(def default-query-params
+  {:page 1
+   :per-page defaults/PER-PAGE
+   :is-active :all
+   :order [["name" "asc"] ["id" "asc"]]
+   :term nil})
 
 (def inventory-pool-path (path :inventory-pool {:inventory-pool-id ":inventory-pool-id"}))
 
 (defn normalized-query-parameters [query-params]
-  (merge default-query-parameters query-params))
+  (merge default-query-params query-params))

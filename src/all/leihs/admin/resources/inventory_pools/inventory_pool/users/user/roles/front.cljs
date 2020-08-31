@@ -15,7 +15,7 @@
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
      [accountant.core :as accountant]
@@ -95,7 +95,6 @@
 (defn on-change-handler [role]
   (swap! inventory-pool-user-roles-data*
          (fn [data role]
-           (console.log (clj->js role))
            (let [new-role-state (-> data
                                     (get-in [:roles role])
                                     boolean not)]
@@ -115,7 +114,7 @@
   [:h1 "Roles for "
    [user/user-name-component]
    " in "
-   [inventory-pool/inventory-pool-name-component]])
+   [inventory-pool/name-component]])
 
 (defn remarks-component []
   [:div
@@ -128,22 +127,9 @@
     " and will be removed in future versions of leihs. "]])
 
 (defn roles-component []
-  [:div
-   (doall (for [role roles-hierarchy]
-            [:div.form-group
-             {:key role}
-             [:div.form-check
-              [:input.formp-check-input
-               {:id role
-                :type :checkbox
-                :checked (get-in @inventory-pool-user-roles-data* [:roles role])
-                :on-change (fn [e] (on-change-handler role))
-                :disabled (not @edit-mode?*)
-                }]
-              [:label.form-check-label
-               {:for role}
-               [:span " " role]]]]))])
-
+  [roles/roles-component @inventory-pool-user-roles-data*
+   {:edit-mode? @edit-mode?*
+    :on-change-handler on-change-handler}])
 
 (defn page []
   [:div.inventory-pool-user-roles

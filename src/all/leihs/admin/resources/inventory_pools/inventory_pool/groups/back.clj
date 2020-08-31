@@ -3,8 +3,9 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
     [leihs.admin.resources.groups.back :as groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
     [leihs.admin.utils.jdbc :as utils.jdbc]
@@ -18,24 +19,7 @@
     [logbug.debug :as debug]
     ))
 
-(defn normalized-inventory-pool-id! [inventory-pool-id tx]
-  "Get the id, i.e. the pkey, given either the id or the org_id and
-  enforce some sanity checks like uniqueness and presence"
-  (assert (presence inventory-pool-id) "inventory-pool-id must not be empty!")
-  (let [inventory-pool-id (str inventory-pool-id)
-        where-clause  (if (re-matches regex/uuid-pattern inventory-pool-id)
-                        [:or
-                         [:= :inventory-pools.id inventory-pool-id]
-                         [:= :inventory-pools.name inventory-pool-id]])
-        ids (->> (-> (sql/select :id)
-                     (sql/from :inventory-pools)
-                     (sql/merge-where where-clause)
-                     sql/format)
-                 (jdbc/query tx)
-                 (map :id))]
-    (assert (= 1 (count ids))
-            "exactly one inventory-pool must match the given inventory-pool-id either name, or id")
-    (first ids)))
+
 
 ;;; groups ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -77,13 +61,6 @@
       (filter-by-role inventory-pool-id request)))
 
 
-(defn inventory-pool-groups-count-query [inventory-pool-id]
-  (-> (sql/select :%count.*)
-      (sql/from :group_access_rights)
-      (sql/merge-where
-        [:= :group_access_rights.inventory_pool_id inventory-pool-id])
-      (sql/format)))
-
 (defn groups-formated-query [inventory-pool-id request]
   (-> (groups-query inventory-pool-id request)
       sql/format))
@@ -110,10 +87,7 @@
                tx :tx :as request}]
   (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)]
     {:body
-     {:inventory-pool_groups_count (->> (inventory-pool-groups-count-query inventory-pool-id)
-                                        (jdbc/query tx)
-                                        first :count)
-      :groups (->> (groups-formated-query inventory-pool-id request)
+     {:groups (->> (groups-formated-query inventory-pool-id request)
                    (jdbc/query tx)
                    (map (fn [group] (group-add-roles tx inventory-pool-id group)))
                    doall)}}))

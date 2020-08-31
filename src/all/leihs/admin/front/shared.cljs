@@ -34,3 +34,8 @@
          "https://www.gravatar.com/avatar/%s?s=%d&d=retro"
          md5 size)))))
 
+
+(defn wait-component []
+  [:div.text-center
+   [:i.fas.fa-spinner.fa-spin.fa-5x]
+   [:span.sr-only "Please wait"]])

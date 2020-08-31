@@ -15,7 +15,7 @@
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
      [accountant.core :as accountant]
@@ -74,7 +74,7 @@
   [:h1 "Group Roles for "
    [user/user-name-component]
    " in "
-   [inventory-pool/inventory-pool-name-component]])
+   [inventory-pool/name-component]])
 
 (defn groups-roles-component []
   [:div.groups-roles-component
@@ -85,29 +85,17 @@
    (doall
      (for [group-roles @inventory-pool-user-groups-roles-data*]
        [:div {:key (:group_id group-roles)}
-        [:h3 [:span
-              [:a {:href (path :inventory-pool-group-roles
-                               {:inventory-pool-id  @inventory-pool/inventory-pool-id*
-                                :group-id (:group_id group-roles)})}
-               "Roles " icons/edit]
-              " via group "
-              [:a {:href (path :group {:group-id (:group_id group-roles)})}
-               [:em (:group_name group-roles)]]
-              ]]
-        [:div
-         (doall
-           (for [role roles-hierarchy]
-             [:div.form-group
-              {:key role}
-              [:div.form-check
-               [:input.formp-check-input
-                {:id role
-                 :type :checkbox
-                 :checked (get-in group-roles [:role role])
-                 ;:on-change (fn [e] (on-change-handler role))
-                 :disabled true }]
-               [:label.form-check-label
-                {:for role}
-                [:span " " role]]]]))]]))])
+        [:h4.mb-0.mt-3
+         "Roles "
+         [:span
+          [:a.btn.btn-outline-primary.btn-sm
+           {:href (path :inventory-pool-group-roles
+                        {:inventory-pool-id  @inventory-pool/inventory-pool-id*
+                         :group-id (:group_id group-roles)})}
+           icons/edit " edit "]
+          " via the group "
+          [:a {:href (path :group {:group-id (:group_id group-roles)})}
+           [:em (:group_name group-roles)]]]]
+        [roles/roles-component group-roles]]))])
 
 

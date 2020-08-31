@@ -27,7 +27,7 @@ feature 'Manage users', type: :feature do
       visit '/admin/'
       click_on 'Users'
 
-      fill_in 'Search term', with: \
+      fill_in 'search', with: \
         "#{@user.firstname} #{@user.lastname}"
 
       click_on_first "#{@user.firstname} #{@user.lastname}"

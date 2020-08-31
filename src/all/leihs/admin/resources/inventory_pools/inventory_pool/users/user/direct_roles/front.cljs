@@ -15,7 +15,7 @@
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
      [leihs.admin.resources.user.front.shared :as user :refer [user-id* user-data*]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy allowed-roles-states]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy allowed-roles-states]]
      [leihs.admin.utils.regex :as regex]
 
      [accountant.core :as accountant]
@@ -25,6 +25,8 @@
 
 
 (defonce inventory-pool-user-direct-roles-data* (reagent/atom nil))
+
+(defonce changed?* (reagent/atom false))
 
 (def edit-mode?*
   (reaction
@@ -60,6 +62,7 @@
 
 
 (defn clean-and-fetch []
+  (reset! changed?* false)
   (reset! inventory-pool-user-direct-roles-data* nil)
   (fetch-inventory-pool-user-direct-roles)
   (user/clean-and-fetch)
@@ -80,22 +83,22 @@
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
           (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pool-user {:inventory-pool-id @inventory-pool-id* :user-id @user-id*})))))))
+            (reset! changed?* false))))))
 
 (defn put-submit-component []
   [:div
    [:div.float-right
     [:button.btn.btn-warning
-     {:on-click put}
+     {:on-click put
+      :disabled (not @changed?*)}
      [:i.fas.fa-save]
      " Save "]]
    [:div.clearfix]])
 
 (defn on-change-handler [role]
+  (reset! changed?* true)
   (swap! inventory-pool-user-direct-roles-data*
          (fn [data role]
-           (console.log (clj->js role))
            (let [new-role-state (-> data
                                     (get-in [:roles role])
                                     boolean not)]
@@ -115,25 +118,12 @@
   [:h1 "Direct Roles for "
    [user/user-name-component]
    " in "
-   [inventory-pool/inventory-pool-name-component]])
+   [inventory-pool/name-component]])
 
 (defn roles-component []
-  [:div
-   (doall (for [role roles-hierarchy]
-            [:div.form-group
-             {:key role}
-             [:div.form-check
-              [:input.formp-check-input
-               {:id role
-                :type :checkbox
-                :checked (get-in @inventory-pool-user-direct-roles-data* [:roles role])
-                :on-change (fn [e] (on-change-handler role))
-                :disabled (not @edit-mode?*)
-                }]
-              [:label.form-check-label
-               {:for role}
-               [:span " " role]]]]))])
-
+  [roles/roles-component @inventory-pool-user-direct-roles-data*
+   {:edit-mode?  @edit-mode?*
+    :on-change-handler on-change-handler}])
 
 (defn page []
   [:div.inventory-pool-user-direct-roles

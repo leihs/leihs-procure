@@ -20,14 +20,14 @@ feature 'Manage users', type: :feature do
     end
 
 
-    scenario 'deleting a user via delete ' do 
+    scenario 'deleting a user via delete ' do
 
       @to_be_deleted_user = @users.first
 
       visit '/admin/'
       click_on 'Users'
 
-      fill_in 'Search term', with: \
+      fill_in 'search', with: \
         "#{@to_be_deleted_user.firstname} #{@to_be_deleted_user.lastname}"
 
       click_on_first @to_be_deleted_user.lastname
@@ -46,14 +46,14 @@ feature 'Manage users', type: :feature do
 
 
 
-    scenario 'deleting a user via transfere and delete' do 
+    scenario 'deleting a user via transfere and delete' do
 
       @to_be_deleted_user = @users.first
 
       visit '/admin/'
       click_on 'Users'
 
-      fill_in 'Search term', with: \
+      fill_in 'search', with: \
         "#{@to_be_deleted_user.firstname} #{@to_be_deleted_user.lastname}"
 
       click_on_first @to_be_deleted_user.lastname

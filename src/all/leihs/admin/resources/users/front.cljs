@@ -6,13 +6,14 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.requests.core :as requests]
-    [leihs.core.routing.front :as routing]
 
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :as front-shared :refer [gravatar-url wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.core.routing.front :as routing]
 
     [leihs.admin.utils.seq :as seq]
     [leihs.admin.resources.users.shared :as shared]
@@ -66,7 +67,9 @@
                       (swap! data* assoc url
                              (-> body
                                  (update-in [:users] (partial seq/with-index offset))
-                                 (update-in [:users] (partial seq/with-key :id)))))))))))))
+                                 (update-in [:users] (partial seq/with-key :id))
+                                 (update-in [:users] (partial seq/with-page-index))
+                                 (update-in [:users] #(into [] %)))))))))))))
 
 (defn escalate-query-paramas-update [_]
   (fetch-users)
@@ -87,7 +90,7 @@
 
 (defn form-term-filter []
   [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :users-search-term} "Search term"]
+   [:label {:for :users-search-term} "Fuzzy and email search"]
    [:input#users-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
      :placeholder "Search term or e-mail ..."
@@ -97,70 +100,65 @@
                     (accountant/navigate! (page-path-for-query-params
                                             {:page 1 :term val}))))}]])
 
-(defn form-admins-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label
-    [:span.pr-1 "Admins only"]
-    [:input
-     {:type :checkbox
-      :on-change #(let [new-state (case (-> @current-query-paramerters-normalized*
-                                            :is_admin presence)
-                                    ("true" true) nil
-                                    true)]
-                    (js/console.log (with-out-str (pprint new-state)))
-                    (accountant/navigate! (page-path-for-query-params
-                                             {:page 1
-                                              :is_admin new-state})))
-      :checked (case (-> @current-query-paramerters-normalized*
-                         :is_admin presence)
-                 (nil false "false") false
-                 ("true" true) true)}]]])
 
-(defn form-type-filter []
-  (let [type (or (-> @current-query-paramerters-normalized* :type presence) "any")]
+(defn form-enabled-filter []
+  (let [enabled (or (some-> @current-query-paramerters-normalized* :account_enabled)
+                    "")]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-type} "Type"]
-     [:select#users-filter-type.form-control
-      {:value type
+     [:label.mr-1 {:for :users-filter-enabled} "Account enabled"]
+     [:select#users-filter-enabled.form-control
+      {:value enabled
        :on-change (fn [e]
                     (let [val (or (-> e .-target .-value presence) "")]
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
-                                               :type val}))))}
-      (for [t ["any" "org" "manual"]]
-        [:option {:key t :value t} t])]]))
+                                               :account_enabled val}))))}
+      (for [[n k] {"any" ""
+                   "yes" true
+                   "no" false}]
+        [:option {:key k :value k} n])]]))
 
-(defn form-per-page []
-  (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
+
+(defn form-admins-filter []
+  (let [is-admin (-> @current-query-paramerters-normalized* :is_admin)]
     [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-per-page} "Per page"]
-     [:select#users-filter-per-page.form-control
-      {:value per-page
+     [:label {:for :users-filter-is-admin} [:span.pr-1 "Is admin"]]
+     [:select#users-filter-is-admin.form-control
+      {:value is-admin
        :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "12")]
+                    (let [val (or (-> e .-target .-value presence) "")]
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
-                                               :per-page val}))))}
-      (for [p [12 25 50 100 250 500 1000]]
-        [:option {:key p :value p} p])]]))
+                                               :is_admin val}))))}
+      (for [[n k] {"any" ""
+                   "yes" true
+                   "no" false}]
+        [:option {:key k :value k} n])]]))
 
-(defn form-reset []
-  [:div.form-group.mt-2
-   [:label.sr-only {:for :users-filter-reset} "Reset"]
-   [:a#users-filter-reset.btn.btn-warning
-    {:href (page-path-for-query-params shared/default-query-parameters)}
-    [:i.fas.fa-times]
-    " Reset "]])
+(defn form-org-filter []
+  (let [org-id (some-> @current-query-paramerters-normalized* :org_id)]
+    [:div.form-group.ml-2.mr-2.mt-2
+     [:label.mr-1 {:for :users-filter-org-id} "Org id"]
+     [:input#users-filter-org-id.form-control
+      {:type :text
+       :value org-id
+       :placeholder "org_id or true or false"
+       :on-change (fn [e]
+                    (let [val (or (-> e .-target .-value presence) "")]
+                      (accountant/navigate! (page-path-for-query-params
+                                              {:page 1
+                                               :org_id val}))))}]]))
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
+   [:div.form-row
     [form-term-filter]
+    [form-org-filter]
+    [form-enabled-filter]
     [form-admins-filter]
-    [form-type-filter]
-    [form-per-page]
-    [form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -188,7 +186,7 @@
         [th {:key key}]))]])
 
 (defn user-row-component [colconfig user]
-  [:tr {:key (:id user)}
+  [:tr.user {:key (:id user)}
    [:td (user-link-component user (:index user))]
    [:td [:a {:href (path :user {:user-id (:id user)})}
          [:img
@@ -214,13 +212,11 @@
 
 (defn users-table-component [colconfig]
   (if-not (contains? @data* @current-url*)
-    [:div.text-center
-     [:i.fas.fa-spinner.fa-spin.fa-5x]
-     [:span.sr-only "Please wait"]]
+    [wait-component]
     (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
       [:table.table.table-striped.table-sm.users
        [users-thead-component colconfig]
-       [:tbody
+       [:tbody.users
         (let [page (:page @current-query-paramerters-normalized*)
               per-page (:per-page @current-query-paramerters-normalized*)]
           (doall (for [user users]
@@ -229,25 +225,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn pagination-component []
-  [:div.clearfix.mt-2.mb-2
-   (let [page (dec (:page @current-query-paramerters-normalized*))]
-     [:div.float-left
-      [:a.btn.btn-primary.btn-sm
-       {:class (when (< page 1) "disabled")
-        :href (page-path-for-query-params {:page page})}
-       [:i.fas.fa-arrow-circle-left] " Previous " ]])
-   [:div.float-right
-    [:a.btn.btn-primary.btn-sm
-     {:href (page-path-for-query-params
-              {:page (inc (:page @current-query-paramerters-normalized*))})}
-     " Next " [:i.fas.fa-arrow-circle-right]]]])
-
 (defn debug-component []
   (when (:debug @state/global-state*)
     [:section.debug
      [:hr]
-     [:h2 "Page Debug"]
+     [:h2 "Users Debug"]
      [:div
       [:h3 "@current-query-paramerters-normalized*"]
       [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
@@ -264,9 +246,9 @@
     {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
-   [pagination-component]
+   [routing/pagination-component]
    [users-table-component colconfig]
-   [pagination-component]
+   [routing/pagination-component]
    [debug-component]])
 
 (defn page []

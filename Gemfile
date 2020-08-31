@@ -1,6 +1,8 @@
 eval_gemfile 'database/Gemfile'
 
-gem 'capybara', '2.18.0'
+gem 'capybara', '~> 3.8'
+#gem 'factory_bot', '~> 4.8'
 gem 'faraday'
 gem 'faraday_middleware'
-gem 'selenium-webdriver', '~> 2.53'
+gem 'geckodriver-helper'
+gem 'selenium-webdriver', '~> 3.14'

@@ -40,6 +40,12 @@
     {:allowed? true}
     {:allowed? false}))
 
+(defn pool-inventory-manager? [request]
+  (if (if-let [access-right (pool-access-right-for-route request)]
+        (#{"inventory_manager"} (:role access-right))
+        false)
+    {:allowed? true}
+    {:allowed? false}))
 
 ;#### debug ###################################################################
 ;(logging-config/set-logger! :level :debug)

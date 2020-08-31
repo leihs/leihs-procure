@@ -61,13 +61,21 @@
       (match-term-fuzzy query term))
     query))
 
-(defn type-filter [query request]
-  (case (-> request :query-params :type)
-    (nil "any") query
-    "org" (-> query
-              (sql/merge-where [:<> nil :org_id]))
-    "manual" (-> query
-                 (sql/merge-where [:= nil :org_id]))))
+(defn org-filter [query request]
+  (let [qp (presence (or (some-> request :query-params-raw :org_id)
+               (some-> request :query-params-raw :type)))]
+    (case qp
+      (nil "any") query
+      ("true" "org") (sql/merge-where query [:<> nil :org_id])
+      ("false" "manual") (sql/merge-where query [:= nil :org_id])
+      (sql/merge-where query [:= :org_id (str qp)]))))
+
+(defn account-enabled-filter [query request]
+  (let [qp  (some-> request :query-params :account_enabled)]
+    (case qp
+      (nil "any") query
+      (true "true") (sql/merge-where query [:= true :account_enabled])
+      (false "false") (sql/merge-where query [:= false :account_enabled]))))
 
 (defn admins-filter [query request]
   (let [is-admin (-> request :query-params :is_admin)]
@@ -88,7 +96,8 @@
     (-> users-base-query
         (set-per-page-and-offset query-params)
         (term-filter request)
-        (type-filter request)
+        (org-filter request)
+        (account-enabled-filter request)
         (admins-filter request)
         (select-fields request))))
 
@@ -109,9 +118,9 @@
     (cpj/POST (path :users) [] #'user/routes)))
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
-;(debug/debug-ns *ns*)
-
 ;(logging-config/set-logger! :level :debug)
-(debug/wrap-with-log-debug #'term-filter)
+;(debug/debug-ns *ns*)
+;(logging-config/set-logger! :level :debug)
+;(debug/wrap-with-log-debug #'org-filter)
+;(debug/wrap-with-log-debug #'users-formated-query)
 ;(debug/wrap-with-log-debug #'users-formated-query)

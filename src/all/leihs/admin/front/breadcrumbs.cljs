@@ -25,8 +25,10 @@
   [li :delegation-users
       [:span icons/users " Users "]
       {:delegation-id delegation-id} {}])
+(defn delegation-groups-li [delegation-id]
+  [li :delegation-groups [:span icons/groups " Groups"]
+   {:delegation-id delegation-id} {}])
 (defn delegations-li [] [li :delegations [:span icons/delegations " Delegations "]])
-
 
 (defn group-add-li [] [li :group-add [:span [:i.fas.fa-plus-circle] " Add group "]])
 (defn group-delete-li [id] [li :group-delete [:span [:i.fas.fa-times] " Delete "] {:group-id id} {}])
@@ -39,6 +41,10 @@
 (defn inventory-pool-add-li [] [li :inventory-pool-add [:span [:i.fas.fa-plus-circle] " Add Inventory-Pool "]])
 (defn inventory-pool-delete-li [id] [li :inventory-pool-delete [:span [:i.fas.fa-times] " Delete "] {:inventory-pool-id id} {}])
 (defn inventory-pool-edit-li [id] [li :inventory-pool-edit [:span [:i.fas.fa-edit] " Edit "] {:inventory-pool-id id} {}])
+(defn inventory-pool-entitlement-groups-li [inventory-pool-id] [li :inventory-pool-entitlement-groups [:span icons/entitlement-groups " Entitlement-Groups "] {:inventory-pool-id inventory-pool-id} {}])
+(defn inventory-pool-entitlement-group-li [inventory-pool-id entitlement-group-id] [li :inventory-pool-entitlement-group [:span " Entitlement-Group "] {:inventory-pool-id inventory-pool-id :entitlement-group-id entitlement-group-id} {}])
+(defn inventory-pool-entitlement-group-users-li [inventory-pool-id entitlement-group-id] [li :inventory-pool-entitlement-group-users [:span " Entitlement-Group Users"] {:inventory-pool-id inventory-pool-id :entitlement-group-id entitlement-group-id} {}])
+(defn inventory-pool-entitlement-group-groups-li [inventory-pool-id entitlement-group-id] [li :inventory-pool-entitlement-group-groups [:span " Entitlement-Group Groups"] {:inventory-pool-id inventory-pool-id :entitlement-group-id entitlement-group-id} {}])
 (defn inventory-pool-group-li [inventory-pool-id group-id] [li :inventory-pool-group [:span icons/group " Group "] {:inventory-pool-id inventory-pool-id :group-id group-id} {}])
 (defn inventory-pool-group-roles-li [inventory-pool-id group-id] [li :inventory-pool-group-roles [:span icons/edit " Manage Group Roles "] {:inventory-pool-id inventory-pool-id :group-id group-id} {}])
 (defn inventory-pool-groups-li [inventory-pool-id] [li :inventory-pool-groups [:span icons/groups " Groups "] {:inventory-pool-id inventory-pool-id} {}])

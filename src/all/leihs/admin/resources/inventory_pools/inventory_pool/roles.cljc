@@ -46,3 +46,29 @@
   (->> roles-hierarchy
        (map (fn [r] [r (.contains roles r)]))
        (into {})))
+
+
+#?(:cljs
+   (defn roles-component
+     [data {edit-mode? :edit-mode?
+            on-change-handler :on-change-handler
+            ks :ks
+            :or {edit-mode? false
+                 on-change-handler nil
+                 ks [:roles]}}]
+     [:div.m-1
+      (doall (for [role roles-hierarchy]
+               (let [enabled (get-in data (conj ks role))]
+                 (if (and (not enabled) (not edit-mode?))
+                   [:div]
+                   [:div.form-check
+                    [:input.form-check-input
+                     {:id role
+                      :type :checkbox
+                      :checked enabled
+                      :on-change (fn [e] (on-change-handler role))
+                      :disabled (not edit-mode?)
+                      }]
+                    [:label.form-check-label
+                     {:for role}
+                     [:span " " role]]]))))]))

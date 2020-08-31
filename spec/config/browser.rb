@@ -9,20 +9,9 @@ def set_capybara_values
   Capybara.server_port = port
 end
 
-def set_browser(example)
-  Capybara.current_driver = \
-    begin
-      ENV['CAPYBARA_DRIVER'].presence.try(:to_sym) \
-          || example.metadata[:driver] \
-          || :selenium
-    rescue
-      :selenium
-    end
-end
+ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_78_PATH']
 
-ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_45_PATH']
-
-def accepted_firefox_path 
+def accepted_firefox_path
   ENV[ ACCEPTED_FIREFOX_ENV_PATHS.detect do |env_path|
     ENV[env_path].present?
   end || ""].tap { |path|
@@ -30,30 +19,55 @@ def accepted_firefox_path
   }
 end
 
+
+Selenium::WebDriver::Firefox.path = accepted_firefox_path
+
+Capybara.register_driver :firefox do |app|
+  capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(
+    # TODO: trust the cert used in container and remove this:
+    acceptInsecureCerts: true
+  )
+
+  profile = Selenium::WebDriver::Firefox::Profile.new
+  # TODO: configure language for locale testing
+  # profile["intl.accept_languages"] = "en"
+  #
+  profile_config = {
+    'browser.helperApps.neverAsk.saveToDisk' => 'image/jpeg,application/pdf,application/json',
+    'browser.download.folderList' => 2, # custom location
+    'browser.download.dir' => BROWSER_DOWNLOAD_DIR.to_s
+  }
+  profile_config.each { |k, v| profile[k] = v }
+
+  opts = Selenium::WebDriver::Firefox::Options.new(
+    binary: accepted_firefox_path,
+    profile: profile,
+    log_level: :trace)
+
+  # NOTE: good for local dev
+  if ENV['LEIHS_TEST_HEADLESS'].present?
+    opts.args << '--headless'
+  end
+  # opts.args << '--devtools' # NOTE: useful for local debug
+
+  # driver = Selenium::WebDriver.for :firefox, options: opts
+  # Capybara::Selenium::Driver.new(app, browser: browser, options: opts)
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :firefox,
+    options: opts,
+    desired_capabilities: capabilities
+  )
+end
+
+
 RSpec.configure do |config|
   set_capybara_values
 
-  Selenium::WebDriver::Firefox.path = accepted_firefox_path
+  # Capybara.run_server = false
+  Capybara.default_driver = :firefox
+  Capybara.current_driver = :firefox
 
-  Capybara.register_driver :selenium do |app|
-
-    profile_config = {
-      'browser.helperApps.neverAsk.saveToDisk' => 'image/jpeg,application/pdf,application/json',
-      'browser.download.folderList' => 2, # custom location
-      'browser.download.dir' => BROWSER_DOWNLOAD_DIR.to_s
-    }
-
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile_config.each { |k, v| profile[k] = v }
-
-    client = Selenium::WebDriver::Remote::Http::Default.new
-
-    Capybara::Selenium::Driver.new \
-      app, browser: :firefox, profile: profile, http_client: client
-
-  end
-
-  Capybara.current_driver = :selenium
 
   config.before :all do
     set_capybara_values
@@ -61,7 +75,6 @@ RSpec.configure do |config|
 
   config.before :each do |example|
     set_capybara_values
-    set_browser example
   end
 
   config.after(:each) do |example|
@@ -70,7 +83,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.before :all do 
+  config.before :all do
     FileUtils.remove_dir(screenshot_dir, force: true)
     FileUtils.mkdir_p(screenshot_dir)
   end
@@ -83,7 +96,7 @@ RSpec.configure do |config|
     name ||= "#{Time.now.iso8601.tr(':', '-')}.png"
     path = screenshot_dir.join(name)
     case Capybara.current_driver
-    when :selenium
+    when :firefox
       page.driver.browser.save_screenshot(path) rescue nil
     when :poltergeist
       page.driver.render(path, full: true) rescue nil

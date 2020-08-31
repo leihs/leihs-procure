@@ -8,9 +8,10 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
@@ -25,15 +26,16 @@
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def default-query-parameters {:is_admin nil
-                               :role "any"
-                               :page 1
-                               :per-page 12
-                               :term ""
-                               :type "any" })
+(def default-query-params
+  {:is_admin nil
+   :role "any"
+   :page 1
+   :per-page defaults/PER-PAGE
+   :term ""
+   :type "any" })
 
 (def current-query-paramerters-normalized*
-  (reaction (merge default-query-parameters
+  (reaction (merge default-query-params
            @current-query-paramerters*)))
 
 (def fetch-delegations-id* (reagent/atom nil))
@@ -85,10 +87,10 @@
 
 (defn form-term-filter []
   [:div.form-group.ml-2.mr-2.mt-2
-   [:label.sr-only {:for :delegations-search-term} "Search term"]
+   [:label {:for :delegations-search-term} "Fuzzy search"]
    [:input#delegations-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
-     :placeholder "Search term ..."
+     :placeholder "term"
      :value (or (-> @current-query-paramerters-normalized* :term presence) "")
      :on-change (fn [e]
                   (let [val (or (-> e .-target .-value presence) "")]
@@ -97,36 +99,13 @@
                                                        {:page 1
                                                         :term val})))))}]])
 
-(defn form-per-page []
-  (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :delegations-filter-per-page} "Per page"]
-     [:select#delegations-filter-per-page.form-control
-      {:value per-page
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "12")]
-                      (accountant/navigate! (path :delegations {}
-                                                  (merge @current-query-paramerters-normalized*
-                                                         {:page 1
-                                                          :per-page val})))))}
-      (for [p [12 25 50 100 250 500 1000]]
-        [:option {:key p :value p} p])]]))
-
-(defn form-reset []
-  [:div.form-group.mt-2.right
-   [:label.sr-only {:for :delegations-filter-reset} "Reset"]
-   [:a#delegations-filter-reset.btn.btn-warning
-    {:href (path :delegations {} default-query-parameters)}
-    [:i.fas.fa-times]
-    " Reset "]])
-
 (defn filter-form []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
+   [:div.form-row
     [form-term-filter]
-    [form-per-page]
-    [form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -152,9 +131,7 @@
 
 (defn delegations-table-component []
   (if-not (contains? @delegations* @current-query-paramerters-normalized*)
-    [:div.text-center
-     [:i.fas.fa-spinner.fa-spin.fa-5x]
-     [:span.sr-only "Please wait"]]
+    [wait-component]
     (if-let [delegations (-> @delegations* (get  @current-query-paramerters-normalized* []) seq)]
       [:table.table.table-striped.table-sm
        [delegations-thead-component]
@@ -168,20 +145,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn pagination-component []
-  [:div.clearfix.mt-2.mb-2
-   (let [page (dec (:page @current-query-paramerters-normalized*))]
-     [:div.float-left
-      [:a.btn.btn-primary.btn-sm
-       {:class (when (< page 1) "disabled")
-        :href (path :delegations {} (assoc @current-query-paramerters-normalized*
-                                     :page page))}
-       [:i.fas.fa-arrow-circle-left] " Previous " ]])
-   [:div.float-right
-    [:a.btn.btn-primary.btn-sm
-     {:href (path :delegations {} (assoc @current-query-paramerters-normalized*
-                                   :page (inc (:page @current-query-paramerters-normalized*))))}
-     " Next " [:i.fas.fa-arrow-circle-right]]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -202,7 +165,7 @@
    [current-query-params-component]
    [:h1 "Delegations"]
    [filter-form]
-   [pagination-component]
+   [routing/pagination-component]
    [delegations-table-component]
-   [pagination-component]
+   [routing/pagination-component]
    [debug-component]])

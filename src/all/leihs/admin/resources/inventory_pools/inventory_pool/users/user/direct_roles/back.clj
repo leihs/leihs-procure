@@ -57,6 +57,15 @@
         {:status 204})
     {:status 422 :data {:message "Submitted combination of roles is not allowed!"}}))
 
+;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn delete-direct-roles
+  [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
+    tx :tx body :body :as request}]
+  (jdbc/delete! tx :direct_access_rights ["inventory_pool_id = ? AND user_id = ?" inventory-pool-id user-id])
+  {:status 204})
+
+
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def inventory-pool-user-direct-roles-path
@@ -64,6 +73,7 @@
 
 (def routes
   (cpj/routes
+    (cpj/DELETE inventory-pool-user-direct-roles-path [] #'delete-direct-roles)
     (cpj/GET inventory-pool-user-direct-roles-path [] #'roles)
     (cpj/PUT inventory-pool-user-direct-roles-path [] #'set-roles)))
 

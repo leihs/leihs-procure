@@ -11,7 +11,7 @@
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
@@ -227,8 +227,6 @@
 
 (defn handle-img-chosen [evt]
   (reset! img-processing* {})
-  (js/console.log evt)
-  (js/console.log (-> evt .-target .-files .-length))
   (get-file-data (-> evt .-target) img-handler))
 
 (defn file-upload []
@@ -355,9 +353,7 @@
 (defn user-component [submit-component submit-handler]
   [:div.user-component
    (if (nil?  @user-data*)
-     [:div.text-center
-      [:i.fas.fa-spinner.fa-spin.fa-5x]
-      [:span.sr-only "Please wait"]]
+     [wait-component]
      [(if @edit-mode?* :form :div)
       {:on-submit (fn [e]
                     (.preventDefault e)

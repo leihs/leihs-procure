@@ -8,9 +8,10 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
+    [leihs.admin.front.shared :refer [wait-component]]
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.breadcrumbs :as ass-breadcrumbs]
@@ -84,34 +85,12 @@
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn form-per-page []
-  (let [per-page (or (-> @current-query-paramerters-normalized* :per-page presence) "12")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :authentication-systems-filter-per-page} "Per page"]
-     [:select#authentication-systems-filter-per-page.form-control
-      {:value per-page
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "12")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :per-page val}))))}
-      (for [p [12 25 50 100 250 500 1000]]
-        [:option {:key p :value p} p])]]))
-
-(defn form-reset []
-  [:div.form-group.mt-2
-   [:label.sr-only {:for :authentication-systems-filter-reset} "Reset"]
-   [:a#authentication-systems-filter-reset.btn.btn-warning
-    {:href (page-path-for-query-params shared/default-query-parameters)}
-    [:i.fas.fa-times]
-    " Reset "]])
-
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
    [:div.form-inline
-    [form-per-page]
-    [form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -143,9 +122,7 @@
 
 (defn authentication-systems-table-component []
   (if-not (contains? @data* @current-url*)
-    [:div.text-center
-     [:i.fas.fa-spinner.fa-spin.fa-5x]
-     [:span.sr-only "Please wait"]]
+    [wait-component]
     (if-let [authentication-systems (-> @data* (get  @current-url* {}) :authentication-systems seq)]
       [:table.table.table-striped.table-sm
        [authentication-systems-thead-component]
@@ -157,20 +134,6 @@
       [:div.alert.alert-warning.text-center "No (more) authentication-systems found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn pagination-component []
-  [:div.clearfix.mt-2.mb-2
-   (let [page (dec (:page @current-query-paramerters-normalized*))]
-     [:div.float-left
-      [:a.btn.btn-primary.btn-sm
-       {:class (when (< page 1) "disabled")
-        :href (page-path-for-query-params {:page page})}
-       [:i.fas.fa-arrow-circle-left] " Previous " ]])
-   [:div.float-right
-    [:a.btn.btn-primary.btn-sm
-     {:href (page-path-for-query-params
-              {:page (inc (:page @current-query-paramerters-normalized*))})}
-     " Next " [:i.fas.fa-arrow-circle-right]]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -193,9 +156,9 @@
     {:did-mount escalate-query-paramas-update
      :did-update escalate-query-paramas-update}]
    [filter-component]
-   [pagination-component]
+   [routing/pagination-component]
    [authentication-systems-table-component]
-   [pagination-component]
+   [routing/pagination-component]
    [debug-component]])
 
 (defn page []

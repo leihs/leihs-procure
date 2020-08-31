@@ -24,10 +24,10 @@ feature 'Manage groups', type: :feature do
     end
 
 
-    scenario 'adding a new group ' do 
+    scenario 'adding a new group ' do
 
       description = <<~TEXT
-          Describir es explicar, de manera detallada y ordenada, cómo son las personas, animales, lugares, objetos, etc. 
+          Describir es explicar, de manera detallada y ordenada, cómo son las personas, animales, lugares, objetos, etc.
           La descripción sirve sobre todo para ambientar la acción y crear una que haga más creíbles los hechos que se narran.
         TEXT
       name = "La Grupa"
@@ -49,12 +49,12 @@ feature 'Manage groups', type: :feature do
         all(".group").count == 1
       end
 
-      # we can open the group by clicking on the name 
+      # we can open the group by clicking on the name
       click_on name
       expect(page).to have_content "Group #{name}"
 
       # we can see the full description here too
-      expect(page).to have_content description
+      expect(page.text.tr("\n\r\s"," ")).to have_content description.tr("\n\r\s"," ")
 
     end
 

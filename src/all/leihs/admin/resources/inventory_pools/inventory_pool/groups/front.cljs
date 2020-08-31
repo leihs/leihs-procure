@@ -15,7 +15,7 @@
     [leihs.admin.front.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-component roles-hierarchy]]
     [leihs.admin.resources.groups.front :as groups]
     [leihs.admin.utils.regex :as regex]
 
@@ -30,28 +30,23 @@
     [reagent.core :as reagent]))
 
 
-(def inventory-pool-groups-count*
-  (reaction (-> @groups/data*
-                (get (:url @routing/state*) {})
-                :inventory-pool_groups_count)))
+
 
 ;### roles ####################################################################
 
 (def roles-th-component [:th {:key :roles} " Roles "])
 
 (defn roles-td-component [group]
-  [:td {:key :roles}
-   [:a
-    {:href (path :inventory-pool-group-roles {:inventory-pool-id @inventory-pool-id* :group-id (:id group)})}
-    (or (->> group :roles
-             (into [])
-             (filter second)
-             (map first)
-             (map str)
-             (clojure.string/join ", ")
-             presence)
-        "none" )]])
-
+  (let [path (path :inventory-pool-group-roles
+                   {:inventory-pool-id @inventory-pool-id*
+                    :group-id (:id group)})
+        has-a-role? (some->> group :roles vals (reduce #(or %1 %2)))]
+    [:td {:key :roles}
+     [roles-component group false nil]
+     [:a.btn.btn-outline-primary.btn-sm {:href path}
+      (if has-a-role?
+        [:span icons/edit " edit "]
+        [:span icons/add " add "])]]))
 
 ;### actions ##################################################################
 
@@ -77,20 +72,19 @@
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
+   [:div.form-row
     [groups/form-term-filter]
+    [groups/form-including-user-filter]
     [form-role-filter]
-    [groups/form-per-page]
-    [groups/form-reset]]]])
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]]])
 
 
 ;### main #####################################################################
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div
-     [:div "@inventory-pool-groups-count*"
-      [:pre (with-out-str (pprint @inventory-pool-groups-count*))]]]))
+    [:div ]))
 
 (defn main-page-component []
   [:div
@@ -98,11 +92,11 @@
     {:did-mount groups/escalate-query-paramas-update
      :did-update groups/escalate-query-paramas-update}]
    [filter-component]
-   [groups/pagination-component]
+   [routing/pagination-component]
    [groups/groups-table-component
     [roles-th-component]
     [roles-td-component]]
-   [groups/pagination-component]
+   [routing/pagination-component]
    [debug-component]
    [groups/debug-component]])
 
@@ -114,13 +108,13 @@
      [(breadcrumbs/leihs-li)
       (breadcrumbs/admin-li)
       (breadcrumbs/inventory-pools-li)
-      (breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*)
-      (breadcrumbs/inventory-pool-groups-li @inventory-pool/inventory-pool-id*)]
+      (breadcrumbs/inventory-pool-li @inventory-pool-id*)
+      (breadcrumbs/inventory-pool-groups-li @inventory-pool-id*)]
      [])
    [:div
     [:h1
-     (let [c (or @inventory-pool-groups-count* 0)]
-       [:span c " " (pluralize-noun c "Group")
-        [:span " in Inventory-Pool "]
-        [inventory-pool/inventory-pool-name-component]])]
+     "Roles of groups "
+     [:span " in the inventory-pool "]
+     [:a {:href (path :inventory-pool {:inventory-pool-id @inventory-pool-id*})}
+      [inventory-pool/name-component]]]
     [main-page-component] ]])

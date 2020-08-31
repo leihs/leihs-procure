@@ -1,4 +1,6 @@
-(ns leihs.admin.resources.system.system-admins.shared)
+(ns leihs.admin.resources.system.system-admins.shared
+  (:require
+    [leihs.admin.defaults :as defaults]))
 
 (def default-fields
   #{
@@ -20,8 +22,8 @@
     :type
     })
 
-(def default-query-parameters {:page 1 :per-page 12 :type :any :term nil})
+(def default-query-params {:page 1 :per-page defaults/PER-PAGE})
 
 (defn normalized-query-parameters [query-params]
-  (merge default-query-parameters query-params))
+  (merge default-query-params query-params))
 

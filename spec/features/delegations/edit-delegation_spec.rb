@@ -24,7 +24,7 @@ feature 'Manage delegations', type: :feature do
     end
 
 
-    scenario 'edit a delegation ' do 
+    scenario 'edit a delegation ' do
 
       visit '/admin/'
       click_on 'Delegations'
@@ -32,7 +32,7 @@ feature 'Manage delegations', type: :feature do
       # pick a random delegation
       delegation = @delegations.sample
 
-      fill_in 'term', with: delegation.firstname
+      fill_in 'Fuzzy search', with: delegation.firstname
       click_on delegation.firstname
 
       click_on 'Edit'
@@ -43,9 +43,9 @@ feature 'Manage delegations', type: :feature do
 
       new_responsible_user = @users.to_a.sample
 
-      fill_in 'term', with: "#{new_responsible_user.firstname} #{new_responsible_user.lastname}"
+      fill_in 'Fuzzy and email search', with: "#{new_responsible_user.firstname} #{new_responsible_user.lastname}"
 
-      wait_until do 
+      wait_until do
         all('a', text: 'Choose as responsible user').count == 1
       end
 

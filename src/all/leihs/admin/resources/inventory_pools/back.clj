@@ -26,7 +26,7 @@
                [:= :access_rights.inventory_pool_id :inventory_pools.id]))
          :users_count])
       (sql/from :inventory_pools)
-      (#(apply sql/order-by (concat [%] (-> shared/default-query-parameters :order))))))
+      (#(apply sql/order-by (concat [%] (-> shared/default-query-params :order))))))
 
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]
