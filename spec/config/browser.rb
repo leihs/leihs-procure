@@ -1,7 +1,7 @@
 require 'capybara/rspec'
 require 'selenium-webdriver'
 
-BROWSER_DONWLOAD_DIR= File.absolute_path(File.expand_path(__FILE__)  + "/../../../tmp")
+BROWSER_DOWNLOAD_DIR= File.absolute_path(File.expand_path(__FILE__)  + "/../../../tmp")
 
 
 def set_capybara_values
@@ -40,7 +40,7 @@ RSpec.configure do |config|
     profile_config = {
       'browser.helperApps.neverAsk.saveToDisk' => 'image/jpeg,application/pdf,application/json',
       'browser.download.folderList' => 2, # custom location
-      'browser.download.dir' => BROWSER_DONWLOAD_DIR.to_s
+      'browser.download.dir' => BROWSER_DOWNLOAD_DIR.to_s
     }
 
     profile = Selenium::WebDriver::Firefox::Profile.new
@@ -63,7 +63,33 @@ RSpec.configure do |config|
     set_capybara_values
     set_browser example
   end
+
+  config.after(:each) do |example|
+    unless example.exception.nil?
+      take_screenshot screenshot_dir
+    end
+  end
+
+  config.before :all do 
+    FileUtils.remove_dir(screenshot_dir, force: true)
+    FileUtils.mkdir_p(screenshot_dir)
+  end
+
+  def screenshot_dir
+    Pathname(BROWSER_DOWNLOAD_DIR).join('screenshots')
+  end
+
+  def take_screenshot(screenshot_dir = nil, name = nil)
+    name ||= "#{Time.now.iso8601.tr(':', '-')}.png"
+    path = screenshot_dir.join(name)
+    case Capybara.current_driver
+    when :selenium
+      page.driver.browser.save_screenshot(path) rescue nil
+    when :poltergeist
+      page.driver.render(path, full: true) rescue nil
+    else
+      Logger.warn "Taking screenshots is not implemented for \
+              #{Capybara.current_driver}."
+    end
+  end
 end
-
-
-

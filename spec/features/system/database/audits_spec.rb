@@ -22,7 +22,7 @@ feature 'System/Database/Audits download and clean-up', type: :feature do
       click_on_first 'Continue'
 
       audits_before_date = current_url.split('/').last
-      audits_file = BROWSER_DONWLOAD_DIR + "/audits_before_" + audits_before_date + ".json"
+      audits_file = BROWSER_DOWNLOAD_DIR + "/audits_before_" + audits_before_date + ".json"
       File.delete audits_file rescue 1
       click_on_first 'Download'
 
