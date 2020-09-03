@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "serve": "9.1.0"
+    "serve": "10.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
