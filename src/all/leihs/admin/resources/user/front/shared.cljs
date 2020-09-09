@@ -328,6 +328,7 @@
 (defn rest-component []
   [:div.form.mt-2
    [:h3 "Other"]
+   [field-component :secondary_email {:type :email}]
    [field-component :url {:type :url}]
    [field-component :org_id]
    [field-component :login]

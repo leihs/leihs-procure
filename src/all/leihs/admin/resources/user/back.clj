@@ -43,6 +43,7 @@
    :org_id
    :password_sign_in_enabled
    :phone
+   :secondary_email
    :updated_at
    :url
    :zip
@@ -74,6 +75,7 @@
    :org_id
    :password_sign_in_enabled
    :phone
+   :secondary_email
    :url
    :zip])
 
