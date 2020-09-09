@@ -140,6 +140,7 @@
   ([user-id target-user-id tx]
    (doseq [[table fields] [[:audited_requests [:user_id]]
                            [:contracts [:user_id]]
+                           [:customer_orders [:user_id]]
                            [:orders [:user_id]]
                            [:reservations [:user_id :handed_over_by_user_id :returned_to_user_id :delegated_user_id]]]]
      (doseq [field fields]
