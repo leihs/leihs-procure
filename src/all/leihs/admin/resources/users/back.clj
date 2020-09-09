@@ -42,12 +42,23 @@
        (sql/limit per-page)
        (sql/offset (* per-page (- page 1))))))
 
-(defn term-filter [query request]
-  (if-let [term (-> request :query-params-raw :term presence)]
-    (-> query
-        (sql/merge-where [:or
+(defn match-term-with-emails [query term]
+  (sql/merge-where
+    query
+    [:or
+     [:= (sql/call :lower term) (sql/call :lower :users.email)]
+     [:= (sql/call :lower term) (sql/call :lower :users.secondary_email)]]))
+
+(defn match-term-fuzzy [query term]
+  (sql/merge-where query [:or
                           ["%" (str term) :searchable]
                           ["~~*" :searchable (str "%" term "%")]]))
+
+(defn term-filter [query request]
+  (if-let [term (-> request :query-params-raw :term presence)]
+    (if (clojure.string/includes? term "@" )
+      (match-term-with-emails query term)
+      (match-term-fuzzy query term))
     query))
 
 (defn type-filter [query request]
@@ -98,9 +109,9 @@
     (cpj/POST (path :users) [] #'user/routes)))
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
+(logging-config/set-logger! :level :debug)
 ;(debug/debug-ns *ns*)
 
 ;(logging-config/set-logger! :level :debug)
-;(debug/wrap-with-log-debug #'term-filter)
+(debug/wrap-with-log-debug #'term-filter)
 ;(debug/wrap-with-log-debug #'users-formated-query)

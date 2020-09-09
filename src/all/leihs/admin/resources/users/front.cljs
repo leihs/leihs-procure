@@ -90,7 +90,7 @@
    [:label.sr-only {:for :users-search-term} "Search term"]
    [:input#users-search-term.form-control.mb-1.mr-sm-1.mb-sm-0
     {:type :text
-     :placeholder "Search term ..."
+     :placeholder "Search term or e-mail ..."
      :value (or (-> @current-query-paramerters-normalized* :term presence) "")
      :on-change (fn [e]
                   (let [val (or (-> e .-target .-value presence) "")]
