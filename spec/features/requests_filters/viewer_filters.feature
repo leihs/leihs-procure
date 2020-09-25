@@ -89,14 +89,14 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester Two    |
       | Organization                  | Organization 3   |
-      | Budgetperiode                 | BP-requesting phase |
+      | Budgetperiode                 | BP-requesting-phase |
       | Kategorie                     | Category 1       |
       | Artikel oder Projekt          | Product I        |
     And there is a request with the following data:
       | field                         | value            |
       | Requester                     | Requester Two    |
       | Organization                  | Organization 3   |
-      | Budgetperiode                 | BP-inspection phase |
+      | Budgetperiode                 | BP-inspection-phase |
       | Kategorie                     | Category 2       |
       | Artikel oder Projekt          | Product J        |
     And there is a request with the following data:
