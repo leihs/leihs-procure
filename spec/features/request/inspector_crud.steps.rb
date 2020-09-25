@@ -27,7 +27,7 @@ step 'I see the article name of the request within budget period :bp' do |bp|
 end
 
 step "I don't see the article name of the request within budget period :bp" do |bp|
-  within find('.card.mb-3', text: bp) do
+  within find('.card.mb-3', text: /^#{bp}$/) do
     expect(current_scope).not_to have_content @request.article_name
   end
 end
