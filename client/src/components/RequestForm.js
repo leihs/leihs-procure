@@ -543,14 +543,16 @@ class RequestForm extends React.Component {
                             >
                               {({ costCenter, account, orderNr, pAccount }) =>
                                 accTypeField.value !== 'investment' ? (
-                                  <Row>
-                                    <Col>
-                                      <FormField {...costCenter} readOnly />
-                                    </Col>
-                                    <Col>
-                                      <FormField {...account} readOnly />
-                                    </Col>
-                                  </Row>
+                                  id !== 'new_request' && (
+                                    <Row>
+                                      <Col>
+                                        <FormField {...costCenter} readOnly />
+                                      </Col>
+                                      <Col>
+                                        <FormField {...account} readOnly />
+                                      </Col>
+                                    </Row>
+                                  )
                                 ) : (
                                   <Row>
                                     <Col sm>
@@ -566,7 +568,9 @@ class RequestForm extends React.Component {
                                     </Col>
 
                                     <Col sm>
-                                      <FormField {...pAccount} readOnly />
+                                      {id !== 'new_request' && (
+                                        <FormField {...pAccount} readOnly />
+                                      )}
                                     </Col>
                                   </Row>
                                 )
