@@ -4,7 +4,7 @@
             [leihs.procurement.permissions.request-fields :as
              request-fields-perms]))
 
-(def attrs-to-skip #{:id :state :total_price_cents})
+(def attrs-to-skip #{:id :short_id :state :total_price_cents})
 
 (def special-perms #{:DELETE})
 

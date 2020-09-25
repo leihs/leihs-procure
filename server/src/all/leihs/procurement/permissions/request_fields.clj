@@ -11,9 +11,9 @@
             [leihs.procurement.resources.budget-period :as budget-period]))
 
 (defn get-for-user-and-request
-  [tx auth-entity proc-request]
   "Read permissions always apply only to an existing request.
   Write permissions apply either to a new or an existing request."
+  [tx auth-entity proc-request]
   (let [new-request (nil? (:id proc-request))
         existing-request (not new-request)
         budget-period (budget-period/get-budget-period-by-id tx
