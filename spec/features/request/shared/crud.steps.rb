@@ -204,7 +204,7 @@ step 'I uncheck filter option :label' do |label|
 end
 
 step 'the category :cat for budget period :bp is expanded' do |cat, bp|
-  find('.card', text: 'Budget Period BP')
+  find('.card', text: 'Budget-Period-BP')
     .find('.list-group-item', match: :first, text: 'Category C')
     .find('.fa-caret-down')
 end

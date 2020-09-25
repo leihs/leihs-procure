@@ -3,9 +3,9 @@ Feature: Requests' filter for inspector, viewer and procurement admin
   Background:
     Given there is an initial admin
     And there are procurement settings
-    And there is a budget period "BP requesting phase" in requesting phase
-    And there is a budget period "BP inspection phase" in inspection phase
-    And there is a budget period "BP past" in past phase
+    And there is a budget period "BP-requesting-phase" in requesting phase
+    And there is a budget period "BP-inspection-phase" in inspection phase
+    And there is a budget period "BP-past" in past phase
     And there is a main category "Main Category 1"
     And there is category "Category 1" for main category "Main Category 1"
     And there is category "Category 2" for main category "Main Category 1"
@@ -141,9 +141,9 @@ Feature: Requests' filter for inspector, viewer and procurement admin
 
     When I expand all categories
     Then I see following budget periods:
-      | BP requesting phase |
-      | BP inspection phase |
-      | BP past             |
+      | BP-requesting-phase |
+      | BP-inspection-phase |
+      | BP-past             |
     And I see "9 Anträge"
     Then I see requests for the following articles:
       | article   | state      |

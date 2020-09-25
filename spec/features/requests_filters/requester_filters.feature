@@ -5,9 +5,9 @@ Feature: Requests' filter
     And there are procurement settings
 
   Scenario: Filters for requester
-    Given there is a budget period "BP requesting phase" in requesting phase
-    And there is a budget period "BP inspection phase" in inspection phase
-    And there is a budget period "BP past" in past phase
+    Given there is a budget period "BP-requesting-phase" in requesting phase
+    And there is a budget period "BP-inspection-phase" in inspection phase
+    And there is a budget period "BP-past" in past phase
     And there is a main category "Main Category 1"
     And there is category "Category 1" for main category "Main Category 1"
     And there is category "Category 2" for main category "Main Category 1"
@@ -108,9 +108,9 @@ Feature: Requests' filter
 
     When I log in as the requester "Requester One"
     Then I see following budget periods:
-      | BP requesting phase |
-      | BP inspection phase |
-      | BP past             |
+      | BP-requesting-phase |
+      | BP-inspection-phase |
+      | BP-past             |
     When I expand all categories
     Then I see requests for the following articles:
       | article   | state      |
@@ -211,8 +211,8 @@ Feature: Requests' filter
 
     When I click on "Filter zurücksetzen"
     Then I see following budget periods:
-      | BP requesting phase |
-      | BP inspection phase |
+      | BP-requesting-phase |
+      | BP-inspection-phase |
       | BP past             |
     And I see requests for the following articles:
       | article   | state      |

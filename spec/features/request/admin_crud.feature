@@ -6,13 +6,13 @@ Feature: Request CRUD as procurement admin
 
   Scenario: Only "close" button and link for requests in past budget period
     Given there is a procurement admin
-    And there is a budget period "Budget Period Past" in past phase
+    And there is a budget period "Budget-Period-Past" in past phase
     And there is a main category "Main Category MC1"
     And there is category "Category C1" for main category "Main Category MC1"
     And there is a requester
     And there is a request of requester with the following data:
       | field                         | value              |
-      | Budgetperiode                 | Budget Period Past |
+      | Budgetperiode                 | Budget-Period-Past |
       | Kategorie                     | Category C1        |
     When I log in as the procurement admin
     And I expand the line of the main category "Main Category MC1"
@@ -22,7 +22,7 @@ Feature: Request CRUD as procurement admin
     And I see the link for the request
 
   Scenario: Inspect a request during inspection phase
-    Given there is a budget period "Budget Period BP" in inspection phase
+    Given there is a budget period "Budget-Period-BP" in inspection phase
     And there is a main category "Main Category MC1"
     And there is category "Category C1" for main category "Main Category MC1"
     And there is a requester
@@ -33,7 +33,7 @@ Feature: Request CRUD as procurement admin
     And there is a room "Room R" for building "Building B"
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C1      |
       | Artikel oder Projekt          | Camera           |
       | Artikelnr. oder Herstellernr. | 12345            |
