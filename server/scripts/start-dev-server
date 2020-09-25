@@ -8,10 +8,13 @@
 
 export LEIHS_SECRET="secret"
 export LEIHS_PROCURE_HTTP_BASE_URL=${LEIHS_PROCURE_HTTP_BASE_URL:="http://localhost:3230"}
-export LEIHS_DATABASE_URL=${LEIHS_DATABASE_URL:="jdbc:postgresql://localhost:5432/leihs_prod?max-pool-size=5"}
+export LEIHS_DATABASE_URL=${LEIHS_DATABASE_URL:="jdbc:postgresql://localhost:5432/leihs_stable?max-pool-size=5"}
 
 test -f resources/dev/log4j.properties \
   || cp resources/dev/log4j.properties.template resources/dev/log4j.properties
+
+test -f profiles.clj \
+  || cp profiles_template.clj profiles.clj
 
 REPL_PORT_FILE="./.nrepl-port"
 

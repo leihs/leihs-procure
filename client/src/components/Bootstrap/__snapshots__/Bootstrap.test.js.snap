@@ -402,7 +402,7 @@ Array [
           className=""
         >
           <div
-            className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
+            className="ui-btn-radio btn-group btn-group-toggle d-flex ui-btn-radio-state-invalid"
             label="<ButtonRadio/>"
             role="radiogroup"
           >
@@ -722,7 +722,7 @@ Array [
             className=""
           >
             <div
-              className="ui-btn-radio btn-group btn-group-block ui-btn-radio-state-invalid"
+              className="ui-btn-radio btn-group btn-group-toggle d-flex ui-btn-radio-state-invalid"
               label="<ButtonRadio/>"
               role="radiogroup"
             >

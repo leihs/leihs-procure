@@ -20,6 +20,8 @@
         ; NOTE: models are joined in the base-query already
         (sql/merge-where
           [:or ["~~*" :buildings.name term-percent]
+          ;  ["~~*" :procurement_requests.id term-percent]
+           ["~~*" :procurement_requests.short_id term-percent]
            ["~~*" :procurement_requests.article_name term-percent]
            ["~~*" :procurement_requests.article_number term-percent]
            ["~~*" :procurement_requests.inspection_comment term-percent]
@@ -35,6 +37,7 @@
 (defn requests-query-map
   [context arguments value]
   (let [id (:id arguments)
+        ; short_id (:short_id arguments)
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
@@ -55,6 +58,7 @@
                          request-helpers/join-and-nest-associated-resources)]
     (cond-> start-sqlmap
       id (sql/merge-where [:in :procurement_requests.id id])
+      ; short_id (sql/merge-where [:in :procurement_requests.short_id short_id])
       category-id (-> (sql/merge-where [:in :procurement_requests.category_id
                                         category-id])
                       (sql/merge-where-false-if-empty category-id))
