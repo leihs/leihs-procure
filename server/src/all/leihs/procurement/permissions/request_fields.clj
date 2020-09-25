@@ -346,9 +346,6 @@
                              (and requesting-phase requester own-request)))))),
         :default (rooms/general-from-general tx),
         :required true},
-     :short_id {:read true,
-                :write false,
-                :required false},
      :supplier
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
