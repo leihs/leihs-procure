@@ -169,8 +169,8 @@ Feature: Requests' filter
 
     And I click on "Filter zurücksetzen"
 
-    When I uncheck "BP requesting phase" for "Budgetperioden" filter
-    Then "Budgetperioden" filter name is "BP inspection phase, BP past"
+    When I uncheck "BP-requesting-phase" for "Budgetperioden" filter
+    Then "Budgetperioden" filter name is "BP-inspection-phase, BP-past"
     And I see "5 Anträge"
     And I see requests for the following articles:
       | article   | state      |
@@ -213,7 +213,7 @@ Feature: Requests' filter
     Then I see following budget periods:
       | BP-requesting-phase |
       | BP-inspection-phase |
-      | BP past             |
+      | BP-past             |
     And I see requests for the following articles:
       | article   | state      |
       | Product A | Neu        |
