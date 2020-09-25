@@ -5,7 +5,7 @@ FactoryBot.define do
   factory :budget_period do
     inspection_start_date { DateTime.now + 30 }
     end_date { DateTime.now + 90 }
-    name { "#{Faker::Cat.name} #{Faker::Cat.breed}".gsub(" ", "-")  }
+    name { Faker::Cat.name.gsub(" ", "-")  }
   end
 
   trait :requesting_phase do
