@@ -50,7 +50,7 @@ class ButtonRadio extends React.PureComponent {
       <div
         className={cx(
           BASE_CLASS,
-          'btn-group btn-group-block',
+          'btn-group btn-group-toggle d-flex',
           isInvalid && `${BASE_CLASS}-state-invalid`
         )}
         role="radiogroup"

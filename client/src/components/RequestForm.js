@@ -725,6 +725,8 @@ const SelectionDropdown = ({
     <DropdownToggle
       size={size}
       caret
+      outline
+      color="dark"
       className="btn m-1 btn-outline-dark btn-massive"
     >
       {children}
