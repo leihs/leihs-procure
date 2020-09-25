@@ -7,7 +7,7 @@ import gql from 'graphql-tag'
 import Loading from '../components/Loading'
 import { ErrorPanel } from '../components/Error'
 
-import { DisplayName } from '../components/decorators'
+import { DisplayName, IdentifierDecorator } from '../components/decorators'
 import t from '../locale/translate'
 import { Row, Col, Alert, RoutedStatus } from '../components/Bootstrap'
 import Icon from '../components/Icons'
@@ -228,6 +228,12 @@ const RequestHeader = ({ data }) => {
         <Row cls="mt-3">
           <Col lg>
             <Row>
+              <Col sm>
+                <dt>{t('request_short_id')}: </dt>
+                <dd>
+                  <IdentifierDecorator id={r.short_id} />
+                </dd>
+              </Col>
               <Col sm>
                 <dt>{t('budget_period')}: </dt>
                 <dd>{bp.name}</dd>

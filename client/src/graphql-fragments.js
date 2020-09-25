@@ -13,6 +13,7 @@ export const RequestField = {
 export const RequestFieldsForIndex = gql`
   fragment RequestFieldsForIndex on Request {
     id
+    short_id
 
     user {
       value {

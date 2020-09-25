@@ -690,6 +690,7 @@ class RequestForm extends React.Component {
                   {request.id && (
                     <Link
                       className="btn m-1 btn-link"
+                      // to={`/requests/${request.short_id}`}
                       to={`/requests/${request.id}`}
                     >
                       <small>

@@ -3,7 +3,7 @@ import cx from 'classnames'
 // import f from 'lodash'
 
 import t from '../locale/translate'
-import { DisplayName, formatCurrency } from './decorators'
+import { DisplayName, IdentifierDecorator, formatCurrency } from './decorators'
 import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
 import RequestStateBadge from './RequestStateBadge'
@@ -74,16 +74,23 @@ export default RequestLine
 
 export const RequestLineClosed = ({ request, onClick, className }) => (
   <Row className={cx('py-3 mx-0', className)} onClick={onClick}>
-    <Col sm="2">
+    <Col md="1">
+      <IdentifierDecorator
+        id={request.short_id}
+        title={t('request_short_id')}
+      />
+    </Col>
+
+    <Col md="2">
       {request.article_name.value || DisplayName(request.model.value)}
     </Col>
 
-    <Col sm="2">
+    <Col md="2">
       {DisplayName(request.user.value)} /{' '}
       {DisplayName(request.organization.value)}
     </Col>
 
-    <Col sm="1" cls="align-self-center text-center">
+    <Col md="1" cls="align-self-center text-md-center">
       <Tooltipped text={t('request_form_field.state')}>
         <RequestStateBadge
           state={request.state}
@@ -93,7 +100,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       </Tooltipped>
     </Col>
 
-    <Col sm="1" className="align-self-center text-center">
+    <Col md="1" className="align-self-center text-md-center">
       <Tooltipped text={t('priority')}>
         <Badge dark cls="mr-1" id={`prio_tt_${request.id}`}>
           {t(`priority_label_${request.priority.value}`)}
@@ -101,7 +108,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       </Tooltipped>
     </Col>
 
-    <Col sm="3" className="align-self-center text-center">
+    <Col md="2" className="align-self-center text-md-center">
       <div className="d-inline-block">
         <Tooltipped text={t('request_form_field.price_cents')}>
           <Badge secondary cls="mr-1" id={`price_cents_tt_${request.id}`}>
@@ -133,7 +140,7 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       </div>
     </Col>
 
-    <Col sm="2" className="align-self-center text-right">
+    <Col md="2" className="align-self-center text-right">
       <Tooltipped text={t('request_form_field.price_total')}>
         <span className="mr-2 f6" id={`totalam_tt_${request.id}`}>
           <samp>{formatCurrency(request.total_price_cents)} </samp>
@@ -142,6 +149,6 @@ export const RequestLineClosed = ({ request, onClick, className }) => (
       </Tooltipped>
     </Col>
 
-    <Col sm="1" />
+    <Col md="1" />
   </Row>
 )

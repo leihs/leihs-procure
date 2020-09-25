@@ -37,8 +37,13 @@ function exportAndDownloadSpreadsheet(table, { type, ext }, title) {
   XLSX.writeFile(workBook, `procure_${calendarDate}.${ext}`)
 }
 
-// TMP: conversion of dashboard data here
+// NOTE: conversion of dashboard data here
 const spreadSheetCols = [
+  {
+    key: 'short_id',
+    label: 'Nummer',
+    fn: r => f.get(r, 'short_id')
+  },
   {
     key: 'budget_period',
     label: 'Budgetperiode',

@@ -7,6 +7,8 @@ import * as CONSTANTS from '../constants'
 import t from '../locale/translate'
 import { isDev } from '../env'
 
+export { default as IdentifierDecorator } from './IdentifierDecorator'
+
 export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   if (short && abbr) throw new Error('Invalid Options!')
   // NOTE: Checks *keys* must be present, but values can be missing.
