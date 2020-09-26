@@ -216,3 +216,46 @@ end
 step 'the request was deleted in the database' do
   expect { @request.reload }.to raise_error Sequel::NoExistingObject
 end
+
+step "the procurement admin is a requester" do
+  FactoryBot.create(:procurement_requester, user: @procurement_admin)
+end
+
+step "I click on the + button" do
+  find(".fa-plus-circle").click
+end
+
+step 'I set the name as :name' do |name|
+  fill_in("0.name", with: name)
+end
+
+step 'I set the start date as :date' do |date|
+  fill_in("0.inspection_start_date", with: date)
+end
+
+step 'I set the end date as :date' do |date|
+  fill_in("0.end_date", with: date)
+end
+
+step "the budget period was created successfully" do
+  find(".alert-success", text: "Gespeichert!")
+end
+
+step "I select budget period :bp" do |bp|
+  within(".form-group", text: "Budgetperioden") do
+    find(".dropdown-toggle").click 
+    find(".dropdown-item-subgroup", text: bp).click
+  end
+end
+
+step "I click on + for budget period :name" do |name|
+  within(".card.mb-3", text: name) do
+    step("I click on the + button")
+  end
+end
+
+step "I click on + for category :name" do |name|
+  within(".list-group", text: name) do
+    step("I click on the + button")
+  end
+end
