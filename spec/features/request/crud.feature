@@ -36,4 +36,4 @@ Feature: Create, read, update, delete, etc.
       | Stückpreis CHF                | 1000          |
       | Menge beantragt               | 5             |
     And I click on 'Speichern'
-    Then I see short ID "3000-01"
+    Then I see short ID "3000.001"
