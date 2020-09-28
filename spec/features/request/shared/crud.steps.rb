@@ -237,10 +237,6 @@ step 'I set the end date as :date' do |date|
   fill_in("0.end_date", with: date)
 end
 
-step "the budget period was created successfully" do
-  find(".alert-success", text: "Gespeichert!")
-end
-
 step "I select budget period :bp" do |bp|
   within(".form-group", text: "Budgetperioden") do
     find(".dropdown-toggle").click 
@@ -264,4 +260,8 @@ step "I see short ID :id" do |id|
   within find('.col-sm', text: "Nummer:") do
     expect(current_scope).to have_content id
   end
+end
+
+step "I set the name as of the budget period :old to :new" do |old, new|
+  find("input[value='#{old}']").set(new)
 end

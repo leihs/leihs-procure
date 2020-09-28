@@ -19,7 +19,6 @@ Feature: Create, read, update, delete, etc.
     And I set the start date as "01.01.3000"
     And I set the end date as "31.12.3000"
     And I click on "Speichern"
-    Then the budget period was created successfully
 
     ### create a new request in this budget period ###
     When I click on "Anträge"
@@ -37,3 +36,26 @@ Feature: Create, read, update, delete, etc.
       | Menge beantragt               | 5             |
     And I click on 'Speichern'
     Then I see short ID "3000.001"
+
+    ### change the name of the budget period ###
+    When I click on "Admin"
+    And I click on "Budgetperioden"
+    And I set the name as of the budget period "3000" to "4000"
+    And I click on "Speichern"
+
+    ### create a new request in this budget period ###
+    When I click on "Anträge"
+    And I refresh the page
+    And I click on + for budget period "4000"
+    And I click on + for category "Category C1"
+    And I enter the following data into the request form:
+      | field                         | value         |
+      | Artikel oder Projekt          | Camera X      |
+      | Artikelnr. oder Herstellernr. | 12345 X       |
+      | Antragsteller                 | Procurement Admin |
+      | Begründung                    | And why yes   |
+      | Ersatz / Neu                  | Ersatz        |
+      | Stückpreis CHF                | 1000          |
+      | Menge beantragt               | 5             |
+    And I click on 'Speichern'
+    Then I see short ID "4000.001"

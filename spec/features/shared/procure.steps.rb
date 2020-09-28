@@ -174,3 +174,7 @@ step 'I log in as the requester :name' do |name|
   @user ||= @requester = u
   step 'I log in as the user'
 end
+
+step 'I refresh the page' do
+  refresh
+end
