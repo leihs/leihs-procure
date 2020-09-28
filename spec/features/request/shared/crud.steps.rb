@@ -225,16 +225,16 @@ step "I click on the + button" do
   find(".fa-plus-circle").click
 end
 
-step 'I set the name as :name' do |name|
-  fill_in("0.name", with: name)
+step 'I set the name as :name on line :n' do |name, n|
+  fill_in("#{n.to_i - 1}.name", with: name)
 end
 
-step 'I set the start date as :date' do |date|
-  fill_in("0.inspection_start_date", with: date)
+step 'I set the start date as :date on line :n' do |date, n|
+  fill_in("#{n.to_i - 1}.inspection_start_date", with: date)
 end
 
-step 'I set the end date as :date' do |date|
-  fill_in("0.end_date", with: date)
+step 'I set the end date as :date on line :n' do |date, n|
+  fill_in("#{n.to_i - 1}.end_date", with: date)
 end
 
 step "I select budget period :bp" do |bp|
