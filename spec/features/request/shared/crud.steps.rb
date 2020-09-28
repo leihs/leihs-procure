@@ -259,3 +259,9 @@ step "I click on + for category :name" do |name|
     step("I click on the + button")
   end
 end
+
+step "I see short ID :id" do |id|
+  within find('.col-sm', text: "Nummer:") do
+    expect(current_scope).to have_content id
+  end
+end

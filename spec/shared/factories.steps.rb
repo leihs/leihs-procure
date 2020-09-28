@@ -14,7 +14,8 @@ step 'there is a leihs admin' do
 end
 
 step 'there is a procurement admin' do
-  @procurement_admin = FactoryBot.create(:procurement_admin).user
+  user = FactoryBot.create(:user, firstname: 'Procurement', lastname: 'Admin')
+  @procurement_admin = FactoryBot.create(:procurement_admin, user: user).user
 end
 
 step 'the user is leihs admin' do

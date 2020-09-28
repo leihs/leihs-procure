@@ -26,3 +26,14 @@ Feature: Create, read, update, delete, etc.
     And I select budget period "3000"
     And I click on + for budget period "3000"
     And I click on + for category "Category C1"
+    And I enter the following data into the request form:
+      | field                         | value         |
+      | Artikel oder Projekt          | Camera X      |
+      | Artikelnr. oder Herstellernr. | 12345 X       |
+      | Antragsteller                 | Procurement Admin |
+      | Begründung                    | And why yes   |
+      | Ersatz / Neu                  | Ersatz        |
+      | Stückpreis CHF                | 1000          |
+      | Menge beantragt               | 5             |
+    And I click on 'Speichern'
+    Then I see short ID "3000-01"
