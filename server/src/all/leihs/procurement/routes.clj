@@ -1,6 +1,7 @@
 (ns leihs.procurement.routes
   (:refer-clojure :exclude [str keyword replace])
   (:require
+    [clj-logging-config.log4j :as logging-config]
     [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
     [bidi.bidi :as bidi]
     [cheshire.core :refer [parse-string]]
@@ -162,6 +163,6 @@
 
 ;#### debug ###################################################################
 ; (logging-config/set-logger! :level :debug)
-; (logging-config/set-logger! :level :info)
+(logging-config/set-logger! :level :info)
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

@@ -3,9 +3,9 @@ Feature: Requests' filter for viewer
   Background:
     Given there is an initial admin
     And there are procurement settings
-    And there is a budget period "BP requesting phase" in requesting phase
-    And there is a budget period "BP inspection phase" in inspection phase
-    And there is a budget period "BP past" in past phase
+    And there is a budget period "BP-requesting-phase" in requesting phase
+    And there is a budget period "BP-inspection-phase" in inspection phase
+    And there is a budget period "BP-past" in past phase
     And there is a main category "Main Category 1"
     And there is category "Category 1" for main category "Main Category 1"
     And there is category "Category 2" for main category "Main Category 1"
@@ -28,7 +28,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP requesting phase |
+      | Budgetperiode                 | BP-requesting-phase |
       | Kategorie                     | Category 1       |
       | Artikel oder Projekt          | Product A        |
       | Menge beantragt               | 1                |
@@ -37,7 +37,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP inspection phase |
+      | Budgetperiode                 | BP-inspection-phase |
       | Kategorie                     | Category 2       |
       | Artikel oder Projekt          | Product B        |
       | Menge beantragt               | 1                |
@@ -46,7 +46,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP past          |
+      | Budgetperiode                 | BP-past          |
       | Kategorie                     | Category 3       |
       | Artikel oder Projekt          | Product C        |
       | Menge beantragt               | 1                |
@@ -55,7 +55,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP past          |
+      | Budgetperiode                 | BP-past          |
       | Kategorie                     | Category 3       |
       | Artikel oder Projekt          | Product D        |
       | Menge beantragt               | 2                |
@@ -65,7 +65,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP past          |
+      | Budgetperiode                 | BP-past          |
       | Kategorie                     | Category 3       |
       | Artikel oder Projekt          | Product E        |
       | Menge beantragt               | 1                |
@@ -75,7 +75,7 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester One    |
       | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP past          |
+      | Budgetperiode                 | BP-past          |
       | Kategorie                     | Category 3       |
       | Artikel oder Projekt          | Product F        |
       | Menge beantragt               | 1                |
@@ -89,21 +89,21 @@ Feature: Requests' filter for viewer
       | field                         | value            |
       | Requester                     | Requester Two    |
       | Organization                  | Organization 3   |
-      | Budgetperiode                 | BP requesting phase |
+      | Budgetperiode                 | BP-requesting-phase |
       | Kategorie                     | Category 1       |
       | Artikel oder Projekt          | Product I        |
     And there is a request with the following data:
       | field                         | value            |
       | Requester                     | Requester Two    |
       | Organization                  | Organization 3   |
-      | Budgetperiode                 | BP inspection phase |
+      | Budgetperiode                 | BP-inspection-phase |
       | Kategorie                     | Category 2       |
       | Artikel oder Projekt          | Product J        |
     And there is a request with the following data:
       | field                         | value            |
       | Requester                     | Requester Two    |
       | Organization                  | Organization 3   |
-      | Budgetperiode                 | BP past          |
+      | Budgetperiode                 | BP-past          |
       | Kategorie                     | Category 3       |
       | Artikel oder Projekt          | Product K        |
       | Priorität des Prüfers         | Zwingend         |
@@ -142,9 +142,9 @@ Feature: Requests' filter for viewer
 
     When I expand all categories
     Then I see following budget periods:
-      | BP requesting phase |
-      | BP inspection phase |
-      | BP past             |
+      | BP-requesting-phase |
+      | BP-inspection-phase |
+      | BP-past             |
     And I see "7 Anträge"
     Then I see requests for the following articles:
       | article   | state      |

@@ -46,7 +46,7 @@ Feature: Request CRUD as a requester
       | Anhänge                       | secd.pdf    |
 
   Scenario: Update a request as a requester
-    Given there is a budget period "Budget Period BP" in requesting phase
+    Given there is a budget period "Budget-Period-BP" in requesting phase
     And there is category "Category C"
     And there is a requester
     And there is a supplier "Supplier S"
@@ -56,7 +56,7 @@ Feature: Request CRUD as a requester
     And there is a room "Room R X" for building "Building B X"
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C       |
       | Artikel oder Projekt          | Camera           |
       | Artikelnr. oder Herstellernr. | 12345            |
@@ -118,12 +118,12 @@ Feature: Request CRUD as a requester
       | Anhänge                       | secd.pdf    |
 
   Scenario: Delete a request as a requester
-    Given there is a budget period "Budget Period BP" in requesting phase
+    Given there is a budget period "Budget-Period-BP" in requesting phase
     And there is category "Category C"
     And there is a requester
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C       |
     When I log in as the requester
     And I expand the line of the main category of the category "Category C"

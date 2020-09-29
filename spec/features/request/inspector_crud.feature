@@ -20,7 +20,7 @@ Feature: Request CRUD as a inspector
   #   And within the line of category "Category C2" I click on +
 
   Scenario: Create a request as an inspector for another user in one's own category during requesting phase
-    Given there is a budget period "Budget Period BP" in requesting phase
+    Given there is a budget period "Budget-Period-BP" in requesting phase
     And there is a main category "Main Category MC1"
     And there is category "Category C1" for main category "Main Category MC1"
     And there is a main category "Main Category MC2"
@@ -32,7 +32,7 @@ Feature: Request CRUD as a inspector
     And there is a building "Building B"
     And there is a room "Room R" for building "Building B"
     When I log in as the inspector
-    And within the line of the budget period "Budget Period BP" I click on +
+    And within the line of the budget period "Budget-Period-BP" I click on +
     And I expand the line of the main category "Main Category MC1"
     And within the line of category "Category C1" I click on +
     When I enter the following data into the request form:
@@ -81,7 +81,7 @@ Feature: Request CRUD as a inspector
       | Anhänge                       | secd.pdf    |
 
   Scenario: Inspect a request during inspection phase
-    Given there is a budget period "Budget Period BP" in inspection phase
+    Given there is a budget period "Budget-Period-BP" in inspection phase
     And there is a main category "Main Category MC1"
     And there is category "Category C1" for main category "Main Category MC1"
     And there is a requester
@@ -92,7 +92,7 @@ Feature: Request CRUD as a inspector
     And there is a room "Room R" for building "Building B"
     And there is a request of requester with the following data:
       | field                         | value       |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C1 |
       | Artikel oder Projekt          | Camera      |
       | Artikelnr. oder Herstellernr. | 12345       |
@@ -150,12 +150,12 @@ Feature: Request CRUD as a inspector
       | Anhänge                       | secd.pdf    |
 
   Scenario: Delete someone else's request as an inspector
-    Given there is a budget period "Budget Period BP" in inspection phase
+    Given there is a budget period "Budget-Period-BP" in inspection phase
     And there is category "Category C"
     And there is a requester
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C       |
     And there is an inspector for category "Category C"
     When I log in as the inspector
@@ -166,18 +166,18 @@ Feature: Request CRUD as a inspector
     Then I see a delete button
     When I click on the delete button and accept the alert
     And I uncheck filter option "nur Kategorien mit Anträgen"
-    Then the category "Category C" for budget period "Budget Period BP" is expanded
+    Then the category "Category C" for budget period "Budget-Period-BP" is expanded
     And I don't see the request
     And the request was deleted in the database
 
   Scenario: Move a request to another category
-    Given there is a budget period "Budget Period BP" in inspection phase
+    Given there is a budget period "Budget-Period-BP" in inspection phase
     And there is category "Category C"
     And there is category "Category D"
     And there is a requester
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period BP |
+      | Budgetperiode                 | Budget-Period-BP |
       | Kategorie                     | Category C       |
     And there is an inspector for category "Category C"
     When I log in as the inspector
@@ -193,13 +193,13 @@ Feature: Request CRUD as a inspector
     And the category for the request has been updated to "Category D"
 
   Scenario: Move a request to another budget period
-    Given there is a budget period "Budget Period 1" in inspection phase
-    Given there is a budget period "Budget Period 2" in requesting phase
+    Given there is a budget period "Budget-Period-1" in inspection phase
+    Given there is a budget period "Budget-Period-2" in requesting phase
     And there is category "Category C"
     And there is a requester
     And there is a request of requester with the following data:
       | field                         | value            |
-      | Budgetperiode                 | Budget Period 1  |
+      | Budgetperiode                 | Budget-Period-1  |
       | Kategorie                     | Category C       |
     And there is an inspector for category "Category C"
     When I log in as the inspector
@@ -208,7 +208,7 @@ Feature: Request CRUD as a inspector
     And I expand the line of the category "Category C"
     And I expand the request line
     When I click on "Budgetperiode ändern"
-    And I click on "Budget Period 2" and accept the alert
-    Then I see the article name of the request within budget period "Budget Period 2"
-    And I don't see the article name of the request within budget period "Budget Period 1"
-    And the budget period for the request has been updated to "Budget Period 2"
+    And I click on "Budget-Period-2" and accept the alert
+    Then I see the article name of the request within budget period "Budget-Period-2"
+    And I don't see the article name of the request within budget period "Budget-Period-1"
+    And the budget period for the request has been updated to "Budget-Period-2"

@@ -39,6 +39,7 @@
   "request_state_label_PARTIALLY_APPROVED": "Partially Accepted",
   "request_state_label_DENIED": "Rejected",
   "request_state_label_IN_APPROVAL": "In Inspection",
+  "request_short_id": "Number",
 
   "request_replacement_labels_new": "New",
   "request_replacement_labels_replacement": "Replacement",

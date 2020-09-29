@@ -1,9 +1,10 @@
 (ns leihs.procurement.permissions.request-helpers
   (:require [clojure.tools.logging :as log]
+            [leihs.core.core :refer [spy-with]]
             [leihs.procurement.permissions.request-fields :as
              request-fields-perms]))
 
-(def attrs-to-skip #{:id :state :total_price_cents})
+(def attrs-to-skip #{:id :short_id :state :total_price_cents})
 
 (def special-perms #{:DELETE})
 
@@ -11,8 +12,7 @@
   [field-perms req-vec]
   (reduce (fn [acc el] (conj acc [el (el field-perms)])) req-vec special-perms))
 
-; FIXME: :read false, :write false !!!
-(defn- fallback-p-spec [value] {:value value, :read true, :write true})
+(defn- fallback-p-spec [value] {:value value, :read false, :write false})
 
 (defn with-protected-value
   [p-spec value]

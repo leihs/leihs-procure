@@ -204,7 +204,7 @@ step 'I uncheck filter option :label' do |label|
 end
 
 step 'the category :cat for budget period :bp is expanded' do |cat, bp|
-  find('.card', text: 'Budget Period BP')
+  find('.card', text: 'Budget-Period-BP')
     .find('.list-group-item', match: :first, text: 'Category C')
     .find('.fa-caret-down')
 end
@@ -215,4 +215,53 @@ end
 
 step 'the request was deleted in the database' do
   expect { @request.reload }.to raise_error Sequel::NoExistingObject
+end
+
+step "the procurement admin is a requester" do
+  FactoryBot.create(:procurement_requester, user: @procurement_admin)
+end
+
+step "I click on the + button" do
+  find(".fa-plus-circle").click
+end
+
+step 'I set the name as :name on line :n' do |name, n|
+  fill_in("#{n.to_i - 1}.name", with: name)
+end
+
+step 'I set the start date as :date on line :n' do |date, n|
+  fill_in("#{n.to_i - 1}.inspection_start_date", with: date)
+end
+
+step 'I set the end date as :date on line :n' do |date, n|
+  fill_in("#{n.to_i - 1}.end_date", with: date)
+end
+
+step "I select budget period :bp" do |bp|
+  within(".form-group", text: "Budgetperioden") do
+    find(".dropdown-toggle").click 
+    find(".dropdown-item-subgroup", text: bp).click
+  end
+end
+
+step "I click on + for budget period :name" do |name|
+  within(".card.mb-3", text: name) do
+    step("I click on the + button")
+  end
+end
+
+step "I click on + for category :name" do |name|
+  within(".list-group", text: name) do
+    step("I click on the + button")
+  end
+end
+
+step "I see short ID :id" do |id|
+  within find('.col-sm', text: "Nummer:") do
+    expect(current_scope).to have_content id
+  end
+end
+
+step "I set the name as of the budget period :old to :new" do |old, new|
+  find("input[value='#{old}']").set(new)
 end
