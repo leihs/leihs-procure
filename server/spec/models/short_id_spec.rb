@@ -47,5 +47,8 @@ describe 'short id' do
     expect(r.short_id).to eq "XYZ.002"
     rc1 = RequestCounter.find(prefix: "XYZ")
     expect(rc1.counter).to eq 2
+
+    # check that the 1st counter stayed the same
+    expect(rc2.reload.counter).to eq 1
   end
 end
