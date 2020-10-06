@@ -38,11 +38,12 @@ function exportAndDownloadSpreadsheet(table, { type, ext }, title) {
 }
 
 // NOTE: conversion of dashboard data here
+const REQ_NUM_PREFIX = '#' // prevent Excel from auto-converting this field (into a Date or Floating Point Number depending on locale)
 const spreadSheetCols = [
   {
     key: 'short_id',
     label: 'Nummer',
-    fn: r => f.get(r, 'short_id')
+    fn: r => REQ_NUM_PREFIX + f.get(r, 'short_id')
   },
   {
     key: 'budget_period',
