@@ -22,6 +22,10 @@ scripts:
       export UBERJAR_NAME="leihs-admin"
 
       function build_uberjar() {
+        echo "DEBUG: checking shared ui - resources/all/leihs-ssr.js"
+        head -n5 resources/all/leihs-ssr.js
+        echo "DEBUG: checking shared ui - resources/all/public/admin/css/site.css"
+        head -n5 resources/all/public/admin/css/site.css
         echo "INFO: building the ${UBERJAR_NAME} uberjar now"
         export LEIN_SNAPSHOTS_IN_RELEASE=yes
         cd $PROJECT_DIR
