@@ -71,17 +71,18 @@
       (sql/merge-where query [:= :org_id (str qp)]))))
 
 (defn account-enabled-filter [query request]
-  (let [qp  (some-> request :query-params :account_enabled)]
+  (let [qp  (some-> request :query-params-raw :account_enabled)]
     (case qp
-      (nil "any") query
-      (true "true") (sql/merge-where query [:= true :account_enabled])
-      (false "false") (sql/merge-where query [:= false :account_enabled]))))
+      (nil "any" "") query
+      (true "true" "yes") (sql/merge-where query [:= true :account_enabled])
+      (false "false" "no") (sql/merge-where query [:= false :account_enabled]))))
 
-(defn admins-filter [query request]
-  (let [is-admin (-> request :query-params :is_admin)]
-    (case is-admin
-      ("true" true) (sql/merge-where query [:= :is_admin true])
-      query)))
+(defn is-admin-filter [query request]
+  (let [qp  (some-> request :query-params-raw :is_admin)]
+    (case qp
+      (nil "any" "") query
+      (true "true" "yes") (sql/merge-where query [:= true :is_admin])
+      (false "false" "no") (sql/merge-where query [:= false :is_admin]))))
 
 (defn select-fields [query request]
   (if-let [fields (some->> request :query-params :fields
@@ -98,7 +99,7 @@
         (term-filter request)
         (org-filter request)
         (account-enabled-filter request)
-        (admins-filter request)
+        (is-admin-filter request)
         (select-fields request))))
 
 (defn users-formated-query [request]

@@ -113,9 +113,9 @@
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
                                                :account_enabled val}))))}
-      (for [[n k] {"any" ""
-                   "yes" true
-                   "no" false}]
+      (for [[k n] {"any" "any"
+                   "yes" "yes"
+                   "no" "no"}]
         [:option {:key k :value k} n])]]))
 
 
@@ -130,9 +130,9 @@
                       (accountant/navigate! (page-path-for-query-params
                                               {:page 1
                                                :is_admin val}))))}
-      (for [[n k] {"any" ""
-                   "yes" true
-                   "no" false}]
+      (for [[k n] {"any" "any"
+                   "yes" "yes"
+                   "no" "no"}]
         [:option {:key k :value k} n])]]))
 
 (defn form-org-filter []
