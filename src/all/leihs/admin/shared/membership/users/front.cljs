@@ -34,8 +34,8 @@
     (doall (for [[k n] {"any" "members and non-members"
                         "non" "non-members"
                         "member" "members"
-                        "direct" "direct-members"
-                        "group" "group-members"}]
+                        "direct" "direct members"
+                        "group" "group members"}]
              [:option {:key k :value k} n] ))]])
 
 (defn filter-component []
