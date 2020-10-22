@@ -10,7 +10,7 @@
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.front :as entitlement-group :refer [name-component users-count-component entitlement-group-id*]]
+    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.front :as entitlement-group :refer [name-component entitlement-group-id*]]
     [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool :refer [inventory-pool-id*]]
     [leihs.admin.resources.users.front :as users]
     [leihs.admin.shared.membership.users.front :as membership.users :refer [form-membership-filter filter-component member-user-conf]]
@@ -79,9 +79,11 @@
 
 (defn header-component []
   [:h1
-   [:span [users-count-component]]
-   [:span " in Entitlement-Group "]
-   [:span [name-component]] ])
+   [:span " Users in the Entitlement-Group "]
+   [:a {:href (path :inventory-pool-entitlement-group
+                    {:inventory-pool-id @inventory-pool-id*
+                     :entitlement-group-id @entitlement-group-id*})}
+    [:span [name-component]]]])
 
 (defn breadcrumbs-component []
   (when (and @inventory-pool-id* @entitlement-group-id*)
