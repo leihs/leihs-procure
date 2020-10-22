@@ -8,6 +8,7 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
+    [leihs.core.user.shared :refer [short-id]]
 
     [leihs.admin.front.breadcrumbs :as breadcrumbs]
     [leihs.admin.front.components :as components :refer [field-component checkbox-component]]
@@ -84,10 +85,12 @@
 
 (defn name-component []
   [:span
-   {:did-mount fetch-inventory-pool
-    :did-change fetch-inventory-pool}
-   (when @inventory-pool-data*
-     [:em (str (:name @inventory-pool-data*))])])
+   [routing/hidden-state-component
+    {:did-mount fetch-inventory-pool
+     :did-change fetch-inventory-pool}]
+   (if @inventory-pool-data*
+     [:em (str (:name @inventory-pool-data*))]
+     [:span {:style {:font-family "monospace"}} (short-id @inventory-pool-id*)])])
 
 (defn inventory-pool-component []
   [:div.inventory-pool

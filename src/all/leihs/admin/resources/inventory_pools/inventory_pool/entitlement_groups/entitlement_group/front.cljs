@@ -125,11 +125,7 @@
 (defn main-component []
   [:div
    [:h1 "Entitlement-Group" " "
-    [:a {:href (path :inventory-pool-entitlement-group
-                     {:inventory-pool-id @inventory-pool-id*
-                      :entitlement-group-id @entitlement-group-id*})}
-     [name-component]]
-    " in Inventory-Pool "
+    [name-component] " in the Inventory-Pool "
     [:a {:href (path :inventory-pool
                      {:inventory-pool-id @inventory-pool-id* })}
      [inventory-pool/name-component]]]
