@@ -21,7 +21,7 @@
             :membership presence str)
     ("" "member") (sql/merge-where query member-expr)
     "any" query
-    "direct" (sql/merge-where query member-expr)
+    "direct" (sql/merge-where query direct-member-expr)
     "group" (sql/merge-where query group-expr)
     "non" (sql/merge-where query [:not member-expr])))
 
