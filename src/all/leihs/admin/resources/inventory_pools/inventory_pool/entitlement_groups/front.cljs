@@ -119,16 +119,20 @@
     {:did-mount (fn [_]
                   (inventory-pool/clean-and-fetch)
                   (fetch-entitlement-groups))}]
-   (breadcrumbs/nav-component
-     [(breadcrumbs/leihs-li)
-      (breadcrumbs/admin-li)
-      (breadcrumbs/inventory-pools-li)
-      (breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*)
-      (breadcrumbs/inventory-pool-entitlement-groups-li @inventory-pool/inventory-pool-id*)]
-     [])
+   [breadcrumbs/nav-component
+    [[breadcrumbs/leihs-li]
+     [breadcrumbs/admin-li]
+     [breadcrumbs/inventory-pools-li]
+     [breadcrumbs/inventory-pool-li @inventory-pool/inventory-pool-id*]
+     [breadcrumbs/inventory-pool-entitlement-groups-li @inventory-pool/inventory-pool-id*]]
+    [[:li.breadcrumb-item
+      [:a.btn.btn-outline-primary.btn.btn-sm.pt-0.pb-0.pl-1.pr-1
+       {:href (str "/manage/" @inventory-pool-id* "/groups")}
+       "Entitlement-Groups (in \"lending\") "]]]]
    [:div
     [:h1
-     [:span "Entitlement-Groups in Inventory-Pool "]
-     [inventory-pool/name-component]]
+     [:span "Entitlement-Groups of the Inventory-Pool "]
+     [:a {:href (path :inventory-pool {:inventory-pool-id @inventory-pool-id*})}
+      [inventory-pool/name-component]]]
     [main-page-component]
     [debug-component]]])

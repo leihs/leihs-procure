@@ -79,7 +79,7 @@
 
 (defn header-component []
   [:h1
-   [:span " Users in the Entitlement-Group "]
+   [:span " Users of the Entitlement-Group "]
    [:a {:href (path :inventory-pool-entitlement-group
                     {:inventory-pool-id @inventory-pool-id*
                      :entitlement-group-id @entitlement-group-id*})}

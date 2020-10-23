@@ -101,7 +101,7 @@
       {:href (str "/manage/"
                   @inventory-pool-id* "/groups/"
                   @entitlement-group-id* "/edit")}
-      icons/edit " Edit"]]
+      icons/edit " Edit (in \"lending\")"]]
     [breadcrumbs/inventory-pool-entitlement-group-users-li @inventory-pool-id* @entitlement-group-id*]
     [breadcrumbs/inventory-pool-entitlement-group-groups-li @inventory-pool-id* @entitlement-group-id*]]])
 
