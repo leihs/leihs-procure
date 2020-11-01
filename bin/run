@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo
+
+ADMIN_DIR="$(dirname ${BASH_SOURCE})/.."
+cd "${ADMIN_DIR}"
+echo "PWD: $PWD"
+
+./bin/build
+
+java -jar target/leihs-admin.jar run "$@"
+
+cd -
+
+# vi: ft=sh

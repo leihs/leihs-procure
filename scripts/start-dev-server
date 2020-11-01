@@ -1,3 +1,0 @@
-export LEIN_SNAPSHOTS_IN_RELEASE=LOL
-lein do clean, uberjar
-java -jar target/leihs-admin.jar run -s secret

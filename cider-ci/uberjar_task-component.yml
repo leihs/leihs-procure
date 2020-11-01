@@ -1,61 +1,32 @@
-include: ['cider-ci/ui_task_component.yml']
+name: "Build admin uberjar"
+
+include:
+- path: cider-ci/install-ruby_task-component.yml
+  submodule: [leihs-ui]
+
+git_options:
+  submodules:
+    include_match: ^.*$
 
 traits:
-  JDK: true
+  JDK 8: true
   Leiningen 2: true
-  S3-Cache: true
+  npm: true
 
+
+# note build-ui is strictly not necessary since build invokes it itself
+# however caching is much more efficient this way
+#
 scripts:
-  build-admin-uberjar:
-    exclusive_executor_resource: build-admin-jar
-    timeout: 5 Minutes
+  build-leihs-ui-for-admin:
     start_when:
-      shared ui was built:
-        script_key: prepare-shared-ui
-    body: |
-      #!/usr/bin/env bash
-      set -euxo
-
-      # custom stuff for this project
-      #
-      export PROJECT_DIR="$LEIHS_ADMIN_DIR"
-      export UBERJAR_NAME="leihs-admin"
-
-      function build_uberjar() {
-        echo "DEBUG: checking shared ui - resources/all/leihs-ssr.js"
-        head -n5 resources/all/leihs-ssr.js
-        echo "DEBUG: checking shared ui - resources/all/public/admin/css/site.css"
-        head -n5 resources/all/public/admin/css/site.css
-        echo "INFO: building the ${UBERJAR_NAME} uberjar now"
-        export LEIN_SNAPSHOTS_IN_RELEASE=yes
-        cd $PROJECT_DIR
-        lein uberjar
-      }
-
-      # the reminder should be pretty much the same for all our projects resulting in an uberjar
-
-      cd $PROJECT_DIR
-      mkdir -p $PROJECT_DIR/target
-      DIGEST=$(git log -n 1 HEAD --pretty=%T)
-
-      UBERJAR_PATH=/tmp/${UBERJAR_NAME}_${DIGEST}.jar # path of locally cached uberjar
-      LEIN_UBERJAR_PATH="${PROJECT_DIR}/target/${UBERJAR_NAME}.jar" # path of the expeced repository uberjar path
-      S3_UBERJAR_FILE_NAME="${UBERJAR_NAME}_${DIGEST}.jar" # name of the uberjar in the S3 Bucket
-
-      export PATH=~/.rubies/$RUBY/bin:$PATH # the s3-chache-helper needs this
-
-      if [ -e $UBERJAR_PATH ]; then
-          echo "INFO: locally cached uberjar found; linking and exiting"
-          ln -s "$UBERJAR_PATH" "$LEIN_UBERJAR_PATH"
-          exit 0
-      else
-        s3-cache-helper download -n "$S3_UBERJAR_FILE_NAME" -p "$UBERJAR_PATH"
-        # build the uberjar if it was not downloaded
-        if [ ! -f ${UBERJAR_PATH} ]; then
-          build_uberjar
-          mv "$LEIN_UBERJAR_PATH" "$UBERJAR_PATH"
-          s3-cache-helper upload -n "$S3_UBERJAR_FILE_NAME" -p "$UBERJAR_PATH" || true
-        fi
-        # link the either downloaded or build uberjar
-        ln -s "$UBERJAR_PATH" "$LEIN_UBERJAR_PATH"
-      fi
+      install-ruby-passed: {script_key: install-ruby}
+    timeout: 10 minutes
+    body: ${LEIHS_ADMIN_DIR}/leihs-ui/bin/build
+    exclusive_executor_resource: build-leihs-ui
+  build-admin-uberjar:
+    start_when:
+      install-ruby: { script_key: install-ruby }
+      build-ui: { script_key: build-leihs-ui-for-admin }
+    exclusive_executor_resource: build_admin_uberjar
+    body: ${LEIHS_ADMIN_DIR}/bin/build

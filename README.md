@@ -1,161 +1,89 @@
 Leihs Admin
-============================================
+===========
+
+
+Prerequisite for Building and Development
+-----------------------------------------
+
+This service builds with Java OpenJDK 8. We recommend https://www.jenv.be/ to
+switch between JAVA Versions. And once set up:
+
+    jenv shell 1.8
+
+There are defaults but you might want to overwrite `LEIHS_MY_HTTP_BASE_URL` or
+`LEIHS_DATABASE_URL` before starting any of the following scripts. E.g.
+
+    export LEIHS_MY_HTTP_BASE_URL=http://localhost:3240
+
+    export DATABASE_URL="postgresql://localhost:5432/leihs?max-pool-size=5"
+    export LEIHS_DATABASE_URL="jdbc:${DATABASE_URL}"
+
+
+Building and testing require that `ruby` in the `PATH` resolves to at least
+Ruby 2.6. If the `RUBY` environment Variable is set, then `PATH` is
+amended with `~/.rubies/$RUBY/bin`.
+
+    export RUBY=ruby-2.6.3
+
+
+Building
+--------
+
+Building uses local and S3 cached artefacts. This can be disabled by setting
+`BUILD_CACHE_DISABLED` to `YES`.
+
+    export BUILD_CACHE_DISABLED=YES
+
+
+### Building
+
+    ./bin/build
+
+
 
 Development
 -----------
 
 ## Run The Application
 
+
 ### Backend
 
-    lein repl
 
-In the REPL
+    ./bin/dev-run-backend
+
+alternatively:
+
+
+    lein do clean, repl
+
+  and once the REPL is running:
 
     (-main "run")
-
-Inspect and set parameters
-
-    (-main "run" "-h")
 
 
 ### Frontend
 
-    lein figwheel
-
-
-## Compiled Stylesheets
-
-    sh scripts/prepare-shared-ui.sh
-
-
-Building and Testing
---------------------
-
-## Build
-
-    lein do clean, uberjar
-
-
-## Testing
-
-1. build the application `lein do clean, uberjar`
-2. start the application `java -jar target/leihs-admin.jar run -s secret`
-3. run specs in a second terminal `bundle exec rspec spec/`
-
-
-## CI
-
-This is not possible yet. It seems that the openjdk 9 on ubuntu 16.04 is outdated.
+    ./bin/dev-run-frontend
 
 
 
-Identified Problems
--------------------
+Testing
+-------
 
-* partially insane database schema,
-    needs to be fixed before deploy in particular wrt. users table
-* dirty data and missing constraints on user table
-* "flexible" authentication_systems table
-* "outdated" password handling
-*  misuse of roles for is_admin
-* "flexible" languages table
+1. Building
 
+  see above
 
-To be Discussed
----------------
+1. start the application
 
-* Refactoring/decomplect authentication systems
-* Refactoring/decomplect language settings
-* Refactoring/decomplect settings table
-* Refactoring/e-mail system
+  `java -jar target/leihs-admin.jar run -s secret`
 
-DONE
-----
+3. run specs in a second terminal
 
-## API-Tokens UI
-
-## Users UI and resouces
-
-* users/user API + UI inc. search/filter
-
-changes so far:
-
-* `is_admin` user property, needs minor roles refactoring in legacy
-* `account_enabled` see auth system refactoring
-* set and use user image, needs adjustments in legacy
-* delete user incl. data transfer
-
-## New Password Sign-in
-
-* new password authentication
-* sign-in via session, sign-out
-* new setting server secret as password
-
-## Initial Admin (preliminary)
+  bundle exec rspec spec/
 
 
-TODOs
------
-
-* Add constraint: account_enabeled requires non null email
-* try to fix text-warning visibility problem with css
-
-### External and PM
-
-* Extend the ZAPI to export the private badge image
-
-### New Code and Refactorings
-
-* `settings`
-* audits
-* delegations
-* authentication system (complete rewrite): PW, Email, AAI (?)
-* support sending mails: https://github.com/drewr/postal
-
-* `user_groups`,
-* `users_groups`,
-
-Last two, can come later. The other have interdependencies in some way.
-
-
-#### Some Details (noted so I don't forget them)
-
-* routes authorization everywhere!
-
-* authorization: api-tokes access via session only; api-tokens should not be
-    modifiable via api-token authentication
-
-* on sign-in: delete expired user_sessions; otherwise they will hang
-    around for ever if concurrent sessions are allowed
-
-
-##### Possible Tickets
-
-* Refactoring and clean-up authentication systems in leihs-legacy:
-  * remove tables and all/most related controllers, models
-  * preserve / rewrite a very simple password sign-in for test purposes only
-  * legacy & admin-API: setup integration tests and add spec for cross service pw-sign in
-
-
-
-### Sync Service & Code
-
-For ZHdK and also proof of concept.
-
-
-# ZAPI
-
-## Example
-
-curl -u 'API-KEY:' resource
-
-## Resources
-
-https://zapi.zhdk.ch/v1/user-group
-https://zapi.zhdk.ch/v1/user-group/documentation
-https://zapi.zhdk.ch/v1/person
-https://zapi.zhdk.ch/v1/person/documentation
 
 
 ## API Keys
@@ -181,34 +109,6 @@ WIDbg6hFVPYzghyDUi4tH1jk03AIgt1TpuBbsO84ydPPsKoPiFXqMAg/
 =Lftp
 -----END PGP MESSAGE-----
 
-
-
-
-
-# Authentication
-
-## LDAP
-
-### Security
-
-Writing a secure LDAP authentication is not simple!
-
-OWASP Recommendation
-
-> Properties of Safe LDAP Client APIs
-
-> Many developers (perhaps the majority) using LDAP client libraries are trying
-> to accomplish a simple task: authenticate users to their application by
-> leveraging the directory server's password store. An effective way to do this
-> can be to simply attempt an LDAP bind as the user that is trying to
-> authenticate, using the password provided by the user. This process often
-> does not require the use of LDAP filter expressions and avoids the risk of
-> search filter injection.
-
-https://www.owasp.org/index.php/Projects/OWASP_Framework_Security_Project/Secure_LDAP_API_Standard#Documents_LDAP_Bind_Authentication_Without_Filter_Queries
-
-
-## E-Mail
 
 
 

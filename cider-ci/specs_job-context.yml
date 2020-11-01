@@ -1,0 +1,42 @@
+generate_tasks:
+  include_match: spec/.*_spec.rb
+task_defaults:
+  include:
+    - cider-ci/database_task-component.yml
+    - cider-ci/ruby-bundle_task-component.yml
+    - cider-ci/service_task-component.yml
+    - cider-ci/uberjar_task-component.yml
+  traits:
+    JDK 8: true
+    Leiningen 2: true
+    Firefox ESR 78: true
+  ports:
+    LEIHS_ADMIN_HTTP_PORT:
+      min: 3000
+      max: 3999
+  environment_variables:
+    DATABASE_NAME: leihs_api_{{CIDER_CI_TRIAL_ID}}
+    LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
+    LEIHS_DATABASE_URL: "jdbc:postgresql://localhost/{{DATABASE_NAME}}?max-pool-size=5"
+    LEIHS_ADMIN_HTTP_BASE_URL: http://localhost:{{LEIHS_ADMIN_HTTP_PORT}}
+    LEIHS_SECRET: '{{CIDER_CI_TRIAL_ID}}'
+    RAILS_ENV: test
+    RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+    RUBY_ENGINE: ruby
+    RUBY_VERSION: 2.6.0
+  git_options:
+    submodules:
+      include_match: ^.*$
+  trial_attachments:
+    screenshots:
+      include_match: '^tmp\/screenshots\/.+\.png$'
+      content_type: image/png
+  scripts:
+    test:
+      body: |
+        #!/usr/bin/env bash
+        set -eux
+        export PATH=~/.rubies/$RUBY/bin:$PATH
+        env | sort
+        mkdir -p log
+        xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
