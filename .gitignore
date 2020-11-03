@@ -1,5 +1,6 @@
+/client/src/locale/xx.json
+/client/src/locale/zz.json
+tmp/
 client.tgz
 client/procure_client_app/
 log/
-/client/src/locale/zz.json
-/client/src/locale/xx.json

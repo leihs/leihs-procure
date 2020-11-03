@@ -1,0 +1,37 @@
+context:
+  generate_tasks:
+    # include_match: server/spec/authorization_spec.rb
+    include_match: server/spec/.*_spec.rb
+  task_defaults:
+    include:
+      - cider-ci/bundle-ruby_task-component.yml
+      - cider-ci/environment_variables.yml
+      - cider-ci/database_task-component.yml
+      - cider-ci/uberjar_task-component.yml
+      - cider-ci/service_task-component.yml
+    environment_variables:
+      LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+    traits:
+      JDK 8: true
+      Leiningen 2: true
+    ports:
+      LEIHS_PROCURE_HTTP_PORT:
+        min: 3200
+        max: 3299
+    git_options:
+      submodules:
+        include_match: ^.*$
+    scripts:
+      test:
+        start_when:
+          procure service is running:
+            script_key: procure-service-is-running
+          ruby-bundled:
+            script_key: bundle-ruby
+        body: |
+          #!/usr/bin/env bash
+          set -euxo
+          export PATH=~/.rubies/$RUBY/bin:$PATH
+          cd server
+          mkdir -p log
+          bundle exec rspec --backtrace ../$CIDER_CI_TASK_FILE

@@ -1,0 +1,51 @@
+context:
+
+  generate_tasks:
+    # include_match: ^spec\/(.*)admin_crud.feature
+    include_match: ^spec\/features\/(.*)\.feature$
+
+  task_defaults:
+    include:
+      - cider-ci/bundle-ruby_task-component.yml
+      - cider-ci/environment_variables.yml
+      - cider-ci/database_task-component.yml
+      - cider-ci/uberjar_task-component.yml
+      - cider-ci/service_task-component.yml
+    environment_variables:
+      LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+
+    traits:
+      JDK 8: true
+      Leiningen 2: true
+      Firefox ESR 45: true
+
+    ports:
+      LEIHS_PROCURE_HTTP_PORT:
+        min: 3200
+        max: 3299
+
+    git_options:
+      submodules:
+        include_match: ^.*$
+
+    trial_attachments:
+      screenshots:
+        include_match: tmp\/(.*-|)screenshots\/.*\.png$
+        content_type: image/png
+
+    scripts:
+      test:
+        timeout: 6 Minutes
+        start_when:
+          procure service is running:
+            script_key: procure-service-is-running
+            states: [passed]
+          ruby-bundled:
+            script_key: bundle-ruby
+        body: |
+          #!/usr/bin/env bash
+          set -eux
+          export PATH=~/.rubies/$RUBY/bin:$PATH
+          mkdir -p log
+          xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
+

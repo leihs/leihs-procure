@@ -1,0 +1,39 @@
+depends_on: &GOOD_TO_MERGE_DEPENDENCIES
+
+  feature-specs was successful:
+    type: job
+    job_key: feature-specs
+    states: [passed]
+
+  backend-specs was successful:
+    type: job
+    job_key: backend-specs
+    states: [passed]
+
+  client-lint-and-specs was successful:
+    type: job
+    job_key: client-lint-and-specs
+    states: [passed]
+
+  build-procure-uberjar was successful:
+    type: job
+    job_key: build-procure-uberjar
+    states: [passed]
+
+  good to merge of the database:
+    job_key: good-to-merge
+    type: job
+    submodule: ['server/database']
+    states: [passed]
+
+run_when: *GOOD_TO_MERGE_DEPENDENCIES
+
+context:
+  task_defaults:
+    max_trials: 1
+  tasks:
+    all relevant tests have passed:
+      name: "All relevant tests have passed, thus good to merge"
+      scripts:
+        main:
+          body: echo 'All relevant tests have passed' ; exit 0

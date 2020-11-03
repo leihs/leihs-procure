@@ -1,0 +1,21 @@
+run_when:
+  any branch is pushed: { type: branch, include_match: ^.*$ }
+task_defaults:
+  environment_variables:
+    CI: 'true'
+  git_options:
+    submodules:
+      include_match: ^.*$
+  traits:
+    npm: true
+tasks:
+  test:
+    scripts:
+      test:
+        timeout: 10 minutes
+        body: 'cd client && { npm ci || npm i ;} && npm test'
+  lint:
+    scripts:
+      lint:
+        timeout: 10 minutes
+        body: 'cd client && { npm ci || npm i ;} && npm run ci:lint'
