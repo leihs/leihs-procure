@@ -1,35 +1,34 @@
 require 'sequel'
 require 'addressable'
 
+DB_ENV = ENV['LEIHS_DATABASE_URL'].presence
+
+def http_uri
+  @http_uri ||= \
+    Addressable::URI.parse DB_ENV.gsub(/^jdbc:postgresql/,'http').gsub(/^postgres/,'http')
+end
+
 def database
   @database ||= \
     Sequel.connect(
-      if (db_env = ENV['LEIHS_DATABASE_URL'].presence)
-        # trick Addressable to parse db urls
-        http_uri = Addressable::URI.parse db_env.gsub(/^jdbc:postgresql/,'http').gsub(/^postgres/,'http')
-        db_url = 'postgres://' \
+      if DB_ENV
+        'postgres://' \
           + (http_uri.user.presence || ENV['PGUSER'].presence || 'postgres') \
           + ((pw = (http_uri.password.presence || ENV['PGPASSWORD'].presence)) ? ":#{pw}" : "") \
           + '@' + (http_uri.host.presence || ENV['PGHOST'].presence || ENV['PGHOSTADDR'].presence || 'localhost') \
           + ':' + (http_uri.port.presence || ENV['PGPORT'].presence || 5432).to_s \
           + '/' + ( http_uri.path.presence.try(:gsub,/^\//,'') || ENV['PGDATABASE'].presence || 'leihs') \
           + '?pool=5'
-  else
-    'postgresql://leihs:leihs@localhost:5432/leihs?pool=5'
-  end
-  )
-end
-
-def reset_database
-  clean_db
-  set_settings
-  resurrect_general_building
-  resurrect_general_room_for_general_building
+      else
+        'postgresql://leihs:leihs@localhost:5432/leihs?pool=5'
+      end
+    )
 end
 
 RSpec.configure do |config|
   config.before :each  do
-    reset_database
+    clean_db
+    system("DATABASE_NAME=#{http_uri.basename} ./server/database/scripts/restore-seeds")
   end
 end
 

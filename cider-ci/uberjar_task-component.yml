@@ -25,7 +25,7 @@ scripts:
   build-procure-client:
     start_when:
       install-ruby-passed: {script_key: install-ruby}
-    timeout: 5 minutes
+    timeout: 10 minutes
     body: ${LEIHS_PROCURE_DIR}/client/bin/build
     exclusive_executor_resource: build-procure-client
   build-procure-uberjar:

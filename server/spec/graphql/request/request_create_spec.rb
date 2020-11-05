@@ -103,7 +103,8 @@ describe 'request' do
 
     context 'get data for new request' do
       before do
-        @general_room_from_general = FactoryBot.create(:room, :general_from_general)
+        @general_room_from_general = \
+          Room.find(building_id: 'abae04c5-d767-425e-acc2-7ce04df645d1', general: true)
         # check that user is not inspector for category
         expect(CategoryInspector.find(category_id: category.id, user_id: requester.id)).not_to be
       end
