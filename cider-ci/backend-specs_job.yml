@@ -4,6 +4,8 @@ context:
     include_match: server/spec/.*_spec.rb
   task_defaults:
     include:
+      - path: cider-ci/install-ruby_task-component.yml
+        submodule: [client/leihs-ui]
       - cider-ci/bundle-ruby_task-component.yml
       - cider-ci/environment_variables.yml
       - cider-ci/database_task-component.yml
@@ -22,12 +24,26 @@ context:
       submodules:
         include_match: ^.*$
     scripts:
+
+      bundle-ruby-for-server-specs:
+        exclusive_executor_resource: bundle-ruby_{{$RUBY}}
+        timeout: 20 Minutes
+        body: |
+          #!/usr/bin/env bash
+          set -eux
+          export PATH=~/.rubies/$RUBY/bin:$PATH
+          cd server
+          bundle install
+        start_when:
+          install-ruby:
+            script_key: install-ruby
+
       test:
         start_when:
           procure service is running:
             script_key: procure-service-is-running
           ruby-bundled:
-            script_key: bundle-ruby
+            script_key: bundle-ruby-for-server-specs
         body: |
           #!/usr/bin/env bash
           set -euxo
