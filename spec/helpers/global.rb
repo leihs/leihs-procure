@@ -18,6 +18,15 @@ module Helpers
       first(:link_or_button, locator, options).click
     end
 
+
+    def click_on_first_user(user, options = {})
+      element = "a ul li"
+      name = "#{user.firstname} #{user.lastname}"
+      wait_until(3) { all(element, text: name).first }
+      all(element, text: name).first.click
+    end
+
+
     def within_first(locator, options = {}, &block)
       wait_until(3){first(locator, options)}
       within(first(locator, options)) do

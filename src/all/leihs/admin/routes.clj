@@ -16,43 +16,47 @@
    [leihs.core.routing.back :as routing]
    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
 
-   [leihs.admin.auth.authorization :as authorization]
-   [leihs.admin.back.html :as html]
+   [leihs.core.auth.core :as authorization :refer [admin-scopes? system-admin-scopes?]]
+   [leihs.admin.html :as html]
    [leihs.admin.env :as env]
    [leihs.admin.paths :refer [path paths]]
-   [leihs.admin.resources.system.authentication-system.back :as authentication-system]
-   [leihs.admin.resources.system.authentication-system.groups.back :as authentication-system-groups]
-   [leihs.admin.resources.system.authentication-system.users.back :as authentication-system-users]
-   [leihs.admin.resources.system.authentication-systems.back :as authentication-systems]
 
-   [leihs.admin.resources.delegations.delegation.back :as delegation]
-   [leihs.admin.resources.delegations.delegation.users.back :as delegation-users]
-   [leihs.admin.resources.delegations.delegation.groups.back :as delegation-groups]
-   [leihs.admin.resources.delegations.back :as delegations]
-   [leihs.admin.resources.group.back :as group]
-   [leihs.admin.resources.group.users.back :as group-users]
-   [leihs.admin.resources.groups.back :as groups]
-   [leihs.admin.resources.inventory-pools.authorization :as inventory-pools-authorization :refer [http-safe-and-some-pools-lending-manger? pool-lending-manager? pool-inventory-manager?]]
-   [leihs.admin.resources.inventory-pools.back :as inventory-pools]
-   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.back :as entitlement-groups]
-   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.back :as entitlement-group]
-   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.back :as entitlement-group-users]
-   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.back :as entitlement-group-groups]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.back :as inventory-pool-groups]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.back :as inventory-pool-group-roles]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.back :as inventory-pool-users]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.back :as inventory-pool-user-direct-roles]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.back :as inventory-pool-user-groups-roles]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.back :as inventory-pool-user-roles]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.back :as inventory-pool-user-suspension]
+   [leihs.admin.resources.statistics.basic :as statistics-basic]
+
+   [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
+   [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
+
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+
+   [leihs.admin.resources.groups.group.main :as group]
+   [leihs.admin.resources.groups.group.users.main :as group-users]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.main :as inventory-pools]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as pool-delegations]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as pool-delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as pool-delegation-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as pool-delegation-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main :as entitlement-group]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main :as entitlement-group-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.main :as inventory-pool-user]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
    [leihs.admin.resources.settings.back :as settings]
    [leihs.admin.resources.status.back :as status]
-   [leihs.admin.resources.system.database.audits.back :as audits]
-   [leihs.admin.resources.system.system-admins.back :as system-admins]
-   [leihs.admin.resources.system.system-admins.direct-users.back :as system-admin-direct-users]
-   [leihs.admin.resources.system.system-admins.groups.back :as system-admin-groups]
-   [leihs.admin.resources.user.back :as user]
-   [leihs.admin.resources.users.back :as users]
+   [leihs.admin.resources.system.system-admins.main :as system-admins]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.resources.users.user.main :as user]
+   [leihs.admin.resources.users.user.groups :as user-groups]
+   [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
 
    [bidi.bidi :as bidi]
    [bidi.ring :refer [make-handler]]
@@ -68,7 +72,9 @@
    [logbug.catcher :as catcher]
    [logbug.debug :as debug :refer [I>]]
    [logbug.ring :refer [wrap-handler-with-logging]]
-   [logbug.thrown :as thrown]))
+   [logbug.thrown :as thrown]
+
+   ))
 
 (declare redirect-to-root-handler)
 
@@ -84,21 +90,6 @@
       :not-found}))
 
 
-(def admin-scopes?
-  (authorization/scope-authorizer
-    {:scope_admin_read true
-     :scope_admin_write true
-     :scope_system_admin_read false
-     :scope_system_admin_write false}))
-
-(def system-admin-scopes?
-  (authorization/scope-authorizer
-    {:scope_admin_read true
-     :scope_admin_write true
-     :scope_system_admin_read true
-     :scope_system_admin_write true}))
-
-
 (def resolve-table
   (merge core-routes/resolve-table
          {:authentication-system {:handler authentication-system/routes :authorizers [system-admin-scopes?]}
@@ -107,49 +98,64 @@
           :authentication-system-user {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
           :authentication-system-users {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
           :authentication-systems {:handler authentication-systems/routes :authorizers [system-admin-scopes?]}
-          :database-audits-before {:handler audits/routes :authorizers [system-admin-scopes?]}
-          :database-audits-download {:handler audits/routes :authorizers [system-admin-scopes?]}
-          :delegation {:handler delegation/routes :authorizers [admin-scopes?]}
-          :delegation-add-choose-responsible-user {:handler delegation/routes :authorizers [admin-scopes?]}
-          :delegation-edit-choose-responsible-user {:handler delegation/routes :authorizers [admin-scopes?]}
-          :delegation-group {:handler delegation-groups/routes :authorizers [admin-scopes?]}
-          :delegation-groups {:handler delegation-groups/routes :authorizers [admin-scopes?]}
-          :delegation-user {:handler delegation-users/routes :authorizers [admin-scopes?]}
-          :delegation-users {:handler delegation-users/routes :authorizers [admin-scopes?]}
-          :delegations {:handler delegations/routes :authorizers [admin-scopes?]}
-          :group {:handler group/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
-          :group-inventory-pools-roles {:handler group/routes :authorizers [admin-scopes?]}
-          :group-user {:handler group-users/routes :authorizers [admin-scopes?]}
-          :group-users {:handler group-users/routes :authorizers [admin-scopes?]}
-          :groups {:handler groups/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
-          :inventory-pool {:handler inventory-pools/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-entitlement-group {:handler entitlement-group/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-direct-user {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-groups {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-group {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-users {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-groups {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-inventory-manager?]}
-          :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-user-roles {:handler inventory-pool-user-roles/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-user-suspension {:handler inventory-pool-user-suspension/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pool-users {:handler inventory-pool-users/routes :authorizers [admin-scopes? pool-lending-manager?]}
-          :inventory-pools {:handler inventory-pools/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :group {:handler group/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :group-inventory-pools-roles {:handler group/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :group-user {:handler group-users/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :group-users {:handler group-users/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :groups {:handler groups/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :inventory-pool {:handler inventory-pools/routes
+                           :authorizers [admin-scopes?
+                                         pool-auth/pool-inventory-manager?
+                                         pool-auth/pool-lending-manager-and-http-safe?]}
+          :inventory-pool-delegation {:handler pool-delegation/routes
+                                      :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegation-group {:handler pool-delegation-groups/routes
+                                            :authorizers [admin-scopes?
+                                                          pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegation-groups {:handler pool-delegation-groups/routes
+                                             :authorizers [admin-scopes?
+                                                           pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegation-user {:handler pool-delegation-users/routes
+                                           :authorizers [admin-scopes?
+                                                         pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegation-users {:handler pool-delegation-users/routes
+                                            :authorizers [admin-scopes?
+                                                          pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegations {:handler pool-delegations/routes
+                                       :authorizers [admin-scopes?
+                                                     pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-group {:handler entitlement-group/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-group-direct-user {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-group-group {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-group-groups {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-group-users {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-groups {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+          :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user-roles {:handler inventory-pool-user-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user {:handler inventory-pool-user/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user-suspension {:handler inventory-pool-user-suspension/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-users {:handler inventory-pool-users/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pools {:handler inventory-pools/routes
+                            :authorizers [admin-scopes?
+                                          pool-auth/some-lending-manager-and-http-safe?]}
           :not-found {:handler html/not-found-handler :authorizers [all-granted]}
           :redirect-to-root {:handler redirect-to-root-handler :authorizers [all-granted]}
+          :statistics-basic {:handler statistics-basic/routes :authorizers [admin-scopes?]}
           :status {:handler status/routes :authorizers [all-granted]}
-          :system-admin-direct-users {:handler system-admin-direct-users/routes :authorizers [admin-scopes?]}
-          :system-admin-groups {:handler system-admin-groups/routes :authorizers [admin-scopes?]}
-          :system-admins {:handler system-admins/routes :authorizers [admin-scopes?]}
-          :system-admins-direct-user {:handler system-admin-direct-users/routes :authorizers [admin-scopes?]}
-          :system-admins-group {:handler system-admin-groups/routes :authorizers [admin-scopes?]}
-          :user {:handler user/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
-          :user-inventory-pools-roles {:handler user/routes :authorizers [admin-scopes?]}
-          :user-transfer-data {:handler user/routes :authorizers [admin-scopes?]}
-          :users {:handler users/routes :authorizers [admin-scopes? http-safe-and-some-pools-lending-manger?]}
+          :system-admins {:handler system-admins/routes
+                          :authorizers [system-admin-scopes?]}
+          :system-admin {:handler system-admins/routes
+                               :authorizers [system-admin-scopes?]}
+          :user {:handler user/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :user-inventory-pools {:handler user-inventory-pools/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :user-groups {:handler user-groups/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :user-transfer-data {:handler user/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :users {:handler users/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
+          :users-choose {:handler users/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
           }))
 
 
@@ -196,8 +202,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
 (defn canonicalize-params-map [params & {:keys [parse-json?]
                                          :or {parse-json? true}}]
   (if-not (map? params)
@@ -207,7 +211,6 @@
                 [(keyword k)
                  (if parse-json? (json/try-parse-json v) v)]))
          (into {}))))
-
 
 (defn wrap-empty [handler]
   (fn [request]

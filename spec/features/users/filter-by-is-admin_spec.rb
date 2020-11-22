@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Filter users', type: :feature do
+feature 'Filter users by admin status ', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'bunch of users exist, as an admin via the UI' do
 
     before :each do
       @admin = FactoryBot.create :admin
@@ -12,7 +12,7 @@ feature 'Filter users', type: :feature do
     end
 
 
-    describe 'is admin filters' do
+    describe 'is_admin filter' do
 
       before :each do
         visit '/admin/'

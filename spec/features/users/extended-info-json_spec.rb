@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage users', type: :feature do
+feature 'Extended info of users ', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'bunch of users exist, as an admin via the UI' do
 
     before :each do
       @admins = 3.times.map do
@@ -20,11 +20,11 @@ feature 'Manage users', type: :feature do
     end
 
 
-    scenario 'adding a new user with extended_info as json' do 
+    scenario 'adding a new user with extended_info as json' do
 
       visit '/admin/'
       click_on 'Users'
-      click_on 'Add user'
+      click_on 'Create user'
       uncheck 'is_admin'
       check 'account_enabled'
       check 'password_sign_in_enabled'

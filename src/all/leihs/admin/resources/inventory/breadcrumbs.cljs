@@ -3,6 +3,7 @@
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]])
   (:require
+    [leihs.core.auth.core :as auth]
     [leihs.core.breadcrumbs :as core-breadcrumbs]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
@@ -13,4 +14,6 @@
 
 (def li core-breadcrumbs/li)
 
-(defn inventory-li [] (li :inventory [:span icons/inventory " Inventory "]))
+(defn inventory-li []
+  [li :inventory [:span icons/inventory " Inventory "] {} {}
+   :authorizers [auth/admin-scopes?]])

@@ -5,7 +5,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.core.sql :as sql]
     [leihs.core.ds :refer [ds]]
-    [leihs.admin.resources.user.back :refer [password-hash]]
+    [leihs.admin.resources.users.user.main :refer [password-hash]]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]

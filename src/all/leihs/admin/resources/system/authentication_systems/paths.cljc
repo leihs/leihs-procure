@@ -10,7 +10,7 @@
   (branch "/authentication-systems"
           (branch "/"
                   (leaf "" :authentication-systems)
-                  (leaf "add" :authentication-system-add))
+                  (leaf "create" :authentication-system-create))
           (branch "/"
                   (param :authentication-system-id)
                   (leaf "" :authentication-system)

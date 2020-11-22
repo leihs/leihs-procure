@@ -1,0 +1,101 @@
+require 'spec_helper'
+require 'pry'
+
+feature 'Manage inventory-pools', type: :feature do
+
+  before :each do
+    @admin = FactoryBot.create :admin
+  end
+
+  let(:name) { Faker::Company.name}
+  let(:description) { Faker::Markdown.sandwich }
+  let(:shortname) { Faker::Name.initials }
+  let(:email) { Faker::Internet.email }
+
+  context 'an admin via the UI' do
+
+    before(:each){ sign_in_as @admin }
+
+    scenario ' creates a new inventory-pool ' do
+
+      visit '/admin/'
+      click_on 'Inventory-Pools'
+      expect(all("a, button", text: 'Create')).not_to be_empty
+      click_on 'Create'
+      fill_in 'name', with: name
+      fill_in 'description', with: description
+      fill_in 'shortname', with: shortname
+      fill_in 'email', with: email
+      check 'is_active'
+      click_on 'Create'
+      wait_until { all(".modal").empty? }
+      wait_until { not page.has_content? "Create Inventory-Pool" }
+      @inventory_pool_path = current_path
+      @inventory_pool_id = current_path.match(/.*\/([^\/]+)/)[1]
+      input_values = all("input").map(&:value).join(" ")
+      expect(page.text + input_values).to have_content name
+      expect(page.text + input_values).to have_content shortname
+      expect(page.text + input_values).to have_content email
+      expect(page.text + input_values).to have_content description
+
+      # The inventory pools path includes the newly created inventory pool and
+      # we can get to it via clicking its name
+      click_on "Inventory-Pools"
+      wait_until { current_path == "/admin/inventory-pools/" }
+      wait_until { page.has_content? name }
+      click_on name
+      wait_until { current_path == @inventory_pool_path }
+
+    end
+
+  end
+
+  context 'a inventory-pool manager' do
+
+    before :each do
+      @pool =  FactoryBot.create :inventory_pool
+      @manager = FactoryBot.create :user
+      FactoryBot.create :access_right, user: @manager,
+        inventory_pool: @pool, role: 'inventory_manager'
+    end
+
+    context 'via the UI' do
+      before(:each){ sign_in_as @manager }
+
+      scenario 'there is no create button' do
+        click_on 'Inventory-Pools'
+        wait_until { page.has_content? @pool.name }
+        expect(all("a, button", text: 'Create')).to be_empty
+      end
+
+    end
+
+
+    context 'via API' do
+
+      let :http_client do
+        plain_faraday_client
+      end
+
+      let :prepare_http_client do
+        @api_token = FactoryBot.create :api_token, user_id: @manager.id
+        @token_secret = @api_token.token_secret
+        http_client.headers["Authorization"] = "Token #{@token_secret}"
+        http_client.headers["Content-Type"] = "application/json"
+      end
+
+      before :each do
+        prepare_http_client
+      end
+
+
+      scenario 'creating an inventory_pool is forbidden ' do
+        resp = http_client.post "/admin/inventory-pools/", {}.to_json
+        expect(resp.status).to be== 403
+      end
+
+    end
+
+  end
+
+end

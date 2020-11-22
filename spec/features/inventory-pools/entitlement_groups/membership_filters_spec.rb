@@ -49,7 +49,7 @@ feature 'Entitlement-group Membership filtering ', type: :feature do
       click_on @pool.name
       click_on 'Entitlement-Groups'
       click_on @entitlement_group.name
-      click_on 'Entitlement-Group Users'
+      click_on 'Users'
 
       select '1000', from: 'Per page'
 

@@ -1,21 +1,14 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage users', type: :feature do
+feature 'Searching users', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'a bunch of users, as an admin via the UI' do
 
     before :each do
-      @admins = 3.times.map do
-        FactoryBot.create :admin
-      end.to_set
-
-      @admin = @admins.first
-
-      @users = 15.times.map do
-        FactoryBot.create :user
-      end.to_set
-
+      @admins = 3.times.map { FactoryBot.create :admin }
+      @admin = @admins.sample
+      @users = 97.times.map { FactoryBot.create :user }
       sign_in_as @admin
     end
 
@@ -32,66 +25,53 @@ feature 'Manage users', type: :feature do
       end
 
       scenario 'without any filters all admins and users are shown' do
-        # we can see all admins and users
-
+        tbody = find("table.users tbody").text
         @admins.each do |admin|
-          expect(page).to have_content admin.email
+          expect(tbody).to have_content admin.email
         end
-
         @users.each do |user|
-          expect(page).to have_content user.email
+          expect(tbody).to have_content user.email
         end
       end
 
       scenario 'filtering by admins' do
-
         select 'yes', from: 'Is admin'
-
         wait_until { not page.has_content? "Please wait" }
-
+        tbody = find("table.users tbody").text
         @admins.each do |admin|
-          expect(page).to have_content admin.email
+          expect(tbody).to have_content admin.email
         end
-
         @users.each do |user|
-          expect(page).not_to have_content user.email
+          expect(tbody).not_to have_content user.email
         end
-
       end
 
-      describe 'seaching for a user ' do
+      describe 'searching for a user ' do
 
         before :each do
-          @search_user = @users.first
+          @search_user = @users.sample
           @other_users= @users - [@search_user]
         end
 
         scenario 'searching by email works' do
-          fill_in 'search', with: @search_user.email
-          wait_until { not page.has_content? "Please wait" }
-
+          fill_in 'Search', with: @search_user.email
+          wait_until{all( "table.users tbody tr").count == 1 }
           expect(page).to have_content @search_user.email
-
           @other_users.each do |other_user|
             expect(page).not_to have_content other_user.email
           end
         end
 
         scenario 'searching with small spelling error works' do
-          fill_in 'search', with: "#{@search_user.firstname}X #{@search_user.lastname}"
+          fill_in 'Search', with: "#{@search_user.firstname}X #{@search_user.lastname}"
           wait_until { not page.has_content? "Please wait" }
-
           expect(page).to have_content @search_user.email
-
-          @other_users.each do |other_user|
-            expect(page).not_to have_content other_user.email
-          end
         end
-
 
       end
 
     end
 
   end
+
 end

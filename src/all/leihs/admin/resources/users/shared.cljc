@@ -4,6 +4,7 @@
 
 (def default-fields
   #{
+    :account_enabled
     :email
     :firstname
     :id
@@ -11,6 +12,7 @@
     :lastname
     :login
     :org_id
+    :protected
     })
 
 (def available-fields

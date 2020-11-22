@@ -56,19 +56,19 @@
             :or {edit-mode? false
                  on-change-handler nil
                  ks [:roles]}}]
-     [:div.m-1
-      (doall (for [role roles-hierarchy]
-               (let [enabled (get-in data (conj ks role))]
-                 (if (and (not enabled) (not edit-mode?))
-                   [:div]
-                   [:div.form-check
-                    [:input.form-check-input
-                     {:id role
-                      :type :checkbox
-                      :checked enabled
-                      :on-change (fn [e] (on-change-handler role))
-                      :disabled (not edit-mode?)
-                      }]
-                    [:label.form-check-label
-                     {:for role}
-                     [:span " " role]]]))))]))
+     [:div.mb-1
+      (for [role roles-hierarchy]
+        (let [enabled (get-in data (conj ks role) false)]
+          (if (and (not enabled) (not edit-mode?))
+            ^{:key role} [:div]
+            ^{:key role} [:div.form-check
+                          [:input.form-check-input
+                           {:id role
+                            :type :checkbox
+                            :checked enabled
+                            :on-change (fn [e] (on-change-handler role))
+                            :disabled (not edit-mode?)
+                            }]
+                          [:label.form-check-label
+                           {:for role}
+                           [:span " " role]]])))]))

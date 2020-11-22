@@ -9,11 +9,10 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.front.breadcrumbs :as breadcrumbs]
-    [leihs.admin.front.components :as components]
+    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.common.components :as components]
     [leihs.core.icons :as icons]
-    [leihs.admin.front.shared :refer [humanize-datetime-component gravatar-url]]
-    [leihs.admin.front.state :as state]
+    [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
     [accountant.core :as accountant]

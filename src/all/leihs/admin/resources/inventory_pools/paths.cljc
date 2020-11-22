@@ -2,6 +2,7 @@
 
   (:refer-clojure :exclude [str keyword])
   (:require
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
     [leihs.core.core :refer [keyword str presence]]
     [bidi.verbose :refer [branch param leaf]]
     ))
@@ -46,12 +47,13 @@
 (def paths
   (branch "/inventory-pools/"
           (leaf "" :inventory-pools)
-          (leaf "add" :inventory-pool-add)
+          (leaf "create" :inventory-pool-create)
           (branch ""
                   (param :inventory-pool-id)
                   (leaf "" :inventory-pool)
                   (leaf "/delete" :inventory-pool-delete)
                   (leaf "/edit" :inventory-pool-edit)
                   users-paths
+                  delegations/paths
                   groups-paths
                   entitlement-groups-paths)))

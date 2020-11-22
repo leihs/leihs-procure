@@ -6,9 +6,9 @@ releases:
 - version_major: 1
   version_minor: 0
   version_patch: 0
-  version_pre: PRE
+  version_pre: NULL
   version_build: $TIMESTAMP$
   description: |
 
-    - new admin service with API for external sync 
+    - new admin service with API for external sync
 

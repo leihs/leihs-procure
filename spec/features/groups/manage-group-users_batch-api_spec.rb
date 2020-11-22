@@ -1,16 +1,16 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage group users via API batch put', type: :feature do
+feature 'Managing group users via API batch put', type: :feature do
 
-  context 'an admin, one group and some prepared users' do
+  context 'an admin, one group and some prepared users exist' do
 
     let :http_client do
       plain_faraday_client
     end
 
     let :prepare_http_client do
-      @api_token = FactoryBot.create :api_token, user_id: @admin.id, 
+      @api_token = FactoryBot.create :api_token, user_id: @admin.id,
         scope_admin_read: true, scope_admin_write: true
       @token_secret = @api_token.token_secret
       http_client.headers["Authorization"] = "Token #{@token_secret}"
@@ -45,7 +45,7 @@ feature 'Manage group users via API batch put', type: :feature do
       prepare_http_client
     end
 
-    scenario 'adding and removing users' do 
+    scenario 'adding and removing users' do
 
       # verify that currently the 15 group_users are given via the API
       get_resp = http_client.get "/admin/groups/#{@group.id}/users/?per-page=100"
@@ -53,8 +53,8 @@ feature 'Manage group users via API batch put', type: :feature do
       expect(user_ids).to be== Set.new(@group_users.map(&:id))
 
       # update the group-users
-      data = { org_ids: [@user_to_be_added_by_org_id.org_id], 
-               emails: [@user_to_be_added_by_email.email], 
+      data = { org_ids: [@user_to_be_added_by_org_id.org_id],
+               emails: [@user_to_be_added_by_email.email],
                ids: [@user_to_be_added_by_id.id, @to_be_kept_user.id]}
       put_resp = http_client.put "/admin/groups/#{@group.id}/users/", data.to_json
       expect(put_resp.status).to be== 200

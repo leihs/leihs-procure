@@ -16,14 +16,15 @@ feature 'Manage inventory-pool users ', type: :feature do
 
     scenario ' managing roles of a user' do
 
-      visit "/admin/inventory-pools/#{@pool.id}"
+      click_on 'Inventory-Pools'
+      click_on @pool.name
       click_on "Users"
-      fill_in 'users-search-term', with: @users.first.email
+      select 'any', from: 'Role'
+      fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
-      within_first("td.direct-roles", text: 'add'){ click_on 'add' }
-
+      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
       check "inventory_manager"
       click_on "Save"
 
@@ -51,7 +52,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
 
       # now change the role to lending_manager
-      click_on 'edit'
+      click_on 'Edit'
       uncheck 'inventory_manager'
       check 'lending_manager'
       click_on "Save"
@@ -67,7 +68,8 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       #check on users page
       click_on "Users"
-      fill_in 'users-search-term', with: @users.first.email
+      select 'any', from: 'Role'
+      fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       ['customer', 'group_manager', 'lending_manager'].each do |role|
         expect(page).to have_field(role, disabled: true, checked: true)
@@ -78,9 +80,8 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(find("table.users")).to have_content("lending_manager")
       expect(find("table.users")).not_to have_content("inventory_manager")
 
-
       # quick remove all roles
-      within("table.users") { click_on 'remove' }
+      within("table.users") { click_on 'Remove' }
       wait_until do
         not find("table.users").has_content? "customer"
       end

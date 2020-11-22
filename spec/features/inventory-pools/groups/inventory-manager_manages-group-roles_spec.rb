@@ -19,11 +19,12 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Groups"
-      fill_in 'groups-search-term', with: @groups.first.name
+      select 'any', from: 'Role'
+      fill_in 'Search', with: @groups.first.name
       wait_until { all("table.groups tbody tr").count == 1 }
       expect(page.find("table.groups ")).not_to have_content "customer"
       expect(page.find("table.groups ")).not_to have_content "inventory_manager"
-      click_on "add"
+      click_on "Add"
       wait_until{ current_path.match? %r"/admin/inventory-pools/[^/]+/groups/[^/]+/roles" }
       _, _, _, inventory_pool_id, _, group_id, _  = current_path.split('/')
 

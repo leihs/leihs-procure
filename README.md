@@ -2,6 +2,15 @@ Leihs Admin
 ===========
 
 
+TODOs
+-----
+
+* Suspensions?
+* Scope Groups under inventory pool everywhere, same as user(s)
+* add tab-index in forms everywhere
+* use generalized term-filter everywhere
+
+
 Prerequisite for Building and Development
 -----------------------------------------
 

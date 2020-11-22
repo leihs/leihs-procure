@@ -21,11 +21,12 @@ feature 'Manage inventory-pool users ', type: :feature do
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Users"
-      fill_in 'users-search-term', with: @users.first.email
+      select 'any', from: 'Role'
+      fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
-      within_first("td.direct-roles", text: 'add'){ click_on 'add' }
+      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
 
       check "customer"
       click_on "Save"
@@ -40,7 +41,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
 
       # role to inventory_manager
-      within(".direct-roles"){ click_on "edit"}
+      within(".direct-roles"){ click_on "Edit"}
       check "inventory_manager"
       click_on "Save"
       find("i.fa-user").click
@@ -51,11 +52,12 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
 
       click_on "Users"
-      fill_in 'users-search-term', with: @users.first.email
+      select 'any', from: 'Role'
+      fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(find("table.users")).to have_content "customer"
       # quick remove all roles
-      within("table.users") { click_on 'remove' }
+      within("table.users") { click_on 'Remove' }
       wait_until do
         not find("table.users").has_content? "customer"
       end

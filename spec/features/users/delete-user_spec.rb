@@ -1,75 +1,153 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage users', type: :feature do
+feature 'Deleting users', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'some admins and a bunch of users exist' do
 
     before :each do
-      @admins = 3.times.map do
-        FactoryBot.create :admin
-      end.to_set
-
-      @admin = @admins.first
-
-      @users = 15.times.map do
-        FactoryBot.create :user
-      end.to_set
-
-      sign_in_as @admin
+      @admins = 3.times.map { FactoryBot.create :admin }
+      @users = 15.times.map { FactoryBot.create :user }
     end
 
 
-    scenario 'deleting a user via delete ' do
+    context " an admin " do
 
-      @to_be_deleted_user = @users.first
-
-      visit '/admin/'
-      click_on 'Users'
-
-      fill_in 'search', with: \
-        "#{@to_be_deleted_user.firstname} #{@to_be_deleted_user.lastname}"
-
-      click_on_first @to_be_deleted_user.lastname
-
-      click_on 'Delete'
-
-      click_on 'Delete'
-
-      wait_until do
-        page.has_content? "No (more) users found."
+      before :each do
+        @admin = @admins.sample
+        sign_in_as @admin
       end
 
-      expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
+      scenario 'deletes a user via delete ' do
+
+        @to_be_deleted_user = @users.filter {|u|
+          u[:is_admin]==false and u[:protected]==true}.sample
+        visit '/admin/'
+        click_on 'Users'
+        fill_in 'Search', with: @to_be_deleted_user.email
+        wait_until{ all('tr.user').count == 1 }
+        click_on_first_user @to_be_deleted_user
+        click_on 'Delete'
+        click_on 'Delete'
+        wait_until { page.has_content? "No (more) users found." }
+        expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
+
+      end
+
+      scenario 'deletes a user via transfer and delete' do
+
+        @to_be_deleted_user = @users.filter {|u|
+          u[:is_admin]==false and u[:protected]==true}.sample
+        @target_user = @users.last
+        visit '/admin/'
+        click_on 'Users'
+        fill_in 'Search', with: @to_be_deleted_user.email
+        wait_until{ all('tr.user').count == 1 }
+        click_on_first_user @to_be_deleted_user
+        click_on 'Delete'
+        click_on 'Choose user'
+        fill_in 'Search', with: @target_user.email
+        wait_until{all( "table.users tbody tr").count == 1 }
+        click_on 'Choose user'
+        expect(find_field("Target user").value).to be== @target_user.email
+        click_on 'Transfer and delete'
+        fill_in 'Search', with: @to_be_deleted_user.email
+        wait_until { page.has_content? "No (more) users found." }
+
+      end
 
     end
 
 
+    context "some inventory-pool's lending-manager " do
 
-    scenario 'deleting a user via transfere and delete' do
+      before :each do
+        @pool =  FactoryBot.create :inventory_pool
+        @lending_manager = FactoryBot.create :user
+        FactoryBot.create :access_right, user: @lending_manager,
+          inventory_pool: @pool, role: 'lending_manager'
 
-      @to_be_deleted_user = @users.first
-
-      visit '/admin/'
-      click_on 'Users'
-
-      fill_in 'search', with: \
-        "#{@to_be_deleted_user.firstname} #{@to_be_deleted_user.lastname}"
-
-      click_on_first @to_be_deleted_user.lastname
-
-      click_on 'Delete'
-
-      fill_in 'Target user id', with: @users.to_a.second.id
-
-      click_on 'Transfer and delete'
-
-
-      wait_until do
-        page.has_content? "No (more) users found."
       end
 
-      expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
+
+      context "signs in, and " do
+
+        before(:each){ sign_in_as @lending_manager }
+
+        scenario 'deletes a user via delete ' do
+
+          @to_be_deleted_user = @users.filter {|u|
+            u[:is_admin]==false and u[:protected]==false}.sample
+          visit '/admin/'
+          click_on 'Users'
+          fill_in 'Search', with: @to_be_deleted_user.email
+          wait_until{all( "table.users tbody tr").count == 1 }
+          click_on_first_user @to_be_deleted_user
+          click_on 'Delete'
+          click_on 'Delete'
+          wait_until { page.has_content? "No (more) users found." }
+          expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
+
+        end
+
+        scenario 'deletes a user via transfer and delete' do
+
+          @to_be_deleted_user = @users.filter {|u|
+            u[:is_admin]==false and u[:protected]==false}.sample
+          @target_user = @users.last
+          visit '/admin/'
+          click_on 'Users'
+          fill_in 'Search', with: @to_be_deleted_user.email
+          wait_until{all( "table.users tbody tr").count == 1 }
+          click_on_first_user @to_be_deleted_user
+          click_on 'Delete'
+          click_on 'Choose user'
+          fill_in 'Search', with: @target_user.email
+          wait_until{all( "table.users tbody tr").count == 1 }
+          click_on 'Choose user'
+          expect(find_field("Target user").value).to be== @target_user.email
+          click_on 'Transfer and delete'
+          fill_in 'Search', with: @to_be_deleted_user.email
+          wait_until { page.has_content? "No (more) users found." }
+
+        end
+
+      end
+
+
+      context 'via API' do
+
+        let :http_client do
+          plain_faraday_client
+        end
+
+        let :prepare_http_client do
+          @api_token = FactoryBot.create :api_token, user_id: @lending_manager.id
+          @token_secret = @api_token.token_secret
+          http_client.headers["Authorization"] = "Token #{@token_secret}"
+          http_client.headers["Content-Type"] = "application/json"
+        end
+
+        before :each do
+          prepare_http_client
+        end
+
+        scenario 'to delete protected is forbidden ' do
+          @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==true}.sample
+          resp = http_client.delete "/admin/users/#{@user[:id]}"
+          expect(resp.status).to be== 403
+        end
+
+        scenario 'to transfer and delete protected is forbidden ' do
+          @user = @users.filter{|u| u[:protected]==true}.sample
+          expect(@user).to be
+          @target = @users.filter{|u| u[:id] != @user[:id]}.sample
+          expect(@target).to be
+          resp = http_client.delete "/admin/users/#{@user[:id]}/transfer/#{@target[:id]}"
+          expect(resp.status).to be== 403
+        end
+
+      end
 
     end
 

@@ -8,45 +8,49 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.url.query-params :as query-params]
 
-    [leihs.admin.front.pages.debug]
     [leihs.admin.paths :as paths :refer [path paths]]
-    [leihs.admin.resources.admin.front :as admin]
-    [leihs.admin.resources.delegations.delegation.front :as delegation]
-    [leihs.admin.resources.delegations.delegation.users.front :as delegation-users]
-    [leihs.admin.resources.delegations.delegation.groups.front :as delegation-groups]
-    [leihs.admin.resources.delegations.front :as delegations]
-    [leihs.admin.resources.group.front :as group]
-    [leihs.admin.resources.group.front.inventory-pools-roles :as group-inventory-pools-roles]
-    [leihs.admin.resources.group.users.front :as group-users]
-    [leihs.admin.resources.groups.front :as groups]
-    [leihs.admin.resources.home.front :as home]
-    [leihs.admin.resources.inventory-pools.front :as inventory-pools]
-    [leihs.admin.resources.inventory.front :as inventory]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.front :as inventory-pool-entitlement-group]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.front :as inventory-pool-entitlement-group-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.groups.front :as inventory-pool-entitlement-group-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.front :as inventory-pool-entitlement-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.front :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.front :as inventory-pool-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.front :as inventory-pool-group-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.front :as inventory-pool-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.front :as inventory-pool-user-direct-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.front :as inventory-pool-user]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.front :as inventory-pool-user-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.front :as inventory-pool-user-suspension]
+    [leihs.admin.resources.admin.main :as admin]
+    [leihs.admin.resources.debug]
+    [leihs.admin.resources.groups.group.create :as group-create]
+    [leihs.admin.resources.groups.group.del :as group-delete]
+    [leihs.admin.resources.groups.group.edit :as group-edit]
+    [leihs.admin.resources.groups.group.show :as group-show]
+    [leihs.admin.resources.groups.group.users.main :as group-users]
+    [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.resources.home.main :as home]
+    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.main :as inventory-pool-entitlement-group]
+    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.main :as inventory-pool-entitlement-group-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as delegation-edit]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as delegation-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as delegation]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as delegation-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.groups.main :as inventory-pool-entitlement-group-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as inventory-pool-entitlement-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
+    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.main :as inventory-pool-user]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
+    [leihs.admin.resources.inventory-pools.main :as inventory-pools]
+    [leihs.admin.resources.inventory.main :as inventory]
+    [leihs.admin.resources.statistics.main :as statistics]
     [leihs.admin.resources.status.front :as status]
-    [leihs.admin.resources.system.authentication-system.front :as authentication-system]
-    [leihs.admin.resources.system.authentication-system.groups.front :as authentication-system-groups]
-    [leihs.admin.resources.system.authentication-system.users.front :as authentication-system-users]
-    [leihs.admin.resources.system.authentication-systems.front :as authentication-systems]
-    [leihs.admin.resources.system.database.audits.front :as database-audits]
-    [leihs.admin.resources.system.database.front :as database]
-    [leihs.admin.resources.system.front :as system]
-    [leihs.admin.resources.system.system-admins.direct-users.front :as system-admin-direct-users]
-    [leihs.admin.resources.system.system-admins.front :as system-admins]
-    [leihs.admin.resources.system.system-admins.groups.front :as system-admin-groups]
-    [leihs.admin.resources.user.front :as user]
-    [leihs.admin.resources.users.front :as users]
+    [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
+    [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
+    [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
+    [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
+    [leihs.admin.resources.system.main :as system]
+    [leihs.admin.resources.system.system-admins.main :as system-admins]
+    [leihs.admin.resources.users.choose-main :as users-choose]
+    [leihs.admin.resources.users.main :as users]
+    [leihs.admin.resources.users.user.create :as user-create]
+    [leihs.admin.resources.users.user.delete-main :as user-delete]
+    [leihs.admin.resources.users.user.edit-main :as user-edit]
+    [leihs.admin.resources.users.user.show :as user-show]
 
     [accountant.core :as accountant]
     [bidi.bidi :as bidi]
@@ -59,42 +63,34 @@
   {
    :admin #'admin/page
    :authentication-system #'authentication-system/show-page
-   :authentication-system-add #'authentication-system/add-page
+   :authentication-system-create #'authentication-system/create-page
    :authentication-system-delete #'authentication-system/delete-page
    :authentication-system-edit #'authentication-system/edit-page
    :authentication-system-groups #'authentication-system-groups/page
-   :authentication-system-user-edit #'authentication-system-users/edit-page
-   :authentication-system-users #'authentication-system-users/index-page
+   :authentication-system-users #'authentication-system-users/page
    :authentication-systems #'authentication-systems/page
-   :database #'database/page
-   :database-audits #'database-audits/index-page
-   :database-audits-before #'database-audits/before-page
-   :debug #'leihs.admin.front.pages.debug/page
-   :delegation #'delegation/show-page
-   :delegation-add #'delegation/new-page
-   :delegation-add-choose-responsible-user #'delegation/choose-responsible-user-page
-   :delegation-delete #'delegation/delete-page
-   :delegation-edit #'delegation/edit-page
-   :delegation-edit-choose-responsible-user #'delegation/choose-responsible-user-page
-   :delegation-users #'delegation-users/index-page
-   :delegation-groups #'delegation-groups/page
-   :delegations #'delegations/page
-   :group #'group/show-page
-   :group-add #'group/add-page
-   :group-delete #'group/delete-page
-   :group-edit #'group/edit-page
-   :group-inventory-pools-roles  #'group-inventory-pools-roles/page
+   :debug #'leihs.admin.resources.debug/page
+   :inventory-pool-delegation #'delegation/show-page
+   :inventory-pool-delegation-create #'delegation-edit/new-page
+   :inventory-pool-delegation-edit #'delegation-edit/edit-page
+   :inventory-pool-delegation-users #'delegation-users/index-page
+   :inventory-pool-delegation-groups #'delegation-groups/page
+   :inventory-pool-delegations #'delegations/page
+   :group #'group-show/page
+   :group-create #'group-create/page
+   :group-delete #'group-delete/page
+   :group-edit #'group-edit/page
    :group-users #'group-users/index-page
    :groups #'groups/page
    :home #'home/page
    :inventory #'inventory/page
    :inventory-pool #'inventory-pool/show-page
-   :inventory-pool-add #'inventory-pool/add-page
+   :inventory-pool-create #'inventory-pool/create-page
    :inventory-pool-delete #'inventory-pool/delete-page
    :inventory-pool-edit #'inventory-pool/edit-page
    :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/index-page
    :inventory-pool-entitlement-group #'inventory-pool-entitlement-group/page
-   :inventory-pool-entitlement-group-users #'inventory-pool-entitlement-group-users/page
+   :inventory-pool-entitlement-group-users inventory-pool-entitlement-group-users/page
    :inventory-pool-entitlement-group-groups #'inventory-pool-entitlement-group-groups/page
    :inventory-pool-group-roles #'inventory-pool-group-roles/page
    :inventory-pool-groups #'inventory-pool-groups/index-page
@@ -104,16 +100,15 @@
    :inventory-pool-user-suspension #'inventory-pool-user-suspension/page
    :inventory-pool-users #'inventory-pool-users/index-page
    :inventory-pools #'inventory-pools/page
+   :statistics #'statistics/page
    :status #'status/info-page
    :system #'system/page
-   :system-admin-direct-users #'system-admin-direct-users/page
-   :system-admin-groups #'system-admin-groups/page
    :system-admins #'system-admins/page
-   :user #'user/show-page
-   :user-delete #'user/delete-page
-   :user-edit #'user/edit-page
-   :user-inventory-pools-roles #'user/inventory-pools-roles-page
-   :user-new #'user/new-page
+   :user #'user-show/page
+   :user-delete #'user-delete/page
+   :user-edit #'user-edit/page
+   :user-create #'user-create/page
+   :users-choose #'users-choose/page
    :users #'users/page
    })
 

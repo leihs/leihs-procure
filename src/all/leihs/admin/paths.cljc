@@ -5,7 +5,7 @@
     [leihs.core.paths]
     [leihs.core.url.query-params :as query-params]
 
-    [leihs.admin.resources.delegations.paths :as delegations]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
     [leihs.admin.resources.system.paths :as system]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
     [leihs.admin.resources.inventory.paths :as inventory]
@@ -18,8 +18,9 @@
           [clojure.tools.logging :as logging]
           [logbug.catcher :as catcher]
           [logbug.debug :as debug]
-          [logbug.thrown :as thrown]
-          ])))
+          [logbug.thrown :as thrown]])
+    #?@(:cljs
+         [[taoensso.timbre :as logging]])))
 
 (def external-handlers
   #{:admin-audits-legacy
@@ -29,7 +30,6 @@
     :admin-mail-templates
     :admin-rooms
     :admin-settings
-    :admin-statistics
     :admin-suppliers
     :borrow
     :home
@@ -46,22 +46,24 @@
   (branch "/users"
           (branch "/"
                   (leaf "" :users)
-                  (leaf "new" :user-new))
+                  (leaf "new" :user-create)
+                  (leaf "choose" :users-choose))
           (branch "/"
                   (param :user-id)
                   (leaf "" :user)
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
-                  (leaf "/inventory-pools-roles/" :user-inventory-pools-roles)
+                  (leaf "/inventory-pools/" :user-inventory-pools)
+                  (leaf "/groups/" :user-groups)
                   (branch "/transfer/"
-                          (param :target-user-id)
+                          (param [#"[^/]+" :target-user-uid])
                           (leaf "" :user-transfer-data)))))
 
 (def groups-paths
   (branch "/groups"
           (branch "/"
                   (leaf "" :groups)
-                  (leaf "add" :group-add))
+                  (leaf "create" :group-create))
           (branch "/"
                   (param :group-id)
                   (leaf "" :group)
@@ -74,6 +76,10 @@
                                   (param :user-id)
                                   (leaf "" :group-user))))))
 
+(def statistics-paths
+  (branch "/statistics/"
+          (leaf  "" :statistics)
+          (leaf "basic/" :statistics-basic)))
 
 (def paths
   (branch ""
@@ -81,12 +87,12 @@
           (branch "/admin"
                   (leaf "/status" :status)
                   (leaf "/debug" :debug)
-                  delegations/paths
                   groups-paths
                   inventory-pools/paths
                   inventory/paths
                   system/paths
                   users-paths
+                  statistics-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)
@@ -94,14 +100,19 @@
                   (leaf "/mail_templates" :admin-mail-templates)
                   (leaf "/rooms" :admin-rooms)
                   (leaf "/settings" :admin-settings)
-                  (leaf "/statistics" :admin-statistics)
                   (leaf "/suppliers" :admin-suppliers)
                   )))
 
 
 (reset! leihs.core.paths/paths* paths)
 
-(def path leihs.core.paths/path)
+(defn path [& args]
+  (try
+    (apply leihs.core.paths/path args)
+    #?(:cljs
+       (catch :default e
+         (logging/error e args)
+         (throw e)))))
 
 ;(path :system-admins-direct-user {:user-id "foo"})
-;(path :user-inventory-pools-roles {:user-id "123"})
+;(path :user-inventory-pools {:user-id "123"})

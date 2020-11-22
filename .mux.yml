@@ -23,6 +23,7 @@ windows:
   7:
     name: test
     command: |
+      export LEIHS_DATABASE_URL="postgresql://localhost:5432/leihs?max-pool-size=5"
       export LEIHS_ADMIN_HTTP_BASE_URL=http://localhost:3220
       export RAILS_ENV=test
   8:

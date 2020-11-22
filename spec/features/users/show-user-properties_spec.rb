@@ -1,16 +1,13 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage users', type: :feature do
+feature 'Show users properties', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'a bunch of users, as an admin via the UI' do
 
     before :each do
-      @admins = 3.times.map do
-        FactoryBot.create :admin
-      end.to_set
-
-      @admin = @admins.first
+      @admins = 3.times.map { FactoryBot.create :admin }
+      @admin = @admins.sample
 
       @users = 15.times.map do
         FactoryBot.create :user
@@ -21,26 +18,18 @@ feature 'Manage users', type: :feature do
       sign_in_as @admin
     end
 
-
     scenario 'showing user properties on the user show page' do
 
       visit '/admin/'
       click_on 'Users'
-
-      fill_in 'search', with: \
-        "#{@user.firstname} #{@user.lastname}"
-
-      click_on_first "#{@user.firstname} #{@user.lastname}"
-
+      fill_in 'Search', with: @user.email
+      wait_until{all( "table.users tbody tr").count == 1 }
+      click_on_first_user @user
       wait_until(10) do
         page.has_content? "User #{@user.firstname} #{@user.lastname}"
       end
-
-      expect(page).to have_content 'firstname'
-      expect(page).to have_content 'lastname'
-      expect(page).to have_content 'org_id'
-      expect(page).to have_content 'badge_id'
-      expect(page).not_to have_content /\s+password\s+/
+      expect(page).to have_content 'Email'
+      expect(page).to have_content @user.email
 
     end
   end

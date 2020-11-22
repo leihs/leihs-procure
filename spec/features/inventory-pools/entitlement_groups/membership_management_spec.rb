@@ -26,15 +26,15 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on @pool.name
       click_on 'Entitlement-Groups'
       click_on @entitlement_group.name
-      click_on 'Entitlement-Group Users'
+      click_on 'Users'
       select 'members and non-members', from: 'Membership'
       click_on_first 'next' # go to the second page because we want also test some internal indexing complexity
       within(first 'tr.user') do
-          expect(find_field("_member", disabled: true)).not_to be_checked
-          within("td.direct-member") { click_on 'add' }
-          wait_until { find_field("_member", disabled: true).checked? }
-          click_on 'remove'
-          wait_until { not find_field("_member", disabled: true).checked? }
+          expect(find_field("member", disabled: true)).not_to be_checked
+          within("td.direct-member") { click_on 'Add' }
+          wait_until { find_field("member", disabled: true).checked? }
+          click_on 'Remove'
+          wait_until { not find_field("member", disabled: true).checked? }
       end
     end
 
@@ -44,24 +44,26 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on @pool.name
       click_on 'Entitlement-Groups'
       click_on @entitlement_group.name
-      click_on 'Entitlement-Group Users'
+      click_on 'Users'
       select 'members and non-members', from: 'Membership'
-      fill_in 'users-search-term', with: user.email
+      fill_in 'Search', with: user.email
       wait_until{ all('tr.user').count == 1 }
       user_on_users_page = current_url
-      within('tr.user') do
-        expect(find_field("_member", disabled: true)).not_to be_checked
-        within('td.group-member') {click_on 'add'}
+      within(find('tr.user')) do
+        expect(find_field("member", disabled: true)).not_to be_checked
+        within('td.group-member') {click_on 'Add'}
       end
-      click_on_first 'add'
+      click_on_first 'Add'
+      wait_until { all('.modal').empty? }
       visit user_on_users_page
-      # now the users is a member, wait_until because we might see stale cached data briefly
-      wait_until { find_field('_member', disabled: true).checked? }
-      within('td.group-member') { click_on 'edit' }
-      click_on 'remove'
+      # now the user is a member, wait_until because we might see stale cached data briefly
+      wait_until { find_field('member', disabled: true).checked? }
+      within('td.group-member') { click_on 'Edit' }
+      click_on 'Remove'
+      wait_until { all('.modal').empty? }
       visit user_on_users_page
       # now the users is no member anymore
-      wait_until { not find_field('_member', disabled: true).checked? }
+      wait_until { not find_field('member', disabled: true).checked? }
     end
 
   end

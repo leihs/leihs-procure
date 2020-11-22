@@ -1,22 +1,22 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage users', type: :feature do
+feature 'Editing users images', type: :feature do
 
-  context 'an existing admin user ' do
+  context 'an admin user via the UI' do
 
     before :each do
       @user = FactoryBot.create :admin
     end
 
 
-    scenario 'setting, seeing and then removing the user image works' do
+    scenario 'stets, views and then removes user images ' do
 
       sign_in_as @user
 
       click_on "Users"
       within '.users' do
-        click_on_first @user.lastname
+        click_on_first_user @user
       end
       click_on 'Edit'
 

@@ -1,13 +1,12 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Filter users', type: :feature do
+feature 'Filter users by account status', type: :feature do
 
-  context 'an admin user and a bunch of users' do
+  context 'a bunch of users exist, as an Admin via the UI' do
 
     before :each do
       @admin = FactoryBot.create :admin
-
 
       @enabeld_user = FactoryBot.create :user, account_enabled: true
       @not_enabeld_user = FactoryBot.create :user, account_enabled: false

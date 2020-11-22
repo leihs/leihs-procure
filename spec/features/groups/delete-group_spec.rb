@@ -1,43 +1,109 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage groups', type: :feature do
+feature 'Deleting groups', type: :feature do
 
-
-  context 'an admin user and a bunch of other users and one group' do
+  context 'some admins, a bunch of users and a bunch of groups exist' do
 
     before :each do
-      @admins = 3.times.map do
-        FactoryBot.create :admin
-      end.to_set
+      @admins = 3.times.map { FactoryBot.create :admin }
+      @users = 100.times.map { FactoryBot.create :user }
+      @groups = 100.times.map { FactoryBot.create :group }
+    end
 
-      @admin = @admins.first
+    context 'an admin via the UI' do
 
-      @users = 15.times.map do
-        FactoryBot.create :user
-      end.to_set
+      before :each do
+        @admin = @admins.sample
+        sign_in_as @admin
+      end
 
-      @group = FactoryBot.create :group
+      scenario "deletes a protected group" do
+        @group = @groups.filter{|g| g[:protected] == true }.sample
+        expect(database[:groups].where(id: @group.id).first).to be
+        visit '/admin/'
+        click_on 'Groups'
+        fill_in 'Search', with: @group.name
+        click_on @group.name
+        click_on 'Delete'
+        wait_until do
+          page.has_content? "Delete Group #{@group.name}"
+        end
+        click_on 'Delete'
+        wait_until{ current_path == '/admin/groups/' }
+        expect(database[:groups].where(id: @group.id).first).not_to be
+      end
 
-      sign_in_as @admin
     end
 
 
-    scenario "delete a group" do
-      visit '/admin/'
-      click_on 'Groups'
-      click_on @group.name
-      click_on 'Delete'
-      wait_until do
-        page.has_content? "Delete Group #{@group.name}"
-      end
-      click_on 'Delete'
-      wait_until do
-        page.has_content? "No (more) groups found."
+
+    context "some inventory-pool's lending-manager " do
+
+      before :each do
+        @pool =  FactoryBot.create :inventory_pool
+        @lending_manager = FactoryBot.create :user
+        FactoryBot.create :access_right, user: @lending_manager,
+          inventory_pool: @pool, role: 'lending_manager'
+
       end
 
+
+      context "signs in, and " do
+
+        before(:each){ sign_in_as @lending_manager }
+
+        scenario "deletes an unprotected protected group" do
+          @group = @groups.filter{|g| g[:protected] == false }.sample
+          expect(database[:groups].where(id: @group.id).first).to be
+          visit '/admin/'
+          click_on 'Groups'
+          fill_in 'Search', with: @group.name
+          click_on @group.name
+          click_on 'Delete'
+          wait_until do
+            page.has_content? "Delete Group #{@group.name}"
+          end
+          click_on 'Delete'
+          wait_until{ current_path == '/admin/groups/' }
+          expect(database[:groups].where(id: @group.id).first).not_to be
+        end
+
+        scenario 'can not delete a protected group' do
+          @group = @groups.filter{|g| g[:protected] == true }.sample
+          expect(database[:groups].where(id: @group.id).first).to be
+          visit '/admin/'
+          click_on 'Groups'
+          fill_in 'Search', with: @group.name
+          click_on @group.name
+          expect(all("a, button", text: "Delete").count).to be== 0
+        end
+
+        context 'via the API' do
+
+          let :http_client do
+            plain_faraday_client
+          end
+
+          let :prepare_http_client do
+            @api_token = FactoryBot.create :api_token, user_id: @lending_manager.id
+            @token_secret = @api_token.token_secret
+            http_client.headers["Authorization"] = "Token #{@token_secret}"
+            http_client.headers["Content-Type"] = "application/json"
+          end
+
+          before :each do
+            prepare_http_client
+          end
+
+          scenario 'tries to delete a protected group which is forbidden ' do
+            @group = @groups.filter{|u| u[:protected]==true }.sample
+            resp = http_client.delete "/admin/groups/#{@group[:id]}"
+            expect(resp.status).to be== 403
+          end
+
+        end
+      end
     end
-
   end
-
 end

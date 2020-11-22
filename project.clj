@@ -22,7 +22,7 @@
 
   :aot [#"leihs\..*"]
 
-  :main leihs.admin.back.main
+  :main leihs.admin.main
 
   :plugins [[lein-asset-minifier "0.4.4" :exclusions [org.clojure/clojure]]
             [lein-cljsbuild "1.1.7"]
@@ -43,7 +43,7 @@
                :app
                {:source-paths ["src/all" "src/dev" "shared-clj/src"]
                 :compiler
-                {:main "leihs.admin.front.init"
+                {:main "leihs.admin.main"
                  :asset-path "/admin/js/out"
                  :output-to "target/cljsbuild/public/admin/js/app.js"
                  :output-dir "target/cljsbuild/public/admin/js/out"

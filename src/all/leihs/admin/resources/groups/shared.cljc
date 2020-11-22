@@ -5,6 +5,7 @@
     :name
     :id
     :org_id
+    :protected
     })
 
 (def available-fields
