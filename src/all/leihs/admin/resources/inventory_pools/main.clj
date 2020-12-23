@@ -130,4 +130,4 @@
 ;(debug/wrap-with-log-debug #'inventory-pools-query)
 ;(debug/wrap-with-log-debug #'inventory-pools-formated-query)
 ;(logging-config/set-logger! :level :info)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
