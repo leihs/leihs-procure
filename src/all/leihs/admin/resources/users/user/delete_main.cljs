@@ -9,10 +9,9 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs-user]
     [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
@@ -32,8 +31,8 @@
   (reset! transfer-data*
           (-> @routing/state*
               :query-params-raw
-              (select-keys [:chosen-user-uid])
-              (rename-keys {:chosen-user-uid :target-user-uid}))))
+              (select-keys [:user-uid])
+              (rename-keys {:user-uid :target-user-uid}))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,7 +96,9 @@
    [:a.btn.btn-info
     {:tab-index 3
      :href (path :users-choose {}
-                 (assoc @transfer-data* :referer (:path @routing/state*)))}
+                 {:return-to (path (:handler-key @routing/state*)
+                                   (:route-params @routing/state*)
+                                   @transfer-data*)})}
     [:i.fas.fa-rotate-90.fa-hand-pointer.px-2]
     " Choose user "]])
 
@@ -149,18 +150,11 @@
   [:div.user-delete
    [routing/hidden-state-component
     {:did-mount user-core/clean-and-fetch}]
-   [:div.row
-    [:nav.col-lg {:aria-label :breadcrumb :role :navigation}
-     [:ol.breadcrumb
-      [breadcrumbs/leihs-li]
-      [breadcrumbs/admin-li]
-      [breadcrumbs/users-li]
-      [breadcrumbs/user-li @user-id*]
-      [breadcrumbs-user/delete-li @user-id*]]]
-    [:nav.col-lg {:role :navigation}]]
+   [breadcrumbs/nav-component
+    (conj  @breadcrumbs/left* [breadcrumbs/delete-li] ) []]
    [:h1 "Delete User "
     (when-let [user @user-data*] (user-core/name-component user))
-    " (" (when-let [user @user-data*] (user-core/some-id user)) ") " ]
+    " (" (when-let [user @user-data*] (user-core/some-uid user)) ") " ]
    [delete-without-reasignment-component]
    [delete-with-transfer-component]
    [debug-component]])

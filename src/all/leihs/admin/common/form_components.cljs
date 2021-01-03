@@ -4,10 +4,15 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [leihs.admin.paths :refer [path]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url wait-component]]
     [leihs.core.icons :as icons]
+
+    [taoensso.timbre :as logging]
+    [accountant.core :as accountant]
+    [cljs.core.async :refer [timeout]]
+    [reagent.core :as reagent]
     [cljs.pprint :refer [pprint]]
     ))
 
@@ -118,3 +123,8 @@
   [:button.btn.btn-warning.btn-sm
    {:type :submit}
    [:span icons/delete " Remove "]])
+
+
+
+;;;
+

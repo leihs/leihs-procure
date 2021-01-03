@@ -54,7 +54,7 @@
                    {:user-id (:id user)
                     :inventory-pool-id @inventory-pool/id*})}
    [:ul.list-unstyled
-    (for [[idx item] (map-indexed vector (user2/fullname-some-id-seq user))]
+    (for [[idx item] (map-indexed vector (user2/fullname-some-uid-seq user))]
       ^{key idx} [:li {:key idx} item])]])
 
 (defn user-td-component [user]

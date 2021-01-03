@@ -47,7 +47,7 @@
    [routing/hidden-state-component {:did-mount user/clean-and-fetch}]
    (let [p (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
                                        :user-id @user-id*})
-         name-or-id (user/fullname-or-some-id @user-data*)]
+         name-or-id (user/fullname-or-some-uid @user-data*)]
      [components/link [:em name-or-id] p])])
 
 

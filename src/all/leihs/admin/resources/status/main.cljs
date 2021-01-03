@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.status.front
+(ns leihs.admin.resources.status.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -9,18 +9,15 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.status.breadcrumbs :as breadcrumbs]
+
     [leihs.admin.common.components :as components]
     [leihs.core.icons :as icons]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
+    [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
     ))
 
@@ -52,19 +49,13 @@
             (js/setTimeout  #(fetch-status-info) 1000))))))
 
 (defn info-page []
-  (reagent/create-class
-    {:component-did-mount #(fetch-status-info)
-     :reagent-render
-     (fn [_]
-       [:div.session
-        (breadcrumbs/nav-component
-          [(breadcrumbs/leihs-li)
-           (breadcrumbs/admin-li)
-           (breadcrumbs/li :status "Status-Info")]
-          [])
-        [:h1 "Server-Status Info"]
-        [:p "The data shown below is mostly of interest for exploring the API or for debugging."]
-        (when-let [status-info-data @status-info-data*]
-          [:pre.bg-light
-           (with-out-str (pprint status-info-data))])])}))
+  [:div.status
+   [routing/hidden-state-component
+    {:did-mount fetch-status-info}]
+   [breadcrumbs/nav-component @breadcrumbs/left* []]
+   [:h1 "Leihs-Admin Server-Status Info"]
+   [:p "The data shown below is mostly of interest for monitoring or debugging."]
+   (when-let [status-info-data @status-info-data*]
+     [:pre.bg-light
+      (with-out-str (pprint status-info-data))])])
 

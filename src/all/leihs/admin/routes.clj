@@ -21,12 +21,11 @@
    [leihs.admin.env :as env]
    [leihs.admin.paths :refer [path paths]]
 
-   [leihs.admin.resources.statistics.basic :as statistics-basic]
 
-   [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
-   [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
-   [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
-   [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
+   [leihs.admin.resources.audits.changes.main :as audited-changes]
+   [leihs.admin.resources.audits.changes.change.main :as audited-change]
+   [leihs.admin.resources.audits.requests.main :as audited-requests]
+   [leihs.admin.resources.audits.requests.request.main :as audited-request]
 
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
 
@@ -50,13 +49,22 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
-   [leihs.admin.resources.settings.back :as settings]
-   [leihs.admin.resources.status.back :as status]
+   [leihs.admin.settings :as settings]
+   [leihs.admin.resources.status.main :as status]
+
+   [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
+   [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
    [leihs.admin.resources.system.system-admins.main :as system-admins]
+
+
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.groups :as user-groups]
    [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
+
+   [leihs.admin.resources.statistics.basic :as statistics-basic]
 
    [bidi.bidi :as bidi]
    [bidi.ring :refer [make-handler]]
@@ -92,12 +100,33 @@
 
 (def resolve-table
   (merge core-routes/resolve-table
-         {:authentication-system {:handler authentication-system/routes :authorizers [system-admin-scopes?]}
-          :authentication-system-group {:handler authentication-system-groups/routes  :authorizers [admin-scopes?]}
-          :authentication-system-groups {:handler authentication-system-groups/routes :authorizers [admin-scopes?]}
-          :authentication-system-user {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
-          :authentication-system-users {:handler authentication-system-users/routes :authorizers [admin-scopes?]}
-          :authentication-systems {:handler authentication-systems/routes :authorizers [system-admin-scopes?]}
+         {:audited-changes {:handler audited-changes/routes
+                            :authorizers [system-admin-scopes?]}
+
+          :audited-changes-meta {:handler audited-changes/routes
+                                 :authorizers [system-admin-scopes?]}
+
+          :audited-change {:handler audited-change/routes
+                           :authorizers [system-admin-scopes?]}
+
+          :audited-requests {:handler audited-requests/routes
+                             :authorizers [system-admin-scopes?]}
+
+          :audited-request {:handler audited-request/routes
+                            :authorizers [system-admin-scopes?]}
+
+          :authentication-system {:handler authentication-system/routes
+                                  :authorizers [system-admin-scopes?]}
+          :authentication-system-group {:handler authentication-system-groups/routes
+                                        :authorizers [admin-scopes?]}
+          :authentication-system-groups {:handler authentication-system-groups/routes
+                                         :authorizers [admin-scopes?]}
+          :authentication-system-user {:handler authentication-system-users/routes
+                                       :authorizers [admin-scopes?]}
+          :authentication-system-users {:handler authentication-system-users/routes
+                                        :authorizers [admin-scopes?]}
+          :authentication-systems {:handler authentication-systems/routes
+                                   :authorizers [system-admin-scopes?]}
           :group {:handler group/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
           :group-inventory-pools-roles {:handler group/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
           :group-user {:handler group-users/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}

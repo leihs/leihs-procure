@@ -27,8 +27,10 @@
 
 (def leihs-version (dom/data-attribute "body" "leihsversion"))
 
-
-(def debug?* (reaction (:debug @global-state*)))
+(def debug?*
+  (reaction
+    (or (:debug @global-state*)
+        (-> @routing/state* :query-params :debug))))
 
 (defn update-state [state-ref key-seq fun]
   (swap! state-ref
@@ -45,7 +47,7 @@
                                [:debug]
                                (fn [v] (not v)))}]
    [:label.navbar-text {:for "toggle-debug"
-                        :style {:padding-left "0.25em"}} " debug "]])
+                        :style {:padding-left "0.25em"}} " Debug "]])
 
 (defn debug-component []
   (when (:debug @global-state*)

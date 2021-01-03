@@ -8,20 +8,14 @@
     [leihs.core.icons :as icons]
 
     [leihs.admin.paths :as paths :refer [path paths]]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory.breadcrumbs :as inventory-breadcrumbs]
+    [leihs.admin.resources.inventory.breadcrumbs :as breadcrumbs]
 
     [clojure.string :as str]
     ))
 
-
 (defn page []
   [:div.page.inventory-page
-   [breadcrumbs/nav-component
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [inventory-breadcrumbs/inventory-li]]
-    []]
+   [breadcrumbs/nav-component @breadcrumbs/left* []]
    [:h1 "Inventory"]
    [:h2 "Export / Download Inventory"]
    [:ul

@@ -10,11 +10,11 @@
     [leihs.core.icons :as icons]
     [leihs.core.auth.core :as auth]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.user.core :refer [user-data*]]
-    [leihs.admin.resources.inventory-pools.authorization :refer [some-lending-manager?]]
+    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
 
     [cljs.pprint :refer [pprint]]
     [cljs.core.async :as async :refer [timeout]]
@@ -23,22 +23,43 @@
     [taoensso.timbre :as logging]
     ))
 
+(defonce user-id*
+  (reaction (or (-> @routing/state* :route-params :user-id)
+                "user-id")))
+
+(def li breadcrumbs/li)
+(def nav-component breadcrumbs/nav-component)
+
 (defn some-lending-manager-user-unprotected? [current-user-state _]
-  (and (some-lending-manager? current-user-state _)
+  (and (pool-auth/some-lending-manager? current-user-state _)
        (boolean  @user-data*)
        (-> @user-data* :protected not)))
 
-(defn edit-li [id]
+(defn edit-li []
   [breadcrumbs/li :user-edit [:span [:i.fas.fa-edit] " Edit "]
-   {:user-id id} {}
+   {:user-id @user-id*} {}
    :button true
    :authorizers [auth/admin-scopes?
                  some-lending-manager-user-unprotected?]])
 
-(defn delete-li [id]
+(defn delete-li []
   [breadcrumbs/li :user-delete [:span [:i.fas.fa-times] " Delete "]
-   {:user-id id} {}
+   {:user-id @user-id*} {}
    :button true
    :authorizers [auth/admin-scopes?
                  some-lending-manager-user-unprotected?]])
 
+(defn user-li []
+  [li :user [:span icons/user " User "] {:user-id @user-id*} {}
+   :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]])
+
+(defn user-my-li []
+  [li :my-user [:span icons/user
+                " User-Home in leihs/my
+                " [:i.fas.fa-external-link-alt]]
+   {:user-id @user-id*} {}
+   :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]])
+
+(defonce left*
+  (reaction
+    (conj @breadcrumbs/left* [user-li])))

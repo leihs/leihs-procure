@@ -9,7 +9,7 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
@@ -23,7 +23,6 @@
 
     [taoensso.timbre :as logging]
     ))
-
 
 
 (defn post [& args]
@@ -68,10 +67,7 @@
    [routing/hidden-state-component
     {:did-mount clean}]
    [breadcrumbs/nav-component
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [breadcrumbs/users-li]
-     [breadcrumbs/user-create-li]][]]
+    (conj @breadcrumbs/left* [breadcrumbs/user-create-li])[]]
    [:h1 "Create User " ]
    [edit-form-component]
    [edit-core/debug-component]])

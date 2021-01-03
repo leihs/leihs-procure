@@ -64,18 +64,24 @@
       trim
       presence))
 
-(defn some-id [user]
+(defn some-uid [user]
+  (or (some-> user :email presence)
+      (some-> user :login presence)
+      (some-> user :org_id presence)
+      (some-> user :id)))
+
+(defn some-id-component [user]
   [:span.text-monospace
    (or (some-> user :email presence)
        (some-> user :login presence)
        (some-> user :org_id presence)
        (some-> user :id (split "-") first))])
 
-(defn fullname-or-some-id [user]
-  (or (fullname user) (some-id user)))
+(defn fullname-or-some-uid [user]
+  (or (fullname user) (some-uid user)))
 
-(defn fullname-some-id-seq [user]
-  (->> [(fullname user) (some-id user)]
+(defn fullname-some-uid-seq [user]
+  (->> [(fullname user) (some-uid user)]
        (filter identity)))
 
 (defn name-component [user]
@@ -83,7 +89,7 @@
    (when-not user
      (logging/error "use name-link-component when you call wo argument and :user-id is in the routes"))
    (let [p (path :user {:user-id (:id user)})
-         name-or-id (fullname-or-some-id user)]
+         name-or-id (fullname-or-some-uid user)]
      [components/link [:em name-or-id] p])])
 
 (defn name-link-component []
@@ -92,7 +98,7 @@
     {:did-change clean-and-fetch
      :did-mount clean-and-fetch}]
    (let [p (path :user {:user-id @user-id*})
-         name-or-id (fullname-or-some-id @user-data*)]
+         name-or-id (fullname-or-some-uid @user-data*)]
      [components/link [:em name-or-id] p])])
 
 (defn img-avatar-component [user]

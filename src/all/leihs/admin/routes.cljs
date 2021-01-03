@@ -9,15 +9,19 @@
     [leihs.core.url.query-params :as query-params]
 
     [leihs.admin.paths :as paths :refer [path paths]]
-    [leihs.admin.resources.admin.main :as admin]
-    [leihs.admin.resources.debug]
+
+    [leihs.admin.resources.audits.main :as audits]
+    [leihs.admin.resources.audits.changes.main :as audited-changes]
+    [leihs.admin.resources.audits.changes.change.main :as audited-change]
+    [leihs.admin.resources.audits.requests.main :as audited-requests]
+    [leihs.admin.resources.audits.requests.request.main :as audited-request]
+
     [leihs.admin.resources.groups.group.create :as group-create]
     [leihs.admin.resources.groups.group.del :as group-delete]
     [leihs.admin.resources.groups.group.edit :as group-edit]
     [leihs.admin.resources.groups.group.show :as group-show]
     [leihs.admin.resources.groups.group.users.main :as group-users]
     [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.home.main :as home]
     [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.main :as inventory-pool-entitlement-group]
     [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.main :as inventory-pool-entitlement-group-users]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as delegation-edit]
@@ -37,8 +41,10 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
     [leihs.admin.resources.inventory-pools.main :as inventory-pools]
     [leihs.admin.resources.inventory.main :as inventory]
+    [leihs.admin.resources.leihs-root :as home]
+    [leihs.admin.resources.main :as admin]
     [leihs.admin.resources.statistics.main :as statistics]
-    [leihs.admin.resources.status.front :as status]
+    [leihs.admin.resources.status.main :as status]
     [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
@@ -62,6 +68,11 @@
 (def resolve-table
   {
    :admin #'admin/page
+   :audits #'audits/page
+   :audited-changes #'audited-changes/page
+   :audited-change #'audited-change/page
+   :audited-requests #'audited-requests/page
+   :audited-request #'audited-request/page
    :authentication-system #'authentication-system/show-page
    :authentication-system-create #'authentication-system/create-page
    :authentication-system-delete #'authentication-system/delete-page
@@ -69,7 +80,6 @@
    :authentication-system-groups #'authentication-system-groups/page
    :authentication-system-users #'authentication-system-users/page
    :authentication-systems #'authentication-systems/page
-   :debug #'leihs.admin.resources.debug/page
    :inventory-pool-delegation #'delegation/show-page
    :inventory-pool-delegation-create #'delegation-edit/new-page
    :inventory-pool-delegation-edit #'delegation-edit/edit-page

@@ -5,7 +5,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.core.sql :as sql]
     [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
-    [leihs.admin.resources.mail-templates.back :as mail-templates]
+    [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
 
     [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]

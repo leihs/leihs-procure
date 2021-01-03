@@ -9,7 +9,7 @@
     [leihs.core.icons :as icons]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
 
@@ -41,6 +41,4 @@
 
 (defonce left*
   (reaction
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [groups-li]]))
+    (conj @breadcrumbs/left* [groups-li])))

@@ -4,7 +4,7 @@
   (:require
     [leihs.admin.env]
     [leihs.admin.paths]
-    [leihs.admin.resources.status.back :as status]
+    [leihs.admin.resources.status.main :as status]
     [leihs.admin.routes :as routes]
     [leihs.core.ds :as ds]
     [leihs.core.http-server :as http-server]

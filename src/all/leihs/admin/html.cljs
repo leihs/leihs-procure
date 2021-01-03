@@ -13,10 +13,11 @@
     [leihs.core.user.shared :refer [short-id]]
     [leihs.core.env :refer [use-global-navbar?]]
 
-    [leihs.admin.utils.misc :refer [humanize-datetime-component]]
+    [leihs.admin.common.http-client.modals]
     [leihs.admin.state :as state]
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.admin.main :as admin :refer [page] :rename {page home-page}]
+    ; TODO remove the following
+    [leihs.admin.resources.main :as admin :refer [page] :rename {page home-page}]
 
     [clojure.pprint :refer [pprint]]
     [accountant.core :as accountant]
@@ -82,6 +83,7 @@
 (defn current-page []
   [:div
    [leihs.core.requests.modal/modal-component]
+   [leihs.admin.common.http-client.modals/modal-component]
    [:div
     (if-let [page (:page @routing/state*)]
       [page]

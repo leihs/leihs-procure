@@ -9,7 +9,7 @@
     [leihs.core.icons :as icons]
     [leihs.core.auth.core :as auth]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
 
     [cljs.pprint :refer [pprint]]
@@ -19,7 +19,15 @@
     [taoensso.timbre :as logging]
     ))
 
+
+(def li breadcrumbs/li)
+(def nav-component breadcrumbs/nav-component)
+
 (defn statistics-li []
-  [breadcrumbs/li :statistics
+  [li :statistics
    [:span [:i.fas.fa-chart-line] " Statistics "] {} {}
    :authorizers [auth/admin-scopes?]])
+
+(defonce left*
+  (reaction
+    (conj @breadcrumbs/left* [statistics-li])))

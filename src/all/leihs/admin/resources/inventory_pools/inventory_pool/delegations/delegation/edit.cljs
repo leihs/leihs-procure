@@ -31,8 +31,8 @@
           (merge {:protected true}
                  (-> @routing/state*
                      :query-params
-                     (select-keys [:name :responsible_user_id :chosen-user-uid :protected])
-                     (rename-keys {:chosen-user-uid :responsible_user_id})))))
+                     (select-keys [:name :responsible_user_id :user-uid :protected])
+                     (rename-keys {:user-uid :responsible_user_id})))))
 
 ;;; form ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -41,7 +41,9 @@
    [:a.btn.btn-info
     {:tab-index form-components/TAB-INDEX
      :href (path :users-choose {}
-                 (assoc @data* :referer (:path @routing/state*)))}
+                 {:return-to (path (:handler-key @routing/state*)
+                                   (:route-params @routing/state*)
+                                   @data*)})}
     [:i.fas.fa-rotate-90.fa-hand-pointer.px-2]
     " Choose responsible user "]])
 

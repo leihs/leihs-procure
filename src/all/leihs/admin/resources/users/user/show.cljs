@@ -8,13 +8,14 @@
     [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs-user]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.breadcrumbs :as breadcrumbs-common]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.audits.changes.breadcrumbs :as audited-changes-breadcrumbs]
+    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as user-core :refer [clean-and-fetch user-id* user-data*] ]
     [leihs.admin.resources.users.user.groups :as groups]
     [leihs.admin.resources.users.user.inventory-pools :as inventory-pools]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -30,15 +31,15 @@
   [:div.user
    [routing/hidden-state-component
     {:did-mount clean-and-fetch}]
-   (breadcrumbs/nav-component
-     [[breadcrumbs/leihs-li]
-      [breadcrumbs/admin-li]
-      [breadcrumbs/users-li]
-      [breadcrumbs/user-li @user-id*]]
-     [[breadcrumbs/email-li (:email @user-data*)]
-      [breadcrumbs/user-my-li @user-id*]
-      [breadcrumbs-user/delete-li @user-id*]
-      [breadcrumbs-user/edit-li @user-id*]])
+   [breadcrumbs/nav-component
+     @breadcrumbs/left*
+     [[breadcrumbs-common/email-li (:email @user-data*)]
+      [breadcrumbs/user-my-li]
+      [audited-changes-breadcrumbs/changes-li
+       :query-params {:pkey (:id @user-data*)
+                      :table "users"}]
+      [breadcrumbs/delete-li]
+      [breadcrumbs/edit-li]]]
    [:h1 " User " (when @user-data* [user-core/name-component @user-data*])]
    [:div.basic-properties.mb-2
     [:h3 "Basic User Properties"]

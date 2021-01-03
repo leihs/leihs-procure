@@ -5,10 +5,11 @@
     [leihs.core.paths]
     [leihs.core.url.query-params :as query-params]
 
+    [leihs.admin.resources.audits.paths :as audits]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
-    [leihs.admin.resources.system.paths :as system]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
     [leihs.admin.resources.inventory.paths :as inventory]
+    [leihs.admin.resources.system.paths :as system]
 
     [bidi.verbose :refer [branch param leaf]]
     [bidi.bidi :refer [path-for match-route]]
@@ -87,6 +88,7 @@
           (branch "/admin"
                   (leaf "/status" :status)
                   (leaf "/debug" :debug)
+                  audits/paths
                   groups-paths
                   inventory-pools/paths
                   inventory/paths

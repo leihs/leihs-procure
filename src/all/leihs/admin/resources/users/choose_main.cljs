@@ -8,8 +8,8 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.url.query-params :as query-params]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.main :as users-main]
     [leihs.admin.resources.users.shared :as users-shared]
 
@@ -22,13 +22,15 @@
 (defn choose-user-td-component [user]
   [:td {:key :choose}
    [:a.btn.btn-sm.btn-primary
-    {:href (let [uid (or (:email user) (:login user)  (:id user))]
-             (str (-> @routing/state* :query-params-raw :referer)
-                  "?" (-> @routing/state*
-                          :query-params-raw
-                          (dissoc :referer)
-                          (assoc :chosen-user-uid uid)
-                          query-params/encode )))}
+    {:href (if-let [href (-> @routing/state* :query-params-raw
+                             :return-to presence)]
+             (let [href-params (routing/dissect-href href)
+                   uid (or (:email user) (:login user) (:id user))]
+               (path (:handler-key href-params)
+                     (:route-params href-params)
+                     (assoc (:query-params-raw href-params) :user-uid uid)
+                     (:fragment href-params)))
+             "")}
     [:i.fas.fa-rotate-90.fa-hand-pointer]
     " Choose user "]])
 
@@ -45,14 +47,10 @@
 (defn page []
   [:div
    [breadcrumbs/nav-component
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [breadcrumbs/users-li]
-     [breadcrumbs/users-choose-li]][]]
+    (conj @breadcrumbs/left* [breadcrumbs/users-choose-li]) []]
    [routing/hidden-state-component
     {:did-mount users-main/escalate-query-paramas-update
      :did-update users-main/escalate-query-paramas-update}]
-
    [:div.card.bg-light
     [:div.card-body
      [:div.form-row
@@ -64,8 +62,6 @@
       [routing/form-reset-component
        :default-query-params users-shared/default-query-params
        ]]]]
-
    [routing/pagination-component]
-
    [table]
    [routing/pagination-component]])

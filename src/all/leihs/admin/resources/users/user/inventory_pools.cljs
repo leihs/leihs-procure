@@ -69,7 +69,7 @@
         user-in-pool-path (path :inventory-pool-user
                                 {:inventory-pool-id (:inventory_pool_id row)
                                  :user-id @user-id*})
-        user-in-pool-inner [:em (user-core/fullname-or-some-id @user-data*)]
+        user-in-pool-inner [:em (user-core/fullname-or-some-uid @user-data*)]
         pool-inner [:em (:inventory_pool_name row )]]
     [:td
      [:span

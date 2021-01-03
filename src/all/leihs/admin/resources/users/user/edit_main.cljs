@@ -9,8 +9,7 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.users.user.breadcrumbs :as user-breadcrumbs]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
@@ -98,11 +97,7 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch}]
    [breadcrumbs/nav-component
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [breadcrumbs/users-li]
-     [breadcrumbs/user-li @user-id*]
-     [user-breadcrumbs/edit-li @user-id*]][]]
+    (conj @breadcrumbs/left* [breadcrumbs/edit-li]) []]
    [:h1 "Edit User " (when @data* [core/name-component @data*])]
    (if (not @data*)
      [wait-component]

@@ -6,9 +6,12 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url wait-component]]
+    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
     [leihs.core.icons :as icons]
 
+    [leihs.admin.utils.clipboard :as clipboard]
+
+    [clojure.string :as string]
     [taoensso.timbre :as logging]
     [cljs.pprint :refer [pprint]]
     ))
@@ -38,3 +41,22 @@
 
 (defn pre-component [data]
   [:pre (with-out-str (pprint data))])
+
+(defn truncated-id-component
+  [id & {:keys [key copy-to-clipboard max-length]
+         :or {key :id
+              copy-to-clipboard true
+              max-length 5}}]
+  [:<> (if-not (presence id)
+         [:span "-"]
+         [:span
+          {:key key
+           :class (str key)
+           (keyword (str  "data-" key)) id
+           :style {:white-space :nowrap}}
+          [:span.text-monospace
+           (if (> (count id) max-length)
+             (str (->> id (take max-length) string/join) "\u2026")
+             id)]
+          (when copy-to-clipboard
+            [:sup " " [clipboard/button-tiny id]])])])

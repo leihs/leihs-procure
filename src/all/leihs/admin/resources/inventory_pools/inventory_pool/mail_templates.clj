@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.mail-templates.back
+(ns leihs.admin.resources.inventory-pools.inventory-pool.mail-templates
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]]
             [leihs.core.sql :as sql]

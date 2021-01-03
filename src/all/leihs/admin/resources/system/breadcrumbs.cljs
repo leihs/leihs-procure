@@ -8,7 +8,7 @@
     [leihs.core.icons :as icons]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]))
 
 (def li breadcrumbs/li)
@@ -31,6 +31,4 @@
 
 (defonce left*
   (reaction
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [system-li]]))
+    (conj @breadcrumbs/left* [system-li])))

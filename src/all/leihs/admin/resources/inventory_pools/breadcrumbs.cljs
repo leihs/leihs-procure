@@ -4,11 +4,10 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
     [leihs.core.auth.core :as auth]
-    [leihs.core.breadcrumbs :as core-breadcrumbs :refer [li]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
     [leihs.core.routing.front :as routing]
@@ -20,6 +19,8 @@
     [taoensso.timbre :as logging]
     ))
 
+(def li breadcrumbs/li)
+(def nav-component breadcrumbs/nav-component)
 
 ;;; Inventory Pools ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -42,6 +43,4 @@
 
 (defonce left*
   (reaction
-    [[breadcrumbs/leihs-li]
-     [breadcrumbs/admin-li]
-     [inventory-pools-li]]))
+    (conj @breadcrumbs/left* [inventory-pools-li])))

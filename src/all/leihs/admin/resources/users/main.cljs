@@ -6,26 +6,23 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.requests.core :as requests]
-
-    [leihs.admin.defaults :as defaults]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.utils.seq :as seq]
+    [leihs.admin.common.components :as components]
+    [leihs.admin.defaults :as defaults]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.shared :as shared]
-    [leihs.admin.resources.users.user.core :as user2]
+    [leihs.admin.resources.users.user.core :as user]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.string :as str]
     [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
+    [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -160,7 +157,7 @@
 
 (defn user-td-inner-component [user]
   [:ul.list-unstyled
-   (for [[idx item] (map-indexed vector (user2/fullname-some-id-seq user))]
+   (for [[idx item] (map-indexed vector (user/fullname-some-uid-seq user))]
      ^{key idx} [:li {:key idx} item])])
 
 (defn user-td-component [user]
@@ -249,10 +246,8 @@
       [:table.table.table-striped.table-sm.users
        [thead-component hds]
        [:tbody.users
-        (let [page (:page @current-query-paramerters-normalized*)
-              per-page (:per-page @current-query-paramerters-normalized*)]
-          (doall (for [user users]
-                   (row-component user tds))))]]
+        (doall (for [user users]
+                 (row-component user tds)))]]
       [:div.alert.alert-warning.text-center "No (more) users found."])))
 
 
@@ -298,9 +293,7 @@
 (defn page []
   [:div.users
    [breadcrumbs/nav-component
-     [[breadcrumbs/leihs-li]
-      [breadcrumbs/admin-li]
-      [breadcrumbs/users-li]]
-     [[breadcrumbs/user-create-li]]]
+    @breadcrumbs/left*
+    [[breadcrumbs/user-create-li]]]
    [:h1 "Users"]
    [main-page-content-component]])

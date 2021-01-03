@@ -12,7 +12,6 @@
     [leihs.core.auth.core :as auth-core]
 
     [leihs.admin.defaults :as defaults]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs-core]
     [leihs.admin.common.components :as components]
     [leihs.admin.utils.misc :refer [wait-component]]
     [leihs.admin.state :as state]
@@ -203,7 +202,7 @@
 
 (defn page []
   [:div.inventory-pools
-   (breadcrumbs-core/nav-component
+   (breadcrumbs/nav-component
      @breadcrumbs/left*
      [[breadcrumbs/create-li]])
    [:h1 icons/inventory-pools " Inventory-Pools"]
