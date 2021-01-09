@@ -5,6 +5,7 @@
     [leihs.core.paths]
     [leihs.core.url.query-params :as query-params]
 
+    [leihs.admin.resources.settings.paths :as settings]
     [leihs.admin.resources.audits.paths :as audits]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
@@ -92,6 +93,7 @@
                   groups-paths
                   inventory-pools/paths
                   inventory/paths
+                  settings/paths
                   system/paths
                   users-paths
                   statistics-paths

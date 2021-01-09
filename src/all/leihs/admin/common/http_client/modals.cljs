@@ -84,7 +84,9 @@
          [modal-body-inner body]
          [:hr]])
       [:small
-       [:p "Please try to reload this page with the reload button of your browser. "]
+       (if (constants/HTTP_UNSAVE_METHODS (:method request))
+         [:p "Please try to send the data again. If that fails use reload button of your browser and send again. "]
+         [:p "Please try to reload this page with the reload button of your browser. "])
        [:p [:span
             "Contact your administrator or file a bug report if this problem persists. "
             "Please provide the details for this request: "

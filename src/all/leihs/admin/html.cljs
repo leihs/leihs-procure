@@ -88,7 +88,7 @@
     (if-let [page (:page @routing/state*)]
       [page]
       [:div.page
-       [:h1.text-danger "Application error: the current path can not be resolved!"]])]
+       [:h1.text-danger "Error 404 - There is no handler for the current path defined."]])]
    [state/debug-component]
    [:nav.footer.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col.mt-4
     [:div.col

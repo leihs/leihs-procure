@@ -59,7 +59,7 @@
      (swap! requests* assoc id req)
      (go (<! (timeout (:delay req)))
          (let [resp (<! (http-client/request
-                          (select-keys req [:url :method :headers])))]
+                          (select-keys req [:url :method :headers :json-params :body])))]
            (when (:success resp)
              (if (:modal-on-response-success req)
                (go (<! (timeout 1000))
@@ -67,9 +67,12 @@
                (dismiss id)))
            (when (get @requests* id)
              (swap! requests* assoc-in [id :response] resp))
-           (when-let [chan (:chan data)] (>! chan resp))))
+           (when-let [chan (:chan req)] (>! chan resp))))
      req)))
 
+
+(defn filter-success [response]
+  (when (:success response) response))
 
 ;;; UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -77,8 +80,7 @@
   [:div.wait-component
    {:style { :opacity 0.4}}
    [:div.text-center
-    [:i.fas.fa-spinner.fa-spin.fa-5x
-     ]]
+    [:i.fas.fa-spinner.fa-spin.fa-5x]]
    [:div.text-center
     {:style {}}
     "Wait for " (-> req :method str str/upper-case)

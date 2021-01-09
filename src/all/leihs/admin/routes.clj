@@ -15,8 +15,9 @@
    [leihs.core.routes :as core-routes :refer [all-granted]]
    [leihs.core.routing.back :as routing]
    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
-
+   [leihs.core.settings :as settings]
    [leihs.core.auth.core :as authorization :refer [admin-scopes? system-admin-scopes?]]
+
    [leihs.admin.html :as html]
    [leihs.admin.env :as env]
    [leihs.admin.paths :refer [path paths]]
@@ -49,7 +50,6 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
-   [leihs.admin.settings :as settings]
    [leihs.admin.resources.status.main :as status]
 
    [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
@@ -58,6 +58,10 @@
    [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
    [leihs.admin.resources.system.system-admins.main :as system-admins]
 
+   [leihs.admin.resources.settings.languages.main :as languages-settings]
+   [leihs.admin.resources.settings.misc.main :as misc-settings]
+   [leihs.admin.resources.settings.smtp.main :as smtp-settings]
+   [leihs.admin.resources.settings.syssec.main :as syssec-settings]
 
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.resources.users.user.main :as user]
@@ -179,6 +183,17 @@
                           :authorizers [system-admin-scopes?]}
           :system-admin {:handler system-admins/routes
                                :authorizers [system-admin-scopes?]}
+
+          :languages-settings {:handler languages-settings/routes
+                          :authorizers [admin-scopes?]}
+          :misc-settings {:handler misc-settings/routes
+                          :authorizers [admin-scopes?]}
+          :smtp-settings {:handler smtp-settings/routes
+                          :authorizers [system-admin-scopes?]}
+          :syssec-settings {:handler syssec-settings/routes
+                          :authorizers [system-admin-scopes?]}
+
+
           :user {:handler user/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
           :user-inventory-pools {:handler user-inventory-pools/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}
           :user-groups {:handler user-groups/routes :authorizers [admin-scopes? pool-auth/some-lending-manager?]}

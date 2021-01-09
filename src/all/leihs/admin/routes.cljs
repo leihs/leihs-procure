@@ -45,6 +45,13 @@
     [leihs.admin.resources.main :as admin]
     [leihs.admin.resources.statistics.main :as statistics]
     [leihs.admin.resources.status.main :as status]
+
+    [leihs.admin.resources.settings.main :as settings]
+    [leihs.admin.resources.settings.languages.main :as languages-settings]
+    [leihs.admin.resources.settings.misc.main :as misc-settings]
+    [leihs.admin.resources.settings.smtp.main :as smtp-settings]
+    [leihs.admin.resources.settings.syssec.main :as syssec-settings]
+
     [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
@@ -110,6 +117,11 @@
    :inventory-pool-user-suspension #'inventory-pool-user-suspension/page
    :inventory-pool-users #'inventory-pool-users/index-page
    :inventory-pools #'inventory-pools/page
+   :settings #'settings/page
+   :languages-settings #'languages-settings/page
+   :misc-settings #'misc-settings/page
+   :smtp-settings #'smtp-settings/page
+   :syssec-settings #'syssec-settings/page
    :statistics #'statistics/page
    :status #'status/info-page
    :system #'system/page
