@@ -25,13 +25,13 @@ scripts:
   build-procure-client:
     start_when:
       install-ruby-passed: {script_key: install-ruby}
+      build-ui: { script_key: build-leihs-ui-for-procure }
     timeout: 10 minutes
     body: ${LEIHS_PROCURE_DIR}/client/bin/build
     exclusive_executor_resource: build-procure-client
   build-procure-uberjar:
     start_when:
       install-ruby: { script_key: install-ruby }
-      build-ui: { script_key: build-leihs-ui-for-procure }
       build-procure-client: { script_key: build-procure-client }
     exclusive_executor_resource: build_procure_uberjar
     body: ${LEIHS_PROCURE_DIR}/bin/build
