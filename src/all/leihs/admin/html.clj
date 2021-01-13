@@ -66,7 +66,7 @@
             (hiccup.page/include-js (cache-buster/cache-busted-path
                                       "/admin/leihs-shared-bundle.js"))
             (hiccup.page/include-js
-              (cache-buster/cache-busted-path "/admin/js/app.js"))])})
+              (cache-buster/cache-busted-path "/admin/js/main.js"))])})
 
 
 ;#### debug ###################################################################

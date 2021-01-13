@@ -11,7 +11,6 @@
 
 
     [leihs.admin.common.components :as components]
-    [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy roles-component]]
@@ -21,15 +20,16 @@
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.users.user.core :as user2]
     [leihs.admin.resources.users.user.shared :as user]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
     [leihs.admin.utils.regex :as regex]
 
+    ["date-fns" :as date-fns]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [accountant.core :as accountant]
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]))
 
@@ -142,34 +142,27 @@
         user-inventory-pool-path (path :inventory-pool-user
                                        {:inventory-pool-id @inventory-pool/id*
                                         :user-id (:id user)})]
-  [:td.suspension
-   (if-let [suspended_until (some-> user :suspended_until js/moment)]
-     [:div
-      [:div
-       [:span.text-danger.m-1
-        [:span
-         (if (.isAfter suspended_until "2098-01-01")
-           "forever"
-           (.format suspended_until "YYYY-MM-DD"))]]]
-      [:span
-       [:span
-        [:a.btn.btn-outline-primary.btn.btn-sm.m-1
-         {:href user-inventory-pool-path}
-           icons/view "  Details" ]
-        [:a.btn.btn-outline-primary.btn.btn-sm.m-1
-         {:href user-suspension-path}
-         icons/edit " Edit " ]
-        [:button.btn.btn-warning.btn.btn-sm.m-1
-         {:on-click #(suspension/cancel user users/fetch-users)}
-         icons/delete " Cancel "]]
-       ]]
-     [:div
-      [:div.m-1
-       [:span.text-success "unsuspended" ]]
-      [:div.m-1
-       [:a.btn.btn-outline-primary.btn-sm
-        {:href user-suspension-path }
-        icons/edit " Suspend" ]]])]))
+    [:td.suspension
+     (let [suspended-until (some-> user :suspended_until js/Date.)]
+       [:div
+        [:div [suspension/humanized-suspended-until-component
+               suspended-until]]
+        (if suspended-until
+          [:span
+           [:span
+            [:a.btn.btn-outline-primary.btn.btn-sm.m-1
+             {:href user-inventory-pool-path}
+             icons/view "  Details" ]
+            [:a.btn.btn-outline-primary.btn.btn-sm.m-1
+             {:href user-suspension-path}
+             icons/edit " Edit " ]
+            [:button.btn.btn-warning.btn.btn-sm.m-1
+             {:on-click #(suspension/cancel user users/fetch-users)}
+             icons/delete " Cancel "]]]
+          [:div.m-1
+           [:a.btn.btn-outline-primary.btn-sm
+            {:href user-suspension-path }
+            icons/edit " Suspend" ]])])]))
 
 
 ;### filter ###################################################################

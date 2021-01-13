@@ -14,7 +14,7 @@
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrums]
     [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools] [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+    [leihs.admin.utils.misc :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -40,10 +40,7 @@
                                      "yes"
                                      "no")]
       [li-dl-component "Org ID" (:org_id @data*)]
-      [li-dl-component "Number of users" (:users_count @data*)]
-      ; [li-dl-component "Created " (humanize-datetime-component (:created_at @data*))]
-      ; [li-dl-component "Updated " (humanize-datetime-component (:updated_at @data*))]
-      ])])
+      [li-dl-component "Number of users" (:users_count @data*)]])])
 
 (defn page []
   [:div.group

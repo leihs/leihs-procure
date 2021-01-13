@@ -22,7 +22,6 @@
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
     ))

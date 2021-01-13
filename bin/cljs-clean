@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo
+
+ADMIN_DIR="$(dirname ${BASH_SOURCE})/.."
+cd "${ADMIN_DIR}"
+
+echo "PWD: $PWD"
+
+rm -rf resources/all/public/admin/js/
+
+cd -
+
+# vi: ft=sh

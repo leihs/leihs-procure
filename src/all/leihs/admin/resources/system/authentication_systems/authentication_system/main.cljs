@@ -16,15 +16,13 @@
     [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.system.authentication-systems.breadcrumbs :as parent-breadcrumbs]
     [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+    [leihs.admin.utils.misc :refer [wait-component]]
     [leihs.core.icons :as icons]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
     ))

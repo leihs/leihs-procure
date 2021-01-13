@@ -1,0 +1,25 @@
+{:paths [:cljc-paths :resource-paths]
+ :deps {
+        bidi/bidi {:mvn/version "2.1.6"}
+        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
+        cljs-http/cljs-http {:mvn/version "0.1.46"}
+        clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
+        com.lucasbradstreet/cljs-uuid-utils {:mvn/version "1.0.2"}
+        com.taoensso/timbre {:mvn/version "5.1.0"}
+        inflections/inflections {:mvn/version "0.13.2"}
+        reagent/reagent {:mvn/version "1.0.0"}
+        timothypratley/patchin {:mvn/version "0.3.5"}
+        venantius/accountant {:mvn/version "0.2.5"}
+        }
+ :aliases
+ {:cljc-paths ["src/all" "shared-clj/src"]
+  :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.11.13"}}}
+  :resource-paths ["resources/all"]
+  :dev {:paths ["resources/dev"]}
+  :prod {:paths ["resources/prod"]}
+  :depstar {:extra-deps {seancorfield/depstar {:mvn/version "1.1.136"}}
+            :ns-default hf.depstar
+            :exec-args
+            {:jar "leihs-admin.jar"
+             :aot true
+             :main-class leihs.admin.main}}}}

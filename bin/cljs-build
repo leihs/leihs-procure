@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo
+
+ADMIN_DIR="$(dirname ${BASH_SOURCE})/.."
+
+cd "${ADMIN_DIR}"
+echo "PWD: $PWD"
+
+# add our clojure version to the path
+source $ADMIN_DIR/shared-clj/clojure/bin/activate
+
+npm i
+npx shadow-cljs compile leihs-admin-js
+
+cd -
+
+# vi: ft=sh

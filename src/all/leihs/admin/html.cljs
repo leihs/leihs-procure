@@ -16,12 +16,10 @@
     [leihs.admin.common.http-client.modals]
     [leihs.admin.state :as state]
     [leihs.admin.paths :refer [path]]
-    ; TODO remove the following
-    [leihs.admin.resources.main :as admin :refer [page] :rename {page home-page}]
 
     [clojure.pprint :refer [pprint]]
     [accountant.core :as accountant]
-    [reagent.core :as reagent]
+    [reagent.dom :as rdom]
     ))
 
 (defn li-navitem [handler-key display-string]
@@ -107,5 +105,5 @@
 
 (defn mount []
   (when-let [app (.getElementById js/document "app")]
-    (reagent/render [current-page] app))
+    (rdom/render [current-page] app))
   (accountant/dispatch-current!))

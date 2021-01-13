@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo
+
+ADMIN_DIR="$(dirname ${BASH_SOURCE})/.."
+cd "${ADMIN_DIR}"
+echo "PWD: $PWD"
+
+# add our clojure version to the path
+source $ADMIN_DIR/shared-clj/clojure/bin/activate
+
+npm ci
+# HINT if you ever run into js problems with release resp advanced optimization
+# add the `--debug` option, this does tree shaking but keeps the original name
+# references, e.g. :
+# npx shadow-cljs release leihs-admin-js --debug
+npx shadow-cljs release leihs-admin-js
+rm -rf resources/all/public/admin/js/cljs-runtime/
+
+cd -
+
+# vi: ft=sh

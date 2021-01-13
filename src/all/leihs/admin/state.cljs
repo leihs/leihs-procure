@@ -17,10 +17,10 @@
 
 (defonce global-state* (reagent/atom {:debug false
                                       :users-query-params {}
-                                      :timestamp (js/moment)}))
+                                      :timestamp (js/Date.)}))
 
 (js/setInterval #(swap! global-state*
-                       (fn [s] (merge s {:timestamp (js/moment)}))) 1000)
+                       (fn [s] (merge s {:timestamp (js/Date.)}))) 1000)
 
 
 (def leihs-admin-version* (reagent/atom (dom/data-attribute "body" "leihsadminversion")))

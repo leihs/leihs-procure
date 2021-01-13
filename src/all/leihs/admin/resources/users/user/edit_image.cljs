@@ -20,8 +20,7 @@
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [cljsjs.moment]
+    ["jimp" :as Jimp]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
 
@@ -69,8 +68,8 @@
 
 (defn img-handler [data]
   (doseq [res [256 32]]
-    (js/Jimp.read
-      data (fn [err img]
+    (.read Jimp data
+           (fn [err ^js img]
              (when err
                (swap! img-processing* assoc :error err)
                (throw err))

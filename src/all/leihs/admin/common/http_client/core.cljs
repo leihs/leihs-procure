@@ -12,7 +12,6 @@
     [cljs-http.client :as http-client]
     [cljs-uuid-utils.core :as uuid]
     [cljs.core.async :as async :refer [timeout]]
-    [cljsjs.moment]
     [clojure.pprint :refer [pprint]]
     [clojure.string :as str]
     [goog.string :as gstring]

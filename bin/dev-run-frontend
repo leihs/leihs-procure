@@ -6,7 +6,7 @@ PROJECT_DIR="$(dirname ${BASH_SOURCE})/.."
 cd "${PROJECT_DIR}"
 echo "PWD: $PWD"
 
-./leihs-ui/bin/build && lein figwheel
+./leihs-ui/bin/build && ./bin/cljs-watch
 
 cd -
 

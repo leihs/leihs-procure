@@ -15,7 +15,7 @@
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+    [leihs.admin.utils.misc :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]

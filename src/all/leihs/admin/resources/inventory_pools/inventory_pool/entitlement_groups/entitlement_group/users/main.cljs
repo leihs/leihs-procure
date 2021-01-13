@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.main
+(ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -11,7 +11,7 @@
 
     [leihs.admin.common.membership.users.main :as membership-users :refer []]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.core :as entitlement-group]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]

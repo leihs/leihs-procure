@@ -1,0 +1,13 @@
+{:deps {:aliases [:cljs]}
+ :builds {:leihs-admin-js
+          {:asset-path "/admin/js"
+           :devtools {:http-root "resources/all/public" :http-port 8020}
+           :modules {:main {:init-fn leihs.admin.main/init}}
+           :output-dir "resources/all/public/admin/js"
+           :release {:compiler-options {:optimizations :advanced
+                                        :infer-externs :auto}}
+           :target :browser}}
+ }
+
+
+

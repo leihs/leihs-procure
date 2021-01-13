@@ -5,24 +5,26 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.digest]
 
-    [cljsjs.moment]
+    ["date-fns" :as date-fns]
+    [cljs.pprint :refer [pprint]]
     [goog.string :as gstring]))
 
 
 ; TODO stuff in this namespace should be moved removed completely
 
 
-; timestuff, js/moment will be replaced when we switch the build system
+(defn humanize-datetime [ref_dt dt add-suffix]
+  [:span (date-fns/formatDistance
+           dt ref_dt
+           (clj->js {:addSuffix add-suffix}))])
 
-(defn humanize-datetime [ref_dt dt]
-  (.to (js/moment) dt))
-
-(defn humanize-datetime-component [dt]
-  (if-let [dt (if (string? dt) (js/moment dt) dt)]
+(defn humanize-datetime-component [dt & {:keys [add-suffix]
+                                         :or {add-suffix true}}]
+  (if-let [dt (if (string? dt) (js/Date. dt) dt)]
     [:span.datetime
-     {:data-iso8601 (.format dt)}
-     ;[:pre (with-out-str (pprint dt))]
-     [humanize-datetime (:timestamp @state/global-state*) dt]]
+     {:data-iso8601 (.toISOString dt)}
+     ;[:pre (with-out-str (pprint (.toISOString dt)))]
+     [humanize-datetime (:timestamp @state/global-state*) dt add-suffix]]
     [:span "NULL"]))
 
 

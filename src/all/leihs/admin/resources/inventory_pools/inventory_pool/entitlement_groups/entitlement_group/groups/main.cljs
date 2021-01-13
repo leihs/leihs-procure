@@ -12,9 +12,9 @@
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.core :as entitlement-group]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy]]
     [leihs.admin.common.membership.groups.main :as groups-membership]
     [leihs.admin.utils.regex :as regex]
@@ -25,8 +25,6 @@
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]))
 

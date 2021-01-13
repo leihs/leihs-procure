@@ -24,8 +24,6 @@
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [cljsjs.jimp]
-    [cljsjs.moment]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]))
 

@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.core
+(ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]

@@ -4,9 +4,13 @@
 .nrepl-port
 .rebel_readline_history
 /.DS_Store
+/.cpcache
 /.sass-cache
+/.shadow-cljs
 /leihs-ui.tgz
 /log
+/node_modules
+/resources/all/public/admin/js/
 /target
 /tmp
 figwheel_server.log

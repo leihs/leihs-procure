@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.main
+(ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -12,9 +12,9 @@
 
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.core :as entitlement-group]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
     [leihs.admin.resources.users.main :as users]
 
     [accountant.core :as accountant]

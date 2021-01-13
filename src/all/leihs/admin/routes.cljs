@@ -22,8 +22,8 @@
     [leihs.admin.resources.groups.group.show :as group-show]
     [leihs.admin.resources.groups.group.users.main :as group-users]
     [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.main :as inventory-pool-entitlement-group]
-    [leihs.admin.resources.inventory-pools.entitlement-groups.entitlement-group.users.main :as inventory-pool-entitlement-group-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main :as inventory-pool-entitlement-group]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main :as inventory-pool-entitlement-group-users]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as delegation-edit]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as delegation-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as delegation]
@@ -41,8 +41,10 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
     [leihs.admin.resources.inventory-pools.main :as inventory-pools]
     [leihs.admin.resources.inventory.main :as inventory]
+
     [leihs.admin.resources.leihs-root :as home]
     [leihs.admin.resources.main :as admin]
+
     [leihs.admin.resources.statistics.main :as statistics]
     [leihs.admin.resources.status.main :as status]
 
@@ -67,19 +69,17 @@
 
     [accountant.core :as accountant]
     [bidi.bidi :as bidi]
-    [cljsjs.js-yaml]
     [clojure.pprint :refer [pprint]]
     [reagent.core :as reagent]
     ))
 
 (def resolve-table
-  {
-   :admin #'admin/page
-   :audits #'audits/page
-   :audited-changes #'audited-changes/page
+  {:admin #'admin/page
    :audited-change #'audited-change/page
-   :audited-requests #'audited-requests/page
+   :audited-changes #'audited-changes/page
    :audited-request #'audited-request/page
+   :audited-requests #'audited-requests/page
+   :audits #'audits/page
    :authentication-system #'authentication-system/show-page
    :authentication-system-create #'authentication-system/create-page
    :authentication-system-delete #'authentication-system/delete-page
@@ -87,12 +87,6 @@
    :authentication-system-groups #'authentication-system-groups/page
    :authentication-system-users #'authentication-system-users/page
    :authentication-systems #'authentication-systems/page
-   :inventory-pool-delegation #'delegation/show-page
-   :inventory-pool-delegation-create #'delegation-edit/new-page
-   :inventory-pool-delegation-edit #'delegation-edit/edit-page
-   :inventory-pool-delegation-users #'delegation-users/index-page
-   :inventory-pool-delegation-groups #'delegation-groups/page
-   :inventory-pool-delegations #'delegations/page
    :group #'group-show/page
    :group-create #'group-create/page
    :group-delete #'group-delete/page
@@ -103,36 +97,41 @@
    :inventory #'inventory/page
    :inventory-pool #'inventory-pool/show-page
    :inventory-pool-create #'inventory-pool/create-page
+   :inventory-pool-delegation #'delegation/show-page
+   :inventory-pool-delegation-create #'delegation-edit/new-page
+   :inventory-pool-delegation-edit #'delegation-edit/edit-page
+   :inventory-pool-delegation-groups #'delegation-groups/page
+   :inventory-pool-delegation-users #'delegation-users/index-page
+   :inventory-pool-delegations #'delegations/page
    :inventory-pool-delete #'inventory-pool/delete-page
    :inventory-pool-edit #'inventory-pool/edit-page
-   :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/index-page
    :inventory-pool-entitlement-group #'inventory-pool-entitlement-group/page
-   :inventory-pool-entitlement-group-users inventory-pool-entitlement-group-users/page
    :inventory-pool-entitlement-group-groups #'inventory-pool-entitlement-group-groups/page
+   :inventory-pool-entitlement-group-users inventory-pool-entitlement-group-users/page
+   :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/index-page
    :inventory-pool-group-roles #'inventory-pool-group-roles/page
    :inventory-pool-groups #'inventory-pool-groups/index-page
    :inventory-pool-user #'inventory-pool-user/page
-   :inventory-pool-user-roles #'inventory-pool-user-roles/page
    :inventory-pool-user-direct-roles #'inventory-pool-user-direct-roles/page
+   :inventory-pool-user-roles #'inventory-pool-user-roles/page
    :inventory-pool-user-suspension #'inventory-pool-user-suspension/page
    :inventory-pool-users #'inventory-pool-users/index-page
    :inventory-pools #'inventory-pools/page
-   :settings #'settings/page
    :languages-settings #'languages-settings/page
    :misc-settings #'misc-settings/page
+   :settings #'settings/page
    :smtp-settings #'smtp-settings/page
-   :syssec-settings #'syssec-settings/page
    :statistics #'statistics/page
    :status #'status/info-page
+   :syssec-settings #'syssec-settings/page
    :system #'system/page
    :system-admins #'system-admins/page
    :user #'user-show/page
+   :user-create #'user-create/page
    :user-delete #'user-delete/page
    :user-edit #'user-edit/page
-   :user-create #'user-create/page
-   :users-choose #'users-choose/page
    :users #'users/page
-   })
+   :users-choose #'users-choose/page })
 
 (defn init []
   (routing/init paths resolve-table paths/external-handlers))

@@ -11,14 +11,15 @@
 
      [leihs.admin.common.components :as components]
      [leihs.admin.common.form-components :as form-components]
-     [leihs.admin.utils.misc :refer [wait-component]]
-     [leihs.admin.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
      [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
+     [leihs.admin.state :as state]
+     [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
      [leihs.admin.utils.regex :as regex]
 
+     ["date-fns" :as date-fns]
      [accountant.core :as accountant]
      [cljs.core.async :as async]
      [cljs.pprint :refer [pprint]]
@@ -29,17 +30,18 @@
 
 (def suspended-until*
   (reaction
-    (some-> @data* :suspended_until presence)))
+    (some-> @data* :suspended_until presence js/Date.)))
+
+(defn suspended? [suspended-until ref-date]
+  (if-not suspended-until
+    false
+    (if (date-fns/isBefore suspended-until ref-date)
+      false
+      true)))
 
 (def suspended?*
   (reaction
-    (if-not @suspended-until*
-      false
-      (if (.isAfter
-            (.add (js/moment @suspended-until*) 1 "days")
-            (:timestamp @state/global-state*))
-        true
-        false))))
+    (suspended? @suspended-until* (:timestamp @state/global-state*))))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -147,12 +149,17 @@
    " in "
    [inventory-pool/name-link-component]])
 
-(defn humanized-suspended-until-component []
-  [:div
-   (if @suspended?*
-     [:span.text-danger "This user is suspended for "
-      (.to (:timestamp @state/global-state*) @suspended-until* true) "."]
-     [:span.text-success "Not suspended."])])
+
+
+(defn humanized-suspended-until-component [suspended-until]
+  [:span
+   (if-not (suspended? suspended-until (:timestamp @state/global-state*))
+     [:span.text-success "Not suspended."]
+     [:span.text-danger
+      (if (date-fns/isAfter suspended-until (js/Date. "2098-01-01"))
+        "Suspended forever."
+        [:span "Suspended for "
+         [humanize-datetime-component suspended-until :add-suffix false] "."])])])
 
 (defn suspension-component []
   [:div.suspension
@@ -161,7 +168,7 @@
    (if-not @data*
      [wait-component]
      [:div
-      [humanized-suspended-until-component]
+      [humanized-suspended-until-component @suspended-until*]
       [:form.form.mt-3
        {:on-submit (fn [e] (.preventDefault e) (put))}
        [form-components/input-component data* [:suspended_until]

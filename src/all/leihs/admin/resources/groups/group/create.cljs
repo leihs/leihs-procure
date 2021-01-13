@@ -12,7 +12,7 @@
     [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :refer [checkbox-component input-component create-submit-component]]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+    [leihs.admin.utils.misc :refer [wait-component]]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
 

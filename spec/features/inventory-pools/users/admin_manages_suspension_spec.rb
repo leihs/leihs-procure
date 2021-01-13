@@ -23,17 +23,16 @@ feature 'Manage inventory-pool users ', type: :feature do
       fill_in 'Search', with: @user.email
       wait_until { all("table.users tbody tr").count == 1 }
       click_on 'Suspend'
-      expect { page.not.to have_content "user is suspended" }
+      expect { page.not.to have_content "Suspended for" }
       fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
       fill_in 'suspended_reason', with: 'Some reason'
       click_on 'Save'
-      wait_until { page.has_content? "user is suspended" }
-
+      wait_until { page.has_content? "Suspended for" }
 
       # the inventory-pool-user's page:
       # suspension info is here and we can cancel suspension
       find('i.fa-user').click
-      wait_until { page.has_content? "user is suspended" }
+      wait_until { page.has_content? "Suspended for" }
       wait_until { page.has_content? "Some reason" }
       within("#suspension") do
         expect(page).to have_content "Edit"
@@ -45,7 +44,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
       fill_in 'suspended_reason', with: 'Some reason'
       click_on 'Save'
-      wait_until { page.has_content? "user is suspended" }
+      wait_until { page.has_content? "Suspended for" }
 
 
       # revoke suspension on users page
@@ -54,9 +53,9 @@ feature 'Manage inventory-pool users ', type: :feature do
       fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       within  ".suspension" do
-        expect { page.not_to have_content "unsuspended" }
+        expect { page.not_to have_content "Not suspended." }
         click_on "Cancel"
-        wait_until { page.has_content? "unsuspended" }
+        wait_until { page.has_content? "Not suspended." }
       end
 
       # suspend forever and test suspension filter

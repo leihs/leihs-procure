@@ -6,18 +6,20 @@
   (:require
     [leihs.admin.html :as html]
     [leihs.admin.routes :as routes]
-    [leihs.admin.paths :as paths]
+    ;[leihs.admin.paths :as paths]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :refer [load-user-data-from-dom]]
 
     [clojure.string :as str]
     [clojure.pprint :refer [pprint]]
 
-    [reagent.core :as reagent]
     [accountant.core :as accountant]
+    [reagent.core :as reagent]
+    [taoensso.timbre :as logging]
     ))
 
 (defn init! []
+  (logging/info  "initializing" 'leihs.admin.main)
   (load-user-data-from-dom)
   (routes/init)
   (html/mount))
