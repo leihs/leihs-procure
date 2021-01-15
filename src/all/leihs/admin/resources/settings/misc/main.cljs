@@ -55,59 +55,76 @@
    [:div.row
     [:div.col-sm
      [form-components/input-component data* [:logo_url]
-      :disabled (not @edit?*)]]
+      :disabled (not @edit?*)
+      :hint [:span
+             "Can be just a filename which is located under "
+             [:code "/leihs/legacy/public/assets"]
+             " or an absolute URL. "
+             "The logo is displayed in the topbar of the legacy application."]]]
     [:div.col-sm
      [form-components/input-component data* [:documentation_link]
-      :disabled (not @edit?*)]]]
+      :disabled (not @edit?*)
+      :hint [:span "Absolute URL for a documentation resource if available. "
+             "It is displayed under " [:cite "leihs"]
+             " in the footer of the legacy application."]]]]
 
    [:div.row
     [:div.col-md
      [form-components/input-component data* [:contract_lending_party_string]
-      :disabled (not @edit?*)]]
-    [:div.col-md
-     [form-components/input-component data* [:contract_terms]
-      :disabled (not @edit?*) :rows 5 :element :textarea]]
+      :disabled (not @edit?*)
+      :hint [:span "Displayed in contracts in addition to the respective inventory pool name."]]]
     [:div.col-md
      [form-components/input-component data* [:custom_head_tag]
-      :disabled (not @edit?*) :rows 3 :element :textarea]]]
-
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:default_email]
-      :disabled (not @edit?*)]]]
+      :disabled (not @edit?*) :rows 3 :element :textarea
+      :hint [:span "Custom html tag to be rendered in the layout of the legacy application."]]]]
 
    [:div.row
     [:div.col-sm
      [form-components/input-component data* [:time_zone]
-      :disabled (not @edit?*)]]
+      :disabled (not @edit?*)
+      :label "Location"
+      :hint [:span
+             "The corresponding time zone is determined using "
+             [:a {:href "https://en.wikipedia.org/wiki/Tz_database"} "tz database"]
+             ". It is used for the configuration of the legacy application."]]]
     [:div.col-sm
      [form-components/input-component data* [:local_currency_string]
-      :disabled (not @edit?*)]]]
+      :disabled (not @edit?*)
+      :hint [:span
+             "The international 3-letter code as defined by the "
+             [:a {:href "https://de.wikipedia.org/wiki/ISO_4217"} "ISO 4217 standard"]
+             "."]]]]
 
 
    [:div.row
     [:div.col-sm
      [form-components/input-component data* [:maximum_reservation_time]
-      :disabled (not @edit?*) :type :number]]
+      :disabled (not @edit?*) :type :number
+      :hint [:span "Maximum duration of reservations in days which applies to all inventory pools."]]]
     [:div.col-sm
      [form-components/input-component data* [:timeout_minutes]
-      :disabled (not @edit?*) :type :number]]]
+      :disabled (not @edit?*) :type :number
+      :hint [:span "Timeout of the borrow reservation cart in minutes."]]]]
 
    [:div.row
     [:div.col-sm-3
      [form-components/checkbox-component data* [:disable_borrow_section]
-      :disabled (not @edit?*)]]
+      :disabled (not @edit?*)
+      :hint [:span "Option to temporarily disable the borrow section of the application."]]]
     [:div.col-sm-9
      [form-components/input-component data* [:disable_borrow_section_message]
-      :disabled (not @edit?*) :rows 3 :element :textarea]]]
+      :disabled (not @edit?*) :rows 3 :element :textarea
+      :hint [:span "Message which is shown to the users when they try to access the borrow section."]]]]
 
    [:div.row
     [:div.col-sm-3
      [form-components/checkbox-component data* [:disable_manage_section]
-      :disabled (not @edit?*)]]
+      :disabled (not @edit?*)
+      :hint [:span "Option to temporarily disable the manage section of all the inventory pools (inventory, lending, etc)."]]]
     [:div.col-sm-9
      [form-components/input-component data* [:disable_manage_section_message]
-      :disabled (not @edit?*) :rows 3 :element :textarea]]]
+      :disabled (not @edit?*) :rows 3 :element :textarea
+      :hint [:span "Message which is shown to the users when they try to access the manage section of any inventory pool."]]]]
 
 
    (when @edit?*

@@ -92,7 +92,7 @@
       :rows rows
       :auto-complete :off}]
     (when append [append])]
-   (when hint [:small hint])])
+   (when hint [:small.form-text hint])])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

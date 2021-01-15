@@ -22,9 +22,7 @@ feature 'SMTP-Settings' do
           fill_in "logo_url", with: "https://my-server/leihs-logo.png"
           fill_in "documentation_link", with: "https://my-server/leihs-docs"
           fill_in "contract_lending_party_string", with: "Me"
-          fill_in "contract_terms", with: "You agree!"
           fill_in "custom_head_tag", with: "My Header ???"
-          fill_in "default_email", with: "leihs-desk@my-server"
           fill_in "time_zone", with: "Berlin"
           fill_in "local_currency_string", with: "CHF"
           fill_in "maximum_reservation_time", with: "500"
@@ -41,9 +39,7 @@ feature 'SMTP-Settings' do
           expect(find_field('logo_url', disabled: true).value).to eq 'https://my-server/leihs-logo.png'
           expect(find_field('documentation_link', disabled: true).value).to eq "https://my-server/leihs-docs"
           expect(find_field('contract_lending_party_string', disabled: true).value).to eq 'Me'
-          expect(find_field('contract_terms', disabled: true).value).to eq 'You agree!'
           expect(find_field('custom_head_tag', disabled: true).value).to eq 'My Header ???'
-          expect(find_field('default_email', disabled: true).value).to eq 'leihs-desk@my-server'
           expect(find_field('time_zone', disabled: true).value).to eq 'Berlin'
           expect(find_field('local_currency_string', disabled: true).value).to eq 'CHF'
           expect(find_field('maximum_reservation_time', disabled: true).value).to eq '500'
