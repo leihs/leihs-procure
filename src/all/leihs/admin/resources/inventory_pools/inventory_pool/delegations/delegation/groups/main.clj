@@ -8,6 +8,7 @@
     [leihs.admin.resources.groups.main :as groups]
     [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -29,15 +30,15 @@
   (-> (groups/groups-query request)
       (extend-with-membership  (member-expr delegation-id) request)))
 
-(defn groups-formated-query [request]
-  (-> request groups-query sql/format))
-
-(defn groups
-  [{tx :tx :as request}]
-  {:body
-   {:groups (->> (groups-formated-query request)
-                 (jdbc/query tx)
-                 doall)}})
+(defn groups [{tx :tx :as request}]
+  (let [query (groups-query request)
+        offset (:offset query) ]
+    {:body
+     {:groups (-> query sql/format
+                  (->>
+                    (jdbc/query tx)
+                    (seq/with-index offset)
+                    seq/with-page-index))}}))
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

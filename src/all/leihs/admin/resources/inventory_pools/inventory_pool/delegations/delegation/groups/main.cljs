@@ -52,7 +52,7 @@
 (defn table-component []
   [:div
    [routing/hidden-state-component
-    {:did-change groups/escalate-query-paramas-update}]
+    {:did-change groups/fetch-groups}]
    [groups/table-component
     [groups/name-th-component
      groups-membership/member-th-component]

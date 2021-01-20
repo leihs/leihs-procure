@@ -32,6 +32,20 @@
                        :lending_manager true
                        :inventory_manager true}})
 
+
+(defn set-roles [role newval]
+  (case [role newval]
+    [:customer false] (:none allowed-roles-states)
+    [:customer true] (:customer allowed-roles-states)
+    [:group_manager false] (:customer allowed-roles-states)
+    [:group_manager true] (:group_manager allowed-roles-states)
+    [:lending_manager false] (:group_manager allowed-roles-states)
+    [:lending_manager true] (:lending_manager allowed-roles-states)
+    [:inventory_manager false] (:lending_manager allowed-roles-states)
+    [:inventory_manager true] (:inventory_manager allowed-roles-states)))
+
+
+
 (defn expand-role-to-hierarchy [role]
   (->> roles-hierarchy
        reverse
@@ -72,3 +86,5 @@
                           [:label.form-check-label
                            {:for role}
                            [:span " " role]]])))]))
+
+

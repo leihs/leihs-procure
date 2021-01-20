@@ -15,32 +15,33 @@ feature 'Manage inventory-pool groups ', type: :feature do
       before(:each){ sign_in_as @admin }
 
       scenario ' manages roles of a groups' do
+        @group = @groups.first
 
         click_on 'Inventory-Pools'
         click_on @pool.name
         click_on 'Groups'
         select "any", from: "Role"
-        fill_in 'Search', with: @groups.first.name
+        fill_in 'Search', with: @group.name
         wait_until { all("table.groups tbody tr").count == 1 }
         expect(page.find("table.groups ")).not_to have_content "customer"
         expect(page.find("table.groups ")).not_to have_content "inventory_manager"
         click_on "Add"
-        wait_until{ current_path.match? %r"/admin/inventory-pools/[^/]+/groups/[^/]+/roles" }
-        _, _, _, inventory_pool_id, _, group_id, _  = current_path.split('/')
-
+        wait_until{ not all(".modal").empty? }
         # set access_right
         check "inventory_manager"
         click_on "Save"
         wait_until do
-          GroupAccessRight.find(inventory_pool_id: inventory_pool_id, group_id: group_id)
+          GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id])
             .try(:role) == "inventory_manager"
         end
 
         # remove all access_rights
+        click_on "Edit"
+        wait_until{ not all(".modal").empty? }
         uncheck :customer
         click_on "Save"
         wait_until do
-          GroupAccessRight.find(inventory_pool_id: inventory_pool_id, group_id: group_id).nil?
+          GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id]).nil?
         end
 
       end

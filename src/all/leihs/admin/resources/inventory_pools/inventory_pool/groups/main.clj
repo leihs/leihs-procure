@@ -10,7 +10,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -49,7 +49,7 @@
                         (:query-params request))
                  :role presence str)]
     (case role
-      "any" query
+      "" query
       "none" (filter-for-none-role query inventory-pool-id)
       ("customer"
         "group_manager"
@@ -64,9 +64,6 @@
       (filter-by-role inventory-pool-id request)))
 
 
-(defn groups-formated-query [inventory-pool-id request]
-  (-> (groups-query inventory-pool-id request)
-      sql/format))
 
 (defn role-query [inventory-pool-id group-id]
   (-> (sql/select :role)
@@ -88,12 +85,16 @@
 
 (defn groups [{{inventory-pool-id :inventory-pool-id} :route-params
                tx :tx :as request}]
-  (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)]
+  (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)
+        query (groups-query inventory-pool-id request)
+        offset (:offset query)]
     {:body
-     {:groups (->> (groups-formated-query inventory-pool-id request)
-                   (jdbc/query tx)
-                   (map (fn [group] (group-add-roles tx inventory-pool-id group)))
-                   doall)}}))
+     {:groups (-> query sql/format
+                  (->>
+                    (jdbc/query tx)
+                    (map (fn [group] (group-add-roles tx inventory-pool-id group)))
+                    (seq/with-index offset)
+                    seq/with-page-index doall))}}))
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

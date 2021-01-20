@@ -33,7 +33,7 @@
                                                  (update-in [:extended_info]
                                                             (fn [s] (.parse js/JSON s))))}
                               {:modal true
-                               :title "Update User"
+                               :title "Create User"
                                :handler-key :user-create
                                :retry-fn #'post}
                               :chan resp-chan)]

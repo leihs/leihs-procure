@@ -68,8 +68,7 @@
 (defn main-page-component []
   [:div
    [routing/hidden-state-component
-    {:did-mount groups/escalate-query-paramas-update
-     :did-update groups/escalate-query-paramas-update}]
+    {:did-change groups/fetch-groups}]
    [filter-component]
    [routing/pagination-component]
    [groups/table-component

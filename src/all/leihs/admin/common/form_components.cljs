@@ -4,11 +4,15 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.admin.paths :refer [path]]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.constants :as constants]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
+
+    [leihs.admin.paths :refer [path]]
+
+    [clojure.string :as string]
     [taoensso.timbre :as logging]
     [accountant.core :as accountant]
     [cljs.core.async :refer [timeout]]
@@ -16,23 +20,21 @@
     [cljs.pprint :refer [pprint]]
     ))
 
-(def TAB-INDEX 1)
+(def TAB-INDEX constants/TAB-INDEX)
 
 (defn set-value [value data* ks]
   (swap! data* assoc-in ks value)
   value)
 
 (defn checkbox-component
-  [data* ks & {:keys [disabled hint
-                      label key
-                      pre-change post-change
-                      ] :or
-               {disabled false
-                hint nil
-                label (last ks)
-                key (last ks)
-                pre-change identity
-                post-change identity }}]
+  [data* ks & {:keys [disabled hint label
+                      key pre-change post-change]
+               :or {disabled false
+                    hint nil
+                    label (last ks)
+                    key (last ks)
+                    pre-change identity
+                    post-change identity }}]
   [:div.form-check.form-check
    [:input.form-check-input
     {:id key
@@ -98,36 +100,50 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn submit-component
-  [& {:keys [btn-class icon inner]
-      :or {btn-class "btn-danger"
+  [& {:keys [outer-classes btn-classes icon inner disabled]
+      :or {outer-classes [:mb-3]
+           btn-classes [:btn-danger]
            inner [:span "Just Do It"]
-           icon [:i.fas.fa-question]}}]
-  [:div.mb-3
+           icon [:i.fas.fa-question]
+           disabled false}}]
+  [:div
+   {:class (->> outer-classes (map str) (string/join " "))}
    [:div.float-right
     [:button.btn.btn-warning
-     {:class btn-class
+     {:class (->> btn-classes (map str) (string/join " "))
       :type :submit
+      :disabled disabled
       :tab-index TAB-INDEX}
      icon " " inner]]
    [:div.clearfix]])
 
-(defn create-submit-component []
-  [submit-component
-   :btn-class :btn-primary
-   :icon icons/add
-   :inner "Create"])
+(defn create-submit-component [& args]
+  [apply submit-component
+   (concat [:btn-classes [:btn-primary]
+            :icon icons/add
+            :inner "Create"]
+           args)])
 
 (defn delete-submit-component []
   [submit-component
-   :btn-class :btn-danger
+   :btn-classes [:btn-danger]
    :icon icons/delete
    :inner "Delete"])
 
-(defn save-submit-component []
-  [submit-component
-   :btn-class :btn-warning
-   :icon icons/save
-   :inner "Save"])
+(defn save-submit-component [& args]
+  [apply submit-component
+   (concat [:btn-classes [:btn-warning]
+            :icon icons/save
+            :inner "Save"]
+           args)])
+
+(defn small-save-submit-component [& args]
+  [apply submit-component
+   (concat
+     [:btn-classes [:btn-warning :btn-sm]
+      :icon icons/save
+      :inner "Save"]
+     args)])
 
 (defn small-add-submit-component []
   [:button.btn.btn-primary.btn-sm

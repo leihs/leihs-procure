@@ -2,14 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.sql :as sql]
+
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
+    [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.set :refer [rename-keys]]
@@ -43,8 +45,8 @@
 
 (defn filter-by-role
   [query inventory-pool-id
-   {query-params :query-params :as request}]
-  (let [role (:role (merge default-query-params query-params))]
+   {query-params-raw :query-params-raw :as request}]
+  (let [role (:role (merge default-query-params query-params-raw))]
     (case role
       "" query
       "any" query
@@ -170,18 +172,20 @@
 
 (defn users [{{inventory-pool-id :inventory-pool-id} :route-params
               tx :tx :as request}]
-  (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)]
+  (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)
+        query (users-query inventory-pool-id request)
+        offset (:offset query)]
     {:body
-     {:users (->> (users-formated-query inventory-pool-id request)
-                  (jdbc/query tx)
-                  (map #(role-to-roles-map [:role] %))
-                  (map #(role-to-roles-map [:direct_role] %))
-                  (map #(role-to-roles-map [:groups_role] %))
-                  (map #(rename-keys % {:role :roles
-                                        :direct_role :direct_roles
-                                        :groups_role :groups_roles}))
-                  ;(map (fn [user] (user-add-suspension tx inventory-pool-id user)))
-                  doall)}}))
+     {:users (-> query sql/format
+                 (->> (jdbc/query tx)
+                      (map #(role-to-roles-map [:role] %))
+                      (map #(role-to-roles-map [:direct_role] %))
+                      (map #(role-to-roles-map [:groups_role] %))
+                      (map #(rename-keys % {:role :roles
+                                            :direct_role :direct_roles
+                                            :groups_role :groups_roles}))
+                      (seq/with-index offset)
+                      seq/with-page-index))}}))
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -2,11 +2,14 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
+    [leihs.core.routing.back :as routing :refer []]
     [leihs.core.sql :as sql]
-    [leihs.admin.resources.users.user.main :as user]
+
+    [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.queries :as queries]
     [leihs.admin.resources.users.shared :as shared]
+    [leihs.admin.resources.users.user.main :as user]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
@@ -23,25 +26,6 @@
       (sql/from :users)
       (sql/order-by :lastname :firstname :id)
       (sql/merge-where [:= nil :delegator_user_id])))
-
-(defn set-per-page-and-offset
-  ([query {per-page :per-page page :page}]
-   (when (or (-> per-page presence not)
-             (-> per-page integer? not)
-             (> per-page 1000)
-             (< per-page 1))
-     (throw (ex-info "The query parameter per-page must be present and set to an integer between 1 and 1000."
-                     {:status 422})))
-   (when (or (-> page presence not)
-             (-> page integer? not)
-             (< page 0))
-     (throw (ex-info "The query parameter page must be present and set to a positive integer."
-                     {:status 422})))
-   (set-per-page-and-offset query per-page page))
-  ([query per-page page]
-   (-> query
-       (sql/limit per-page)
-       (sql/offset (* per-page (- page 1))))))
 
 (defn match-term-with-emails [query term]
   (sql/merge-where
@@ -92,36 +76,37 @@
     (apply sql/select query fields)
     query))
 
-(defn users-query [request]
-  (let [query-params (-> request :query-params
-                         shared/normalized-query-parameters)]
-    (-> users-base-query
-        (set-per-page-and-offset query-params)
-        (term-filter request)
-        (org-filter request)
-        (account-enabled-filter request)
-        (is-admin-filter request)
-        (select-fields request))))
-
-
 (defn select-contract-counts [query]
   (-> query
       (sql/merge-select [queries/open-contracts-sub :open_contracts_count])
       (sql/merge-select [queries/closed-contracts-sub :closed_contracts_count])))
 
-(defn users-formated-query [request]
-  (-> request
-      users-query
-      select-contract-counts
-      (sql/merge-select [queries/pools-count :pools_count])
-      (sql/merge-select [queries/groups-count :groups_count])
-      sql/format))
+(defn users-query [request]
+  (let [request (routing/mixin-default-query-params
+                  request shared/default-query-params)]
+    (-> users-base-query
+        (routing/set-per-page-and-offset request)
+        (term-filter request)
+        (org-filter request)
+        (account-enabled-filter request)
+        (is-admin-filter request)
+        (select-fields request)
+        select-contract-counts
+        (sql/merge-select [queries/pools-count :pools_count])
+        (sql/merge-select [queries/groups-count :groups_count]))))
 
-(defn users [request]
-  (when (= :json (-> request :accept :mime))
+(defn users [{tx :tx :as request}]
+  (let [query (users-query request)
+        offset (:offset query)]
     {:body
      {:users
-      (jdbc/query (:tx request) (users-formated-query request))}}))
+      (-> query
+          sql/format
+          (->> (jdbc/query tx)
+               (seq/with-key :id)
+               (seq/with-index offset)
+               seq/with-page-index))}}))
+
 
 (def routes
   (cpj/routes

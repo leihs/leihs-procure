@@ -22,25 +22,25 @@ feature 'Filter users by admin status ', type: :feature do
 
       scenario 'cycle through is admin filters' do
 
-        select('yes', from: 'Is admin')
+        select('yes', from: 'Admin')
         wait_until { all("table.users tbody tr").count == 1 }
         expect(page).to have_content @admin.lastname
         expect(page).not_to have_content @user.lastname
-        expect(page).to have_select('Is admin', selected: 'yes')
+        expect(page).to have_select('Admin', selected: 'yes')
 
-        select('any', from: 'Is admin')
+        select('(any value)', from: 'Admin')
         wait_until { all("table.users tbody tr").count == 2 }
-        expect(page).to have_select('Is admin', selected: 'any')
+        expect(page).to have_select('Admin', selected: '(any value)')
 
-        select('no', from: 'Is admin')
+        select('no', from: 'Admin')
         wait_until { all("table.users tbody tr").count == 1 }
         expect(page).not_to have_content @admin.lastname
         expect(page).to have_content @user.lastname
-        expect(page).to have_select('Is admin', selected: 'no')
+        expect(page).to have_select('Admin', selected: 'no')
 
-        select('any', from: 'Is admin')
+        select('(any value)', from: 'Admin')
         wait_until { all("table.users tbody tr").count == 2 }
-        expect(page).to have_select('Is admin', selected: 'any')
+        expect(page).to have_select('Admin', selected: '(any value)')
 
       end
 

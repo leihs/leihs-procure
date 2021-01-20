@@ -18,21 +18,23 @@ feature 'Manage inventory-pool users ', type: :feature do
 
     scenario ' managing roles of a user as an inventory_manager' do
       sign_in_as @inventory_manager
+      @user = @users.first
 
       visit "/admin/inventory-pools/#{@pool.id}"
       click_on "Users"
       select 'any', from: 'Role'
-      fill_in 'Search', with: @users.first.email
+      fill_in 'Search', with: @user.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
-      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
 
+      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
+      wait_until{ not all(".modal").empty? }
       check "customer"
       click_on "Save"
 
       # check on user page
-      find("i.fa-user").click
+      click_on_first_user(@user)
       within ".effective-roles" do
         expect(find_field('customer', disabled: true)).to be_checked
       end
@@ -56,11 +58,6 @@ feature 'Manage inventory-pool users ', type: :feature do
       fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
       expect(find("table.users")).to have_content "customer"
-      # quick remove all roles
-      within("table.users") { click_on 'Remove' }
-      wait_until do
-        not find("table.users").has_content? "customer"
-      end
 
     end
   end

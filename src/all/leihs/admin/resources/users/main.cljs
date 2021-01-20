@@ -5,9 +5,10 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
+    ;[leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.common.http-client.core :as http]
     [leihs.admin.common.components :as components]
     [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
@@ -38,36 +39,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
-  "Fetches the the currernt url with accept/json
-  after 1/5 second timeout if query-params have not changed in the meanwhile
-  yet and stores the result in the map data* under this url."
-  (let [url @current-url*
-        normalized-query-params @current-query-paramerters-normalized*]
-    (go (<! (timeout 200))
-        (when (= url @current-url*)
-          (let [resp-chan (async/chan)
-                id (requests/send-off {:url url
-                                       :method :get}
-                                      {:modal false
-                                       :title "Fetch Users"
-                                       :handler-key :users
-                                       :retry-fn #'fetch-users}
-                                      :chan resp-chan)]
-            (reset! fetch-users-id* id)
-            (go (let [resp (<! resp-chan)]
-                  (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-users-id*) ;still the most recent request
-                             (= url @current-url*)) ;query-params have still not changed yet
-                    (let [body (-> resp :body)
-                          page (:page normalized-query-params)
-                          per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))]
-                      (swap! data* assoc url
-                             (-> body
-                                 (update-in [:users] (partial seq/with-index offset))
-                                 (update-in [:users] (partial seq/with-key :id))
-                                 (update-in [:users] (partial seq/with-page-index))
-                                 (update-in [:users] #(into [] %)))))))))))))
+  (http/url-cached-fetch data*))
 
 (defn escalate-query-paramas-update [_]
   (fetch-users)
@@ -91,64 +63,34 @@
    :placeholder "fuzzy term or exact email-address" ])
 
 (defn form-enabled-filter []
-  (let [enabled (or (some-> @current-query-paramerters-normalized* :account_enabled)
-                    "")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-enabled} "Account enabled"]
-     [:select#users-filter-enabled.form-control
-      {:value enabled
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :account_enabled val}))))}
-      (for [[k n] {"any" "any"
-                   "yes" "yes"
-                   "no" "no"}]
-        [:option {:key k :value k} n])]]))
-
+  [routing/select-component
+   :query-params-key :account_enabled
+   :label "Enabled"
+   :options {"" "(any value)" "yes" "yes" "no" "no"}])
 
 (defn form-admins-filter []
-  (let [is-admin (or (-> @current-query-paramerters-normalized* :is_admin)
-                     "any")]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label {:for :users-filter-is-admin} [:span.pr-1 "Is admin"]]
-     [:select#users-filter-is-admin.form-control
-      {:value is-admin
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :is_admin val}))))}
-      (for [[k n] {"any" "any"
-                   "yes" "yes"
-                   "no" "no"}]
-        [:option {:key k :value k} n])]]))
+  [routing/select-component
+   :label "Admin"
+   :query-params-key :is_admin
+   :options {"" "(any value)" "yes" "yes" "no" "no"}])
 
 (defn form-org-filter []
-  (let [org-id (some-> @current-query-paramerters-normalized* :org_id)]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-org-id} "Org id"]
-     [:input#users-filter-org-id.form-control
-      {:type :text
-       :value org-id
-       :placeholder "org_id or true or false"
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :org_id val}))))}]]))
+  [routing/delayed-query-params-input-component
+   :label "Org ID"
+   :query-params-key :org_id
+   :input-options
+   {:placeholder "org_id or true or false"}])
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-row
-    [form-term-filter]
-    [form-org-filter]
-    [form-enabled-filter]
-    [form-admins-filter]
-    [routing/form-per-page-component]
-    [routing/form-reset-component :default-query-params shared/default-query-params]]]])
+    [:div.form-row
+     [form-term-filter]
+     [form-org-filter]
+     [form-enabled-filter]
+     [form-admins-filter]
+     [routing/form-per-page-component]
+     [routing/form-reset-component :default-query-params shared/default-query-params]]]])
 
 ;;; user
 

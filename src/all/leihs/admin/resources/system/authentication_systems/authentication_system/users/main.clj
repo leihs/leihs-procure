@@ -1,16 +1,17 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.main
-
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.sql :as sql]
+
+    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
-    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
-    [leihs.core.sql :as sql]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -55,15 +56,17 @@
         (group-member-expr authentication-system-id)
         request)))
 
-(defn users-formated-query [request]
-  (-> request
-      users-query
-      sql/format))
+
 
 (defn users [{tx :tx :as request}]
-  {:body
-   {:users (->> request users-formated-query
-                (jdbc/query tx))}})
+  (let [query (users-query request)
+        offset (:offset query)]
+    {:body
+     {:users (->> query
+                  sql/format
+                  (jdbc/query tx)
+                  (seq/with-index offset)
+                  seq/with-page-index )}}))
 
 
 

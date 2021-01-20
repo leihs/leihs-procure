@@ -11,6 +11,7 @@
     [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -57,16 +58,14 @@
         (group-member-expr entitlement-group-id)
         request)))
 
-(defn users-formated-query [entitlement-group-id request]
-  (-> (users-query request)
-      sql/format))
-
-(defn users [{{entitlement-group-id :entitlement-group-id} :route-params
-              tx :tx :as request}]
-  {:body
-   {:users (->> (users-formated-query entitlement-group-id request)
-                (jdbc/query tx)
-                doall)}})
+(defn users [{tx :tx :as request}]
+  (let [query (-> request users-query )
+        offset (:offset query)]
+    {:body
+     {:users (-> query sql/format
+                 (->> (jdbc/query tx)
+                      (seq/with-index offset)
+                      seq/with-page-index))}}))
 
 ;;; remove direct user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -7,6 +7,7 @@
     [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.set :as set]
@@ -36,21 +37,15 @@
 (defn groups-formated-query [request]
   (-> request groups-query sql/format))
 
-(defn groups
-  [{tx :tx :as request}]
-  {:body
-   {:groups (->> (groups-formated-query request)
-                 (jdbc/query tx)
-                 doall)}})
-
-
-
-
-
-
-
-
-
+(defn groups [{tx :tx :as request}]
+  (let [query (groups-query request)
+        offset (:offset query)]
+    {:body
+     {:groups (-> query sql/format
+                  (->>
+                    (jdbc/query tx)
+                    (seq/with-index offset)
+                    seq/with-page-index))}}))
 
 
 ;;; put-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

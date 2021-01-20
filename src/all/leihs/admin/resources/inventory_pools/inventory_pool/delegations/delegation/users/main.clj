@@ -2,11 +2,13 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.sql :as sql]
+
     [leihs.admin.paths :refer [path]]
     [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.core.sql :as sql]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -54,9 +56,13 @@
       sql/format))
 
 (defn users [{tx :tx :as request}]
-  {:body
-   {:users (->> (users-formated-query request)
-                (jdbc/query tx))}})
+  (let [query (users-query request)
+        offset (:offset query)]
+    {:body
+     {:users (-> query sql/format
+                 (->> (jdbc/query tx)
+                      (seq/with-index offset)
+                      seq/with-page-index))}}))
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

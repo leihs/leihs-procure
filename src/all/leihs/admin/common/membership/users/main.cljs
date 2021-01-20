@@ -20,31 +20,21 @@
 
 ;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn form-membership-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label.mr-1 {:for :users-membership} " Membership "]
-   [:select#users-membership.form-control
-    {:value (:membership (merge default-query-params
-                                (:query-params @routing/state*)))
-     :on-change (fn [e]
-                  (let [val (or (-> e .-target .-value presence) "")]
-                    (accountant/navigate! (users/page-path-for-query-params
-                                            {:page 1
-                                             :membership val}))))}
-    (doall (for [[k n] {"any" "members and non-members"
-                        "non" "non-members"
-                        "member" "members"
-                        "direct" "direct members"
-                        "group" "group members"}]
-             [:option {:key k :value k} n] ))]])
-
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
     [:div.form-row
      [users/form-term-filter]
      [users/form-enabled-filter]
-     [form-membership-filter]
+     [routing/select-component
+      :label "Membership"
+      :query-params-key :membership
+      :options {"any" "members and non-members"
+                "non" "non-members"
+                "member" "members"
+                "direct" "direct members"
+                "group" "group members"}
+      :default-option "member"]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 

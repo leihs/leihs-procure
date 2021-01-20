@@ -25,10 +25,13 @@
     {:href (if-let [href (-> @routing/state* :query-params-raw
                              :return-to presence)]
              (let [href-params (routing/dissect-href href)
-                   uid (or (:email user) (:login user) (:id user))]
+                   uid (or (:email user) (:login user) (:id user))
+                   query-params-key (-> @routing/state* :query-params-raw
+                                        :query-params-key presence (or :user-uid)
+                                        keyword)]
                (path (:handler-key href-params)
                      (:route-params href-params)
-                     (assoc (:query-params-raw href-params) :user-uid uid)
+                     (assoc (:query-params-raw href-params) query-params-key uid)
                      (:fragment href-params)))
              "")}
     [:i.fas.fa-rotate-90.fa-hand-pointer]

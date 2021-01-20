@@ -20,6 +20,9 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
 
       context "visits the roles page of a group" do
         before :each do
+          @group = @groups.first
+          @group_id = @group[:id]
+          @inventory_pool_id = @pool[:id]
           click_on "Inventory-Pools"
           click_on @pool.name
           click_on "Groups"
@@ -29,8 +32,7 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           expect(page.find("table.groups ")).not_to have_content "customer"
           expect(page.find("table.groups ")).not_to have_content "inventory_manager"
           click_on "Add"
-          wait_until{ current_path.match? %r"/admin/inventory-pools/[^/]+/groups/[^/]+/roles" }
-          _, _, _, @inventory_pool_id, _, @group_id, _  = current_path.split('/')
+          wait_until{ not all(".modal").empty? }
         end
 
         scenario 'can manage roles up to lending_manager' do
@@ -44,6 +46,8 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           end
 
           # remove all access_rights
+          click_on "Edit"
+          wait_until{ not all(".modal").empty? }
           uncheck :customer
           click_on "Save"
           wait_until do

@@ -77,14 +77,14 @@ feature 'Authentication-Systems', type: :feature do
           select "members and non-members", from: 'Membership'
           fill_in 'Search', with: @user.email
           wait_until{ all('.users tbody tr').count == 1 }
-          within('.users tbody tr')do
+          within('tbody.users tr')do
             expect(find(:checkbox, id: 'member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'direct_member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked
           end
           within(".direct-member"){ click_on 'Add' }
           wait_until { all('.modal').empty? }
-          within('.users tbody tr')do
+          within('tbody.users tr')do
             expect(find(:checkbox, id: 'member', disabled: true)).to be_checked
             expect(find(:checkbox, id: 'direct_member', disabled: true)).to be_checked
             expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked

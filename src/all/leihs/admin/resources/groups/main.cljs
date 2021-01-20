@@ -6,19 +6,20 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.auth.core :as core-auth :refer [allowed? admin-scopes?]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
 
-    [leihs.admin.defaults :as defaults]
-    [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.components :as components]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http]
+    [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.utils.seq :as seq]
+    [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.groups.shared :as shared]
+    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :refer [wait-component]]
+    [leihs.admin.utils.seq :as seq]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -36,45 +37,10 @@
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-(def fetch-groups-id* (reagent/atom nil))
-
 (def data* (reagent/atom {}))
 
 (defn fetch-groups []
-  "Fetches the the currernt url with accept/json
-  after 1/5 second timeout if query-params have not changed in the meanwhile
-  yet and stores the result in the map data* under this url."
-  (let [url @current-url*
-        normalized-query-params @current-query-paramerters-normalized*]
-    (go (<! (timeout 200))
-        (when (= url @current-url*)
-          (let [resp-chan (async/chan)
-                id (requests/send-off {:url url
-                                       :method :get}
-                                      {:modal false
-                                       :title "Fetch Groups"
-                                       :handler-key :groups
-                                       :retry-fn #'fetch-groups}
-                                      :chan resp-chan)]
-            (reset! fetch-groups-id* id)
-            (go (let [resp (<! resp-chan)]
-                  (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-groups-id*) ;still the most recent request
-                             (= url @current-url*)) ;query-params have still not changed yet
-                    (let [body (-> resp :body)
-                          page (:page normalized-query-params)
-                          per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))]
-                      (swap! data* assoc url
-                             (-> body
-                                 (update-in [:groups] (partial seq/with-index offset))
-                                 (update-in [:groups] (partial seq/with-page-index))
-                                 (update-in [:groups] #(into [] %)))))))))))))
-
-(defn escalate-query-paramas-update [_]
-  (fetch-groups)
-  (swap! state/global-state*
-         assoc :groups-query-params @current-query-paramerters-normalized*))
+  (http/url-cached-fetch data*))
 
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -99,41 +65,26 @@
   [routing/form-term-filter-component])
 
 (defn form-including-user-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label {:for :groups-including-user} "Including User"]
-   [:input#groups-including-user.form-control.mb-1.mr-sm-1.mb-sm-0
-    {:type :text
-     :placeholder "ID or E-Mail Address"
-     :value (or (-> @current-query-paramerters-normalized* :including-user presence) "")
-     :on-change (fn [e]
-                  (let [val (or (-> e .-target .-value presence) "")]
-                    (accountant/navigate! (page-path-for-query-params
-                                            {:page 1 :including-user val}))))}]])
+  [routing/choose-user-component
+   :query-params-key :including-user
+   :input-options {:placeholder "email, login, or id"}])
 
 (defn form-org-filter []
-  (let [org-id (some-> @current-query-paramerters-normalized* :org_id)]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :groups-filter-org-id} "Org ID"]
-     [:input#groups-filter-org-id.form-control
-      {:type :text
-       :value org-id
-       :placeholder "org_id or true or false"
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (page-path-for-query-params
-                                              {:page 1
-                                               :org_id val}))))}]]))
+  [routing/delayed-query-params-input-component
+   :label "Org ID"
+   :query-params-key :org_id
+   :input-options
+   {:placeholder "org_id or true or false"}])
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-row
-    [:div.col-auto [form-term-filter]]
-    [:div.col-auto [form-including-user-filter]]
-    [:div.col-auto [form-org-filter]]
-    [:div.col-auto [routing/form-per-page-component]]
-    [:div.col-auto [routing/form-reset-component]]]]])
-
+    [:div.form-row
+     [form-term-filter]
+     [form-including-user-filter]
+     [form-org-filter]
+     [routing/form-per-page-component]
+     [routing/form-reset-component]]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -156,10 +107,10 @@
      "no")])
 
 (defn users-count-th-component []
-  [:th {:key :count_users} "# Users"])
+  [:th.text-right {:key :count_users} "# Users"])
 
 (defn users-count-td-component [group]
-  [:td {:key :users_count} (:count_users group)])
+  [:td.text-right {:key :users_count} (:count_users group)])
 
 
 ;;;;;
@@ -216,8 +167,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-mount escalate-query-paramas-update
-     :did-update escalate-query-paramas-update}]
+    {:did-update fetch-groups}]
    [filter-component]
    [routing/pagination-component]
    [table-component

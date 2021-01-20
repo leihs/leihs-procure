@@ -10,6 +10,7 @@
     [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
     [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -41,13 +42,14 @@
 (defn groups-formated-query [request]
   (-> request groups-query sql/format))
 
-(defn groups [{{inventory-pool-id :inventory-pool-id
-                entitlement-group-id :entitlement-group-id} :route-params
-               tx :tx :as request}]
-  {:body
-   {:groups (->> (groups-formated-query request)
-                 (jdbc/query tx)
-                 doall)}})
+(defn groups [{tx :tx :as request}]
+  (let [query (groups-query request)
+        offset (:offset query)]
+    {:body
+     {:groups (-> query sql/format
+                  (->> (jdbc/query tx)
+                       (seq/with-index offset)
+                       seq/with-page-index))}}))
 
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

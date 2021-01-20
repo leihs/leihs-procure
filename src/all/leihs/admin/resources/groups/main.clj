@@ -2,11 +2,14 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [leihs.core.sql :as sql]
+
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.shared :as shared]
     [leihs.admin.utils.regex :refer [uuid-pattern]]
-    [leihs.core.sql :as sql]
+    [leihs.admin.resources.users.choose-core :as choose-user]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
@@ -65,27 +68,17 @@
       ("false" "manual") (sql/merge-where query [:= nil :org_id])
       (sql/merge-where query [:= :org_id (str qp)]))))
 
-(defn filter-for-including-user-by-email [query email-term]
-  (-> query
-      (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
-      (sql/merge-join :users [:= :groups_users.user_id :users.id])
-      (sql/merge-where [:= (sql/call :lower email-term) (sql/call :lower :users.email)])))
-
-(defn filter-for-including-user-by-id [query id-term]
-  (-> query
-      (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
-      (sql/merge-join :users [:= :groups_users.user_id :users.id])
-      (sql/merge-where [:= (sql/call :cast id-term :uuid) :users.id])))
-
 (defn filter-for-including-user
-  [query {{user-term :including-user} :query-params :as request}]
-  (cond
-    (nil? (presence user-term)) query
-    (clojure.string/includes? user-term "@") (filter-for-including-user-by-email
-                                               query user-term)
-    (re-matches uuid-pattern user-term) (filter-for-including-user-by-id
-                                          query user-term)
-    :else (sql/merge-where query false)))
+  [query {{user-uid :including-user} :query-params-raw :as request}]
+  (if-let [user-uid (presence user-uid)]
+    (sql/merge-where
+      query
+      [:exists
+       (-> (choose-user/find-by-some-uid-query user-uid)
+           (sql/select :true)
+           (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
+           (sql/merge-where [:= :groups_users.user_id :users.id]))])
+    query))
 
 (defn select-fields [query request]
   (if-let [fields (some->> request :query-params :fields
@@ -104,16 +97,15 @@
         (filter-for-including-user request)
         (select-fields request))))
 
-(defn groups-formated-query [request]
-  (-> request
-      groups-query
-      sql/format))
-
-(defn groups [request]
-  (when (= :json (-> request :accept :mime))
+(defn groups [{tx :tx :as request}]
+  (let [query (groups-query request)
+        offset (:offset query)]
     {:body
-     {:groups
-      (jdbc/query (:tx request) (groups-formated-query request))}}))
+     {:groups (-> query
+                  sql/format
+                  (->> (jdbc/query tx)
+                       (seq/with-index offset)
+                       seq/with-page-index))}}))
 
 (def routes
   (cpj/routes

@@ -10,6 +10,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
     [leihs.admin.resources.users.main :as users]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -91,15 +92,17 @@
       (merge-select-counts inventory-pool-id)
       (inventory-pool-filter request)
       (set-per-page-and-offset request)
-      (term-fitler request)
-      sql/format))
+      (term-fitler request)))
 
 (defn delegations
-  [{:as request tx :tx
-    {inventory-pool-id :inventory-pool-id } :route-params }]
-  {:body
-   {:delegations
-    (jdbc/query (:tx request) (delegations-query request))}})
+  [{:as request tx :tx}]
+  (let [query (delegations-query request)
+        offset (:offset query)]
+    {:body
+     {:delegations (-> query sql/format
+                       (->> (jdbc/query tx)
+                            (seq/with-index offset)
+                            seq/with-page-index))}}))
 
 
 ;;; create delegation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

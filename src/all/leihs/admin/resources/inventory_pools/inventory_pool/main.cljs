@@ -38,25 +38,23 @@
   (if-not @inventory-pool/data*
     [wait-component]
     [:div.inventory-pool.mt-3
-     [:div.form-row
-      [:div.col-md-4
-       [form-components/input-component inventory-pool/data* [:shortname]
-        :label "Short name"
-        :disabled (not @edit-mode?*)]]
-      [:div.col-md-8
-       [form-components/input-component inventory-pool/data* [:name]
-        :label "Name"
-        :disabled (not @edit-mode?*)]]]
-     [:div.form-row
-      [:div.col-md-3
-       [form-components/checkbox-component inventory-pool/data* [:is_active]
-        :label "Active"
-        :disabled (not @edit-mode?*)]]
-      [:div.col-md-9
-       [form-components/input-component inventory-pool/data* [:email]
-        :label "Email"
-        :type :email
-        :disabled (not @edit-mode?*)]]]
+     [:div.mb-3
+      [form-components/checkbox-component inventory-pool/data* [:is_active]
+       :label "Active"
+       :disabled (not @edit-mode?*)]]
+     [:div
+      [form-components/input-component inventory-pool/data* [:shortname]
+       :label "Short name"
+       :disabled (not @edit-mode?*)]]
+     [:div
+      [form-components/input-component inventory-pool/data* [:name]
+       :label "Name"
+       :disabled (not @edit-mode?*)]]
+     [:div
+      [form-components/input-component inventory-pool/data* [:email]
+       :label "Email"
+       :type :email
+       :disabled (not @edit-mode?*)]]
      [form-components/input-component inventory-pool/data* [:description]
       :label "Description"
       :element :textarea

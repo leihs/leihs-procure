@@ -9,8 +9,9 @@
     [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
     [leihs.admin.resources.users.main :as users]
 
-    [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -73,16 +74,18 @@
                             (sql/merge-where
                               [:= :groups_users.group_id group-id])))))
 
-(defn users-formated-query [group-id request]
-  (-> (users-query group-id request)
-      sql/format))
+
 
 (defn users [{{group-id :group-id} :route-params
               tx :tx :as request}]
-  (let [group-id (normalized-group-id! group-id tx)]
+  (let [group-id (normalized-group-id! group-id tx)
+        query (users-query group-id request)
+        offset (:offset query)]
     {:body
-     {:users (->> (users-formated-query group-id request)
-                  (jdbc/query tx))}}))
+     {:users  (-> query sql/format
+                  (->> (jdbc/query tx)
+                       (seq/with-index offset)
+                       seq/with-page-index))}}))
 
 
 ;;; update-users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

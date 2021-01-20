@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [str keyword send-off])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+    [cljs.core.async.macros :refer [go go-loop]])
   (:require
     [leihs.core.anti-csrf.front :as anti-csrf]
     [leihs.core.core :refer [str keyword deep-merge presence]]
@@ -21,8 +21,7 @@
     ))
 
 
-; TODO
-(def base-delay* (reagent/atom 1000))
+(def base-delay* (reagent/atom 0))
 
 (defonce requests* (reagent/atom {}))
 
@@ -129,3 +128,19 @@
            [inner (:body resp)])
          [wait-component @req*])])))
 
+(defn url-cached-fetch [data* & {:keys [reload] :or {reload false}}]
+  (let [chan (async/chan)
+        url (-> @routing/state* :url)
+        routing-id (-> @routing/state* :id)]
+    (go-loop [do-fetch true]
+             (when do-fetch
+               (let [req (request {:chan chan
+                                   :url url})
+                     resp (<! chan)]
+                 (when (< (:status resp) 300)
+                   (swap! data* assoc url (-> resp :body)))))
+             (<! (timeout (* 3 60 1000)))
+             (if (= routing-id (:id @routing/state*))
+               (recur reload)
+               (when (not= url (:url @routing/state*))
+                 (swap! data* dissoc url))))))

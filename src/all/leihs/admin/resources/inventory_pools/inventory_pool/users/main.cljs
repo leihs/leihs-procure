@@ -14,6 +14,7 @@
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy roles-component]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.roles-ui :as roles-ui]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
@@ -25,13 +26,11 @@
     [leihs.admin.utils.regex :as regex]
 
     ["date-fns" :as date-fns]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
     [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
+    [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
+    [reagent.core :as reagent]
+    [taoensso.timbre :as logging]))
 
 
 (def inventory-pool-users-count*
@@ -75,59 +74,50 @@
 (defn direct-roles-th-component []
   [:th {:key :direct-roles} " Direct roles "])
 
-(defn remove-direct-roles [user]
+(defn update-direct-roles [user roles success-chan]
   (let  [path (path :inventory-pool-user-direct-roles
-                                    {:user-id (:id user)
-                                     :inventory-pool-id @inventory-pool/id*})]
+                    {:user-id (:id user)
+                     :inventory-pool-id @inventory-pool/id*})]
     (let [resp-chan (async/chan)
           id (requests/send-off {:url path
-                                 :method :delete }
+                                 :method :put
+                                 :json-params {:roles roles}}
                                 {:modal true
-                                 :title "Remove direct roles"
-                                 :retry-fn #'remove-direct-roles}
+                                 :title "Update direct roles"
+                                 :retry-fn #'update-direct-roles}
                                 :chan resp-chan)]
       (go (let [resp (<! resp-chan)]
-            (users/fetch-users))))))
+            (users/fetch-users)
+            (async/put! success-chan roles))))))
 
 (defn direct-roles-td-component [user]
-  (let [has-a-role? (some->> user :direct_roles vals (reduce #(or %1 %2)))
-        path (path :inventory-pool-user-direct-roles
-                   {:inventory-pool-id @inventory-pool/id* :user-id (:id user)})]
-    [:td.direct-roles {:key :direct-roles}
-     [roles-component user {:ks [:direct_roles]}]
-     (if has-a-role?
-       [:span
-        [:a.btn.btn-outline-primary.btn-sm.m-1 {:href path}
-         [:span icons/edit " Edit " ]]
-        [:button.btn.btn-warning.btn-sm.m-1
-         {:on-click #(remove-direct-roles user)}
-         [:span icons/delete " Remove "] ]]
-       [:a.btn.btn-outline-primary.btn-sm.m-1
-        {:href path}
-        [:span icons/add " Add " ]])]))
-
+  [:td.direct-roles {:key :direct-roles}
+   [roles-ui/inline-roles-form-component
+    (get user :direct_roles)
+    (fn [roles chan] (update-direct-roles user roles chan))]])
 
 
 ;### groups roles #############################################################
-
 
 (defn groups-roles-th-component []
   [:th {:key :groups-roles} " Roles via groups "])
 
 (defn groups-roles-td-component [user]
   (let [has-a-role? (some->> user :groups_roles vals (reduce #(or %1 %2)))
-        path (path :inventory-pool-groups
-                   {:inventory-pool-id @inventory-pool/id*}
-                   {:including-user (or (-> user :email presence) (:id user))})]
+        path (partial path :inventory-pool-groups
+                      {:inventory-pool-id @inventory-pool/id*})]
     [:td {:key :groups-roles}
      [roles-component user {:ks [:groups_roles]}]
      (if has-a-role?
        [:span
-        [:a.btn.btn-outline-primary.btn-sm.m-1 {:href path}
+        [:a.btn.btn-outline-primary.btn-sm.m-1
+         {:href (path {:including-user (or (-> user :email presence) (:id user))})}
          [:span icons/view " details " " / " icons/edit " edit"]]]
-       [:a.btn.btn-outline-primary.btn-sm.m-1
-        {:href path}
-        [:span icons/add " Add " ]])]))
+       (when (> (:groups_count user) 0)
+         [:a.btn.btn-outline-primary.btn-sm.m-1
+          {:href (path {:including-user (or (-> user :email presence) (:id user))
+                        :role ""})}
+          [:span icons/add " Add " ]]))]))
 
 
 ;### suspended ################################################################
@@ -168,35 +158,23 @@
 ;### filter ###################################################################
 
 (defn form-role-filter []
-  (let [role (:role @current-query-params*)]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-filter-role} " Role "]
-     [:select#users-filter-role.form-control
-      {:value role
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (users/page-path-for-query-params
-                                              {:page 1
-                                               :role val}))))}
-      (doall (for [a (concat ["any" "none"] roles-hierarchy)]
-               [:option {:key a :value a} a]))]]))
-
+  [routing/select-component
+   :label "Role"
+   :query-params-key :role
+   :default-option "customer"
+   :options (merge {"" "(any role or none)"
+                    "none" "none"}
+                   (->> roles-hierarchy
+                        (map (fn [%1] [%1 %1]))
+                        (into {})))])
 
 (defn form-suspension-filter []
-  (let [suspended (:suspension @current-query-params*)]
-    [:div.form-group.ml-2.mr-2.mt-2
-     [:label.mr-1 {:for :users-suspended-filter} " Suspension "]
-     [:select#users-suspended-filter.form-control
-      {:value suspended
-       :on-change (fn [e]
-                    (let [val (or (-> e .-target .-value presence) "")]
-                      (accountant/navigate! (users/page-path-for-query-params
-                                              {:page 1
-                                               :suspension val}))))}
-      (doall (for [[n k] {"any" ""
-                          "suspended" "suspended"
-                          "unsuspended" "unsuspended" }]
-               [:option {:key k :value k} n]))]]))
+  [routing/select-component
+   :label "Suspension"
+   :query-params-key :suspension
+   :options {"" "(suspended or not)"
+             "suspended" "suspended"
+             "unsuspended" "unsuspended"}])
 
 (defn filter-component []
   [:div.card.bg-light

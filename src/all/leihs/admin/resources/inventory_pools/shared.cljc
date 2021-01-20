@@ -6,11 +6,10 @@
     [leihs.admin.defaults :as defaults]))
 
 (def default-fields
-  #{
-    :is_active
+  #{:is_active
     :id
     :name
-    })
+    :shortname})
 
 (def available-fields
   #{
@@ -39,7 +38,7 @@
 (def default-query-params
   {:page 1
    :per-page defaults/PER-PAGE
-   :is-active :all
+   :active ""
    :order [["name" "asc"] ["id" "asc"]]
    :term nil})
 

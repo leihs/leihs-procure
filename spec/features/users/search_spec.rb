@@ -35,7 +35,7 @@ feature 'Searching users', type: :feature do
       end
 
       scenario 'filtering by admins' do
-        select 'yes', from: 'Is admin'
+        select 'yes', from: 'Admin'
         wait_until { not page.has_content? "Please wait" }
         tbody = find("table.users tbody").text
         @admins.each do |admin|
@@ -69,9 +69,6 @@ feature 'Searching users', type: :feature do
         end
 
       end
-
     end
-
   end
-
 end
