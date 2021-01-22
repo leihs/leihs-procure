@@ -28,11 +28,15 @@
 
 (def inventory-pool-id* breadcrumbs-parent/inventory-pool-id*)
 
-;(def users-li breadcrumbs-parent/users-li)
+(defn create-li []
+  [li :inventory-pool-user-create [:span [:i.fas.fa-plus-circle] " Create user "]
+   {:inventory-pool-id @inventory-pool-id*} {}
+   :button true
+   :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]])
+
+(def users-li breadcrumbs-parent/users-li)
 
 (defonce left*
   (reaction
     (conj @breadcrumbs-parent/left*
           [breadcrumbs-parent/users-li])))
-
-

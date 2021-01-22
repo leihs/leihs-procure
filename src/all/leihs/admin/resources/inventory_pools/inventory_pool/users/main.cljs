@@ -229,7 +229,8 @@
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch users/fetch-users))}]
    (breadcrumbs/nav-component
-     @breadcrumbs/left* [])
+     @breadcrumbs/left*
+     [[breadcrumbs/create-li]])
    [:div
     [:h1
      [:span "Users "

@@ -58,7 +58,7 @@ feature 'Creating users', type: :feature do
     context "some inventory-pool's lending-manager " do
 
       before :each do
-        @pool =  FactoryBot.create :inventory_pool
+        @pool = FactoryBot.create :inventory_pool
         @lending_manager = FactoryBot.create :user
         FactoryBot.create :access_right, user: @lending_manager,
           inventory_pool: @pool, role: 'lending_manager'
@@ -79,6 +79,28 @@ feature 'Creating users', type: :feature do
         wait_until do
           current_path.match "^\/admin\/users\/.+"
         end
+      end
+
+      scenario 'creates a new user inside one own\'s inventory pool' do
+
+        @pool.update(automatic_access: true)
+
+        visit "/admin/inventory-pools/#{@pool.id}"
+        click_on 'Users'
+        click_on 'Create user'
+        check 'account_enabled'
+        check 'password_sign_in_enabled'
+        expect(find(:checkbox, id: 'is_admin', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
+        expect(find(:checkbox, id: 'protected', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
+        fill_in 'email', with: 'test@example.com'
+        click_on 'Create'
+        new_user = User.find(email: 'test@example.com')
+        wait_until do
+          current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/#{new_user.id}$"
+        end
+        expect(find(".effective-roles input#customer")).to be_checked
+        expect(find(".direct-roles input#customer")).to be_checked
+        expect(all(".roles-via-groups input")).to be_empty
       end
 
       context 'via API' do

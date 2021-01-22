@@ -37,6 +37,8 @@
 
 (def authorizers-default [auth/admin-scopes? pool-auth/pool-lending-manager?])
 
+(def create-li breadcrumbs-parent/create-li)
+
 (defn user-li []
   [li :inventory-pool-user [:span icons/user " User "]
    @route-params-default* {}

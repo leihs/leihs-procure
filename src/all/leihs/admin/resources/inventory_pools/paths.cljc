@@ -34,6 +34,7 @@
 (def users-paths
   (branch "/users/"
           (leaf "" :inventory-pool-users)
+          (leaf "new" :inventory-pool-user-create)
           (branch ""
                   (param :user-id)
                   (leaf "" :inventory-pool-user)
