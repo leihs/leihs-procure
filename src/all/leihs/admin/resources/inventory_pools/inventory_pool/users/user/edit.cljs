@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.users.user.create
+(ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.edit
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -9,12 +9,14 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
     [leihs.admin.resources.users.user.edit-main :as edit-main]
+    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -24,53 +26,37 @@
     [taoensso.timbre :as logging]
     ))
 
-
-(defn post [& args]
+(defn patch []
   (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :users)
-                               :method :post
+        id (requests/send-off {:url (path :user {:user-id @user-id*})
+                               :method :patch
                                :json-params  (-> @data*
                                                  (update-in [:extended_info]
                                                             (fn [s] (.parse js/JSON s))))}
                               {:modal true
-                               :title "Create User"
-                               :handler-key :user-create
-                               :retry-fn #'post}
+                               :title "Update User"
+                               :handler-key :user-edit
+                               :retry-fn #'patch}
                               :chan resp-chan)]
     (go (let [resp (<! resp-chan)]
           (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :user {:user-id (-> resp :body :id)})))))))
-
-(defn clean [& _]
-  (reset! data* {}))
-
-(defn submit-component []
-  [:div
-   [:div.float-right
-    [:button.btn.btn-primary
-     icons/add
-     " Create "]]
-   [:div.clearfix]])
-
-(defn edit-form-component
-  ([] 
-   (edit-form-component (fn [e]
-                          (.preventDefault e)
-                          (post))))
-  ([on-submit]
-   [:form.form
-    {:auto-complete :off
-     :on-submit on-submit}
-    [edit-main/inner-form-component]
-    [submit-component]]))
+            (accountant/navigate! (path :inventory-pool-user
+                                        {:inventory-pool-id @inventory-pool/id*
+                                         :user-id @user-id*})))))))
 
 (defn page []
-  [:div.user-create
-   [routing/hidden-state-component
-    {:did-mount clean}]
+  [:div.user-data
+   [routing/hidden-state-component {:did-mount edit-main/clean-and-fetch}]
    [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/user-create-li])[]]
-   [:h1 "Create User " ]
-   [edit-form-component]
+    (conj @breadcrumbs/left* [breadcrumbs/edit-li])[]]
+   [:h1
+    "Edit User "
+    [core/name-component @data*]
+    " in the Inventory-Pool "
+    [inventory-pool/name-link-component]]
+   (if (not @data*)
+     [wait-component]
+     [edit-main/edit-form-component (fn [e]
+                                      (.preventDefault e)
+                                      (patch))])
    [edit-core/debug-component]])

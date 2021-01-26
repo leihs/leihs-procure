@@ -39,6 +39,13 @@
 
 (def create-li breadcrumbs-parent/create-li)
 
+(defn edit-li []
+  [li :inventory-pool-user-edit [:span [:i.fas.fa-edit] " User-Data "]
+   {:inventory-pool-id @inventory-pool-id*
+    :user-id @user-id*} {}
+   :button true
+   :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]])
+
 (defn user-li []
   [li :inventory-pool-user [:span icons/user " User "]
    @route-params-default* {}
@@ -47,6 +54,12 @@
 (defn roles-li []
   [li :inventory-pool-user-roles [:span icons/edit " Manage Roles "]
    @route-params-default* {}
+   :authorizers authorizers-default])
+
+(defn user-data-li []
+  [li :inventory-pool-user-edit [:span icons/edit " User Data "]
+   @route-params-default* {}
+   :button true
    :authorizers authorizers-default])
 
 (defn direct-roles-li []

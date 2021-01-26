@@ -83,14 +83,15 @@
    ])
 
 
-(defn edit-form-component []
-  [:form.form
-   {:auto-complete :off
-    :on-submit (fn [e]
-                 (.preventDefault e)
-                 (patch))}
-   [inner-form-component]
-   [patch-submit-component]])
+(defn edit-form-component
+  ([]
+   (edit-form-component (fn [e]
+                          (.preventDefault e)
+                          (patch))))
+  ([on-submit]
+   [:form.form {:auto-complete :off, :on-submit on-submit}
+    [inner-form-component]
+    [patch-submit-component]]))
 
 (defn page []
   [:div.user-edit

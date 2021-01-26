@@ -54,21 +54,41 @@ feature 'Editing users', type: :feature do
       context "via the UI" do
         before(:each) { sign_in_as @lending_manager }
 
-        scenario "edits an unprotected user" do
-          @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
-          visit '/admin/'
-          click_on 'Users'
-          fill_in 'Search' , with: @user.email
-          wait_until{ all(".users tbody tr").count == 1 }
-          click_on_first_user @user
-          click_on 'Edit'
-          fill_in :firstname, with: "Bobby"
-          fill_in :lastname, with: "Foo"
-          click_on 'Save'
-          wait_until do
-            current_path.match "^\/admin\/users\/.+"
+        context "edits an unprotected user" do
+          scenario "globally" do
+            @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
+            visit '/admin/'
+            click_on 'Users'
+            fill_in 'Search' , with: @user.email
+            wait_until{ all(".users tbody tr").count == 1 }
+            click_on_first_user @user
+            click_on 'Edit'
+            fill_in :firstname, with: "Bobby"
+            fill_in :lastname, with: "Foo"
+            click_on 'Save'
+            wait_until do
+              current_path.match "^\/admin\/users\/.+"
+            end
+            expect(find("dl", text: "Name")).to have_content "Bobby Foo"
           end
-          expect(find("dl", text: "Name")).to have_content "Bobby Foo"
+
+          scenario "inside an inventory pool" do
+            @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
+            visit "/admin/inventory-pools/#{@pool.id}"
+            click_on 'Users'
+            select('none', from: 'Role')
+            fill_in 'Search' , with: @user.email
+            wait_until{ all(".users tbody tr").count == 1 }
+            click_on_first_user @user
+            click_on 'User Data'
+            fill_in :firstname, with: "Bobby"
+            fill_in :lastname, with: "Foo"
+            click_on 'Save'
+            wait_until do
+              current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/.+"
+            end
+            expect(find("dl", text: "Name")).to have_content "Bobby Foo"
+          end
         end
 
         scenario 'can not edit a protected user' do

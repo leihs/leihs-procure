@@ -12,6 +12,7 @@
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.user.create :as create]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
     [leihs.admin.resources.users.user.edit-main :as edit-main]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
@@ -44,32 +45,14 @@
               (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
                                           :user-id (-> resp :body :id)})))))))
 
-(defn clean [& _]
-  (reset! data* {}))
-
-(defn submit-component []
-  [:div
-   [:div.float-right
-    [:button.btn.btn-primary
-     icons/add
-     " Create "]]
-   [:div.clearfix]])
-
-(defn edit-form-component []
-  [:form.form
-   {:auto-complete :off
-    :on-submit (fn [e]
-                 (.preventDefault e)
-                 (post))}
-   [edit-main/inner-form-component]
-   [submit-component]])
-
 (defn page []
   [:div.user-create
    [routing/hidden-state-component
-    {:did-mount clean}]
+    {:did-mount create/clean}]
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left* [breadcrumbs/create-li])[]]
    [:h1 "Create User in the Inventory-Pool " [inventory-pool/name-link-component]]
-   [edit-form-component]
+   [create/edit-form-component (fn [e]
+                                 (.preventDefault e)
+                                 (post))]
    [edit-core/debug-component]])
