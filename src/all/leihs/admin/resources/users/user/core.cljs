@@ -10,6 +10,7 @@
     [leihs.core.icons :as icons]
     [leihs.core.auth.core :as auth]
 
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.common.components :as components]
@@ -38,22 +39,13 @@
 (defn clean-and-fetch
   [& {:keys [path]
       :or {path (path :user {:user-id @user-id*})}}]
-  (def fetch-id* (reagent/atom nil))
   (reset! user-data* nil)
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url path
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch User"}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! user-data*
-                    (-> resp :body (update-in [:extended_info]
-                                              stringify-json))))))))
+  (go (reset! user-data*
+              (-> {:chan (async/chan)
+                   :url path}
+                  http-client/request
+                  :chan <! http-client/filter-success!  :body
+                  (update-in [:extended_info] stringify-json)))))
 
 
 
@@ -136,8 +128,8 @@
      [user-data-li-dl-component "Org ID" org-id])
    (when-let [badge-id (:badge_id user)]
      [user-data-li-dl-component "Badge ID" badge-id])
-   [user-data-li-dl-component "ID" (:id user)]
-   ])
+   [user-data-li-dl-component "ID"
+    [components/truncated-id-component (:id user)]]])
 
 (defn email-component [email-addr]
   [:a {:href (str "mailto:" email-addr)}
@@ -171,7 +163,15 @@
                                    (map-indexed vector))]
            ^{:key idx} [:li itm])]]))
    (when-let [url (:url user)]
-     [user-data-li-dl-component "URL" [:a {:href url} url]])])
+     [user-data-li-dl-component "URL"
+       [:a {:href url}
+        [:p
+         {:style
+          {:white-space :nowrap
+           :overflow :hidden
+           :text-overflow :ellipsis
+           :max-width :15em}}
+         url ]]])])
 
 
 (defn debug-component []

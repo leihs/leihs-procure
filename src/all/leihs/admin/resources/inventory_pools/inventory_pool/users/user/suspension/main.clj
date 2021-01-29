@@ -57,7 +57,7 @@
                                                         Date.)))]
     (when (-> data :suspended_until)
       (jdbc/insert! tx :suspensions (assoc data :inventory_pool_id inventory-pool-id :user_id user-id))))
-  {:status 204})
+  (get-suspension request))
 
 
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

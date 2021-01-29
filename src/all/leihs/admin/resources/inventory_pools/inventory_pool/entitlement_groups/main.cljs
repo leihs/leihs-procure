@@ -16,7 +16,6 @@
     [leihs.admin.resources.groups.main :as groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy]]
     [leihs.admin.utils.regex :as regex]
 
     [clojure.contrib.inflect :refer [pluralize-noun]]

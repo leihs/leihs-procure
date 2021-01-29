@@ -167,7 +167,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-update fetch-groups}]
+    {:did-change fetch-groups}]
    [filter-component]
    [routing/pagination-component]
    [table-component

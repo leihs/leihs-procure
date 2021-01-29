@@ -6,7 +6,7 @@
     [leihs.core.auth.core :refer [http-safe?]]
 
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
 
     [clojure.set :refer [rename-keys]]
@@ -21,7 +21,7 @@
 
 (defn some-lending-manager? [request]
   (if (some
-        #(:lending_manager (-> % :role roles/expand-role-to-hierarchy set))
+        #(:lending_manager (-> % :role roles/expand-to-hierarchy set))
         (->> request :authenticated-entity :access-rights))
     true
     false))

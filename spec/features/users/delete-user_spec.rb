@@ -29,6 +29,7 @@ feature 'Deleting users', type: :feature do
         click_on_first_user @to_be_deleted_user
         click_on 'Delete'
         click_on 'Delete'
+        fill_in 'Search', with: @to_be_deleted_user.email
         wait_until { page.has_content? "No (more) users found." }
         expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
 
@@ -85,6 +86,7 @@ feature 'Deleting users', type: :feature do
           click_on_first_user @to_be_deleted_user
           click_on 'Delete'
           click_on 'Delete'
+          fill_in 'Search', with: @to_be_deleted_user.email
           wait_until { page.has_content? "No (more) users found." }
           expect(database[:users].where(id: @to_be_deleted_user.id)).to be_empty
 

@@ -7,7 +7,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.seq :as seq]
@@ -77,7 +77,7 @@
                      (jdbc/query tx)
                      first :role keyword)]
     (-> role-kw
-        roles/expand-role-to-hierarchy
+        roles/expand-to-hierarchy
         roles/roles-to-map)))
 
 (defn group-add-roles [tx inventory-pool-id group]

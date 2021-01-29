@@ -60,3 +60,8 @@
              id)]
           (when copy-to-clipboard
             [:sup " " [clipboard/button-tiny id]])])])
+
+(defn truncated-url-component [url & {:keys [max-length]
+                                      :or {max-length 20}}]
+
+  [:a {:href url}])

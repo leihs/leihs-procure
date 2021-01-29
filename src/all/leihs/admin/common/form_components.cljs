@@ -159,3 +159,38 @@
 
 ;;;
 
+
+(defn edit-modal-component [data header form-elements
+                            & {:keys [abort-handler submit-handler]
+                               :or {abort-handler #()
+                                    submit-handler #()}}]
+  (reagent/with-let [edit-data* (reagent/atom data)]
+    [:div
+     (let [changed? (not= data @edit-data*)]
+       [:div.text-left {:style {:opacity "1.0" :z-index 10000}}
+        [:div.modal {:style {:display "block" :z-index 10000}}
+         [:div.modal-dialog
+          [:div.modal-content
+           [:div.modal-header [header] ]
+           [:div.modal-body
+            [:form.form
+             {:on-submit (fn [e]
+                           (.preventDefault e)
+                           (submit-handler @edit-data*))}
+             [form-elements edit-data*]
+             [:hr]
+             [:div.row
+              [:div.col
+               (if changed?
+                 [:button.btn.btn-outline-warning
+                  {:type :button
+                   :on-click abort-handler}
+                  icons/delete " Cancel" ]
+                 [:button.btn.btn-outline-secondary
+                  {:type :button
+                   :on-click abort-handler}
+                  icons/delete " Close" ])]
+              [:div.col
+               [save-submit-component :disabled (not changed?)]
+               ]]]]]]]
+        [:div.modal-backdrop {:style {:opacity "0.5"}}]])]))

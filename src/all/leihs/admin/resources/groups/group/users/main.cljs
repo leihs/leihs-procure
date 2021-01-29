@@ -133,9 +133,6 @@
 
 (defn main-page-component []
   [:div
-   [routing/hidden-state-component
-    {:did-mount users/escalate-query-paramas-update
-     :did-update users/escalate-query-paramas-update}]
    (when (and @group/data*
               (not @manage-membership-allowed*?))
      [:div.alert.alert-warning

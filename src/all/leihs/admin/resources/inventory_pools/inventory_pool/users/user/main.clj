@@ -3,7 +3,7 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.resources.users.user.main :as root-user]
     [leihs.core.sql :as sql]
@@ -71,4 +71,4 @@
 ;(logging-config/set-logger! :level :info)
 ;(debug/wrap-with-log-debug #'filter-suspended)
 ;(debug/wrap-with-log-debug #'users-formated-query)
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

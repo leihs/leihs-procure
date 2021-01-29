@@ -10,13 +10,13 @@
     [leihs.core.icons :as icons]
 
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.common.roles.components :refer [roles-component put-roles<]]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.groups.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-component roles-hierarchy]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles-ui :as roles-ui]
     [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
@@ -27,29 +27,25 @@
 
 ;### roles ####################################################################
 
-(defn update-roles [group roles success-chan]
-  (let  [path (path :inventory-pool-group-roles
-                    {:group-id (:id group)
-                     :inventory-pool-id @inventory-pool/id*})]
-    (let [resp-chan (async/chan)
-          id (requests/send-off {:url path
-                                 :method :put
-                                 :json-params {:roles roles}}
-                                {:modal true
-                                 :title "Update direct roles"}
-                                :chan resp-chan)]
-      (go (let [resp (<! resp-chan)]
-            (groups/fetch-groups)
-            (async/put! success-chan roles))))))
+(defn roles-update-handler [roles group]
+  (go (swap! groups/data* assoc-in
+             [(:url @routing/state*) :groups (:page-index group) :roles]
+             (<! (put-roles<
+                   (path :inventory-pool-group-roles
+                         {:inventory-pool-id @inventory-pool/id*
+                          :group-id (:id group)})
+                   roles)))))
+
 
 (defn roles-th-component  []
   [:th.pl-5 {:key :roles} " Roles "])
 
 (defn roles-td-component [group]
   [:td.pl-5 {:key :roles}
-   [roles-ui/inline-roles-form-component
+   [roles-component
     (get group :roles)
-    (fn [roles chan] (update-roles group roles chan))]])
+    :compact true
+    :update-handler #(roles-update-handler % group)]])
 
 ;### actions ##################################################################
 
@@ -60,7 +56,7 @@
    :default-option "customer"
    :options (merge {"" "(any role or none)"
                     "none" "none"}
-                   (->> roles-hierarchy
+                   (->> roles/hierarchy
                         (map (fn [%1] [%1 %1]))
                         (into {})))])
 

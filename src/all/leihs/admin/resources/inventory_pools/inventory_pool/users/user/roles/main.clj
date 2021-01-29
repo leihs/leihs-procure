@@ -3,8 +3,7 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states roles-to-map]]
-    ;[leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [user-roles]]
+    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
@@ -27,34 +26,32 @@
       (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
       (sql/merge-where [:= :user_id user-id])))
 
-(defn roles
+(defn get-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
     tx :tx :as request}]
   (let [access-rights (->> (access-rights-query inventory-pool-id user-id)
                            sql/format (jdbc/query tx) first)
         roles (-> access-rights :role keyword
-                  expand-role-to-hierarchy
+                  expand-to-hierarchy
                   roles-to-map)]
-    {:body {:roles roles
-            :origin_table (:origin_table access-rights)}}))
+    {:body roles}))
 
 
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx data :body :as request}]
-  (let [roles (:roles data)]
-    (logging/debug 'roles roles)
-    (if-let [allowed-role-key (some->> allowed-roles-states
-                                       (into [])
-                                       (filter #(= roles (second %)))
-                                       first first)]
-      (do (jdbc/delete! tx :access_rights ["inventory_pool_id = ? AND user_id =? " inventory-pool-id user-id])
-          (when (not= allowed-role-key :none)
-            (jdbc/insert! tx :access_rights {:inventory_pool_id inventory-pool-id
-                                             :user_id user-id
-                                             :role (str allowed-role-key)}))
-          {:status 204})
-      {:status 422 :data {:message "Submitted combination of roles is not allowed!"}})))
+    tx :tx roles :body :as request}]
+  (if-let [allowed-role-key (some->> roles/allowed-states
+                                     (into [])
+                                     (filter #(= roles (second %)))
+                                     first first)]
+    (do (jdbc/delete! tx :access_rights ["inventory_pool_id = ? AND user_id =? " inventory-pool-id user-id])
+        (when (not= allowed-role-key :none)
+          (jdbc/insert! tx :access_rights {:inventory_pool_id inventory-pool-id
+                                           :user_id user-id
+                                           :role (str allowed-role-key)}))
+        (get-roles request))
+    {:status 422 :data {:message "Submitted combination of roles is not allowed!"}}))
+
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def inventory-pool-user-roles-path
@@ -62,7 +59,7 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-user-roles-path [] #'roles)
+    (cpj/GET inventory-pool-user-roles-path [] #'get-roles)
     (cpj/PUT inventory-pool-user-roles-path [] #'set-roles)))
 
 

@@ -13,7 +13,8 @@
      [leihs.admin.state :as state]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-     [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer []]
+     [leihs.admin.common.roles.core :refer []]
+     [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
@@ -26,7 +27,8 @@
      [accountant.core :as accountant]
      [cljs.core.async :as async]
      [cljs.pprint :refer [pprint]]
-     [reagent.core :as reagent]))
+     [reagent.core :as reagent]
+     [taoensso.timbre :as logging]))
 
 (defonce inventory-pool-user-data* (reagent/atom nil))
 
@@ -37,14 +39,13 @@
      [:h2 "Page Debug"]
      [:div
       [:h3 "@user-data*"]
-      [:pre (with-out-str (pprint @user-data*))]]
-     [:div
-      [:h3 "@suspension/data*"]
-      [:pre (with-out-str (pprint @suspension/data*))]]]))
+      [:pre (with-out-str (pprint @user-data*))]]]))
 
 (defn name-component []
   [:span
-   [routing/hidden-state-component {:did-mount user/clean-and-fetch}]
+   [routing/hidden-state-component
+    {:did-mount #(let [p (:url @routing/state*)]
+                   (user/clean-and-fetch :path p))}]
    (let [p (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
                                        :user-id @user-id*})
          name-or-id (user/fullname-or-some-uid @user-data*)]
@@ -55,18 +56,8 @@
 
 (defn suspension-component []
   [:div#suspension
-   [:h2
-    " Suspension "
-    [:a.btn.btn-outline-primary
-     {:href (path :inventory-pool-user-suspension
-                  {:inventory-pool-id @inventory-pool/id*
-                   :user-id @user-id*})}
-     icons/edit (if @suspension/suspended?* " Edit " " Suspend ")]
-    (when @suspension/suspended?*
-      [:button.btn.btn-warning.btn.mx-2
-       {:on-click #(suspension/cancel {:id @user-id*} suspension/clean-and-fetch)}
-       icons/delete " Cancel suspension "])]
-   [suspension/suspension-component]])
+   [:h2 " Suspension " ]
+   [suspension/user-page-suspension-component]])
 
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,25 +65,22 @@
 (defn effective-roles-component []
   [:div.effective-roles
    [routing/hidden-state-component
-    {:did-mount user-roles/clean-and-fetch
-     :did-change user-roles/clean-and-fetch}]
+    {:did-change user-roles/clean-and-fetch}]
    [:h2 "Roles"]
    [:p "This section shows the effective roles. This is an aggregate computed from "
     "direct roles, and roles via groups. "]
-   [user-roles/roles-component]])
+   [roles-ui/roles-component @user-roles/roles-data*
+    :compact false]])
 
 (defn direct-roles-component []
   [:div.direct-roles
    [routing/hidden-state-component
-    {:did-mount direct-roles/clean-and-fetch
-     :did-change direct-roles/clean-and-fetch}]
-   [:h3
-    [:span " Direct roles "]
-    [:a.btn.btn-outline-primary {:href (path :inventory-pool-user-direct-roles
-                                             {:inventory-pool-id @inventory-pool/id*
-                                              :user-id @user-id*})}
-     [:span icons/edit "Edit"]]]
-   [direct-roles/roles-component]])
+    {:did-change direct-roles/fetch}]
+   [:h3 [:span " Direct roles "] ]
+   [roles-ui/roles-component @direct-roles/roles-data*
+    :compact true
+    :update-handler #(go (<! (direct-roles/update-handler %))
+                         (user-roles/clean-and-fetch))]])
 
 (defn roles-via-groups-component [user]
   [:div.roles-via-groups
@@ -100,11 +88,12 @@
     [:a.btn.btn-outline-primary
      {:href (path :inventory-pool-groups
                   {:inventory-pool-id @inventory-pool/id*}
-                  {:including-user (or (-> user :email presence) (:id user))}
-                  )}
+                  {:including-user (or (-> user :email presence) (:id user))
+                   :role "" })}
 
      icons/add " Add group role "]]
-   [groups-roles/groups-roles-component]])
+   [groups-roles/groups-roles-component2
+    #(user-roles/clean-and-fetch)]])
 
 (defn roles-component []
   [:div
@@ -137,11 +126,14 @@
   [:div
    [:ul.list-unstyled
     [pool-data-li-dl-component "Suspended"
-     (if @suspension/suspended?*
+     (if (suspension/suspended?
+           (-> @suspension/data* :suspended_until presence js/Date.)
+           (:timestamp @state/global-state*))
        [:span.text-danger "yes"]
        [:span.text-success "no"])]
     [pool-data-li-dl-component "Roles"
-     [user-roles/roles-component]]
+     [roles-ui/roles-component @user-roles/roles-data*
+      :compact true]]
     [not-zero-count-pool-data-li-dl-component user
      "Submitted reservations" :reservations_submitted_count ]
     [not-zero-count-pool-data-li-dl-component user
@@ -153,20 +145,24 @@
 
 (defn overview-component []
   [:div.overview
-   [:h2 "Overview"]
    [:div.row
-    [:div.col-md
+    [:div.col-lg-3
+     [:hr]
+     [:h3 "Pool Related Properties"]
+     [overview-pool-data-component @user-data*]]
+    [:div.col-lg-3
+     [:hr]
      [:h3 " Image / Avatar "]
      [user/img-avatar-component @user-data*]]
-    [:div.col-md
+    [:div.col-lg-3
+     [:hr]
      [:h3 "Personal Properties"]
      [user/personal-properties-component @user-data*]]
-    [:div.col-md
+    [:div.col-lg-3
+     [:hr]
      [:h3 "Account Properties"]
      [user/account-properties-component @user-data*] ]
-    [:div.col-md
-     [:h3 "Pool Related Properties"]
-     [overview-pool-data-component @user-data*]]]])
+    ]])
 
 
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -185,14 +181,14 @@
      [breadcrumbs/direct-roles-li]
      [breadcrumbs/suspension-li]]]
    [page-title-component]
-   [:hr]
    [overview-component]
-   [:hr]
-   [suspension-component]
-   [:hr]
-   [roles-component]
-   [:hr]
+   [:div.row
+    [:div.col-md-6
+     [:hr] [roles-component]]
+    [:div.col-md-6
+     [:hr] [suspension-component]]]
    [:div
+    [:hr]
     [:h2 "Extended User Info"]
     (when-let [ext-info (-> @user-data* :extended_info presence)]
       [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]

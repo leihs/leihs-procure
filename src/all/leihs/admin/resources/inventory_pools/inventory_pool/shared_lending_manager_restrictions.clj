@@ -2,7 +2,10 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.authorization :refer [pool-access-right-for-route]]
+
     [leihs.core.sql :as sql]
     [clojure.java.jdbc :as jdbc]
     [clj-logging-config.log4j :as logging-config]
@@ -14,9 +17,14 @@
   (boolean (and (not (:scope_admin_write authenticated-entity))
                 (= "lending_manager" (-> request pool-access-right-for-route :role)))))
 
+(defn assert-roles-structure! [roles]
+  (when-not (= (set roles/hierarchy) (-> roles keys set))
+    (throw (ex-info "Roles data does not conform to expected structure"
+                    {:status 422}))))
 
 (defn protect-inventory-manager-escalation-by-lending-manager!
-  [{{roles :roles} :body :as request}]
+  [{roles :body :as request}]
+  (assert-roles-structure! roles)
   (when (and (:inventory_manager roles)
              (acts-as-lending-manger? request))
     (throw
@@ -27,7 +35,8 @@
 (defn protect-inventory-manager-restriction-by-lending-manager!
   [access-rights-query
    {{inventory-pool-id :inventory-pool-id user-id :user-id group-id :group-id} :route-params
-    tx :tx {roles :roles} :body :as request}]
+    tx :tx roles :body :as request}]
+  (assert-roles-structure! roles)
   (when (and (not (:inventory_manager roles))
             (acts-as-lending-manger? request))
     (when-let [existing-access-right (->> (access-rights-query

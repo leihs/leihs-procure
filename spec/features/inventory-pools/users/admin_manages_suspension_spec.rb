@@ -16,34 +16,38 @@ feature 'Manage inventory-pool users ', type: :feature do
 
     scenario ' managing the suspension of a user' do
 
+      # suspend on the users table
       click_on 'Inventory-Pools'
       click_on @pool.name
       click_on "Users"
       select 'any', from: 'Role'
       fill_in 'Search', with: @user.email
       wait_until { all("table.users tbody tr").count == 1 }
-      click_on 'Suspend'
+      within("td.suspension"){ click_on 'Edit' }
       expect { page.not.to have_content "Suspended for" }
       fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
       fill_in 'suspended_reason', with: 'Some reason'
       click_on 'Save'
       wait_until { page.has_content? "Suspended for" }
 
-      # the inventory-pool-user's page:
+      # on the inventory-pool-user's page:
       # suspension info is here and we can cancel suspension
-      find('i.fa-user').click
+      click_on_first_user @user
       wait_until { page.has_content? "Suspended for" }
       wait_until { page.has_content? "Some reason" }
-      within("#suspension") do
-        expect(page).to have_content "Edit"
-        click_on "Cancel"
-      end
+      within("#suspension"){ click_on "Edit" }
+      wait_until{ not all(".modal").empty? }
+      click_on "Reset suspension"
+      click_on "Save"
+      wait_until{ all(".modal").empty? }
       wait_until { page.has_content? "Not suspended" }
       # suspend again from here
-      click_on "Suspend"
+      within("#suspension"){ click_on "Edit" }
+      wait_until{ not all(".modal").empty? }
       fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
       fill_in 'suspended_reason', with: 'Some reason'
       click_on 'Save'
+      wait_until{ all(".modal").empty? }
       wait_until { page.has_content? "Suspended for" }
 
 
@@ -52,17 +56,22 @@ feature 'Manage inventory-pool users ', type: :feature do
       select 'any', from: 'Role'
       fill_in 'Search', with: @users.first.email
       wait_until { all("table.users tbody tr").count == 1 }
-      within  ".suspension" do
+      within  "td.suspension" do
         expect { page.not_to have_content "Not suspended." }
-        click_on "Cancel"
-        wait_until { page.has_content? "Not suspended." }
+        click_on "Edit"
       end
+      wait_until{ not all(".modal").empty? }
+      click_on "Reset suspension"
+      click_on "Save"
+      wait_until{ all(".modal").empty? }
+      wait_until { page.has_content? "Not suspended" }
 
       # suspend forever and test suspension filter
-      click_on "Suspend"
+      within("td.suspension"){ click_on "Edit" }
+      wait_until{ not all(".modal").empty? }
       fill_in 'suspended_until', with: (Date.today + 100.years).iso8601
       click_on 'Save'
-      click_on 'Users'
+      wait_until{ all(".modal").empty? }
       select 'any', from: 'Role'
       select('suspended', from: 'Suspension')
       wait_until { all("table.users tbody tr").count == 1 }

@@ -72,6 +72,11 @@
 (defn filter-success [response]
   (when (:success response) response))
 
+(defn filter-success! [response]
+  (if (:success response)
+    response
+    (throw (ex-info "Response is not success." response))))
+
 ;;; UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn wait-component [req]

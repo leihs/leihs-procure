@@ -11,7 +11,7 @@
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id* edit-mode?*]]
 
     [accountant.core :as accountant]
@@ -90,6 +90,6 @@
          [:a {:href (path :inventory-pool-group-roles
                           {:inventory-pool-id (:inventory_pool_id row)
                            :group-id (:group_id row)})}
-          (->> row :role roles/expand-role-to-hierarchy
+          (->> row :role roles/expand-to-hierarchy
                (map str)
                (clojure.string/join ", "))]]])]]])

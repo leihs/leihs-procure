@@ -14,7 +14,7 @@
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
 
     [accountant.core :as accountant]
@@ -81,7 +81,7 @@
 
 (defn roles-td-component [row]
   [:td
-   (->> row :role roles/expand-role-to-hierarchy
+   (->> row :role roles/expand-to-hierarchy
         (map str)
         (clojure.string/join ", "))])
 

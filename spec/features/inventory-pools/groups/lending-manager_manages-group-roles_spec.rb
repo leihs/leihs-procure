@@ -31,7 +31,7 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           wait_until { all("table.groups tbody tr").count == 1 }
           expect(page.find("table.groups ")).not_to have_content "customer"
           expect(page.find("table.groups ")).not_to have_content "inventory_manager"
-          click_on "Add"
+          click_on "Edit"
           wait_until{ not all(".modal").empty? }
         end
 

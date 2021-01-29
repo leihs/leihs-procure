@@ -24,6 +24,7 @@ RSpec.configure do |config|
   config.include Helpers::User
 
   config.before :each do
+    page.driver.browser.manage.window.resize_to(1200, 1200)
     srand 1
   end
 

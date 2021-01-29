@@ -5,7 +5,7 @@
     [leihs.core.sql :as sql]
 
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.common.membership.users.main :refer [extend-with-membership]]

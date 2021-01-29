@@ -38,10 +38,10 @@ feature 'Manage inventory-pool groups', type: :feature do
         gar = GroupAccessRight.find group_id: @group.id
         expect(gar).not_to be
 
-        payload= '{"roles":{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":false}}'
+        payload= '{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":false}'
         resp  = http_client.put "/admin/inventory-pools/#{@pool.id}/groups/#{@group.id}/roles", payload
 
-        expect(resp.status).to be== 204
+        expect(resp.status).to be< 300
 
         gar = GroupAccessRight.find group_id: @group.id
         expect(gar).to be
@@ -56,7 +56,7 @@ feature 'Manage inventory-pool groups', type: :feature do
         gar = GroupAccessRight.find group_id: @group.id
         expect(gar).not_to be
 
-        payload= '{"roles":{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":true}}'
+        payload= '{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":true}'
         resp  = http_client.put "/admin/inventory-pools/#{@pool.id}/groups/#{@group.id}/roles", payload
 
         expect(resp.status).to be== 403
@@ -75,7 +75,7 @@ feature 'Manage inventory-pool groups', type: :feature do
         FactoryBot.create :group_access_right, group_id: @group.id,
           inventory_pool_id: @pool.id, role: 'inventory_manager'
 
-        payload= '{"roles":{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":false}}'
+        payload= '{"customer":true,"group_manager":true,"lending_manager":true,"inventory_manager":false}'
         resp  = http_client.put "/admin/inventory-pools/#{@pool.id}/groups/#{@group.id}/roles", payload
 
         expect(resp.status).to be== 403

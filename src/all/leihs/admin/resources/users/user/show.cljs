@@ -42,19 +42,25 @@
    [:div.basic-properties.mb-2
     [:h3 "Basic User Properties"]
     [:div.row
-     [:div.col-md.mb-1
+     [:div.col-md-3.mb-1
+      [:hr]
       [:h3 " Image / Avatar "]
       [user-core/img-avatar-component @user-data*]]
      [:div.col-md
+      [:hr]
+      [:h3 "Personal Properties"]
+      [user-core/personal-properties-component @user-data*]]
+     [:div.col-md
+      [:hr]
       [:h3 "Account Properties"]
       [user-core/account-properties-component @user-data*]]
-     [:div.col-md
-      [:h3 "Personal Properties"]
-      [user-core/personal-properties-component @user-data*]]]]
+     ]]
    [:div
+    [:hr]
     [:h2 "Inventory Pools"]
     [inventory-pools/table-component]]
    [:div
+    [:hr]
     [:h2 "Groups"]
     [groups/table-component]
     ]

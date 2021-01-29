@@ -5,7 +5,7 @@
     [leihs.core.sql :as sql]
 
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
     [leihs.admin.resources.users.main :as users]
@@ -103,30 +103,37 @@
 
 
 (defn role-to-roles-map [ks data]
-  (update-in data ks #(-> % roles/expand-role-to-hierarchy roles/roles-to-map)))
+  (update-in data ks #(-> % roles/expand-to-hierarchy roles/roles-to-map)))
 
 
 ;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn add-suspended-until-to-query [query inventory-pool-id]
   (-> query
-      (sql/merge-left-join :suspensions [:and
-                                         [:= :suspensions.inventory_pool_id inventory-pool-id]
-                                         [:= :suspensions.user_id :users.id]
-                                         (sql/merge-where (sql/raw  "CURRENT_DATE <= suspensions.suspended_until"))])
-      (sql/merge-select :suspensions.suspended_until)))
+      (sql/merge-select [(-> (sql/select (sql/raw " json_agg(to_json(suspensions.*))" ))
+                             (sql/from :suspensions)
+                             (sql/merge-where [:= :suspensions.user_id :users.id])
+                             (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
+                             ) :suspension])))
 
-;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; suspension filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn suspension-subquery [inventory-pool-id]
+  (-> (sql/select :true)
+      (sql/from :suspensions)
+      (sql/merge-where [:= :suspensions.user_id :users.id])
+      (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
+      (sql/merge-where (sql/raw  "CURRENT_DATE <= suspensions.suspended_until"))))
+
 
 (defn filter-suspended [query inventory-pool-id {:as request}]
   (case (-> request :query-params :suspension)
     "suspended" (sql/merge-where
-                  query (sql/raw  "CURRENT_DATE <= suspensions.suspended_until"))
+                  query
+                  [:exists (suspension-subquery inventory-pool-id) ])
     "unsuspended" (sql/merge-where
                     query
-                    [:or
-                     [:= nil :suspensions.suspended_until]
-                     (sql/raw  "CURRENT_DATE > suspensions.suspended_until")])
+                    [:not [:exists (suspension-subquery inventory-pool-id)]])
 
     query))
 
@@ -142,7 +149,8 @@
       (merge-aggreaged-role-to-query inventory-pool-id)
       (merge-direct-role-to-query inventory-pool-id)
       (sql/merge-select [(groups-role-query inventory-pool-id) :groups_role])
-      (add-suspended-until-to-query inventory-pool-id)))
+      (add-suspended-until-to-query inventory-pool-id)
+      ))
 
 (defn users-formated-query [inventory-pool-id request]
   (-> (users-query inventory-pool-id request)
@@ -176,14 +184,19 @@
         query (users-query inventory-pool-id request)
         offset (:offset query)]
     {:body
-     {:users (-> query sql/format
-                 (->> (jdbc/query tx)
+     {:users (-> query
+                 (->> (logging/spy :warn))
+                 sql/format
+                 (->> (logging/spy :warn)
+                      (jdbc/query tx)
                       (map #(role-to-roles-map [:role] %))
                       (map #(role-to-roles-map [:direct_role] %))
                       (map #(role-to-roles-map [:groups_role] %))
                       (map #(rename-keys % {:role :roles
                                             :direct_role :direct_roles
                                             :groups_role :groups_roles}))
+                      (map (fn [user] (update-in user [:suspension]
+                                                 #(-> % first (select-keys [:suspended_until :suspended_reason])))))
                       (seq/with-index offset)
                       seq/with-page-index))}}))
 

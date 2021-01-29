@@ -2,13 +2,14 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [expand-role-to-hierarchy allowed-roles-states roles-to-map]]
-    ; [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [user-roles]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
+
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
+    [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
+    [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -39,7 +40,8 @@
                           (map #(update-in % [:roles]
                                            (fn [role]
                                              (-> role keyword
-                                                 expand-role-to-hierarchy roles-to-map)))))]
+                                                 expand-to-hierarchy roles-to-map))))
+                          seq/with-page-index)]
     {:body {:groups-roles groups-roles}}))
 
 

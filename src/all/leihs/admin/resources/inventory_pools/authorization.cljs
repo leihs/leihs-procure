@@ -6,14 +6,14 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :as current-user]
 
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [expand-role-to-hierarchy]]
+    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
 
     [taoensso.timbre :as logging]))
 
 (defn some-lending-manager? [current-user-state routing-state]
   (if (some
         (fn [ac] (some #(= :lending_manager)
-                       (-> ac :role roles/expand-role-to-hierarchy)))
+                       (-> ac :role roles/expand-to-hierarchy)))
         (:access-rights current-user-state))
     true
     false))
@@ -24,7 +24,7 @@
                 :access-rights
                 (some #(when (= inventory-pool-id (:inventory_pool_id %))
                          (:role %)))
-                expand-role-to-hierarchy)))
+                expand-to-hierarchy)))
 
 (defn current-user-roles-in-pool [inventory-pool-id]
   (roles-in-pool @current-user/state* inventory-pool-id))

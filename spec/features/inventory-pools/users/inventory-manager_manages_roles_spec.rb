@@ -28,7 +28,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
 
-      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
+      within_first("td.direct-roles", text: 'Edit'){ click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
       check "customer"
       click_on "Save"

@@ -5,9 +5,9 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.common.http-client.core :as http]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
@@ -20,32 +20,14 @@
     [cljs.pprint :refer [pprint]]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
+    [taoensso.timbre :as logging]
     ))
 
 
 (defonce data* (reagent/atom nil))
 
 (defn fetch-groups []
-  (defonce fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user-groups
-                                          (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Inventory Pool Roles"
-                               :retry-fn #'fetch-groups}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! data*
-                    (-> resp :body :user-groups)))))))
-
-(defn clean-and-fetch-groups [& args]
-  (reset! data* nil)
-  (fetch-groups))
+  (http/url-cached-fetch data*))
 
 (defn debug-component []
   [:div
@@ -65,8 +47,7 @@
 (defn table-component []
   [:div.user-groups
    [routing/hidden-state-component
-    {:did-mount clean-and-fetch-groups
-     :did-change clean-and-fetch-groups}]
+    {:did-change fetch-groups}]
    (if (and @data* @user-data*)
      [:table.table.table-striped.table-sm.user-groups
       [:thead

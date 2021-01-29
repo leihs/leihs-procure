@@ -15,7 +15,6 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :refer [roles-hierarchy]]
     [leihs.admin.common.membership.groups.main :as groups-membership]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.icons :as icons]

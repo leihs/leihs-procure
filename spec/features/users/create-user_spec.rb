@@ -98,9 +98,8 @@ feature 'Creating users', type: :feature do
         wait_until do
           current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/#{new_user.id}$"
         end
-        expect(find(".effective-roles input#customer")).to be_checked
-        expect(find(".direct-roles input#customer")).to be_checked
-        expect(all(".roles-via-groups input")).to be_empty
+        within('.effective-roles'){ expect(find_field('customer', disabled: true)).to be_checked }
+        within('.direct-roles'){ expect(find_field('customer', disabled: true)).to be_checked }
       end
 
       context 'via API' do

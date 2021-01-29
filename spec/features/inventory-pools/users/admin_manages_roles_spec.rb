@@ -26,7 +26,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(page.find("table.users")).not_to have_content "customer"
       expect(page.find("table.users")).not_to have_content "inventory_manager"
 
-      within_first("td.direct-roles", text: 'Add'){ click_on 'Add' }
+      within_first("td.direct-roles", text: 'Edit'){ click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
       check "inventory_manager"
       click_on "Save"
@@ -56,7 +56,7 @@ feature 'Manage inventory-pool users ', type: :feature do
 
 
       # now change the role to lending_manager
-      click_on 'Edit'
+      within("td.direct-roles"){ click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
       uncheck 'inventory_manager'
       check 'lending_manager'
@@ -86,7 +86,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       expect(find("table.users")).not_to have_content("inventory_manager")
 
       # remove all roles
-      within("table.users") { click_on 'Edit' }
+      within("table.users td.direct-roles") { click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
       uncheck 'customer'
       click_on "Save"

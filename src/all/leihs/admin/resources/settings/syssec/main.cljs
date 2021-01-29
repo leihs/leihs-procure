@@ -33,7 +33,7 @@
   (go (reset! data*
               (some-> {:chan (async/chan)}
                       http-client/request
-                      :chan <! http-client/filter-success :body))))
+                      :chan <! http-client/filter-success! :body))))
 
 (defn put [& _]
   (go (when-let [data (some->

@@ -34,7 +34,6 @@
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-(def fetch-users-id* (reagent/atom nil))
 
 (def data* (reagent/atom {}))
 
@@ -182,15 +181,18 @@
      ^{:key idx} [col user])])
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* @current-url*)
-    [wait-component]
-    (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
-      [:table.table.table-striped.table-sm.users
-       [thead-component hds]
-       [:tbody.users
-        (doall (for [user users]
-                 (row-component user tds)))]]
-      [:div.alert.alert-warning.text-center "No (more) users found."])))
+  [:div
+   [routing/hidden-state-component
+    {:did-change fetch-users}]
+   (if-not (contains? @data* @current-url*)
+     [wait-component]
+     (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
+       [:table.table.table-striped.table-sm.users
+        [thead-component hds]
+        [:tbody.users
+         (doall (for [user users]
+                  (row-component user tds)))]]
+       [:div.alert.alert-warning.text-center "No (more) users found."]))])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -212,9 +214,6 @@
 
 (defn main-page-content-component []
   [:div
-   [routing/hidden-state-component
-    {:did-mount escalate-query-paramas-update
-     :did-update escalate-query-paramas-update}]
    [filter-component]
    [routing/pagination-component]
    [table-component

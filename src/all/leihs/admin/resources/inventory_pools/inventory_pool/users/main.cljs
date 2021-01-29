@@ -9,12 +9,11 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles :as roles :refer [roles-hierarchy roles-component]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.roles-ui :as roles-ui]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
@@ -66,7 +65,12 @@
   [:th {:key :roles} " Roles "])
 
 (defn roles-td-component [user]
-  [:td {:key :roles} [roles-component user {}]])
+  [:td {:key :roles} [roles-component
+                      (->> roles/hierarchy
+                           (map (fn [rk] [rk (or (-> user :direct_roles rk)
+                                                 (-> user :groups_roles rk))]))
+                           (into {}))
+                      :compact true]])
 
 
 ;### direct roles #############################################################
@@ -74,27 +78,21 @@
 (defn direct-roles-th-component []
   [:th {:key :direct-roles} " Direct roles "])
 
-(defn update-direct-roles [user roles success-chan]
-  (let  [path (path :inventory-pool-user-direct-roles
-                    {:user-id (:id user)
-                     :inventory-pool-id @inventory-pool/id*})]
-    (let [resp-chan (async/chan)
-          id (requests/send-off {:url path
-                                 :method :put
-                                 :json-params {:roles roles}}
-                                {:modal true
-                                 :title "Update direct roles"
-                                 :retry-fn #'update-direct-roles}
-                                :chan resp-chan)]
-      (go (let [resp (<! resp-chan)]
-            (users/fetch-users)
-            (async/put! success-chan roles))))))
+(defn direct-roles-update-handler [roles user]
+  (go (swap! users/data* assoc-in
+             [(:url @routing/state*) :users (:page-index user) :direct_roles]
+             (<! (put-roles<
+                   (path :inventory-pool-user-direct-roles
+                         {:inventory-pool-id @inventory-pool/id*
+                          :user-id (:id user)})
+                   roles)))))
 
 (defn direct-roles-td-component [user]
   [:td.direct-roles {:key :direct-roles}
-   [roles-ui/inline-roles-form-component
+   [roles-component
     (get user :direct_roles)
-    (fn [roles chan] (update-direct-roles user roles chan))]])
+    :compact true
+    :update-handler #(direct-roles-update-handler % user)]])
 
 
 ;### groups roles #############################################################
@@ -107,7 +105,9 @@
         path (partial path :inventory-pool-groups
                       {:inventory-pool-id @inventory-pool/id*})]
     [:td {:key :groups-roles}
-     [roles-component user {:ks [:groups_roles]}]
+     [roles-component
+      (:groups_roles user)
+      :compact true]
      (if has-a-role?
        [:span
         [:a.btn.btn-outline-primary.btn-sm.m-1
@@ -126,34 +126,19 @@
   [:th " Suspension "])
 
 (defn suspension-td-component [user]
-  (let [user-suspension-path (path :inventory-pool-user-suspension
-                                   {:user-id (:id user)
-                                    :inventory-pool-id @inventory-pool/id*})
-        user-inventory-pool-path (path :inventory-pool-user
-                                       {:inventory-pool-id @inventory-pool/id*
-                                        :user-id (:id user)})]
-    [:td.suspension
-     (let [suspended-until (some-> user :suspended_until js/Date.)]
-       [:div
-        [:div [suspension/humanized-suspended-until-component
-               suspended-until]]
-        (if suspended-until
-          [:span
-           [:span
-            [:a.btn.btn-outline-primary.btn.btn-sm.m-1
-             {:href user-inventory-pool-path}
-             icons/view "  Details" ]
-            [:a.btn.btn-outline-primary.btn.btn-sm.m-1
-             {:href user-suspension-path}
-             icons/edit " Edit " ]
-            [:button.btn.btn-warning.btn.btn-sm.m-1
-             {:on-click #(suspension/cancel user users/fetch-users)}
-             icons/delete " Cancel "]]]
-          [:div.m-1
-           [:a.btn.btn-outline-primary.btn-sm
-            {:href user-suspension-path }
-            icons/edit " Suspend" ]])])]))
-
+  [:td.suspension
+   (suspension/suspension-component
+     (:suspension user)
+     :compact true
+     :update-handler (fn [updated]
+                       (go (let [data (<! (suspension/put-suspension<
+                                            (path :inventory-pool-user-suspension
+                                                  {:inventory-pool-id @inventory-pool/id*
+                                                   :user-id (:id user)})
+                                            updated))]
+                             (swap! users/data* assoc-in
+                                    [(:url @routing/state*) :users
+                                     (:page-index user) :suspension] data)))))])
 
 ;### filter ###################################################################
 
@@ -164,7 +149,7 @@
    :default-option "customer"
    :options (merge {"" "(any role or none)"
                     "none" "none"}
-                   (->> roles-hierarchy
+                   (->> roles/hierarchy
                         (map (fn [%1] [%1 %1]))
                         (into {})))])
 
