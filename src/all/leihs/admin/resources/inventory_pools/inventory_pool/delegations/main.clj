@@ -9,6 +9,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
+    [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.seq :as seq]
 
@@ -70,6 +71,18 @@
                           ["~~*" :searchable (str "%" term "%")]]))
     query))
 
+(defn filter-for-including-user
+  [query {{user-uid :including-user} :query-params-raw :as request}]
+  (if-let [user-uid (presence user-uid)]
+    (sql/merge-where
+      query
+      [:exists
+       (-> (choose-user/find-by-some-uid-query user-uid)
+           (sql/select :true)
+           (sql/merge-join :delegations_users [:= :delegations_users.delegation_id :delegations.id])
+           (sql/merge-where [:= :delegations_users.user_id :users.id]))])
+    query))
+
 (defn inventory-pool-filter
   [query {{inventory-pool-id :inventory-pool-id} :route-params
           query-params :query-params
@@ -89,6 +102,7 @@
   [{{inventory-pool-id :inventory-pool-id} :route-params
     :as request}]
   (-> delegations-base-query
+      (filter-for-including-user request)
       (merge-select-counts inventory-pool-id)
       (inventory-pool-filter request)
       (set-per-page-and-offset request)

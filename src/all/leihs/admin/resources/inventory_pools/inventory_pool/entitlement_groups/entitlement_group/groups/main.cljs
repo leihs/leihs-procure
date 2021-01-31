@@ -71,8 +71,10 @@
    [filter-component]
    [routing/pagination-component]
    [groups/table-component
-    [groups-membership/member-th-component]
-    [(partial groups-membership/member-td-component member-path)]]
+    [groups/name-th-component
+     groups-membership/member-th-component]
+    [groups/name-td-component
+     (partial groups-membership/member-td-component member-path)]]
    [routing/pagination-component]
    [debug-component]
    [groups/debug-component]])

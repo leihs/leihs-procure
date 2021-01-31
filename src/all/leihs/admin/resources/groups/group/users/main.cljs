@@ -79,7 +79,7 @@
 (defn action-td-component [user]
   [:td.text-right
    (if (:group_id user)
-     [:button.btn.btn-sm.btn-danger
+     [:button.btn.btn-sm.btn-warning
       {:on-click (fn [_] (remove-user (:id user)))
        :disabled (not @manage-membership-allowed*?)}
       icons/delete " Remove "]

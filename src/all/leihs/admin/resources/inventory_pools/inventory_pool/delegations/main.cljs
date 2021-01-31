@@ -76,30 +76,22 @@
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn form-membership-filter []
-  [:div.form-group.ml-2.mr-2.mt-2
-   [:label.mr-1 {:for :users-membership} " Membership "]
-   [:select#users-membership.form-control
-    {:value (:membership (merge default-query-params
-                                (:query-params @routing/state*)))
-     :on-change (fn [e]
-                  (let [val (or (-> e .-target .-value presence) "")]
-                    (accountant/navigate!
-                      (routing/current-path-for-query-params
-                        default-query-params
-                        {:page 1 :membership val}))))}
-    (doall (for [[k n] {"any" "members and non-members"
-                        "non" "non-members"
-                        "member" "members"}]
-             [:option {:key k :value k} n] ))]])
-
 (defn filter-form []
   [:div.card.bg-light
    [:div.card-body
     [:div.form-row
      [routing/form-term-filter-component
       {:default-query-params default-query-params}]
-     [form-membership-filter]
+     [routing/choose-user-component
+      :query-params-key :including-user
+      :input-options {:placeholder "email, login, or id"}]
+     [routing/select-component
+      :options {"any" "members and non-members"
+                "non" "non-members"
+                "member" "members"}
+      :default-option :member
+      :label "Membership"
+      :query-params-key :membership]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 

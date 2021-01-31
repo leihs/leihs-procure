@@ -112,12 +112,22 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
+
+
+(defn filter-form []
+  [:div.card.bg-light
+   [:div.card-body
+    [:div.form-row
+     [routing/choose-user-component
+      :query-params-key :including-user
+      :input-options {:placeholder "email, login, or id"}]
+     [routing/form-reset-component]]]])
+
+
 (defn index-page []
   [:div.inventory-pool-entitlement-groups
    [routing/hidden-state-component
-    {:did-mount (fn [_]
-                  (inventory-pool/clean-and-fetch)
-                  (fetch-entitlement-groups))}]
+    {:did-change fetch-entitlement-groups}]
    [breadcrumbs/nav-component
     @breadcrumbs/left* []]
    [:div
@@ -129,5 +139,6 @@
     [:h1
      [:span "Entitlement-Groups of the Inventory-Pool "]
      [inventory-pool/name-link-component]]
+    [filter-form]
     [main-page-component]
     [debug-component]]])

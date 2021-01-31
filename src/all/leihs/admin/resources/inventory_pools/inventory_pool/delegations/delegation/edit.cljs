@@ -22,7 +22,8 @@
     [cljs.core.async :as async :refer [timeout]]
     [accountant.core :as accountant]
     [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
+    [reagent.core :as reagent]
+    [taoensso.timbre :as logging]))
 
 (defonce data* (reagent/atom {}))
 
@@ -96,8 +97,7 @@
 (defn edit-page []
   [:div.edit-delegation
    [routing/hidden-state-component
-    {:did-mount
-     set-data-by-query-params}]
+    {:did-mount set-data-by-query-params}]
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left*
           [breadcrumbs/edit-li])[]]

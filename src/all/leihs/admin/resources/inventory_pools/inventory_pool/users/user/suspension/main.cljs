@@ -29,7 +29,7 @@
 (defn suspended? [suspended-until ref-date]
   (if-not suspended-until
     false
-    (if (date-fns/isBefore suspended-until ref-date)
+    (if (date-fns/isBefore suspended-until (date-fns/startOfDay ref-date))
       false
       true)))
 

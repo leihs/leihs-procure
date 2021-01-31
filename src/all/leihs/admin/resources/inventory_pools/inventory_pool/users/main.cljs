@@ -108,16 +108,10 @@
      [roles-component
       (:groups_roles user)
       :compact true]
-     (if has-a-role?
-       [:span
-        [:a.btn.btn-outline-primary.btn-sm.m-1
-         {:href (path {:including-user (or (-> user :email presence) (:id user))})}
-         [:span icons/view " details " " / " icons/edit " edit"]]]
-       (when (> (:groups_count user) 0)
-         [:a.btn.btn-outline-primary.btn-sm.m-1
+     [:a.btn.btn-outline-primary.btn-sm.py-0
           {:href (path {:including-user (or (-> user :email presence) (:id user))
                         :role ""})}
-          [:span icons/add " Add " ]]))]))
+          [:span icons/view " " icons/edit " Manage " ]]]))
 
 
 ;### suspended ################################################################

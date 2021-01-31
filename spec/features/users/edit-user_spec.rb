@@ -80,7 +80,7 @@ feature 'Editing users', type: :feature do
             fill_in 'Search' , with: @user.email
             wait_until{ all(".users tbody tr").count == 1 }
             click_on_first_user @user
-            click_on 'User Data'
+            click_on 'User data'
             fill_in :firstname, with: "Bobby"
             fill_in :lastname, with: "Foo"
             click_on 'Save'

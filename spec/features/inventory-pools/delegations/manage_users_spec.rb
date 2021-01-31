@@ -7,6 +7,7 @@ shared_examples :direct_user do
     click_on 'Inventory-Pools'
     click_on @pool.name
     click_on 'Delegations'
+    @delegations_path = current_path
     click_on @delegation.firstname
     @delegation_path = current_path
     click_on 'Users'
@@ -26,10 +27,22 @@ shared_examples :direct_user do
       expect(find(:checkbox, id: 'direct_member', disabled: true)).to be_checked
       expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked
     end
+
     visit @delegation_path
     within("tr", text: "Number of users"){ expect(find("td.users-count").text).to eq "1"}
     within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "1"}
     within("tr", text: "Number of groups"){ expect(find("td.groups-count").text).to eq "0"}
+
+    # test including-user filter
+    visit @delegations_path
+    fill_in "including-user", with: "foo.bar@baz"
+    wait_until{ page.has_content? "No (more) delegations found." }
+    expect(page).not_to have_content @delegation.firstname
+    wait_until{ not page.has_content? @delegation.firstname }
+    fill_in "including-user", with: @user.email
+    wait_until{ page.has_content? @delegation.firstname }
+
+    # remove user again
     visit @delegation_users_url
     wait_until{ first("tr.user td.direct-member", text: 'Remove') }
     within("tr.user td.direct-member"){ click_on 'Remove' }
@@ -48,6 +61,7 @@ shared_examples :group_user do
     click_on 'Inventory-Pools'
     click_on @pool.name
     click_on 'Delegations'
+    @delegations_path = current_path
     click_on @delegation.firstname
     @delegation_path = current_path
     click_on 'Users'
@@ -70,9 +84,20 @@ shared_examples :group_user do
       expect(find(:checkbox, id: 'direct_member', disabled: true)).not_to be_checked
       expect(find(:checkbox, id: 'group_member', disabled: true)).to be_checked
     end
+
     visit @delegation_path
     within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "0"}
     within("tr", text: "Number of groups"){ expect(find("td.groups-count").text).to eq "1"}
+
+    # test including-user filter
+    visit @delegations_path
+    fill_in "including-user", with: "foo.bar@baz"
+    wait_until{ page.has_content? "No (more) delegations found." }
+    expect(page).not_to have_content @delegation.firstname
+    wait_until{ not page.has_content? @delegation.firstname }
+    fill_in "including-user", with: @user.email
+    wait_until{ page.has_content? @delegation.firstname }
+
     visit @delegation_users_url
     within("tr td.group-member"){ click_on 'Edit' }
     wait_until{ not all('button, a', text: 'Remove').empty?}

@@ -2,13 +2,15 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
+
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
+    [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -47,23 +49,43 @@
         [:= :entitlements.entitlement_group_id
          :entitlement_groups.id])))
 
-(defn entitlement-groups-query [inventory-pool-id]
+(def base-query
   (-> (sql/select :*)
       (sql/from :entitlement_groups)
-      (sql/merge-where
-        [:= :entitlement_groups.inventory_pool_id inventory-pool-id])
       (sql/order-by :name)
       (sql/merge-select [direct-users-count :direct_users_count])
       (sql/merge-select [entitlements-count :entitlements_count])
       (sql/merge-select [groups-count :groups_count])
-      (sql/merge-select [users-count :users_count])))
+      (sql/merge-select [users-count :users_count])
+      ))
+
+(defn filter-for-including-user
+  [query {{user-uid :including-user} :query-params-raw :as request}]
+  (if-let [user-uid (presence user-uid)]
+    (sql/merge-where
+      query
+      [:exists
+       (-> (choose-user/find-by-some-uid-query user-uid)
+           (sql/select :true)
+           (sql/merge-join :entitlement_groups_users
+                           [:= :entitlement_groups_users.entitlement_group_id
+                            :entitlement_groups.id])
+           (sql/merge-where [:= :entitlement_groups_users.user_id :users.id]))])
+    query))
+
+(defn entitlement-groups-query
+  [{{inventory-pool-id :inventory-pool-id} :route-params :as request}]
+  (-> base-query
+      (sql/merge-where
+        [:= :entitlement_groups.inventory_pool_id inventory-pool-id])
+      (filter-for-including-user request)))
 
 (defn entitlement-groups
   [{{inventory-pool-id :inventory-pool-id} :route-params
     tx :tx :as request}]
   {:body
    {:entitlement-groups
-    (->> inventory-pool-id
+    (->> request
          entitlement-groups-query
          sql/format
          (jdbc/query tx))}})

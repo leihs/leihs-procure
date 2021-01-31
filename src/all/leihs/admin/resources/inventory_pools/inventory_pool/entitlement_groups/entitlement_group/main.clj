@@ -19,7 +19,9 @@
     [logbug.debug :as debug]))
 
 (defn query [inventory-pool-id entitlement-group-id]
-  (-> (entitlement-groups/entitlement-groups-query  inventory-pool-id)
+  (-> entitlement-groups/base-query
+      (sql/merge-where
+        [:= :entitlement_groups.inventory_pool_id inventory-pool-id])
       (sql/merge-where [:= :entitlement_groups.id entitlement-group-id])))
 
 (defn entitlement-group
@@ -27,9 +29,7 @@
      entitlement-group-id :entitlement-group-id} :route-params
     tx :tx :as request}]
   (if-let [eg (->> (query inventory-pool-id entitlement-group-id)
-                   logging/spy
                    sql/format
-                   logging/spy
                    (jdbc/query tx)
                    first)]
     {:body eg}

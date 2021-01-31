@@ -52,27 +52,40 @@
    :authorizers authorizers-default])
 
 (defn roles-li []
-  [li :inventory-pool-user-roles [:span icons/edit " Manage Roles "]
+  [li :inventory-pool-user-roles [:span icons/edit " Manage roles "]
    @route-params-default* {}
    :authorizers authorizers-default])
 
 (defn user-data-li []
-  [li :inventory-pool-user-edit [:span icons/edit " User Data "]
+  [li :inventory-pool-user-edit [:span icons/edit " User data "]
    @route-params-default* {}
    :button true
    :authorizers authorizers-default])
 
 (defn direct-roles-li []
-  [li :inventory-pool-user-direct-roles [:span icons/edit " Direct Roles "]
+  [li :inventory-pool-user-direct-roles
+   [:span icons/view " " icons/edit " Direct roles "]
    @route-params-default* {}
    :button true
    :authorizers authorizers-default])
 
+(defn groups-roles-li [& {:keys [user-uid]}]
+  [li :inventory-pool-groups
+   [:span icons/view " " icons/edit " Roles via groups "]
+   @route-params-default*
+   {:including-user (or user-uid (-> @routing/state* :route-params :user-id))
+    :role "" }
+   :button true
+   :authorizers authorizers-default])
+
 (defn suspension-li []
-  [li :inventory-pool-user-suspension [:span icons/edit " Suspension"]
+  [li :inventory-pool-user-suspension
+   [:span icons/view " " icons/edit " Suspension"]
    @route-params-default* {}
    :button true
    :authorizers authorizers-default])
+
+
 
 (defonce left*
   (reaction

@@ -84,16 +84,10 @@
 
 (defn roles-via-groups-component [user]
   [:div.roles-via-groups
-   [:h3 "Roles via groups "
-    [:a.btn.btn-outline-primary
-     {:href (path :inventory-pool-groups
-                  {:inventory-pool-id @inventory-pool/id*}
-                  {:including-user (or (-> user :email presence) (:id user))
-                   :role "" })}
-
-     icons/add " Add group role "]]
+   [:h3 "Roles via groups "]
    [groups-roles/groups-roles-component2
-    #(user-roles/clean-and-fetch)]])
+    #(user-roles/clean-and-fetch)
+    :user-uid (-> user :email presence)]])
 
 (defn roles-component []
   [:div
@@ -179,6 +173,8 @@
     @breadcrumbs/left*
     [[breadcrumbs/user-data-li]
      [breadcrumbs/direct-roles-li]
+     [breadcrumbs/groups-roles-li
+      :user-uid (-> @user-data* :email presence)]
      [breadcrumbs/suspension-li]]]
    [page-title-component]
    [overview-component]

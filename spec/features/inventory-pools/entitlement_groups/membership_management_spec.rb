@@ -25,16 +25,30 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on 'Inventory-Pools'
       click_on @pool.name
       click_on 'Entitlement-Groups'
+      @entitlement_groups_path = current_path
       click_on @entitlement_group.name
       click_on 'Users'
       select 'members and non-members', from: 'Membership'
       click_on_first 'next' # go to the second page because we want also test some internal indexing complexity
       within(first 'tr.user') do
-          expect(find_field("member", disabled: true)).not_to be_checked
-          within("td.direct-member") { click_on 'Add' }
-          wait_until { find_field("member", disabled: true).checked? }
-          click_on 'Remove'
-          wait_until { not find_field("member", disabled: true).checked? }
+        @email = find("td.user").text.split(/\s/).last
+        expect(find_field("member", disabled: true)).not_to be_checked
+        within("td.direct-member") { click_on 'Add' }
+        wait_until { find_field("member", disabled: true).checked? }
+      end
+      @list_page = current_url
+
+      visit @entitlement_groups_path
+      fill_in 'including-user', with: "Foo.Bar@baz"
+      wait_until { page.has_content? "No (more) entitlement-groups found." }
+      expect(page).not_to have_content  @entitlement_group.name
+      fill_in 'including-user', with: @email
+      wait_until { page.has_content? @entitlement_group.name }
+
+      visit @list_page
+      within(first 'tr.user') do
+        click_on 'Remove'
+        wait_until { not find_field("member", disabled: true).checked? }
       end
     end
 
@@ -43,6 +57,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       click_on 'Inventory-Pools'
       click_on @pool.name
       click_on 'Entitlement-Groups'
+      @entitlement_groups_path = current_path
       click_on @entitlement_group.name
       click_on 'Users'
       select 'members and non-members', from: 'Membership'
@@ -58,6 +73,17 @@ feature 'Manage inventory-pool users ', type: :feature do
       visit user_on_users_page
       # now the user is a member, wait_until because we might see stale cached data briefly
       wait_until { find_field('member', disabled: true).checked? }
+
+      # test including-user filter
+      visit @entitlement_groups_path
+      fill_in 'including-user', with: "Foo.Bar@baz"
+      wait_until { page.has_content? "No (more) entitlement-groups found." }
+      expect(page).not_to have_content  @entitlement_group.name
+      fill_in 'including-user', with: user.email
+      wait_until { page.has_content? @entitlement_group.name }
+
+
+      visit user_on_users_page
       within('td.group-member') { click_on 'Edit' }
       click_on 'Remove'
       wait_until { all('.modal').empty? }

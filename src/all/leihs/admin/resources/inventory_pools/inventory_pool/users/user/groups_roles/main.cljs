@@ -45,15 +45,23 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn groups-roles-component2 [update-notifier]
+(defn groups-roles-component2
+  [update-notifier & {:keys [user-uid]}]
   [:div.groups-roles-component
    [routing/hidden-state-component
     {:did-mount #(do (reset! data* nil) (fetch))}]
    [debug-component2]
+   (let [groups-roles (->> @data*
+                           (map :roles)
+                           (roles/aggregate))]
+     [roles-component groups-roles])
 
-   [roles-component (->> @data*
-                         (map :roles)
-                         (roles/aggregate))]
+   [:a.btn.btn-outline-primary.btn-sm.py-0
+    {:href (path :inventory-pool-groups
+                 {:inventory-pool-id @inventory-pool/id*}
+                 {:including-user (or user-uid  (-> @routing/state* :route-params :user-id))
+                  :role "" })}
+    icons/view " " icons/edit " Roles via groups "]
 
    (doall
      (for [group-roles @data*]
