@@ -1,12 +1,17 @@
 require 'spec_helper'
 require 'pry'
 
+
+
+
 feature 'Entitlement-group Membership filtering ', type: :feature do
 
   context ' an admin, a pool, an entitlement-group, several users, each within at least one group' do
 
     before :each do
       @admin = FactoryBot.create :admin
+      @manager = FactoryBot.create :user
+
       @pool =  FactoryBot.create :inventory_pool
       @entitlement_group = FactoryBot.create :entitlement_group, inventory_pool_id: @pool.id
       100.times.map{ FactoryBot.create :user }
@@ -40,40 +45,58 @@ feature 'Entitlement-group Membership filtering ', type: :feature do
       @members = @direct_members + @group_members
       @non_members = @users - @members
 
-      sign_in_as @admin
     end
 
-    scenario 'Filter membership' do
 
-      click_on 'Inventory-Pools'
-      click_on @pool.name
-      click_on 'Entitlement-Groups'
-      click_on @entitlement_group.name
-      click_on 'Users'
+    shared_examples :filter_membership do
+      scenario 'Filter membership' do
+        visit '/admin/'
+        click_on 'Inventory-Pools'
+        click_on @pool.name
+        click_on 'Entitlement-Groups'
+        click_on @entitlement_group.name
+        click_on 'Users'
 
-      select '1000', from: 'Per page'
+        select '1000', from: 'Per page'
 
-      select 'members and non-members', from: 'Membership'
-      wait_until { all("table.users tbody tr").count == @users.count }
+        select 'members and non-members', from: 'Membership'
+        wait_until { all("table.users tbody tr").count == @users.count }
 
-      # direct_members filter
-      select 'direct members', from:  'Membership'
-      wait_until { all("table.users tbody tr").count == @direct_members.count }
+        # direct_members filter
+        select 'direct members', from:  'Membership'
+        wait_until { all("table.users tbody tr").count == @direct_members.count }
 
-      select 'members and non-members', from: 'Membership'
-      wait_until { all("table.users tbody tr").count == @users.count }
+        select 'members and non-members', from: 'Membership'
+        wait_until { all("table.users tbody tr").count == @users.count }
 
-      # group_members filter
-      select 'group members', from:  'Membership'
-      wait_until { all("table.users tbody tr").count == @group_members.count }
+        # group_members filter
+        select 'group members', from:  'Membership'
+        wait_until { all("table.users tbody tr").count == @group_members.count }
 
-      select 'members and non-members', from: 'Membership'
-      wait_until { all("table.users tbody tr").count == @users.count }
+        select 'members and non-members', from: 'Membership'
+        wait_until { all("table.users tbody tr").count == @users.count }
 
-      # non member filter
-      select 'non-members', from:  'Membership'
-      wait_until { all("table.users tbody tr").count == @non_members.count }
+        # non member filter
+        select 'non-members', from:  'Membership'
+        wait_until { all("table.users tbody tr").count == @non_members.count }
 
+      end
     end
+
+
+    context 'as an admin via the UI' do
+      before(:each){ sign_in_as @admin }
+      include_examples :filter_membership
+    end
+
+    context 'as lending_manager via the UI' do
+      before :each do
+        FactoryBot.create :access_right, user: @manager,
+          inventory_pool: @pool, role: 'lending_manager'
+        sign_in_as @manager
+      end
+      include_examples :filter_membership
+    end
+
   end
 end

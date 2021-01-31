@@ -157,13 +157,23 @@
           :inventory-pool-delegations {:handler pool-delegations/routes
                                        :authorizers [admin-scopes?
                                                      pool-auth/pool-lending-manager?]}
-          :inventory-pool-entitlement-group {:handler entitlement-group/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-direct-user {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-group {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-groups {:handler entitlement-group-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-group-users {:handler entitlement-group-users/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-groups {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
-          :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes :authorizers [admin-scopes? pool-auth/pool-inventory-manager?]}
+
+          :inventory-pool-entitlement-group {:handler entitlement-group/routes
+                                           :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-group-direct-user {:handler entitlement-group-users/routes
+                                                       :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-group-group {:handler entitlement-group-groups/routes
+                                                 :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-group-groups {:handler entitlement-group-groups/routes
+                                                  :authorizers [admin-scopes?  pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-group-users {:handler entitlement-group-users/routes
+                                                 :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-groups {:handler entitlement-groups/routes
+                                            :authorizers [admin-scopes?  pool-auth/pool-lending-manager?]}
+          :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes
+                                                  :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
+
+
           :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
