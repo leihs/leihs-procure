@@ -71,4 +71,4 @@
 ;(logging-config/set-logger! :level :info)
 ;(debug/wrap-with-log-debug #'filter-suspended)
 ;(debug/wrap-with-log-debug #'users-formated-query)
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)

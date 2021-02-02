@@ -32,7 +32,7 @@
   [:created_at
    [:firstname :name]
    :id
-   :protected
+   :pool_protected
    :updated_at
    [(sql/call :case
               [:exists responsible-user-email-subquery] responsible-user-email-subquery
@@ -50,7 +50,7 @@
 (def delegation-write-keys
   [:name
    :delegator_user_id
-   :protected])
+   :pool_protected])
 
 (def delegation-write-keymap
   {:name :firstname
@@ -145,12 +145,12 @@
 
 (defn patch-delegation
   ([{tx :tx {delegation-id :delegation-id} :route-params
-     {protected :protected name :name uid :responsible_user_id} :body }]
+     {protected :pool_protected name :name uid :responsible_user_id} :body }]
    (if-let [ruid (-> uid  (responsible-user/find-by-unique-property tx) :id)]
      (let [update-count (first (jdbc/update! tx :users
                                              {:delegator_user_id ruid
                                               :firstname name
-                                              :protected protected}
+                                              :pool_protected protected}
                                              ["id = ?" delegation-id]))]
        (if (= update-count 1)
          {:status 204}
@@ -164,7 +164,7 @@
   ([{{inventory-pool-id :inventory-pool-id delegation-id :delegation-id} :route-params
      tx :tx :as request}]
    (let [delegation (delegation! tx delegation-id)]
-     (if (:protected delegation)
+     (if (:pool_protected delegation)
        (throw (ex-info "Delegation is protected " {:status 403}))
        (if-not (first (jdbc/insert! tx :direct_access_rights
                                     {:inventory_pool_id inventory-pool-id

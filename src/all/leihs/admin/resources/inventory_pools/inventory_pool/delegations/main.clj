@@ -26,7 +26,7 @@
 (def delegations-base-query
   (-> (sql/select :delegations.id
                   :delegations.firstname
-                  :delegations.protected)
+                  :delegations.pool_protected)
       (sql/from [:users :delegations])
       (sql/order-by :delegations.firstname)
       (sql/merge-where [:<> nil :delegations.delegator_user_id])))
@@ -94,10 +94,10 @@
             query
             [:or
              (queries/member-expr inventory-pool-id)
-             [:= :delegations.protected :false]])
+             [:= :delegations.pool_protected :false]])
     "non" (-> query
               (sql/merge-where [:and [:not (queries/member-expr inventory-pool-id)]
-                                [:= :delegations.protected :false]]))
+                                [:= :delegations.pool_protected :false]]))
     "member" (sql/merge-where query (queries/member-expr inventory-pool-id))))
 
 (defn delegations-query
@@ -135,12 +135,12 @@
 (defn create-delegation
   [{tx :tx
     {inventory-pool-id :inventory-pool-id} :route-params
-    {protected :protected name :name uid :responsible_user_id} :body}]
+    {protected :pool_protected name :name uid :responsible_user_id} :body}]
   (if-let [ruid (-> uid (responsible-user/find-by-unique-property tx) :id)]
     (if-let [delegation (first (jdbc/insert! tx :users
                                              {:delegator_user_id ruid
                                               :firstname name
-                                              :protected protected}))]
+                                              :pool_protected protected}))]
       (if (first (jdbc/insert! tx :delegations_users
                                {:delegation_id (:id delegation)
                                 :user_id ruid}))

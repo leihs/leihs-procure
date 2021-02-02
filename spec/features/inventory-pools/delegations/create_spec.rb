@@ -7,23 +7,23 @@ shared_examples :create do
     click_on @pool.name
     click_on 'Delegations'
     click_on 'Create'
-    expect(find_field('protected')).to be_checked
+    expect(find_field('pool_protected')).to be_checked
     fill_in :name , with: 'Foo-Delegation'
-    uncheck :protected
+    uncheck :pool_protected
     click_on 'Choose responsible user'
     resp_user = @users.sample
     within('tr', text: resp_user.email) do
       click_on 'Choose user'
     end
     expect(find_field('name').value).to eq 'Foo-Delegation'
-    expect(find_field('protected')).not_to be_checked
-    check :protected
+    expect(find_field('pool_protected')).not_to be_checked
+    check :pool_protected
     click_on 'Choose responsible user'
     resp_user = @users.sample
     within('tr', text: resp_user.email) do
       click_on 'Choose user'
     end
-    expect(find_field('protected')).to be_checked
+    expect(find_field('pool_protected')).to be_checked
     click_on 'Create'
     wait_until do
       current_path.match? %{/admin/inventory-pools/[^/]+/delegations/[^/]+}

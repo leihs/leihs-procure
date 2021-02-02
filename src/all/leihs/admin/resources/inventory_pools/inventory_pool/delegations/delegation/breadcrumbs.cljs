@@ -49,7 +49,7 @@
   [li :inventory-pool-delegation-edit
    [:span [:i.fas.fa-edit] " Edit "]
    @default-route-params* {:name (:name @delegation/delegation*)
-                           :protected (:protected @delegation/delegation*)
+                           :pool_protected (:pool_protected @delegation/delegation*)
                            :responsible_user_id (or (-> @delegation/delegation* :responsible_user :email)
                                                     (-> @delegation/delegation* :responsible_user :id))}
    :button true

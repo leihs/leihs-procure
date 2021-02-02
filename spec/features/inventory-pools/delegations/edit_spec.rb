@@ -11,7 +11,7 @@ shared_examples :edit do
     click_on @delegation.firstname
     within('nav.breadcrumbs-right') { click_on 'Edit' }
     fill_in :name, with: 'New-Name'
-    uncheck :protected
+    uncheck :pool_protected
     click_on 'Choose responsible user'
     fill_in 'Search', with: resp_user.email
     wait_until { all("table tbody tr").count == 1 }
@@ -23,7 +23,7 @@ shared_examples :edit do
     expect(page).to have_content resp_user.email
     expect(find('tr', text: 'Protected').text).to have_content 'no'
     within('nav.breadcrumbs-right') { click_on 'Edit' }
-    check :protected
+    check :pool_protected
     click_on 'Save'
     wait_until do
       current_path.match? %{/admin/inventory-pools/[^/]+/delegations/[^/]+$}

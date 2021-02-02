@@ -170,7 +170,7 @@
             (fetch-delegations))))))
 
 (defn action-td-component
-  [{member :member id :id protected :protected
+  [{member :member id :id protected :pool_protected
     pools-count :pools_count :as delegation}]
   [:td.text-center
    (if-not member
@@ -221,7 +221,7 @@
       (if (> pools-count 1)
         [:strong.text-warning pools-count]
         [:span.text-success pools-count]))]
-   [:td.text-center (if (:protected delegation)
+   [:td.text-center (if (:pool_protected delegation)
                       [:span.text-success "yes"]
                       [:span.text-warning "no"])]
    [action-td-component delegation]

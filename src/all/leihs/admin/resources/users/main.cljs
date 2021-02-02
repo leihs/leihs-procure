@@ -5,11 +5,11 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    ;[leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.common.http-client.core :as http]
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.http-client.core :as http]
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
@@ -40,6 +40,7 @@
 (defn fetch-users []
   (http/url-cached-fetch data*))
 
+; TODO remove the following
 (defn escalate-query-paramas-update [_]
   (fetch-users)
   (swap! state/global-state*
@@ -70,24 +71,21 @@
 (defn form-admins-filter []
   [routing/select-component
    :label "Admin"
-   :query-params-key :is_admin
-   :options {"" "(any value)" "yes" "yes" "no" "no"}])
-
-(defn form-org-filter []
-  [routing/delayed-query-params-input-component
-   :label "Org ID"
-   :query-params-key :org_id
-   :input-options
-   {:placeholder "org_id or true or false"}])
+   :query-params-key :admin
+   :options {"" "(any value)"
+             "leihs-admin" "Leihs admin"
+             "system-admin" "System admin"}])
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
     [:div.form-row
      [form-term-filter]
-     [form-org-filter]
      [form-enabled-filter]
+     [users-and-groups/form-org-filter data*]
+     [users-and-groups/form-org-id-filter]
      [form-admins-filter]
+     [users-and-groups/protected-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component :default-query-params shared/default-query-params]]]])
 
@@ -119,11 +117,11 @@
 ;;; protected
 
 (defn protected-th-component []
-  [:th {:key :protected} "Protected"])
+  [:th {:key :admin_protected} "Protected"])
 
 (defn protected-td-component [group]
-  [:td {:key :protected}
-   (if (:protected group)
+  [:td {:key :admin_protected}
+   (if (:admin_protected group)
      "yes"
      "no")])
 
@@ -135,6 +133,16 @@
 
 (defn org-id-td-component [user]
   [:td (:org_id user) ])
+
+;;; org
+
+(defn org-th-component []
+ [:th {:key :organization} "Organization"])
+
+(defn org-td-component [group]
+  [:td {:key :organization}
+   (:organization group)])
+
 
 ;;; counts
 
@@ -164,8 +172,7 @@
   [:thead
    [:tr
     [:th {:key :index} "Index"]
-    [protected-th-component]
-    [org-id-th-component]
+    [account-enabled-th-component]
     [:th {:key :image} "Image"]
     (for [[idx hd] (map-indexed vector hds)]
       ^{:key idx} [hd])]])
@@ -174,8 +181,7 @@
 (defn row-component [user more-cols]
   [:tr.user {:key (:id user)}
    [:td (:index user)]
-   ^{:key :protected} [protected-td-component user]
-   ^{:key :org-id} [org-id-td-component user]
+   [account-enabled-td-component user]
    [:td [components/img-small-component user]]
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col user])])
@@ -218,13 +224,12 @@
    [routing/pagination-component]
    [table-component
     [user-th-component
-     account-enabled-th-component
+     org-th-component
      contracts-count-th-component
      pools-count-th-component
      groups-count-th-component]
     [user-td-component
-     account-enabled-td-component
-     org-id-td-component
+     org-td-component
      contracts-count-td-component
      pools-count-td-component
      groups-count-td-component]]

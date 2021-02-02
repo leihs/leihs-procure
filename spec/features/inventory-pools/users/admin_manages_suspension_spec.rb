@@ -50,11 +50,10 @@ feature 'Manage inventory-pool users ', type: :feature do
       wait_until{ all(".modal").empty? }
       wait_until { page.has_content? "Suspended for" }
 
-
       # revoke suspension on users page
       click_on "Users"
       select 'any', from: 'Role'
-      fill_in 'Search', with: @users.first.email
+      fill_in 'Search', with: @user.email
       wait_until { all("table.users tbody tr").count == 1 }
       within  "td.suspension" do
         expect { page.not_to have_content "Not suspended." }

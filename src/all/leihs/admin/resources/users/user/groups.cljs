@@ -7,12 +7,13 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.groups.main :as groups-core]
     [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -27,7 +28,13 @@
 (defonce data* (reagent/atom nil))
 
 (defn fetch-groups []
-  (http/url-cached-fetch data*))
+  (go (reset! data*
+              (-> {:chan (async/chan)
+                   :url (path :groups {} {:including-user @user-id*
+                                          :page 1
+                                          :pre-page 1000})}
+                  http-client/request
+                  :chan <! http-client/filter-success! :body :groups))))
 
 (defn debug-component []
   [:div
@@ -35,7 +42,7 @@
      [:div.groups-debug
       [:hr]
       [:div.groups-data
-       [:h3 "@data*"]
+       [:h3 "Groups @data*"]
        [:pre (with-out-str (pprint @data*))]]])])
 
 (defn group-td-component [row]
@@ -48,19 +55,8 @@
   [:div.user-groups
    [routing/hidden-state-component
     {:did-change fetch-groups}]
-   (if (and @data* @user-data*)
-     [:table.table.table-striped.table-sm.user-groups
-      [:thead
-       [:tr
-        [:th "Group"]
-        [:th.text-center "Org ID"]
-        [:th.text-right "# Users"]]]
-      [:tbody
-       (for [row (->>  @data* (sort-by :inventory_pool_name))]
-         [:tr.pool {:key (:group_id row)}
-          [group-td-component row]
-          [:td.text-center (:org_id row)]
-          [:td.text-right (:users_count row)]])]]
-     [wait-component])
+   (if-not (and @data* @user-data*)
+     [wait-component]
+     [groups-core/core-table-component [] [] @data*])
    [debug-component]])
 

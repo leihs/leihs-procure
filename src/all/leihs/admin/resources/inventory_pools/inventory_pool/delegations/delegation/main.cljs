@@ -55,7 +55,7 @@
            (:responsible_user delegation)]]]
         [:tr.protected
          [:td "Protected"]
-         [:td (if (:protected delegation)
+         [:td (if (:pool_protected delegation)
                 [:span.text-success "yes"]
                 [:span.text-warning "no"])]]
         [:tr.contracts-count-open-per-pool

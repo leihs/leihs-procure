@@ -61,7 +61,6 @@
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
     [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
     [leihs.admin.resources.system.main :as system]
-    [leihs.admin.resources.system.system-admins.main :as system-admins]
     [leihs.admin.resources.users.choose-main :as users-choose]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.users.user.create :as user-create]
@@ -129,7 +128,6 @@
    :status #'status/info-page
    :syssec-settings #'syssec-settings/page
    :system #'system/page
-   :system-admins #'system-admins/page
    :user #'user-show/page
    :user-create #'user-create/page
    :user-delete #'user-delete/page

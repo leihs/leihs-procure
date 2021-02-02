@@ -5,6 +5,7 @@
     [leihs.core.routing.back :as routing :refer []]
     [leihs.core.sql :as sql]
 
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.queries :as queries]
     [leihs.admin.resources.users.shared :as shared]
@@ -46,15 +47,6 @@
       (match-term-fuzzy query term))
     query))
 
-(defn org-filter [query request]
-  (let [qp (presence (or (some-> request :query-params-raw :org_id)
-               (some-> request :query-params-raw :type)))]
-    (case qp
-      (nil "any") query
-      ("true" "org") (sql/merge-where query [:<> nil :org_id])
-      ("false" "manual") (sql/merge-where query [:= nil :org_id])
-      (sql/merge-where query [:= :org_id (str qp)]))))
-
 (defn account-enabled-filter [query request]
   (let [qp  (some-> request :query-params-raw :account_enabled)]
     (case qp
@@ -62,12 +54,12 @@
       (true "true" "yes") (sql/merge-where query [:= true :account_enabled])
       (false "false" "no") (sql/merge-where query [:= false :account_enabled]))))
 
-(defn is-admin-filter [query request]
-  (let [qp  (some-> request :query-params-raw :is_admin)]
+(defn admin-filter [query request]
+  (let [qp  (some-> request :query-params-raw :admin)]
     (case qp
       (nil "any" "") query
-      (true "true" "yes") (sql/merge-where query [:= true :is_admin])
-      (false "false" "no") (sql/merge-where query [:= false :is_admin]))))
+      ("leihs-admin") (sql/merge-where query [:= true :is_admin])
+      ("system-admin") (sql/merge-where query [:= true :is_system_admin]))))
 
 (defn select-fields [query request]
   (if-let [fields (some->> request :query-params :fields
@@ -87,19 +79,29 @@
     (-> users-base-query
         (routing/set-per-page-and-offset request)
         (term-filter request)
-        (org-filter request)
+        (users-and-groups/organization-filter request)
+        (users-and-groups/org-id-filter request)
+        (users-and-groups/protected-filter request)
         (account-enabled-filter request)
-        (is-admin-filter request)
+        (admin-filter request)
         (select-fields request)
         select-contract-counts
         (sql/merge-select [queries/pools-count :pools_count])
         (sql/merge-select [queries/groups-count :groups_count]))))
 
+(def organizations-query
+  (-> (sql/select :organization)
+      (sql/modifiers :distinct)
+      (sql/from :users)))
+
 (defn users [{tx :tx :as request}]
   (let [query (users-query request)
         offset (:offset query)]
     {:body
-     {:users
+     {:meta {:organizations
+             (-> organizations-query sql/format
+                 (->> (jdbc/query tx) (map :organization)))}
+      :users
       (-> query
           sql/format
           (->> (jdbc/query tx)

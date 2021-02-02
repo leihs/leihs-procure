@@ -14,7 +14,7 @@ end
 
 FactoryBot.define do
   factory :delegation do
-    firstname { Faker::Name.last_name }
+    firstname { Faker::Name.unique.last_name + '-' + Faker::Name.unique.last_name }
     delegator_user_id { create(:user).id }
   end
 end

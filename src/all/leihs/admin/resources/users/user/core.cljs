@@ -110,24 +110,34 @@
     (if (:account_enabled user)
       [:span.text-success "yes"]
       [:span.text-danger "no"])]
-   [user-data-li-dl-component "PW sign-in"
-    (if (:password_sign_in_enabled user)
-      [:span "yes"]
-      [:span "no"])]
-   [user-data-li-dl-component "Protected"
-    (if (:protected user)
-      [:span "yes"]
-      [:span "no"])]
    [user-data-li-dl-component "Admin"
     (if (:is_admin user)
       [:span "yes"]
       [:span "no"])]
-   (when-let [login (:login user)]
-     [user-data-li-dl-component "Login" login])
-   (when-let [org-id (:org_id user)]
-     [user-data-li-dl-component "Org ID" org-id])
+   [user-data-li-dl-component "System-admin"
+    (if (:is_system_admin user)
+      [:span "yes"]
+      [:span "no"])]
+   [user-data-li-dl-component "PW sign-in"
+    (if (:password_sign_in_enabled user)
+      [:span "yes"]
+      [:span "no"])]
+   [user-data-li-dl-component "Admin protected"
+    (if (:admin_protected user)
+      [:span "yes"]
+      [:span "no"])]
+   [user-data-li-dl-component "System-admin protected"
+    (if (:system_admin_protected user)
+      [:span "yes"]
+      [:span "no"])]
    (when-let [badge-id (:badge_id user)]
      [user-data-li-dl-component "Badge ID" badge-id])
+   (when-let [login (:login user)]
+     [user-data-li-dl-component "Login" login])
+   (when-let [org (:organization user)]
+     [user-data-li-dl-component "Organization" org])
+   (when-let [org-id (:org_id user)]
+     [user-data-li-dl-component "Org ID" org-id])
    [user-data-li-dl-component "ID"
     [components/truncated-id-component (:id user)]]])
 

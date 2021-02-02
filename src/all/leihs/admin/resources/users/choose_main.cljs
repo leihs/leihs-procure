@@ -54,17 +54,7 @@
    [routing/hidden-state-component
     {:did-mount users-main/escalate-query-paramas-update
      :did-update users-main/escalate-query-paramas-update}]
-   [:div.card.bg-light
-    [:div.card-body
-     [:div.form-row
-      [users-main/form-term-filter]
-      [users-main/form-org-filter]
-      [users-main/form-enabled-filter]
-      [users-main/form-admins-filter]
-      [routing/form-per-page-component]
-      [routing/form-reset-component
-       :default-query-params users-shared/default-query-params
-       ]]]]
+   [users-main/filter-component]
    [routing/pagination-component]
    [table]
    [routing/pagination-component]])

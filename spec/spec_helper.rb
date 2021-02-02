@@ -28,4 +28,12 @@ RSpec.configure do |config|
     srand 1
   end
 
+  config.after(:each) do |example|
+    # auto-pry after failures, except in CI!
+    unless (ENV['CIDER_CI_TRIAL_ID'].present? or ENV['NOPRY_ON_EXCEPTION'].present?)
+      unless example.exception.nil?
+        binding.pry if example.exception
+      end
+    end
+  end
 end

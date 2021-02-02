@@ -9,11 +9,12 @@
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
 
-    [leihs.admin.resources.groups.group.core :as group]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.groups.group.core :as group]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -24,16 +25,12 @@
 (defn inner-form-component []
   [:div
    [:div.form-row
-    [:div.col-md-6 [form-components/input-component group/data* [:name]
-                    :label "Name"]]
-    [:div.col-md-2 [form-components/input-component group/data* [:org_id]
-                    :label "Org ID"]]
-    [:div.col-md-4
-     [form-components/checkbox-component group/data* [:protected]
-      :disabled (not @current-user/admin?*)
-      :label "Admin protected"
-      :hint [:span "A protected Group can only be modified by admins and in particular not by inventory-pool staff. "
-             "This is often set for accounts which are automatically managed via the API. "  ]]]]
+    [:div.col-md [form-components/input-component group/data* [:name]
+                    :label "Name"]]]
+
+   [users-and-groups/protect-form-fiels-row-component group/data*]
+   [users-and-groups/org-form-fields-row-component group/data*]
+
    [:div.form-row
     [:div.col-md
      [form-components/input-component group/data* [:description]

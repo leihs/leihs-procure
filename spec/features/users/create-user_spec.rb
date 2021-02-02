@@ -1,144 +1,102 @@
 require 'spec_helper'
 require 'pry'
+require "#{File.dirname(__FILE__)}/_shared"
 
-feature 'Creating users', type: :feature do
+shared_examples :create_with_extra_props do |extra_props = {}|
+  scenario "I can create a user with all basic properties and #{extra_props}" do
+  properties = BASIC_USER_PROPERTIES.merge(extra_props)
+  click_on 'Users'
+  click_on 'Create'
+  fill_in_user_properties properties
+  click_on 'Create'
+  wait_until { current_path.match(%r"/admin/users/([^/]+)") }
+  assert_user_properties current_path.match(%r"/admin/users/([^/]+)")[1], properties
+end
+end
 
-  context 'a bunch of users and an admin exist' do
-
-    before :each do
-      @admin = FactoryBot.create :admin
-      @users = 15.times.map do
-        FactoryBot.create :user
-      end
-    end
-
-    context 'an admin' do
-
-      before :each do
-        sign_in_as @admin
-      end
-
-      scenario 'creates a new user' do
-
-        visit '/admin/'
-        click_on 'Users'
-        click_on 'Create user'
-        check 'account_enabled'
-        check 'password_sign_in_enabled'
-        check 'is_admin'
-        check 'protected'
-        fill_in 'email', with: 'test@example.com'
-        create_path = current_path
-        click_on 'Create'
-        wait_until do
-          current_path.match "^\/admin\/users\/.+"
-        end
-
-      end
-
-      scenario 'create a new user wo email' do
-        visit '/admin/'
-        click_on 'Users'
-        click_on 'Create user'
-        check 'account_enabled'
-        check 'password_sign_in_enabled'
-        check 'is_admin'
-        check 'protected'
-        fill_in 'email', with: " "
-        fill_in 'login', with: 'test'
-        create_path = current_path
-        click_on 'Create'
-        wait_until do
-          current_path.match "^\/admin\/users\/.+"
-        end
-      end
-
-    end
-
-    context "some inventory-pool's lending-manager " do
-
-      before :each do
-        @pool = FactoryBot.create :inventory_pool
-        @lending_manager = FactoryBot.create :user
-        FactoryBot.create :access_right, user: @lending_manager,
-          inventory_pool: @pool, role: 'lending_manager'
-        sign_in_as @lending_manager
-      end
-
-      scenario 'creates a new user' do
-
-        visit '/admin/'
-        click_on 'Users'
-        click_on 'Create user'
-        check 'account_enabled'
-        check 'password_sign_in_enabled'
-        expect(find(:checkbox, id: 'is_admin', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
-        expect(find(:checkbox, id: 'protected', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
-        fill_in 'email', with: 'test@example.com'
-        click_on 'Create'
-        wait_until do
-          current_path.match "^\/admin\/users\/.+"
-        end
-      end
-
-      scenario 'creates a new user inside one own\'s inventory pool' do
-
-        visit "/admin/inventory-pools/#{@pool.id}"
-        click_on 'Users'
-        click_on 'Create user'
-        check 'account_enabled'
-        check 'password_sign_in_enabled'
-        expect(find(:checkbox, id: 'is_admin', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
-        expect(find(:checkbox, id: 'protected', disabled: true)).not_to be_checked # is_admin is disabled and unchecked
-        fill_in 'email', with: 'test@example.com'
-        click_on 'Create'
-        new_user = User.find(email: 'test@example.com')
-        wait_until do
-          current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/#{new_user.id}$"
-        end
-        within('.effective-roles'){ expect(find_field('customer', disabled: true)).not_to be_checked }
-        within('.direct-roles') do
-          expect { find_field('customer', disabled: true) }.to raise_error Capybara::ElementNotFound
-        end
-      end
-
-      context 'via API' do
-
-        let :http_client do
-          plain_faraday_client
-        end
-
-        let :prepare_http_client do
-          @api_token = FactoryBot.create :api_token, user_id: @lending_manager.id
-          @token_secret = @api_token.token_secret
-          http_client.headers["Authorization"] = "Token #{@token_secret}"
-          http_client.headers["Content-Type"] = "application/json"
-        end
-
-        before :each do
-          prepare_http_client
-        end
-
-        scenario 'tries to set is_admin forbidden ' do
-          post_resp = http_client.post "/admin/users/", {login: "new-user", is_admin: true }.to_json
-          expect(post_resp.status).to be== 403
-          new_user = User.where(login: 'new-user').first
-          expect(new_user).not_to be
-        end
-
-        scenario 'tries to set protected forbidden ' do
-          post_resp = http_client.post "/admin/users/", {login: "new-user", protected: true }.to_json
-          expect(post_resp.status).to be== 403
-          new_user = User.where(login: 'new-user').first
-          expect(new_user).not_to be
-        end
-
-
-      end
-
-    end
-
+shared_examples :can_not_set_the_attribure do |attr_name|
+  scenario "I can not set the attribure #{attr_name}" do
+    click_on 'Users'
+    click_on 'Create'
+    fill_in_user_properties ::BASIC_USER_PROPERTIES
+    expect(find_field(attr_name, disabled: :all)).to be_disabled
   end
+end
 
+shared_examples :create_via_api_ok do |extra_props|
+  scenario "I can create the a user via the API with extra_props #{extra_props}" do
+    properties = BASIC_USER_PROPERTIES.merge(extra_props)
+    resp = @http_client.post "/admin/users/", properties.to_json
+    expect(resp.status).to be== 200
+    data = resp.body.with_indifferent_access
+    properties.each do |k,v|
+      expect(data[k]).to be== properties[k]
+    end
+  end
+end
+
+shared_examples :create_via_api_forbidden do |extra_props|
+  scenario "It is forbidden for me to create the a user via the API with extra_props #{extra_props}" do
+    properties = BASIC_USER_PROPERTIES.merge(extra_props)
+    resp = @http_client.post "/admin/users/", properties.to_json
+    expect(resp.status).to be== 403
+  end
+end
+
+feature 'Creating a user', type: :feature do
+
+  context 'all types of useres exist,' do
+    include_context :all_types_of_users
+
+    context 'as a pool manager' do
+      before(:each){ @current_user = @manager}
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+        include_examples :create_with_extra_props, {}
+        include_examples :can_not_set_the_attribure, :is_admin
+        include_examples :can_not_set_the_attribure, :admin_protected
+        include_examples :can_not_set_the_attribure, :is_system_admin
+        include_examples :can_not_set_the_attribure, :system_admin_protected
+      end
+      context 'via the API' do
+        include_context :setup_api
+        include_context :basic_user_properties
+        include_examples :create_via_api_ok, {}
+        include_examples :create_via_api_forbidden, {is_admin: true}
+        include_examples :create_via_api_forbidden, {admin_protected: true}
+        include_examples :create_via_api_forbidden, {is_system_admin: true}
+        include_examples :create_via_api_forbidden, {system_admin_protected: true}
+      end
+    end
+
+    context 'as an admin' do
+      before(:each){ @current_user = @admin}
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+        include_examples :create_with_extra_props, {}
+      end
+      context 'via the API' do
+        include_context :setup_api
+        include_context :basic_user_properties
+        include_examples :create_via_api_ok, {is_admin: true, admin_protected: true}
+        include_examples :create_via_api_forbidden, {is_system_admin: true}
+        include_examples :create_via_api_forbidden, {system_admin_protected: true}
+      end
+    end
+
+    context 'as a system-admin' do
+      before(:each){ @current_user = @system_admin}
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+        include_examples :create_with_extra_props,
+          {is_admin: true, admin_protected: true,
+           is_system_admin: true, system_admin_protected: true,
+           organization: 'example-com', org_id: '123'}
+      end
+    end
+  end
 end
 

@@ -3,7 +3,9 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.core.sql :as sql]
+    [leihs.core.auth.core :as auth]
 
+    [leihs.admin.common.users-and-groups.core :as  users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
@@ -21,17 +23,15 @@
     [logbug.debug :as debug]
     ))
 
-
-(defn admin-or-unprotected-group! [request]
+(defn protected-checked-group! [request]
   (let [group (-> request group/get-group :body)]
     (when-not group
       (throw (ex-info "Group not found" {:status 404})))
-    (when-not (group/requester-is-admin? request)
-      (when (or (:protected group) (nil? (:protected group)))
-        (throw (ex-info "Only admins may update membership of protected groups"
-                        {:status 403}))))
+    (when-not (-> request auth/system-admin-scopes?)
+      (users-and-groups/assert-not-system-admin-proteced! group))
+    (when-not (-> request auth/admin-scopes?)
+      (users-and-groups/assert-not-admin-proteced! group))
     group))
-
 
 (defn normalized-group-id! [group-id tx]
   "Get the id, i.e. the pkey, given either the id or the org_id and
@@ -140,7 +140,7 @@
 (defn batch-update-users [{tx :tx body :body
                            {group-id :group-id} :route-params
                            :as request}]
-  (let [group (admin-or-unprotected-group! request)
+  (let [group (protected-checked-group! request)
         group-id (:id group)
         target-ids (target-ids body tx)
         existing-ids (existing-ids group-id tx)
@@ -170,7 +170,7 @@
 (defn put-user [{tx :tx :as request
                  {group-id :group-id
                   user-id :user-id} :route-params}]
-  (let [group (admin-or-unprotected-group! request)
+  (let [group (protected-checked-group! request)
         group-id (:id group)]
     (utils.jdbc/insert-or-update!
       tx :groups_users ["group_id = ? AND user_id = ?" group-id user-id]
@@ -183,7 +183,7 @@
 (defn remove-user [{tx :tx :as request
                     {group-id :group-id
                      user-id :user-id} :route-params}]
-  (let [group (admin-or-unprotected-group! request)
+  (let [group (protected-checked-group! request)
         group-id (:id group) ]
     (if (= 1 (->> ["group_id = ? AND user_id = ?" group-id user-id]
                   (jdbc/delete! tx :groups_users)

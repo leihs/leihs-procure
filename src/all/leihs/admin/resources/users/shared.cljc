@@ -5,6 +5,7 @@
 (def default-fields
   #{
     :account_enabled
+    :admin_protected
     :email
     :firstname
     :id
@@ -12,7 +13,7 @@
     :lastname
     :login
     :org_id
-    :protected
+    :organization
     })
 
 (def available-fields
@@ -31,9 +32,11 @@
     :img32_url
     :img_digest
     :is_admin
+    :is_system_admin
     :lastname
     :login
     :org_id
+    :organization
     :password_sign_in_enabled
     :phone
     :secondary_email

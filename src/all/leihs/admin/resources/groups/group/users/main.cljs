@@ -14,7 +14,7 @@
     [leihs.admin.common.components :as components]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.groups.group.core :as group :refer [group-id* data*]]
+    [leihs.admin.resources.groups.group.core :as group :refer [group-id*]]
     [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.state :as state]
@@ -30,15 +30,21 @@
 
 ;### helpers ##################################################################
 
-(def manage-membership-allowed*?
+(def not-protected*
+  (reaction
+    (-> @group/data* :admin_protected not))); suffices because of hierarchy
+
+(def is-admin-and-not-system-admin-protected*
   (reaction
     (boolean
-      (and @data*
-           (some
-             (fn [authorizer]
-               (authorizer @current-user/state* @routing/state*))
-             [auth/admin-scopes?
-              breadcrumbs/some-lending-manager-group-unprotected?])))))
+      (and (-> @group/data* :system_admin_protected not)
+           @current-user/admin?*))))
+
+(def manage-membership-allowed?*
+  (reaction
+    (or @not-protected*
+        @is-admin-and-not-system-admin-protected*
+        @current-user/system-admin?*)))
 
 
 ;### actions ##################################################################
@@ -81,11 +87,11 @@
    (if (:group_id user)
      [:button.btn.btn-sm.btn-warning
       {:on-click (fn [_] (remove-user (:id user)))
-       :disabled (not @manage-membership-allowed*?)}
+       :disabled (not @manage-membership-allowed?*)}
       icons/delete " Remove "]
      [:button.btn.btn-sm.btn-primary
       {:on-click (fn [_] (add-user (:id user)))
-       :disabled (not @manage-membership-allowed*?)}
+       :disabled (not @manage-membership-allowed?*)}
       icons/add " Add "])])
 
 
@@ -129,12 +135,27 @@
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div ]))
+    [:<>
+    [:div
+     [:h3 "@group/data"]
+     [:pre (with-out-str (pprint @group/data*))]]
+    [:div
+     [:h3 "@current-user/admin?*"]
+     [:pre (with-out-str (pprint @current-user/admin?*))]]
+    [:div
+     [:h3 "(-> @group/data* :system_admin_protected not)"]
+     [:pre (with-out-str (pprint (-> @group/data* :system_admin_protected not)))]]
+    [:div
+     [:h3 "@is-admin-and-not-system-admin-protected*"]
+     [:pre (with-out-str (pprint @is-admin-and-not-system-admin-protected*))]]
+    [:div
+     [:h3 "@manage-membership-allowed?*"]
+     [:pre (with-out-str (pprint @manage-membership-allowed?*))]]]))
 
 (defn main-page-component []
   [:div
    (when (and @group/data*
-              (not @manage-membership-allowed*?))
+              (not @manage-membership-allowed?*))
      [:div.alert.alert-warning
       "This group is " [:strong "protected"] ". "
       "Memebership can be inspected but not changed!"])

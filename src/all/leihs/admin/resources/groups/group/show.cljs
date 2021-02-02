@@ -36,9 +36,11 @@
      [:ul.list-unstyled
       [li-dl-component "Name" (:name @data*)]
       [li-dl-component "Description " (:description @data*)]
-      [li-dl-component "Protected" (if (:protected @data*)
-                                     "yes"
-                                     "no")]
+      [li-dl-component "Admin protected"
+       (if (:admin_protected @data*) "yes" "no")]
+      [li-dl-component "System-admin protected"
+       (if (:system_admin_protected @data*) "yes" "no")]
+      [li-dl-component "Organization" (:organization @data*)]
       [li-dl-component "Org ID" (:org_id @data*)]
       [li-dl-component "Number of users" (:users_count @data*)]])])
 

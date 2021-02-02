@@ -29,10 +29,10 @@
 
 (defn set-data-by-query-params [& _]
   (reset! data*
-          (merge {:protected true}
+          (merge {:pool_protected true}
                  (-> @routing/state*
                      :query-params
-                     (select-keys [:name :responsible_user_id :user-uid :protected])
+                     (select-keys [:name :responsible_user_id :user-uid :pool_protected])
                      (rename-keys {:user-uid :responsible_user_id})))))
 
 ;;; form ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -61,7 +61,7 @@
     :label "Responsible user"
     :append responsible-user-choose-component]
    [:div
-    [form-components/checkbox-component data* [:protected]
+    [form-components/checkbox-component data* [:pool_protected]
      :label "Protected"
      :hint [:span
             "An " [:strong " unprotected " ]

@@ -61,13 +61,16 @@
     [inventory-pools/table-component]]
    [:div
     [:hr]
-    [:h2 "Groups"]
-    [groups/table-component]
-    ]
+    [:h2 [:a {:href (path :groups {} {:including-user @user-id*})}
+          "Groups"]]
+    [groups/table-component]]
    [:div.row
     [:div.col-md
      [:h2 "Extended User Info"]
-     (when-let [ext-info (-> @user-data* :extended_info presence)]
-       [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]]
+     (if-let [ext-info (some-> @user-data* :extended_info presence
+                               (->> (.parse js/JSON )) presence)]
+       [:div.bg-light [:pre (.stringify js/JSON ext-info nil 2)]]
+       [:div.alert.alert-secondary.text-center "There is no extended info available for this user."]
+       )]]
    [user-core/debug-component]])
 

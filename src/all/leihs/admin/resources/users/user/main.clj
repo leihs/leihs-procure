@@ -5,6 +5,7 @@
     [leihs.core.sql :as sql]
     [leihs.core.auth.core :as auth]
 
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.choose-core :as choose-core]
 
@@ -20,8 +21,8 @@
   (:import
     [java.awt.image BufferedImage]
     [java.io ByteArrayInputStream ByteArrayOutputStream]
-    [java.util Base64]
     [javax.imageio ImageIO]
+    [java.util Base64]
     ))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,12 +42,15 @@
    :img32_url
    :img_digest
    :is_admin
+   :is_system_admin
    :lastname
    :login
+   :organization
    :org_id
    :password_sign_in_enabled
    :phone
-   :protected
+   :admin_protected
+   :system_admin_protected
    :secondary_email
    :updated_at
    :url
@@ -74,27 +78,42 @@
    :img32_url
    :img_digest
    :is_admin
+   :is_system_admin
    :lastname
+   :admin_protected
    :login
+   :organization
    :org_id
    :password_sign_in_enabled
    :phone
-   :protected
    :secondary_email
+   :system_admin_protected
    :url
    :zip])
 
 (def user-write-keymap
   {})
 
+
 (def admin-restricted-attributes
-  [:is_admin
-   :protected])
+  [:admin_protected
+   :is_admin
+   :org_id
+   :organization])
+
+(def system-admin-restricted-attributes
+  [:is_system_admin
+   :system_admin_protected])
+
+
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn requester-is-admin? [request]
   (auth/admin-scopes? request))
+
+(defn requester-is-system-admin? [request]
+  (auth/system-admin-scopes? request))
 
 ;;; user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -112,12 +131,39 @@
 
 ;;; delete user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn throw-forbidden! []
+  (throw (ex-info "Forbidden" {:status 403})))
+
+(defn protect-admin-and-system-admin! [user request]
+  (cond
+    (requester-is-system-admin?
+      request)  "OK"
+    (requester-is-admin?
+      request) (cond (:system_admin_protected
+                       user) (throw-forbidden!)
+                     (:is_system_admin
+                       user) (throw-forbidden!)
+                     :else "OK")
+    :else (cond (:admin_protected
+                  user) (throw-forbidden!)
+                (:is_admin
+                  user) (throw-forbidden!)
+                :else "OK")))
+
+
+(defn assert-deletion-permitted! [request user]
+  (cond (requester-is-system-admin? request) :OK
+        (requester-is-admin?
+          request) (cond (:is_system_admin user) (throw-forbidden!)
+                         (:system_admin_protected user) (throw-forbidden!)
+                         :else :OK)
+        :else (cond (:is_admin user) (throw-forbidden!)
+                    (:admin_protected user) (throw-forbidden!)
+                    :else :OK)))
+
 (defn delete-user [{tx :tx {user-id :user-id} :route-params :as request}]
   (if-let [user (-> request get-user :body)]
-    (do (when-not (requester-is-admin? request)
-          (when (:protected user)
-            (throw (ex-info "Only admins may delete a proteced user. "
-                            {:status 403}))))
+    (do (assert-deletion-permitted! request user)
         (if (= [1] (jdbc/delete! tx :users ["id = ?" user-id]))
           {:status 204}
           (throw (ex-info "Deleted failed" {:status 500}))))
@@ -178,14 +224,8 @@
                       first)]
     (when-not del-user
       (throw (ex-info "To be deleted user not found." {:status 404})))
-    (when-not (requester-is-admin? request)
-      (when (:protected del-user)
-        (throw (ex-info "Only admins may delete a proteced user. "
-                        {:status 403}))))
     (transfer-data user-id target-user-id tx)
-    (if (= [1] (jdbc/delete! tx :users ["id = ?" user-id]))
-      {:status 204}
-      (throw (ex-info "Deleteing user failed." {:status 500})))))
+    (delete-user request)))
 
 
 ;;; image handling ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -258,32 +298,40 @@
 
 ;;; update user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
 (defn prepare-write-data [data]
   (-> data
       (select-keys user-write-keys)
       (rename-keys user-write-keymap)))
 
-(defn check-protected-attributes-do-not-change! [data user]
-  (when-let [attr (some
-                    #(and (contains? data %)
-                          (not= (get user %) (get data %)))
-                    admin-restricted-attributes)]
-    (throw (ex-info "Only admins may change restricted-attributes"
-                    {:status 403 :attribure attr}))))
+(defn protect-admin! [data user]
+  (users-and-groups/assert-attributes-do-not-change!
+    data user admin-restricted-attributes)
+  (users-and-groups/assert-not-admin-proteced! user))
+
+(defn protect-system-admin! [data user]
+  (users-and-groups/assert-attributes-do-not-change!
+    data user system-admin-restricted-attributes)
+  (users-and-groups/assert-not-system-admin-proteced! user))
+
+(defn protect-attribute-de-escalation!
+  [user {data :body :as request}]
+  (cond
+    (requester-is-system-admin? request) "OK"
+    (requester-is-admin?
+      request) (users-and-groups/assert-attributes-do-not-change!
+                 data user [:is_system_admin :system_admin_protected])
+    :else (users-and-groups/assert-attributes-do-not-change!
+            data user [:is_system_admin :system_admin_protected
+                       :is_admin :admin_protected
+                       :organization :org_id])))
 
 (defn patch-user
   ([{tx :tx data :body {user-id :user-id} :route-params :as request}]
    (patch-user user-id (prepare-write-data data) tx request))
   ([user-id data tx request]
    (if-let [user (-> request get-user :body)]
-     (do (when-not (requester-is-admin? request)
-           (check-protected-attributes-do-not-change! data user)
-           (when (-> user :protected not false?)
-             (throw (ex-info "Only admins may update protected groups"
-                             {:status 403}))))
-         (logging/info 'data data)
+     (do (protect-admin-and-system-admin! user request)
+         (protect-attribute-de-escalation! user request)
          (or (= [1] (jdbc/update! tx :users data ["id = ?" user-id]))
              (throw (ex-info "Number of updated rows does not equal one." {} )))
          (get-user request))
@@ -292,23 +340,21 @@
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn check-protected-attributes-are-not-set! [data]
-  (when-let [attr (some
-                    #(true? (get data %))
-                    admin-restricted-attributes)]
-    (throw (ex-info "Only admins can set admin restricted-attributes"
-                    {:status 403 :attribure attr}))))
-
 (defn create-user
   ([{tx :tx data :body :as request}]
    (create-user (prepare-write-data data) tx request))
   ([data tx request]
    (when-not (requester-is-admin? request)
-     (check-protected-attributes-are-not-set! data))
+     (users-and-groups/assert-attributes-are-not-set!
+       data admin-restricted-attributes))
+   (when-not (requester-is-system-admin? request)
+            (users-and-groups/assert-attributes-are-not-set!
+              data system-admin-restricted-attributes))
    (if-let [user (first (jdbc/insert! tx :users data))]
      {:body user}
      {:status 422
       :body "No user has been created."})))
+
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

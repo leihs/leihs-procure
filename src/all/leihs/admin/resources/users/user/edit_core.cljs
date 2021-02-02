@@ -10,10 +10,10 @@
     [leihs.core.user.front :as current-user]
 
     [leihs.admin.common.form-components :refer [checkbox-component input-component]]
-    [leihs.admin.state :as state]
-
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -92,11 +92,13 @@
                          "used in cases where the same person has multiple accounts. "
                          "The secondary email address can not be used to sign in. "]]]]
    [:div.form-row
-    [:div.col-md-5 [input-component data* [:address]
+    [:div.col-md-4 [input-component data* [:address]
                     :label "Street address"]]
-    [:div.col-md-3 [input-component data* [:zip]
+    [:div.col-md-2 [input-component data* [:zip]
                     :label "Zip code"]]
-    [:div.col-md-4 [input-component data* [:country]
+    [:div.col-md-3 [input-component data* [:city]
+                    :label "City"]]
+    [:div.col-md-3 [input-component data* [:country]
                     :label "Country"]]]])
 
 (defn account-settings-form-component []
@@ -106,45 +108,40 @@
     [:div.col-md-3
      [checkbox-component data* [:account_enabled]
       :label "Enabled"
-      :hint [:span  "A disabled account prevents sign in. "
-             "Generally used if a user leaves the organization but the account can not be deleted. "]]]
+      :hint [:span  "A disabled account prevents sign ins. "
+             "This is used if a user leaves the organization but the account can not be deleted. "]]]
     [:div.col-md-3
      [checkbox-component data* [:password_sign_in_enabled]
       :label "Password sign-in"
-      :hint [:span "Often generally disabled when leihs is connected to an external authentication system."]]]
-    [:div.col-md-3
-     [checkbox-component data* [:protected]
-      :disabled (not @current-user/admin?*)
-      :label "Admin protected"
-      :hint [:span "A protected account can only be modifed by admins and in particular not by inventory-pool staff. "
-             "This is often set for accounts which are automatically managed via the API. "  ]]]
+      :hint [:span "This is often disabled when leihs is connected to an external authentication system."]]]
     [:div.col-md-3
      [checkbox-component data* [:is_admin]
       :disabled (not @current-user/admin?*)
       :label "Leihs admin"
-      :hint "Marks this account to be a leihs admin or not."]]]
+      :hint "Marks this account to be a leihs admin."]]
+    [:div.col-md-3
+     [checkbox-component data* [:is_system_admin]
+      :disabled (not @current-user/system-admin?*)
+      :label "System admin"
+      :hint "Marks this account to be a system admin."]]]
+
+   [users-and-groups/protect-form-fiels-row-component data*]
 
    [:div
     [:h3  "Other Fields "]
     [:div.form-row
      [:div.col-md
-      [input-component data* [:login]
-       :label "Login"
-       :hint [:span "The login can be used alternative to the primary email-address to sign in. "
-              "Each value must be " [:strong " unique accross all users "] " and  "
-              [:strong " may not contain a " [:span.text-monospace "@"]] " sign."]]]
-     [:div.col-md
-      [input-component data* [:org_id]
-       :label "Organizational ID"
-       :hint [:span "This field is often used by automatically manged imports to identify users, "
-              "in particular when the email-address is not guarantted to be stable (reuse). "
-              "Each value must be " [:strong " unique accross all users."]]]]
-     [:div.col-md
       [input-component data* [:badge_id]
        :label "Badge ID"
        :hint [:span "This value is meant to be used during the hand out or take back in conjunction "
-              "with external machinery such as barcode or RFID scanners." ]]]]
-
+              "with external machinery such as barcode or RFID scanners." ]]]
+     [:div.col-md
+      [input-component data* [:login]
+       :label "Login"
+       :hint [:span "The login can be used alternatively to the primary email-address to sign in. "
+              "Each value must be " [:strong " unique accross all users "] " and  "
+              "only consist of the characters " [:strong " a-z, and 0-9. "]]]]]
+    [users-and-groups/org-form-fields-row-component data*]
     [:div
      [json-component :extended_info
       :label "Extended info"

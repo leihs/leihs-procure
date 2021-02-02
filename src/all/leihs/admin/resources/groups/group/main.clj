@@ -4,6 +4,8 @@
   (:require
     [leihs.core.auth.core :as auth]
     [leihs.core.sql :as sql]
+
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
 
     [clojure.java.jdbc :as jdbc]
@@ -18,12 +20,20 @@
 
 
 (def admin-restricted-attributes
-  [:protected])
+  [:admin_protected
+   :org_id
+   :organization])
+
+(def system-admin-restricted-attributes
+  [:system_admin_protected])
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn requester-is-admin? [request]
   (auth/admin-scopes? request))
+
+(defn requester-is-system-admin? [request]
+  (auth/system-admin-scopes? request))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -31,8 +41,10 @@
   [:groups.id
    :name
    :description
+   :organization
    :org_id
-   :protected
+   :system_admin_protected
+   :admin_protected
    [(-> (sql/select :%count.*)
         (sql/from :groups_users)
         (sql/merge-where [:= :groups_users.group_id :groups.id]))
@@ -46,9 +58,11 @@
 
 (def group-write-keys
   [:name
+   :admin_protected
    :description
+   :organization
    :org_id
-   :protected ])
+   :system_admin_protected])
 
 (def group-write-keymap
   {})
@@ -70,9 +84,9 @@
 (defn delete-group [{tx :tx {group-id :group-id} :route-params :as request}]
   (if-let [group (-> request get-group :body)]
     (do (when-not (requester-is-admin? request)
-          (when (:protected group)
-            (throw (ex-info "Only admins may delete a proteced group. "
-                            {:status 403}))))
+          (users-and-groups/assert-not-admin-proteced! group))
+        (when-not (requester-is-system-admin? request)
+          (users-and-groups/assert-not-system-admin-proteced! group))
         (if (= [1] (jdbc/delete! tx :groups ["id = ?" group-id]))
           {:status 204}
           (throw (ex-info "Deleted failed" {:status 500}))))
@@ -81,13 +95,6 @@
 
 ;;; update group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn check-protected-attributes-do-not-change! [data user]
-  (when-let [attr (some
-                    #(and (contains? data %)
-                          (not= (get user %) (get data %)))
-                    admin-restricted-attributes)]
-    (throw (ex-info "Only admins may change restricted-attributes"
-                    {:status 403 :attribure attr}))))
 
 (defn prepare-write-data [data tx]
   (catcher/with-logging
@@ -96,37 +103,44 @@
         (select-keys group-write-keys)
         (rename-keys group-write-keymap))))
 
+(defn protect-admin! [data group]
+  (users-and-groups/assert-attributes-do-not-change!
+    data group admin-restricted-attributes)
+  (users-and-groups/assert-not-admin-proteced! group))
+
+(defn protect-system-admin! [data group]
+  (users-and-groups/assert-attributes-do-not-change!
+    data group system-admin-restricted-attributes)
+  (users-and-groups/assert-not-system-admin-proteced! group))
+
 (defn patch-group
   ([{tx :tx data :body {group-id :group-id} :route-params :as request}]
    (patch-group group-id (prepare-write-data data tx) tx request))
   ([group-id data tx request]
    (if-let [group (-> request get-group :body)]
-     (do (when-not (requester-is-admin? request)
-           (when (-> group :protected not false?)
-             (throw (ex-info "Only admins may update protected groups"
-                             {:status 403})))
-           (check-protected-attributes-do-not-change! data group))
-         (or (= [1] (jdbc/update! tx :groups data ["id = ?" group-id]))
-             (throw (ex-info "Number of updated rows does not equal one." {} )))
-         (get-group request))
+     (do
+       (when-not (requester-is-admin? request)
+         (protect-admin! data group))
+       (when-not (requester-is-system-admin? request)
+         (protect-system-admin! data group))
+       (or (= [1] (jdbc/update! tx :groups data ["id = ?" group-id]))
+           (throw (ex-info "Number of updated rows does not equal one." {} )))
+       (get-group request))
      {:status 404})))
 
 
 ;;; create group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn check-protected-attributes-are-not-set! [data]
-  (when-let [attr (some
-                    #(true? (get data %))
-                    admin-restricted-attributes)]
-    (throw (ex-info "Only admins can set admin restricted-attributes"
-                    {:status 403 :attribure attr}))))
 
 (defn create-group
   ([{tx :tx data :body :as request}]
    (create-group (prepare-write-data data tx) tx request))
   ([data tx request]
    (when-not (requester-is-admin? request)
-     (check-protected-attributes-are-not-set! data))
+     (users-and-groups/assert-attributes-are-not-set!
+       data admin-restricted-attributes))
+   (when-not (requester-is-system-admin? request)
+     (users-and-groups/assert-attributes-are-not-set!
+       data system-admin-restricted-attributes))
    (if-let [group (first (jdbc/insert! tx :groups data))]
      {:body group}
      (throw (ex-info "Group has not been created" {:status 534})))))

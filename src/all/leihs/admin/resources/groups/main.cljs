@@ -5,13 +5,14 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.auth.core :as core-auth :refer [allowed? admin-scopes?]]
+    [leihs.core.auth.core :as auth :refer []]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
 
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http]
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
@@ -54,7 +55,7 @@
 (defn link-to-group
   [group inner & {:keys [authorizers]
                   :or {authorizers []}}]
-  (if (allowed? authorizers)
+  (if (auth/allowed? authorizers)
     [:a {:href (path :group {:group-id (:id group)})} inner]
     inner))
 
@@ -82,7 +83,8 @@
     [:div.form-row
      [form-term-filter]
      [form-including-user-filter]
-     [form-org-filter]
+     [users-and-groups/form-org-filter data*]
+     [users-and-groups/form-org-id-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
@@ -95,14 +97,21 @@
 (defn name-td-component [group]
   [:td {:key :name}
    [link-to-group group [:span (:name group) ]
-    :authorizers [admin-scopes? pool-auth/some-lending-manager?]]])
+    :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]]])
+
+(defn org-th-component []
+ [:th {:key :organization} "Organization"])
+
+(defn org-td-component [group]
+  [:td {:key :organization}
+   (:organization group)])
 
 (defn protected-th-component []
-  [:th {:key :protected} "Protected"])
+  [:th {:key :admin_protected} "Protected"])
 
 (defn protected-td-component [group]
-  [:td {:key :protected}
-   (if (:protected group)
+  [:td {:key :admin_protected}
+   (if (:admin_protected group)
      "yes"
      "no")])
 
@@ -119,8 +128,6 @@
   [:thead
    [:tr
     [:th {:key :index} "Index"]
-    [protected-th-component]
-    [:th {:key :org_id} "Org ID"]
     (for [[idx col] (map-indexed vector more-cols)]
       ^{:key idx} [col])]])
 
@@ -128,24 +135,26 @@
   ^{:key (:id group)}
   [:tr.group {:key (:id group)}
    [:td {:key :index} (:index group)]
-   [protected-td-component group]
-   [:td {:key :org_id} (:org_id group)]
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col group])])
+
+(defn core-table-component [hds tds groups]
+  (if-let [groups (seq groups)]
+    [:table.groups.table.table-striped.table-sm
+     [groups-thead-component hds]
+     [:tbody
+      (let [page (:page @current-query-paramerters-normalized*)
+            per-page (:per-page @current-query-paramerters-normalized*)]
+        (doall (for [group groups]
+                 ^{:key (:id group)}
+                 [group-row-component group tds])))]]
+    [:div.alert.alert-warning.text-center "No (more) groups found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* @current-url*)
     [wait-component]
-    (if-let [groups (-> @data* (get  @current-url* {}) :groups seq)]
-      [:table.groups.table.table-striped.table-sm
-       [groups-thead-component hds]
-       [:tbody
-        (let [page (:page @current-query-paramerters-normalized*)
-              per-page (:per-page @current-query-paramerters-normalized*)]
-          (doall (for [group groups]
-                   ^{:key (:id group)}
-                   [group-row-component group tds])))]]
-      [:div.alert.alert-warning.text-center "No (more) groups found."])))
+    [core-table-component hds tds
+     (-> @data* (get  @current-url* {}) :groups)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -171,8 +180,12 @@
    [filter-component]
    [routing/pagination-component]
    [table-component
-    [name-th-component users-count-th-component]
-    [name-td-component users-count-td-component]]
+    [name-th-component
+     org-th-component
+     users-count-th-component]
+    [name-td-component
+     org-td-component
+     users-count-td-component]]
    [routing/pagination-component]
    [debug-component]])
 

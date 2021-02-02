@@ -1,148 +1,236 @@
 require 'spec_helper'
 require 'pry'
+require "#{File.dirname(__FILE__)}/_shared"
 
-feature 'Editing users', type: :feature do
+def ui_update_user_ok user, extra_props
+  properties = BASIC_USER_PROPERTIES.merge(extra_props)
+  click_on 'Users'
+  click_on_first_user user
+  click_on 'Edit'
+  fill_in_user_properties properties
+  click_on 'Save'
+  wait_until { current_path.match(%r"/admin/users/([^/]+)") }
+  assert_user_properties user[:id] , properties
+end
 
-  context 'a bunch of users and an admin exist' do
+def ui_can_not_edit user
+  click_on 'Users'
+  click_on_first_user user
+  wait_until { current_path.match(%r"/admin/users/([^/]+)") }
+  within('ol.leihs-nav-right') do
+    expect(all("button, a", text: 'Edit')).to be_empty
+  end
+end
 
-    before :each do
-      @admin = FactoryBot.create :admin
-      @users = 100.times.map { FactoryBot.create :user }
+def ui_update_attribute_disabled user, attr_name
+  click_on 'Users'
+  click_on_first_user user
+  click_on 'Edit'
+  fill_in_user_properties ::BASIC_USER_PROPERTIES
+  expect(find_field(attr_name, disabled: :all)).to be_disabled
+end
+
+def api_update_ok user, extra_props
+  properties = BASIC_USER_PROPERTIES.merge(extra_props)
+  resp = @http_client.patch "/admin/users/#{user[:id]}", properties.to_json
+  expect(resp.status).to be== 200
+  data = resp.body.with_indifferent_access
+  properties.each do |k,v|
+    expect(data[k]).to be== properties[k]
+  end
+end
+
+def api_update_forbidden user, extra_props = {}
+  properties = BASIC_USER_PROPERTIES.merge(extra_props)
+  resp = @http_client.patch "/admin/users/#{user[:id]}", properties.to_json
+  expect(resp.status).to be== 403
+end
+
+feature 'Editing and updating a user', type: :feature do
+  context 'all types of useres exist,' do
+    include_context :all_types_of_users
+
+    context 'as a pool manager' do
+      before(:each){ @current_user = @manager }
+
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+        scenario "I can update a normal user with basic properties"  do
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can not change the organization attribute" do
+          ui_update_attribute_disabled @user, :organization
+        end
+        scenario "I can not change the org_id attribure" do
+          ui_update_attribute_disabled @user, :org_id
+        end
+        scenario "I can not change the is_admin attribure" do
+          ui_update_attribute_disabled @user, :is_admin
+        end
+        scenario "I can not change the admin_protected attribure" do
+          ui_update_attribute_disabled @user, :admin_protected
+        end
+        scenario "I can not change the is_system_admin attribure" do
+          ui_update_attribute_disabled @user, :is_system_admin
+        end
+        scenario "I can not change the system_admin_protected attribure" do
+          ui_update_attribute_disabled @user, :system_admin_protected
+        end
+        scenario "I can not update an admin" do
+          ui_can_not_edit @admin
+        end
+        scenario "I can not update a system_admin" do
+          ui_can_not_edit @system_admin
+        end
+        scenario "I can not update an admin_protected user" do
+          database[:users].where(id: @user[:id]).update(admin_protected: true)
+          ui_can_not_edit @user
+        end
+        scenario "I can not update an system_admin_protected user" do
+          database[:users].where(id: @user[:id]) \
+            .update(admin_protected: true, system_admin_protected: true)
+          ui_can_not_edit @user
+        end
+      end
+
+      context 'via the API' do
+        include_context :setup_api
+        include_context :basic_user_properties
+        scenario "I can update user via the API with basic_user_properties" do
+          api_update_ok @user, {}
+        end
+        scenario "It is forbidden for me to update the a user via the API changing the organization" do
+          api_update_forbidden @user, organization: Faker::Internet.domain_name
+        end
+        scenario "It is forbidden for me to update the a user via the API changing the org_id" do
+          api_update_forbidden @user, org_id: Faker::Internet.uuid
+        end
+        scenario "It is forbidden for me to update the a user via the API changing admin_protected to true" do
+          api_update_forbidden @user, admin_protected: true
+        end
+        scenario "It is forbidden for me to update the a user via the API changing is_admin to true" do
+          api_update_forbidden @user, is_admin: true
+        end
+        scenario "It is forbidden for me to update the a user via the API changing admin_protected to true" do
+          api_update_forbidden @user, admin_protected: true
+        end
+        scenario "It is forbidden for me to update the a user via the API changing is_system_admin to true" do
+          api_update_forbidden @user, is_system_admin: true
+        end
+        scenario "It is forbidden for me to update the a user via the API changing system_admin_protected to true" do
+          api_update_forbidden @user, system_admin_protected: true
+        end
+        scenario "It is forbidden for me to update an admin with basic properties" do
+          api_update_forbidden @admin
+        end
+        scenario "It is forbidden for me to update an system_admin with basic properties" do
+          api_update_forbidden @system_admin
+        end
+        scenario "It is forbidden for me to update an admin_protect normal user with basic properties" do
+          database[:users].where(id: @user[:id]).update(admin_protected: true)
+          api_update_forbidden @user
+        end
+        scenario "It is forbidden for me to update an system_admin_protected normal user with basic properties" do
+          database[:users].where(id: @user[:id]).update(admin_protected: true, system_admin_protected: true)
+          api_update_forbidden @user
+        end
+      end
     end
 
-    context 'an admin' do
 
-      before :each do
-        sign_in_as @admin
+    context 'as an (leihs) admin' do
+      before(:each){ @current_user = @admin }
+
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+        scenario "I can update a normal user with basic properties"  do
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can update an other admin with basic properties"  do
+          database[:users].where(id: @user[:id]).update(is_admin: true)
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can update an admin_protected user with basic properties"  do
+          database[:users].where(id: @user[:id]).update(admin_protected: true)
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can change the organization attribute" do
+          ui_update_user_ok @user, {organization: Faker::Internet.domain_name}
+        end
+        scenario "I can change the org_id attribure" do
+          ui_update_user_ok @user, {org_id: Faker::Internet.uuid}
+        end
+        scenario "I can escalate a user to admin " do
+          ui_update_user_ok @user, {is_admin: true}
+        end
+        scenario "I can set a user to admin_protectd " do
+          ui_update_user_ok @user, {admin_protected: true}
+        end
+        scenario "I can not change the is_system_admin attribure" do
+          ui_update_attribute_disabled @user, :is_system_admin
+        end
+        scenario "I can not change the system_admin_protected attribure" do
+          ui_update_attribute_disabled @user, :system_admin_protected
+        end
+        scenario "I can not update an system_admin_protected user" do
+          database[:users].where(id: @user[:id]) \
+            .update(admin_protected: true, system_admin_protected: true)
+          ui_can_not_edit @user
+        end
       end
 
-      scenario 'edits a user to be a protected admin' do
-
-        @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
-
-        visit '/admin/'
-        click_on 'Users'
-        fill_in 'Search', with: @user.email
-        wait_until{ all(".users tbody tr").count == 1 }
-        click_on_first_user @user
-        expect(find("dl", text: 'Protected')).to have_content 'no'
-        expect(find("dl", text: 'Admin')).to have_content 'no'
-        click_on 'Edit'
-        expect(find(:checkbox, id: 'protected')).not_to be_checked
-        expect(find(:checkbox, id: 'is_admin')).not_to be_checked
-        check 'is_admin'
-        check 'protected'
-        click_on 'Save'
-        wait_until do
-          current_path.match "^\/admin\/users\/.+"
+      context 'via the API' do
+        include_context :setup_api
+        include_context :basic_user_properties
+        scenario "I can update user via the API with basic_user_properties" do
+          api_update_ok @user, {}
         end
-        expect(find("dl", text: 'Protected')).to have_content 'yes'
-        expect(find("dl", text: 'Admin')).to have_content 'yes'
-
+        scenario "It is forbidden for me to update the a user via the API changing is_system_admin to true" do
+          api_update_forbidden @user, is_system_admin: true
+        end
+        scenario "It is forbidden for me to update the a user via the API changing system_admin_protected to true" do
+          api_update_forbidden @user, system_admin_protected: true
+        end
+        scenario "It is forbidden for me to update an system_admin with basic properties" do
+          api_update_forbidden @system_admin
+        end
+        scenario "It is forbidden for me to update an system_admin_protected normal user with basic properties" do
+          database[:users].where(id: @user[:id]).update(admin_protected: true, system_admin_protected: true)
+          api_update_forbidden @user
+        end
       end
     end
 
-    context "some inventory-pool's lending-manager " do
+    context 'as a system admin' do
+      before(:each){ @current_user = @system_admin}
 
-      before :each do
-        @pool =  FactoryBot.create :inventory_pool
-        @lending_manager = FactoryBot.create :user
-        FactoryBot.create :access_right, user: @lending_manager,
-          inventory_pool: @pool, role: 'lending_manager'
+      context 'via the UI' do
+        include_context :sign_in_to_admin
+        include_context :basic_user_properties
+
+        scenario "I can update an other system-admin with basic properties"  do
+          database[:users].where(id: @user[:id])\
+            .update(is_admin: true, is_system_admin: true)
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can update an sytem_admin_protected user with basic properties"  do
+          database[:users].where(id: @user[:id])\
+            .update(admin_protected: true, system_admin_protected: true)
+          ui_update_user_ok @user, {}
+        end
+        scenario "I can escalate a user to system_admin " do
+          ui_update_user_ok @user, {is_admin: true, is_system_admin: true}
+        end
+        scenario "I can set a user to system_admin_protectd " do
+          ui_update_user_ok @user, {admin_protected: true, system_admin_protected: true}
+        end
       end
 
-      context "via the UI" do
-        before(:each) { sign_in_as @lending_manager }
-
-        context "edits an unprotected user" do
-          scenario "globally" do
-            @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
-            visit '/admin/'
-            click_on 'Users'
-            fill_in 'Search' , with: @user.email
-            wait_until{ all(".users tbody tr").count == 1 }
-            click_on_first_user @user
-            click_on 'Edit'
-            fill_in :firstname, with: "Bobby"
-            fill_in :lastname, with: "Foo"
-            click_on 'Save'
-            wait_until do
-              current_path.match "^\/admin\/users\/.+"
-            end
-            expect(find("dl", text: "Name")).to have_content "Bobby Foo"
-          end
-
-          scenario "inside an inventory pool" do
-            @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==false}.sample
-            visit "/admin/inventory-pools/#{@pool.id}"
-            click_on 'Users'
-            select('none', from: 'Role')
-            fill_in 'Search' , with: @user.email
-            wait_until{ all(".users tbody tr").count == 1 }
-            click_on_first_user @user
-            click_on 'User data'
-            fill_in :firstname, with: "Bobby"
-            fill_in :lastname, with: "Foo"
-            click_on 'Save'
-            wait_until do
-              current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/.+"
-            end
-            expect(find("dl", text: "Name")).to have_content "Bobby Foo"
-          end
-        end
-
-        scenario 'can not edit a protected user' do
-          @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==true}.sample
-          expect(@user).to be
-          visit '/admin/'
-          click_on 'Users'
-          fill_in 'Search', with: @user.email
-          wait_until{ all(".users tbody tr").count == 1 }
-          click_on_first_user @user
-          within(".breadcrumbs-bar") do
-            expect(all("a, button", text: "Edit").count).to be== 0
-          end
-        end
-
-      end
-
-      context 'via API' do
-
-        let :http_client do
-          plain_faraday_client
-        end
-
-        let :prepare_http_client do
-          @api_token = FactoryBot.create :api_token, user_id: @lending_manager.id
-          @token_secret = @api_token.token_secret
-          http_client.headers["Authorization"] = "Token #{@token_secret}"
-          http_client.headers["Content-Type"] = "application/json"
-        end
-
-        before :each do
-          prepare_http_client
-        end
-
-        scenario 'changing is_admin is forbidden ' do
-          @user = @users.filter{|u| u[:is_admin]==false and u[:protected]==true}.sample
-          resp = http_client.patch "/admin/users/#{@user[:id]}", {is_admin: true }.to_json
-          expect(resp.status).to be== 403
-        end
-
-        scenario 'changing protected is forbidden ' do
-          @user = @users.filter{|u| u[:protected]==false}.sample
-          resp = http_client.patch "/admin/users/#{@user[:id]}", {protected: true }.to_json
-          expect(resp.status).to be== 403
-        end
-
-        scenario 'changing some field of a protected user is forbidden ' do
-          user = @users.filter{|g| g[:protected] == true }.sample # pick a random user
-          expect(user).to be
-          resp = http_client.patch "/admin/users/#{user[:id]}", {name: "New Group-Name", description: "BlaBla"}.to_json
-          expect(resp.status).to be== 403
-        end
-
-      end
     end
   end
 end
+
+
+

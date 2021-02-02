@@ -4,11 +4,12 @@
   (:require
     [leihs.core.sql :as sql]
 
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.shared :as shared]
-    [leihs.admin.utils.regex :refer [uuid-pattern]]
     [leihs.admin.resources.users.choose-core :as choose-user]
+    [leihs.admin.utils.regex :refer [uuid-pattern]]
     [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
@@ -59,15 +60,6 @@
                           ["~~*" :groups.searchable (str "%" term "%")]]))
     query))
 
-(defn org-filter [query request]
-  (let [qp (presence (or (some-> request :query-params-raw :org_id)
-               (some-> request :query-params-raw :type)))]
-    (case qp
-      (nil "any") query
-      ("true" "org") (sql/merge-where query [:<> nil :org_id])
-      ("false" "manual") (sql/merge-where query [:= nil :org_id])
-      (sql/merge-where query [:= :org_id (str qp)]))))
-
 (defn filter-for-including-user
   [query {{user-uid :including-user} :query-params-raw :as request}]
   (if-let [user-uid (presence user-uid)]
@@ -93,15 +85,26 @@
     (-> groups-base-query
         (set-per-page-and-offset query-params)
         (term-filter request)
-        (org-filter request)
         (filter-for-including-user request)
+        (users-and-groups/organization-filter request)
+        (users-and-groups/org-id-filter request)
+        (users-and-groups/protected-filter request)
         (select-fields request))))
+
+
+(def organizations-query
+  (-> (sql/select :organization)
+      (sql/modifiers :distinct)
+      (sql/from :groups)))
 
 (defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body
-     {:groups (-> query
+     {:meta {:organizations
+             (-> organizations-query sql/format
+                 (->> (jdbc/query tx) (map :organization)))}
+      :groups (-> query
                   sql/format
                   (->> (jdbc/query tx)
                        (seq/with-index offset)

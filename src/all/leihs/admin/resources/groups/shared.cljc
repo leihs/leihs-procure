@@ -1,20 +1,23 @@
 (ns leihs.admin.resources.groups.shared
   (:require [leihs.admin.defaults :as defaults]))
+
 (def default-fields
   #{
     :name
     :id
-    :org_id
-    :protected
+    :organization
     })
 
 (def available-fields
   #{
+    :admin_protected
     :created_at
     :description
     :id
     :name
     :org_id
+    :organization
+    :system_admin_protected
     })
 
 (def default-query-params

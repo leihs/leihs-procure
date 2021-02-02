@@ -30,26 +30,33 @@
   (reaction (or (-> @routing/state* :route-params :group-id)
                 "group-id")))
 
-(defn some-lending-manager-group-unprotected? [current-group-state _]
-  (and (pool-auth/some-lending-manager? current-group-state _)
+(defn some-lending-manager-and-group-unprotected? [current-user-state _]
+  (and (pool-auth/some-lending-manager? current-user-state _)
        (boolean  @data*)
-       (-> @data* :protected not)))
+       (and (-> @data* :admin_protected not)
+            (-> @data* :system_admin_protected not))))
 
+(defn admin-and-group-not-system-admin-protected?
+  [current-user routing-state]
+  (and (auth/admin-scopes? current-user routing-state)
+       (-> @data* :system_admin_protected not)))
 
 
 (defn edit-li []
   [breadcrumbs/li :group-edit [:span icons/edit " Edit "]
    {:group-id @group-id*} {}
    :button true
-   :authorizers [auth/admin-scopes?
-                 some-lending-manager-group-unprotected?]])
+   :authorizers [admin-and-group-not-system-admin-protected?
+                 auth/system-admin-scopes?
+                 some-lending-manager-and-group-unprotected?]])
 
 (defn delete-li []
   [breadcrumbs/li :group-delete [:span icons/delete " Delete "]
    {:group-id @group-id*} {}
    :button true
-   :authorizers [auth/admin-scopes?
-                 some-lending-manager-group-unprotected?]])
+   :authorizers [admin-and-group-not-system-admin-protected?
+                 auth/system-admin-scopes?
+                 some-lending-manager-and-group-unprotected?]])
 
 (defn group-li []
   [li :group [:span icons/group " Group "]

@@ -10,6 +10,5 @@ FactoryBot.define do
     updated_at { Time.now }
     state { "open" }
     purpose { Faker::Lorem.sentence }
-    reservation_id { Reservation.all.sample.id }
   end
 end

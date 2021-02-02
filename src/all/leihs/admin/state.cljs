@@ -67,7 +67,7 @@
       [:h3 "@current-user/state*"]
       [:pre (with-out-str (pprint @current-user/state*))]]
      [:div
-      [:h3 "(authorization/admin-scopes? @current-user/state*)"]
+      [:h3 "(authorization/leihts-admin-scopes? @current-user/state*)"]
       [:pre (with-out-str (pprint  (authorization/admin-scopes?
                                      @current-user/state* @routing/state*)))]]
      [:div

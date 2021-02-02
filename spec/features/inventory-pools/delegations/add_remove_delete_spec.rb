@@ -119,7 +119,7 @@ feature 'Add, remove, delete delegations within a pool ', type: :feature do
       @delgator1 = FactoryBot.create :user
       @delegation1 = FactoryBot.create :delegation,
         firstname: "Delegation 1 (in pool 1)",
-        protected: false,
+        pool_protected: false,
         delegator_user_id: @delgator1.id
       FactoryBot.create :access_right, user: @delegation1,
         inventory_pool: @pool1, role: 'customer'
@@ -127,7 +127,7 @@ feature 'Add, remove, delete delegations within a pool ', type: :feature do
       @delgator2 = FactoryBot.create :user
       @delegation2 = FactoryBot.create :delegation,
         firstname: "Delegation 2 (in pool 1 and 2)",
-        protected: false,
+        pool_protected: false,
         delegator_user_id: @delgator2.id
       FactoryBot.create :access_right, user: @delegation2,
         inventory_pool: @pool1, role: 'customer'
@@ -137,13 +137,13 @@ feature 'Add, remove, delete delegations within a pool ', type: :feature do
       @delgator3 = FactoryBot.create :user
       @delegation3 = FactoryBot.create :delegation,
         firstname: "Delegation 3 (in no pool, unprotected)",
-        protected: false,
+        pool_protected: false,
         delegator_user_id: @delgator3.id
 
       @delgator4 = FactoryBot.create :user
       @delegation4 = FactoryBot.create :delegation,
         firstname: "Delegation 4 (in no pool, protected)",
-        protected: true,
+        pool_protected: true,
         delegator_user_id: @delgator4.id
 
     end

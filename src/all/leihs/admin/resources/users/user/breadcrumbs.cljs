@@ -33,21 +33,32 @@
 (defn some-lending-manager-user-unprotected? [current-user-state _]
   (and (pool-auth/some-lending-manager? current-user-state _)
        (boolean  @user-data*)
-       (-> @user-data* :protected not)))
+       (-> @user-data* :admin_protected not)))
+
+(defn modifieable? [current-user-state _]
+  (cond
+    (auth/system-admin-scopes?
+      current-user-state _) true
+    (auth/admin-scopes?
+      current-user-state
+      _) (cond (:is_system_admin @user-data*) false
+               (:system_admin_protected @user-data*) false
+               :else true )
+    :else (cond (:is_admin @user-data*) false
+                (:admin_protected @user-data*) false
+                :else true)))
 
 (defn edit-li []
   [breadcrumbs/li :user-edit [:span [:i.fas.fa-edit] " Edit "]
    {:user-id @user-id*} {}
    :button true
-   :authorizers [auth/admin-scopes?
-                 some-lending-manager-user-unprotected?]])
+   :authorizers [modifieable?]])
 
 (defn delete-li []
   [breadcrumbs/li :user-delete [:span [:i.fas.fa-times] " Delete "]
    {:user-id @user-id*} {}
    :button true
-   :authorizers [auth/admin-scopes?
-                 some-lending-manager-user-unprotected?]])
+   :authorizers [modifieable?]])
 
 (defn user-li []
   [li :user [:span icons/user " User "] {:user-id @user-id*} {}

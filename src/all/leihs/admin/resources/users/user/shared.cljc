@@ -6,5 +6,3 @@
     [clojure.string :refer [trim split]]
     ))
 
-
-

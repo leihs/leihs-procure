@@ -56,7 +56,6 @@
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
                   (leaf "/inventory-pools/" :user-inventory-pools)
-                  (leaf "/groups/" :user-groups)
                   (branch "/transfer/"
                           (param [#"[^/]+" :target-user-uid])
                           (leaf "" :user-transfer-data)))))

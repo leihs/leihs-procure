@@ -24,8 +24,7 @@
 (defn breadcrumbs []
   [breadcrumbs/nav-component
    @breadcrumbs/left*
-   [[breadcrumbs/authentication-systems-li]
-    [breadcrumbs/system-admins-li]]])
+   [[breadcrumbs/authentication-systems-li]]])
 
 (defn page []
   [:div.system
