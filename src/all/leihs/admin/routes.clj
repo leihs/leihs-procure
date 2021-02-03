@@ -37,6 +37,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as pool-delegations]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as pool-delegation]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as pool-delegation-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as inventory-pool-delegation-suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as pool-delegation-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main :as entitlement-group]
@@ -148,6 +149,7 @@
           :inventory-pool-delegation-groups {:handler pool-delegation-groups/routes
                                              :authorizers [admin-scopes?
                                                            pool-auth/pool-lending-manager?]}
+          :inventory-pool-delegation-suspension {:handler inventory-pool-delegation-suspension/routes :authorizers [admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-delegation-user {:handler pool-delegation-users/routes
                                            :authorizers [admin-scopes?
                                                          pool-auth/pool-lending-manager?]}

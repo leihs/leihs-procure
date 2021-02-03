@@ -25,4 +25,5 @@
                           (leaf "" :inventory-pool-delegation-groups)
                           (branch ""
                                   (param :group-id)
-                                  (leaf "" :inventory-pool-delegation-group))))))
+                                  (leaf "" :inventory-pool-delegation-group)))
+                  (leaf "/suspension" :inventory-pool-delegation-suspension))))

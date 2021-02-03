@@ -101,7 +101,8 @@
 (defn user-query [user-id]
   (-> (apply sql/select user-selects)
       (sql/from :users)
-      (sql/merge-where [:= :id user-id])))
+      (sql/merge-where [:= :id user-id])
+      (sql/merge-where [:= :delegator_user_id nil])))
 
 (defn get-user [{tx :tx {user-id :user-id} :route-params}]
   {:body
@@ -170,8 +171,10 @@
   [{{user-id :user-id target-user-uid :target-user-uid} :route-params
     tx :tx :as request}]
   (let [target-user-id (-> target-user-uid (choose-core/find-user-by-some-uid! tx) :id)
-        del-user (->> ["SELECT * FROM users WHERE id = ?" user-id]
-                      (jdbc/query tx )
+        del-user (->> user-id
+                      user-query
+                      sql/format
+                      (jdbc/query tx)
                       first)]
     (when-not del-user
       (throw (ex-info "To be deleted user not found." {:status 404})))

@@ -16,6 +16,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
 
@@ -92,6 +93,7 @@
       :default-option :member
       :label "Membership"
       :query-params-key :membership]
+     [users/form-suspension-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
@@ -109,7 +111,8 @@
     [:th.text-right " # Groups"]
     [:th.text-right " # Pools"]
     [:th.text-center " Protected "]
-    [:th.text-center " Action "]]])
+    [:th.text-center " Action "]
+    [:th.text-center " Suspension "]]])
 
 (defn link-to-delegation [id inner-component]
   [:a {:href (path :inventory-pool-delegation
@@ -187,6 +190,21 @@
         [:button.btn.btn-danger.btn-sm
          icons/delete " Delete "])])])
 
+(defn suspension-td-component [delegation]
+  [:td.suspension.text-center
+   (suspension/suspension-component
+     (:suspension delegation)
+     :compact true
+     :update-handler (fn [updated]
+                       (go (let [data (<! (suspension/put-suspension<
+                                            (path :inventory-pool-delegation-suspension
+                                                  {:inventory-pool-id @inventory-pool/id*
+                                                   :delegation-id (:id delegation)})
+                                            updated))]
+                             (swap! data* assoc-in
+                                    [(:url @routing/state*) :delegations
+                                     (:page-index delegation) :suspension] data)))))])
+
 (defn delegation-row-component [{id :id :as delegation}]
   [:tr.delegation {:key (:id delegation)}
    [name-td-component id delegation]
@@ -206,7 +224,8 @@
    [:td.text-center (if (:protected delegation)
                       [:span.text-success "yes"]
                       [:span.text-warning "no"])]
-   [action-td-component delegation]])
+   [action-td-component delegation]
+   [suspension-td-component delegation]])
 
 (defn delegations-table-component []
   (let [current-url (:url @routing/state*)]

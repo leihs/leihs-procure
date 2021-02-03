@@ -2,10 +2,10 @@ module Helpers
   module Global
     extend self
 
-    def wait_until(wait_time = 5, &block)
+    def wait_until(wait_time = 10, sleep_secs: 0.2, &block)
       Timeout.timeout(wait_time) do
         until value = yield
-          sleep(0.2)
+          sleep(sleep_secs)
         end
         value
       end

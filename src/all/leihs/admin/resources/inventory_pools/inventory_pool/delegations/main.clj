@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [clj-logging-config.log4j :as logging-config]
     [leihs.core.sql :as sql]
 
     [leihs.admin.paths :refer [path]]
@@ -11,6 +12,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
     [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.resources.users.main :as users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [filter-suspended add-suspended-until-to-query]]
     [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
@@ -105,6 +107,8 @@
       (filter-for-including-user request)
       (merge-select-counts inventory-pool-id)
       (inventory-pool-filter request)
+      (filter-suspended inventory-pool-id request :delegations)
+      (add-suspended-until-to-query inventory-pool-id :delegations)
       (set-per-page-and-offset request)
       (term-fitler request)))
 
@@ -114,7 +118,14 @@
         offset (:offset query)]
     {:body
      {:delegations (-> query sql/format
+                       logging/spy
                        (->> (jdbc/query tx)
+                            (map (fn [del]
+                                   (update-in del [:suspension]
+                                              #(-> %
+                                                   first
+                                                   (select-keys [:suspended_until :suspended_reason])))))
+
                             (seq/with-index offset)
                             seq/with-page-index))}}))
 
@@ -163,6 +174,6 @@
 
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
+(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns *ns*)

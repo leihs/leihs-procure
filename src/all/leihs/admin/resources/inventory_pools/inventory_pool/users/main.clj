@@ -63,15 +63,6 @@
                    [:= :suspensions.user_id :users.id]
                    [:= :suspensions.inventory_pool_id inventory-pool-id]]))
 
-(defn suspension-subquery [inventory-pool-id]
-  (-> (sql/select true)
-      (sql/from :suspensions)
-      (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
-      (sql/merge-where [:= :user_id :users.id])
-      ))
-
-
-
 (defn merge-aggreaged-role-to-query [query inventory-pool-id]
   (-> query
       (sql/merge-left-join :access_rights
@@ -108,34 +99,41 @@
 
 ;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn add-suspended-until-to-query [query inventory-pool-id]
-  (-> query
-      (sql/merge-select [(-> (sql/select (sql/raw " json_agg(to_json(suspensions.*))" ))
-                             (sql/from :suspensions)
-                             (sql/merge-where [:= :suspensions.user_id :users.id])
-                             (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
-                             ) :suspension])))
+(defn add-suspended-until-to-query
+  ([query inventory-pool-id]
+   (add-suspended-until-to-query query inventory-pool-id :users))
+  ([query inventory-pool-id table]
+   (-> query
+       (sql/merge-select [(-> (sql/select (sql/raw " json_agg(to_json(suspensions.*))" ))
+                              (sql/from :suspensions)
+                              (sql/merge-where [:= :suspensions.user_id (sql/qualify table :id)])
+                              (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
+                              ) :suspension]))))
 
 ;;; suspension filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn suspension-subquery [inventory-pool-id]
-  (-> (sql/select :true)
-      (sql/from :suspensions)
-      (sql/merge-where [:= :suspensions.user_id :users.id])
-      (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
-      (sql/merge-where (sql/raw  "CURRENT_DATE <= suspensions.suspended_until"))))
+(defn suspension-subquery
+  ([inventory-pool-id] (suspension-subquery inventory-pool-id :users))
+  ([inventory-pool-id table]
+   (-> (sql/select :true)
+       (sql/from :suspensions)
+       (sql/merge-where [:= :suspensions.user_id (sql/qualify table :id)])
+       (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
+       (sql/merge-where (sql/raw  "CURRENT_DATE <= suspensions.suspended_until")))))
 
 
-(defn filter-suspended [query inventory-pool-id {:as request}]
-  (case (-> request :query-params :suspension)
-    "suspended" (sql/merge-where
-                  query
-                  [:exists (suspension-subquery inventory-pool-id) ])
-    "unsuspended" (sql/merge-where
-                    query
-                    [:not [:exists (suspension-subquery inventory-pool-id)]])
-
-    query))
+(defn filter-suspended
+  ([query inventory-pool-id request]
+   (filter-suspended query inventory-pool-id request :users))
+  ([query inventory-pool-id request table]
+   (case (-> request :query-params :suspension)
+     "suspended" (sql/merge-where
+                   query
+                   [:exists (suspension-subquery inventory-pool-id table) ])
+     "unsuspended" (sql/merge-where
+                     query
+                     [:not [:exists (suspension-subquery inventory-pool-id table)]])
+     query)))
 
 ;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

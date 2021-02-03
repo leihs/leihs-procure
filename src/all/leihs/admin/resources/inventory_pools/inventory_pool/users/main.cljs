@@ -16,7 +16,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
+    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.users.user.core :as user2]
     [leihs.admin.resources.users.user.shared :as user]

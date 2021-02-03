@@ -19,6 +19,7 @@
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
+     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
      [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
      [leihs.admin.resources.users.user.shared :as user-shared]
@@ -120,7 +121,7 @@
   [:div
    [:ul.list-unstyled
     [pool-data-li-dl-component "Suspended"
-     (if (suspension/suspended?
+     (if (suspension-core/suspended?
            (-> @suspension/data* :suspended_until presence js/Date.)
            (:timestamp @state/global-state*))
        [:span.text-danger "yes"]

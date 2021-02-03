@@ -19,6 +19,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation ]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as suspension]
     [leihs.admin.utils.regex :as regex]
 
     [accountant.core :as accountant]
@@ -27,6 +28,12 @@
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]))
 
+;;; suspension ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn suspension-component []
+  [:div#suspension
+   [:h2 " Suspension " ]
+   [suspension/delegation-page-suspension-component]])
 
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -105,4 +112,7 @@
    [breadcrumbs]
    [show-title-component]
    [delegation-component]
+   [:div.row
+    [:div.col-md-6
+     [:hr] [suspension-component]]]
    [delegation/debug-component]])
