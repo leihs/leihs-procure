@@ -83,8 +83,6 @@ feature 'Creating users', type: :feature do
 
       scenario 'creates a new user inside one own\'s inventory pool' do
 
-        @pool.update(automatic_access: true)
-
         visit "/admin/inventory-pools/#{@pool.id}"
         click_on 'Users'
         click_on 'Create user'
@@ -98,8 +96,10 @@ feature 'Creating users', type: :feature do
         wait_until do
           current_path.match "^\/admin\/inventory-pools\/#{@pool.id}\/users\/#{new_user.id}$"
         end
-        within('.effective-roles'){ expect(find_field('customer', disabled: true)).to be_checked }
-        within('.direct-roles'){ expect(find_field('customer', disabled: true)).to be_checked }
+        within('.effective-roles'){ expect(find_field('customer', disabled: true)).not_to be_checked }
+        within('.direct-roles') do
+          expect { find_field('customer', disabled: true) }.to raise_error Capybara::ElementNotFound
+        end
       end
 
       context 'via API' do

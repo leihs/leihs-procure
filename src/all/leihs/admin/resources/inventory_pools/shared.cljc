@@ -14,7 +14,6 @@
 (def available-fields
   #{
     :address_id
-    :automatic_access
     :automatic_suspension
     :automatic_suspension_reason
     :color
