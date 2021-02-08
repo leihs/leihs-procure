@@ -6,6 +6,7 @@
     :name
     :id
     :organization
+    :org_id
     })
 
 (def available-fields

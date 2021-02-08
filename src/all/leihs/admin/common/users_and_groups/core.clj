@@ -74,3 +74,9 @@
       (ex-info
         "Only system-admins may modify or delete system-admin-protected entities"
         {:status 403}))))
+
+
+(defn protect-leihs-core! [entity]
+  (when (= (:organization entity) "leihs-core")
+    (throw (ex-info "The leihs-core organizations are protected/reserved!"
+                    {:status 422}))))

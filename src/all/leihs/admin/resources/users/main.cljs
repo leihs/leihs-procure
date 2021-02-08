@@ -225,11 +225,13 @@
    [table-component
     [user-th-component
      org-th-component
+     org-id-th-component
      contracts-count-th-component
      pools-count-th-component
      groups-count-th-component]
     [user-td-component
      org-td-component
+     org-id-td-component
      contracts-count-td-component
      pools-count-td-component
      groups-count-td-component]]

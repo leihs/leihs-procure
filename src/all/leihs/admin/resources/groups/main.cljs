@@ -106,6 +106,13 @@
   [:td {:key :organization}
    (:organization group)])
 
+(defn org-id-th-component []
+ [:th {:key :org-id} "Org ID"])
+
+(defn org-id-td-component [group]
+  [:td {:key :org-id}
+   (:org_id group)])
+
 (defn protected-th-component []
   [:th {:key :admin_protected} "Protected"])
 
@@ -182,9 +189,11 @@
    [table-component
     [name-th-component
      org-th-component
+     org-id-th-component
      users-count-th-component]
     [name-td-component
      org-td-component
+     org-id-td-component
      users-count-td-component]]
    [routing/pagination-component]
    [debug-component]])

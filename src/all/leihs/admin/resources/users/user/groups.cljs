@@ -57,6 +57,15 @@
     {:did-change fetch-groups}]
    (if-not (and @data* @user-data*)
      [wait-component]
-     [groups-core/core-table-component [] [] @data*])
+     [groups-core/core-table-component
+      [groups-core/name-th-component
+       groups-core/org-th-component
+       groups-core/org-id-th-component
+       groups-core/users-count-th-component]
+      [groups-core/name-td-component
+       groups-core/org-td-component
+       groups-core/org-id-td-component
+       groups-core/users-count-td-component]
+      @data*])
    [debug-component]])
 

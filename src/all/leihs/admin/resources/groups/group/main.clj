@@ -118,14 +118,15 @@
    (patch-group group-id (prepare-write-data data tx) tx request))
   ([group-id data tx request]
    (if-let [group (-> request get-group :body)]
-     (do
-       (when-not (requester-is-admin? request)
-         (protect-admin! data group))
-       (when-not (requester-is-system-admin? request)
-         (protect-system-admin! data group))
-       (or (= [1] (jdbc/update! tx :groups data ["id = ?" group-id]))
-           (throw (ex-info "Number of updated rows does not equal one." {} )))
-       (get-group request))
+     (do (users-and-groups/protect-leihs-core! group)
+         (users-and-groups/protect-leihs-core! data)
+         (when-not (requester-is-admin? request)
+           (protect-admin! data group))
+         (when-not (requester-is-system-admin? request)
+           (protect-system-admin! data group))
+         (or (= [1] (jdbc/update! tx :groups data ["id = ?" group-id]))
+             (throw (ex-info "Number of updated rows does not equal one." {} )))
+         (get-group request))
      {:status 404})))
 
 
@@ -135,6 +136,7 @@
   ([{tx :tx data :body :as request}]
    (create-group (prepare-write-data data tx) tx request))
   ([data tx request]
+   (users-and-groups/protect-leihs-core! data)
    (when-not (requester-is-admin? request)
      (users-and-groups/assert-attributes-are-not-set!
        data admin-restricted-attributes))

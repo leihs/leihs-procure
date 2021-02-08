@@ -330,7 +330,9 @@
    (patch-user user-id (prepare-write-data data) tx request))
   ([user-id data tx request]
    (if-let [user (-> request get-user :body)]
-     (do (protect-admin-and-system-admin! user request)
+     (do (users-and-groups/protect-leihs-core! user)
+         (users-and-groups/protect-leihs-core! data)
+         (protect-admin-and-system-admin! user request)
          (protect-attribute-de-escalation! user request)
          (or (= [1] (jdbc/update! tx :users data ["id = ?" user-id]))
              (throw (ex-info "Number of updated rows does not equal one." {} )))
@@ -344,6 +346,7 @@
   ([{tx :tx data :body :as request}]
    (create-user (prepare-write-data data) tx request))
   ([data tx request]
+   (users-and-groups/protect-leihs-core! data)
    (when-not (requester-is-admin? request)
      (users-and-groups/assert-attributes-are-not-set!
        data admin-restricted-attributes))
