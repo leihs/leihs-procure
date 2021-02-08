@@ -18,6 +18,7 @@
     [cljs.core.async :refer [timeout]]
     [reagent.core :as reagent]
     [cljs.pprint :refer [pprint]]
+    ["@leihs/ui-components" :as UI]
     ))
 
 (def TAB-INDEX constants/TAB-INDEX)
@@ -59,42 +60,49 @@
       value)))
 
 (defn input-component
-  [data* ks & {:keys [label hint type element placeholder disabled rows
+  [data* ks & {:keys [label hint type class element placeholder disabled rows
                       on-change post-change
-                      prepend append ]
+                      prepend append extra-props]
                :or {label (last ks)
                     hint nil
                     disabled false
                     type :text
+                    class :form-control
                     rows 10
                     element :input
                     on-change identity
                     post-change identity
                     prepend nil
-                    append nil}}]
-  [:div.form-group
-   [:label {:for (last ks)}
-    (if (= label (last ks))
-      [:strong label]
-      [:span [:strong  label] [:small " ("
-                               [:span.text-monospace (last ks)] ")"]])]
-   [:div.input-group
-    (when prepend [prepend])
-    [element
-     {:id (last ks)
-      :class :form-control
-      :placeholder placeholder
-      :type type
-      :value (get-in @data* ks)
-      :on-change  #(-> % .-target .-value presence
-                       (convert type)
-                       on-change (set-value data* ks) post-change)
-      :tab-index TAB-INDEX
-      :disabled disabled
-      :rows rows
-      :auto-complete :off}]
-    (when append [append])]
-   (when hint [:small.form-text hint])])
+                    append nil
+                    extra-props nil}}]
+  (let [input-props-base 
+        {:id (last ks)
+         :class class
+         :placeholder placeholder
+         :type type
+         :value (get-in @data* ks)
+         :on-change  #(-> % .-target .-value presence
+                          (convert type)
+                          on-change (set-value data* ks) post-change)
+         :tab-index TAB-INDEX
+         :disabled disabled
+         :rows rows
+         :auto-complete :off}
+        
+        input-props (into {} (remove (comp nil? second) ;; NOTE: remove `nil`s so that default props are used!
+                                     (merge input-props-base extra-props)))] 
+     [:div.form-group
+        [:label {:for (last ks)}
+         (if (= label (last ks))
+           [:strong label]
+           [:span [:strong  label] [:small " ("
+                                    [:span.text-monospace (last ks)] ")"]])]
+        [:div.input-group
+         (when prepend [prepend])
+         [element input-props]
+         (when append [append])]
+        (when hint [:small.form-text hint])]))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

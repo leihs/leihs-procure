@@ -24,7 +24,9 @@
     [cljs.core.async :as async]
     [cljs.pprint :refer [pprint]]
     [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre :as logging]
+    ["@leihs/ui-components" :as UI]
+    ))
 
 (defn suspended? [suspended-until ref-date]
   (if-not suspended-until
@@ -69,9 +71,12 @@
 (defn supension-inner-form-component [disabled data*]
   [:div.my-3
    [form-components/input-component data* [:suspended_until]
-    :type :date
+    :element (reagent/adapt-react-class UI/DatePicker)
     :disabled disabled
+    :extra-props { :minDate "tomorrow" }
+    :placeholder (when disabled "")
     :label "Suspended until"]
+
    [form-components/input-component data* [:suspended_reason]
     :element :textarea
     :rows 3

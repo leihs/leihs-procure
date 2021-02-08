@@ -18,6 +18,7 @@
     [clojure.pprint :refer [pprint]]
     [accountant.core :as accountant]
     [reagent.dom :as rdom]
+    ["@leihs/ui-components" :as UI]
     ))
 
 (defn li-navitem [handler-key display-string]
@@ -83,7 +84,9 @@
     (if-let [page (:page @routing/state*)]
       [page]
       [:div.page
-       [:h1.text-danger "Error 404 - There is no handler for the current path defined."]])]
+       [:h1.text-danger 
+        ;; NOTE: usage of this Bold component from leihs-ui seems pointless, but acts as a smoke test for the build system!
+        [:> UI/Bold "Error 404 - There is no handler for the current path defined."]]])]
    [state/debug-component]
    [:nav.footer.navbar.navbar-expand-lg.navbar-dark.bg-secondary.col.mt-4
     [:div.col
