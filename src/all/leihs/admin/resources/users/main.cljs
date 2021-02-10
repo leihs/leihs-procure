@@ -25,14 +25,12 @@
     [cljs.pprint :refer [pprint]]
     [reagent.core :as reagent]))
 
-(def current-query-paramerters*
-  (reaction (-> @routing/state* :query-params
-                (assoc :term (-> @routing/state* :query-params-raw :term)))))
+(def current-query-params*
+  (reaction (merge shared/default-query-params
+                   (:query-params-raw @routing/state*)
+                   )))
 
 (def current-route* (reaction (:route @routing/state*)))
-
-(def current-query-paramerters-normalized*
-  (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
 
 (def data* (reagent/atom {}))
@@ -40,19 +38,13 @@
 (defn fetch-users []
   (http/route-cached-fetch data*))
 
-; TODO remove the following
-(defn escalate-query-paramas-update [_]
-  (fetch-users)
-  (swap! state/global-state*
-         assoc :users-query-params @current-query-paramerters-normalized*))
-
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn page-path-for-query-params [query-params]
   (path (:handler-key @routing/state*)
         (:route-params @routing/state*)
-        (merge @current-query-paramerters-normalized*
+        (merge @current-query-params*
                query-params)))
 
 
@@ -66,7 +58,8 @@
   [routing/select-component
    :query-params-key :account_enabled
    :label "Enabled"
-   :options {"" "(any value)" "yes" "yes" "no" "no"}])
+   :options {"" "(any value)" "yes" "yes" "no" "no"}
+   :default-option "yes"])
 
 (defn form-admins-filter []
   [routing/select-component
@@ -209,8 +202,8 @@
      [:hr]
      [:h2 "Users Debug"]
      [:div
-      [:h3 "@current-query-paramerters-normalized*"]
-      [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
+      [:h3 "@current-query-params*"]
+      [:pre (with-out-str (pprint @current-query-params*))]]
      [:div
       [:h3 "@current-route*"]
       [:pre (with-out-str (pprint @current-route*))]]

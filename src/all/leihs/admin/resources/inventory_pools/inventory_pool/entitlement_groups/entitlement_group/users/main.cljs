@@ -50,9 +50,6 @@
 
 (defn users-component []
   [:div.entitlement-group-users
-   [routing/hidden-state-component
-    {:did-mount users/escalate-query-paramas-update
-     :did-update users/escalate-query-paramas-update}]
    [membership-users/filter-component]
    [routing/pagination-component]
    [users/table-component

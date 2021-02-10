@@ -51,9 +51,6 @@
   [:div
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left* [breadcrumbs/users-choose-li]) []]
-   [routing/hidden-state-component
-    {:did-mount users-main/escalate-query-paramas-update
-     :did-update users-main/escalate-query-paramas-update}]
    [users-main/filter-component]
    [routing/pagination-component]
    [table]

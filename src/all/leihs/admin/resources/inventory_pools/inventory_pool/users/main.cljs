@@ -38,7 +38,7 @@
 
 (def current-query-params*
   (reaction (merge default-query-params
-                   @users/current-query-paramerters-normalized*)))
+                   @users/current-query-params*)))
 
 
 ;### user #####################################################################
@@ -192,9 +192,6 @@
 
 (defn main-page-component []
   [:div
-   [routing/hidden-state-component
-    {:did-mount users/escalate-query-paramas-update
-     :did-update users/escalate-query-paramas-update}]
    [filter-component]
    [routing/pagination-component]
    [table-component]

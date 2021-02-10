@@ -60,8 +60,6 @@
 
 (defn main-component []
   [:div
-   [routing/hidden-state-component
-    {:did-change users/escalate-query-paramas-update}]
    [users-membership/filter-component]
    [routing/pagination-component]
    [table-component]

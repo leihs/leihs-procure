@@ -46,7 +46,7 @@
     })
 
 (def default-query-params
-  {:account_enabled nil
+  {:account_enabled "yes"
    :is_admin nil
    :org_id nil
    :page 1
