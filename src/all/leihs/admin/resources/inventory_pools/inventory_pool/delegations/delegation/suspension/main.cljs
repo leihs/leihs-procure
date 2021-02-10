@@ -13,8 +13,9 @@
     [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
@@ -43,7 +44,7 @@
 
 (defn header-component []
   [:h1 "Suspension of "
-   [user/name-link-component]
+   [delegation/name-link-component]
    " in "
    [inventory-pool/name-link-component]])
 

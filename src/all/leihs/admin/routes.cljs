@@ -27,6 +27,7 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as delegation-edit]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as delegation-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as delegation]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as delegation-suspension]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as delegation-users]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
     [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.groups.main :as inventory-pool-entitlement-group-groups]
@@ -102,6 +103,7 @@
    :inventory-pool-delegation-create #'delegation-edit/new-page
    :inventory-pool-delegation-edit #'delegation-edit/edit-page
    :inventory-pool-delegation-groups #'delegation-groups/page
+   :inventory-pool-delegation-suspension #'delegation-suspension/page
    :inventory-pool-delegation-users #'delegation-users/index-page
    :inventory-pool-delegations #'delegations/page
    :inventory-pool-delete #'inventory-pool/delete-page

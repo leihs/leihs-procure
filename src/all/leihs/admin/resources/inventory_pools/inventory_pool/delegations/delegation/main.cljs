@@ -104,7 +104,8 @@
     @breadcrumbs/left*
     [[breadcrumbs/users-li]
      [breadcrumbs/groups-li]
-     [breadcrumbs/edit-li]]))
+     [breadcrumbs/edit-li]
+     [breadcrumbs/suspension-li]]))
 
 (defn show-page []
   [:div.delegation

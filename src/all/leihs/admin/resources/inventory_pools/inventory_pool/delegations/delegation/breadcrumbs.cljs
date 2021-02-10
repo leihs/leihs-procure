@@ -67,6 +67,13 @@
    @default-route-params* {}
    :authorizers default-authorizers])
 
+(defn suspension-li []
+  [li :inventory-pool-delegation-suspension
+   [:span icons/edit " Suspension"]
+   @default-route-params* {}
+   :button true
+   :authorizers default-authorizers])
+
 (defonce left*
   (reaction
     (conj @breadcrumbs-parent/left*
