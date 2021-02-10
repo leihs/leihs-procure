@@ -121,23 +121,29 @@
 
 (defn suspension-component
   [data & {:keys [compact update-handler]
-                              :or {compact false
-                                   update-handler nil}}]
+           :or {compact false
+                update-handler nil}}]
   (reagent/with-let [edit-mode?* (reagent/atom false)]
     [:div.suspension
      (if (nil? data)
        [wait-component]
-       [:div
-        (when @edit-mode?*
-          [suspension-edit-component data edit-mode?* update-handler])
+       (let [suspended-until (some-> data :suspended_until presence js/Date.)]
          [:div
-          [:div [humanized-suspended-until-component
-                 (some-> data :suspended_until presence js/Date.)]]
-          (when-not compact [supension-inner-form-component
-                             true (reagent/atom data)])]
-         [:div
+          (when @edit-mode?*
+            [suspension-edit-component data edit-mode?* update-handler])
           [:div
-           [:button.btn.btn-outline-primary
-            {:class (when compact "btn-sm py-0")
-             :on-click #(reset! edit-mode?* true)}
-            [:span icons/edit " Edit"]]]] ])]))
+           [:div [humanized-suspended-until-component
+                  suspended-until]]
+           (when-not compact [supension-inner-form-component
+                              true (reagent/atom data)])]
+          [:div
+           [:div
+            (when (suspended? suspended-until (:timestamp @state/global-state*))
+              [:button.btn.btn-warning.mr-2
+               {:class (when compact "btn-sm py-0")
+                :on-click #(update-handler {})}
+               [:span icons/delete " Reset "]])
+            [:button.btn.btn-outline-primary
+             {:class (when compact "btn-sm py-0")
+              :on-click #(reset! edit-mode?* true)}
+             [:span icons/edit " Edit"]]]]]))]))
