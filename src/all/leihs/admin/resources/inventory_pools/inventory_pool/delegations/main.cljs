@@ -6,17 +6,17 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
 
@@ -37,42 +37,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-delegations []
-  (def fetch-delegations-id* (reagent/atom nil))
-  (let [query-paramerters @current-query-paramerters-normalized*]
-    (go (<! (timeout 100))
-        (when (= query-paramerters @current-query-paramerters-normalized*)
-          (let [resp-chan (async/chan)
-                url (:url @routing/state*)
-                id (requests/send-off {:url (path :inventory-pool-delegations
-                                                  {:inventory-pool-id @inventory-pool/id*})
-                                       :method :get
-                                       :query-params query-paramerters}
-                                      {:modal false
-                                       :title "Fetch Delegations"
-                                       :handler-key :delegations
-                                       :retry-fn #'fetch-delegations}
-                                      :chan resp-chan)]
-            (reset! fetch-delegations-id* id)
-            (go (let [resp (<! resp-chan)]
-                  (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-delegations-id*) ;still the most recent request
-                             (= query-paramerters @current-query-paramerters-normalized*)) ;query-params have not changed yet
-                    (swap! data* assoc url (:body resp))))))))))
-
-(defn escalate-query-paramas-update [_]
-  (fetch-delegations)
-  (swap! state/global-state*
-         assoc :delegations-query-params @current-query-paramerters-normalized*))
-
-(defn current-query-params-component []
-  (reagent/create-class
-    {:component-did-mount escalate-query-paramas-update
-     :component-did-update escalate-query-paramas-update
-     :reagent-render
-     (fn [_] [:div.current-query-parameters
-              {:style {:display (if @state/debug?* :block :none)}}
-              [:h3 "@current-query-paramerters-normalized*"]
-              [components/pre-component @current-query-paramerters-normalized*]])}))
+ (http-client/route-cached-fetch data*))
 
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -143,31 +108,16 @@
   [:td.groups-count.text-right
    (-> delegation :groups_count)])
 
-(defn add-delegation [delegation]
-  (let [resp-chan (async/chan)
-        _ (requests/send-off {:url (path :inventory-pool-delegation
-                                          {:inventory-pool-id @inventory-pool/id*
-                                           :delegation-id (:id delegation)})
-                               :method :put}
-                              {:modal true
-                               :title "Add Delegation" }
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (< (:status resp) 300)
-            (fetch-delegations))))))
-
-(defn delete-delegation [delegation]
-  (let [resp-chan (async/chan)
-        _ (requests/send-off {:url (path :inventory-pool-delegation
-                                         {:inventory-pool-id @inventory-pool/id*
-                                          :delegation-id (:id delegation)})
-                              :method :delete}
-                             {:modal true
-                              :title "Delete Delegation" }
-                             :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (< (:status resp) 300)
-            (fetch-delegations))))))
+(defn add-or-remove-delegation [method delegation]
+  (go (when (some->
+              {:chan (async/chan)
+               :url (path :inventory-pool-delegation
+                          {:inventory-pool-id @inventory-pool/id*
+                           :delegation-id (:id delegation)})
+               :method method}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (fetch-delegations))))
 
 (defn action-td-component
   [{member :member id :id protected :pool_protected
@@ -177,13 +127,13 @@
      [:form
       {:on-submit (fn [e]
                     (.preventDefault e)
-                    (add-delegation delegation))}
+                    (add-or-remove-delegation :put delegation))}
       [:button.btn.btn-primary.btn-sm
        icons/add " Add "]]
      [:form
       {:on-submit (fn [e]
                     (.preventDefault e)
-                    (delete-delegation delegation))}
+                    (add-or-remove-delegation :delete delegation))}
       (if (> pools-count 1)
         [:button.btn.btn-warning.btn-sm
          icons/delete " Remove "]
@@ -202,7 +152,7 @@
                                                    :delegation-id (:id delegation)})
                                             updated))]
                              (swap! data* assoc-in
-                                    [(:url @routing/state*) :delegations
+                                    [(:route @routing/state*) :delegations
                                      (:page-index delegation) :suspension] data)))))])
 
 (defn delegation-row-component [{id :id :as delegation}]
@@ -228,7 +178,7 @@
    [suspension-td-component delegation]])
 
 (defn delegations-table-component []
-  (let [current-url (:url @routing/state*)]
+  (let [current-url (:route @routing/state*)]
     (if-not (contains? @data* current-url)
       [wait-component]
       (if-let [delegations (-> @data* (get  current-url  {}) :delegations seq)]
@@ -260,8 +210,9 @@
 
 (defn page []
   [:div.delegations
+   [routing/hidden-state-component
+    {:did-change fetch-delegations}]
    [breadcrumbs]
-   [current-query-params-component]
    [:h1
     [:span "Delegations in the Inventory-Pool "]
     [inventory-pool/name-link-component]]

@@ -5,14 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
     [leihs.admin.common.components :as components]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrums]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
+    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools] [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
 

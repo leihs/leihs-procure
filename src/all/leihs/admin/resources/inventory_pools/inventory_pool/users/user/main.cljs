@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
      [leihs.core.core :refer [keyword str presence]]
-     [leihs.core.requests.core :as requests]
      [leihs.core.routing.front :as routing]
      [leihs.core.icons :as icons]
 
@@ -45,7 +44,7 @@
 (defn name-component []
   [:span
    [routing/hidden-state-component
-    {:did-mount #(let [p (:url @routing/state*)]
+    {:did-mount #(let [p (:route @routing/state*)]
                    (user/clean-and-fetch :path p))}]
    (let [p (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
                                        :user-id @user-id*})

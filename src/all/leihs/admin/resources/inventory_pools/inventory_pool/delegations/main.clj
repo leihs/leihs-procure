@@ -2,22 +2,22 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clj-logging-config.log4j :as logging-config]
     [leihs.core.sql :as sql]
+    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset mixin-default-query-params]]
 
     [leihs.admin.paths :refer [path]]
-
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [filter-suspended add-suspended-until-to-query]]
     [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.resources.users.main :as users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [filter-suspended add-suspended-until-to-query]]
     [leihs.admin.utils.seq :as seq]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
 
+    [clj-logging-config.log4j :as logging-config]
     [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     ))
@@ -45,25 +45,6 @@
       (sql/merge-select [queries/responsible-user :responsible_user])
       (sql/merge-select [(queries/contracts-count-per-pool inventory-pool-id) :contracts_count_per_pool])
       (sql/merge-select [(queries/contracts-count-open-per-pool inventory-pool-id) :contracts_count_open_per_pool])))
-
-(defn set-per-page-and-offset
-  ([query {{per-page :per-page page :page} :query-params}]
-   (when (or (-> per-page presence not)
-             (-> per-page integer? not)
-             (> per-page 1000)
-             (< per-page 1))
-     (throw (ex-info "The query parameter per-page must be present and set to an integer between 1 and 1000."
-                     {:status 422})))
-   (when (or (-> page presence not)
-             (-> page integer? not)
-             (< page 0))
-     (throw (ex-info "The query parameter page must be present and set to a positive integer."
-                     {:status 422})))
-   (set-per-page-and-offset query per-page page))
-  ([query per-page page]
-   (-> query
-       (sql/limit per-page)
-       (sql/offset (* per-page (- page 1))))))
 
 (defn term-fitler [query request]
   (if-let [term (-> request :query-params-raw :term presence)]
@@ -118,7 +99,6 @@
         offset (:offset query)]
     {:body
      {:delegations (-> query sql/format
-                       logging/spy
                        (->> (jdbc/query tx)
                             (map (fn [del]
                                    (update-in del [:suspension]
@@ -169,11 +149,13 @@
                :as request}]
   (case handler-key
     :inventory-pool-delegations (case request-method
-                                 :get  (delegations request)
+                                 :get  (-> request
+                                           (mixin-default-query-params default-query-params)
+                                           delegations)
                                  :post (create-delegation request))))
 
 
 ;#### debug ###################################################################
-(logging-config/set-logger! :level :debug)
+;(logging-config/set-logger! :level :debug)
 ;(logging-config/set-logger! :level :info)
 ;(debug/debug-ns *ns*)

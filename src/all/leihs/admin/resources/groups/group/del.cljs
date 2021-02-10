@@ -5,13 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
+    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
@@ -28,19 +28,14 @@
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-group [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group (-> @routing/state* :route-params))
-                               :method :delete
-                               :query-params {}}
-                              {:title "Delete Group"
-                               :handler-key :group-delete
-                               :retry-fn #'delete-group}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :groups {}
-                    (-> @state/global-state* :groups-query-params))))))))
+  (go (when (some->
+              {:chan (async/chan)
+               :url (path :group (-> @routing/state* :route-params))
+               :method :delete}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (accountant/navigate!
+          (path :groups {})))))
 
 
 (defn delete-form-component []

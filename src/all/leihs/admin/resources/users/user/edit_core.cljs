@@ -5,14 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
 
     [leihs.admin.common.form-components :refer [checkbox-component input-component]]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
+    [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
     [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
@@ -25,8 +24,7 @@
     [taoensso.timbre :as logging]
     ))
 
-
-(defonce data* (reagent/atom nil))
+(def data* user-data*)
 
 (defn json-component
   [kw & {:keys [label hint]

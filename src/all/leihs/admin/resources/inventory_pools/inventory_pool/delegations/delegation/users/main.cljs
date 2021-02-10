@@ -6,7 +6,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.shared :refer [short-id]]
 
@@ -45,7 +44,6 @@
            {:including-user (or (-> user :email presence) (:id user))}
            more-query-params))))
 
-
 ;### main #####################################################################
 
 (defn debug-component []
@@ -64,7 +62,6 @@
       direct-member-path)
     (users-membership/create-group-member-user-td-component
       groups-path-fn)]])
-
 
 (defn main-page-component []
   [:div

@@ -5,14 +5,14 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id* edit-mode?*]]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -40,22 +40,14 @@
 (defonce fetch-inventory-pools-roles-id* (reagent/atom nil))
 
 (defn fetch-inventory-pools-roles []
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group-inventory-pools-roles
-                                          (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Inventory Pool Roles"
-                               :retry-fn #'fetch-inventory-pools-roles}
-                              :chan resp-chan)]
-    (reset! fetch-inventory-pools-roles-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-inventory-pools-roles-id*))
-            (reset! data*
-                    (-> resp :body :inventory_pools_roles ;prepare-inventory-pools-data
-                        )))))))
+  (go (reset! data*
+              (some->
+                {:chan (async/chan)
+                 :url (path :group-inventory-pools-roles
+                            (-> @routing/state* :route-params))}
+                http-client/request :chan <!
+                http-client/filter-success!
+                :body :inventory_pools_roles))))
 
 (defn clean-and-fetch [& args]
   (reset! data* nil)

@@ -5,10 +5,10 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.paths :as paths :refer [path]]
@@ -37,48 +37,27 @@
         (merge default-query-params (:query-params-raw @routing/state*) query-params)))
 
 (defn fetch-changes [& _]
-  (let [url @routing/current-url*
-        chan (async/chan)]
-    (requests/send-off
-      {:url url :method :get}{}
-      :chan chan)
-    (go (let [resp (<! chan)]
-          (when (< (:status resp) 300)
-            (swap! data* assoc url (:body resp)))))))
+  (http-client/route-cached-fetch data* :reload true))
 
 ;;; meta ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defonce meta* (reagent/atom {}))
 
 (def tables*
   (reaction
     (let [query-param-table (some-> @routing/state* :query-params-raw :table presence)
-          meta-tables  (some->> @meta* :tables seq)
+          meta-tables (some-> @data*
+                              (get-in [(:route @routing/state*) :meta :tables])
+                              seq)
           tables (->> (concat [] meta-tables [query-param-table])
                       (map presence) (filter identity) distinct sort
                       (map (fn [t] [t t])))]
-      (concat [["" ""]]
+      (concat [["(any)" ""]]
               tables))))
-
-(defonce meta-chan (async/chan))
-
-(go (loop []
-      (let [resp (<! meta-chan)]
-        (when (< (:status resp) 300)
-          (reset! meta* (:body resp))))
-      (recur)))
-
-(defn fetch-meta [& _]
-  (requests/send-off
-    {:url (path :audited-changes-meta {})
-     :method :get} {}
-    :chan meta-chan))
 
 
 ;;; filters ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn table-filter-component []
-  (let [disabled* (reaction (-> @meta* :tables empty?))]
+  (let [disabled* (reaction (-> @tables* empty?))]
     (fn []
       [:div.form-group.m-2
        [:label {:for :table}
@@ -196,10 +175,7 @@
   (when (:debug @state/global-state*)
     [:div
      [:hr]
-     [:div.meta*
-      [:h3 "@meta*"]
-      [:pre (with-out-str (pprint @meta*))]]
-     [:div.meta*
+     [:div
       [:h3 "@tables*"]
       [:pre (with-out-str (pprint @tables*))]]
      [:div.data*
@@ -208,8 +184,6 @@
 
 (defn page []
   [:div.audited-changes-page
-   [routing/hidden-state-component
-    {:did-mount fetch-meta}]
    [breadcrumbs/nav-component @breadcrumbs/left*[]]
    [:h1 audits/icon-changes " Audited Changes "]
    [filter-component]

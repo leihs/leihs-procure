@@ -5,17 +5,17 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
     [leihs.admin.resources.users.user.edit-image :as edit-image]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -24,44 +24,19 @@
     [taoensso.timbre :as logging]
     ))
 
-(defn fetch []
-  (def fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user {:user-id @user-id*})
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch User"}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! data*
-                    (-> resp :body (update-in
-                                     [:extended_info]
-                                     (fn [json] (.stringify js/JSON (clj->js json)))))))))))
 
 (defn patch [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user {:user-id @user-id*})
-                               :method :patch
-                               :json-params  (-> @data*
-                                                 (update-in [:extended_info]
-                                                            (fn [s] (.parse js/JSON s))))}
-                              {:modal true
-                               :title "Update User"
-                               :handler-key :user-edit
-                               :retry-fn #'patch}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :user {:user-id @user-id*})))))))
-
-(defn clean-and-fetch [& _]
-  (reset! data* nil)
-  (fetch))
+  (let [route (path :user {:user-id @user-id*})]
+    (go (when (some->
+                {:chan (async/chan)
+                 :url route
+                 :method :patch
+                 :json-params  (-> @data*
+                                   (update-in [:extended_info]
+                                              (fn [s] (.parse js/JSON s))))}
+                http-client/request :chan <!
+                http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn patch-submit-component []
   [:div
@@ -96,7 +71,7 @@
 (defn page []
   [:div.user-edit
    [routing/hidden-state-component
-    {:did-mount clean-and-fetch}]
+    {:did-mount core/clean-and-fetch}]
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left* [breadcrumbs/edit-li]) []]
    [:h1 "Edit User " (when @data* [core/name-component @data*])]

@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
@@ -29,7 +28,7 @@
 
 (defn roles-update-handler [roles group]
   (go (swap! groups/data* assoc-in
-             [(:url @routing/state*) :groups (:page-index group) :roles]
+             [(:route @routing/state*) :groups (:page-index group) :roles]
              (<! (put-roles<
                    (path :inventory-pool-group-roles
                          {:inventory-pool-id @inventory-pool/id*

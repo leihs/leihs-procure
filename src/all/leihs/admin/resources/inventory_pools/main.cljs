@@ -7,7 +7,6 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
     [leihs.core.json :as json]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.auth.core :as auth-core]
 
@@ -38,7 +37,7 @@
                        :order (some-> @routing/state* :query-params
                                       :order clj->js json/to-json)))))
 
-(def current-url* (reaction (:url @routing/state*)))
+(def current-route* (reaction (:route @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
@@ -120,9 +119,9 @@
               (inventory-pool-row-component inventory-pool tds))))])
 
 (defn inventory-pools-table-component [& [hds tds]]
-  (if-not (contains? @data* @current-url*)
+  (if-not (contains? @data* @current-route*)
     [wait-component]
-    (if-let [inventory-pools (-> @data* (get  @current-url* {}) :inventory-pools seq)]
+    (if-let [inventory-pools (-> @data* (get  @current-route* {}) :inventory-pools seq)]
       [:table.table.table-striped.table-sm.inventory-pools
        [inventory-pools-thead-component hds]
        [tbody-component inventory-pools tds]]
@@ -140,8 +139,8 @@
       [:h3 "@current-query-paramerters-normalized*"]
       [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
      [:div
-      [:h3 "@current-url*"]
-      [:pre (with-out-str (pprint @current-url*))]]
+      [:h3 "@current-route*"]
+      [:pre (with-out-str (pprint @current-route*))]]
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
@@ -149,7 +148,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-change #(http/url-cached-fetch data*)}]
+    {:did-change #(http/route-cached-fetch data*)}]
    [filter-component]
    [routing/pagination-component]
    [inventory-pools-table-component]

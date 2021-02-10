@@ -33,7 +33,7 @@
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def current-url* (reaction (:url @routing/state*)))
+(def current-url* (reaction (:route @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
@@ -41,7 +41,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-groups []
-  (http/url-cached-fetch data*))
+  (http/route-cached-fetch data*))
 
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -158,10 +158,10 @@
     [:div.alert.alert-warning.text-center "No (more) groups found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* @current-url*)
+  (if-not (contains? @data* (:route @routing/state*))
     [wait-component]
     [core-table-component hds tds
-     (-> @data* (get  @current-url* {}) :groups)]))
+     (-> @data* (get (:route @routing/state*) {}) :groups)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

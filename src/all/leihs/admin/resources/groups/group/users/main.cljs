@@ -6,11 +6,11 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.auth.core :as auth]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
     [leihs.core.icons :as icons]
 
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.common.components :as components]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
@@ -24,7 +24,6 @@
     [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
     [reagent.core :as reagent]))
-
 
 
 
@@ -49,35 +48,25 @@
 
 ;### actions ##################################################################
 
-(defn add-user [user-id]
-  (let [resp-chan (async/chan)
-        id (requests/send-off
-             {:url (path :group-user {:group-id @group-id* :user-id user-id})
-              :method :put
-              :query-params {}}
-             {:modal true
-              :title "Add user"
-              :handler-key :group-users
-              :retry-fn #(add-user user-id)}
-             :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 204))
-            (users/fetch-users))))))
+(defn add-user [{user-id :id page-index :page-index}]
+  (go (when (some->
+              {:chan (async/chan)
+               :url (path :group-user {:group-id @group-id* :user-id user-id})
+               :method :put}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (swap! users/data* assoc-in [(:route @routing/state*)
+                                     :users page-index :group_id] @group-id*))))
 
-(defn remove-user [user-id]
-  (let [resp-chan (async/chan)
-        id (requests/send-off
-             {:url (path :group-user {:group-id @group-id* :user-id user-id})
-              :method :delete
-              :query-params {}}
-             {:modal true
-              :title "Remove user"
-              :handler-key :group-users
-              :retry-fn #(remove-user user-id)}
-             :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 204))
-            (users/fetch-users))))))
+(defn remove-user [{user-id :id page-index :page-index}]
+  (go (when (some->
+              {:chan (async/chan)
+               :url (path :group-user {:group-id @group-id* :user-id user-id})
+               :method :delete}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (swap! users/data* assoc-in [(:route @routing/state*)
+                                     :users page-index :group_id] nil))))
 
 (defn action-th-component []
   [:th.text-right "Add or remove from this group"])
@@ -86,11 +75,11 @@
   [:td.text-right
    (if (:group_id user)
      [:button.btn.btn-sm.btn-warning
-      {:on-click (fn [_] (remove-user (:id user)))
+      {:on-click #(remove-user user)
        :disabled (not @manage-membership-allowed?*)}
       icons/delete " Remove "]
      [:button.btn.btn-sm.btn-primary
-      {:on-click (fn [_] (add-user (:id user)))
+      {:on-click #(add-user user)
        :disabled (not @manage-membership-allowed?*)}
       icons/add " Add "])])
 

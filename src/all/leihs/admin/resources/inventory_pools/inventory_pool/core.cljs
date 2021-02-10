@@ -5,16 +5,16 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
     [leihs.core.user.shared :refer [short-id]]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.components :as components]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -45,22 +45,13 @@
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn fetch []
-  (defonce fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Inventory-Pool"
-                               :handler-key :inventory-pool
-                               :retry-fn #'fetch}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! data* (:body resp)))))))
-
+  (go (reset! data*
+              (some->
+                {:chan (async/chan)
+                 :url (path :inventory-pool
+                            (-> @routing/state* :route-params))}
+                http-client/request :chan <!
+                http-client/filter-success! :body))))
 
 (defn clean-and-fetch [& args]
   (reset! data* nil)

@@ -5,9 +5,9 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.shared :refer [short-id]]
+    [leihs.admin.common.http-client.core :as http-client]
 
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.components :as components]
@@ -23,31 +23,17 @@
     ))
 
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
-(defonce data* (reagent/atom nil))
 
+(def data* (reagent/atom nil))
 
-(defonce edit-mode?*
-  (reaction
-    (and (map? @data*)
-         (boolean ((set '(:group-edit :group-create))
-                   (:handler-key @routing/state*))))))
+(def route* (reaction (path :group (:route-params @routing/state*))))
 
 (defn fetch-group []
-  (defonce fetch-group-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Group"
-                               :handler-key :group
-                               :retry-fn #'fetch-group}
-                              :chan resp-chan)]
-    (reset! fetch-group-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-group-id*))
-            (reset! data* (:body resp)))))))
+  (go (reset! data*
+              (some-> {:chan (async/chan)
+                       :url @route*}
+                      http-client/request
+                      :chan <! http-client/filter-success! :body))))
 
 
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,9 +56,6 @@
   (when (:debug @state/global-state*)
     [:div.group-debug
      [:hr]
-     [:div.edit-mode?*
-      [:h3 "@edit-mode?*"]
-      [:pre (with-out-str (pprint @edit-mode?*))]]
      [:div.group-data
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))

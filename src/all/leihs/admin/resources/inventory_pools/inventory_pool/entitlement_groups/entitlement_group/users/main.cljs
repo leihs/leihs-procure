@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
@@ -25,6 +24,8 @@
 
 
 ;;; direct member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 (defn direct-member-path-fn [user]
   (path :inventory-pool-entitlement-group-direct-user

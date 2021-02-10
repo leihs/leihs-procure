@@ -6,17 +6,16 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.components :as components]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.utils.regex :as regex]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.breadcrumbs :as breadcrumbs]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :refer [wait-component]]
 
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [accountant.core :as accountant]
@@ -27,27 +26,10 @@
 
 
 (defonce data* (reagent/atom {}))
-(defonce current-url* (reaction (:url @routing/state*)))
+(defonce current-route* (reaction (:route @routing/state*)))
 
 (defn fetch-entitlement-groups []
-  (def fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        url @current-url*
-        id (requests/send-off {:url url
-                               :method :get}
-                              {:modal false
-                               :title "Fetch Entitlement-Groups"
-                               :handler-key :inventory-pool-entitlement-groups
-                               :retry-fn #'fetch-entitlement-groups}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= url @current-url*)
-                     (= id @fetch-id*))
-            (let [body (-> resp :body)]
-              (swap! data* assoc url body)))))))
-
+  (http-client/route-cached-fetch data*))
 
 (defn entitlement-groups-thead-component []
   [:thead
@@ -90,12 +72,11 @@
    [:td.text-center [:a {:href  (str "/manage/" @inventory-pool/id* "/groups/" id "/edit")}
          icons/edit " Edit " ]]])
 
-
 (defn main-page-component []
   [:div.entitlement-entitlement-groups
-   (if-not (contains? @data* @current-url*)
+   (if-not (contains? @data* @current-route*)
      [wait-component]
-     (if-let [entitlement-groups (-> @data* (get  @current-url* {}) :entitlement-groups seq)]
+     (if-let [entitlement-groups (-> @data* (get  @current-route* {}) :entitlement-groups seq)]
        [:table.entitlement-groups.table.table-striped.table-sm
         [entitlement-groups-thead-component]
         [:tbody
@@ -112,8 +93,6 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-
-
 (defn filter-form []
   [:div.card.bg-light
    [:div.card-body
@@ -122,7 +101,6 @@
       :query-params-key :including-user
       :input-options {:placeholder "email, login, or id"}]
      [routing/form-reset-component]]]])
-
 
 (defn index-page []
   [:div.inventory-pool-entitlement-groups

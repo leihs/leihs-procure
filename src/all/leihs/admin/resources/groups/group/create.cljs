@@ -5,11 +5,11 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.resources.groups.group.edit-core :as edit-core]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
+    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :refer [checkbox-component input-component create-submit-component]]
     [leihs.admin.utils.misc :refer [wait-component]]
@@ -23,18 +23,16 @@
     ))
 
 (defn post [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :groups)
-                               :method :post
-                               :json-params @data*}
-                              {:modal true
-                               :title "Create Group"
-                               :retry-fn #'post}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (< (:status resp) 300)
-            (accountant/navigate!
-              (path :group {:group-id (-> resp :body :id)})))))))
+  (go (when-let [body (some->
+                        {:chan (async/chan)
+                         :url (path :groups)
+                         :method :post
+                         :json-params @data*}
+                        http-client/request
+                        :chan <! http-client/filter-success!
+                        :body)]
+        (accountant/navigate!
+          (path :group {:group-id (:id body)})))))
 
 (defn clean-and-preset []
   (reset! data* {}))

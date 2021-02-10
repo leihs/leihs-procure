@@ -5,13 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.shared :refer [short-id]]
     [leihs.core.url.shared]
 
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.system.authentication-systems.breadcrumbs :as parent-breadcrumbs]
@@ -32,7 +32,6 @@
                 ":authentication-system-id")))
 (defonce authentication-system-data* (reagent/atom nil))
 
-
 (defonce edit-mode?*
   (reaction
     (and (map? @authentication-system-data*)
@@ -40,21 +39,13 @@
                    (:handler-key @routing/state*))))))
 
 (defn fetch [& args]
-  (defonce fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :authentication-system (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Authentication-System"
-                               :handler-key :authentication-system
-                               :retry-fn #'fetch}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! authentication-system-data* (:body resp)))))))
+  (go (reset! authentication-system-data*
+              (some->
+                {:chan (async/chan)
+                 :url (path :authentication-system
+                            (-> @routing/state* :route-params))}
+                http-client/request :chan <!
+                http-client/filter-success! :body))))
 
 
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -62,7 +53,6 @@
 (defn clean-and-fetch [& args]
   (reset! authentication-system-data* nil)
   (fetch))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -199,6 +189,8 @@
 (defn show-page []
   [:div.authentication-system
    [show-breadcrumbs]
+   [routing/hidden-state-component
+    {:did-change fetch}]
    [:div.row
     [:div.col-lg
      [:h1
@@ -212,19 +204,15 @@
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :authentication-system {:authentication-system-id @id*})
-                               :method :patch
-                               :json-params  (dissoc @authentication-system-data* :users_count)}
-                              {:modal true
-                               :title "Update Authentication-System"
-                               :handler-key :authentication-system-edit
-                               :retry-fn #'patch}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :authentication-system {:authentication-system-id @id*})))))))
+  (let [route (path :authentication-system {:authentication-system-id @id*})]
+    (go (when (some->
+                {:url route
+                 :method :patch
+                 :json-params  (dissoc @authentication-system-data* :users_count)
+                 :chan (async/chan)}
+                http-client/request :chan <!
+                http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn edit-form []
   [:form.form
@@ -254,19 +242,16 @@
 ;;; create  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :authentication-systems)
-                               :method :post
-                               :json-params  @authentication-system-data*}
-                              {:modal true
-                               :title "Create Authentication-System"
-                               :handler-key :authentication-system-create
-                               :retry-fn #'create}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :authentication-system {:authentication-system-id (-> resp :body :id)})))))))
+  (go (when-let [id (some->
+                      {:chan(async/chan)
+                       :url (path :authentication-systems)
+                       :method :post
+                       :json-params  @authentication-system-data*}
+                      http-client/request :chan <!
+                      http-client/filter-success! :body :id)]
+        (accountant/navigate!
+          (path :authentication-system
+                {:authentication-system-id id})))))
 
 (defn create-form []
   [:form
@@ -293,19 +278,15 @@
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-authentication-system [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :authentication-system (-> @routing/state* :route-params))
-                               :method :delete
-                               :query-params {}}
-                              {:title "Delete Authentication-System"
-                               :handler-key :authentication-system-delete
-                               :retry-fn #'delete-authentication-system}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :authentication-systems {}
-                    (-> @state/global-state* :authentication-systems-query-params))))))))
+  (go (when
+        (some->
+          {:url (path :authentication-system (-> @routing/state* :route-params))
+           :method :delete
+           :chan (async/chan)}
+          http-client/request :chan <!
+          http-client/filter-success!)
+        (accountant/navigate!
+          (path :authentication-systems)))))
 
 (defn delete-form []
   [:form.form

@@ -14,8 +14,7 @@
                   (branch "/"
                           ; bidi doesn't like the exact match with ^...$ in leihs.admin.utils.regex here!
                           (param [#"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" :audited-change-id])
-                          (leaf "" :audited-change))
-                  (leaf "/meta" :audited-changes-meta))
+                          (leaf "" :audited-change)))
           (branch "/requests"
                   (leaf "/" :audited-requests)
                   (branch "/"

@@ -5,10 +5,10 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.defaults :as defaults]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.breadcrumbs :as breadcrumbs]
@@ -29,56 +29,18 @@
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def current-url* (reaction (:url @routing/state*)))
+(def current-route* (reaction (:route @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-(def fetch-authentication-systems-id* (reagent/atom nil))
 
 (def data* (reagent/atom {}))
 
 (defn fetch-authentication-systems []
-  "Fetches the the currernt url with accept/json
-  after 1/5 second timeout if query-params have not changed in the meanwhile
-  yet and stores the result in the map data* under this url."
-  (let [url @current-url*
-        normalized-query-params @current-query-paramerters-normalized*]
-    (go (<! (timeout 200))
-        (when (= url @current-url*)
-          (let [resp-chan (async/chan)
-                id (requests/send-off {:url url
-                                       :method :get}
-                                      {:modal false
-                                       :title "Fetch Authentication-Systems"
-                                       :handler-key :authentication-systems
-                                       :retry-fn #'fetch-authentication-systems}
-                                      :chan resp-chan)]
-            (reset! fetch-authentication-systems-id* id)
-            (go (let [resp (<! resp-chan)]
-                  (when (and (= (:status resp) 200) ;success
-                             (= id @fetch-authentication-systems-id*) ;still the most recent request
-                             (= url @current-url*)) ;query-params have still not changed yet
-                    (let [body (-> resp :body)
-                          page (:page normalized-query-params)
-                          per-page (:per-page normalized-query-params)
-                          offset (* per-page (- page 1))
-                          body-with-indexed-authentication-systems (update-in body [:authentication-systems] (partial with-index offset))]
-                      (swap! data* assoc url body-with-indexed-authentication-systems))))))))))
-
-(defn escalate-query-paramas-update [_]
-  (fetch-authentication-systems)
-  (swap! state/global-state*
-         assoc :authentication-systems-query-params @current-query-paramerters-normalized*))
+  (http-client/route-cached-fetch data*))
 
 
-;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn page-path-for-query-params [query-params]
-  (path (:handler-key @routing/state*)
-        (:route-params @routing/state*)
-        (merge @current-query-paramerters-normalized*
-               query-params)))
 
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,9 +81,9 @@
    [:td (link-to-authentication-system authentication-system (:name authentication-system))]])
 
 (defn authentication-systems-table-component []
-  (if-not (contains? @data* @current-url*)
+  (if-not (contains? @data* @current-route*)
     [wait-component]
-    (if-let [authentication-systems (-> @data* (get  @current-url* {}) :authentication-systems seq)]
+    (if-let [authentication-systems (-> @data* (get  @current-route* {}) :authentication-systems seq)]
       [:table.table.table-striped.table-sm
        [authentication-systems-thead-component]
        [:tbody
@@ -142,8 +104,8 @@
       [:h3 "@current-query-paramerters-normalized*"]
       [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
      [:div
-      [:h3 "@current-url*"]
-      [:pre (with-out-str (pprint @current-url*))]]
+      [:h3 "@current-route*"]
+      [:pre (with-out-str (pprint @current-route*))]]
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
@@ -151,8 +113,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-mount escalate-query-paramas-update
-     :did-update escalate-query-paramas-update}]
+    {:did-change fetch-authentication-systems }]
    [filter-component]
    [routing/pagination-component]
    [authentication-systems-table-component]

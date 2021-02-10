@@ -5,10 +5,10 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
     [leihs.admin.common.membership.groups.shared :refer [default-query-params]]
@@ -52,17 +52,15 @@
 
 (defn remove-memebership [path group]
   (swap! groups/data* update-in
-         [(:url @routing/state*) :groups (:page-index group) :member]
+         [(:route @routing/state*) :groups (:page-index group) :member]
          #(identity nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url path
-                               :method :delete}
-                              {:modal true
-                               :title "Remove Membership" }
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (< (:status resp) 300)
-            (groups/fetch-groups))))))
+  (go (when (some->
+              {:chan (async/chan)
+               :url path
+               :method :delete}
+              http-client/request
+              :chan <! http-client/filter-success!)
+        (groups/fetch-groups))))
 
 (defn remove-memebership-component [path group]
   [:form
@@ -75,25 +73,23 @@
      icons/delete
      " Remove "]]])
 
-(defn add-memebership [path group]
-  (let [data-path [(:url @routing/state*) :groups (:page-index group) :member]]
+(defn add-membership [path group]
+  (let [data-path [(:route @routing/state*) :groups (:page-index group) :member]]
     (swap! groups/data* update-in data-path #(identity nil))
-    (let [resp-chan (async/chan)
-          id (requests/send-off {:url path
-                                 :method :put}
-                                {:modal true
-                                 :title "Add Membership"}
-                                :chan resp-chan)]
-      (go (let [resp (<! resp-chan)]
-            (if (< (:status resp) 300)
-              (groups/fetch-groups)
-              (swap! groups/data* update-in data-path #(identity false))))))))
+    (go (when (some->
+                {:chan (async/chan)
+                 :url path
+                 :method :put}
+                http-client/request
+                :chan <! http-client/filter-success!)
+          (groups/fetch-groups)
+          (swap! groups/data* update-in data-path #(identity false))))))
 
-(defn add-memebership-component [path group]
+(defn add-membership-component [path group]
   [:form
    {:on-submit (fn [e]
                  (.preventDefault e)
-                 (add-memebership path group))}
+                 (add-membership path group))}
    [:button.btn.btn-sm.btn-primary
     {:type :submit}
     [:span icons/add " Add "]]])
@@ -112,7 +108,7 @@
       [:div.ml-2
        (case (:member group)
          true [remove-memebership-component path group]
-         false [add-memebership-component path group]
+         false [add-membership-component path group]
          nil [:button.btn.btn-sm.btn-secondary
               {:disabled true}
               [:span icons/waiting]])]]]))

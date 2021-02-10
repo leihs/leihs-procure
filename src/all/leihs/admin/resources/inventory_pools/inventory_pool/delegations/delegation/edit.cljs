@@ -5,16 +5,16 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.shared :refer [short-id]]
 
+    [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
-    [leihs.admin.common.form-components :as form-components]
     [leihs.admin.state :as state]
     [leihs.admin.utils.regex :as regex]
 
@@ -73,23 +73,17 @@
 ;;; edit / patch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch [& more]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-delegation
-                                          {:inventory-pool-id @inventory-pool/id*
-                                           :delegation-id @delegation/id*})
-                               :method :patch
-                               :json-params  @data*}
-                              {:modal true
-                               :title "Update Delegation"
-                               :handler-key :delegation-edit
-                               :retry-fn #'patch}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pool-delegation
+  (let [route (path :inventory-pool-delegation
                     {:inventory-pool-id @inventory-pool/id*
-                     :delegation-id @delegation/id*})))))))
+                     :delegation-id @delegation/id*})]
+    (go (when (some->
+                {:chan (async/chan)
+                 :url route
+                 :method :patch
+                 :json-params  @data*}
+                http-client/request :chan <!
+                http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn edit-delegation-form-component []
   [form-component patch form-components/save-submit-component])
@@ -113,20 +107,17 @@
 ;;; new / post ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create [& _]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-delegations
-                                          {:inventory-pool-id @inventory-pool/id*})
-                               :method :post
-                               :json-params @data*}
-                              {:modal true
-                               :title "Create Delegation"
-                               :retry-fn #'create}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :inventory-pool-delegation {:inventory-pool-id @inventory-pool/id*
-                                 :delegation-id (-> resp :body :id)})))))))
+  (go (when-let [id (some->
+                      {:chan (async/chan)
+                       :url (path :inventory-pool-delegations
+                                  {:inventory-pool-id @inventory-pool/id*})
+                       :method :post
+                       :json-params @data*}
+                      http-client/request :chan <!
+                      http-client/filter-success! :body :id)]
+        (accountant/navigate!
+          (path :inventory-pool-delegation {:inventory-pool-id @inventory-pool/id*
+                                            :delegation-id id})))))
 
 (defn new-delegation-form-component []
   [form-component create form-components/create-submit-component])

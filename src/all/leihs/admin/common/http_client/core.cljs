@@ -133,19 +133,19 @@
            [inner (:body resp)])
          [wait-component @req*])])))
 
-(defn url-cached-fetch [data* & {:keys [reload] :or {reload false}}]
-  (let [chan (async/chan)
-        url (-> @routing/state* :url)
-        routing-id (-> @routing/state* :id)]
+(defn route-cached-fetch
+  [data* & {:keys [reload route]
+            :or {reload false}}]
+  (let [route (or route (-> @routing/state* :route))
+        chan (async/chan)]
     (go-loop [do-fetch true]
              (when do-fetch
                (let [req (request {:chan chan
-                                   :url url})
+                                   :url route})
                      resp (<! chan)]
                  (when (< (:status resp) 300)
-                   (swap! data* assoc url (-> resp :body)))))
+                   (swap! data* assoc route (-> resp :body)))))
              (<! (timeout (* 3 60 1000)))
-             (if (= routing-id (:id @routing/state*))
+             (if (str/starts-with? (:route @routing/state*) route)
                (recur reload)
-               (when (not= url (:url @routing/state*))
-                 (swap! data* dissoc url))))))
+               (swap! data* dissoc route)))))

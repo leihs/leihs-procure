@@ -5,18 +5,18 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
     [leihs.core.user.shared :refer [short-id]]
     [leihs.core.icons :as icons]
 
     [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -65,19 +65,16 @@
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool {:inventory-pool-id @inventory-pool/id*})
-                               :method :patch
-                               :json-params  @inventory-pool/data*}
-                              {:modal true
-                               :title "Update Inventory-Pool"
-                               :handler-key :inventory-pool-edit
-                               :retry-fn #'patch}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pool {:inventory-pool-id @inventory-pool/id*})))))))
+  (let [route (path :inventory-pool
+                    {:inventory-pool-id @inventory-pool/id*})]
+  (go (when (some->
+              {:url route
+               :method :patch
+               :json-params  @inventory-pool/data*
+               :chan (async/chan)}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (accountant/navigate! route)))))
 
 (defn edit-page []
   [:div.edit-inventory-pool
@@ -101,19 +98,16 @@
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create [_]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pools)
-                               :method :post
-                               :json-params  @inventory-pool/data*}
-                              {:modal true
-                               :title "Add Inventory-Pool"
-                               :handler-key :inventory-pool-create
-                               :retry-fn #'create}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :inventory-pool {:inventory-pool-id (-> resp :body :id)})))))))
+  (go (when-let [id (some->
+                      {:url (path :inventory-pools)
+                       :method :post
+                       :json-params  @inventory-pool/data*
+                       :chan (async/chan)}
+                      http-client/request :chan <!
+                      http-client/filter-success!
+                      :body :id)]
+        (accountant/navigate!
+          (path :inventory-pool {:inventory-pool-id id})))))
 
 (defn create-submit-component []
   (if @edit-mode?*
@@ -145,19 +139,13 @@
 
 
 (defn delete-inventory-pool [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool (-> @routing/state* :route-params))
-                               :method :delete
-                               :query-params {}}
-                              {:title "Delete Inventory-Pool"
-                               :handler-key :inventory-pool-delete
-                               :retry-fn #'delete-inventory-pool}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :inventory-pools {}
-                    (-> @state/global-state* :inventory-pools-query-params))))))))
+  (go (when (some->
+              {:url (path :inventory-pool (-> @routing/state* :route-params))
+               :method :delete
+               :chan (async/chan)}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (accountant/navigate! (path :inventory-pools)))))
 
 (defn delete-submit-component []
   [:div.form

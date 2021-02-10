@@ -70,7 +70,7 @@
                  {delegation-id :delegation-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
-    tx :delegations_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
+    tx :delegations_direct_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
     {:delegation_id delegation-id :user_id user-id})
   {:status 204})
 
@@ -81,7 +81,7 @@
                     {delegation-id :delegation-id
                      user-id :user-id} :route-params}]
   (if (= 1 (->> ["delegation_id = ? AND user_id = ?" delegation-id user-id]
-                (jdbc/delete! tx :delegations_users)
+                (jdbc/delete! tx :delegations_direct_users)
                 first))
     {:status 204}
     (throw (ex-info "Remove delegation-user failed" {:request request}))))

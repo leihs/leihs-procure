@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.components :as components]
@@ -26,7 +25,6 @@
     [cljs.pprint :refer [pprint]]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]))
-
 
 
 (defn member-path [group]

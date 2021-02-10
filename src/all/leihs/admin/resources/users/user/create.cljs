@@ -5,16 +5,16 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
     [leihs.admin.resources.users.user.edit-main :as edit-main]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -24,23 +24,19 @@
     [taoensso.timbre :as logging]
     ))
 
-
 (defn post [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :users)
-                               :method :post
-                               :json-params  (-> @data*
-                                                 (update-in [:extended_info]
-                                                            (fn [s] (.parse js/JSON s))))}
-                              {:modal true
-                               :title "Create User"
-                               :handler-key :user-create
-                               :retry-fn #'post}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 200)
-            (accountant/navigate!
-              (path :user {:user-id (-> resp :body :id)})))))))
+  (go (when-let
+        [id (some->
+              {:chan (async/chan)
+               :url (path :users)
+               :method :post
+               :json-params  (-> @data*
+                                 (update-in [:extended_info]
+                                            (fn [s] (.parse js/JSON s))))}
+              http-client/request :chan <!
+              http-client/filter-success! :body :id)]
+        (accountant/navigate!
+          (path :user {:user-id id})))))
 
 (defn clean [& _]
   (reset! data* {}))
@@ -54,7 +50,7 @@
    [:div.clearfix]])
 
 (defn edit-form-component
-  ([] 
+  ([]
    (edit-form-component (fn [e]
                           (.preventDefault e)
                           (post))))

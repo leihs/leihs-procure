@@ -5,11 +5,11 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
@@ -20,19 +20,12 @@
 (def data* (reagent/atom {}))
 
 (defn fetch []
-  (def fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :statistics-basic)
-                               :method :get}
-                              {:modal false
-                               :title "Basic Statistics" }
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200) ;success
-                     (= id @fetch-id*))
-            (reset! data* (:body resp)))))))
-
+  (go (reset! data*
+              (some->
+                {:url (path :statistics-basic)
+                 :chan (async/chan)}
+                http-client/request :chan <!
+                http-client/filter-success! :body))))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -40,7 +33,6 @@
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
-
 
 (defn contracts-component []
   [:div.contracts

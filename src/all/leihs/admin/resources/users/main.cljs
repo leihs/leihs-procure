@@ -29,7 +29,7 @@
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def current-url* (reaction (:url @routing/state*)))
+(def current-route* (reaction (:route @routing/state*)))
 
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
@@ -38,7 +38,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
-  (http/url-cached-fetch data*))
+  (http/route-cached-fetch data*))
 
 ; TODO remove the following
 (defn escalate-query-paramas-update [_]
@@ -190,9 +190,9 @@
   [:div
    [routing/hidden-state-component
     {:did-change fetch-users}]
-   (if-not (contains? @data* @current-url*)
+   (if-not (contains? @data* @current-route*)
      [wait-component]
-     (if-let [users (-> @data* (get  @current-url* {}) :users seq)]
+     (if-let [users (-> @data* (get  @current-route* {}) :users seq)]
        [:table.table.table-striped.table-sm.users
         [thead-component hds]
         [:tbody.users
@@ -212,8 +212,8 @@
       [:h3 "@current-query-paramerters-normalized*"]
       [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
      [:div
-      [:h3 "@current-url*"]
-      [:pre (with-out-str (pprint @current-url*))]]
+      [:h3 "@current-route*"]
+      [:pre (with-out-str (pprint @current-route*))]]
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))

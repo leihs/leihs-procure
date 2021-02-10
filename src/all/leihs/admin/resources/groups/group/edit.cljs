@@ -5,13 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.form-components :refer [checkbox-component input-component save-submit-component]]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component edit-mode?* clean-and-fetch fetch-group group-name-component group-id-component]]
+    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
     [leihs.admin.resources.groups.group.edit-core :as edit-core]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
@@ -23,18 +23,15 @@
     ))
 
 (defn patch [& args]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :group {:group-id @group-id*})
-                               :method :patch
-                               :json-params @data*}
-                              {:modal true
-                               :title "Update Group"
-                               :retry-fn #'patch}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (< (:status resp) 300)
-            (accountant/navigate!
-              (path :group {:group-id @group-id*})))))))
+  (go (when (some->
+              {:chan (async/chan)
+               :url (path :group {:group-id @group-id*})
+               :method :patch
+               :json-params @data*}
+              http-client/request
+              :chan <! http-client/filter-success!)
+        (accountant/navigate!
+          (path :group {:group-id @group-id*})))))
 
 (defn edit-form-component []
   [:form.form

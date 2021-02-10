@@ -28,7 +28,7 @@
   (merge {"" "(any)"}
          (some-> @routing/state* :query-params-raw :organization presence
                  (#(do {% %})))
-         (some-> @data* (get (:url @routing/state*))
+         (some-> @data* (get (:route @routing/state*))
                  :meta :organizations
                  (->> (map presence)
                       (filter identity)

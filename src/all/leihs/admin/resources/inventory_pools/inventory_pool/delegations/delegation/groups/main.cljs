@@ -6,7 +6,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.icons :as icons]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
     [leihs.admin.common.components :as components]

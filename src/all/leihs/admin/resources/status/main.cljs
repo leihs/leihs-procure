@@ -6,15 +6,14 @@
   (:require
     [leihs.core.anti-csrf.front :as anti-csrf]
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.resources.status.breadcrumbs :as breadcrumbs]
-
     [leihs.admin.common.components :as components]
-    [leihs.core.icons :as icons]
-    [leihs.admin.state :as state]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.status.breadcrumbs :as breadcrumbs]
+    [leihs.admin.state :as state]
+    [leihs.core.icons :as icons]
 
     [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
@@ -26,27 +25,14 @@
 
 (defonce status-info-data* (reagent/atom nil))
 
-(def fetch-status-info-id* (reagent/atom nil))
-
 (defn fetch-status-info []
-  ;(reset! status-info-data* nil)
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :status)
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Status-Info"
-                               :handler-key :auth
-                               :retry-fn #'fetch-status-info}
-                              :chan resp-chan)]
-    (reset! fetch-status-info-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= :status (-> @routing/state* :handler-key))
-                     (or (= (:status resp) 200)
-                         (>= 900(:status resp)))
-                     (= id @fetch-status-info-id*))
-            (reset! status-info-data* (:body resp))
-            (js/setTimeout  #(fetch-status-info) 1000))))))
+  (go (reset! status-info-data*
+              (some->
+                {:url (path :status)
+                 :chan (async/chan)}
+                http-client/request :chan <!
+                http-client/filter-success!
+                :body))))
 
 (defn info-page []
   [:div.status

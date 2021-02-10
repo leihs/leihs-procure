@@ -6,16 +6,16 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :as current-user]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
 
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
     [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
@@ -29,22 +29,15 @@
 (defonce data* (reagent/atom nil))
 
 (defn fetch-inventory-pools []
-  (defonce fetch-id* (reagent/atom nil))
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user-inventory-pools
-                                          (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Inventory Pool Roles"
-                               :retry-fn #'fetch-inventory-pools}
-                              :chan resp-chan)]
-    (reset! fetch-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-id*))
-            (reset! data*
-                    (-> resp :body :user-inventory-pools)))))))
+  (go (reset!
+        data*
+        (some->
+          {:chan (async/chan)
+           :url (path :user-inventory-pools
+                      (-> @routing/state* :route-params))}
+          http-client/request :chan <!
+          http-client/filter-success!
+          :body :user-inventory-pools))))
 
 (defn clean-and-fetch-inventory-pools [& args]
   (reset! data* nil)

@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
@@ -34,7 +33,7 @@
 
 (def inventory-pool-users-count*
   (reaction (-> @users/data*
-                (get (:url @routing/state*) {})
+                (get (:route @routing/state*) {})
                 :inventory-pool_users_count)))
 
 (def current-query-params*
@@ -80,7 +79,7 @@
 
 (defn direct-roles-update-handler [roles user]
   (go (swap! users/data* assoc-in
-             [(:url @routing/state*) :users (:page-index user) :direct_roles]
+             [(:route @routing/state*) :users (:page-index user) :direct_roles]
              (<! (put-roles<
                    (path :inventory-pool-user-direct-roles
                          {:inventory-pool-id @inventory-pool/id*
@@ -131,7 +130,7 @@
                                                    :user-id (:id user)})
                                             updated))]
                              (swap! users/data* assoc-in
-                                    [(:url @routing/state*) :users
+                                    [(:route @routing/state*) :users
                                      (:page-index user) :suspension] data)))))])
 
 ;### filter ###################################################################

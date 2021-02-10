@@ -5,13 +5,13 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
 
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
@@ -38,19 +38,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-user [& _]
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :user (-> @routing/state* :route-params))
-                               :method :delete
-                               :query-params {}}
-                              {:title "Delete User"
-                               :handler-key :user-delete
-                               :retry-fn #'delete-user}
-                              :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :users {}
-                    (-> @state/global-state* :users-query-params))))))))
+  (go (when (some->
+              {:url (path :user (-> @routing/state* :route-params))
+               :method :delete
+               :chan (async/chan)}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (accountant/navigate! (path :users)))))
 
 (defn delete-without-reasignment-component []
   [:div.card.m-3
@@ -73,23 +67,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn transfer-data-and-delete-user [& _]
-  (let [resp-chan (async/chan)
-        url (path :user-transfer-data
-                  {:user-id @user-id*
-                   :target-user-uid (:target-user-uid @transfer-data*)})
-        id (requests/send-off
-             {:url url
-              :method :delete
-              :query-params {}}
-             {:title "Transfer Data and Delete User"
-              :handler-key :user-delete
-              :retry-fn #'transfer-data-and-delete-user}
-             :chan resp-chan)]
-    (go (let [resp (<! resp-chan)]
-          (when (= (:status resp) 204)
-            (accountant/navigate!
-              (path :users {}
-                    (-> @state/global-state* :users-query-params))))))))
+  (go (when (some->
+              {:url  (path :user-transfer-data
+                           {:user-id @user-id*
+                            :target-user-uid (:target-user-uid @transfer-data*)})
+               :method :delete
+               :chan (async/chan)}
+              http-client/request :chan <!
+              http-client/filter-success!)
+        (accountant/navigate! (path :users)))))
 
 (defn target-user-choose-component []
   [:div.input-group-append

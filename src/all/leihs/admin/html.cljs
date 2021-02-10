@@ -6,8 +6,6 @@
   (:require
     [leihs.core.anti-csrf.front :as anti-csrf]
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
-    [leihs.core.requests.modal]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
     [leihs.core.user.shared :refer [short-id]]
@@ -80,7 +78,6 @@
 
 (defn current-page []
   [:div
-   [leihs.core.requests.modal/modal-component]
    [leihs.admin.common.http-client.modals/modal-component]
    [:div
     (if-let [page (:page @routing/state*)]
@@ -97,11 +94,7 @@
       {:href (path :status)} "Admin-Status-Info"]]
     [state/debug-toggle-navbar-component]
     [:form.form-inline {:style {:margin-left "0.5em"
-                                :margin-right "0.5em"}}
-     [:label.navbar-text
-      [:a {:href (path :requests)}
-       [requests/icon-component]
-       " Requests "]]]]])
+                                :margin-right "0.5em"}}]]])
 
 (defn mount []
   (when-let [app (.getElementById js/document "app")]

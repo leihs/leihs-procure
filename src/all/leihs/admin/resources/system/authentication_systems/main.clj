@@ -6,10 +6,9 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.shared :as shared]
-
+    [leihs.admin.utils.seq :as seq]
 
     [leihs.core.sql :as sql]
-
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
     [compojure.core :as cpj]
@@ -65,16 +64,17 @@
         (set-per-page-and-offset query-params)
         (select-fields request))))
 
-(defn authentication-systems-formated-query [request]
-  (-> request
-      authentication-systems-query
-      sql/format))
-
-(defn authentication-systems [request]
-  (when (= :json (-> request :accept :mime))
+(defn authentication-systems [{tx :tx :as request}]
+  (let [query (authentication-systems-query request)
+        offset (:offset query)]
     {:body
      {:authentication-systems
-      (jdbc/query (:tx request) (authentication-systems-formated-query request))}}))
+      (-> query
+          sql/format
+          (->> (jdbc/query tx)
+               (seq/with-key :id)
+               (seq/with-index offset)
+               seq/with-page-index))}}))
 
 (def routes
   (-> (cpj/routes

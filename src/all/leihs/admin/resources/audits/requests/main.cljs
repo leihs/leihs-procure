@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.requests.core :as requests]
     [leihs.core.routing.front :as routing]
     [leihs.core.icons :as icons]
     [leihs.admin.common.http-client.core :as http]
@@ -45,7 +44,7 @@
               (swap! requests* assoc url (-> resp :body :requests))
               ; after some time reload or clean cached
               (go (<! (timeout (* 3 60 1000)))
-                  (if (= url (:url @routing/state*))
+                  (if (= url (:route @routing/state*))
                     (fetch)
                     (swap! requests* dissoc url)))))))))
 
@@ -54,7 +53,7 @@
    [:a.btn.btn-info
     {:tab-index form-components/TAB-INDEX
      :href (path :users-choose {}
-                 {:return-to (:url @routing/state*)})}
+                 {:return-to (:route @routing/state*)})}
     [:i.fas.fa-rotate-90.fa-hand-pointer.px-2]
     " Choose "]])
 
@@ -71,7 +70,7 @@
                     (accountant/navigate! (page-path-for-query-params
                                             {:page 1
                                              :method val}))))}
-    (for [[n v] (->> ["" "DELETE" "PATCH" "POST" "PUT"]
+    (for [[n v] (->> ["" "DELETE" "GET" "PATCH" "POST" "PUT"]
                      (map (fn [op] [op op])))]
       ^{:key n} [:option {:value v} n]) ]])
 

@@ -5,11 +5,11 @@
     [cljs.core.async.macros :refer [go]])
   (:require
      [leihs.core.core :refer [keyword str presence]]
-     [leihs.core.requests.core :as requests]
      [leihs.core.routing.front :as routing]
      [leihs.core.icons :as icons]
 
      [leihs.admin.common.components :as components]
+     [leihs.admin.common.http-client.core :as http-client]
      [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
      [leihs.admin.common.roles.core :as roles]
      [leihs.admin.paths :as paths :refer [path]]
@@ -45,23 +45,14 @@
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def fetch-inventory-pool-group-roles-id* (reagent/atom nil))
 (defn fetch-inventory-pool-group-roles []
-  (let [resp-chan (async/chan)
-        id (requests/send-off {:url (path :inventory-pool-group-roles (-> @routing/state* :route-params))
-                               :method :get
-                               :query-params {}}
-                              {:modal false
-                               :title "Fetch Inventory-Pool Group Roles"
-                               :handler-key :inventory-pool-group-roles
-                               :retry-fn #'fetch-inventory-pool-group-roles}
-                              :chan resp-chan)]
-    (reset! fetch-inventory-pool-group-roles-id* id)
-    (go (let [resp (<! resp-chan)]
-          (when (and (= (:status resp) 200)
-                     (= id @fetch-inventory-pool-group-roles-id*))
-            (reset! data* (:body resp)))))))
-
+  (go (reset! data*
+              (some->
+                {:url (path :inventory-pool-group-roles
+                            (-> @routing/state* :route-params))
+                 :chan (async/chan)}
+                http-client/request :chan <!
+                http-client/filter-success! :body))))
 
 (defn clean-and-fetch []
   (reset! changed?* false)

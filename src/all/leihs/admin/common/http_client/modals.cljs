@@ -108,7 +108,8 @@
                        :success " OK "
                        :pending " PENDING "
                        nil))
-            (-> request :response :status)]]
+            (when-not (= status :success)
+              (-> request :response :status))]]
           [modal-body request status bootstrap-status]
           [:div.modal-footer {:key (str "modal-footer_" (:id request))}
            [:div.clearfix]

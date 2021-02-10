@@ -91,20 +91,22 @@
 
 (defn audited-changes [{tx :tx :as request}]
   {:body
-   {:changes
-    (->> (-> changes-base-query
-             (set-per-page-and-offset request)
-             (filter-by-search-term request)
-             (filter-by-txid request)
-             (filter-by-pkey request)
-             (filter-by-tg-op request)
-             (filter-by-table request)
-             sql/format)
-         (jdbc/query tx))}})
+   {:meta {:tables
+           (->> ["SELECT DISTINCT table_name FROM audited_changes"]
+                (jdbc/query tx)
+                (map :table_name))}
+    :changes (->> (-> changes-base-query
+                    (set-per-page-and-offset request)
+                    (filter-by-search-term request)
+                    (filter-by-txid request)
+                    (filter-by-pkey request)
+                    (filter-by-tg-op request)
+                    (filter-by-table request)
+                    sql/format)
+                (jdbc/query tx))}})
 
 (def routes
   (-> (cpj/routes
-        (cpj/GET (path :audited-changes-meta {}) [] #'audited-changes-meta)
         (cpj/GET (path :audited-changes {}) [] #'audited-changes))
       (wrap-mixin-default-query-params default-query-params)))
 
