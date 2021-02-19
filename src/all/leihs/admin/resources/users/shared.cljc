@@ -3,8 +3,7 @@
     [leihs.admin.defaults :as defaults]))
 
 (def default-fields
-  #{
-    :account_enabled
+  #{:account_enabled
     :admin_protected
     :email
     :firstname
@@ -13,13 +12,12 @@
     :lastname
     :login
     :org_id
-    :organization
-    })
+    :organization})
 
 (def available-fields
-  #{
-    :account_enabled
+  #{:account_enabled
     :address
+    :admin_protected
     :badge_id
     :city
     :country
@@ -40,10 +38,10 @@
     :password_sign_in_enabled
     :phone
     :secondary_email
+    :system_admin_protected
     :updated_at
     :url
-    :zip
-    })
+    :zip})
 
 (def default-query-params
   {:account_enabled "yes"
