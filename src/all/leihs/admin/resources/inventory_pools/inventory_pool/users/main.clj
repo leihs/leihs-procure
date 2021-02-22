@@ -183,9 +183,9 @@
         offset (:offset query)]
     {:body
      {:users (-> query
-                 (->> (logging/spy :warn))
+                 (->> #_(logging/spy :warn))
                  sql/format
-                 (->> (logging/spy :warn)
+                 (->> #_(logging/spy :warn)
                       (jdbc/query tx)
                       (map #(role-to-roles-map [:role] %))
                       (map #(role-to-roles-map [:direct_role] %))

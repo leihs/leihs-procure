@@ -20,7 +20,7 @@
   (case (-> (merge
               shared/default-query-params
               (:query-params request))
-            logging/spy
+            #_logging/spy
             :membership presence str)
     ( "" "member") (sql/merge-where query member-expr)
     "any" query
