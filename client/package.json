@@ -12,7 +12,6 @@
     "build:app": "react-scripts build",
     "build:ui": "cd leihs-ui && npm run -s build:theme && npm run -s build:ssr",
     "build:i18n": "node src/locale/make-pseudoloc.js",
-    "preinstall": "cd leihs-ui && { test -d node_modules && npm i || { npm ci || npm i ;} ;}",
     "postinstall": "npm run cleanup-typescript",
     "prestart": "npm run -s build:i18n",
     "pretest": "npm run -s build:i18n",
