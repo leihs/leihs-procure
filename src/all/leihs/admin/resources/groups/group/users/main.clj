@@ -90,39 +90,7 @@
 
 ;;; update-users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn users-ids-from-emails-query [emails]
-  (-> (sql/select :id)
-      (sql/from :users)
-      (sql/merge-where [:in :email emails])
-      (sql/format)))
 
-(defn- users-ids-from-emails [tx emails]
-  (->> emails
-       users-ids-from-emails-query
-       (jdbc/query tx)
-       (map :id)
-       (map str)))
-
-(defn- users-ids-from-org-ids-query [org-ids]
-  (-> (sql/select :id)
-      (sql/from :users)
-      (sql/merge-where [:in :org_id (map str org-ids)])
-      (sql/format)))
-
-(defn- users-ids-from-org-ids [tx org-ids]
-  (->> org-ids
-       users-ids-from-org-ids-query
-       (jdbc/query tx)
-       (map :id)
-       (map str)))
-
-(defn- target-ids [body tx]
-  (->> [[]
-        (some->> body :emails seq (users-ids-from-emails tx))
-        (some->> body :org_ids seq (users-ids-from-org-ids tx))
-        (some->> body :ids seq)]
-       (apply concat)
-       set))
 
 (defn- existing-ids [group-id tx]
   "returns the current ids of users of a group,
@@ -136,13 +104,15 @@
        (map str)
        set))
 
-
 (defn batch-update-users [{tx :tx body :body
                            {group-id :group-id} :route-params
                            :as request}]
+  (when-let [extra-keys (some-> body keys set (disj :ids) not-empty)]
+    (throw (ex-info (str "Batch uptdate only supports the ids key, given: "
+                         extra-keys) {:status 422})))
   (let [group (protected-checked-group! request)
         group-id (:id group)
-        target-ids (target-ids body tx)
+        target-ids (-> body (get :ids) set)
         existing-ids (existing-ids group-id tx)
         to-be-removed-ids (set/difference existing-ids target-ids)
         to-be-added-ids (set/difference target-ids existing-ids)]

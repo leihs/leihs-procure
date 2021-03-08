@@ -29,7 +29,7 @@
                       (sql/call :lower uid)])
 
 
-    ; case login, could be anything but the above, for now it is restricted
+    ; case login
     (and (not (clojure.string/includes? uid "@"))
          (not (clojure.string/includes? uid "|")))
     (sql/merge-where query

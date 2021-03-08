@@ -15,7 +15,8 @@
     :organization})
 
 (def available-fields
-  #{:account_enabled
+  #{:account_disabled_at
+    :account_enabled
     :address
     :admin_protected
     :badge_id
@@ -31,6 +32,7 @@
     :img_digest
     :is_admin
     :is_system_admin
+    :last_sign_in_at
     :lastname
     :login
     :org_id
