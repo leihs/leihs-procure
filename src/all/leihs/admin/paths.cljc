@@ -28,7 +28,6 @@
   #{:admin-audits-legacy
     :admin-buildings
     :admin-fields
-    :admin-languages
     :admin-mail-templates
     :admin-rooms
     :admin-settings
@@ -100,7 +99,6 @@
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)
-                  (leaf "/languages" :admin-languages)
                   (leaf "/mail_templates" :admin-mail-templates)
                   (leaf "/rooms" :admin-rooms)
                   (leaf "/settings" :admin-settings)
