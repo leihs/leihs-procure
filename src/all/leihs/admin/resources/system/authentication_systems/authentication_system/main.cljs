@@ -93,6 +93,7 @@
     [:div.col-md-2
      [form-components/input-component authentication-system-data* [:priority]
       :disabled (not @edit-mode?*)
+      :type :number
       :label "Priority"]]
     [:div.col-md-2
      [form-components/checkbox-component authentication-system-data* [:enabled]
