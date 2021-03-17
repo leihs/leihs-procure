@@ -30,6 +30,7 @@
 
 (def user-selects
   [:account_enabled
+   :account_disabled_at
    :address
    :badge_id
    :city
@@ -44,6 +45,7 @@
    :img_digest
    :is_admin
    :is_system_admin
+   :last_sign_in_at
    :lastname
    :login
    :organization
