@@ -48,7 +48,7 @@
     (conj @breadcrumbs/left* [breadcrumbs/edit-li])[]]
    [:h1
     "Edit User "
-    [core/name-component @data*]
+    [core/name-link-component]
     " in the Inventory-Pool "
     [inventory-pool/name-link-component]]
    (if (not @data*)
