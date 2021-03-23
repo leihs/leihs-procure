@@ -66,8 +66,8 @@
      :hint [:span
             "An " [:strong " unprotected " ]
             " delegation can be " [:strong "added"] " to any other pool and then be used and "
-            [:strong  " modified "] " from those pool in every way."
-            " You can unprotect an delegation temporarily to share it with a limited number of pools."]]]
+            [:strong  " modified "] " from those pools in every way."
+            " You can unprotect a delegation temporarily to share it with a limited number of pools."]]]
    [submit-component]])
 
 ;;; edit / patch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
