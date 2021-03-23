@@ -167,6 +167,7 @@
        [user-data-li-dl-component "Address"
         [:ul.list-unstyled
          (for [[idx itm]  (some->> [addr (str zip  " "  city) country]
+                                   (map str)
                                    (map clojure.string/trim)
                                    (map presence)
                                    (map identity)
