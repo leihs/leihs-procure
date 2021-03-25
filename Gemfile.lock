@@ -99,7 +99,7 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (1.0.0)
-    mimemagic (0.3.5)
+    mimemagic (0.3.7)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.2)
@@ -199,6 +199,7 @@ DEPENDENCIES
   faraday
   faraday_middleware
   geckodriver-helper
+  mimemagic (= 0.3.7)
   money-rails (~> 1.4)
   pg
   pg_tasks!
@@ -210,4 +211,4 @@ DEPENDENCIES
   uuidtools
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
