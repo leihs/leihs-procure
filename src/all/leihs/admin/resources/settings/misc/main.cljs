@@ -1,27 +1,27 @@
 (ns leihs.admin.resources.settings.misc.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [reagent.ratom :as ratom :refer [reaction]]
+   [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.breadcrumbs :as core-breadcrumbs]
-    [leihs.core.icons :as core-icons]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.breadcrumbs :as core-breadcrumbs]
+   [leihs.core.icons :as core-icons]
 
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.settings.icons :as icons]
-    [leihs.admin.resources.settings.misc.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.settings.icons :as icons]
+   [leihs.admin.resources.settings.misc.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [reagent.core :as reagent]))
 
 
 (defonce data* (reagent/atom nil))
@@ -36,14 +36,14 @@
 
 (defn put [& _]
   (go (when-let [data (some->
-                         {:chan (async/chan)
-                          :json-params @data*
-                          :method :put}
-                         http-client/request
-                         :chan <!
-                         http-client/filter-success :body)]
-         (reset! data* data)
-         (reset! edit?* false))))
+                       {:chan (async/chan)
+                        :json-params @data*
+                        :method :put}
+                       http-client/request
+                       :chan <!
+                       http-client/filter-success :body)]
+        (reset! data* data)
+        (reset! edit?* false))))
 
 (defn form-component []
   [:form.form
@@ -128,10 +128,22 @@
    [:div.row
     [:div.col-sm-3
      [form-components/checkbox-component data* [:deliver_received_order_notifications]
-      :disabled (not @edit?*) ]]
+      :disabled (not @edit?*)]]
     [:div.col-sm-9
      [form-components/input-component data* [:email_signature]
       :disabled (not @edit?*) :rows 3 :element :textarea]]]
+
+   [:div.row
+    [:div.col-sm-3
+     [form-components/checkbox-component data* [:lending_terms_acceptance_required_for_order]
+      :disabled (not @edit?*)
+      :hint [:span "Option to activate the obligation to accept the lending terms before submiting an order."]]]
+    [:div.col-sm-9
+     [form-components/input-component data* [:lending_terms_url]
+      :disabled (not @edit?*)
+      :hint [:span "Absolute URL for the web resource containing the lending terms. Required if "
+             [:code "lending_terms_acceptance_required_for_order"]
+             " is checked."]]]]
 
    (when @edit?*
      [form-components/save-submit-component])])
@@ -164,5 +176,4 @@
        core-icons/edit " Edit"]]]]
    [:h1 icons/misc " Miscellaneous Settings"]
    [main-component]
-   [debug-component]
-   ])
+   [debug-component]])
