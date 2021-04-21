@@ -53,6 +53,12 @@
    [:div
     [form-components/input-component data* [:external_base_url]
      :disabled (not @edit?*) :label "Base URL"]]
+
+   [:div
+    [form-components/input-component data* [:instance_element]
+     :disabled (not @edit?*) :rows 3 :element :textarea
+     :hint [:span "Some custom html/text. "]]]
+
    [:div.row
     [:div.col-sm
      [form-components/input-component data* [:sessions_max_lifetime_secs]

@@ -125,6 +125,13 @@
       :disabled (not @edit?*) :rows 3 :element :textarea
       :hint [:span "Message which is shown to the users when they try to access the manage section of any inventory pool."]]]]
 
+   [:div.row
+    [:div.col-sm-3
+     [form-components/checkbox-component data* [:deliver_received_order_notifications]
+      :disabled (not @edit?*) ]]
+    [:div.col-sm-9
+     [form-components/input-component data* [:email_signature]
+      :disabled (not @edit?*) :rows 3 :element :textarea]]]
 
    (when @edit?*
      [form-components/save-submit-component])])
