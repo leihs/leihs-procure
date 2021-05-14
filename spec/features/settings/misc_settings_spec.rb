@@ -31,6 +31,10 @@ feature 'SMTP-Settings' do
           fill_in "disable_borrow_section_message", with: "Borrow is disabled."
           check "disable_manage_section"
           fill_in "disable_manage_section_message", with: "Manage is disabled."
+          check "deliver_received_order_notifications"
+          fill_in "email_signature", with: "Your awesome Lending Desk"
+          check "lending_terms_acceptance_required_for_order"
+          fill_in "lending_terms_url", with: "https://example.org/fileadmin/leihs-terms-2000-01-01.pdf"
           click_on "Save"
           sleep 0.5
           wait_until{ all(".modal").empty? }
@@ -48,6 +52,10 @@ feature 'SMTP-Settings' do
           expect(find_field('disable_borrow_section_message', disabled: true).value).to eq 'Borrow is disabled.'
           expect(find_field('disable_manage_section', disabled: true)).to be_checked
           expect(find_field('disable_manage_section_message', disabled: true).value).to eq 'Manage is disabled.'
+          expect(find_field('deliver_received_order_notifications', disabled: true)).to be_checked
+          expect(find_field('email_signature', disabled: true).value).to eq 'Your awesome Lending Desk'
+          expect(find_field('lending_terms_acceptance_required_for_order', disabled: true)).to be_checked
+          expect(find_field('lending_terms_url', disabled: true).value).to eq 'https://example.org/fileadmin/leihs-terms-2000-01-01.pdf'
 
         end
 
