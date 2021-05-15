@@ -106,39 +106,45 @@
       :hint [:span "Timeout of the borrow reservation cart in minutes."]]]]
 
    [:div.row
-    [:div.col-sm-3
+    [:div.col-sm-4
      [form-components/checkbox-component data* [:disable_borrow_section]
       :disabled (not @edit?*)
       :hint [:span "Option to temporarily disable the borrow section of the application."]]]
-    [:div.col-sm-9
+    [:div.col-sm
      [form-components/input-component data* [:disable_borrow_section_message]
       :disabled (not @edit?*) :rows 3 :element :textarea
       :hint [:span "Message which is shown to the users when they try to access the borrow section."]]]]
 
    [:div.row
-    [:div.col-sm-3
+    [:div.col-sm-4
      [form-components/checkbox-component data* [:disable_manage_section]
       :disabled (not @edit?*)
       :hint [:span "Option to temporarily disable the manage section of all the inventory pools (inventory, lending, etc)."]]]
-    [:div.col-sm-9
+    [:div.col-sm
      [form-components/input-component data* [:disable_manage_section_message]
       :disabled (not @edit?*) :rows 3 :element :textarea
       :hint [:span "Message which is shown to the users when they try to access the manage section of any inventory pool."]]]]
 
    [:div.row
-    [:div.col-sm-3
+    [:div.col-sm-4
      [form-components/checkbox-component data* [:deliver_received_order_notifications]
       :disabled (not @edit?*)]]
-    [:div.col-sm-9
+    [:div.col-sm
      [form-components/input-component data* [:email_signature]
       :disabled (not @edit?*) :rows 3 :element :textarea]]]
 
    [:div.row
-    [:div.col-sm-3
+    [:div.col-sm-4.mb-2
+     [form-components/checkbox-component data* [:include_customer_email_in_contracts]
+      :disabled (not @edit?*)
+      :hint [:span "If enabled, the contact email address of the lender will be included in the contract documents."]]]]
+
+   [:div.row
+    [:div.col-sm-4
      [form-components/checkbox-component data* [:lending_terms_acceptance_required_for_order]
       :disabled (not @edit?*)
       :hint [:span "Option to activate the obligation to accept the lending terms before submiting an order."]]]
-    [:div.col-sm-9
+    [:div.col-sm
      [form-components/input-component data* [:lending_terms_url]
       :disabled (not @edit?*)
       :hint [:span "Absolute URL for the web resource containing the lending terms. Required if "
