@@ -1,9 +1,11 @@
 name: "Build procure uberjar"
 
 include:
-- path: cider-ci/install-ruby_task-component.yml
-  submodule: [client/leihs-ui]
-- path: cider-ci/environment_variables.yml
+  - path: cider-ci/install-ruby_task-component.yml
+    submodule: [client/leihs-ui]
+  - path: cider-ci/install-nodejs_task-component.yml
+    submodule: [client/leihs-ui]
+  - path: cider-ci/environment_variables.yml
 
 git_options:
   submodules:
@@ -12,26 +14,32 @@ git_options:
 traits:
   JDK 8: true
   Leiningen 2: true
-  npm: true
 
+environment_variables:
+  NVM_NODEJS_VERSION: "14"
 
 scripts:
   build-leihs-ui-for-procure:
     start_when:
-      install-ruby-passed: {script_key: install-ruby}
+      install-ruby-passed: { script_key: install-ruby }
     timeout: 10 minutes
-    body: ${LEIHS_PROCURE_DIR}/client/leihs-ui/bin/build
     exclusive_executor_resource: build-leihs-ui
+    body: |
+      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      ${LEIHS_PROCURE_DIR}/client/leihs-ui/bin/build
+
   build-procure-client:
     start_when:
-      install-ruby-passed: {script_key: install-ruby}
       build-ui: { script_key: build-leihs-ui-for-procure }
     timeout: 10 minutes
-    body: ${LEIHS_PROCURE_DIR}/client/bin/build
     exclusive_executor_resource: build-procure-client
+    body: |
+      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      ${LEIHS_PROCURE_DIR}/client/bin/build
+
   build-procure-uberjar:
+    timeout: 10 minutes
     start_when:
-      install-ruby: { script_key: install-ruby }
       build-procure-client: { script_key: build-procure-client }
     exclusive_executor_resource: build_procure_uberjar
     body: ${LEIHS_PROCURE_DIR}/bin/build
