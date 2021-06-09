@@ -1,8 +1,10 @@
 name: "Build admin uberjar"
 
 include:
-- path: cider-ci/install-ruby_task-component.yml
-  submodule: [leihs-ui]
+  - path: cider-ci/install-ruby_task-component.yml
+    submodule: [leihs-ui]
+  - path: cider-ci/install-nodejs_task-component.yml
+    submodule: [leihs-ui]
 
 git_options:
   submodules:
@@ -11,8 +13,9 @@ git_options:
 traits:
   JDK 8: true
   Leiningen 2: true
-  npm: true
 
+environment_variables:
+  NVM_NODEJS_VERSION: "14"
 
 # note build-ui is strictly not necessary since build invokes it itself
 # however caching is much more efficient this way
@@ -20,13 +23,18 @@ traits:
 scripts:
   build-leihs-ui-for-admin:
     start_when:
-      install-ruby-passed: {script_key: install-ruby}
-    timeout: 10 minutes
-    body: ${LEIHS_ADMIN_DIR}/leihs-ui/bin/build
+      install-ruby-passed: { script_key: install-ruby }
+      install-nodejs-passed: { script_key: install-nodejs }
+    timeout: 15 minutes
     exclusive_executor_resource: build-leihs-ui
+    body: |
+      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      ${LEIHS_ADMIN_DIR}/leihs-ui/bin/build
   build-admin-uberjar:
     start_when:
-      install-ruby: { script_key: install-ruby }
       build-ui: { script_key: build-leihs-ui-for-admin }
+    timeout: 15 minutes
     exclusive_executor_resource: build_admin_uberjar
-    body: ${LEIHS_ADMIN_DIR}/bin/build
+    body: |
+      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
+      ${LEIHS_ADMIN_DIR}/bin/build
