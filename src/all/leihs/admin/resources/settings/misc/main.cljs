@@ -150,6 +150,12 @@
       :hint [:span "Absolute URL for the web resource containing the lending terms. Required if "
              [:code "lending_terms_acceptance_required_for_order"]
              " is checked."]]]]
+    
+    [:div.row
+     [:div.col-sm-4.mb-2
+      [form-components/checkbox-component data* [:show_contact_details_on_customer_order]
+       :disabled (not @edit?*)
+       :hint [:span "If enabled, the contact details field will be shown on the customer order before submitting."]]]]
 
    (when @edit?*
      [form-components/save-submit-component])])
