@@ -25,7 +25,6 @@ feature 'Editing groups', type: :feature do
         group = @groups.filter{|g| g[:system_admin_protected] == true }.sample # pick a random group
         fill_in 'term', with: group.name
         click_on group.name
-        binding.pry
         click_on 'Edit'
         name = Faker::Name.name
         description = Faker::Lorem.sentences.join(' ')
