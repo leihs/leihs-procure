@@ -78,7 +78,7 @@
     "reactstrap": "^6.5.0",
     "source-map-explorer": "git+https://github.com/danvk/source-map-explorer.git#b74f718",
     "tachyons-type-scale": "^6.1.1",
-    "xlsx": "^0.14.1"
+    "xlsx": "^0.17.0"
   },
   "prettier": {
     "printWidth": 80,
