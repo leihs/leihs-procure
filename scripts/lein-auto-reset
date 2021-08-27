@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+SCRIPT_FULL_PATH=$(realpath "$0")
+export SCRIPT_DIR=$(dirname $SCRIPT_FULL_PATH)
+
+set -euxo 
+
+until test -f $SCRIPT_DIR/../.nrepl-port;
+do
+  sleep 1;
+done
+
+lein auto-reset
