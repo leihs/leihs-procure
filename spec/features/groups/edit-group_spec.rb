@@ -48,10 +48,20 @@ feature 'Editing groups', type: :feature do
       scenario 'edits an admin protected group ' do
         visit '/admin/'
         click_on 'Groups'
-        group = @groups.filter{|g| g[:admin_protected] == true }.sample # pick a random group
+        group = @groups.filter{|g| g[:admin_protected] == true && g[:system_admin_protected] == false }.sample # pick a random group
         fill_in 'term', with: group.name
         click_on group.name
-        click_on 'Edit'
+
+        #####################################################################
+        # NOTE: Capybara finds the button and clicks it but nothing happens.
+        # It has to be retried some times until the modal is displayed.
+        # Some UI hooks/callbacks not initialized yet on first try?
+        wait_until do
+          click_on 'Edit'
+          page.has_content?("Edit Group #{group.name}")
+        end
+        #####################################################################
+       
         name = Faker::Name.name
         description = Faker::Lorem.sentences.join(' ')
         fill_in 'name', with: name

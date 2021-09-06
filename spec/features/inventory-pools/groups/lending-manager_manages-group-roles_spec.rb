@@ -28,11 +28,21 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           click_on "Groups"
           select 'any', from: 'Role'
           fill_in 'Search', with: @groups.first.name
-          wait_until { all("table.groups tbody tr").count == 1 }
+          wait_until { find("table.groups").has_content?(@group.name) }
           expect(page.find("table.groups ")).not_to have_content "customer"
           expect(page.find("table.groups ")).not_to have_content "inventory_manager"
-          click_on "Edit"
-          wait_until{ not all(".modal").empty? }
+          
+          #####################################################################
+          # NOTE: Capybara finds the button and clicks it but nothing happens.
+          # It has to be retried some times until the modal is displayed.
+          # Some UI hooks/callbacks not initialized yet on first try?
+          wait_until do
+            within find("table.groups tbody tr", text: @group.name) do
+              find("button", text: "Edit").click
+            end
+            page.has_selector?(".modal")
+          end
+          #####################################################################
         end
 
         scenario 'can manage roles up to lending_manager' do
@@ -46,8 +56,18 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           end
 
           # remove all access_rights
-          click_on "Edit"
-          wait_until{ not all(".modal").empty? }
+          #####################################################################
+          # NOTE: Capybara finds the button and clicks it but nothing happens.
+          # It has to be retried some times until the modal is displayed.
+          # Some UI hooks/callbacks not initialized yet on first try?
+          wait_until do
+            within find("table.groups tbody tr", text: @group.name) do
+              find("button", text: "Edit").click
+            end
+            page.has_selector?(".modal")
+          end
+          #####################################################################
+
           uncheck :customer
           click_on "Save"
           wait_until do
