@@ -99,10 +99,12 @@
      "Contracts, reserverations, and orders of this user will be "
      "transferred to the user entered below. " ]
     [:p.text-danger
-     "Permissions, such as given by delegations, groups, or roles will not be
-     transferred! " ]
+     "Associations to entitlements, delegations, groups, et cetera will be removed! " ]
     [:p.text-danger
-     "Audits will still contain references to the removed user! "]
+     "Roles (permissions) to inventory pools will be removed! " ]
+    [:p [:span.text-danger "Audits will still contain references to the removed user! "]
+     [:span " The audit trace is still intact and complete as this action is audited, too. "
+      "However, it is much more involved to follow it."]]
     [:p.text-danger
      "External data, such as open contracts printed on paper for example, "
      "will become inconsistent with the data in leihs!"]

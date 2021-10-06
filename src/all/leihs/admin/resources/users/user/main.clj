@@ -175,35 +175,6 @@
 
 ;;; transfer data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn- transfer-entitlement-groups [tx user-id target-user-id]
-  (let [target-entitlemens-ids (->> (-> (sql/select :*)
-                                        (sql/from :entitlement_groups_users)
-                                        (sql/merge-where [:= :user_id target-user-id])
-                                        sql/format)
-                                    (jdbc/query tx)
-                                    (map :entitlement_group_id))
-        source-entitlements-ids (->> (-> (sql/select :*)
-                                         (sql/from :entitlement_groups_users)
-                                         (sql/merge-where [:= :user_id user-id])
-                                         sql/format)
-                                     (jdbc/query tx)
-                                     (map :entitlement_group_id))
-        to-be-transfered-ids (clojure.set/difference (set source-entitlements-ids)
-                                                     (set target-entitlemens-ids))]
-    (when (seq to-be-transfered-ids)
-      (->>
-        (-> (sql/update :entitlement_groups_users)
-            (sql/set {:user_id target-user-id})
-            (sql/merge-where [:= :user_id user-id])
-            (sql/merge-where [:in :entitlement_group_id to-be-transfered-ids])
-            sql/format)
-        (jdbc/execute! tx)))
-    (->>
-       (-> (sql/delete-from :entitlement_groups_users)
-           (sql/merge-where [:= :user_id user-id])
-           sql/format)
-       (jdbc/execute! tx))))
-
 (defn transfer-data [user-id target-user-id tx]
   (doseq [[table fields] [[:audited_requests [:user_id]]
                           [:contracts [:user_id]]
@@ -213,8 +184,7 @@
     (doseq [field fields]
       (jdbc/update! tx table
                     {(str field) target-user-id}
-                    [(str field " = ?") user-id])))
-  (transfer-entitlement-groups tx user-id target-user-id))
+                    [(str field " = ?") user-id]))))
 
 (defn transfer-data-and-delete-user
   [{{uid :user-id target-user-uid :target-user-uid} :route-params
@@ -376,7 +346,6 @@
     (cpj/GET user-path [] #'get-user)
     (cpj/PATCH user-path [] #'patch-user)
     (cpj/DELETE user-path [] #'delete-user)
-    ;(cpj/POST user-transfer-path [] #'transfer-data)
     (cpj/DELETE user-transfer-path [] #'transfer-data-and-delete-user)
     (cpj/POST (path :users) [] #'create-user)))
 
