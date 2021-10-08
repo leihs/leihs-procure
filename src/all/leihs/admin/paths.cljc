@@ -80,7 +80,11 @@
 (def statistics-paths
   (branch "/statistics/"
           (leaf  "" :statistics)
-          (leaf "basic/" :statistics-basic)))
+          (leaf "contracts/" :statistics-contracts)
+          (leaf "items/" :statistics-items)
+          (leaf "models/" :statistics-models)
+          (leaf "pools/" :statistics-pools)
+          (leaf "users/" :statistics-users)))
 
 (def paths
   (branch ""

@@ -66,7 +66,11 @@
    [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
 
-   [leihs.admin.resources.statistics.basic :as statistics-basic]
+   [leihs.admin.resources.statistics.contracts :as statistics-contracts]
+   [leihs.admin.resources.statistics.items :as statistics-items]
+   [leihs.admin.resources.statistics.models :as statistics-models]
+   [leihs.admin.resources.statistics.pools :as statistics-pools]
+   [leihs.admin.resources.statistics.users :as statistics-users]
 
    [bidi.bidi :as bidi]
    [bidi.ring :refer [make-handler]]
@@ -188,7 +192,13 @@
                                           pool-auth/some-lending-manager-and-http-safe?]}
           :not-found {:handler html/not-found-handler :authorizers [all-granted]}
           :redirect-to-root {:handler redirect-to-root-handler :authorizers [all-granted]}
-          :statistics-basic {:handler statistics-basic/routes :authorizers [auth/admin-scopes?]}
+
+          :statistics-contracts {:handler statistics-contracts/routes :authorizers [auth/admin-scopes?]}
+          :statistics-items {:handler statistics-items/routes :authorizers [auth/admin-scopes?]}
+          :statistics-models {:handler statistics-models/routes :authorizers [auth/admin-scopes?]}
+          :statistics-pools {:handler statistics-pools/routes :authorizers [auth/admin-scopes?]}
+          :statistics-users {:handler statistics-users/routes :authorizers [auth/admin-scopes?]}
+
           :status {:handler status/routes :authorizers [all-granted]}
 
           :languages-settings {:handler languages-settings/routes
