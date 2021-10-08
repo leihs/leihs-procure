@@ -44,7 +44,7 @@
 (defn val-component [k]
   [:<>
    (if-let [v (get @data* k)]
-     [:span v]
+     [:span.text-monospace v]
      [:span icons/waiting])])
 
 (defn section-component

@@ -14,7 +14,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn active_users_sub [where-cond]
+(defn active_users_sub [before after]
   (-> (sql/select :%count.*)
       (sql/from :users)
       (sql/merge-where
@@ -23,32 +23,24 @@
          [:exists (-> (sql/select (sql/raw "true"))
                       (sql/from :user_sessions)
                       (sql/merge-where [:= :user_sessions.user_id :users.id])
-                      (sql/merge-where where-cond))]
+                      (sql/merge-where [:and [:<= :user_sessions.created_at before]
+                                        [:> :user_sessions.created_at after]]))]
          ; this is reliable but exists only since version 6
          [:exists (-> (sql/select (sql/raw "true"))
                       (sql/from :audited_requests)
                       (sql/merge-where [:= :audited_requests.user_id :users.id])
                       (sql/merge-join :audited_changes [:= :audited_requests.txid :audited_changes.txid])
                       (sql/merge-where [:= :audited_changes.table_name "user_sessions"])
-                      (sql/merge-where [:= :audited_changes.tg_op "INSERT"]))]])))
-
-(def sessions_0m_12m_where_cond
-  [:and
-   [:<= :user_sessions.created_at shared/now]
-   [:> :user_sessions.created_at shared/one-year-ago]])
-
-(def sessions_12m_24m_where_cond
-  [:and
-   [:<= :user_sessions.created_at shared/one-year-ago]
-   [:> :user_sessions.created_at shared/two-years-ago]])
-
+                      (sql/merge-where [:= :audited_changes.tg_op "INSERT"])
+                      (sql/merge-where [:and [:<= :audited_requests.created_at before]
+                                        [:> :audited_requests.created_at after]]))]])))
 
 (def users-query
   (-> (sql/select [(-> (sql/select :%count.*)
                        (sql/from :users)) :users_count])
-      (sql/merge-select [(active_users_sub sessions_0m_12m_where_cond)
+      (sql/merge-select [(active_users_sub shared/now shared/one-year-ago)
                          :active_users_0m_12m_count])
-      (sql/merge-select [(active_users_sub sessions_12m_24m_where_cond)
+      (sql/merge-select [(active_users_sub shared/one-year-ago shared/two-years-ago)
                          :active_users_12m_24m_count])))
 
 (defn get-users [tx]
