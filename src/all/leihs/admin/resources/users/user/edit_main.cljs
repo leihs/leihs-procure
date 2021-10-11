@@ -52,7 +52,8 @@
    [edit-core/essentials-form-component]
    [:div.image
     [:h3 "Image / Avatar"]
-    [edit-image/image-component]]
+    [edit-image/image-component]
+    ]
    [edit-core/personal-and-contact-form-component]
    [edit-core/account-settings-form-component]])
 

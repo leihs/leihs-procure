@@ -77,7 +77,6 @@
 
 (defn name-component [user]
   [:span
-   (logging/info 'user user)
    (when-not user
      (logging/error "use name-link-component when you call wo argument and :user-id is in the routes"))
    (let [p (path :user {:user-id (:id user)})

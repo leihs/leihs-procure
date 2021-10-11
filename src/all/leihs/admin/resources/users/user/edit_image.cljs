@@ -9,17 +9,17 @@
 
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :refer [input-component]]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.state :as state]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
+    [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
 
     [accountant.core :as accountant]
     [cljs.core.async :as async]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
-    ["jimp" :as Jimp]
     [clojure.contrib.inflect :refer [pluralize-noun]]
     [reagent.core :as reagent]
 
@@ -67,20 +67,14 @@
 
 (defn img-handler [data]
   (doseq [res [256 32]]
-    (.read Jimp data
-           (fn [err ^js img]
-             (when err
-               (swap! img-processing* assoc :error err)
-               (throw err))
-             (doto img
-               (.resize res res)
-               (.quality 80))
-             (.getBase64 img "image/jpeg"
-                         (fn [err b64]
-                           (if err
-                             (swap! img-processing* assoc :error err)
-                             (swap! data* assoc (keyword (str "img" res "_url")) b64)))))))
-  (update-img-digest))
+    (-> data
+        (image-resize/resize-to-b64
+          res
+          :error-handler (fn [err]
+                           (swap! img-processing* assoc :error err)                          )
+          :success-handler (fn [b64]
+                             (swap! data* assoc (keyword (str "img" res "_url")) b64)
+                             (update-img-digest))))))
 
 (defn handle-img-drop [evt]
   (reset! img-processing* {})

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Frontend for leihs-admin",
   "devDependencies": {
-    "shadow-cljs": "^2.11.23"
+    "shadow-cljs": "^2.15.12"
   },
   "dependencies": {
     "@leihs/ui-components": "file:leihs-ui/dist/ui-components",
