@@ -1,11 +1,9 @@
 #!/bin/bash -eu
 
-PROJECT_DIR="$(dirname ${BASH_SOURCE})/.."
-cd "${PROJECT_DIR}"
-echo "PWD: $PWD"
-
-lein run -- run --secret 'secret' "$@"
-
-cd -
+set -eux
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+cd $PROJECT_DIR
+source $PROJECT_DIR/shared-clj/clojure/bin/activate
+clj -M -m leihs.admin.main --dev-mode true --repl true run $@
 
 # vi: ft=sh

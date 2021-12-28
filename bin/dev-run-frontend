@@ -3,6 +3,7 @@
 PROJECT_DIR="$(dirname ${BASH_SOURCE})/.."
 cd "${PROJECT_DIR}"
 echo "PWD: $PWD"
+source $PROJECT_DIR/shared-clj/clojure/bin/activate
 
 function prepare_shared_ui () {
   cd leihs-ui

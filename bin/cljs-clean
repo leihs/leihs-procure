@@ -5,7 +5,7 @@ cd "${ADMIN_DIR}"
 
 echo "PWD: $PWD"
 
-rm -rf resources/all/public/admin/js/
+rm -rf resources/public/admin/js/
 
 cd -
 

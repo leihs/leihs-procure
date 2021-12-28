@@ -3,7 +3,7 @@ require 'pry'
 
 feature 'Managing group users via API batch put', type: :feature do
 
-  context 'an admin, one group and some prepared users exist' do
+  context 'an system admin, one group and some prepared users exist' do
 
     let :http_client do
       plain_faraday_client
@@ -11,14 +11,15 @@ feature 'Managing group users via API batch put', type: :feature do
 
     let :prepare_http_client do
       @api_token = FactoryBot.create :api_token, user_id: @admin.id,
-        scope_admin_read: true, scope_admin_write: true
+        scope_admin_read: true, scope_admin_write: true,
+        scope_system_admin_read: true, scope_system_admin_write: true
       @token_secret = @api_token.token_secret
       http_client.headers["Authorization"] = "Token #{@token_secret}"
       http_client.headers["Content-Type"] = "application/json"
     end
 
     before :each do
-      @admin = FactoryBot.create :admin
+      @admin = FactoryBot.create :system_admin
 
       @group = FactoryBot.create :group
 

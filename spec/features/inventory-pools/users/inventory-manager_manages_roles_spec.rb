@@ -46,7 +46,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       within(".direct-roles"){ click_on "Edit"}
       check "inventory_manager"
       click_on "Save"
-      find("i.fa-user").click
+      wait_until{ all(".modal").empty? }
       within ".direct-roles" do
         ['customer', 'group_manager', 'lending_manager', 'inventory_manager'].each do |role|
           expect(find_field(role, disabled: true)).to be_checked

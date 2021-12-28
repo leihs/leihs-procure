@@ -1,28 +1,29 @@
 scripts:
 
-  run-admin-service:
+  admin-service-run:
     start_when:
       uberjar has been built:
         script_key: build-admin-uberjar
       database has been created:
         script_key: create-database
     body: |
-      set -euxo 
+      set -euxo
+      export HTTP_PORT=${LEIHS_ADMIN_HTTP_PORT}
       cd $LEIHS_ADMIN_DIR
       mkdir -p $LEIHS_ADMIN_DIR/tmp
-      java -jar target/leihs-admin.jar run 
+      java -jar target/leihs-admin.jar run --pid-file tmp/service.pid
 
   admin-service-is-running:
     body: |
-      set -euxo 
+      set -euxo
       until curl --silent --fail -I \
-        -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        ${LEIHS_ADMIN_HTTP_BASE_URL}/admin/status;
+        -H 'Accept: application/json' \
+        "http://localhost:${LEIHS_ADMIN_HTTP_PORT}/admin/status";
         do sleep 1;
       done
     start_when:
       run server is executing:
-        script_key: run-admin-service
+        script_key: admin-service-run
         states: [executing]
 
   test:
@@ -32,10 +33,10 @@ scripts:
 
   shutdown-admin-service:
     body: |
-      set -euxo 
+      set -euxo
       cd $LEIHS_ADMIN_DIR
       export PID=$(cat tmp/service.pid)
-      kill $PID 
+      kill $PID
       tail --pid=$PID -f /dev/null
     start_when:
       test is terminal:

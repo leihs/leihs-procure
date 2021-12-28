@@ -234,7 +234,6 @@ feature 'Creating groups', type: :feature do
         scenario "can create a new group" do
           resp = http_client.post "/admin/groups/",
             {name: name}.to_json
-          binding.pry
           expect(resp.status).to be== 200
           new_group = Group.where(name: name).first
           expect(new_group).to be

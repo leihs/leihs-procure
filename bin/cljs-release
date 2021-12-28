@@ -13,7 +13,7 @@ npm ci
 # references, e.g. :
 # npx shadow-cljs release leihs-admin-js --debug
 npx shadow-cljs release leihs-admin-js
-rm -rf resources/all/public/admin/js/cljs-runtime/
+rm -rf resources/public/admin/js/cljs-runtime/
 
 cd -
 

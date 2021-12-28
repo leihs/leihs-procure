@@ -7,6 +7,10 @@ scripts:
   admin-bundle-rspec-ruby:
     exclusive_executor_resource: ruby-install_{{$RUBY}}
     timeout: 20 Minutes
+    start_when:
+      uberjar done: # bundle may alter the Gemfile.lock
+        script_key: build-admin-uberjar
+        states: [passed]
     body: |
       #!/usr/bin/env bash
       set -euxo
@@ -17,11 +21,10 @@ scripts:
         ruby-install --no-install-deps $RUBY_ENGINE $RUBY_VERSION
       fi
 
-      if [ ! -f ~/.rubies/$RUBY/bin/bundle ]; then
-        gem install bundler
-      fi
+      gem install bundler:${RUBY_BUNDLER_VERSION}
 
       bundle install
+
 
   test:
     start_when:

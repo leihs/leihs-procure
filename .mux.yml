@@ -1,15 +1,11 @@
-name: LEIHS/v5/admin
+name: LEIHS/leihs/admin
 windows:
   2:
-    name: app
+    name: server-dev
     command: |
-      export LEIHS_ADMIN_HTTP_BASE_URL=http://localhost:3220
-      jenv shell 1.8
-      lein do clean, repl
-    post_command_send_keys: |
-      (-main "run")
+      ./bin/dev-run-backend
   3:
-    name: figwheel
+    name: front-dev
     command: |
       bin/dev-run-frontend
   5:
@@ -27,6 +23,6 @@ windows:
       export LEIHS_ADMIN_HTTP_BASE_URL=http://localhost:3220
       export RAILS_ENV=test
   8:
-    name: log
+    name: shared-clj
     command: |
-      mkdir -p log && echo " " > log/debug.log && tail -f log/debug.log
+      cd shared-clj

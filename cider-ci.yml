@@ -12,7 +12,8 @@ jobs:
           LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
           RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
           RUBY_ENGINE: ruby
-          RUBY_VERSION: 2.7.2
+          RUBY_VERSION: 2.7.5
+          RUBY_BUNDLER_VERSION: 2.3.3
       tasks:
         build-admin-uberjar:
           { include: cider-ci/uberjar_task-component.yml }

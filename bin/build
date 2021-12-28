@@ -38,7 +38,8 @@ fi
 function build {
   ./leihs-ui/bin/build
   ./bin/cljs-release
-  LEIN_SNAPSHOTS_IN_RELEASE=LOL lein do uberjar || { echo "build error!"; exit 1; }
+  ./bin/set-built-info
+  ./bin/clj-uberjar
 }
 
 function pack {

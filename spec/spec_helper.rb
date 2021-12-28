@@ -4,14 +4,6 @@ require 'pry'
 require 'config/database'
 require 'config/factories'
 
-def base_url
-  @base_url ||= ENV['LEIHS_ADMIN_HTTP_BASE_URL'].presence || 'http://localhost:3220'
-end
-
-def port
-  @port ||= Addressable::URI.parse(base_url).port
-end
-
 require 'config/browser'
 require 'config/http_client'
 
