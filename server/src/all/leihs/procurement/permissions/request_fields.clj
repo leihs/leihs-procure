@@ -244,6 +244,28 @@
      ;                :write (and new-request
      ;                            (or requester inspector admin)),
      ;                :required true},
+     :order_status
+       {:read (or category-viewer inspector admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        ; keep it upper-case!
+        :default "NOT_PROCURED",
+        :required true},
+     :order_comment
+       {:read (or category-viewer inspector admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        :required false},
      :price_cents
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
