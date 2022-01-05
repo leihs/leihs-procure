@@ -34,6 +34,7 @@ fi
 
 function build {
   export PUBLIC_URL="/procure"
+  cd ./src/styles && rm bootstrap-leihs.css && cp ../../leihs-ui/bootstrap-theme-leihs/build/bootstrap-leihs.css bootstrap-leihs.css && cd -
   npm ci --no-audit
   npm run ci-build
 }

@@ -1,5 +1,11 @@
-#!/bin/sh -eu
+#!/bin/bash
+
+# nvm use 14
 
 test -d node_modules && npm i || { npm ci || npm i ;}
-npm run build:ui
+
+cd leihs-ui && bin/build && cd -
+
+cd ./src/styles && rm bootstrap-leihs.css && cp ../../leihs-ui/bootstrap-theme-leihs/build/bootstrap-leihs.css bootstrap-leihs.css && cd -
+
 npm start

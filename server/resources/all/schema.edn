@@ -1,7 +1,8 @@
 {:enums {:InspectorPriority {:values [:LOW :MEDIUM :HIGH :MANDATORY]},
          :Priority {:values [:NORMAL :HIGH]},
          :State {:values [:APPROVED :DENIED :IN_APPROVAL :NEW
-                          :PARTIALLY_APPROVED]}},
+                          :PARTIALLY_APPROVED]}
+         :OrderState {:values [:NOT_PROCURED :PROCURED]}},
  :input-objects
    {:AdminInput {:fields {:user_id {:type (non-null ID)}}},
     :BudgetLimitInput {:fields {:amount_cents {:type Int},
@@ -43,6 +44,8 @@
                                   :model {:type ID},
                                   :motivation {:type String},
                                   :order_quantity {:type Int},
+                                  :order_state {:type :OrderState},
+                                  :order_comment {:type String},
                                   :price_cents {:type Int},
                                   :price_currency {:type String},
                                   :priority {:type :Priority},
@@ -75,6 +78,8 @@
                             :model {:type ID},
                             :motivation {:type String},
                             :order_quantity {:type Int},
+                            :order_state {:type :OrderState}
+                            :order_comment {:type String}
                             :organization {:type ID},
                             :price_cents {:type Int},
                             :price_currency {:type String},
@@ -244,6 +249,8 @@
                  :model {:type :RequestFieldModel},
                  :motivation {:type :RequestFieldString},
                  :order_quantity {:type :RequestFieldInt},
+                 :order_state {:type :RequestFieldOrderState}
+                 :order_comment {:type :RequestFieldString}
                  :organization {:type :RequestFieldOrganization},
                  :price_cents {:type :RequestFieldInt},
                  :price_currency {:type :RequestFieldString},
@@ -323,6 +330,16 @@
                                         :read {:type (non-null Boolean)},
                                         :required {:type (non-null Boolean)},
                                         :value {:type :Organization},
+                                        :write {:type (non-null Boolean)}}},
+    :RequestFieldOrderState {:fields {:default {:type :OrderState},
+                                      :read {:type (non-null Boolean)},
+                                      :required {:type (non-null Boolean)},
+                                      :value {:type :OrderState},
+                                      :write {:type (non-null Boolean)}}},
+    :RequestFieldOrderComment {:fields {:default {:type String},
+                                        :read {:type (non-null Boolean)},
+                                        :required {:type (non-null Boolean)},
+                                        :value {:type :OrderState},
                                         :write {:type (non-null Boolean)}}},
     :RequestFieldPriority {:fields {:default {:type :Priority},
                                     :read {:type (non-null Boolean)},
@@ -454,6 +471,7 @@
                       :id {:type (list ID)},
                       :short_id {:type (list String)},
                       :inspectory_priority {:type (list :InspectorPriority)},
+                      :order_state {:type (list :OrderState)},
                       :organization_id {:type (list ID)},
                       :priority {:type (list :Priority)},
                       :requested_by_auth_user {:type Boolean},

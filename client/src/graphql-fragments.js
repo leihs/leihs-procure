@@ -223,6 +223,16 @@ export const RequestFieldsForEdit = gql`
       ...RequestFieldInt
     }
 
+    order_state {
+      read
+      write
+      required
+      value
+    }
+    order_comment {
+      ...RequestFieldString
+    }
+
     priority {
       read
       write

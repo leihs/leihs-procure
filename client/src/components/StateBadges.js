@@ -16,3 +16,12 @@ const RequestStateBadge = ({ state, className, ...props }) => {
 }
 
 export default RequestStateBadge
+
+export const ProcureStateBadge = ({ state, className, ...props }) => {
+  const cls = cx(`bg-${CONSTANTS.ORDER_STATE_COLORS[state]}`, className)
+  return (
+    <Badge dark {...props} className={cls}>
+      {t(`order_state_label_${state}`)}
+    </Badge>
+  )
+}

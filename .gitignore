@@ -1,5 +1,7 @@
+/client/src/styles/bootstrap-leihs.css
 /client/src/locale/xx.json
 /client/src/locale/zz.json
+
 tmp/
 client.tgz
 client/procure_client_app/

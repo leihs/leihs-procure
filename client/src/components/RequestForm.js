@@ -101,7 +101,7 @@ class RequestForm extends React.Component {
               ? request[key].read || request[key].write
               : null
             const labelTxt = t(`request_form_field.${key}`)
-            return {
+            const field = {
               ...formHelpers.formPropsFor(key),
               // add translated labels, with 'required' marker if writable
               label: readOnly ? labelTxt : requiredLabel(labelTxt, required),
@@ -111,6 +111,8 @@ class RequestForm extends React.Component {
               readOrWrite,
               ...(readOnly && { type: 'text-static' })
             }
+            console.log(key, { field })
+            return field
           }
 
           return (
@@ -581,6 +583,36 @@ class RequestForm extends React.Component {
                       )
                     }
                   </Let>
+
+                  <RequestInput field={formPropsFor('order_state')}>
+                    {field => (
+                      <FormGroup horizontal={compactView} label={field.label}>
+                        <Select
+                          {...field}
+                          emptyOption={false}
+                          options={CONSTANTS.ORDER_STATES.map(v => ({
+                            value: v,
+                            label: t(
+                              `request_form_field.order_state_label_${v}`
+                            )
+                          }))}
+                        />
+                      </FormGroup>
+                    )}
+                  </RequestInput>
+
+                  <RequestInput field={formPropsFor('order_comment')}>
+                    {field =>
+                      !(field.readOnly && !f.present(field.value)) && (
+                        <FormField
+                          horizontal={compactView}
+                          type="textarea"
+                          {...field}
+                          required={false}
+                        />
+                      )
+                    }
+                  </RequestInput>
                 </Col>
               </Row>
 

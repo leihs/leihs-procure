@@ -12,7 +12,7 @@ import t from '../locale/translate'
 import { Row, Col, Alert, RoutedStatus } from '../components/Bootstrap'
 import Icon from '../components/Icons'
 import RequestForm from '../components/RequestForm'
-import RequestStateBadge from '../components/RequestStateBadge'
+import RequestStateBadge from '../components/StateBadges'
 import * as Fragments from '../graphql-fragments'
 
 const REQUEST_EDIT_QUERY = gql`
