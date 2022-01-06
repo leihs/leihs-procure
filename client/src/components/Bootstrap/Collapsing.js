@@ -15,7 +15,10 @@ export class Collapsing extends React.Component {
   onToggleOpen(event) {
     event.preventDefault()
     if (!this.props.canToggle) return
-    this.setState(s => ({ isOpen: !s.isOpen }), () => this.handleCallback())
+    this.setState(
+      s => ({ isOpen: !s.isOpen }),
+      () => this.handleCallback()
+    )
   }
 
   handleCallback() {
