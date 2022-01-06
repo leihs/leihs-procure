@@ -2,7 +2,7 @@
          :Priority {:values [:NORMAL :HIGH]},
          :State {:values [:APPROVED :DENIED :IN_APPROVAL :NEW
                           :PARTIALLY_APPROVED]}
-         :OrderState {:values [:NOT_PROCURED :PROCURED]}},
+         :OrderState {:values [:NOT_PROCURED :IN_PROGRESS :PROCURED :ALTERNATIVE_PROCURED]}},
  :input-objects
    {:AdminInput {:fields {:user_id {:type (non-null ID)}}},
     :BudgetLimitInput {:fields {:amount_cents {:type Int},
