@@ -57,7 +57,17 @@ export const ORDER_STATES_MAP = [
     roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   },
   {
+    key: 'IN_PROGRESS',
+    bsColor: 'info',
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
+  },
+  {
     key: 'PROCURED',
+    bsColor: 'success',
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
+  },
+  {
+    key: 'ALTERNATIVE_PROCURED',
     bsColor: 'success',
     roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   }
