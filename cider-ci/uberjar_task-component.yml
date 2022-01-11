@@ -15,7 +15,7 @@ traits:
   Leiningen 2: true
 
 environment_variables:
-  NVM_NODEJS_VERSION: "14"
+  NVM_NODEJS_VERSION: "16"
 
 # note build-ui is strictly not necessary since build invokes it itself
 # however caching is much more efficient this way
