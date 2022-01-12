@@ -50,7 +50,7 @@ export const REQUEST_STATE_COLORS = f.fromPairs(
 )
 export const REQUEST_STATES = f.map(REQUEST_STATES_MAP, 'key')
 
-export const ORDER_STATES_MAP = [
+export const ORDER_STATI_MAP = [
   {
     key: 'NOT_PROCURED',
     bsColor: 'info',
@@ -73,7 +73,7 @@ export const ORDER_STATES_MAP = [
   }
 ]
 
-export const ORDER_STATE_COLORS = f.fromPairs(
-  f.map(ORDER_STATES_MAP, i => [i.key, i.bsColor])
+export const ORDER_STATUS_COLORS = f.fromPairs(
+  f.map(ORDER_STATI_MAP, i => [i.key, i.bsColor])
 )
-export const ORDER_STATES = f.map(ORDER_STATES_MAP, 'key')
+export const ORDER_STATI = f.map(ORDER_STATI_MAP, 'key')

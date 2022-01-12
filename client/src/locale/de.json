@@ -40,8 +40,8 @@
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
 
-  "order_state_label_NOT_PROCURED": "Nicht beschafft",
-  "order_state_label_PROCURED": "Beschafft",
+  "order_status_label_NOT_PROCURED": "Nicht beschafft",
+  "order_status_label_PROCURED": "Beschafft",
 
   "request_replacement_labels_new": "Neu",
   "request_replacement_labels_replacement": "Ersatz",
@@ -119,9 +119,9 @@
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto I (ER)",
 
-    "order_state": "Beschaffungs-Status",
-    "order_state_label_NOT_PROCURED": "Nicht beschafft",
-    "order_state_label_PROCURED": "Beschafft",
+    "order_status": "Beschaffungs-Status",
+    "order_status_label_NOT_PROCURED": "Nicht beschafft",
+    "order_status_label_PROCURED": "Beschafft",
     "order_comment": "Beschaffungs-Kommentar",
 
     "id": "ID",

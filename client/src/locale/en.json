@@ -40,8 +40,8 @@
   "request_state_label_DENIED": "Rejected",
   "request_state_label_IN_APPROVAL": "In Inspection",
 
-  "order_state_label_NOT_PROCURED": "Not procured",
-  "order_state_label_PROCURED": "Procured",
+  "order_status_label_NOT_PROCURED": "Not procured",
+  "order_status_label_PROCURED": "Procured",
 
   "request_short_id": "Number",
 
@@ -120,9 +120,9 @@
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto Ⅰ (ER)",
 
-    "order_state": "Procuring-State",
-    "order_state_label_NOT_PROCURED": "Not procured",
-    "order_state_label_PROCURED": "Procured",
+    "order_status": "Procuring-State",
+    "order_status_label_NOT_PROCURED": "Not procured",
+    "order_status_label_PROCURED": "Procured",
     "order_comment": "Procuring-Comment",
 
     "id": "ID",

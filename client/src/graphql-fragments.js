@@ -223,7 +223,7 @@ export const RequestFieldsForEdit = gql`
       ...RequestFieldInt
     }
 
-    order_state {
+    order_status {
       read
       write
       required

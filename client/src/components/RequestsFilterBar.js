@@ -69,7 +69,7 @@ const Filters = ({ me, data, current, onChange }) => {
   const requestStates = CONSTANTS.REQUEST_STATES_MAP.filter(s =>
     f.any(s.roles, r => me.roles[r])
   )
-  const procureStates = CONSTANTS.ORDER_STATES_MAP.filter(s =>
+  const procureStates = CONSTANTS.ORDER_STATI_MAP.filter(s =>
     f.any(s.roles, r => me.roles[r])
   )
 
@@ -139,7 +139,7 @@ const Filters = ({ me, data, current, onChange }) => {
 
     procureState: procureStates.map(({ key }) => ({
       value: key,
-      label: t(`order_state_label_${key}`)
+      label: t(`order_status_label_${key}`)
     }))
   }
 

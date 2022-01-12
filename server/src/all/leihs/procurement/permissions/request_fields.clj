@@ -29,6 +29,7 @@
                             :id)
                         (:category_id template))
         category (category/get-category-by-id tx category-id)
+        order-status (proc-request :order_status)
         user-id (-> proc-request
                     :user
                     :id)
@@ -246,7 +247,7 @@
      ;                :required true},
      :order_status
        {:read (or category-viewer inspector admin),
-        :write (and (not past-phase)
+        :write true #_(and (not past-phase)
                     (or (and new-request
                              requester
                              (or (and requesting-phase inspector)
@@ -258,14 +259,14 @@
         :required true},
      :order_comment
        {:read (or category-viewer inspector admin),
-        :write (and (not past-phase)
+        :write true #_(and (not past-phase)
                     (or (and new-request
                              requester
                              (or (and requesting-phase inspector)
                                  (and inspection-phase category-inspector)
                                  admin))
                         (and existing-request (or admin category-inspector)))),
-        :required false},
+        :required false #_(when-not (= order-status "NOT_PROCURED"))},
      :price_cents
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and

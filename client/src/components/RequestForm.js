@@ -584,16 +584,16 @@ class RequestForm extends React.Component {
                     }
                   </Let>
 
-                  <RequestInput field={formPropsFor('order_state')}>
+                  <RequestInput field={formPropsFor('order_status')}>
                     {field => (
                       <FormGroup horizontal={compactView} label={field.label}>
                         <Select
                           {...field}
                           emptyOption={false}
-                          options={CONSTANTS.ORDER_STATES.map(v => ({
+                          options={CONSTANTS.ORDER_STATI.map(v => ({
                             value: v,
                             label: t(
-                              `request_form_field.order_state_label_${v}`
+                              `request_form_field.order_status_label_${v}`
                             )
                           }))}
                         />

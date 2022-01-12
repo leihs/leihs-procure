@@ -51,7 +51,7 @@
         requested-by-auth-user (:requested_by_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
-        order-status (:order_status arguments)
+        order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
         tx (:tx rrequest)
         advanced-user? (user-perms/advanced? tx

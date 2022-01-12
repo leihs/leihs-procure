@@ -6,7 +6,7 @@ add fields in DB. needs contraint "one of 'NOT_PROCURED', 'PROCURED'"
 
 ```sql
 ALTER TABLE "procurement_requests"
-  ADD COLUMN "order_state" character varying DEFAULT 'NOT_PROCURED',
+  ADD COLUMN "order_status" character varying DEFAULT 'NOT_PROCURED',
   ADD COLUMN "order_comment" text;
 ```
 
