@@ -14,12 +14,12 @@ class GraphqlQuery
   end
 
   def perform
-    @response = Faraday.post("#{Constants::LEIHS_PROCURE_HTTP_BASE_URL}/procure/graphql") do |req|
+    @response = Faraday.post("#{http_base_url}/procure/graphql") do |req|
       req.headers['Accept'] = 'application/json'
       req.headers['Content-Type'] = 'application/json'
       req.headers['X-CSRF-Token'] = @csrf_token
       req.body = { query: @query, variables: @variables }.to_json
-      
+
       cookies = { "leihs-anti-csrf-token" => @csrf_token }
 
       if @cookies['leihs-user-session']
@@ -37,19 +37,19 @@ class GraphqlQuery
   end
 
   def get_csrf_token
-    r = Faraday.get("#{Constants::LEIHS_PROCURE_HTTP_BASE_URL}/sign-in")
+    r = Faraday.get("#{http_base_url}/sign-in")
     r.body.match(/name="csrf-token" value="(.*?)"\/>/)[1]
   end
 
   def get_cookies(user_id, csrf_token)
     resp = if user = User.find(id: user_id)
-             Faraday.post("#{Constants::LEIHS_PROCURE_HTTP_BASE_URL}/sign-in",
+             Faraday.post("#{http_base_url}/sign-in",
                           { user: user.email, password: 'password' }) do |req|
                             req.headers['X-CSRF-Token'] = csrf_token
                             req.headers['Cookie'] = "leihs-anti-csrf-token=#{csrf_token}"
                           end
            else
-             Faraday.post("#{Constants::LEIHS_PROCURE_HTTP_BASE_URL}")
+             Faraday.post(http_base_url)
            end
 
     Rack::Utils.parse_cookies_header(resp.headers['set-cookie'])

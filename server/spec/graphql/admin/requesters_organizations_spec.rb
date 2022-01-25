@@ -110,14 +110,14 @@ describe 'requesters organizations' do
           ) {
             user {
               id
-            } 
+            }
             organization {
               name
             }
             department {
               name
             }
-          } 
+          }
         }
       GRAPHQL
     end
@@ -129,8 +129,7 @@ describe 'requesters organizations' do
       result = query(@q, user.id)
 
       expect(result['data']['requesters_organizations']).to be_blank
-      expect(result['errors'].first['extensions']['exception'])
-        .to be == 'UnauthorizedException'
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
 
       RequesterOrganization
         .all

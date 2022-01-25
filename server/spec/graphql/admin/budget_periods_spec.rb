@@ -141,7 +141,7 @@ describe 'budget periods' do
 
         result = query(q, user.id)
         expect(result['data']['budget_periods'].first[tp]).to be_nil
-        expect(result['errors'].first['extensions']['exception']).to be == 'UnauthorizedException'
+        expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       end
     end
   end
@@ -186,13 +186,13 @@ describe 'budget periods' do
             ]
           ) {
             name
-          } 
+          }
         }
       GRAPHQL
     end
 
     #############################################################################
-    
+
     it 'returns error for unauthorized user' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector, user_id: user.id)
@@ -200,8 +200,7 @@ describe 'budget periods' do
       result = query(@q, user.id)
 
       expect(result['data']['budget_periods']).to be_blank
-      expect(result['errors'].first['extensions']['exception'])
-        .to be == 'UnauthorizedException'
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
 
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']
     end
@@ -228,7 +227,7 @@ describe 'budget periods' do
           inspection_start_date: @new_inspection_start_date_2,
           end_date: @new_end_date_2 },
         { name: 'bp_1_new_name',
-          inspection_start_date: @new_inspection_start_date_1, 
+          inspection_start_date: @new_inspection_start_date_1,
           end_date: @new_end_date_1 }
       ]
       expect(BudgetPeriod.count).to be == budget_periods_after.count

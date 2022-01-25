@@ -267,8 +267,7 @@ describe 'main categories' do
         result = query(q, inspector_user.id, @qvariables)
 
         expect(result['data']['main_categories']).to be_blank
-        expect(result['errors'].first['extensions']['exception'])
-          .to be == 'UnauthorizedException'
+          expect(result['errors'].first['message']).to match(/UnauthorizedException/)
 
         MainCategory
           .all

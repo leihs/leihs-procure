@@ -29,8 +29,7 @@ describe 'request' do
 
           expect(result['data']['request']).not_to be
           expect(result['errors'].length).to be 1
-          expect(result['errors'].first['extensions']['exception'])
-            .to be == 'UnauthorizedException'
+          expect(result['errors'].first['message']).to match(/UnauthorizedException/)
 
           expect(request).to be == request.reload
         end

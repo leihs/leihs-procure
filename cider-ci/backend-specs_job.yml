@@ -4,18 +4,18 @@ context:
     include_match: server/spec/.*_spec.rb
   task_defaults:
     include:
-      - path: cider-ci/install-ruby_task-component.yml
-        submodule: [client/leihs-ui]
-      - cider-ci/bundle-ruby_task-component.yml
+      - path: cider-ci/task-components/database.yml
+        submodule: [server/database]
       - cider-ci/environment_variables.yml
-      - cider-ci/database_task-component.yml
       - cider-ci/uberjar_task-component.yml
       - cider-ci/service_task-component.yml
+      - cider-ci/bundle-ruby_task-component.yml
     environment_variables:
       LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
+      LEIHS_PROCURE_SPEC_DIR: "{{LEIHS_PROCURE_DIR}}/server"
+      LEIHS_DATABASE_DIR: "{{LEIHS_PROCURE_DIR}}/server/database"
     traits:
-      JDK 8: true
-      Leiningen 2: true
+      OpenJDK: true
     ports:
       LEIHS_PROCURE_HTTP_PORT:
         min: 3200
@@ -24,30 +24,14 @@ context:
       submodules:
         include_match: ^.*$
     scripts:
-
-      bundle-ruby-for-server-specs:
-        exclusive_executor_resource: bundle-ruby_{{$RUBY}}
-        timeout: 20 Minutes
-        body: |
-          #!/usr/bin/env bash
-          set -eux
-          export PATH=~/.rubies/$RUBY/bin:$PATH
-          cd server
-          bundle install
-        start_when:
-          install-ruby:
-            script_key: install-ruby
-
       test:
         start_when:
           procure service is running:
             script_key: procure-service-is-running
-          ruby-bundled:
-            script_key: bundle-ruby-for-server-specs
         body: |
           #!/usr/bin/env bash
           set -euxo
           export PATH=~/.rubies/$RUBY/bin:$PATH
-          cd server
+          cd ${LEIHS_PROCURE_SPEC_DIR}
           mkdir -p log
           bundle exec rspec --backtrace ../$CIDER_CI_TASK_FILE

@@ -1,21 +1,33 @@
-include:
-- path: cider-ci/install-ruby_task-component.yml
-  submodule: [client/leihs-ui]
-
 traits:
+  ruby-install: true
   Bash: true
 
 scripts:
 
-  bundle-ruby:
-    exclusive_executor_resource: bundle-ruby_{{$RUBY}}
+  procure-bundle-rspec-ruby:
+    exclusive_executor_resource: ruby-install_{{$RUBY}}
     timeout: 20 Minutes
+    start_when:
+      uberjar done: # bundle may alter the Gemfile.lock
+        script_key: build-procure-uberjar
+        states: [passed]
     body: |
       #!/usr/bin/env bash
-      set -eux
+      set -euxo
+      cd ${LEIHS_PROCURE_SPEC_DIR}
       export PATH=~/.rubies/$RUBY/bin:$PATH
-      bundle install
-    start_when:
-      install-ruby:
-        script_key: install-ruby
 
+      if [ ! -d ~/.rubies/$RUBY ]; then
+        ruby-install --no-install-deps $RUBY_ENGINE $RUBY_VERSION
+      fi
+
+      gem install bundler:${RUBY_BUNDLER_VERSION}
+
+      bundle install
+
+
+  test:
+    start_when:
+      gems are bundled:
+        script_key: procure-bundle-rspec-ruby
+        states: [passed]

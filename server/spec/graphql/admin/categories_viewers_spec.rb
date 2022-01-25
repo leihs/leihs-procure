@@ -63,7 +63,7 @@ describe 'categories viewers' do
             ]
           ) {
             id
-          } 
+          }
         }
       GRAPHQL
     end
@@ -84,7 +84,7 @@ describe 'categories viewers' do
       result = query(@q, User.find(firstname: 'inspector').id)
 
       expect(result['data']['categories_viewers']).to be_blank
-      expect(result['errors'].first['extensions']['exception']).to be == 'UnauthorizedException'
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
 
       CategoryViewer
         .all

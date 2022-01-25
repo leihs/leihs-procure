@@ -43,9 +43,7 @@ describe 'templates' do
 
       result = query(q, user.id)
       expect(result['data']['update_templates']).to be_blank
-      expect(result['errors'].first['extensions']['exception'])
-        .to be == 'UnauthorizedException'
-
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Template.all.count).to be == templates_before.count
       templates_before.each do |data|
         expect(Template.find(data)).to be

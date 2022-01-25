@@ -3,7 +3,7 @@ require_relative '../graphql_helper'
 
 describe 'admins' do
   context 'query' do
-    context 'authorization' do 
+    context 'authorization' do
       context 'unauthorized user' do
         it 'returns empty data and an error' do
           user = FactoryBot.create(:user)
@@ -12,7 +12,7 @@ describe 'admins' do
 
           q = <<-GRAPHQL
             query {
-              admins { 
+              admins {
                 id
               }
             }
@@ -20,15 +20,14 @@ describe 'admins' do
 
           result = query(q, user.id)
           expect(result['data']['admins']).to be_blank
-          expect(result['errors'].first['extensions']['exception'])
-            .to be == 'UnauthorizedException'
+          expect(result['errors'].first['message']).to match(/UnauthorizedException/)
         end
       end
     end
   end
 
   context 'mutation' do
-    context 'authorization' do 
+    context 'authorization' do
       context 'unauthorized user' do
         it 'returns empty data and an error' do
           user_1 = FactoryBot.create(:user)
@@ -43,15 +42,13 @@ describe 'admins' do
                 input_data: [
                   { user_id: "#{user_2.id}" }
                 ]
-              ) { id } 
+              ) { id }
             }
           GRAPHQL
 
           result = query(q, user_1.id)
           expect(result['data']['admins']).to be_blank
-          expect(result['errors'].first['extensions']['exception'])
-            .to be == 'UnauthorizedException'
-
+          expect(result['errors'].first['message']).to match(/UnauthorizedException/)
           expect(Admin.count).to be == 1
           expect(Admin.first.user_id).to be == admin_1.id
         end
@@ -84,7 +81,7 @@ describe 'admins' do
               { user_id: "#{User.find(firstname: 'admin_2').id}" },
               { user_id: "#{User.find(firstname: 'user_1').id}" }
             ]
-          ) { id } 
+          ) { id }
         }
       GRAPHQL
 

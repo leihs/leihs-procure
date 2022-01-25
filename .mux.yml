@@ -1,21 +1,13 @@
-name: LEIHS/v5/procure
+name: LEIHS/leihs/procure
 windows:
   2:
-    name: server
+    name: server-dev
     command: |
-      cd server
-      export LEIHS_SECRET="secret"
-      export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3230"
-      export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs?max-pool-size=10"
-      lein do clean, with-profile prod repl
-    post_command_send_keys: |
-      (-main "run")
+      ./bin/dev-run-backend
   3:
-    name: frontend
+    name: front-dev
     command: |
-      cd client
-      export PUBLIC_URL='/procure'
-      npm run build
+      ./bin/dev-run-frontend
   5:
     name: psql
     command: |
@@ -23,18 +15,13 @@ windows:
   6:
     name: db
     command: |
-      cd database
-
+      cd server/database
   7:
-    name: server-test
+    name: test
     command: |
-      cd server
-      export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs?max-pool-size=10"
-      export LEIHS_SECRET="secret"
-      export LEIHS_PROCURE_HTTP_BASE_URL="http://localhost:3230"
       export RAILS_ENV=test
   8:
-    name: server-log
+    name: shared-clj
     command: |
-      cd server
-      mkdir -p log && echo " " > log/debug.log && tail -f log/debug.log
+      cd server/shared-clj
+

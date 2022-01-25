@@ -8,17 +8,19 @@ scripts:
       database has been created:
         script_key: create-database
     body: |
-      set -euxo 
+      set -euxo
       cd $LEIHS_PROCURE_DIR/server
+      export DB_NAME=${LEIHS_DATABASE_NAME}
+      export HTTP_PORT=${LEIHS_PROCURE_HTTP_PORT}
       mkdir tmp
-      java -jar target/leihs-procure.jar run
+      java -jar target/leihs-procure.jar run --pid-file tmp/service.pid
 
   procure-service-is-running:
     body: |
-      set -euxo 
+      set -euxo
       until curl --silent --fail -I \
-        -H 'Accept: application/json' -H "Authorization: secret $CIDER_CI_TRIAL_ID" \
-        ${LEIHS_PROCURE_HTTP_BASE_URL}/procure/status;
+        -H 'Accept: application/json' \
+        "http://localhost:${LEIHS_PROCURE_HTTP_PORT}/procure/status";
         do sleep 1;
       done
     start_when:
@@ -33,10 +35,10 @@ scripts:
 
   shutdown-procure-service:
     body: |
-      set -euxo 
+      set -euxo
       cd $LEIHS_PROCURE_DIR/server
       export PID=$(cat tmp/service.pid)
-      kill $PID 
+      kill $PID
       tail --pid=$PID -f /dev/null
     start_when:
       test is terminal:

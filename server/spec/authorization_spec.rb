@@ -6,12 +6,11 @@ describe 'authorization' do
   it 'returns 401 if not authenticated' do
     q = <<-GRAPHQL
       query {
-        admins { 
+        admins {
           id
         }
       }
     GRAPHQL
-
     user_id = UUIDTools::UUID.random_create.to_s
     response = GraphqlQuery.new(q, user_id).perform.response
     expect(response.status).to eq(401)
@@ -20,7 +19,7 @@ describe 'authorization' do
   it 'returns 403 if not procurement access' do
     q = <<-GRAPHQL
       query {
-        admins { 
+        admins {
           id
         }
       }

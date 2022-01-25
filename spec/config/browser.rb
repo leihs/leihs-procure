@@ -5,8 +5,7 @@ require 'turnip/capybara'
 require 'turnip/rspec'
 
 
-
-def accepted_firefox_path 
+def accepted_firefox_path
   ENV[ ACCEPTED_FIREFOX_ENV_PATHS.detect do |env_path|
     ENV[env_path].present?
   end || ""].tap { |path|

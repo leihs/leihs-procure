@@ -1,6 +1,9 @@
 require 'active_support/all'
 require 'pry'
 
+DIR = Pathname.new(__dir__)
+require DIR.join('..').join('server/spec/config/database')
+
 require 'config/database'
 require 'config/factories'
 require 'config/metadata_extractor'
@@ -8,9 +11,8 @@ require 'config/screenshots'
 
 ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_60_PATH']
 
-# switch to HTTPS ?
-LEIHS_PROCURE_HTTP_BASE_URL = ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence || 'http://localhost:3230'
-LEIHS_PROCURE_HTTP_PORT =  Addressable::URI.parse(LEIHS_PROCURE_HTTP_BASE_URL).port.presence  || '3230'
+LEIHS_PROCURE_HTTP_PORT =  ENV['LEIHS_PROCURE_HTTP_PORT'].presence  || '3230'
+LEIHS_PROCURE_HTTP_BASE_URL = ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence || "http://localhost:#{LEIHS_PROCURE_HTTP_PORT}"
 
 BROWSER_WINDOW_SIZE = [ 1200, 800 ]
 

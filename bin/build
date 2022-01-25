@@ -9,6 +9,7 @@ PROJECT_NAME="leihs-procure"
 
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
 CLIENT_DIR="${PROJECT_DIR}/client"
+SERVER_DIR="${PROJECT_DIR}/server"
 UI_DIR="${CLIENT_DIR}/leihs-ui"
 ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 DIGEST="$(git -C "$PROJECT_DIR" log -n 1 HEAD --pretty=%T)"
@@ -34,13 +35,10 @@ fi
 ### functions #################################################################
 
 
-
 function build {
   ${UI_DIR}/bin/build || { echo "UI build error!"; exit 1; }
   ${CLIENT_DIR}/bin/build || { echo "CLIENT build error!"; exit 1; }
-  cd server
-  LEIN_SNAPSHOTS_IN_RELEASE=LOL lein do uberjar || { echo "SERVER build error!"; exit 1; }
-  cd -
+  ${SERVER_DIR}/bin/clj-uberjar || { echo "CLIENT uberjar error!"; exit 1; }
 }
 
 function pack {

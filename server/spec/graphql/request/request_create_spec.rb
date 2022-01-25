@@ -256,9 +256,7 @@ describe 'request' do
       result = query(q, viewer.id, variables)
 
       expect(result['data']['request']).not_to be
-      expect(result['errors'].first['extensions']['exception'])
-        .to be == 'UnauthorizedException'
-
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Request.find(transform_uuid_attrs(attrs))).not_to be
     end
 
