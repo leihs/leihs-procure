@@ -320,6 +320,9 @@ export const requestDataFromFields = (request, fields) => {
     ...getField(fields, request, 'inspector_priority'),
     ...getField(fields, request, 'inspection_comment'),
 
+    ...getField(fields, request, 'order_status'),
+    ...getField(fields, request, 'order_comment'),
+
     ...getField(fields, request, 'accounting_type'),
     ...getField(fields, request, 'internal_order_number'),
 
