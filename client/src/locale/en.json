@@ -40,6 +40,8 @@
   "request_state_label_DENIED": "Rejected",
   "request_state_label_IN_APPROVAL": "In Inspection",
 
+  "order_status_label_ALTERNATIVE_PROCURED": "Alternative procured",
+  "order_status_label_IN_PROGRESS": "In progress",
   "order_status_label_NOT_PROCURED": "Not procured",
   "order_status_label_PROCURED": "Procured",
 

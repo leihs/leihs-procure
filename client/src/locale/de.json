@@ -40,6 +40,8 @@
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
 
+  "order_status_label_ALTERNATIVE_PROCURED": "Ersatz beschafft",
+  "order_status_label_IN_PROGRESS": "In Bearbeitung",
   "order_status_label_NOT_PROCURED": "Nicht beschafft",
   "order_status_label_PROCURED": "Beschafft",
 
