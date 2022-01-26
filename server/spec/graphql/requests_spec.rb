@@ -461,4 +461,78 @@ describe 'requests' do
       end
     end
   end
+
+  context 'filter for order status' do
+    let :q do
+      <<-GRAPHQL
+        query RequestsIndexFiltered(
+          $budgetPeriods: [ID]
+          $orderStati: [OrderStatus]
+        ) {
+          dashboard(
+            budget_period_id: $budgetPeriods
+            order_status: $orderStati
+          ) {
+            budget_periods {
+              id
+              main_categories {
+                id
+                categories {
+                  id
+                  requests {
+                    id
+                    order_status {
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      GRAPHQL
+    end
+
+    before :example do
+      @bp_inspection_phase = \
+        FactoryBot.create(:budget_period,
+                          inspection_start_date: Date.today,
+                          end_date: Date.today + 1.week)
+
+      @requester = FactoryBot.create(:user)
+      @organization = \
+        FactoryBot.create(:requester_organization, user_id: @requester.id).organization
+
+      @category = FactoryBot.create(:category)
+      @inspector = FactoryBot.create(:user)
+      FactoryBot.create(:category_inspector,
+                        category_id: @category.id,
+                        user_id: @inspector.id)
+
+      @request_in_progress = \
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          organization_id: @organization.id,
+                          category_id: @category.id,
+                          order_status: 'in_progress')
+
+      10.times do
+        FactoryBot.create(:request,
+                          user_id: @requester.id,
+                          budget_period_id: @bp_inspection_phase.id,
+                          organization_id: @organization.id,
+                          category_id: @category.id)
+      end
+    end
+
+    example 'works' do
+      variables = { budgetPeriods: [@bp_inspection_phase.id], orderStati: ['IN_PROGRESS'] }
+      result = query(q, @inspector.id, variables).deep_symbolize_keys
+      requests = get_requests(result)
+      expect(requests.count).to eq(1)
+      expect(requests).to include({ id: @request_in_progress.id,
+                                    order_status: { value: 'IN_PROGRESS' } })
+    end
+  end
 end
