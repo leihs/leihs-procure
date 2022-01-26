@@ -83,7 +83,7 @@
                   (request/get-where-conds-for-states state advanced-user?))
                 (sql/merge-where-false-if-empty state))
       order-status (-> (sql/merge-where [:in :procurement_requests.order_status
-                                         order-status])
+                                         (map #(sql/call :cast % :order_status_enum) order-status)])
                        (sql/merge-where-false-if-empty order-status))
       requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
                                                (-> context
