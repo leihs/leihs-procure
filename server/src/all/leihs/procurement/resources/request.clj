@@ -454,7 +454,9 @@
           (as-> input-data <>
             (dissoc <> :id)
             (dissoc <> :attachments)
-            (cond-> <> (:order_status <>) (update :order_status to-name-and-lower-case))
+            (cond-> <> (:order_status <>)
+              (update :order_status
+                      #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority
