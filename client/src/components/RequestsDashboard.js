@@ -42,7 +42,7 @@ class RequestsDashboard extends React.Component {
     log('render', { props })
     const { requestsQuery, refetchAllData, refetchQuery } = props
 
-    const hasData = !(requestsQuery.loading || !requestsQuery.data)
+    const isLoading = !!(requestsQuery.loading && !requestsQuery.data)
 
     const requestTotalCount =
       f.get(requestsQuery, 'data.dashboard.total_count') || 0
@@ -51,8 +51,8 @@ class RequestsDashboard extends React.Component {
       <Row cls="pt-1">
         <Col sm>
           <h1 className="h4">
-            {requestsQuery.loading || !requestsQuery.data
-              ? ' '
+            {requestsQuery.loading
+              ? t('dashboard.requests_title_loading')
               : `${requestTotalCount} ${
                   requestTotalCount === 1
                     ? t('dashboard.requests_title_singular')
@@ -99,7 +99,7 @@ class RequestsDashboard extends React.Component {
       </Row>
     )
 
-    const SpreadsheetExporter = state.exportView && hasData && (
+    const SpreadsheetExporter = state.exportView && !isLoading && (
       <Suspense fallback={<Loading size="1" />}>
         <SpreadsheetExportProvider requestsData={requestsQuery.data}>
           {({ table, download, exportFormats }) => (
@@ -201,7 +201,7 @@ const RequestsTree = ({
   doChangeBudgetPeriod,
   doDeleteRequest
 }) => {
-  if (loading) return <Loading size="1" />
+  if (loading && !data) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
 
   return f.map(f.get(data, 'dashboard.budget_periods'), b => (
@@ -554,7 +554,7 @@ const RequestTable = ({
   table,
   query: { loading, error, data, networkStatus }
 }) => {
-  if (loading) return <Loading size="1" />
+  if (loading && !data) return <Loading size="1" />
   if (error) return <ErrorPanel error={error} data={data} />
   if (!table.rows.length) return '---'
   return <DataTable small darkHead bordered striped hover {...table} />
