@@ -73,6 +73,7 @@
     },
     "requests_title_singular": "Request",
     "requests_title_plural": "Requests",
+    "requests_title_loading": "Loading Requests…",
     "requesting_phase_until": "Requesting Phase until",
     "inspection_phase_until": "Inspection Phase until",
     "bp_total_sum": "Total of Budget Period",

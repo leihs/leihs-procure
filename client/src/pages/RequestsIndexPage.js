@@ -315,7 +315,7 @@ class RequestsIndexPage extends React.Component {
                       <Query
                         query={REQUESTS_QUERY}
                         variables={variables}
-                        // fetchPolicy="cache-and-network"
+                        fetchPolicy="cache-and-network"
                         notifyOnNetworkStatusChange
                       >
                         {requestsQuery => {
