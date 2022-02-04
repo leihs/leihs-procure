@@ -6,7 +6,7 @@ import t from '../locale/translate'
 import { DisplayName, IdentifierDecorator, formatCurrency } from './decorators'
 import { Row, Col, Badge, Tooltipped } from './Bootstrap'
 import Icon from './Icons'
-import RequestStateBadge from './RequestStateBadge'
+import RequestStateBadge from './StateBadges'
 import RequestEdit from '../containers/RequestEdit'
 
 class RequestLine extends React.Component {

@@ -29,6 +29,7 @@
                             :id)
                         (:category_id template))
         category (category/get-category-by-id tx category-id)
+        order-status (proc-request :order_status)
         user-id (-> proc-request
                     :user
                     :id)
@@ -44,7 +45,9 @@
         requesting-phase (budget-period/in-requesting-phase? tx budget-period)
         inspection-phase (budget-period/in-inspection-phase? tx budget-period)
         category-inspector (user-perms/inspector? tx auth-entity category-id)
-        category-viewer (user-perms/viewer? tx auth-entity category-id)]
+        category-viewer (user-perms/viewer? tx auth-entity category-id)
+        can-edit-order-status-fields (and existing-request (or admin category-inspector))
+        can-read-order-status-fields (and existing-request (or can-edit-order-status-fields category-viewer (and requester own-request)))]
     {:accounting_type
        {:read (or (and requester own-request (or inspection-phase past-phase))
                   category-viewer
@@ -244,6 +247,16 @@
      ;                :write (and new-request
      ;                            (or requester inspector admin)),
      ;                :required true},
+     :order_status
+      {:read can-read-order-status-fields
+        :write can-edit-order-status-fields
+        ; keep it upper-case!
+        :default "NOT_PROCURED"
+        :required true}
+     :order_comment
+      {:read can-read-order-status-fields
+        :write can-edit-order-status-fields
+        :required (not (= order-status "NOT_PROCURED"))}
      :price_cents
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and

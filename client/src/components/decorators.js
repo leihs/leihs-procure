@@ -99,6 +99,10 @@ export const RequestFieldValue = (name, request) => {
       return t(
         `request_form_field.accounting_type_label_${r.accounting_type.value}`
       )
+    case 'order_status':
+      return t(
+        `request_form_field.order_status_label_${r.accounting_type.value}`
+      )
     default:
       throw new Error(`Unknown RequestField name '${name}'`)
   }

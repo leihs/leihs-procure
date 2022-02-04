@@ -133,6 +133,8 @@ const spreadSheetCols = [
   { key: 'general_ledger_account', label: 'Sachkonto' },
   { key: 'procurement_account', label: 'Beschaffungskonto' },
   { key: 'internal_order_number', label: 'Innenauftrag' },
+  { key: 'order_status', label: 'Beschaffungs-Status' },
+  { key: 'order_comment', label: 'Beschaffungs-Kommentar' },
   {
     key: 'url',
     label: 'Link',

@@ -54,6 +54,7 @@ const REQUESTS_QUERY = gql`
     $categories: [ID!]
     $search: String
     $state: [State!]
+    $order_status: [OrderStatus]
     $organizations: [ID!]
     $priority: [Priority!]
     $inspector_priority: [InspectorPriority!]
@@ -64,6 +65,7 @@ const REQUESTS_QUERY = gql`
       category_id: $categories
       search: $search
       state: $state
+      order_status: $order_status
       organization_id: $organizations
       priority: $priority
       inspector_priority: $inspector_priority

@@ -137,9 +137,10 @@
                       [:= :procurement_budget_periods.id
                        :procurement_requests.budget_period_id])))
 
-(defn to-name-and-lower-case-priorities
+(defn to-name-and-lower-case-enums
   [m]
   (cond-> m
+    (:order_status m) (update :order_status to-name-and-lower-case)
     (:priority m) (update :priority to-name-and-lower-case)
     (:inspector_priority m) (update :inspector_priority
                                     to-name-and-lower-case)))
@@ -151,6 +152,8 @@
           #(-> %
                upper-case
                keyword)))
+
+(defn treat-order-status [row] (upper-case-keyword-value row :order_status))
 
 (defn treat-priority [row] (upper-case-keyword-value row :priority))
 
@@ -217,6 +220,7 @@
       add-cost-center
       add-procurement-account
       (add-total-price advanced-user?)
+      treat-order-status
       treat-priority
       treat-inspector-priority
       initialize-attachments-attribute
@@ -410,7 +414,7 @@
                        (dissoc :attachments)
                        (assoc :user user-id)
                        (assoc :organization (:id organization))
-                       to-name-and-lower-case-priorities)]
+                       to-name-and-lower-case-enums)]
     (with-local-vars [req-id nil]
       (authorization/authorize-and-apply
         #(do (insert! tx
@@ -450,6 +454,9 @@
           (as-> input-data <>
             (dissoc <> :id)
             (dissoc <> :attachments)
+            (cond-> <> (:order_status <>)
+              (update :order_status
+                      #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority

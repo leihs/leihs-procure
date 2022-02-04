@@ -22,7 +22,7 @@ import t from '../locale/translate'
 // import Icon from './Icons'
 import Loading from './Loading'
 import { ErrorPanel } from './Error'
-import RequestStateBadge from './RequestStateBadge'
+import { default as RequestStateBadge, OrderStatusBadge } from './StateBadges'
 import CurrentUser from '../containers/CurrentUserProvider'
 
 // import logger from 'debug'
@@ -69,6 +69,9 @@ const Filters = ({ me, data, current, onChange }) => {
   const requestStates = CONSTANTS.REQUEST_STATES_MAP.filter(s =>
     f.any(s.roles, r => me.roles[r])
   )
+  const orderStati = CONSTANTS.ORDER_STATI_MAP.filter(s =>
+    f.any(s.roles, r => me.roles[r])
+  )
 
   const allowed = {
     search: true,
@@ -81,7 +84,8 @@ const Filters = ({ me, data, current, onChange }) => {
     onlyInspectedCategories: me.roles.isInspector,
     priority: true,
     inspector_priority: !me.roles.isOnlyRequester,
-    state: true
+    state: true,
+    order_status: true
   }
 
   const available = {
@@ -131,6 +135,11 @@ const Filters = ({ me, data, current, onChange }) => {
     state: requestStates.map(({ key }) => ({
       value: key,
       label: t(`request_state_label_${key}`)
+    })),
+
+    order_status: orderStati.map(({ key }) => ({
+      value: key,
+      label: t(`order_status_label_${key}`)
     }))
   }
 
@@ -161,6 +170,8 @@ const Filters = ({ me, data, current, onChange }) => {
     },
     f.keys(allowed)
   )
+  // eslint-disable-next-line
+  // debugger
 
   return (
     <StatefulForm
@@ -418,6 +429,54 @@ const Filters = ({ me, data, current, onChange }) => {
                                     htmlFor={field.id + value}
                                   >
                                     <RequestStateBadge state={value} />
+                                  </label>
+                                </Div>
+                              </F>
+                            ))}
+                        </FormGroup>
+                      )}
+                    </Let>
+
+                    <Let field={formPropsFor('order_status')}>
+                      {({ field }) => (
+                        <FormGroup
+                          label={t('dashboard.filter_titles.order_status')}
+                        >
+                          {available.order_status &&
+                            available.order_status.map(({ value, label }) => (
+                              <F key={value}>
+                                <Div
+                                  cls={cx(
+                                    'custom-control custom-checkbox',
+                                    'mr-3 d-inline-block',
+                                    `mr-${BIG}-0 d-${BIG}-block`
+                                  )}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    className="custom-control-input"
+                                    {...field}
+                                    id={field.id + value}
+                                    value={value}
+                                    checked={f.include(field.value, value)}
+                                    onChange={e => {
+                                      const add = e.target.checked
+                                      const values = field.value || []
+                                      setValue(
+                                        'order_status',
+                                        f.uniq(
+                                          add
+                                            ? [...values, value]
+                                            : f.without(values, value)
+                                        )
+                                      )
+                                    }}
+                                  />
+                                  <label
+                                    className="custom-control-label"
+                                    htmlFor={field.id + value}
+                                  >
+                                    <OrderStatusBadge state={value} />
                                   </label>
                                 </Div>
                               </F>
