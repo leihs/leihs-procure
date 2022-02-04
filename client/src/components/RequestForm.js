@@ -101,7 +101,7 @@ class RequestForm extends React.Component {
               ? request[key].read || request[key].write
               : null
             const labelTxt = t(`request_form_field.${key}`)
-            return {
+            const field = {
               ...formHelpers.formPropsFor(key),
               // add translated labels, with 'required' marker if writable
               label: readOnly ? labelTxt : requiredLabel(labelTxt, required),
@@ -111,6 +111,8 @@ class RequestForm extends React.Component {
               readOrWrite,
               ...(readOnly && { type: 'text-static' })
             }
+            console.log(key, { field })
+            return field
           }
 
           return (
