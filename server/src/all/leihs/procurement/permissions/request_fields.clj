@@ -29,7 +29,6 @@
                             :id)
                         (:category_id template))
         category (category/get-category-by-id tx category-id)
-        order-status (proc-request :order_status)
         user-id (-> proc-request
                     :user
                     :id)
@@ -256,7 +255,7 @@
      :order_comment
       {:read can-read-order-status-fields
         :write can-edit-order-status-fields
-        :required (not (= order-status "NOT_PROCURED"))}
+        :required false}
      :price_cents
        {:read (or (and requester own-request) category-viewer inspector admin),
         :write (and
