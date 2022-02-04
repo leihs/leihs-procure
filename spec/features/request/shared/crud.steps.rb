@@ -100,9 +100,9 @@ step 'I enter the following data into the request form:' do |table|
         within '.ui-interactive-text-field-results' do
           find('div', text: v).click
         end
-      when 'Begründung', 'Kommentar des Prüfers'
+      when 'Begründung', 'Kommentar des Prüfers', 'Beschaffungs-Kommentar'
         find('textarea').set v
-      when 'Priorität', 'Priorität des Prüfers', 'Gebäude', 'Raum'
+      when 'Priorität', 'Priorität des Prüfers', 'Gebäude', 'Raum', 'Beschaffungs-Status'
         find('select option', text: /^#{v}$/).select_option
       when 'Abrechnungsart'
         find('label.btn', text: v).click

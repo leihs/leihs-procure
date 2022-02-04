@@ -1,7 +1,5 @@
 # leihs-procurement
 
-WIP
-
 ## For devs
 
 1. clone this repo

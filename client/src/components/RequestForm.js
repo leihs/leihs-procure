@@ -581,6 +581,36 @@ class RequestForm extends React.Component {
                       )
                     }
                   </Let>
+
+                  <RequestInput field={formPropsFor('order_status')}>
+                    {field => (
+                      <FormGroup horizontal={compactView} label={field.label}>
+                        <Select
+                          {...field}
+                          emptyOption={false}
+                          options={CONSTANTS.ORDER_STATI.map(v => ({
+                            value: v,
+                            label: t(
+                              `request_form_field.order_status_label_${v}`
+                            )
+                          }))}
+                        />
+                      </FormGroup>
+                    )}
+                  </RequestInput>
+
+                  <RequestInput field={formPropsFor('order_comment')}>
+                    {field =>
+                      !(field.readOnly && !f.present(field.value)) && (
+                        <FormField
+                          horizontal={compactView}
+                          type="textarea"
+                          {...field}
+                          required={false}
+                        />
+                      )
+                    }
+                  </RequestInput>
                 </Col>
               </Row>
 

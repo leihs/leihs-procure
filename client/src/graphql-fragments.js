@@ -151,6 +151,12 @@ export const RequestFieldsForIndex = gql`
     internal_order_number {
       value
     }
+    order_status {
+      value
+    }
+    order_comment {
+      value
+    }
   }
 `
 
@@ -221,6 +227,16 @@ export const RequestFieldsForEdit = gql`
     }
     order_quantity {
       ...RequestFieldInt
+    }
+
+    order_status {
+      read
+      write
+      required
+      value
+    }
+    order_comment {
+      ...RequestFieldString
     }
 
     priority {

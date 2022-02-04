@@ -25,6 +25,7 @@
            ["~~*" :procurement_requests.article_name term-percent]
            ["~~*" :procurement_requests.article_number term-percent]
            ["~~*" :procurement_requests.inspection_comment term-percent]
+           ["~~*" :procurement_requests.order_comment term-percent]
            ["~~*" :procurement_requests.motivation term-percent]
            ["~~*" :procurement_requests.receiver term-percent]
            ["~~*" :procurement_requests.supplier_name term-percent]
@@ -50,6 +51,7 @@
         requested-by-auth-user (:requested_by_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
+        order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
         tx (:tx rrequest)
         advanced-user? (user-perms/advanced? tx
@@ -74,12 +76,15 @@
                                      priority])
                    (sql/merge-where-false-if-empty priority))
       inspector-priority
-        (-> (sql/merge-where [:in :procurement_requests.inspector_priority
-                              inspector-priority])
-            (sql/merge-where-false-if-empty inspector-priority))
+      (-> (sql/merge-where [:in :procurement_requests.inspector_priority
+                            inspector-priority])
+          (sql/merge-where-false-if-empty inspector-priority))
       state (-> (sql/merge-where
                   (request/get-where-conds-for-states state advanced-user?))
                 (sql/merge-where-false-if-empty state))
+      order-status (-> (sql/merge-where [:in :procurement_requests.order_status
+                                         (map #(sql/call :cast % :order_status_enum) order-status)])
+                       (sql/merge-where-false-if-empty order-status))
       requested-by-auth-user (sql/merge-where [:= :procurement_requests.user_id
                                                (-> context
                                                    :request

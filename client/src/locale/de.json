@@ -40,6 +40,11 @@
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
 
+  "order_status_label_ALTERNATIVE_PROCURED": "Alternative Beschafft",
+  "order_status_label_IN_PROGRESS": "In Bearbeitung",
+  "order_status_label_NOT_PROCURED": "Nicht Bearbeitet",
+  "order_status_label_PROCURED": "Beschafft",
+
   "request_replacement_labels_new": "Neu",
   "request_replacement_labels_replacement": "Ersatz",
   "request_short_id": "Nummer",
@@ -69,7 +74,8 @@
       "orgs": "Organisationen",
       "prio": "Priorität",
       "prio_insp": "Priorität des Prüfers",
-      "status": "Status Antrag"
+      "status": "Status Antrag",
+      "order_status": "Status Beschaffung"
     },
     "requests_title_singular": "Antrag",
     "requests_title_plural": "Anträge",
@@ -115,6 +121,11 @@
     "general_ledger_account": "Sachkonto II (IR)",
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto I (ER)",
+
+    "order_status": "Beschaffungs-Status",
+    "order_status_label_NOT_PROCURED": "Nicht beschafft",
+    "order_status_label_PROCURED": "Beschafft",
+    "order_comment": "Beschaffungs-Kommentar",
 
     "id": "ID",
     "model": "Model",

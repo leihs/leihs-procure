@@ -4,22 +4,35 @@ Feature: Request CRUD as procurement admin
     Given there is an initial admin
     And there are procurement settings
 
-  Scenario: Only "close" button and link for requests in past budget period
+  Scenario: Only order_status/-comment fields editable for requests in past budget period
     Given there is a procurement admin
     And there is a budget period "Budget-Period-Past" in past phase
     And there is a main category "Main Category MC1"
     And there is category "Category C1" for main category "Main Category MC1"
     And there is a requester
     And there is a request of requester with the following data:
-      | field                         | value              |
-      | Budgetperiode                 | Budget-Period-Past |
-      | Kategorie                     | Category C1        |
+      | field         | value              |
+      | Budgetperiode | Budget-Period-Past |
+      | Kategorie     | Category C1        |
     When I log in as the procurement admin
     And I expand the line of the main category "Main Category MC1"
     And I expand the line of the category "Category C"
     And I expand the request line
-    Then I only see the close button
-    And I see the link for the request
+    Then I see the link for the request
+    And the "priority" field is readonly
+    And the "inspector_priority" field is readonly
+    But the "order_comment" field is not readonly
+    And I enter the following data into the request form:
+      | field                  | value                         |
+      | Beschaffungs-Status    | Beschafft                     |
+      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
+
+    And I click on 'Speichern'
+    And I expand the request line
+    And the request form has the following data:
+      | field                  | value                         |
+      | Beschaffungs-Status    | Beschafft                     |
+      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
 
   Scenario: Inspect a request during inspection phase
     Given there is a budget period "Budget-Period-BP" in inspection phase
@@ -69,7 +82,7 @@ Feature: Request CRUD as procurement admin
       | Anhänge                       | secd.pdf      |
     And I click on 'Speichern'
     And I expand the request line
-    And the request form has the following data: 
+    And the request form has the following data:
       | field                         | value         |
       | Artikel oder Projekt          | Camera X      |
       | Artikelnr. oder Herstellernr. | 12345 X       |

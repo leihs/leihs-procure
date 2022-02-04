@@ -39,6 +39,12 @@
   "request_state_label_PARTIALLY_APPROVED": "Partially Accepted",
   "request_state_label_DENIED": "Rejected",
   "request_state_label_IN_APPROVAL": "In Inspection",
+
+  "order_status_label_ALTERNATIVE_PROCURED": "Alternative Procured",
+  "order_status_label_IN_PROGRESS": "In Progress",
+  "order_status_label_NOT_PROCURED": "Not Processed",
+  "order_status_label_PROCURED": "Procured",
+
   "request_short_id": "Number",
 
   "request_replacement_labels_new": "New",
@@ -69,7 +75,8 @@
       "orgs": "Organisations",
       "prio": "Priority",
       "prio_insp": "Inspector's Priority",
-      "status": "Status of Request"
+      "status": "Status of Request",
+      "order_status": "Procuring Status"
     },
     "requests_title_singular": "Request",
     "requests_title_plural": "Requests",
@@ -115,6 +122,11 @@
     "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto Ⅰ (ER)",
+
+    "order_status": "Procuring-State",
+    "order_status_label_NOT_PROCURED": "Not procured",
+    "order_status_label_PROCURED": "Procured",
+    "order_comment": "Procuring-Comment",
 
     "id": "ID",
     "model": "Model",
