@@ -590,9 +590,7 @@ class RequestForm extends React.Component {
                           emptyOption={false}
                           options={CONSTANTS.ORDER_STATI.map(v => ({
                             value: v,
-                            label: t(
-                              `request_form_field.order_status_label_${v}`
-                            )
+                            label: t(`order_status_label_${v}`)
                           }))}
                         />
                       </FormGroup>

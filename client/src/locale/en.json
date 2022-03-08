@@ -124,8 +124,6 @@
     "procurement_account": "Sachkonto Ⅰ (ER)",
 
     "order_status": "Procuring-State",
-    "order_status_label_NOT_PROCURED": "Not procured",
-    "order_status_label_PROCURED": "Procured",
     "order_comment": "Procuring-Comment",
 
     "id": "ID",

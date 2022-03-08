@@ -123,8 +123,6 @@
     "procurement_account": "Sachkonto I (ER)",
 
     "order_status": "Beschaffungs-Status",
-    "order_status_label_NOT_PROCURED": "Nicht beschafft",
-    "order_status_label_PROCURED": "Beschafft",
     "order_comment": "Beschaffungs-Kommentar",
 
     "id": "ID",
