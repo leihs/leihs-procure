@@ -10,7 +10,7 @@
     "build": "npm run -s build:i18n && npm run -s build:ui && npm run -s build:app",
     "ci-build": "npm run -s build:i18n && npm run -s build:app",
     "build:app": "react-scripts build",
-    "build:ui": "cd leihs-ui && npm run -s build:theme && npm run -s build:ssr",
+    "build:ui": "cd leihs-ui && bin/build",
     "build:i18n": "node src/locale/make-pseudoloc.js",
     "postinstall": "npm run cleanup-typescript",
     "prestart": "npm run -s build:i18n",
