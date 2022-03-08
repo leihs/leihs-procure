@@ -45,8 +45,11 @@
         inspection-phase (budget-period/in-inspection-phase? tx budget-period)
         category-inspector (user-perms/inspector? tx auth-entity category-id)
         category-viewer (user-perms/viewer? tx auth-entity category-id)
-        can-edit-order-status-fields (and existing-request (or admin category-inspector))
-        can-read-order-status-fields (and existing-request (or can-edit-order-status-fields category-viewer (and requester own-request)))]
+        can-edit-order-status-fields (and existing-request 
+                                          (or admin category-inspector))
+        can-read-order-status-fields (and existing-request 
+                                          (or can-edit-order-status-fields category-viewer 
+                                              (and requester own-request past-phase)))]
     {:accounting_type
        {:read (or (and requester own-request (or inspection-phase past-phase))
                   category-viewer
