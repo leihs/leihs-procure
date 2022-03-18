@@ -107,26 +107,6 @@
 
    [:div.row
     [:div.col-sm-4
-     [form-components/checkbox-component data* [:disable_borrow_section]
-      :disabled (not @edit?*)
-      :hint [:span "Option to temporarily disable the borrow section of the application."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:disable_borrow_section_message]
-      :disabled (not @edit?*) :rows 3 :element :textarea
-      :hint [:span "Message which is shown to the users when they try to access the borrow section."]]]]
-
-   [:div.row
-    [:div.col-sm-4
-     [form-components/checkbox-component data* [:disable_manage_section]
-      :disabled (not @edit?*)
-      :hint [:span "Option to temporarily disable the manage section of all the inventory pools (inventory, lending, etc)."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:disable_manage_section_message]
-      :disabled (not @edit?*) :rows 3 :element :textarea
-      :hint [:span "Message which is shown to the users when they try to access the manage section of any inventory pool."]]]]
-
-   [:div.row
-    [:div.col-sm-4
      [form-components/checkbox-component data* [:deliver_received_order_notifications]
       :disabled (not @edit?*)]]
     [:div.col-sm

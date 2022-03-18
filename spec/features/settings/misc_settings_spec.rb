@@ -27,10 +27,6 @@ feature 'SMTP-Settings' do
           fill_in "local_currency_string", with: "CHF"
           fill_in "maximum_reservation_time", with: "500"
           fill_in "timeout_minutes", with: "21"
-          check "disable_borrow_section"
-          fill_in "disable_borrow_section_message", with: "Borrow is disabled."
-          check "disable_manage_section"
-          fill_in "disable_manage_section_message", with: "Manage is disabled."
           check "deliver_received_order_notifications"
           check "include_customer_email_in_contracts"
           fill_in "email_signature", with: "Your awesome Lending Desk"
@@ -49,10 +45,6 @@ feature 'SMTP-Settings' do
           expect(find_field('local_currency_string', disabled: true).value).to eq 'CHF'
           expect(find_field('maximum_reservation_time', disabled: true).value).to eq '500'
           expect(find_field('timeout_minutes', disabled: true).value).to eq '21'
-          expect(find_field('disable_borrow_section', disabled: true)).to be_checked
-          expect(find_field('disable_borrow_section_message', disabled: true).value).to eq 'Borrow is disabled.'
-          expect(find_field('disable_manage_section', disabled: true)).to be_checked
-          expect(find_field('disable_manage_section_message', disabled: true).value).to eq 'Manage is disabled.'
           expect(find_field('deliver_received_order_notifications', disabled: true)).to be_checked
           expect(find_field('include_customer_email_in_contracts', disabled: true)).to be_checked
           expect(find_field('email_signature', disabled: true).value).to eq 'Your awesome Lending Desk'
@@ -79,15 +71,15 @@ feature 'SMTP-Settings' do
 
           get = @http_client.get "/admin/settings/misc/"
           expect(get).to be_success
-          expect(get.body["disable_borrow_section"]).to be false
+          expect(get.body["deliver_received_order_notifications"]).to be false
 
-          patch = @http_client.patch "/admin/settings/misc/", {disable_borrow_section: true}.to_json
+          patch = @http_client.patch "/admin/settings/misc/", {deliver_received_order_notifications: true}.to_json
           expect(patch).to be_success
-          expect(patch.body["disable_borrow_section"]).to be true
+          expect(patch.body["deliver_received_order_notifications"]).to be true
 
           get = @http_client.get "/admin/settings/misc/"
           expect(get).to be_success
-          expect(get.body["disable_borrow_section"]).to be true
+          expect(get.body["deliver_received_order_notifications"]).to be true
 
         end
 
