@@ -10,10 +10,9 @@ context:
       - cider-ci/uberjar_task-component.yml
       - cider-ci/service_task-component.yml
       - cider-ci/bundle-ruby_task-component.yml
-    environment_variables:
-      LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
-      LEIHS_PROCURE_SPEC_DIR: "{{LEIHS_PROCURE_DIR}}/server"
-      LEIHS_DATABASE_DIR: "{{LEIHS_PROCURE_DIR}}/server/database"
+
+    max_trials: 5
+
     traits:
       OpenJDK: true
     ports:
@@ -30,7 +29,7 @@ context:
             script_key: procure-service-is-running
         body: |
           #!/usr/bin/env bash
-          set -euxo
+          set -eux
           export PATH=~/.rubies/$RUBY/bin:$PATH
           cd ${LEIHS_PROCURE_SPEC_DIR}
           mkdir -p log

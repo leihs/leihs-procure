@@ -1,21 +1,34 @@
-run_when:
-  any branch is pushed: { type: branch, include_match: ^.*$ }
-task_defaults:
-  environment_variables:
-    CI: 'true'
-  git_options:
-    submodules:
-      include_match: ^.*$
-  traits:
-    npm: true
-tasks:
-  test:
+context:
+  task_defaults:
+    include:
+      - cider-ci/uberjar_task-component.yml
+      - cider-ci/docker_container-partial.yml
+
     scripts:
       test:
         timeout: 10 minutes
-        body: 'cd client && { npm ci || npm i ;} && npm test'
-  lint:
-    scripts:
-      lint:
-        timeout: 10 minutes
-        body: 'cd client && { npm ci || npm i ;} && npm run ci:lint'
+        start_when:
+          container is running: { script_key: start-container }
+
+    environment_variables:
+      CI: 'true'
+
+    git_options:
+      submodules:
+        include_match: ^.*$
+
+  tasks:
+    'Test':
+      scripts:
+        test:
+          body: |
+            docker exec -i "$RUNNER_CONTAINER_NAME" bash -c \
+              'cd client && npm test'
+
+    'Lint':
+      scripts:
+        test:
+          body: |
+            docker exec -i "$RUNNER_CONTAINER_NAME" bash -c \
+              'cd client && \
+              npm run ci:lint'

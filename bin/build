@@ -8,15 +8,18 @@ set -x
 PROJECT_NAME="leihs-procure"
 
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-CLIENT_DIR="${PROJECT_DIR}/client"
-SERVER_DIR="${PROJECT_DIR}/server"
-UI_DIR="${CLIENT_DIR}/leihs-ui"
+UI_DIR="${PROJECT_DIR}/client/leihs-ui"
 ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 DIGEST="$(git -C "$PROJECT_DIR" log -n 1 HEAD --pretty=%T)"
 LOCAL_CACHE_DIR="${LOCAL_CACHE_DIR:-"${TMPDIR:-/tmp/}/leihs-build-cache"}"
 LOCAL_CACHED_ARTEFACT_PATH="${LOCAL_CACHE_DIR}/${PROJECT_NAME}_${DIGEST}.jar"
 S3_CACHED_ARTEFACT_NAME="${PROJECT_NAME}_${DIGEST}.jar"
 BUILD_CACHE_DISABLED="${BUILD_CACHE_DISABLED:-NO}"
+USE_DOCKER="${USE_DOCKER:-YES}"
+FORCE_DOCKER_BUILD="${FORCE_DOCKER_BUILD:-NO}"
+
+# add our clojure version to the path
+source $PROJECT_DIR/server/shared-clj/clojure/bin/activate
 
 set +x
 
@@ -31,14 +34,24 @@ else
   exit 1
 fi
 
+if [ $USE_DOCKER == "YES" ] ||  [ $USE_DOCKER == "NO" ]; then
+  echo "USE_DOCKER=$USE_DOCKER"
+else
+  echo 'USE_DOCKER must be initially unset, or "YES", or "NO"'
+  exit 1
+fi
+
 
 ### functions #################################################################
 
-
 function build {
-  ${UI_DIR}/bin/build || { echo "UI build error!"; exit 1; }
-  ${CLIENT_DIR}/bin/build || { echo "CLIENT build error!"; exit 1; }
-  ${SERVER_DIR}/bin/clj-uberjar || { echo "CLIENT uberjar error!"; exit 1; }
+  if [ $USE_DOCKER == "YES" ]; then
+    bin/docker-build
+  else
+    ${UI_DIR}/bin/build || { echo "UI build error!"; exit 1; }
+    ${CLIENT_DIR}/bin/build || { echo "CLIENT build error!"; exit 1; }
+    ${SERVER_DIR}/bin/clj-uberjar || { echo "CLIENT uberjar error!"; exit 1; }
+  fi
 }
 
 function pack {

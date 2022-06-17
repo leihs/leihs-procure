@@ -19,6 +19,6 @@ gem 'faker'
 
 # helpers
 gem 'activesupport', '~> 5.2'
-gem 'exiftool_vendored'
+gem 'exiftool_vendored', '11.44.0', :groups => [:default, :production]
 gem 'rb-readline'
 gem 'pry', '~> 0.11'

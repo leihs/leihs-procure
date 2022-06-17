@@ -1,0 +1,39 @@
+include: cider-ci/uberjar_task-component.yml
+
+scripts:
+  build-runner:
+    start_when:
+      build-uberjar: { script_key: build-procure-uberjar }
+    timeout: 10 minutes
+    exclusive_executor_resource: leihs-procure-runner-docker-build_{{CIDER_CI_TREE_ID}}
+    body: |
+      set -exu
+      IMAGE_NAME="$RUNNER_IMAGE_NAME" \
+      VERSION_NAME="$RUNNER_IMAGE_VERSION" \
+      STAGE=runner \
+        bin/docker-build
+
+      docker image inspect "$RUNNER_IMAGE_TAG"
+      echo; echo OK; echo
+
+  start-container:
+    start_when:
+      build-runner: { script_key: build-runner }
+    body: |
+      # NOTE: dont use `-t` because in CI there is no interactive TTY!
+      docker run -d -i \
+        -e CI=true \
+        --name "$RUNNER_CONTAINER_NAME" \
+        "$RUNNER_IMAGE_TAG"
+
+  cleanup-container:
+    start_when:
+      test finished: { script_key: test, states: [aborted, defective, passed, failed, skipped] }
+    timeout: 5 minutes
+    body: |
+      set -exu
+      docker stop "$RUNNER_CONTAINER_NAME"
+      docker rm "$RUNNER_CONTAINER_NAME"
+      # NOTE: removes this tag from the image, but if there are more tags the image wont be deleted!
+      docker image rm "$RUNNER_IMAGE_TAG"
+      echo; echo OK; echo

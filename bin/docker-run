@@ -1,0 +1,14 @@
+#!/bin/bash
+set -exu
+
+IMAGE="$(IMAGE_NAME=leihs-procure-runner STAGE=builder bin/docker-build | tail -1)"
+test "$IMAGE"
+
+# for dev add:
+  # -v "${WD}/:/leihs/procure/" \
+
+docker run --rm -it \
+  -p '5432:5432' \
+  -e 'DB_HOST=host.docker.internal' \
+  "$IMAGE" \
+  $*

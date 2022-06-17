@@ -3,9 +3,8 @@ traits:
   Bash: true
 
 scripts:
-
   procure-bundle-rspec-ruby:
-    exclusive_executor_resource: ruby-install_{{$RUBY}}
+    exclusive_executor_resource: ruby-install_{{RUBY}}
     timeout: 20 Minutes
     start_when:
       uberjar done: # bundle may alter the Gemfile.lock
@@ -13,7 +12,7 @@ scripts:
         states: [passed]
     body: |
       #!/usr/bin/env bash
-      set -euxo
+      set -eux
       cd ${LEIHS_PROCURE_SPEC_DIR}
       export PATH=~/.rubies/$RUBY/bin:$PATH
 
@@ -24,7 +23,6 @@ scripts:
       gem install bundler:${RUBY_BUNDLER_VERSION}
 
       bundle install
-
 
   test:
     start_when:

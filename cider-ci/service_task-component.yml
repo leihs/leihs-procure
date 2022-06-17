@@ -1,14 +1,13 @@
 scripts:
-
   run-procure-service:
-    timeout: 6 Minutes
+    timeout: 15 Minutes
     start_when:
       uberjar has been built:
         script_key: build-procure-uberjar
       database has been created:
         script_key: create-database
     body: |
-      set -euxo
+      set -eux
       cd $LEIHS_PROCURE_DIR/server
       export DB_NAME=${LEIHS_DATABASE_NAME}
       export HTTP_PORT=${LEIHS_PROCURE_HTTP_PORT}
@@ -17,7 +16,7 @@ scripts:
 
   procure-service-is-running:
     body: |
-      set -euxo
+      set -eux
       until curl --silent --fail -I \
         -H 'Accept: application/json' \
         "http://localhost:${LEIHS_PROCURE_HTTP_PORT}/procure/status";
@@ -35,7 +34,7 @@ scripts:
 
   shutdown-procure-service:
     body: |
-      set -euxo
+      set -eux
       cd $LEIHS_PROCURE_DIR/server
       export PID=$(cat tmp/service.pid)
       kill $PID
@@ -47,6 +46,6 @@ scripts:
 
   delete-database:
     start_when:
-       shutdown-procure-service is in terminal state:
+      shutdown-procure-service is in terminal state:
         script_key: shutdown-procure-service
         states: [aborted, defective, passed, failed, skipped]

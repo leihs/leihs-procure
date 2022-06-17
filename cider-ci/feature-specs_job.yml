@@ -17,6 +17,8 @@ context:
       LEIHS_PROCURE_SPEC_DIR: "{{LEIHS_PROCURE_DIR}}"
       LEIHS_DATABASE_DIR: "{{LEIHS_PROCURE_DIR}}/server/database"
 
+    max_trials: 5
+
     traits:
       OpenJDK: true
       Firefox ESR 60: true

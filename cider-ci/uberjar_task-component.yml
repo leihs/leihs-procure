@@ -1,9 +1,7 @@
-name: "Build procure uberjar"
+name: 'Build procure uberjar (Docker)'
 
 include:
   - path: cider-ci/install-ruby_task-component.yml
-    submodule: [client/leihs-ui]
-  - path: cider-ci/install-nodejs_task-component.yml
     submodule: [client/leihs-ui]
   - path: cider-ci/environment_variables.yml
 
@@ -12,34 +10,22 @@ git_options:
     include_match: ^.*$
 
 traits:
-  OpenJDK: true
-
-environment_variables:
-  NVM_NODEJS_VERSION: "16"
+  Docker Engine: true
 
 scripts:
-  build-leihs-ui-for-procure:
+  build-procure-uberjar:
+    timeout: 60 minutes
     start_when:
       install-ruby-passed: { script_key: install-ruby }
-      install-node-js-passed: { script_key: install-nodejs}
-    timeout: 10 minutes
-    exclusive_executor_resource: build-leihs-ui
+    exclusive_executor_resource: leihs-procure-jar-build_{{CIDER_CI_TREE_ID}}
     body: |
-      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
-      ${LEIHS_PROCURE_DIR}/client/leihs-ui/bin/build
+      set -exu
+      cd ${LEIHS_PROCURE_DIR}
 
-  build-procure-client:
-    start_when:
-      build-ui: { script_key: build-leihs-ui-for-procure }
-    timeout: 10 minutes
-    exclusive_executor_resource: build-procure-client
-    body: |
-      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
-      ${LEIHS_PROCURE_DIR}/client/bin/build
+      # build with docker, prime docker cache
+      export IMAGE_NAME="$DIST_IMAGE_NAME"
+      export VERSION_NAME="$DIST_VERSION_NAME"
+      bin/docker-build
 
-  build-procure-uberjar:
-    timeout: 10 minutes
-    start_when:
-      build-procure-client: { script_key: build-procure-client }
-    exclusive_executor_resource: build_procure_uberjar
-    body: ${LEIHS_PROCURE_DIR}/bin/build
+      # build again to prime our own file-based artefact cache
+      USE_DOCKER=YES bin/build
