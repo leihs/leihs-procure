@@ -1,5 +1,4 @@
 jobs:
-
   build-admin-uberjar:
     name: Build admin uberjar
     run_when:
@@ -7,16 +6,9 @@ jobs:
         type: branch
         include_match: ^.*$
     context:
-      task_defaults:
-        environment_variables:
-          LEIHS_ADMIN_DIR: "{{CIDER_CI_WORKING_DIR}}"
-          RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
-          RUBY_ENGINE: ruby
-          RUBY_VERSION: 2.7.5
-          RUBY_BUNDLER_VERSION: 2.3.3
+      include: cider-ci/task_defaults.yml
       tasks:
-        build-admin-uberjar:
-          { include: cider-ci/uberjar_task-component.yml }
+        build-admin-uberjar: { include: cider-ci/uberjar_task-component.yml }
 
   specs:
     name: Run specs
@@ -26,7 +18,10 @@ jobs:
         job_key: build-admin-uberjar
         states: [passed]
     run_when: *SPEC_DEPENDENTS
-    context: { include: cider-ci/specs_job-context.yml }
+    context:
+      include:
+        - cider-ci/task_defaults.yml
+        - cider-ci/specs_job-context.yml
 
   good-to-merge:
     name: ⚑ Good To Merge

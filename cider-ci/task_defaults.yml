@@ -1,0 +1,17 @@
+task_defaults:
+  traits:
+    Docker Engine: true
+
+  environment_variables:
+    CI: 'true'
+
+    LEIHS_ADMIN_DIR: '{{CIDER_CI_WORKING_DIR}}'
+    LEIHS_DATABASE_DIR: '{{LEIHS_ADMIN_DIR}}/database'
+
+    RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
+    RUBY_ENGINE: ruby
+    RUBY_VERSION: 2.7.5
+    RUBY_BUNDLER_VERSION: 2.3.3
+
+    DIST_IMAGE_NAME: 'leihs-admin'
+    DIST_VERSION_NAME: 'trial-{{CIDER_CI_TRIAL_ID}}'

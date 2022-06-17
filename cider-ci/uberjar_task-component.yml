@@ -1,40 +1,30 @@
-name: "Build admin uberjar"
+name: Build admin uberjar (Docker)
 
 include:
   - path: cider-ci/install-ruby_task-component.yml
     submodule: [leihs-ui]
-  - path: cider-ci/install-nodejs_task-component.yml
-    submodule: [leihs-ui]
+
+traits:
+  Docker Engine: true
+
+max_trials: 5
 
 git_options:
   submodules:
     include_match: ^.*$
 
-traits:
-  OpenJDK: true
-
-environment_variables:
-  NVM_NODEJS_VERSION: "16"
-
 scripts:
-  build-leihs-ui-for-admin:
-    # note build-ui is strictly not necessary since build invokes it itself
-    # however ci caching and parallelization is much more efficient this way
-    start_when:
-      install-ruby-passed: { script_key: install-ruby }
-      install-nodejs-passed: { script_key: install-nodejs }
-    timeout: 15 minutes
-    exclusive_executor_resource: build-leihs-ui
-    body: |
-      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
-      ${LEIHS_ADMIN_DIR}/leihs-ui/bin/build
   build-admin-uberjar:
+    timeout: 60 minutes
+    exclusive_executor_resource: 'build-leihs-admin-jar-docker_{{CIDER_CI_TREE_ID}}'
     start_when:
-      build-ui: { script_key: build-leihs-ui-for-admin }
       install-ruby-passed: { script_key: install-ruby }
-      install-nodejs-passed: { script_key: install-nodejs }
-    timeout: 15 minutes
-    exclusive_executor_resource: build_admin_uberjar
     body: |
-      . ~/.nvm/nvm.sh && nvm use "$NVM_NODEJS_VERSION"
-      ${LEIHS_ADMIN_DIR}/bin/build
+      cd ${LEIHS_ADMIN_DIR}
+      # build with docker, prime docker cache
+      export IMAGE_NAME="$DIST_IMAGE_NAME"
+      export VERSION_NAME="$DIST_VERSION_NAME"
+      bin/docker-build
+
+      # build again to prime our own file-based artefact cache
+      USE_DOCKER=YES bin/build

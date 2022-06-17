@@ -1,6 +1,6 @@
 scripts:
-
   admin-service-run:
+    timeout: 30 Minutes
     start_when:
       uberjar has been built:
         script_key: build-admin-uberjar
@@ -45,7 +45,6 @@ scripts:
 
   delete-database:
     start_when:
-       shutdown-admin-service is in termial state:
+      shutdown-admin-service is in termial state:
         script_key: shutdown-admin-service
         states: [aborted, defective, passed, failed, skipped]
-
