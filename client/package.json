@@ -80,7 +80,7 @@
     "react-scripts": "^3.4.0",
     "react-test-renderer": "^16.7.0",
     "reactstrap": "^6.5.0",
-    "source-map-explorer": "git+https://github.com/danvk/source-map-explorer.git#b74f718",
+    "source-map-explorer": "^2.5.2",
     "tachyons-type-scale": "^6.1.1",
     "xlsx": "^0.14.1"
   },
