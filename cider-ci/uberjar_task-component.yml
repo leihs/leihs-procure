@@ -23,9 +23,9 @@ scripts:
       cd ${LEIHS_PROCURE_DIR}
 
       # build with docker, prime docker cache
-      export IMAGE_NAME="$DIST_IMAGE_NAME"
-      export VERSION_NAME="$DIST_VERSION_NAME"
-      bin/docker-build
+      IMAGE_NAME="$DIST_IMAGE_NAME" \
+      VERSION_NAME="$DIST_VERSION_NAME" \
+        bin/docker-build
 
       # build again to prime our own file-based artefact cache
       USE_DOCKER=YES bin/build
