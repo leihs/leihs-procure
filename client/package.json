@@ -63,7 +63,7 @@
     "graphql-tag": "^2.10.0",
     "lodash": "^4.17.11",
     "luxon": "^1.9.0",
-    "moment": "^2.23.0",
+    "moment": "^2.29.4",
     "prettier": "^1.15.3",
     "prettier-eslint": "^8.8.2",
     "prop-types": "^15.6.2",
