@@ -159,7 +159,9 @@
                   (jdbc/delete! tx :groups_users)
                   first))
       {:status 204}
-      (throw (ex-info "Remove group-user failed" {:request request})))))
+      (throw (ex-info (str "Remove group-user failed. "
+                           "It seems the user is not a member of the group.")
+                      {:status 404})))))
 
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
