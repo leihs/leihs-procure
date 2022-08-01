@@ -75,19 +75,25 @@
    [:h3 "Properties"]
 
    [:div.form-row
-    [:div.col-md-3
+    [:div.col-md-4
      [form-components/input-component authentication-system-data* [:id]
       :label "Id"
       :disabled (or (not= (-> @routing/state* :handler-key) :authentication-system-create)
                     (not @edit-mode?*))]]
-    [:div.col-md-5
+    [:div.col-md-8
      [form-components/input-component authentication-system-data* [:name]
       :disabled (not @edit-mode?*)
-      :label "Name"]]
-    [:div.col-md-4
+      :label "Name"]]]
+
+   [:div.form-row
+    [:div.col-md-3
      [form-components/input-component authentication-system-data* [:type]
       :disabled (not @edit-mode?*)
-      :label "Type"]]]
+      :label "Type"]]
+    [:div.col-md-9
+     [form-components/input-component authentication-system-data* [:sign_up_email_match]
+      :disabled (not @edit-mode?*)
+      :label "Sign-up email address match"]]]
 
    [:div.form-row
     [:div.col-md-2
@@ -141,6 +147,15 @@
     :element :textarea
     :rows 2
     :label "Internal public key"]
+
+   (when @edit-mode?*
+     [:div.alert.alert-secondary
+      [:p "Leihs acceps " [:strong "ES256 keys only. "]
+       "The openssl cli can be used to create a pair as in the following:"]
+      [:div
+       [:pre.code
+        "openssl ecparam -name prime256v1 -genkey -noout -out tmp/key.pem\n"
+        "openssl ec -in tmp/key.pem -pubout -out tmp/public.pem" ]]])
 
    [form-components/input-component authentication-system-data* [:external_public_key]
     :disabled (not @edit-mode?*)
