@@ -15,14 +15,14 @@
 (def li breadcrumbs/li)
 (def nav-component breadcrumbs/nav-component)
 
-(def audited-request-id*
-  (reaction (or (-> @routing/state* :route-params :audited-request-id)
-                ":audited-request-id")))
+(def request-id*
+  (reaction (or (-> @routing/state* :route-params :request-id)
+                ":request-id")))
 
 (defn request-li []
   [li :audited-request
    [:span audits/icon-request " Audited-Reuest" ]
-   {:audited-request-id @audited-request-id*} {}
+   {:audited-request-id @request-id*} {}
    :authorizers [auth/system-admin-scopes?]])
 
 (defonce left*

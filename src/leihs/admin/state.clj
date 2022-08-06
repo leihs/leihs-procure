@@ -3,9 +3,15 @@
   (:require
     [clj-yaml.core :as yaml]
     [clojure.java.io :as io]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+    [taoensso.timbre :refer [error warn info debug spy]]
     [tick.core :as tick]
-    [taoensso.timbre :as logging]))
+    ))
 
 (defonce state* (atom {}))
 
@@ -19,9 +25,20 @@
     (swap! state* update-in [:built-info :timestamp]
            #(or % (str(tick/now))))))
 
+(defn init-settings [ds]
+  (-> (sql/select :external_base_url :documentation_link)
+      (sql/from :settings)
+      (sql/from :system_and_security_settings)
+      (sql-format)
+      (->> (#(jdbc-query ds % db/builder-fn-options)) first
+           (swap! state* assoc :settings))))
 
-(defn init []
-  (logging/info "initializing global state ...")
+(comment (init-settings @db/ds-next*))
+
+
+(defn init [ds]
+  (info "initializing global state ...")
   (init-built-info)
-  (logging/info "initialized state " @state*))
+  (init-settings ds)
+  (info "initialized state " @state*))
 

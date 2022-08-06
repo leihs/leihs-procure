@@ -2,23 +2,24 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
     [logbug.debug :as debug]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+    [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
 (defn get-change
   [{{id :audited-change-id} :route-params
-    tx :tx :as request}]
-  {:body (->> (-> (sql/select :audited_changes.*)
-                  (sql/from :audited_changes)
-                  (sql/merge-where [:= :id id])
-                  sql/format)
-              (jdbc/query tx) first )})
+    tx-next :tx-next :as request}]
+  {:body (-> (sql/select :audited_changes.*)
+             (sql/from :audited_changes)
+             (sql/where [:= :id id])
+             sql-format
+             (->> (jdbc/execute-one! tx-next)))})
 
 (defn routes [request]
   (case (:handler-key request)

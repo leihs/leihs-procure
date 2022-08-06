@@ -28,11 +28,11 @@
     {:return-fn (fn [e] (System/exit -1))}
     (logging/info "Invoking run with options: " options)
     (shutdown/init options)
-    (state/init)
     (ssr-engine/init options)
     (leihs.core.ssr/init leihs.admin.utils.ssr/render-page-base)
     (let [status (status/init)]
       (db/init options (:health-check-registry status)))
+    (state/init @db/ds-next*)
     (let [http-handler (routes/init)]
       (http-server/start options http-handler))))
 

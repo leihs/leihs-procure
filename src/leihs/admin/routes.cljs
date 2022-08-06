@@ -59,6 +59,7 @@
     [leihs.admin.resources.users.user.create :as user-create]
     [leihs.admin.resources.users.user.delete-main :as user-delete]
     [leihs.admin.resources.users.user.edit-main :as user-edit]
+    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
     [leihs.admin.resources.users.user.show :as user-show]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
@@ -123,6 +124,7 @@
    :user #'user-show/page
    :user-create #'user-create/page
    :user-delete #'user-delete/page
+   :user-password-reset #'user-password-reset/page
    :user-edit #'user-edit/page
    :users #'users/page
    :users-choose #'users-choose/page })

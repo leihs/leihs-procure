@@ -2,13 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
-    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
+    [next.jdbc :as jdbc]
+    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+    [leihs.admin.utils.uuid :refer [uuid]]
+    [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
 (def selects
@@ -21,16 +24,17 @@
    [:audited_requests.user_id :requester_id]])
 
 (defn get-request
-  [{{txid :txid} :route-params
-    tx :tx :as request}]
-  {:body (->> (-> (apply sql/select selects)
-                  (sql/from :audited_requests)
-                  (sql/merge-where [:= :audited_requests.txid txid])
-                  (sql/merge-left-join
-                    :audited_responses
-                    [:= :audited_requests.txid :audited_responses.txid])
-                  sql/format)
-              (jdbc/query tx) first )})
+  [{{request-id :request-id} :route-params
+    tx-next :tx-next :as request}]
+  (assert request-id)
+  {:body (-> (apply sql/select selects)
+             (sql/from :audited_requests)
+             (sql/where [:= :audited_requests.id (uuid request-id)])
+             (sql/left-join
+               :audited_responses
+               [:= :audited_requests.txid :audited_responses.txid])
+             sql-format
+             (#(jdbc/execute-one! tx-next %)))})
 
 (defn routes [request]
   (case (:handler-key request)

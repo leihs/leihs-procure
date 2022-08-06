@@ -17,6 +17,7 @@
     "@leihs/ui-components": "file:leihs-ui/dist/ui-components",
     "date-fns": "^2.19.0",
     "jimp": "^0.16.1",
+    "qrcode.react": "^3.1.0",
     "react": "17.0.1",
     "react-bootstrap": "^1.6.4",
     "react-dom": "17.0.1"

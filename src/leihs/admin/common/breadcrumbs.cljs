@@ -31,8 +31,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn email-li [address]
-  [:li.breadcrumb-item {:key (str "mailto:" address )}
-   [:a {:href (str "mailto:" address )} [:i.fas.fa-envelope] " Email "]])
-
-
-
+  [core-breadcrumbs/li
+   (str "mailto:" address)
+   [:span [icons/email] " E-Mail"]
+   {} {} :button true])

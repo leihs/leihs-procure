@@ -29,7 +29,7 @@
     [taoensso.timbre :as logging]))
 
 
-(def txid* (reaction (or (-> @routing/state* :route-params :txid) ":txid")))
+(def request-id* (reaction (or (-> @routing/state* :route-params :request-id) ":request-id")))
 
 (defonce changes-index* (reagent/atom {}))
 
@@ -37,8 +37,7 @@
 
 (defn fetch-changes-index [& _]
   (reset! changes-index* {})
-  (let [txid @txid*
-        url (path :audited-changes {} {:txid txid})
+  (let [url (path :audited-changes {} {:request-id @request-id*})
         chan (async/chan)
         req (http/request {:chan chan :url url})]
     (go (let [resp (<! chan)]
@@ -94,7 +93,7 @@
   [:div.request-outer.p-2.my-5.bg-light
    {:key :request}
    [http/request-response-component
-    {:url (path :audited-request {:txid @txid*})}
+    {:url (path :audited-request {:request-id @request-id*})}
     request-component]])
 
 
@@ -150,9 +149,7 @@
                   (fetch-changes-index))}]
    [breadcrumbs/nav-component
     @breadcrumbs/left* []]
-   [:h1 audits/icon-request
-    " Audited-Request for TXID "
-    [components/truncated-id-component @txid* :max-length 8]]
+   [:h1 audits/icon-request " Audited-Request "]
    [request-fetch-component]
    [requester-component]
    [changes-component]

@@ -52,6 +52,7 @@
           (branch "/"
                   (param [#"[^/]+" :user-id])
                   (leaf "" :user)
+                  (leaf "/password-reset" :user-password-reset)
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
                   (leaf "/inventory-pools/" :user-inventory-pools)

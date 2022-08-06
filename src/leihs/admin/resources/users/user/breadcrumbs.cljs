@@ -4,20 +4,18 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [cljs.core.async :as async :refer [timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.string :refer [split trim]]
+    [leihs.admin.common.icons :as icons]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.users.user.core :refer [user-data*]]
+    [leihs.admin.state :as state]
+    [leihs.core.auth.core :as auth]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.auth.core :as auth]
-
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.core :refer [user-data*]]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-
-    [cljs.pprint :refer [pprint]]
-    [cljs.core.async :as async :refer [timeout]]
-    [clojure.string :refer [split trim]]
     [reagent.core :as reagent]
     [taoensso.timbre :refer [error warn info debug spy]]
     ))
@@ -48,13 +46,13 @@
                 :else true)))
 
 (defn edit-li []
-  [breadcrumbs/li :user-edit [:span [:i.fas.fa-edit] " Edit "]
+  [breadcrumbs/li :user-edit [:span [icons/edit] " Edit "]
    {:user-id @user-id*} {}
    :button true
    :authorizers [modifieable?]])
 
 (defn delete-li []
-  [breadcrumbs/li :user-delete [:span [:i.fas.fa-times] " Delete "]
+  [breadcrumbs/li :user-delete [:span [icons/delete] " Delete "]
    {:user-id @user-id*} {}
    :button true
    :authorizers [modifieable?]])
@@ -65,10 +63,20 @@
 
 (defn user-my-li [user-id]
   [li :my-user [:span [icons/user]
-                " User-Home in leihs/my
+                " User-Home
                 " [:i.fas.fa-external-link-alt]]
    {:user-id user-id} {}
    :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]])
+
+(defn user-password-reset-li [user-id]
+  [li :user-password-reset
+   [:span [icons/password-reset] " Password reset"]
+   {:user-id user-id} {}
+   :authorizers [modifieable?]
+   :button true])
+
+(defn password-reset-li []
+  [user-password-reset-li @user-id*])
 
 (defonce left*
   (reaction

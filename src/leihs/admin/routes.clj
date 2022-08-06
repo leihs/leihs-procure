@@ -50,6 +50,7 @@
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
     [leihs.admin.resources.users.user.main :as user]
+    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
     [leihs.core.anti-csrf.back :as anti-csrf]
     [leihs.core.auth.core :as auth]
     [leihs.core.constants :as constants]
@@ -196,9 +197,12 @@
 
 
           :user {:handler user/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
+          :user-password-reset {:handler user-password-reset/routes
+                                :authorizers [auth/admin-hierarchy?]}
           :user-inventory-pools {:handler user-inventory-pools/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :user-transfer-data {:handler user/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :users {:handler users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
+
           :users-choose {:handler users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           }))
 

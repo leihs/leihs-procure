@@ -27,12 +27,12 @@
 (defn breadcrumbs []
   [breadcrumbs/nav-component
    @breadcrumbs/left*
-   [[breadcrumbs-common/email-li (:email @user-data*)]
-    [breadcrumbs/user-my-li (or (:id @user-data*)
-                                (uuid "00000000-0000-0000-0000-000000000000"))]
+   [[breadcrumbs/user-my-li @user-id*]
     [audited-changes-breadcrumbs/changes-li
      :query-params {:pkey (:id @user-data*)
                     :table "users"}]
+    [breadcrumbs-common/email-li (:email @user-data*)]
+    [breadcrumbs/user-password-reset-li @user-id*]
     [breadcrumbs/delete-li]
     [breadcrumbs/edit-li]]])
 

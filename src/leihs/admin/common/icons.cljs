@@ -24,6 +24,7 @@
 (defn inventory [] (FontAwesomeIcon #js{:icon solids/faCube :className ""}))
 (defn inventory-pool [] (FontAwesomeIcon #js{:icon solids/faCube :className ""}))
 (defn inventory-pools [] (FontAwesomeIcon #js{:icon solids/faCubes :className ""}))
+(defn password-reset [] (FontAwesomeIcon #js{:icon solids/faKey :className ""}))
 (defn save [] (FontAwesomeIcon #js{:icon solids/faSave :className ""}))
 (defn system [] (FontAwesomeIcon #js{:icon solids/faUserServer :className ""}))
 (defn system-admin [] (FontAwesomeIcon #js{:icon solids/faUserAstronaut :className ""}))

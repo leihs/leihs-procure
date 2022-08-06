@@ -18,8 +18,8 @@
           (branch "/requests"
                   (leaf "/" :audited-requests)
                   (branch "/"
-                          (param :txid)
+                          (param :request-id)
                           (leaf "" :audited-request)))
           (branch "/responses/"
-                  (param :txid)
+                  (param :response-id)
                   (leaf "" :audited-responses))))

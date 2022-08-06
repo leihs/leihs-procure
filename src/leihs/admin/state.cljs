@@ -21,7 +21,6 @@
 (js/setInterval #(swap! global-state*
                        (fn [s] (merge s {:timestamp (js/Date.)}))) 1000)
 
-
 (def debug?*
   (reaction
     (or (:debug @global-state*)

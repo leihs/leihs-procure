@@ -3,24 +3,11 @@
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
-    [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
-    [clojure.set :as set]
-
-    [clj-time.format]
-    [clj-time.coerce]
-
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
-    )
-  (:import [java.sql Date]))
+    [taoensso.timbre :refer [error warn info debug spy]]
+    ))
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

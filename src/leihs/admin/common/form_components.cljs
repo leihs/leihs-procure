@@ -4,20 +4,17 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.constants :as constants]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
-
-    [leihs.admin.paths :refer [path]]
-
-    [clojure.string :as string]
-    [taoensso.timbre :as logging]
     [accountant.core :as accountant]
     [cljs.core.async :refer [timeout]]
-    [reagent.core :as reagent]
     [cljs.pprint :refer [pprint]]
+    [clojure.string :as string]
+    [leihs.admin.common.icons :as icons]
+    [leihs.admin.paths :refer [path]]
+    [leihs.core.constants :as constants]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent]
+    [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
 (def TAB-INDEX constants/TAB-INDEX)
@@ -96,6 +93,38 @@
     (when append [append])]
    (when hint [:small.form-text hint])])
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn select-component
+  [data* ks options default-option
+   & {:keys [label classes]
+      :or {label "Select"
+           classes []}}]
+  (let [options (cond
+                  (map? options) (->> options
+                                      (map (fn [[k v]] [(str k) (str v)]))
+                                      (into {}))
+                  (sequential? options) (->> options
+                                             (map (fn [k] [(str k) (str k)]))
+                                             (into {}))
+                  :else {"" ""})
+        default-option (or default-option
+                           (-> options first first))]
+    [:div.form-group.m-2
+     [:label {:for {:for (last ks)}}
+      [:span label [:small.text-monospace (last ks)]]]
+     [:div.input-group
+      [:select.form-control
+       {:id (last ks)
+        :value (let [val (get-in @data* ks)]
+                 (if (some #{val} (keys options))
+                   val
+                   default-option))
+        :on-change (fn [e]
+                     (let [val (or (-> e .-target .-value presence) "")]
+                       (swap! data* assoc-in ks val)))}
+       (for [[k n] options]
+         [:option {:key k :value k} n])]]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -109,7 +138,7 @@
   [:div
    {:class (->> outer-classes (map str) (string/join " "))}
    [:div.float-right
-    [:button.btn.btn-warning
+    [:button.btn
      {:class (->> btn-classes (map str) (string/join " "))
       :type :submit
       :disabled disabled

@@ -4,29 +4,27 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.http-client.core :as http]
-
-    [leihs.admin.resources.users.user.core :as user]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.audits.requests.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.resources.audits.core :as audits]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.utils.clipboard :as clipboard]
-
-    [clojure.set :refer [rename-keys]]
-    [clojure.string :as string]
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
+    [clojure.set :refer [rename-keys]]
+    [clojure.string :as string]
+    [leihs.admin.common.components :as components]
+    [leihs.admin.common.form-components :as form-components]
+    [leihs.admin.common.http-client.core :as http]
+    [leihs.admin.common.icons :as icons]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.audits.core :as audits]
+    [leihs.admin.resources.audits.requests.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
+    [leihs.admin.resources.users.user.core :as user]
+    [leihs.admin.state :as state]
+    [leihs.admin.utils.clipboard :as clipboard]
+    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
     [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre :as logging :refer [error warn info debug spy]]))
 
 (def requests* (reagent/atom {}))
 
@@ -128,6 +126,7 @@
       " " [clipboard/button-tiny path]])])
 
 (defn row-component [request tds]
+  (warn 'request request)
   [:tr.request
    {:key (:txid request)}
    [:td.text-monospace.timestamp {:key :timestamp} (:request_timestamp request)]
@@ -138,7 +137,7 @@
    [td-path-handler request]
    [td-requester request]
    [:td.actions
-    [:a {:href (path :audited-request {:txid (:txid request)})}
+    [:a {:href (path :audited-request {:request-id (:id request)})}
      [:span [icons/view] " Request "]]]
    (for [[idx col] (map-indexed vector tds)]
      ^{:key idx} [col request])])

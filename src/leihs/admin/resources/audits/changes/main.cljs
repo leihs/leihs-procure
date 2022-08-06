@@ -141,7 +141,7 @@
     (->> change :changed_attributes (map str) (str/join ", "))]
    [:td.request
     (when (:has_request change)
-      [:a {:href (path :audited-request {:txid (:txid change)})}
+      [:a {:href (path :audited-request {:request-id (:request-id change)})}
        [:span [icons/view] " Request "]])]
    [:td.change
     [:a {:href (path :audited-change {:audited-change-id (:id change)})}
