@@ -52,7 +52,7 @@ export const REQUEST_STATES = f.map(REQUEST_STATES_MAP, 'key')
 
 export const ORDER_STATI_MAP = [
   {
-    key: 'NOT_PROCURED',
+    key: 'NOT_PROCESSED',
     bsColor: 'info',
     roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   },
@@ -69,6 +69,11 @@ export const ORDER_STATI_MAP = [
   {
     key: 'ALTERNATIVE_PROCURED',
     bsColor: 'success',
+    roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
+  },
+  {
+    key: 'NOT_PROCURED',
+    bsColor: 'danger',
     roles: ['isRequester', 'isInspector', 'isViewer', 'isAdmin']
   }
 ]

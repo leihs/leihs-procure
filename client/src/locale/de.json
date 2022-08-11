@@ -40,9 +40,10 @@
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
 
-  "order_status_label_ALTERNATIVE_PROCURED": "Alternative Beschafft",
+  "order_status_label_ALTERNATIVE_PROCURED": "Alternative beschafft",
   "order_status_label_IN_PROGRESS": "In Bearbeitung",
-  "order_status_label_NOT_PROCURED": "Nicht Bearbeitet",
+  "order_status_label_NOT_PROCESSED": "Nicht bearbeitet",
+  "order_status_label_NOT_PROCURED": "Nicht beschafft",
   "order_status_label_PROCURED": "Beschafft",
 
   "request_replacement_labels_new": "Neu",

@@ -42,7 +42,8 @@
 
   "order_status_label_ALTERNATIVE_PROCURED": "Alternative Procured",
   "order_status_label_IN_PROGRESS": "In Progress",
-  "order_status_label_NOT_PROCURED": "Not Processed",
+  "order_status_label_NOT_PROCESSED": "Not Processed",
+  "order_status_label_NOT_PROCURED": "Not Procured",
   "order_status_label_PROCURED": "Procured",
 
   "request_short_id": "Number",
