@@ -122,7 +122,10 @@ if (process.env.NODE_ENV !== 'production') {
   const THROWING_FN = () => {
     throw new Error('WTF')
   }
-  assert.strictEqual(lodash_try(() => 23), 23)
+  assert.strictEqual(
+    lodash_try(() => 23),
+    23
+  )
   assert.strictEqual((() => lodash_try(THROWING_FN))(), undefined)
   assert.doesNotThrow(() => lodash_try(THROWING_FN))
 
@@ -130,7 +133,10 @@ if (process.env.NODE_ENV !== 'production') {
   assert.strictEqual(present([1]), true)
   assert.strictEqual(present(true), true)
   assert.strictEqual(present(false), true)
-  assert.strictEqual(present(function() {}), true)
+  assert.strictEqual(
+    present(function() {}),
+    true
+  )
   assert.strictEqual(present({}), false)
   assert.strictEqual(present([]), false)
   assert.strictEqual(present(undefined), false)
@@ -141,10 +147,17 @@ if (process.env.NODE_ENV !== 'production') {
 
   assert.deepEqual(
     uniqBy(
-      [{ n: 1, name: 'one' }, { n: 2, name: 'two' }, { n: 1, name: 'eins' }],
+      [
+        { n: 1, name: 'one' },
+        { n: 2, name: 'two' },
+        { n: 1, name: 'eins' }
+      ],
       'n'
     ),
-    [{ n: 1, name: 'one' }, { n: 2, name: 'two' }]
+    [
+      { n: 1, name: 'one' },
+      { n: 2, name: 'two' }
+    ]
   )
 
   assert.deepEqual(
@@ -153,7 +166,10 @@ if (process.env.NODE_ENV !== 'production') {
       { id: 2, name: 'two' },
       { id: 1, name: 'eins' }
     ]),
-    [{ id: 1, name: 'one' }, { id: 2, name: 'two' }]
+    [
+      { id: 1, name: 'one' },
+      { id: 2, name: 'two' }
+    ]
   )
 
   assert.strictEqual(

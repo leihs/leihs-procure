@@ -48,7 +48,10 @@ class MultiSelect extends React.PureComponent {
 
   isAllSelected = () => this.allOptions().length === this.selection().length
   groupValues = ({ options }) =>
-    f.map(options.filter(o => !o.disabled), 'value')
+    f.map(
+      options.filter(o => !o.disabled),
+      'value'
+    )
   groupSelection = group => {
     const selection = this.selection()
     const options = this.groupValues(group)

@@ -429,6 +429,7 @@ Array [
                 className="svg-inline--fa fa-circle fa-w-16 mr-2"
                 data-icon="circle"
                 data-prefix="far"
+                focusable="false"
                 role="img"
                 style={Object {}}
                 viewBox="0 0 512 512"
@@ -465,6 +466,7 @@ Array [
                 className="svg-inline--fa fa-circle fa-w-16 mr-2"
                 data-icon="circle"
                 data-prefix="far"
+                focusable="false"
                 role="img"
                 style={Object {}}
                 viewBox="0 0 512 512"
@@ -749,6 +751,7 @@ Array [
                   className="svg-inline--fa fa-circle fa-w-16 mr-2"
                   data-icon="circle"
                   data-prefix="far"
+                  focusable="false"
                   role="img"
                   style={Object {}}
                   viewBox="0 0 512 512"
@@ -785,6 +788,7 @@ Array [
                   className="svg-inline--fa fa-circle fa-w-16 mr-2"
                   data-icon="circle"
                   data-prefix="far"
+                  focusable="false"
                   role="img"
                   style={Object {}}
                   viewBox="0 0 512 512"
