@@ -86,7 +86,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 5.2)
   capybara (= 3.8.2)
-  exiftool_vendored
+  exiftool_vendored (= 11.44.0)
   factory_bot
   faker
   geckodriver-helper (= 0.21.0)
