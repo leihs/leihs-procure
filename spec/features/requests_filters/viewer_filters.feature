@@ -110,13 +110,15 @@ Feature: Requests' filter for viewer
 
 
   Scenario: Filters for viewer
-    Given there is an inspector for categories:
+    Given there is a viewer for categories:
       | Category 1 |
       | Category 3 |
 
     When I log in as the viewer
 
     Then the "nur Kategorien mit Anträgen" filter is checked
+    And I don't see "nur eigene (als Prüfer)"
+
     And "Budgetperioden" filter name is "Alle 3 ausgewählt"
     And "Kategorien" filter name is "Alle 2 ausgewählt"
 

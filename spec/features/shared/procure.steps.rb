@@ -149,29 +149,34 @@ step 'there is a request of requester with the following data:' do |table|
 end
 
 step 'I log in as the requester' do
-  @user ||= @requester
+  @user = @requester
+  expect(@user).to be
   step 'I log in as the user'
 end
 
 step 'I log in as the inspector' do
-  @user ||= @inspector
+  @user = @inspector
+  expect(@user).to be
   step 'I log in as the user'
 end
 
 step 'I log in as the viewer' do
-  @user ||= @viewer
+  @user = @viewer
+  expect(@user).to be
   step 'I log in as the user'
 end
 
 step 'I log in as the procurement admin' do
-  @user ||= @procurement_admin
+  @user = @procurement_admin
+  expect(@user).to be
   step 'I log in as the user'
 end
 
 step 'I log in as the requester :name' do |name|
   fn, ln = name.split(' ')
   u = User.find(firstname: fn, lastname: ln)
-  @user ||= @requester = u
+  @user = @requester = u
+  expect(@user).to be
   step 'I log in as the user'
 end
 

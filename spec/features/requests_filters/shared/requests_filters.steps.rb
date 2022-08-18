@@ -66,4 +66,14 @@ step 'there is a(n) :role for categories:' do |role, table|
                       user: @user,
                       category: c)
   end
+  if role = 'inspector'
+    @inspector = @user
+  end
+  if role = 'viewer'
+    @viewer = @user
+  end
+end
+
+step 'I don\'t see :text' do |text|
+  expect(page).not_to have_content text
 end

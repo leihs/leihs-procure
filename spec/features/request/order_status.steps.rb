@@ -10,26 +10,6 @@ step "there is a viewer for category :cat" do |cat|
   @viewer = pv.user
 end
 
-step "I log in as the inspector" do
-  expect(@inspector).to be
-  @user = @inspector
-  step "I log in as the user"
-end
-
-step "I log in as the viewer" do
-  expect(@viewer).to be
-  @user = @viewer
-  step "I log in as the user"
-end
-
-step "I log in as the requester :name" do |name|
-  fn, ln = name.split(" ")
-  u = User.find(firstname: fn, lastname: ln)
-  expect(u).to be
-  @user = @requester = u
-  step "I log in as the user"
-end
-
 step ":prop filter has following checkboxes:" do |prop, table|
   within ".form-compact" do
     within find(".form-group", text: prop) do
