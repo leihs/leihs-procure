@@ -77,7 +77,7 @@
      :label "Organization"
      :disabled (not @current-user/admin?*)
      :hint [:span "Is is recommended to set this to "
-            [:strong  [:em "leihs-local"]] " for locally managed entities "
+            [:strong  [:em "local"]] " for locally managed entities "
             "or to the corresponding " [:strong " domain name "] " for automatically managed entitie. "
             "This value must " [:strong  "not be empty"] ". "
             "The characters " [:strong " a-z, 0-9, hyphens, and dots are allowed. "]
