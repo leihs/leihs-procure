@@ -20,8 +20,6 @@ scripts:
         ruby-install --no-install-deps $RUBY_ENGINE $RUBY_VERSION
       fi
 
-      gem install bundler:${RUBY_BUNDLER_VERSION}
-
       bundle install
 
   test:

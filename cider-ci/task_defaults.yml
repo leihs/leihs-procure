@@ -10,8 +10,7 @@ task_defaults:
 
     RUBY: '{{RUBY_ENGINE}}-{{RUBY_VERSION}}'
     RUBY_ENGINE: ruby
-    RUBY_VERSION: 2.7.5
-    RUBY_BUNDLER_VERSION: 2.3.3
+    RUBY_VERSION: 2.7.6
 
     DIST_IMAGE_NAME: 'leihs-admin'
     DIST_VERSION_NAME: 'trial-{{CIDER_CI_TRIAL_ID}}'
