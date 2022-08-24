@@ -26,12 +26,12 @@ shared_context :all_types_of_users do
 
     @admin =  FactoryBot.create :admin,
       email: 'admin@example.com', password: 'secret',
-      admin_protected: false, system_admin_protected: false,
+      admin_protected: true , system_admin_protected: false,
       lastname: 'Adminus'
 
     @system_admin =  FactoryBot.create :system_admin,
       email: 'system-admin@example.com', password: 'secret',
-      admin_protected: false, system_admin_protected: false,
+      admin_protected: true, system_admin_protected: true,
       lastname: 'Sysmaster'
 
     @pool =  FactoryBot.create :inventory_pool

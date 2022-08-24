@@ -32,7 +32,7 @@
     (leihs.core.ssr/init leihs.admin.utils.ssr/render-page-base)
     (let [status (status/init)]
       (db/init options (:health-check-registry status)))
-    (state/init @db/ds-next*)
+    (state/init)
     (let [http-handler (routes/init)]
       (http-server/start options http-handler))))
 

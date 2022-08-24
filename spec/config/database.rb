@@ -12,13 +12,14 @@ end
 
 def db_con_str
   logger = Logger.new(STDOUT)
+  logger.level = Logger::INFO
   s = 'postgres://' \
     + (ENV['PGUSER'].presence || 'postgres') \
     + ((pw = (ENV['DB_PASSWORD'].presence || ENV['PGPASSWORD'].presence)) ? ":#{pw}" : "") \
     + '@' + (ENV['PGHOST'].presence || 'localhost') \
     + ':' + (db_port).to_s \
     + '/' + (db_name)
-  logger.info "SEQUEL CONN #{s}"
+  logger.debug "SEQUEL CONN #{s}"
   s
 end
 

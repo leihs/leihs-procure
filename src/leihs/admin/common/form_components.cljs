@@ -100,7 +100,8 @@
    & {:keys [label classes]
       :or {label "Select"
            classes []}}]
-  (let [options (cond
+  (let [k (last ks)
+        options (cond
                   (map? options) (->> options
                                       (map (fn [[k v]] [(str k) (str v)]))
                                       (into {}))
@@ -111,10 +112,10 @@
         default-option (or default-option
                            (-> options first first))]
     [:div.form-group.m-2
-     [:label {:for {:for (last ks)}}
-      [:span label [:small.text-monospace (last ks)]]]
-     [:div.input-group
-      [:select.form-control
+     [:div.input-group {:id k}
+      [:div.input-group-prepend
+       [:label.input-group-text  {:for k} label ]]
+      [:select.custom-select
        {:id (last ks)
         :value (let [val (get-in @data* ks)]
                  (if (some #{val} (keys options))

@@ -30,7 +30,11 @@
 
 (defn body-attributes [request]
   {:data-user (some-> (:authenticated-entity request) to-json url/encode)
-   :data-server-state (some-> @state* to-json  url/encode)})
+   :data-server-state (some-> @state*
+                              (assoc :settings
+                                     (-> request :settings
+                                         (select-keys [:external_base_url])))
+                              to-json url/encode)})
 
 (defn not-found-handler [request]
   {:status 404

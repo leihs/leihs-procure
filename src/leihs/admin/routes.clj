@@ -3,7 +3,6 @@
   (:require
     [bidi.bidi :as bidi]
     [bidi.ring :refer [make-handler]]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [leihs.admin.html :as html]
     [leihs.admin.paths :refer [path paths]]
@@ -75,6 +74,7 @@
     [ring.middleware.json]
     [ring.middleware.params]
     [ring.util.response :refer [redirect]]
+    [taoensso.timbre :refer [debug info warn error spy]]
     ))
 
 (declare redirect-to-root-handler)

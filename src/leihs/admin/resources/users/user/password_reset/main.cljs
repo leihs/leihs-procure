@@ -105,12 +105,14 @@
    [:div.alert.alert-success
     (let [url (reset-full-url (:token @data*))]
       [:div
-       [:p [:span "visit " ]]
-       [:p.text-center
-        {:style {:font-size "125%"}} [:span.code (reset-path-url)]]
-       [:p [:span "enter token"]]
-       [:p.text-center
-        {:style {:font-size "150%"}} [:span.code (:token @data*)]]
+       [:div
+        [:p [:span "visit " ]]
+        [:p.text-center
+         {:style {:font-size "125%"}} [:span.code (reset-path-url)]]]
+       [:div
+        [:p [:span "enter token"]]
+        [:p.text-center
+         {:style {:font-size "150%"}} [:span.code (:token @data*)]]]
        [:hr]
        [:p "or scan "]
        [:div.d-flex.justify-content-center
@@ -119,7 +121,7 @@
        [:div
         [:p "this token is valid until: "]
         [:p.text-center
-        (-> @data* :valid_until date-fns/parseISO str)]]])]
+         (-> @data* :valid_until date-fns/parseISO str)]]])]
    [:div.float-right
     [:button.btn.btn-primary
      {:on-click #(reset! data* data-defaults)}
@@ -127,10 +129,11 @@
    [:div.clearfix.mb-2]
    ])
 
-(defonce data* (reagent/atom data-defaults))
+;for debugging
+;(defonce data* (reagent/atom data-defaults))
 
 (defn main-component []
-  (let [_data* :foo]
+  (let [data* (reagent/atom data-defaults)]
     (fn []
       [:<>
        (when @state/debug?* [:pre (with-out-str (pprint @data*))])
