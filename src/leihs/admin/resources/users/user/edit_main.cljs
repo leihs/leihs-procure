@@ -12,7 +12,7 @@
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
-    [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
+    [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data* form-is-invalid*]]
     [leihs.admin.resources.users.user.edit-image :as edit-image]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
@@ -42,8 +42,8 @@
   [:div
    [:div.float-right
     [:button.btn.btn-warning
-     [icons/save]
-     " Save "]]
+     {:disabled @form-is-invalid*}
+     [icons/save] " Save "]]
    [:div.clearfix]])
 
 
@@ -52,8 +52,7 @@
    [edit-core/essentials-form-component]
    [:div.image
     [:h3 "Image / Avatar"]
-    [edit-image/image-component]
-    ]
+    [edit-image/image-component]]
    [edit-core/personal-and-contact-form-component]
    [edit-core/account-settings-form-component]])
 

@@ -84,6 +84,7 @@ feature 'Managing admin users:' do
           click_on_first_user @manager
           click_on  'Edit'
           check 'is_admin'
+          check 'admin_protected'
           click_on 'Save'
           wait_until { database[:users].where(id: @manager.id).first[:is_admin] == true }
         end
@@ -144,7 +145,9 @@ feature 'Managing admin users:' do
             click_on_first_user @manager
             click_on  'Edit'
             check 'is_admin'
+            check 'admin_protected'
             check 'is_system_admin'
+            check 'system_admin_protected'
             click_on 'Save'
             wait_until { database[:users].where(id: @manager.id) \
               .first[:is_system_admin] == true }

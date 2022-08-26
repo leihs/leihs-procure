@@ -26,29 +26,40 @@
 
 (def data* user-data*)
 
+(def admin-protected-is-invalid* (reaction (and (:is_admin @data*)  (not (:admin_protected @data*)))))
+
+(def system-admin-protected-is-invalid* (reaction (and (:is_system_admin @data*)  (not (:system_admin_protected @data*)))) )
+
+(def extended-info-is-valid*
+  (reaction (try (.parse js/JSON (get @data* :extended_info))
+                 true
+                 (catch :default _ false))))
+
+
+(def form-is-invalid*
+  (reaction (or @admin-protected-is-invalid*
+                @system-admin-protected-is-invalid*
+                (not @extended-info-is-valid*))))
+
+
 (defn json-component
-  [kw & {:keys [label hint]
+  [kw & {:keys [label hint classes]
          :or {label kw
               hint nil}}]
-  (let [is-valid* (reaction
-                    (try
-                      (.parse js/JSON (get @data* kw))
-                      true
-                      (catch :default _ false)))]
-    [:div.form-group
-     [:label {:for kw}
-      (if (= label kw)
-        [:strong  label]
-        [:span [:strong  label] [:small " (" [:span.text-monospace kw] ")"]])]
-     [:textarea.form-control
-      {:id kw
-       :class (if @is-valid* "is-valid" "is-invalid")
-       :auto-complete :off
-       :value (or (kw @data*) "")
-       :on-change #(swap! data* assoc kw (-> % .-target .-value presence))
-       :tab-index 100
-       :disabled false}]
-     (when hint [:small hint])]))
+  [:div.form-group
+   [:label {:for kw}
+    (if (= label kw)
+      [:strong  label]
+      [:span [:strong  label] [:small " (" [:span.text-monospace kw] ")"]])]
+   [:textarea.form-control
+    {:id kw
+     :class classes
+     :auto-complete :off
+     :value (or (kw @data*) "")
+     :on-change #(swap! data* assoc kw (-> % .-target .-value presence))
+     :tab-index 100
+     :disabled false}]
+   (when hint [:small hint])])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -111,19 +122,36 @@
     [:div.col-md-3
      [checkbox-component data* [:password_sign_in_enabled]
       :label "Password sign-in"
-      :hint [:span "This is often disabled when leihs is connected to an external authentication system."]]]
+      :hint [:span "This is often disabled when leihs is connected to an external authentication system."]]]]
+
+   [:div.form-row
     [:div.col-md-3
      [checkbox-component data* [:is_admin]
       :disabled (not @current-user/admin?*)
       :label "Leihs admin"
       :hint "Marks this account to be a leihs admin."]]
     [:div.col-md-3
+     [checkbox-component data* [:admin_protected]
+      :classes [(when @admin-protected-is-invalid* :is-invalid)]
+      :disabled (not @current-user/admin?*)
+      :label "Leihs admin protected"
+      :hint [:span "An admin protected entity can only be modifed by admins and in particular not by inventory-pool staff. "
+             "This is often used for entities which are automatically managed via the API. "]
+      :invalid-feedback [:span "An admin must be admin_protected."]]]]
+
+   [:div.form-row
+    [:div.col-md-3
      [checkbox-component data* [:is_system_admin]
       :disabled (not @current-user/system-admin?*)
       :label "System admin"
-      :hint "Marks this account to be a system admin."]]]
-
-   [users-and-groups/protect-form-fiels-row-component data*]
+      :hint "Marks this account to be a system admin."]]
+    [:div.col-md-3
+     [checkbox-component data* [:system_admin_protected]
+      :classes [(when @system-admin-protected-is-invalid* :is-invalid)]
+      :disabled (not @current-user/system-admin?*)
+      :label "System admin protected"
+      :hint [:span "This entity can only be modifed by system-admins. "]
+      :invalid-feedback [:span "A system_admin must be system_admin_protected."] ]]]
 
    [:div
     [:h3  "Other Fields "]
@@ -142,6 +170,7 @@
     [users-and-groups/org-form-fields-row-component data*]
     [:div
      [json-component :extended_info
+      :classes [(when-not @extended-info-is-valid* :is-invalid)]
       :label "Extended info"
       :hint [:span "This field can hold any structured data in JSON format."]]]]])
 

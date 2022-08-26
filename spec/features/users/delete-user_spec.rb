@@ -97,7 +97,7 @@ feature 'Deleting users', type: :feature do
         include_context :sign_in_to_admin
         scenario "I can delete an other admin" do
           database[:users].where(id: @user[:id])\
-            .update(is_admin: true)
+            .update(is_admin: true, admin_protected: true)
           ui_delete_user @user
         end
         scenario "There is no delete button for a system_admin" do
@@ -139,7 +139,8 @@ feature 'Deleting users', type: :feature do
         include_context :sign_in_to_admin
         scenario "I can delete an other system_admin" do
           database[:users].where(id: @user[:id])\
-            .update(is_admin: true, is_system_admin: true)
+            .update(is_admin: true, is_system_admin: true,
+                    admin_protected: true, system_admin_protected: true)
           ui_delete_user @user
         end
       end

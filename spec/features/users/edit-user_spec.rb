@@ -149,7 +149,7 @@ feature 'Editing and updating a user', type: :feature do
           ui_update_user_ok @user, {}
         end
         scenario "I can update an other admin with basic properties"  do
-          database[:users].where(id: @user[:id]).update(is_admin: true)
+          database[:users].where(id: @user[:id]).update(is_admin: true, admin_protected: true)
           ui_update_user_ok @user, {}
         end
         scenario "I can update an admin_protected user with basic properties"  do
@@ -163,9 +163,9 @@ feature 'Editing and updating a user', type: :feature do
           ui_update_user_ok @user, {org_id: Faker::Internet.uuid}
         end
         scenario "I can escalate a user to admin " do
-          ui_update_user_ok @user, {is_admin: true}
+          ui_update_user_ok @user, {is_admin: true, admin_protected: true}
         end
-        scenario "I can set a user to admin_protectd " do
+        scenario "I can set a user to admin_protected " do
           ui_update_user_ok @user, {admin_protected: true}
         end
         scenario "I can not change the is_system_admin attribure" do
@@ -212,7 +212,7 @@ feature 'Editing and updating a user', type: :feature do
 
         scenario "I can update an other system-admin with basic properties"  do
           database[:users].where(id: @user[:id])\
-            .update(is_admin: true, is_system_admin: true)
+            .update(is_admin: true, admin_protected: true, is_system_admin: true, system_admin_protected: true)
           ui_update_user_ok @user, {}
         end
         scenario "I can update an sytem_admin_protected user with basic properties"  do
@@ -221,9 +221,11 @@ feature 'Editing and updating a user', type: :feature do
           ui_update_user_ok @user, {}
         end
         scenario "I can escalate a user to system_admin " do
-          ui_update_user_ok @user, {is_admin: true, is_system_admin: true}
+          ui_update_user_ok @user,
+            {is_admin: true, admin_protected: true,
+             is_system_admin: true, system_admin_protected: true}
         end
-        scenario "I can set a user to system_admin_protectd " do
+        scenario "I can set a user to system_admin_protected " do
           ui_update_user_ok @user, {admin_protected: true, system_admin_protected: true}
         end
       end

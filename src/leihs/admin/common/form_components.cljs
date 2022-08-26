@@ -25,16 +25,20 @@
 
 (defn checkbox-component
   [data* ks & {:keys [disabled hint label
-                      key pre-change post-change]
+                      classes
+                      key pre-change post-change
+                      invalid-feedback]
                :or {disabled false
                     hint nil
+                    classes []
                     label (last ks)
                     key (last ks)
                     pre-change identity
                     post-change identity }}]
-  [:div.form-check.form-check
+  [:div.form-check.form-check.mb-2
    [:input.form-check-input
     {:id key
+     :class classes
      :type :checkbox
      :checked (boolean (get-in @data* ks))
      :on-change #(-> @data* (get-in ks) boolean not
@@ -47,7 +51,8 @@
     (if (= label (last ks))
       [:strong label]
       [:span [:strong  label] [:small " (" [:span.text-monospace (last ks)] ")"]])]
-   (when hint [:p [:small hint]]) ])
+   [:<> (when hint [:div [:small hint]])]
+   [:<> (when invalid-feedback [:div.invalid-feedback invalid-feedback])]])
 
 (defn convert [value type]
   (when value
