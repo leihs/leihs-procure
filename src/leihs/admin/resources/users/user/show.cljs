@@ -27,14 +27,14 @@
 (defn breadcrumbs []
   [breadcrumbs/nav-component
    @breadcrumbs/left*
-   [[breadcrumbs/user-my-li @user-id*]
-    [audited-changes-breadcrumbs/changes-li
+   [[audited-changes-breadcrumbs/changes-li
      :query-params {:pkey (:id @user-data*)
                     :table "users"}]
     [breadcrumbs-common/email-li (:email @user-data*)]
     [breadcrumbs/user-password-reset-li @user-id*]
     [breadcrumbs/delete-li]
-    [breadcrumbs/edit-li]]])
+    [breadcrumbs/edit-li]
+    [breadcrumbs/user-my-li @user-id*]]])
 
 (defn basic-properties []
  [:div.basic-properties.mb-2
