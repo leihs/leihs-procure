@@ -25,6 +25,13 @@
     ))
 
 
+(def user-password-resetable?*
+  (reaction
+    (and (-> @user-data* :account_enabled)
+         (-> @user-data* :password_sign_in_enabled)
+         (or (-> @user-data* :email presence)
+             (-> @user-data* :login presence)))))
+
 (def data-defaults {:valid_for_hours 24
                     :mode :create})
 
@@ -132,14 +139,27 @@
 ;for debugging
 ;(defonce data* (reagent/atom data-defaults))
 
+(defn reset-link-no-possible-warning-component []
+  [:div.alert.alert-warning {:role :alert}
+   [:h3.alert-heading "Creating a Password Reset Link Is Not Possible"]
+   [:p "To create and use a password reset link the folling must be sattisfied:"]
+   [:ul
+    [:li "The  " [:code "account_enabled"] " property must be set, and"]
+    [:li "The  " [:code "password_sign_in_enabled"] " property must be set, and"]
+    [:li "the account must have an " [:code "email"] " address."]]])
+
 (defn main-component []
   (let [data* (reagent/atom data-defaults)]
     (fn []
       [:<>
-       (when @state/debug?* [:pre (with-out-str (pprint @data*))])
-       (if (= (:mode @data*) :create)
-         [create-form-component data*]
-         [show-component data*])])))
+       (when @state/debug?*
+         [:pre (with-out-str (pprint @data*))]
+         [:pre (with-out-str (pprint @user-data*))])
+       (if-not @user-password-resetable?*
+         [reset-link-no-possible-warning-component]
+         (if (= (:mode @data*) :create)
+           [create-form-component data*]
+           [show-component data*]))])))
 
 (defn page []
   [:div.user-password-reset

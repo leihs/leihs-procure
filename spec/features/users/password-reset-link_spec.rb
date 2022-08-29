@@ -25,6 +25,16 @@ shared_examples :create_password_reset_link_via_ui do
   end
 end
 
+shared_examples :password_reset_page_shows_warning do
+  include_context :sign_in_to_admin
+  scenario 'The password reset link page shows an warning' do
+    click_on 'Users'
+    click_on_first_user target_user
+    click_on 'Password reset'
+    expect(page).to have_content "Creating a Password Reset Link Is Not Possible"
+  end
+end
+
 
 shared_examples :create_password_reset_link_via_api do
   include_context :setup_api
@@ -65,13 +75,32 @@ feature "Password Reset Link" do
       before(:each){ @current_user = @admin }
       context 'set target user as regular user' do
         let (:target_user) {@user}
-        include_examples :create_password_reset_link_via_api
-        include_examples :create_password_reset_link_via_ui
+
+        context 'the target users password sign in is disabled' do
+          before :each do
+            database[:users].where(id: @user.id).update(password_sign_in_enabled: false)
+          end
+          include_examples :password_reset_page_shows_warning
+        end
+        context 'the targer user has no email-address' do
+          before :each do
+            database[:users].where(id: @user.id).update(email: nil)
+          end
+          include_examples :password_reset_page_shows_warning
+        end
+
+        context do
+          include_examples :create_password_reset_link_via_api
+          include_examples :create_password_reset_link_via_ui
+        end
+
       end
+
       context 'set target_user as system_admin' do
         let (:target_user) {@system_admin}
         include_examples :create_password_reset_link_via_api_is_forbidden
       end
+
     end
 
     context 'as an system admin' do
