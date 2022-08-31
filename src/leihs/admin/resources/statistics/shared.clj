@@ -22,7 +22,7 @@
     [:>  :reservations.start_date one-year-ago]]
    [:and
     [:<= :reservations.returned_date now]
-    [:>  :reservations.returned_date two-years-ago]]])
+    [:>  :reservations.returned_date one-year-ago]]])
 
 (def active_reservations_12m_24m_cond
   [:or
