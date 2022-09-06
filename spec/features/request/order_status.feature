@@ -169,7 +169,7 @@ Feature: Order status
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
-  Scenario: Requester can only view the order status for budget periods in procuring phase
+  Scenario: Requester can view the order status
     When I log in as the requester "Elvira Ehring"
 
     Then I see "3 Anträge"
@@ -186,22 +186,24 @@ Feature: Order status
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
-    # Can not view order status in inspecting phase
+    # Can view order status in inspecting phase
     And I check all items for "Budgetperioden" filter
     And I uncheck all items for "Budgetperioden" filter
     And I check "Inspecting" for "Budgetperioden" filter
     And I expand the line of the request for "Zebra"
     Then I see "Artikel oder Projekt" in the request form
-    But I don't see "Beschaffungs-Status" in the request form
-    And I don't see "Nicht bearbeitet" in the request form
+    And I see "Beschaffungs-Status" in the request form
+    And I see "Nicht bearbeitet" in the request form
+    And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
-    # Can not view order status in requesting phase
+    # Can view order status in requesting phase
     And I check all items for "Budgetperioden" filter
     And I uncheck all items for "Budgetperioden" filter
     And I check "Requesting" for "Budgetperioden" filter
     And I expand the line of the request for "Gepard"
     Then I see "Artikel oder Projekt" in the request form
-    But I don't see "Beschaffungs-Status" in the request form
-    And I don't see "Nicht bearbeitet" in the request form
+    And I see "Beschaffungs-Status" in the request form
+    And I see "Nicht bearbeitet" in the request form
+    And I see a readonly "order_status" field in the request form
     And I click on "Abbrechen"
