@@ -17,6 +17,7 @@
     [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     [logbug.catcher :as catcher]
+    [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
 (def users-count-sub
@@ -48,7 +49,7 @@
        [[:delegations_count :desc][:id :asc]]) (apply sql/order-by query order)
       (apply sql/order-by query [[:name :asc][:id :asc]]))))
 
-(defn term-fitler [query request]
+(defn term-filter [query request]
   (if-let [term (-> request :query-params-raw :term presence)]
     (-> query
         (sql/merge-where [:or
@@ -62,12 +63,22 @@
     "no" (sql/merge-where query [:= :inventory_pools.is_active false])
     query))
 
+(defn with-items-from-suppliers-filter [query request]
+  (case (-> request :query-params-raw :with_items_from_suppliers)
+    "yes" (-> query
+              (sql/select :inventory_pools.id :inventory_pools.name)
+              (sql/modifiers :distinct)
+              (sql/merge-join :items [:= :items.inventory_pool_id :inventory_pools.id])
+              (sql/merge-join :suppliers [:= :items.supplier_id :suppliers.id]))
+    query))
+
 (defn inventory-pools-query [{:as request}]
   (-> inventory-pools-base-query
       (set-per-page-and-offset request)
       (set-order request)
       (activity-filter request)
-      (term-fitler request)))
+      (term-filter request)
+      (with-items-from-suppliers-filter request)))
 
 (defn inventory-pools [{tx :tx :as request}]
   (let [query (inventory-pools-query request)

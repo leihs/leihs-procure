@@ -1,5 +1,6 @@
 (ns leihs.admin.main
   (:require
+    [leihs.admin.scratch]
     [leihs.admin.run]
     [leihs.core.logging]
     [taoensso.timbre :refer [info]]

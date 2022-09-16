@@ -86,6 +86,18 @@
           (leaf "pools/" :statistics-pools)
           (leaf "users/" :statistics-users)))
 
+(def suppliers-paths
+  (branch "/suppliers"
+          (branch "/"
+                  (leaf "" :suppliers)
+                  (leaf "create" :supplier-create))
+          (branch "/"
+                  (param :supplier-id)
+                  (leaf "" :supplier)
+                  (leaf "/delete" :supplier-delete)
+                  (leaf "/edit" :supplier-edit)
+                  (leaf "/items" :supplier-items))))
+
 (def paths
   (branch ""
           leihs.core.paths/core-paths
@@ -100,13 +112,13 @@
                   system/paths
                   users-paths
                   statistics-paths
+                  suppliers-paths
                   (leaf "/audits" :admin-audits-legacy)
                   (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)
                   (leaf "/mail_templates" :admin-mail-templates)
                   (leaf "/rooms" :admin-rooms)
                   (leaf "/settings" :admin-settings)
-                  (leaf "/suppliers" :admin-suppliers)
                   )))
 
 

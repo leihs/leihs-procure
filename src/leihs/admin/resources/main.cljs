@@ -36,7 +36,7 @@
        [breadcrumbs/li :admin-rooms " Rooms " {} {} :authorizers [auth/admin-scopes?]]
        [settings-breadcrumbs/settings-li]
        [breadcrumbs-statistics/statistics-li]
-       [breadcrumbs/li :admin-suppliers " Suppliers " {} {} :authorizers [auth/admin-scopes?]]
+       [breadcrumbs/suppliers-li]
        [breadcrumbs-system/system-li]
        [breadcrumbs-users/users-li]]])
    [:div

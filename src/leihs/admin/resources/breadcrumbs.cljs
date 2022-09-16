@@ -36,6 +36,10 @@
    :authorizers [auth/admin-scopes?
                  pool-auth/some-lending-manager?]])
 
+(defn suppliers-li []
+  [li :suppliers [:span [icons/suppliers] " Suppliers "] {} {}
+   :authorizers [auth/admin-scopes?]])
+
 (defn leihs-li [] [li :home [:span [icons/home] " Home "] {} {}
                    :authorizers [auth/all-granted]])
 (defn lending-li [] [li :lending "Lending"])

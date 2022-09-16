@@ -1,6 +1,7 @@
 (ns leihs.admin.utils.misc
   (:refer-clojure :exclude [str keyword])
   (:require
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.state :as state]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.digest]
@@ -50,6 +51,5 @@
 ; the following should be moved to common.components
 
 (defn wait-component []
-  [:div.text-center.wait-component
-   [:i.fas.fa-spinner.fa-spin.fa-5x]
-   [:span.sr-only "Please wait"]])
+  [:h3.text-center.wait-component
+   [icons/waiting]])

@@ -16,7 +16,7 @@
 (defn page []
   [:div.page.inventory-page
    [breadcrumbs/nav-component @breadcrumbs/left* []]
-   [:h1 "Inventory"]
+   [:h1 [icons/inventory] " Inventory"]
    [:h2 "Export / Download Inventory"]
    [:ul
      [:li [:a {:href (path :inventory-csv) :target :_blank} [:i.fas.fa-download] " CSV"]]

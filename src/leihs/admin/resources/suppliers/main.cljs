@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.groups.main
+(ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -12,11 +12,9 @@
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http]
     [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.groups.shared :as shared]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+    [leihs.admin.resources.suppliers.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.suppliers.shared :as shared]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
     [leihs.admin.utils.seq :as seq]
@@ -38,9 +36,21 @@
 
 (def data* (reagent/atom {}))
 
-(defn fetch-groups []
+(defonce inventory-pools-data* (reagent/atom nil))
+
+(defn fetch-suppliers []
   (http/route-cached-fetch data*))
 
+(defn fetch-inventory-pools []
+  (go (reset! inventory-pools-data*
+              (some->
+                {:chan (async/chan)
+                 :url (path :inventory-pools {} {:with_items_from_suppliers "yes"
+                                                 :active "yes"
+                                                 :per-page 1000})}
+                http/request :chan <!
+                http/filter-success!
+                :body))))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -50,39 +60,27 @@
         (merge @current-query-paramerters-normalized*
                query-params)))
 
-(defn link-to-group
-  [group inner & {:keys [authorizers]
-                  :or {authorizers []}}]
+(defn link-to-supplier
+  [supplier inner & {:keys [authorizers]
+                     :or {authorizers []}}]
   (if (auth/allowed? authorizers)
-    [:a {:href (path :group {:group-id (:id group)})} inner]
+    [:a {:href (path :supplier {:supplier-id (:id supplier)})} inner]
     inner))
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(defn form-term-filter []
-  [routing/form-term-filter-component])
-
-(defn form-including-user-filter []
-  [routing/choose-user-component
-   :query-params-key :including-user
-   :input-options {:placeholder "email, login, or id"}])
-
-(defn form-org-filter []
-  [routing/delayed-query-params-input-component
-   :label "Org ID"
-   :query-params-key :org_id
-   :input-options
-   {:placeholder "org_id or true or false"}])
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
     [:div.form-row
-     [form-term-filter]
-     [form-including-user-filter]
-     [users-and-groups/form-org-filter data*]
-     [users-and-groups/form-org-id-filter]
+     [routing/form-term-filter-component]
+     [routing/select-component
+      :label "Inventory Pool"
+      :query-params-key :inventory_pool_id
+      :options (cons ["" "(any)"]
+                     (->> @inventory-pools-data*
+                          :inventory-pools
+                          (map #(do [(:id %) (:name %)]))))]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
@@ -92,74 +90,51 @@
 (defn name-th-component []
   [:th {:key :name} "Name"])
 
-(defn name-td-component [group]
+(defn name-td-component [supplier]
   [:td {:key :name}
-   [link-to-group group [:span (:name group) ]
-    :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]]])
+   [link-to-supplier supplier [:span (:name supplier) ]
+    :authorizers [auth/admin-scopes?]]])
 
-(defn org-th-component []
- [:th {:key :organization} "Organization"])
+(defn items-count-th-component []
+  [:th.text-left {:key :count_items} "# Items"])
 
-(defn org-td-component [group]
-  [:td {:key :organization}
-   (:organization group)])
-
-(defn org-id-th-component []
- [:th {:key :org-id} "Org ID"])
-
-(defn org-id-td-component [group]
-  [:td {:key :org-id}
-   (:org_id group)])
-
-(defn protected-th-component []
-  [:th {:key :admin_protected} "Protected"])
-
-(defn protected-td-component [group]
-  [:td {:key :admin_protected}
-   (if (:admin_protected group)
-     "yes"
-     "no")])
-
-(defn users-count-th-component []
-  [:th.text-right {:key :count_users} "# Users"])
-
-(defn users-count-td-component [group]
-  [:td.text-right {:key :users_count} (:count_users group)])
+(defn items-count-td-component [supplier]
+  [:td.text-left {:key :items_count} (:count_items supplier)])
 
 
 ;;;;;
 
-(defn groups-thead-component [more-cols]
+(defn suppliers-thead-component [more-cols]
   [:thead
    [:tr
     [:th {:key :index} "Index"]
     (for [[idx col] (map-indexed vector more-cols)]
       ^{:key idx} [col])]])
 
-(defn group-row-component [group more-cols]
-  ^{:key (:id group)}
-  [:tr.group {:key (:id group)}
-   [:td {:key :index} (:index group)]
+(defn supplier-row-component [supplier more-cols]
+  ^{:key (:id supplier)}
+  [:tr.supplier {:key (:id supplier)}
+   [:td {:key :index} (:index supplier)]
    (for [[idx col] (map-indexed vector more-cols)]
-     ^{:key idx} [col group])])
+     ^{:key idx} [col supplier])])
 
-(defn core-table-component [hds tds groups]
-  (if-let [groups (seq groups)]
-    [:table.groups.table.table-striped.table-sm
-     [groups-thead-component hds]
+(defn core-table-component [hds tds suppliers]
+  (if-let [suppliers (seq suppliers)]
+    [:table.suppliers.table.table-striped.table-sm
+     [suppliers-thead-component hds]
      [:tbody
       (let [page (:page @current-query-paramerters-normalized*)
             per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [group groups]
-                 ^{:key (:id group)}
-                 [group-row-component group tds])))]]
-    [:div.alert.alert-warning.text-center "No (more) groups found."]))
+        (doall (for [supplier suppliers]
+                 ^{:key (:id supplier)}
+                 [supplier-row-component supplier tds])))]]
+    [:div.alert.alert-warning.text-center "No (more) suppliers found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))
     [wait-component]
     [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :groups)]))
+     (-> @data* (get (:route @routing/state*) {}) :suppliers)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -175,31 +150,31 @@
       [:h3 "@current-url*"]
       [:pre (with-out-str (pprint @current-url*))]]
      [:div
+      [:h3 "@inventory-pools-data*"]
+      [:pre (with-out-str (pprint @inventory-pools-data*))]]
+     [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-change fetch-groups}]
+    {:did-change fetch-suppliers
+     :did-mount fetch-inventory-pools}]
    [filter-component]
    [routing/pagination-component]
    [table-component
     [name-th-component
-     org-th-component
-     org-id-th-component
-     users-count-th-component]
+     items-count-th-component]
     [name-td-component
-     org-td-component
-     org-id-td-component
-     users-count-td-component]]
+     items-count-td-component]]
    [routing/pagination-component]
    [debug-component]])
 
 (defn page []
-  [:div.groups
+  [:div.suppliers
    [breadcrumbs/nav-component
     @breadcrumbs/left*
     [[breadcrumbs/create-li]]]
-   [:h1 [icons/groups] " Groups"]
+   [:h1 [icons/suppliers] " Suppliers"]
    [main-page-content-component]])

@@ -49,6 +49,12 @@
     [leihs.admin.resources.settings.smtp.main :as smtp-settings]
     [leihs.admin.resources.settings.syssec.main :as syssec-settings]
     [leihs.admin.resources.statistics.main :as statistics]
+    ; [leihs.admin.resources.suppliers.supplier.create :as supplier-create]
+    ; [leihs.admin.resources.suppliers.supplier.del :as supplier-delete]
+    [leihs.admin.resources.suppliers.supplier.main :as supplier]
+    ; [leihs.admin.resources.suppliers.supplier.show :as supplier-show]
+    ; [leihs.admin.resources.suppliers.supplier.users.main :as supplier-users]
+    [leihs.admin.resources.suppliers.main :as suppliers]
     [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
@@ -119,6 +125,11 @@
    :settings #'settings/page
    :smtp-settings #'smtp-settings/page
    :statistics #'statistics/page
+   :supplier #'supplier/show-page
+   :supplier-create #'supplier/create-page
+   :supplier-delete #'supplier/delete-page
+   :supplier-edit #'supplier/edit-page
+   :suppliers #'suppliers/page
    :syssec-settings #'syssec-settings/page
    :system #'system/page
    :user #'user-show/page

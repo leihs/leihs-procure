@@ -7,6 +7,7 @@
     [accountant.core :as accountant]
     [cljs.core.async :refer [timeout]]
     [cljs.pprint :refer [pprint]]
+    [clojure.core.match :refer [match]]
     [clojure.string :as string]
     [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :refer [path]]
@@ -110,9 +111,11 @@
                   (map? options) (->> options
                                       (map (fn [[k v]] [(str k) (str v)]))
                                       (into {}))
-                  (sequential? options) (->> options
-                                             (map (fn [k] [(str k) (str k)]))
-                                             (into {}))
+                  (sequential? options)  (->> options
+                                              (map (fn [x]
+                                                     (match x
+                                                            [k v] [(str k) (str v)]
+                                                            :else [(str x) (str x)]))))
                   :else {"" ""})
         default-option (or default-option
                            (-> options first first))]
@@ -123,7 +126,7 @@
       [:select.custom-select
        {:id (last ks)
         :value (let [val (get-in @data* ks)]
-                 (if (some #{val} (keys options))
+                 (if (some #{val} (map first options))
                    val
                    default-option))
         :on-change (fn [e]

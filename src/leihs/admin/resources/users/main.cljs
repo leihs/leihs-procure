@@ -11,6 +11,7 @@
     [leihs.admin.common.components :as components]
     [leihs.admin.common.http-client.core :as http]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.shared :as shared]
@@ -234,5 +235,5 @@
    [breadcrumbs/nav-component
     @breadcrumbs/left*
     [[breadcrumbs/user-create-li]]]
-   [:h1 "Users"]
+   [:h1 [icons/users] " Users"]
    [main-page-content-component]])

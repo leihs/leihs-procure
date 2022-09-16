@@ -41,6 +41,9 @@
     [leihs.admin.resources.statistics.models :as statistics-models]
     [leihs.admin.resources.statistics.pools :as statistics-pools]
     [leihs.admin.resources.statistics.users :as statistics-users]
+    [leihs.admin.resources.suppliers.supplier.main :as supplier]
+    [leihs.admin.resources.suppliers.supplier.items :as supplier-items]
+    [leihs.admin.resources.suppliers.main :as suppliers]
     [leihs.core.status :as status]
     [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
@@ -185,6 +188,10 @@
           :statistics-models {:handler statistics-models/routes :authorizers [auth/admin-scopes?]}
           :statistics-pools {:handler statistics-pools/routes :authorizers [auth/admin-scopes?]}
           :statistics-users {:handler statistics-users/routes :authorizers [auth/admin-scopes?]}
+
+          :supplier {:handler supplier/routes :authorizers [auth/admin-scopes?]}
+          :supplier-items {:handler supplier-items/routes :authorizers [auth/admin-scopes?]}
+          :suppliers {:handler suppliers/routes :authorizers [auth/admin-scopes?]}
 
           :languages-settings {:handler languages-settings/routes
                           :authorizers [auth/admin-scopes?]}
