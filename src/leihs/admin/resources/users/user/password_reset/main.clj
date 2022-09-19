@@ -1,14 +1,13 @@
 (ns leihs.admin.resources.users.user.password-reset.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [alphabase.base32 :as base32 :refer [encode] :rename {encode b32encode}]
-    [alphabase.bytes :refer [random-bytes]]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.main :as users]
     [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.random :refer [base32-crockford-rand-str]]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
     [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
@@ -20,8 +19,7 @@
 
 (defn token
   ([] (token 6))
-  ([n]
-   (-> n random-bytes b32encode)))
+  ([n] (base32-crockford-rand-str n)))
 
 (defn timestamp [hrs]
   (assert (int? hrs ))
