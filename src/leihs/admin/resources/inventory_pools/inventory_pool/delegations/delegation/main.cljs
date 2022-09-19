@@ -52,6 +52,15 @@
          [:td.responsible-user
           [delegation-users/user-inner-component
            (:responsible_user delegation)]]]
+        [:tr.users-count
+         [:td "Number of users"]
+         [:td.users-count (:users_count delegation)]]
+        [:tr.direct-users-count
+         [:td "Number of direct users"]
+         [:td.direct-users-count (:direct_users_count delegation)]]
+        [:tr.groups-count
+         [:td "Number of groups"]
+         [:td.groups-count (:groups_count delegation)]]
         [:tr.protected
          [:td "Protected"]
          [:td (if (:pool_protected delegation)
@@ -78,15 +87,6 @@
                                               {:inventory-pool-id (:id pool)
                                                :delegation-id (:id delegation)})}
                               inner]]))))]]]
-        [:tr.users-count
-         [:td "Number of users"]
-         [:td.users-count (:users_count delegation)]]
-        [:tr.direct-users-count
-         [:td "Number of direct users"]
-         [:td.direct-users-count (:direct_users_count delegation)]]
-        [:tr.groups-count
-         [:td "Number of groups"]
-         [:td.groups-count (:groups_count delegation)]]
         [:tr.created
          [:td "Created "]
          [:td.created (-> delegation :created_at humanize-datetime-component)]]]]]

@@ -25,7 +25,6 @@
    [:div.card-body
     [:div.form-row
      [users/form-term-filter]
-     [users/form-enabled-filter]
      [routing/select-component
       :label "Membership"
       :query-params-key :membership
@@ -35,6 +34,7 @@
                 "direct" "direct members"
                 "group" "group members"}
       :default-option "member"]
+     [users/form-enabled-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
@@ -71,7 +71,7 @@
   (update-aggregated-membership user))
 
 (defn direct-member-user-th-component []
-  [:th "Direct member"])
+  [:th "Add or remove user"])
 
 (defn change-direct-membership
   [path user method]
@@ -136,7 +136,7 @@
 ;;; group member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn group-member-user-th-component []
-  [:th "Group member"])
+  [:th "Add or remove group"])
 
 (defn create-group-member-user-td-component [path-fn]
   (fn [user]

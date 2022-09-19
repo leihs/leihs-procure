@@ -61,7 +61,8 @@
 
 
 (defn form-term-filter []
-  [routing/form-term-filter-component])
+  [routing/form-term-filter-component
+   :placeholder "name of the group"])
 
 (defn form-including-user-filter []
   [routing/choose-user-component

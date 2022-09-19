@@ -51,7 +51,7 @@
 
 (defn form-term-filter []
   [routing/form-term-filter-component
-   :placeholder "fuzzy term or exact email-address" ])
+   :placeholder "part of the name, exact email-address" ])
 
 (defn form-enabled-filter []
   [routing/select-component
