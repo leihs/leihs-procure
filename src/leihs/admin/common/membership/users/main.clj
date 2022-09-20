@@ -5,7 +5,7 @@
     [leihs.core.sql :as sql]
 
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.common.membership.users.shared :refer [default-query-params]]
+    [leihs.admin.common.membership.users.shared :refer [DEFAULT-QUERY-PARAMS MEMBERSHIP-QUERY-PARAM-KEY]]
 
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
@@ -16,9 +16,9 @@
 (defn filter-by-membership
   [query member-expr direct-member-expr group-expr request]
   (case (-> (merge
-              default-query-params
+              DEFAULT-QUERY-PARAMS
               (:query-params request))
-            :membership presence str)
+            MEMBERSHIP-QUERY-PARAM-KEY presence str)
     ("" "member") (sql/merge-where query member-expr)
     "any" query
     "direct" (sql/merge-where query direct-member-expr)

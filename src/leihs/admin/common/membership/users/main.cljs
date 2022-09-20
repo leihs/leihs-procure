@@ -4,18 +4,19 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [accountant.core :as accountant]
+    [cljs.core.async :as async]
+    [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as icons]
+    [leihs.admin.common.membership.users.shared :refer [DEFAULT-QUERY-PARAMS QUERY-OPTIONS DEFAULT-MEMBERSHIP-QUERY-PARAM MEMBERSHIP-QUERY-PARAM-KEY]]
+    [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.users.main :as users]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.membership.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.paths :as paths :refer [path]]
-
-    [cljs.core.async :as async]
-    [accountant.core :as accountant]
     [reagent.core :as reagent]))
+
+
+
 
 
 ;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,13 +28,9 @@
      [users/form-term-filter]
      [routing/select-component
       :label "Membership"
-      :query-params-key :membership
-      :options {"any" "members and non-members"
-                "non" "non-members"
-                "member" "members"
-                "direct" "direct members"
-                "group" "group members"}
-      :default-option "member"]
+      :query-params-key MEMBERSHIP-QUERY-PARAM-KEY
+      :options QUERY-OPTIONS
+      :default-option DEFAULT-MEMBERSHIP-QUERY-PARAM]
      [users/form-enabled-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])

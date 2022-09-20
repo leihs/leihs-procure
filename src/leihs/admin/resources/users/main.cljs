@@ -10,8 +10,10 @@
     [clojure.string :as str]
     [leihs.admin.common.components :as components]
     [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.common.icons :as icons]
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.common.membership.users.shared :as users-membership]
+    [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.shared :as shared]
@@ -39,6 +41,10 @@
 
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def on-first-page?*
+  (reaction (= 1 (get-in @routing/state* [:query-params :page] 1)) ))
+
 
 (defn page-path-for-query-params [query-params]
   (path (:handler-key @routing/state*)
@@ -178,7 +184,12 @@
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col user])])
 
-(defn table-component [hds tds]
+
+(defn table-component
+  [hds tds &
+   {:keys [membership-filter? role-filter?]
+    :or {membership-filter? false
+         role-filer? false}}]
   [:div
    [routing/hidden-state-component
     {:did-change fetch-users}]
@@ -190,7 +201,13 @@
         [:tbody.users
          (doall (for [user users]
                   (row-component user tds)))]]
-       [:div.alert.alert-warning.text-center "No (more) users found."]))])
+       (if @on-first-page?*
+         (cond
+           (and membership-filter? @users-membership/filtered-by-member?*
+                ) (users-membership/empty-members-alert)
+           (and role-filter? @roles/filtered-by-role?*) (roles/empty-alert)
+           :else [:div.alert.alert-warning.text-center "No users found."])
+         [:div.alert.alert-warning.text-center "No more users found."])))])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -188,7 +188,8 @@
     roles-td-component
     direct-roles-td-component
     groups-roles-td-component
-    suspension-td-component]])
+    suspension-td-component]
+   :role-filter? true])
 
 (defn main-page-component []
   [:div

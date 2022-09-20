@@ -62,7 +62,8 @@
      (membership-users/create-direct-member-user-td-component
        direct-member-path-fn)
      (membership-users/create-group-member-user-td-component
-       groups-path-fn)]]
+       groups-path-fn)]
+    :membership-filter? true]
    [routing/pagination-component]])
 
 (defn header-component []
