@@ -11,6 +11,7 @@
 (defn admin [] (FontAwesomeIcon #js{:icon solids/faWrench :className ""}))
 (defn authentication-system [] (FontAwesomeIcon #js{:icon solids/faExternalLinkAlt :className ""}))
 (defn authentication-systems [] (FontAwesomeIcon #js{:icon solids/faExternalLinkAlt :className ""}))
+(defn building [] (FontAwesomeIcon #js{:icon solids/faBuilding :className ""}))
 (defn delegation [] (FontAwesomeIcon #js{:icon solids/faHandsHelping :className ""}))
 (defn delegations [] (FontAwesomeIcon #js{:icon solids/faHandsHelping :className ""}))
 (defn delete [] (FontAwesomeIcon #js{:icon solids/faTimes :className ""}))

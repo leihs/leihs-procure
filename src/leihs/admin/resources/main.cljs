@@ -27,7 +27,7 @@
       @breadcrumbs/left*
       [[breadcrumbs/li :admin-audits-legacy " Audits legacy " {} {} :authorizers [auth/admin-scopes?]]
        [breadcrumbs-audits/audits-li]
-       [breadcrumbs/li :admin-buildings " Buildings " {} {} :authorizers [auth/admin-scopes?]]
+       [breadcrumbs/buildings-li]
        [breadcrumbs/li :admin-fields " Fields " {} {} :authorizers [auth/admin-scopes?]]
        [breadcrumbs/groups-li]
        [breadcrumbs-inventory/inventory-li]

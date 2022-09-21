@@ -1,4 +1,4 @@
-(ns leihs.admin.resources.suppliers.supplier.core
+(ns leihs.admin.resources.buildings.building.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
     [reagent.ratom :as ratom :refer [reaction]]
@@ -13,7 +13,7 @@
     [leihs.admin.common.components :as components]
     [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.suppliers.supplier.breadcrumbs :as breadcrumbs]
+    [leihs.admin.resources.buildings.building.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
 
     [accountant.core :as accountant]
@@ -23,15 +23,15 @@
     ))
 
 (defonce id*
-  (reaction (or (-> @routing/state* :route-params :supplier-id presence)
-                ":supplier-id")))
+  (reaction (or (-> @routing/state* :route-params :building-id presence)
+                ":building-id")))
 
 (defonce data* (reagent/atom nil))
 
 (defonce edit-mode?*
   (reaction
     (and (map? @data*)
-         (boolean ((set '(:supplier-edit :supplier-create))
+         (boolean ((set '(:building-edit :building-create))
                    (:handler-key @routing/state*))))))
 
 
@@ -41,7 +41,7 @@
   (go (reset! data*
               (some->
                 {:chan (async/chan)
-                 :url (path :supplier
+                 :url (path :building
                             (-> @routing/state* :route-params))}
                 http-client/request :chan <!
                 http-client/filter-success! :body))))
@@ -55,9 +55,9 @@
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div.supplier-debug
+    [:div.building-debug
      [:hr]
-     [:div.supplier-data
+     [:div.building-data
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
@@ -71,7 +71,7 @@
   [:span
    [routing/hidden-state-component
     {:did-change fetch}]
-   (let [p (path :supplier {:supplier-id @id*})
+   (let [p (path :building {:building-id @id*})
          inner (if @data*
                  [:em (str (:name @data*))]
                  [:span {:style {:font-family "monospace"}} (short-id @id*)])]

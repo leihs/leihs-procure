@@ -1,12 +1,12 @@
-(ns leihs.admin.resources.suppliers.main
+(ns leihs.admin.resources.buildings.main
   (:refer-clojure :exclude [str keyword])
   (:require
     [next.jdbc.sql :as jdbc]
     [clojure.set]
     [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.suppliers.shared :as shared]
-    [leihs.admin.resources.suppliers.supplier.main :as supplier]
+    [leihs.admin.resources.buildings.shared :as shared]
+    [leihs.admin.resources.buildings.building.main :as building]
     [leihs.admin.utils.seq :as seq]
     [leihs.admin.utils.uuid :refer [uuid]]
     [leihs.core.core :refer [keyword str presence]]
@@ -16,16 +16,28 @@
     [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
-(def suppliers-base-query
-  (-> (sql/select-distinct :suppliers.id
-                           :suppliers.name
-                           :suppliers.note
-                           [(-> (sql/select :%count.*)
-                                (sql/from :items)
-                                (sql/where := :items.supplier_id :suppliers.id))
-                            :count_items])
-      (sql/from :suppliers)
-      (sql/order-by :suppliers.name :suppliers.id)))
+(def count-items-select-query
+  (-> (sql/select :%count.*)
+      (sql/from :items)
+      (sql/join :rooms [:= :rooms.id :items.room_id])
+      (sql/join [:buildings :buildings_2] [:= :buildings_2.id :rooms.building_id])
+      (sql/where := :rooms.building_id :buildings.id)))
+
+(def count-rooms-select-query
+  (-> (sql/select :%count.*)
+      (sql/from :rooms)
+      (sql/join [:buildings :buildings_2] [:= :buildings_2.id :rooms.building_id])
+      (sql/where := :rooms.building_id :buildings.id)))
+
+(def buildings-base-query
+  (-> (sql/select-distinct :buildings.id
+                           :buildings.name
+                           :buildings.code
+                           shared/is-general-select-expr
+                           [count-items-select-query :items_count]
+                           [count-rooms-select-query :rooms_count])
+      (sql/from :buildings)
+      (sql/order-by :buildings.name)))
 
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]
@@ -46,7 +58,7 @@
        (sql/limit per-page)
        (sql/offset (* per-page (- page 1))))))
 
-(def searchable-expr [:concat :name " " :note])
+(def searchable-expr [:concat :name " " :code])
 
 (defn term-filter [query request]
   (if-let [term (-> request :query-params-raw :term presence)]
@@ -57,47 +69,47 @@
 (defn inventory-pool-filter [query request]
   (if-let [pool-id (-> request :query-params-raw :inventory_pool_id presence)]
     (-> query
-        (sql/join :items [:= :items.supplier_id :suppliers.id])
+        (sql/join :items [:= :items.building_id :buildings.id])
         (sql/join :inventory_pools [:= :items.inventory_pool_id :inventory_pools.id])
         (sql/where [:= :inventory_pools.id (uuid pool-id)]))
     query))
 
-(defn suppliers-query [request]
+(defn buildings-query [request]
   (let [query-params  (-> request :query-params
                           shared/normalized-query-parameters)]
-    (-> suppliers-base-query
+    (-> buildings-base-query
         (set-per-page-and-offset query-params)
         (term-filter request)
-        (inventory-pool-filter request))))
+        #_(inventory-pool-filter request))))
 
-(defn suppliers [{tx-next :tx-next :as request}]
-  (let [query (suppliers-query request)
+(defn buildings [{tx-next :tx-next :as request}]
+  (let [query (buildings-query request)
         offset (:offset query)]
     {:body
-     {:suppliers (-> query
+     {:buildings (-> query
                      sql-format
                      (->> (jdbc/query tx-next)
                           (seq/with-index offset)
                           seq/with-page-index))}}))
 
-;;; create supplier ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; create building ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-supplier [{tx-next :tx-next data :body :as request}]
-  (if-let [supplier (jdbc/insert! tx-next
-                                  :suppliers
-                                  (select-keys data supplier/fields))]
-    {:body supplier}
+(defn create-building [{tx-next :tx-next data :body :as request}]
+  (if-let [building (jdbc/insert! tx-next
+                                  :buildings
+                                  (select-keys data building/fields))]
+    {:body building}
     {:status 422
-     :body "No supplier has been created."}))
+     :body "No building has been created."}))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def suppliers-path (path :suppliers))
+(def buildings-path (path :buildings))
 
 (def routes
   (cpj/routes
-    (cpj/GET suppliers-path [] #'suppliers)
-    (cpj/POST suppliers-path [] #'create-supplier)))
+    (cpj/GET buildings-path [] #'buildings)
+    (cpj/POST buildings-path [] #'create-building)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

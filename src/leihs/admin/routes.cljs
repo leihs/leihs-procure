@@ -13,6 +13,8 @@
     [leihs.admin.resources.audits.main :as audits]
     [leihs.admin.resources.audits.requests.main :as audited-requests]
     [leihs.admin.resources.audits.requests.request.main :as audited-request]
+    [leihs.admin.resources.buildings.building.main :as building]
+    [leihs.admin.resources.buildings.main :as buildings]
     [leihs.admin.resources.groups.group.create :as group-create]
     [leihs.admin.resources.groups.group.del :as group-delete]
     [leihs.admin.resources.groups.group.edit :as group-edit]
@@ -49,11 +51,7 @@
     [leihs.admin.resources.settings.smtp.main :as smtp-settings]
     [leihs.admin.resources.settings.syssec.main :as syssec-settings]
     [leihs.admin.resources.statistics.main :as statistics]
-    ; [leihs.admin.resources.suppliers.supplier.create :as supplier-create]
-    ; [leihs.admin.resources.suppliers.supplier.del :as supplier-delete]
     [leihs.admin.resources.suppliers.supplier.main :as supplier]
-    ; [leihs.admin.resources.suppliers.supplier.show :as supplier-show]
-    ; [leihs.admin.resources.suppliers.supplier.users.main :as supplier-users]
     [leihs.admin.resources.suppliers.main :as suppliers]
     [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
@@ -87,6 +85,11 @@
    :authentication-system-groups #'authentication-system-groups/page
    :authentication-system-users #'authentication-system-users/page
    :authentication-systems #'authentication-systems/page
+   :building #'building/show-page
+   :building-create #'building/create-page
+   :building-delete #'building/delete-page
+   :building-edit #'building/edit-page
+   :buildings #'buildings/page
    :group #'group-show/page
    :group-create #'group-create/page
    :group-delete #'group-delete/page

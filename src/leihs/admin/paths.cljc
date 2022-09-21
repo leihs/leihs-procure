@@ -29,7 +29,6 @@
     :admin-mail-templates
     :admin-rooms
     :admin-settings
-    :admin-suppliers
     :borrow
     :home
     :inventory-csv
@@ -98,6 +97,18 @@
                   (leaf "/edit" :supplier-edit)
                   (leaf "/items" :supplier-items))))
 
+(def buildings-paths
+  (branch "/buildings"
+          (branch "/"
+                  (leaf "" :buildings)
+                  (leaf "create" :building-create))
+          (branch "/"
+                  (param :building-id)
+                  (leaf "" :building)
+                  (leaf "/delete" :building-delete)
+                  (leaf "/edit" :building-edit)
+                  (leaf "/items" :building-items))))
+
 (def paths
   (branch ""
           leihs.core.paths/core-paths
@@ -105,6 +116,7 @@
                   (leaf "/status" :status)
                   (leaf "/debug" :debug)
                   audits/paths
+                  buildings-paths
                   groups-paths
                   inventory-pools/paths
                   inventory/paths

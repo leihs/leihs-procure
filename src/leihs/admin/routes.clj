@@ -10,6 +10,8 @@
     [leihs.admin.resources.audits.changes.main :as audited-changes]
     [leihs.admin.resources.audits.requests.main :as audited-requests]
     [leihs.admin.resources.audits.requests.request.main :as audited-request]
+    [leihs.admin.resources.buildings.building.main :as building]
+    [leihs.admin.resources.buildings.main :as buildings]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.group.users.main :as group-users]
     [leihs.admin.resources.groups.main :as groups]
@@ -123,6 +125,8 @@
                                         :authorizers [auth/admin-scopes?]}
           :authentication-systems {:handler authentication-systems/routes
                                    :authorizers [auth/system-admin-scopes?]}
+          :building {:handler building/routes :authorizers [auth/admin-scopes?]}
+          :buildings {:handler buildings/routes :authorizers [auth/admin-scopes?]}
           :group {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-inventory-pools-roles {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-user {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
