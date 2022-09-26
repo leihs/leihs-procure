@@ -6,11 +6,11 @@
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
+    [leihs.core.uuid :refer [uuid]]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
     [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-    [leihs.admin.utils.uuid :refer [uuid]]
     [taoensso.timbre :refer [error warn info debug spy]]
     ))
 

@@ -6,6 +6,7 @@
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
+    [leihs.core.uuid :refer [uuid]]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
     [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
@@ -17,7 +18,7 @@
     tx-next :tx-next :as request}]
   {:body (-> (sql/select :audited_changes.*)
              (sql/from :audited_changes)
-             (sql/where [:= :id id])
+             (sql/where [:= :id (uuid id)])
              sql-format
              (->> (jdbc/execute-one! tx-next)))})
 

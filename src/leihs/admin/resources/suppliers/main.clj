@@ -1,18 +1,18 @@
 (ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [next.jdbc.sql :as jdbc]
     [clojure.set]
     [compojure.core :as cpj]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.suppliers.shared :as shared]
     [leihs.admin.resources.suppliers.supplier.main :as supplier]
     [leihs.admin.utils.seq :as seq]
-    [leihs.admin.utils.uuid :refer [uuid]]
     [leihs.core.core :refer [keyword str presence]]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
+    [leihs.core.uuid :refer [uuid]]
     [logbug.debug :as debug]
+    [next.jdbc.sql :as jdbc]
     [taoensso.timbre :refer [error warn info debug spy]]
     ))
 

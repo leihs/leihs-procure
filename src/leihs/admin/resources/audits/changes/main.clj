@@ -7,9 +7,9 @@
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
-    [leihs.admin.utils.uuid :refer [uuid]]
     [leihs.core.auth.core :as auth]
     [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+    [leihs.core.uuid :refer [uuid]]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
     [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
@@ -45,16 +45,20 @@
 (def changes-base-query
   (-> (apply sql/select selects)
       (sql/select
-        [:lift
-         [:array_to_json
-          [[:ARRAY
-            (sql/select
-              [:lift [:jsonb_object_keys :audited_changes.changed]])] ]
-          :changed_attributes]])
+        [[:array_to_json
+          [:ARRAY
+           (sql/select
+             [[:jsonb_object_keys :audited_changes.changed]])]]
+         :changed_attributes])
       (sql/from :audited_changes)
       (sql/order-by [:audited_changes.created_at :desc]
                     [:audited_changes.table_name :asc]
                     [:audited_changes.pkey :asc])))
+
+
+(comment
+  (-> changes-base-query
+      (sql-format)))
 
 (defn filter-by-search-term
   [query {{term :term} :query-params :as request}]
@@ -116,7 +120,21 @@
                  spy
                  sql-format
                  spy
-                 (->> (jdbc/execute-one! tx)))}})
+                 (->> (jdbc/execute! tx)))}})
+
+
+(comment
+  (-> changes-base-query
+      (filter-by-search-term {})
+      (filter-by-txid {})
+      (filter-by-request-id {})
+      (filter-by-pkey {})
+      (filter-by-tg-op {})
+      (filter-by-table {})
+      (sql-format :inline true :pretty true)
+      println
+      )
+  )
 
 (def routes
   (-> (cpj/routes
@@ -125,6 +143,6 @@
 
 ;#### debug ###################################################################
 
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
 ;(debug/wrap-with-log-debug #'users-formated-query)
 ;(debug/wrap-with-log-debug #'users-formated-query)
