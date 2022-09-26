@@ -33,7 +33,7 @@
        [breadcrumbs-inventory/inventory-li]
        [breadcrumbs-inventory-pools/inventory-pools-li]
        [breadcrumbs/li :admin-mail-templates " Mail templates " {} {} :authorizers [auth/admin-scopes?]]
-       [breadcrumbs/li :admin-rooms " Rooms " {} {} :authorizers [auth/admin-scopes?]]
+       [breadcrumbs/rooms-li]
        [settings-breadcrumbs/settings-li]
        [breadcrumbs-statistics/statistics-li]
        [breadcrumbs/suppliers-li]

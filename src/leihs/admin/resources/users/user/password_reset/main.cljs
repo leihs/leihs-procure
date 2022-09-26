@@ -60,7 +60,8 @@
                                (* 3 24) "3 days"
                                (* 7 24) "7 days" }
      24
-     :label [:span "Link valid for  "] ]
+     :label [:span "Link valid for  "]
+     :inline-label true]
     [:div
      [:div.float-left
       [:button.btn.btn-warning

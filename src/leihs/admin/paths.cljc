@@ -24,10 +24,8 @@
 
 (def external-handlers
   #{:admin-audits-legacy
-    :admin-buildings
     :admin-fields
     :admin-mail-templates
-    :admin-rooms
     :admin-settings
     :borrow
     :home
@@ -109,6 +107,18 @@
                   (leaf "/edit" :building-edit)
                   (leaf "/items" :building-items))))
 
+(def rooms-paths
+  (branch "/rooms"
+          (branch "/"
+                  (leaf "" :rooms)
+                  (leaf "create" :room-create))
+          (branch "/"
+                  (param :room-id)
+                  (leaf "" :room)
+                  (leaf "/delete" :room-delete)
+                  (leaf "/edit" :room-edit)
+                  (leaf "/items" :room-items))))
+
 (def paths
   (branch ""
           leihs.core.paths/core-paths
@@ -120,6 +130,7 @@
                   groups-paths
                   inventory-pools/paths
                   inventory/paths
+                  rooms-paths
                   settings/paths
                   system/paths
                   users-paths

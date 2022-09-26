@@ -1,7 +1,7 @@
 {:deps {:aliases [:cljs]}
  :builds {:leihs-admin-js
           {:asset-path "/admin/js"
-           :devtools {:http-root "resources/public" :http-port 8020}
+           :devtools {:http-root "resources/public" :http-port 8020 :preloads [devtools.preload]}
            :modules {:main {:init-fn leihs.admin.main/init}}
            :output-dir "resources/public/admin/js"
            :release {:compiler-options {:optimizations :advanced

@@ -39,6 +39,7 @@
      [:div
       [form-components/input-component supplier/data* [:name]
        :label "Name"
+       :required true
        :disabled (not @supplier/edit-mode?*)]]
      [form-components/input-component supplier/data* [:note]
       :label "Note"
@@ -80,7 +81,7 @@
 
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create [_]
+(defn create []
   (go (when-let [id (some->
                       {:url (path :suppliers)
                        :method :post
@@ -97,7 +98,6 @@
     [:div
      [:div.float-right
       [:button.btn.btn-primary
-       {:on-click create}
        " Create "]]
      [:div.clearfix]]))
 
@@ -106,15 +106,17 @@
    [routing/hidden-state-component
     {:did-mount #(reset! supplier/data* {})}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
+     (conj @breadcrumbs-parent/left*
            [breadcrumbs-parent/create-li])
      [])
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Create Supplier "]]]]
-   [supplier-component]
-   [create-submit-component]
+   [:form.form
+    {:on-submit (fn [e] (.preventDefault e) (create))}
+    [supplier-component]
+    [create-submit-component]]
    [supplier/debug-component]])
 
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

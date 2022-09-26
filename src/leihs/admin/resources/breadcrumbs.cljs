@@ -40,6 +40,10 @@
   [li :buildings [:span [icons/building] " Buildings "] {} {}
    :authorizers [auth/admin-scopes?]])
 
+(defn rooms-li []
+  [li :rooms [:span [icons/rooms] " Rooms "] {} {}
+   :authorizers [auth/admin-scopes?]])
+
 (defn suppliers-li []
   [li :suppliers [:span [icons/suppliers] " Suppliers "] {} {}
    :authorizers [auth/admin-scopes?]])

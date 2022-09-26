@@ -30,12 +30,12 @@
       (sql/where := :rooms.building_id :buildings.id)))
 
 (def buildings-base-query
-  (-> (sql/select-distinct :buildings.id
-                           :buildings.name
-                           :buildings.code
-                           shared/is-general-select-expr
-                           [count-items-select-query :items_count]
-                           [count-rooms-select-query :rooms_count])
+  (-> (sql/select :buildings.id
+                  :buildings.name
+                  :buildings.code
+                  shared/is-general-select-expr
+                  [count-items-select-query :items_count]
+                  [count-rooms-select-query :rooms_count])
       (sql/from :buildings)
       (sql/order-by :buildings.name)))
 
@@ -79,8 +79,7 @@
                           shared/normalized-query-parameters)]
     (-> buildings-base-query
         (set-per-page-and-offset query-params)
-        (term-filter request)
-        #_(inventory-pool-filter request))))
+        (term-filter request))))
 
 (defn buildings [{tx-next :tx-next :as request}]
   (let [query (buildings-query request)

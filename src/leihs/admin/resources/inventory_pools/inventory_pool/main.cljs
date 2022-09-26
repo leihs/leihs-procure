@@ -13,6 +13,7 @@
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-parent]
     [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.state :as state]
@@ -45,15 +46,18 @@
      [:div
       [form-components/input-component inventory-pool/data* [:shortname]
        :label "Short name"
+       :required true
        :disabled (not @edit-mode?*)]]
      [:div
       [form-components/input-component inventory-pool/data* [:name]
        :label "Name"
+       :required true
        :disabled (not @edit-mode?*)]]
      [:div
       [form-components/input-component inventory-pool/data* [:email]
        :label "Email"
        :type :email
+       :required true
        :disabled (not @edit-mode?*)]]
      [form-components/input-component inventory-pool/data* [:description]
       :label "Description"
@@ -97,7 +101,7 @@
 
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create [_]
+(defn create []
   (go (when-let [id (some->
                       {:url (path :inventory-pools)
                        :method :post
@@ -114,7 +118,6 @@
     [:div
      [:div.float-right
       [:button.btn.btn-primary
-       {:on-click create}
        " Create "]]
      [:div.clearfix]]))
 
@@ -123,15 +126,17 @@
    [routing/hidden-state-component
     {:did-mount #(reset! inventory-pool/data* {})}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
+     (conj @breadcrumbs-parent/left*
            [breadcrumbs/create-li])
      [])
    [:div.row
     [:div.col-lg
      [:h1
       [:span " Create Inventory-Pool "]]]]
-   [inventory-pool-component]
-   [create-submit-component]
+   [:form.form
+    {:on-submit (fn [e] (.preventDefault e) (create))}
+    [inventory-pool-component]
+    [create-submit-component]]
    [inventory-pool/debug-component]])
 
 

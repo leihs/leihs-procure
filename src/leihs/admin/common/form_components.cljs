@@ -62,12 +62,13 @@
       value)))
 
 (defn input-component
-  [data* ks & {:keys [label hint type element placeholder disabled rows
+  [data* ks & {:keys [label hint type element placeholder disabled rows required
                       on-change post-change
                       prepend append ]
                :or {label (last ks)
                     hint nil
                     disabled false
+                    required false
                     type :text
                     rows 10
                     element :input
@@ -88,6 +89,7 @@
       :class :form-control
       :placeholder placeholder
       :type type
+      :required required
       :value (get-in @data* ks)
       :on-change  #(-> % .-target .-value presence
                        (convert type)
@@ -102,29 +104,38 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn select-component
-  [data* ks options default-option
-   & {:keys [label classes]
-      :or {label "Select"
-           classes []}}]
-  (let [k (last ks)
+  [data* ks options default-option & {:keys [label classes disabled inline-label required]
+                                      :or {label "Select"
+                                           classes []
+                                           disabled false
+                                           required false
+                                           inline-label false}}]
+  (let [id (last ks)
         options (cond
                   (map? options) (->> options
                                       (map (fn [[k v]] [(str k) (str v)]))
                                       (into {}))
-                  (sequential? options)  (->> options
-                                              (map (fn [x]
-                                                     (match x
-                                                            [k v] [(str k) (str v)]
-                                                            :else [(str x) (str x)]))))
+                  (sequential? options) (->> options
+                                             (map (fn [x]
+                                                    (match x
+                                                           [k v] [(str k) (str v)]
+                                                           :else [(str x) (str x)]))))
                   :else {"" ""})
         default-option (or default-option
                            (-> options first first))]
     [:div.form-group.m-2
-     [:div.input-group {:id k}
-      [:div.input-group-prepend
-       [:label.input-group-text  {:for k} label ]]
+     (when-not inline-label
+       [:label {:for id}
+        (if (= label id)
+          [:strong label]
+          [:span [:strong label] [:small " (" [:span.text-monospace id] ")"]])])
+     [:div.input-group {:id id}
+      (when inline-label
+        [:div.input-group-prepend [:label.input-group-text {:for id} label]])
       [:select.custom-select
-       {:id (last ks)
+       {:id id
+        :disabled disabled
+        :required required
         :value (let [val (get-in @data* ks)]
                  (if (some #{val} (map first options))
                    val
