@@ -45,6 +45,8 @@
     [leihs.admin.resources.inventory.main :as inventory]
     [leihs.admin.resources.leihs-root :as home]
     [leihs.admin.resources.main :as admin]
+    [leihs.admin.resources.mail-templates.mail-template.main :as mail-template]
+    [leihs.admin.resources.mail-templates.main :as mail-templates]
     [leihs.admin.resources.rooms.room.main :as room]
     [leihs.admin.resources.rooms.main :as rooms]
     [leihs.admin.resources.settings.languages.main :as languages-settings]
@@ -127,6 +129,9 @@
    :inventory-pools #'inventory-pools/page
    :languages-settings #'languages-settings/page
    :misc-settings #'misc-settings/page
+   :mail-template #'mail-template/show-page
+   :mail-template-edit #'mail-template/edit-page
+   :mail-templates #'mail-templates/page
    :room #'room/show-page
    :room-create #'room/create-page
    :room-delete #'room/delete-page

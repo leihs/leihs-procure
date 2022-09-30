@@ -25,8 +25,6 @@
 (def external-handlers
   #{:admin-audits-legacy
     :admin-fields
-    :admin-mail-templates
-    :admin-settings
     :borrow
     :home
     :inventory-csv
@@ -119,6 +117,18 @@
                   (leaf "/edit" :room-edit)
                   (leaf "/items" :room-items))))
 
+(def mail-templates-paths
+  (branch "/mail-templates"
+          (branch "/"
+                  (leaf "" :mail-templates)
+                  (leaf "create" :mail-template-create))
+          (branch "/"
+                  (param :mail-template-id)
+                  (leaf "" :mail-template)
+                  (leaf "/delete" :mail-template-delete)
+                  (leaf "/edit" :mail-template-edit)
+                  (leaf "/items" :mail-template-items))))
+
 (def paths
   (branch ""
           leihs.core.paths/core-paths
@@ -130,6 +140,7 @@
                   groups-paths
                   inventory-pools/paths
                   inventory/paths
+                  mail-templates-paths
                   rooms-paths
                   settings/paths
                   system/paths
@@ -137,11 +148,7 @@
                   statistics-paths
                   suppliers-paths
                   (leaf "/audits" :admin-audits-legacy)
-                  (leaf "/buildings" :admin-buildings)
                   (leaf "/fields_editor" :admin-fields)
-                  (leaf "/mail_templates" :admin-mail-templates)
-                  (leaf "/rooms" :admin-rooms)
-                  (leaf "/settings" :admin-settings)
                   )))
 
 

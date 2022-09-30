@@ -34,6 +34,8 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
     [leihs.admin.resources.inventory-pools.main :as inventory-pools]
+    [leihs.admin.resources.mail-templates.mail-template.main :as mail-template]
+    [leihs.admin.resources.mail-templates.main :as mail-templates]
     [leihs.admin.resources.rooms.room.main :as room]
     [leihs.admin.resources.rooms.main :as rooms]
     [leihs.admin.resources.settings.languages.main :as languages-settings]
@@ -189,6 +191,8 @@
           :not-found {:handler html/not-found-handler :authorizers [all-granted]}
           :redirect-to-root {:handler redirect-to-root-handler :authorizers [all-granted]}
 
+          :mail-template {:handler mail-template/routes :authorizers [auth/admin-scopes?]}
+          :mail-templates {:handler mail-templates/routes :authorizers [auth/admin-scopes?]}
           :room {:handler room/routes :authorizers [auth/admin-scopes?]}
           :rooms {:handler rooms/routes :authorizers [auth/admin-scopes?]}
           :statistics-contracts {:handler statistics-contracts/routes :authorizers [auth/admin-scopes?]}
