@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+INSTALL_DEPS="${INSTALL_DEPS:-YES}"
+
 ADMIN_DIR="$(dirname ${BASH_SOURCE})/.."
 cd "${ADMIN_DIR}"
 echo "PWD: $PWD"
