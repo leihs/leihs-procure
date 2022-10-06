@@ -9,6 +9,7 @@
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
     [leihs.admin.resources.users.choose-core :as choose-user]
+    [leihs.admin.resources.users.user.core :refer [sql-where-unique-user]]
     [leihs.core.auth.core :as auth]
     [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
     [leihs.core.uuid :refer [uuid]]
@@ -48,8 +49,9 @@
     (sql/where
       query
       [:exists
-       (-> (choose-user/find-by-some-uid-query user-uid)
-           (sql/select :true)
+       (-> (sql/select :true)
+           (sql/from :users)
+           (sql-where-unique-user user-uid)
            (sql/where [:= :users.id :audited_requests.user_id]))])
     query))
 
