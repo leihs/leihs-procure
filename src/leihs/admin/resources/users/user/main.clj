@@ -2,22 +2,19 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-    [leihs.core.auth.core :as auth]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
+    [clojure.tools.logging :as logging]
+    [compojure.core :as cpj]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.choose-core :as choose-core]
     [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
-
-    [clojure.set :refer [rename-keys]]
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
+    [logbug.debug :as debug]
+    [slingshot.slingshot :refer [try+]]
     )
   (:import
     [java.awt.image BufferedImage]
@@ -167,9 +164,17 @@
 (defn delete-user [{tx :tx :as request}]
   (if-let [user (-> request get-user :body)]
     (do (assert-deletion-permitted! request user)
-        (if (= [1] (jdbc/delete! tx :users ["id = ?" (:id user)]))
-          {:status 204}
-          (throw (ex-info "Deleted failed" {:status 500}))))
+        (try+
+          (if (= [1] (jdbc/delete! tx :users ["id = ?" (:id user)]))
+            {:status 204}
+            (throw (ex-info "User deleted failed" {:status 500})))
+          (catch #(clojure.string/includes?
+                    (ex-message %)
+                    "violates foreign key constraint")  e
+            (throw
+              (ex-info
+                (str "User delete failed because it violates foreign key constraint: "
+                     (ex-message e)) {:status 422} e)))))
     (throw (ex-info "To be deleted user not found." {:status 404}))))
 
 
