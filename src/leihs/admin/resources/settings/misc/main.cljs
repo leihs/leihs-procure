@@ -137,6 +137,13 @@
        :disabled (not @edit?*)
        :hint [:span "If enabled, the contact details field will be shown on the customer order before submitting."]]]]
 
+    [:div.row
+     [:div.col-sm
+      [form-components/input-component data* [:home_page_image_url]
+       :label "Homepage Image"
+       :hint [:span "Absolute URL of the image to display on the home page (max 2000 characters). If left empty then the default image is used."]
+       :disabled (not @edit?*)]]]
+
    (when @edit?*
      [form-components/save-submit-component])])
 
