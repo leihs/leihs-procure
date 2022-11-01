@@ -7,8 +7,6 @@ include:
 traits:
   Docker Engine: true
 
-max_trials: 5
-
 git_options:
   submodules:
     include_match: ^.*$

@@ -1,10 +1,10 @@
 traits:
-  ruby-install: true
+  asdf-ruby: true
   Bash: true
 
 scripts:
   admin-bundle-rspec-ruby:
-    exclusive_executor_resource: ruby-install_{{RUBY}}
+    exclusive_executor_resource: asdf-ruby
     timeout: 20 Minutes
     start_when:
       uberjar done: # bundle may alter the Gemfile.lock
@@ -12,16 +12,9 @@ scripts:
         states: [passed]
     body: |
       #!/usr/bin/env bash
-      set -euxo
+      set -eux
       cd $LEIHS_ADMIN_DIR
-      export PATH=~/.rubies/$RUBY/bin:$PATH
-
-      if [ ! -d ~/.rubies/$RUBY ]; then
-        RUBY_INSTALL_SRC_DIR=/tmp/src-${RUBY}
-        rm -rf ${RUBY_INSTALL_SRC_DIR}
-        ruby-install --src-dir ${RUBY_INSTALL_SRC_DIR}} --no-install-deps $RUBY_ENGINE $RUBY_VERSION
-      fi
-
+      asdf install ruby
       bundle install
 
   test:

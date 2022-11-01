@@ -34,7 +34,5 @@ task_defaults:
       body: |
         #!/usr/bin/env bash
         set -eux
-        export PATH=~/.rubies/$RUBY/bin:$PATH
-        env | sort
         mkdir -p log
         xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
