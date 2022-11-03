@@ -17,7 +17,7 @@ context:
       LEIHS_PROCURE_SPEC_DIR: "{{LEIHS_PROCURE_DIR}}"
       LEIHS_DATABASE_DIR: "{{LEIHS_PROCURE_DIR}}/server/database"
 
-    max_trials: 5
+    max_trials: 2
 
     traits:
       OpenJDK: true
@@ -47,7 +47,6 @@ context:
         body: |
           #!/usr/bin/env bash
           set -eux
-          export PATH=~/.rubies/$RUBY/bin:$PATH
           mkdir -p log
           xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
 

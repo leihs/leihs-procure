@@ -11,7 +11,7 @@ context:
       - cider-ci/service_task-component.yml
       - cider-ci/bundle-ruby_task-component.yml
 
-    max_trials: 5
+    max_trials: 2
 
     traits:
       OpenJDK: true
@@ -30,7 +30,6 @@ context:
         body: |
           #!/usr/bin/env bash
           set -eux
-          export PATH=~/.rubies/$RUBY/bin:$PATH
           cd ${LEIHS_PROCURE_SPEC_DIR}
           mkdir -p log
           bundle exec rspec --backtrace ../$CIDER_CI_TASK_FILE

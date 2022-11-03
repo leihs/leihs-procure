@@ -1,5 +1,5 @@
 scripts:
-  run-procure-service:
+  procure-service-run:
     timeout: 15 Minutes
     start_when:
       uberjar has been built:
@@ -24,7 +24,7 @@ scripts:
       done
     start_when:
       run server is executing:
-        script_key: run-procure-service
+        script_key: procure-service-run
         states: [executing]
 
   test:
