@@ -20,7 +20,7 @@ scripts:
     body: |
       cd ${LEIHS_ADMIN_DIR}
       # build with docker, prime docker cache
-      IMAGE_NAME="$DIST_IMAGE_NAME" \
+      ADMIN_IMAGE_NAME="$DIST_ADMIN_IMAGE_NAME" \
       VERSION_NAME="$DIST_VERSION_NAME" \
         bin/docker-build
 
