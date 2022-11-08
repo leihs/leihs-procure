@@ -8,8 +8,7 @@ task_defaults:
     - cider-ci/service_task-component.yml
     - cider-ci/uberjar_task-component.yml
   traits:
-    JDK 8: true
-    Leiningen 2: true
+    JDK: true
     Firefox ESR 78: true
   ports:
     LEIHS_ADMIN_HTTP_PORT:

@@ -12,7 +12,7 @@ git_options:
     include_match: ^.*$
 
 scripts:
-  build-admin-uberjar:
+  admin-build-uberjar:
     timeout: 60 minutes
     exclusive_executor_resource: 'build-leihs-admin-jar-docker_{{CIDER_CI_TREE_ID}}'
     start_when:

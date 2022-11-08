@@ -1,9 +1,19 @@
 scripts:
+
+  admin-install-nodejs:
+    exclusive_executor_resource: asdf-nodjes
+    body: |
+      set -eux
+      cd $LEIHS_ADMIN_DIR
+      asdf install nodejs
+
   admin-service-run:
     timeout: 30 Minutes
     start_when:
+      nodejs is installed:
+        script_key: admin-install-nodejs
       uberjar has been built:
-        script_key: build-admin-uberjar
+        script_key: admin-build-uberjar
       database has been created:
         script_key: create-database
     body: |

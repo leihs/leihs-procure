@@ -1,5 +1,5 @@
 jobs:
-  build-admin-uberjar:
+  admin-build-uberjar:
     name: Build admin uberjar
     run_when:
       any branch has been updated:
@@ -8,14 +8,14 @@ jobs:
     context:
       include: cider-ci/task_defaults.yml
       tasks:
-        build-admin-uberjar: { include: cider-ci/uberjar_task-component.yml }
+        admin-build-uberjar: { include: cider-ci/uberjar_task-component.yml }
 
   specs:
     name: Run specs
     depends_on: &SPEC_DEPENDENTS
       uberjar passed:
         type: job
-        job_key: build-admin-uberjar
+        job_key: admin-build-uberjar
         states: [passed]
     run_when: *SPEC_DEPENDENTS
     context:

@@ -11,9 +11,9 @@ depends_on: &GOOD_TO_MERGE_DEPENDENTS
     submodule: [database]
     states: [passed]
 
-  build-admin-uberjar was successful:
+  admin-build-uberjar was successful:
     type: job
-    job_key: build-admin-uberjar
+    job_key: admin-build-uberjar
     states: [passed]
 
 run_when: *GOOD_TO_MERGE_DEPENDENTS
