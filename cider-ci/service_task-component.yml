@@ -3,7 +3,7 @@ scripts:
     timeout: 15 Minutes
     start_when:
       uberjar has been built:
-        script_key: build-procure-uberjar
+        script_key: procure-build-uberjar
       database has been created:
         script_key: create-database
     body: |

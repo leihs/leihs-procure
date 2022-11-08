@@ -1,5 +1,5 @@
 jobs:
-  build-procure-uberjar:
+  procure-build-uberjar:
     name: Build procure uberjar
     include: cider-ci/uberjar_job.yml
 
@@ -8,7 +8,7 @@ jobs:
     depends_on: &SPEC_DEPENDS
       uberjar was built:
         type: job
-        job_key: build-procure-uberjar
+        job_key: procure-build-uberjar
         states: [passed]
     run_when: *SPEC_DEPENDS
     include: cider-ci/backend-specs_job.yml

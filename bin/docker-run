@@ -1,7 +1,7 @@
 #!/bin/bash
 set -exu
 
-IMAGE="$(IMAGE_NAME=leihs-procure-runner STAGE=builder bin/docker-build | tail -1)"
+IMAGE="$(PROCURE_IMAGE_NAME=leihs-procure-runner STAGE=builder bin/docker-build | tail -1)"
 test "$IMAGE"
 
 # for dev add:

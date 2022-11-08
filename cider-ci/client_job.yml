@@ -22,13 +22,13 @@ context:
       scripts:
         test:
           body: |
-            docker exec -i "$RUNNER_CONTAINER_NAME" bash -c \
+            docker exec -i "$RUNNER_PROCURE_CONTAINER_NAME" bash -c \
               'cd client && npm test'
 
     'Lint':
       scripts:
         test:
           body: |
-            docker exec -i "$RUNNER_CONTAINER_NAME" bash -c \
+            docker exec -i "$RUNNER_PROCURE_CONTAINER_NAME" bash -c \
               'cd client && \
               npm run ci:lint'

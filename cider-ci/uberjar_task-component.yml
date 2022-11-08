@@ -13,17 +13,17 @@ traits:
   Docker Engine: true
 
 scripts:
-  build-procure-uberjar:
+  procure-build-uberjar:
     timeout: 60 minutes
     start_when:
       install-ruby-passed: { script_key: install-ruby }
-    exclusive_executor_resource: leihs-procure-jar-build_{{CIDER_CI_TREE_ID}}
+    exclusive_executor_resource: procure-build-uberjar
     body: |
       set -exu
       cd ${LEIHS_PROCURE_DIR}
 
       # build with docker, prime docker cache
-      IMAGE_NAME="$DIST_IMAGE_NAME" \
+      PROCURE_IMAGE_NAME="$DIST_PROCURE_IMAGE_NAME" \
       VERSION_NAME="$DIST_VERSION_NAME" \
         bin/docker-build
 

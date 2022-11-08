@@ -15,9 +15,9 @@ depends_on: &GOOD_TO_MERGE_DEPENDENCIES
     job_key: client-lint-and-specs
     states: [passed]
 
-  build-procure-uberjar was successful:
+  procure-build-uberjar was successful:
     type: job
-    job_key: build-procure-uberjar
+    job_key: procure-build-uberjar
     states: [passed]
 
   good to merge of the database:
