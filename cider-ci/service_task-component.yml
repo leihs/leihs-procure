@@ -1,7 +1,17 @@
 scripts:
+
+  procure-install-nodejs:
+    exclusive_executor_resource: asdf-nodjes
+    body: |
+      set -eux
+      cd $LEIHS_PROCURE_DIR
+      asdf install nodejs
+
   procure-service-run:
     timeout: 15 Minutes
     start_when:
+      nodejs is installed:
+        script_key: procure-install-nodejs
       uberjar has been built:
         script_key: procure-build-uberjar
       database has been created:
