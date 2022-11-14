@@ -24,7 +24,6 @@
 
 (def external-handlers
   #{:admin-audits-legacy
-    :admin-fields
     :borrow
     :home
     :inventory-csv
@@ -93,6 +92,18 @@
                   (leaf "/edit" :supplier-edit)
                   (leaf "/items" :supplier-items))))
 
+(def inventory-fields-paths
+  (branch "/inventory-fields"
+          (branch "/"
+                  (leaf "" :inventory-fields)
+                  (leaf "groups" :inventory-fields-groups)
+                  (leaf "create" :inventory-field-create))
+          (branch "/"
+                  (param :inventory-field-id)
+                  (leaf "" :inventory-field)
+                  (leaf "/delete" :inventory-field-delete)
+                  (leaf "/edit" :inventory-field-edit))))
+
 (def buildings-paths
   (branch "/buildings"
           (branch "/"
@@ -138,6 +149,7 @@
                   audits/paths
                   buildings-paths
                   groups-paths
+                  inventory-fields-paths
                   inventory-pools/paths
                   inventory/paths
                   mail-templates-paths
@@ -148,7 +160,6 @@
                   statistics-paths
                   suppliers-paths
                   (leaf "/audits" :admin-audits-legacy)
-                  (leaf "/fields_editor" :admin-fields)
                   )))
 
 

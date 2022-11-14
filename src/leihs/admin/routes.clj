@@ -12,6 +12,8 @@
     [leihs.admin.resources.audits.requests.request.main :as audited-request]
     [leihs.admin.resources.buildings.building.main :as building]
     [leihs.admin.resources.buildings.main :as buildings]
+    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
+    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.group.users.main :as group-users]
     [leihs.admin.resources.groups.main :as groups]
@@ -131,6 +133,9 @@
                                    :authorizers [auth/system-admin-scopes?]}
           :building {:handler building/routes :authorizers [auth/admin-scopes?]}
           :buildings {:handler buildings/routes :authorizers [auth/admin-scopes?]}
+          :inventory-field {:handler inventory-field/routes :authorizers [auth/admin-scopes?]}
+          :inventory-fields {:handler inventory-fields/routes :authorizers [auth/admin-scopes?]}
+          :inventory-fields-groups {:handler inventory-fields/groups-route :authorizers [auth/admin-scopes?]}
           :group {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-inventory-pools-roles {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-user {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}

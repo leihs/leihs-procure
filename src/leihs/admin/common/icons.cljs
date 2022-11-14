@@ -23,6 +23,8 @@
 (defn groups [] (FontAwesomeIcon #js{:icon solids/faUsers :className ""}))
 (defn home [] (FontAwesomeIcon #js{:icon solids/faHome :className ""}))
 (defn inventory [] (FontAwesomeIcon #js{:icon solids/faCube :className ""}))
+(defn inventory-field [] (FontAwesomeIcon #js{:icon solids/faCode :className ""}))
+(defn inventory-fields [] (FontAwesomeIcon #js{:icon solids/faCode :className ""}))
 (defn inventory-pool [] (FontAwesomeIcon #js{:icon solids/faCube :className ""}))
 (defn inventory-pools [] (FontAwesomeIcon #js{:icon solids/faCubes :className ""}))
 (defn mail-template [] (FontAwesomeIcon #js{:icon solids/faEnvelope :className ""}))

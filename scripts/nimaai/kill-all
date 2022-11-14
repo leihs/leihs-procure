@@ -2,5 +2,5 @@
 
 tmux send-keys -t leihs-admin:2.1 "^C" C-m
 tmux send-keys -t leihs-admin:3.1 "^C" C-m
-tmux send-keys -t leihs-admin:4.1 "^C" C-m
-tmux send-keys -t leihs-admin:5.1 "^C" C-m
+
+sleep 1

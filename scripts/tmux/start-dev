@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-SCRIPT_FULL_PATH=$(realpath "$0")
-SCRIPT_DIR=$(dirname $SCRIPT_FULL_PATH)
-export LEIHS_DATABASE_URL="jdbc:postgresql://localhost:5432/leihs_dev?min-pool-size=1&max-pool-size=16"
-$SCRIPT_DIR/start

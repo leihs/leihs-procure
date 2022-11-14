@@ -54,7 +54,6 @@ feature 'Deleting groups', type: :feature do
         wait_until do
           page.has_content? "Delete Group #{@group.name}"
         end
-        binding.pry
         click_on 'Delete'
         wait_until{ current_path == '/admin/groups/' }
         expect(database[:groups].where(id: @group.id).first).not_to be

@@ -2,6 +2,7 @@
   (:require
     [clj-yaml.core :as yaml]
     [clojure.pprint :refer [pprint]]
+    [clojure.spec.alpha :as spec]
     [clojure.tools.cli :as cli :refer [parse-opts]]
     [environ.core :refer [env]]
     [leihs.core.repl :as repl]
@@ -46,6 +47,7 @@
 
 (defn main []
   (leihs.core.logging/init)
+  (spec/check-asserts true)
   (let [args @args*
         {:keys [options arguments
                 errors summary]} (cli/parse-opts

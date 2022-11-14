@@ -21,6 +21,8 @@
     [leihs.admin.resources.groups.group.show :as group-show]
     [leihs.admin.resources.groups.group.users.main :as group-users]
     [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
+    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as delegation-edit]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as delegation-groups]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as delegation]
@@ -94,6 +96,11 @@
    :building-delete #'building/delete-page
    :building-edit #'building/edit-page
    :buildings #'buildings/page
+   :inventory-field #'inventory-field/show-page
+   :inventory-field-create #'inventory-field/create-page
+   :inventory-field-delete #'inventory-field/delete-page
+   :inventory-field-edit #'inventory-field/edit-page
+   :inventory-fields #'inventory-fields/page
    :group #'group-show/page
    :group-create #'group-create/page
    :group-delete #'group-delete/page

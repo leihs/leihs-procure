@@ -27,6 +27,8 @@ def database
   @database ||= Sequel.connect(db_con_str)
 end
 
+database.extension :pg_json
+database.wrap_json_primitives = true
 
 def clean_db
   tables = database[ <<-SQL.strip_heredoc

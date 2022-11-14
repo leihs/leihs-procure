@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+./scripts/nimaai/kill-all
+
+tmux send -t leihs-admin:2.1 "./bin/dev-run-backend --db-name=leihs_test --db-user=nitaai --db-password=nitaai" C-m
+tmux send -t leihs-admin:3.1 "./bin/dev-run-frontend" C-m

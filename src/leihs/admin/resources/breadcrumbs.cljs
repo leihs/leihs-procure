@@ -40,6 +40,10 @@
   [li :buildings [:span [icons/building] " Buildings "] {} {}
    :authorizers [auth/admin-scopes?]])
 
+(defn inventory-fields-li []
+  [li :inventory-fields [:span [icons/inventory-fields] " Inventory-Fields "] {} {}
+   :authorizers [auth/admin-scopes?]])
+
 (defn mail-templates-li []
   [li :mail-templates [:span [icons/mail-templates] " Mail-Templates "] {} {}
    :authorizers [auth/admin-scopes?]])
