@@ -132,13 +132,14 @@
          (when-not (-> @data* :data :values empty?)
            [:div.mt-3.ml-3
             [:strong.row
-             [:div.col-1 (when-not (-> @data* :data :type (= "checkbox")) "Default")]
-             [:div.col-6 "Label"]
-             [:div.col-4 "Value"]
+             [:div.col-2.text-center
+              (when-not (-> @data* :data :type (= "checkbox")) "Default")]
+             [:div.col-5 "Label shown in UI"]
+             [:div.col-4 "Value saved in DB"]
              [:div.col-1]]
             (doall (for [option (-> @data* :data :values)]
                      [:div.row.my-3 {:key (:uuid option)}
-                      [:div.col-1.text-center
+                      [:div.col-2.text-center
                        (when-not (-> @data* :data :type (= "checkbox"))
                          [:input.align-middle
                           {:type :radio,
@@ -147,7 +148,7 @@
                                         (set-value (:value option) data* [:data :default])
                                         (set-value (:uuid option) data* [:data :default-uuid]))
                            :disabled (not @edit-mode?*)}])]
-                      [:div.col-6
+                      [:div.col-5
                        [:input.form-control {:type :text, :value (:label option),
                                              :on-change (fn [e]
                                                           (let [val (-> e .-target .-value presence)]
@@ -186,8 +187,8 @@
                             " - "])])]))
             (when @edit-mode?*
               [:div.row
-               [:div.col-1]
-               [:div.col-11 [:button.btn.btn-outline-secondary
+               [:div.col-2]
+               [:div.col-10 [:button.btn.btn-outline-secondary
                              {:type "button"
                               :on-click (fn [e]
                                           (.preventDefault e)

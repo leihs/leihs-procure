@@ -34,9 +34,9 @@ feature 'Create inventory-fields', type: :feature do
       label_2 = Faker::Lorem.word
       value_2 = label_2.downcase
 
-      find(".form-group", text: "data:type").all(".col-6 input")[0].set label_1
+      find(".form-group", text: "data:type").all(".col-5 input")[0].set label_1
       find(".form-group", text: "data:type").all(".col-4 input")[0].set value_1
-      find(".form-group", text: "data:type").all(".col-6 input")[1].set label_2
+      find(".form-group", text: "data:type").all(".col-5 input")[1].set label_2
       find(".form-group", text: "data:type").all(".col-4 input")[1].set value_2
 
       click_on 'Create'
@@ -55,9 +55,9 @@ feature 'Create inventory-fields', type: :feature do
       expect(find(:xpath, "//select[@id='data:target_type']").value).to eq "license"
       expect(find(:xpath, "//select[@id='data:type']").value).to eq "checkbox"
 
-      expect(find(".form-group", text: "data:type").all(".col-6 input")[0].value).to eq label_1
+      expect(find(".form-group", text: "data:type").all(".col-5 input")[0].value).to eq label_1
       expect(find(".form-group", text: "data:type").all(".col-4 input")[0].value).to eq value_1
-      expect(find(".form-group", text: "data:type").all(".col-6 input")[1].value).to eq label_2
+      expect(find(".form-group", text: "data:type").all(".col-5 input")[1].value).to eq label_2
       expect(find(".form-group", text: "data:type").all(".col-4 input")[1].value).to eq value_2
 
       within find(".nav-component nav", match: :first) do
