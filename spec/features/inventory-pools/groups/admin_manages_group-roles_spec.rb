@@ -15,7 +15,7 @@ feature 'Manage inventory-pool groups ', type: :feature do
       before(:each){ sign_in_as @admin }
 
       scenario ' manages roles of a groups' do
-        @group = @groups.first
+        @group = @groups.sample
 
         click_on 'Inventory-Pools'
         click_on @pool.name
