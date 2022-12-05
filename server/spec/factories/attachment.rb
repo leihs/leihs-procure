@@ -7,13 +7,13 @@ FactoryBot.define do
   me = MetadataExtractor.new(f_path)
 
   factory :attachment, class: Attachment do
-    filename f_name
-    content_type 'application/pdf'
-    size 56000
-    content Base64.encode64(File.new(f_path).read)
-    metadata me.data.to_display_hash.to_json
+    filename { f_name }
+    content_type { 'application/pdf' }
+    size { 56000 }
+    content { Base64.encode64(File.new(f_path).read) }
+    metadata { me.data.to_display_hash.to_json }
     request_id { create(:request).id }
-    exiftool_version MetadataExtractor::EXIFTOOL_VERSION
-    exiftool_options MetadataExtractor::EXIFTOOL_CMD_LINE_OPTIONS
+    exiftool_version { MetadataExtractor::EXIFTOOL_VERSION }
+    exiftool_options { MetadataExtractor::EXIFTOOL_CMD_LINE_OPTIONS }
   end
 end

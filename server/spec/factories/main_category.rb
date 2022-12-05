@@ -3,6 +3,6 @@ end
 
 FactoryBot.define do
   factory :main_category do
-    name { "#{Faker::Cat.name} #{Faker::Cat.breed}" }
+    name { "#{Faker::Cannabis.brand} #{Faker::Cannabis.strain}" }
   end
 end
