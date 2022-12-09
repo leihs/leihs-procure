@@ -206,6 +206,7 @@ GEM
       thor (~> 1.0)
     rake (13.0.6)
     regexp_parser (2.6.1)
+    rexml (3.2.5)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -263,6 +264,7 @@ DEPENDENCIES
   pg_tasks!
   pry
   rails (~> 6.1.0)
+  rexml
   rspec
   selenium-webdriver (~> 3.14)
   sequel
