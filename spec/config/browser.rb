@@ -4,6 +4,10 @@ require 'selenium-webdriver'
 require 'turnip/capybara'
 require 'turnip/rspec'
 
+ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_78_PATH']
+BROWSER_WINDOW_SIZE = [ 1200, 800 ]
+LEIHS_PROCURE_HTTP_PORT =  ENV['LEIHS_PROCURE_HTTP_PORT'].presence  || '3230'
+LEIHS_PROCURE_HTTP_BASE_URL = ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence || "http://localhost:#{LEIHS_PROCURE_HTTP_PORT}"
 
 def accepted_firefox_path
   ENV[ ACCEPTED_FIREFOX_ENV_PATHS.detect do |env_path|
@@ -15,7 +19,7 @@ end
 
 Selenium::WebDriver::Firefox.path = accepted_firefox_path
 
-
+Capybara.app_host = LEIHS_PROCURE_HTTP_BASE_URL
 
 Capybara.register_driver :firefox do |app|
   capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(
@@ -28,7 +32,7 @@ Capybara.register_driver :firefox do |app|
   # profile["intl.accept_languages"] = "en"
 
   opts = Selenium::WebDriver::Firefox::Options.new(
-    binary: ENV['FIREFOX_ESR_60_PATH'],
+    binary: accepted_firefox_path,
     profile: profile,
     log_level: :trace)
 

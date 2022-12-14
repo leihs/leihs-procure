@@ -1,24 +1,26 @@
 source 'https://rubygems.org'
 
 # test
-gem 'rspec', '~> 3.0'
-gem 'turnip', '~> 3.1'
+gem 'rspec'
+gem 'turnip'
 
 # test in browser
-gem 'capybara', '3.8.2'
-gem 'selenium-webdriver', '3.14.0'
-gem 'geckodriver-helper', '0.21.0'
+gem 'capybara', '~> 3.8'
+gem 'selenium-webdriver', '~> 3.14'
+gem 'geckodriver-helper'
 
 # DB
 gem 'sequel'
-gem 'pg', '~> 1.1', platform: :mri
+gem 'pg', platform: :mri
 
 # factories
 gem 'factory_bot'
 gem 'faker'
 
 # helpers
-gem 'activesupport', '~> 5.2'
+gem 'activesupport'
 gem 'exiftool_vendored', '11.44.0', :groups => [:default, :production]
 gem 'rb-readline'
-gem 'pry', '~> 0.11'
+gem 'pry'
+
+gem 'rexml'

@@ -8,18 +8,8 @@ require 'config/database'
 require 'config/factories'
 require 'config/metadata_extractor'
 require 'config/screenshots'
-
-ACCEPTED_FIREFOX_ENV_PATHS = ['FIREFOX_ESR_60_PATH']
-
-LEIHS_PROCURE_HTTP_PORT =  ENV['LEIHS_PROCURE_HTTP_PORT'].presence  || '3230'
-LEIHS_PROCURE_HTTP_BASE_URL = ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence || "http://localhost:#{LEIHS_PROCURE_HTTP_PORT}"
-
-BROWSER_WINDOW_SIZE = [ 1200, 800 ]
-
-Capybara.app_host = LEIHS_PROCURE_HTTP_BASE_URL
-
-require 'config/rspec'
 require 'config/browser'
+require 'config/rspec'
 
 module Leihs
   module Constants
