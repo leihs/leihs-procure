@@ -12,12 +12,12 @@ depends_on: &GOOD_TO_MERGE_DEPENDENCIES
 
   client-lint-and-specs was successful:
     type: job
-    job_key: client-lint-and-specs
+    job_key: client-specs
     states: [passed]
 
-  procure-build-uberjar was successful:
+  procure-uberjar-build was successful:
     type: job
-    job_key: procure-build-uberjar
+    job_key: procure-uberjar-build
     states: [passed]
 
   good to merge of the database:

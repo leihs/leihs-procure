@@ -1,0 +1,10 @@
+name: Build procure uberjar
+
+context:
+  task_defaults:
+    environment_variables:
+      LEIHS_PROCURE_DIR: '{{CIDER_CI_WORKING_DIR}}'
+
+  tasks:
+    procure-uberjar-build:
+      include: cider-ci/task-components/uberjar.yml

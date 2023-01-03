@@ -1,29 +1,38 @@
 jobs:
-  procure-build-uberjar:
-    name: Build procure uberjar
-    include: cider-ci/uberjar_job.yml
+  procure-uberjar-build:
+    include: cider-ci/jobs/uberjar.yml
+    run_when: &RUN_ALWAYS
+      any branch has been updated:
+        type: branch
+        include_match: ^.*$
 
   backend-specs:
-    name: 'Backend: Run specs'
     depends_on: &SPEC_DEPENDS
       uberjar was built:
         type: job
-        job_key: procure-build-uberjar
+        job_key: procure-uberjar-build
         states: [passed]
     run_when: *SPEC_DEPENDS
-    include: cider-ci/backend-specs_job.yml
+    include: cider-ci/jobs/backend-specs.yml
 
-  client-lint-and-specs:
-    name: 'Client/Frontend: Lint and Specs'
-    depends_on: *SPEC_DEPENDS
-    run_when: *SPEC_DEPENDS
-    include: cider-ci/client_job.yml
+  client-specs:
+    name: 'Client/Frontend: Lint and Tests'
+    run_when: *RUN_ALWAYS
+    include: cider-ci/jobs/client.yml
 
   feature-specs:
+    depends_on: &FEATURE_DEPS
+      backend-specs:
+        type: job
+        job_key: backend-specs
+        states: [passed]
+      client-specs:
+        type: job
+        job_key: client-specs
+        states: [passed]
+    run_when: *FEATURE_DEPS
     name: Feature specs
-    depends_on: *SPEC_DEPENDS
-    run_when: *SPEC_DEPENDS
-    include: cider-ci/feature-specs_job.yml
+    include: cider-ci/jobs/feature-specs.yml
 
   good-to-merge:
     name: Good To Merge
@@ -31,4 +40,4 @@ jobs:
       This job depends on all other tests and checks
       and it will pass if and only if all dependencies have passed.
       Status of this job is **used by github's "branch protection"**!
-    include: cider-ci/good-to-merge_job.yml
+    include: cider-ci/jobs/good-to-merge.yml

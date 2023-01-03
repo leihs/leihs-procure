@@ -1,8 +1,8 @@
-#!/usr/bin/env bash -eux
+#!/usr/bin/env bash
+set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+$PROJECT_DIR/bin/env/java-setup
 cd $PROJECT_DIR
-source $PROJECT_DIR/shared-clj/clojure/bin/activate
-java -jar target/leihs-procure.jar --dev-mode true -r true run $@
+java -jar target/leihs-procure.jar --dev-mode true -r true run "$@"
 
 # vi: ft=sh
-

@@ -1,0 +1,13 @@
+traits:
+  asdf: true
+
+scripts:
+  procure-ruby-bundle:
+    exclusive_executor_resource: asdf-ruby
+    timeout: 20 Minutes
+    body: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      cd ${LEIHS_PROCURE_DIR}
+      ./bin/env/ruby-setup
+

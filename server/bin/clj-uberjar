@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-set -eux
+set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
 cd $PROJECT_DIR
-source $PROJECT_DIR/shared-clj/clojure/bin/activate
-
+$PROJECT_DIR/bin/env/java-setup
+$PROJECT_DIR/bin/env/clojure-setup
 clojure -T:build-leihs uber
+
+# vi: ft=sh

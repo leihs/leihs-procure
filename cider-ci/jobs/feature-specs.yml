@@ -8,10 +8,10 @@ context:
     include:
       - path: cider-ci/task-components/database.yml
         submodule: [server/database]
-      - cider-ci/environment_variables.yml
-      - cider-ci/uberjar_task-component.yml
-      - cider-ci/service_task-component.yml
-      - cider-ci/bundle-ruby_task-component.yml
+      - cider-ci/task-components/env-vars.yml
+      - cider-ci/task-components/uberjar.yml
+      - cider-ci/task-components/service.yml
+      - cider-ci/task-components/bundle-ruby.yml
     environment_variables:
       LEIHS_PROCURE_DIR: "{{CIDER_CI_WORKING_DIR}}"
       LEIHS_PROCURE_SPEC_DIR: "{{LEIHS_PROCURE_DIR}}"
@@ -20,8 +20,7 @@ context:
     max_trials: 2
 
     traits:
-      OpenJDK: true
-      Firefox ESR 60: true
+      asdf: true
 
     ports:
       LEIHS_PROCURE_HTTP_PORT:
@@ -46,7 +45,10 @@ context:
             states: [passed]
         body: |
           #!/usr/bin/env bash
-          set -eux
+          set -euo pipefail
+          cd $LEIHS_PROCURE_DIR
           mkdir -p log
-          xvfb-run -a -e log/xvfb.log bundle exec rspec $CIDER_CI_TASK_FILE
-
+          unset PGPORT; unset PGUSER
+          PGPORT=${PG10PORT} PGUSER=${PG10USER} \
+            xvfb-run -a -e log/xvfb.log \
+            ./bin/rspec $CIDER_CI_TASK_FILE

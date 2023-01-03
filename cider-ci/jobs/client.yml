@@ -1,0 +1,26 @@
+context:
+  task_defaults:
+    environment_variables:
+      LEIHS_PROCURE_DIR: '{{CIDER_CI_WORKING_DIR}}'
+      CI: 'true'
+
+    git_options:
+      submodules:
+        include_match: ^.*$
+
+  tasks:
+    'Test':
+      scripts:
+        test:
+          body: |
+            #!/usr/bin/env bash
+            set -euo pipefail
+            ${LEIHS_PROCURE_DIR}/client/bin/test
+
+    'Lint':
+      scripts:
+        test:
+          body: |
+            #!/usr/bin/env bash
+            set -euo pipefail
+            ${LEIHS_PROCURE_DIR}/client/bin/lint

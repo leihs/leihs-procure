@@ -1,0 +1,26 @@
+scripts:
+
+  leihs-ui-build:
+    timeout: 10 minutes
+    body: ${LEIHS_PROCURE_DIR}/client/leihs-ui/bin/build
+
+  procure-client-deps-install:
+    timeout: 10 minutes
+    body: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      ${LEIHS_PROCURE_DIR}/bin/env/nodejs-setup
+      cd ${LEIHS_PROCURE_DIR}/client
+      npm ci --no-audit
+
+  procure-client-build:
+    timeout: 10 minutes
+    exclusive_executor_resource: procure-ui-build
+    start_when:
+      procure client deps installed:
+        script_key: procure-client-deps-install
+      leihs-ui built passed:
+        script_key: leihs-ui-build
+    body: ${LEIHS_PROCURE_DIR}/client/bin/build
+
+

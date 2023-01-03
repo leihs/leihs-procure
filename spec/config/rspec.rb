@@ -1,4 +1,27 @@
+def http_port
+  @port ||= Integer(ENV['LEIHS_PROCURE_HTTP_PORT'].presence || 3220)
+end
+
+def http_host
+  @host ||= ENV['LEIHS_PROCURE_HTTP_HOST'].presence || 'localhost'
+end
+
+def http_base_url
+  @http_base_url ||= "http://#{http_host}:#{http_port}"
+end
+
+def set_capybara_values
+  Capybara.app_host = http_base_url
+  Capybara.server_port = http_port
+  Capybara.default_driver = :firefox
+  Capybara.current_driver = :firefox
+end
+
+
+
 RSpec.configure do |config|
+  set_capybara_values
+
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4.
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -21,10 +44,14 @@ RSpec.configure do |config|
     config.default_formatter = "doc"
   end
 
-  config.before :each do
-    srand 1
+  config.before :all do
+    set_capybara_values
   end
 
+  config.before :each do
+    set_capybara_values
+    srand 1
+  end
 
 
   # Turnip:
@@ -41,7 +68,6 @@ RSpec.configure do |config|
     feature_steps_file = "#{dn}/#{bn}.steps.rb"
     require(feature_steps_file) if File.exist?(feature_steps_file)
 
-    Capybara.current_driver = :firefox
     begin
       page.driver.browser.manage.window.resize_to(*BROWSER_WINDOW_SIZE)
     rescue => e

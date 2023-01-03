@@ -3,30 +3,32 @@ scripts:
   procure-install-nodejs:
     exclusive_executor_resource: asdf-nodjes
     body: |
-      set -eux
       cd $LEIHS_PROCURE_DIR
-      asdf install nodejs
+      ./bin/env/nodejs-setup
 
   procure-service-run:
     timeout: 15 Minutes
     start_when:
-      nodejs is installed:
-        script_key: procure-install-nodejs
       uberjar has been built:
-        script_key: procure-build-uberjar
+        script_key: procure-uberjar-build
       database has been created:
         script_key: create-database
+      nodejs is installed:
+        script_key: procure-install-nodejs
     body: |
-      set -eux
+      #!/usr/bin/env bash
+      set -euo pipefail
       cd $LEIHS_PROCURE_DIR/server
       export DB_NAME=${LEIHS_DATABASE_NAME}
       export HTTP_PORT=${LEIHS_PROCURE_HTTP_PORT}
       mkdir tmp
-      java -jar target/leihs-procure.jar run --pid-file tmp/service.pid
+      unset PGPORT; unset PGUSER
+      PGPORT=$PG10PORT PGUSER=$PG10USER ./bin/run --pid-file tmp/service.pid
 
   procure-service-is-running:
     body: |
-      set -eux
+      #!/usr/bin/env bash
+      set -euo pipefail
       until curl --silent --fail -I \
         -H 'Accept: application/json' \
         "http://localhost:${LEIHS_PROCURE_HTTP_PORT}/procure/status";
@@ -44,7 +46,8 @@ scripts:
 
   shutdown-procure-service:
     body: |
-      set -eux
+      #!/usr/bin/env bash
+      set -euo pipefail
       cd $LEIHS_PROCURE_DIR/server
       export PID=$(cat tmp/service.pid)
       kill $PID

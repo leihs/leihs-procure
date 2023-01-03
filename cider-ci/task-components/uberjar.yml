@@ -1,0 +1,24 @@
+name: 'Build procure uberjar '
+
+include:
+  - cider-ci/task-components/bundle-ruby.yml
+  - cider-ci/task-components/client-built.yml
+
+git_options:
+  submodules:
+    include_match: ^.*$
+
+traits:
+  asdf: true
+
+scripts:
+
+  procure-uberjar-build:
+    timeout: 10 minutes
+    exclusive_executor_resource: procure-uberjar-build
+    start_when:
+      procure-client-build passed:
+        script_key: procure-client-build
+      install-ruby-passed:
+        script_key: procure-ruby-bundle
+    body: cd ${LEIHS_PROCURE_DIR} && ./bin/build
