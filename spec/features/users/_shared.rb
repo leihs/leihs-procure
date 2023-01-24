@@ -79,7 +79,7 @@ shared_context :basic_user_properties do
     user = database[:users].where(id: id).first.try(:with_indifferent_access)
     expect(user).to be
     properties.each do |k, v|
-      expect(user[k]).to be== v
+      expect(user[k]).to be== v, "expected value for key #{k} is #{user[k]} but is #{v}"
     end
   end
 

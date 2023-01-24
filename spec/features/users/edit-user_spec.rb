@@ -8,8 +8,10 @@ def ui_update_user_ok user, extra_props
   click_on_first_user user
   click_on 'Edit'
   fill_in_user_properties properties
+  sleep(0.5) if (properties.include? :img256_url) or (properties.include? :img32_url)
   click_on 'Save'
   wait_until { current_path.match(%r"/admin/users/([^/]+)") }
+  sleep(0.5) if (properties.include? :img256_url) or (properties.include? :img32_url)
   assert_user_properties user[:id] , properties
 end
 
