@@ -1,7 +1,4 @@
-class Contract < Sequel::Model(:contracts)
-end
-
-FactoryBot.define do
+FactoryBot.modify do
   factory :contract do
     user_id { User.all.sample.id }
     inventory_pool_id { InventoryPool.all.sample.id }

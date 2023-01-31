@@ -1,4 +1,4 @@
-class Item < Sequel::Model
+class Item
   many_to_one(:leihs_model, key: :model_id)
   many_to_one(:responsible, class: :InventoryPool, key: :inventory_pool_id)
   many_to_one(:owner, class: :InventoryPool, key: :owner_id)
@@ -6,7 +6,7 @@ class Item < Sequel::Model
   many_to_one(:supplier)
 end
 
-FactoryBot.define do
+FactoryBot.modify do
   factory :item do
     inventory_code { Faker::Alphanumeric.alphanumeric(number: 10) }
     leihs_model
