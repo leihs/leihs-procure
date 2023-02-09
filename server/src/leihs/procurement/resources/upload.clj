@@ -34,7 +34,7 @@
         (assoc :content content)
         (assoc :metadata metadata)
         (assoc :content-type content-type)
-        (assoc :exiftool_version exif/exiftool-version)
+        (assoc :exiftool_version (exif/exiftool-version))
         (assoc :exiftool_options (string/join " " exif/exiftool-options)))))
 
 (defn get-by-id

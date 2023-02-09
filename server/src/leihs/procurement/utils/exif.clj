@@ -3,7 +3,7 @@
             [clojure.java.shell :refer [sh]]
             [clojure.string :as string]))
 
-(def exiftool-version
+(defn exiftool-version []
   (->> ["exiftool" "-ver"]
        (apply sh)
        :out
