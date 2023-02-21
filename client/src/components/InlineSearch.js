@@ -97,9 +97,15 @@ const InlineSearch = ({
                 )
               }
 
-              const resultKeys = f.keys(data)
-              if (resultKeys.length !== 1) throw new Error('Ambiguous result!')
-              const items = data[resultKeys[0]]
+              let items
+              if (data) {
+                const resultKeys = f.keys(data)
+                if (resultKeys.length !== 1)
+                  throw new Error('Ambiguous result!')
+                items = data[resultKeys[0]]
+              } else {
+                items = []
+              }
 
               return (
                 <ItemsList

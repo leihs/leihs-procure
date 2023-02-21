@@ -8,6 +8,6 @@ cd $PROJECT_DIR
 
 test -d node_modules && npm i || { npm ci || npm i ;}
 npm run build:ui
-npm test
+npm start
 
 # vi: ft=sh
