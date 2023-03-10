@@ -15,7 +15,6 @@ feature 'Manage inventory-pool delegations ', type: :feature do
                         inventory_pool_id: pool.id,
                         user_id: delegation.responsible_user.id,
                         role: 'customer')
-      delegation.add_member(delegation.responsible_user)
       delegation
     end
 

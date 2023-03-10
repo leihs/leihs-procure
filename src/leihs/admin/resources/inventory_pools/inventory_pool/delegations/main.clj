@@ -121,18 +121,13 @@
                                              {:delegator_user_id ruid
                                               :firstname name
                                               :pool_protected protected}))]
-      (if (first (jdbc/insert! tx :delegations_users
-                               {:delegation_id (:id delegation)
-                                :user_id ruid}))
-        (if (first (jdbc/insert! tx :direct_access_rights
-                                 {:user_id (:id delegation)
-                                  :inventory_pool_id inventory-pool-id
-                                  :role "customer" }))
-          {:status 200 :body delegation}
-          (throw (ex-info
-                   "failed to add delegation as customer to pool" {:status 422})))
-        (throw (ex-info "the responsible user could not be added as a delegation member"
-                        {:status 422})))
+      (if (first (jdbc/insert! tx :direct_access_rights
+                               {:user_id (:id delegation)
+                                :inventory_pool_id inventory-pool-id
+                                :role "customer" }))
+        {:status 200 :body delegation}
+        (throw (ex-info
+                 "failed to add delegation as customer to pool" {:status 422})))
       (throw (ex-info  "The delegation could not be created!" {:status 422})))
     (throw responsible-user/not-found-ex)))
 

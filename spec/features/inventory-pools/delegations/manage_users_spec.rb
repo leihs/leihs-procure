@@ -3,7 +3,7 @@ require 'pry'
 
 shared_examples :direct_user do
   scenario 'adding and removing a direct user' do
-    @user = @users.sample
+    @user = @users.find { |u| u.id != @delegation.delegator_user_id }
     click_on 'Inventory-Pools'
     click_on @pool.name
     click_on 'Delegations'
@@ -29,8 +29,8 @@ shared_examples :direct_user do
     end
 
     visit @delegation_path
-    within("tr", text: "Number of users"){ expect(find("td.users-count").text).to eq "1"}
-    within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "1"}
+    within("tr", text: "Number of users"){ expect(find("td.users-count").text).to eq "2"}
+    within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "2"}
     within("tr", text: "Number of groups"){ expect(find("td.groups-count").text).to eq "0"}
 
     # test including-user filter
@@ -86,7 +86,7 @@ shared_examples :group_user do
     end
 
     visit @delegation_path
-    within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "0"}
+    within("tr", text: "Number of direct users"){ expect(find("td.direct-users-count").text).to eq "1"}
     within("tr", text: "Number of groups"){ expect(find("td.groups-count").text).to eq "1"}
 
     # test including-user filter
