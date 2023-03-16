@@ -9,6 +9,7 @@
     [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
     [leihs.core.auth.core :as auth]
     [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+    leihs.core.sql2
     [leihs.core.uuid :refer [uuid]]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
@@ -64,7 +65,7 @@
   [query {{term :term} :query-params :as request}]
   (if-let [term (presence term)]
     (-> query
-        (sql/where ["@@" :audited_changes.changed term]))
+        (sql/where [(keyword "@@") :audited_changes.changed term]))
     query))
 
 (defn filter-by-table

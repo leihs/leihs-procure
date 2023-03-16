@@ -27,16 +27,21 @@ feature 'Audits' do
         expect(page).to have_content 'FooHans'
       end
 
-      scenario 'I can inspect the audited changes' do
+      scenario 'I can inspect the audited changes after searching' do
         click_on_first 'Admin'
         click_on 'Audits'
         click_on 'Audited-Changes'
+
+        fill_in 'term', with: @user.firstname
+        wait_until { all('table tbody.audited-changes tr').count == 2 } 
+
         within(find_all('table tbody.audited-changes tr').first) do |node|
           expect(find('td.table-name')).to have_content 'users'
           expect(find('td.tg-op')).to have_content 'UPDATE'
           expect(find('td.changed-attributes')).to have_content 'firstname'
           click_on 'Change'
         end
+
         expect(page).to have_content 'Audited-Change'
         expect(page).to have_content @user.firstname
         expect(page).to have_content 'FooHans'
