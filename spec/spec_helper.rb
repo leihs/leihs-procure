@@ -1,7 +1,7 @@
 require 'active_support/all'
 require 'pry'
 
-require 'config/database'
+require_relative '../database/spec/config/database'
 require 'config/factories'
 
 require 'config/browser'
@@ -15,12 +15,19 @@ RSpec.configure do |config|
   config.include Helpers::Global
   config.include Helpers::User
 
-  config.before :each do
+
+  config.before(:example) do |example|
+
     page.driver.browser.manage.window.resize_to(1200, 1200)
     srand 1
+
+    db_clean
+    db_restore_data seeds_sql
+
   end
 
-  config.after(:each) do |example|
+
+  config.after(:example) do |example|
     # auto-pry after failures, except in CI!
     unless (ENV['CIDER_CI_TRIAL_ID'].present? or ENV['NOPRY_ON_EXCEPTION'].present?)
       unless example.exception.nil?

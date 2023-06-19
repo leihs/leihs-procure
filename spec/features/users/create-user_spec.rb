@@ -4,14 +4,14 @@ require "#{File.dirname(__FILE__)}/_shared"
 
 shared_examples :create_with_extra_props do |extra_props = {}|
   scenario "I can create a user with all basic properties and #{extra_props}" do
-  properties = BASIC_USER_PROPERTIES.merge(extra_props)
-  click_on 'Users'
-  click_on 'Create'
-  fill_in_user_properties properties
-  click_on 'Create'
-  wait_until { current_path.match(%r"/admin/users/([^/]+)") }
-  assert_user_properties current_path.match(%r"/admin/users/([^/]+)")[1], properties
-end
+    properties = BASIC_USER_PROPERTIES.merge(extra_props)
+    click_on 'Users'
+    click_on 'Create'
+    fill_in_user_properties properties
+    click_on 'Create'
+    wait_until { current_path.match(%r"/admin/users/([^/]+)") }
+    assert_user_properties current_path.match(%r"/admin/users/([^/]+)")[1], properties
+  end
 end
 
 shared_examples :can_not_set_the_attribure do |attr_name|
@@ -49,6 +49,7 @@ feature 'Creating a user', type: :feature do
     include_context :all_types_of_users
 
     context 'as a pool manager' do
+
       before(:each){ @current_user = @manager}
       context 'via the UI' do
         include_context :sign_in_to_admin
@@ -59,6 +60,7 @@ feature 'Creating a user', type: :feature do
         include_examples :can_not_set_the_attribure, :is_system_admin
         include_examples :can_not_set_the_attribure, :system_admin_protected
       end
+
       context 'via the API' do
         include_context :setup_api
         include_context :basic_user_properties
@@ -71,12 +73,15 @@ feature 'Creating a user', type: :feature do
     end
 
     context 'as an admin' do
+
       before(:each){ @current_user = @admin}
+
       context 'via the UI' do
         include_context :sign_in_to_admin
         include_context :basic_user_properties
         include_examples :create_with_extra_props, {}
       end
+
       context 'via the API' do
         include_context :setup_api
         include_context :basic_user_properties
@@ -84,6 +89,7 @@ feature 'Creating a user', type: :feature do
         include_examples :create_via_api_forbidden, {is_system_admin: true}
         include_examples :create_via_api_forbidden, {system_admin_protected: true}
       end
+
     end
 
     context 'as a system-admin' do
