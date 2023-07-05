@@ -1,9 +1,10 @@
 require 'active_support/all'
-require 'config/database'
+
+SERVER_DIR = Pathname.new(__dir__).join("..")
+require SERVER_DIR.join('database/spec/config/database').to_s
+
 require 'config/factories'
 require 'config/metadata_extractor'
-require 'pry'
-
 
 
 def http_port
@@ -20,4 +21,9 @@ end
 
 
 RSpec.configure do |config|
+  config.before(:example) do |example|
+    srand 1
+    db_clean
+    db_restore_data seeds_sql
+  end
 end

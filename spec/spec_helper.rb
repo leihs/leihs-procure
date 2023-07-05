@@ -1,10 +1,9 @@
 require 'active_support/all'
 require 'pry'
 
-DIR = Pathname.new(__dir__)
-require DIR.join('..').join('server/spec/config/database')
+PROJECT_DIR = Pathname.new(__dir__)
+require PROJECT_DIR.join('..').join('server/database/spec/config/database')
 
-require 'config/database'
 require 'config/factories'
 require 'config/metadata_extractor'
 require 'config/screenshots'
@@ -17,3 +16,11 @@ module Leihs
   end
 end
 
+
+RSpec.configure do |config|
+  config.before(:example) do |example|
+    srand 1
+    db_clean
+    db_restore_data seeds_sql
+  end
+end

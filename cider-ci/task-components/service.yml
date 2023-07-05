@@ -23,7 +23,7 @@ scripts:
       export HTTP_PORT=${LEIHS_PROCURE_HTTP_PORT}
       mkdir tmp
       unset PGPORT; unset PGUSER
-      PGPORT=$PG10PORT PGUSER=$PG10USER ./bin/run --pid-file tmp/service.pid
+      PGPORT=$PG15PORT PGUSER=$PG15USER ./bin/run --pid-file tmp/service.pid
 
   procure-service-is-running:
     body: |

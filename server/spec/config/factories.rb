@@ -1,4 +1,7 @@
-require 'config/database.rb'
+require 'active_support/all'
+
+require SERVER_DIR.join('database/spec/config/database').to_s
+
 require 'factory_bot'
 require 'faker'
 
