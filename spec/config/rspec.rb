@@ -1,27 +1,4 @@
-def http_port
-  @port ||= Integer(ENV['LEIHS_PROCURE_HTTP_PORT'].presence || 3220)
-end
-
-def http_host
-  @host ||= ENV['LEIHS_PROCURE_HTTP_HOST'].presence || 'localhost'
-end
-
-def http_base_url
-  @http_base_url ||= "http://#{http_host}:#{http_port}"
-end
-
-def set_capybara_values
-  Capybara.app_host = http_base_url
-  Capybara.server_port = http_port
-  Capybara.default_driver = :firefox
-  Capybara.current_driver = :firefox
-end
-
-
-
 RSpec.configure do |config|
-  set_capybara_values
-
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4.
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -44,12 +21,7 @@ RSpec.configure do |config|
     config.default_formatter = "doc"
   end
 
-  config.before :all do
-    set_capybara_values
-  end
-
   config.before :each do
-    set_capybara_values
     srand 1
   end
 
@@ -93,7 +65,7 @@ RSpec.configure do |config|
   #
   config.after(:each) do |example|
     # auto-pry after failures, except in CI!
-    unless ENV['CIDER_CI_TRIAL_ID'].present? or ENV['NOPRY']
+    if not ENV['CIDER_CI_TRIAL_ID'].present? and ENV['PRY_ON_EXCEPTION']
       unless example.exception.nil?
         puts decorate_exception(example.exception)
         binding.pry if example.exception

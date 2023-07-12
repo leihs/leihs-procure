@@ -79,7 +79,6 @@ const MAINCAT_PROPS_FRAGMENT = gql`
   }
   fragment UserProps on User {
     id
-    login
     firstname
     lastname
   }

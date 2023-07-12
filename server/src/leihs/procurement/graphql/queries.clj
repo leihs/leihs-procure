@@ -99,8 +99,8 @@
    :total-price-cents-order-quantities
      (-> requests/total-price-cents-order-quantities
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
-   :user user/get-user,
-   :users users/get-users,
+   :user (-> user/get-user (authorization/wrap-ensure-one-of [user-perms/admin? user-perms/inspector?])),
+   :users (-> users/get-users (authorization/wrap-ensure-one-of [user-perms/admin? user-perms/inspector?])),
    :viewers (fn [context args value]
               (let [rrequest (:request context)
                     tx (:tx rrequest)

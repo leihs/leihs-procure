@@ -7,10 +7,7 @@ BROWSER_WINDOW_SIZE = [ 1200, 800 ]
 LEIHS_PROCURE_HTTP_PORT =  ENV['LEIHS_PROCURE_HTTP_PORT'].presence  || '3230'
 LEIHS_PROCURE_HTTP_BASE_URL = ENV['LEIHS_PROCURE_HTTP_BASE_URL'].presence || "http://localhost:#{LEIHS_PROCURE_HTTP_PORT}"
 
-
 BROWSER_DOWNLOAD_DIR= File.absolute_path(File.expand_path(__FILE__)  + "/../../../tmp")
-
-
 
 firefox_bin_path = Pathname.new(`asdf where firefox`.strip).join('bin/firefox').expand_path.to_s
 Selenium::WebDriver::Firefox.path = firefox_bin_path
@@ -54,5 +51,10 @@ Capybara.register_driver :firefox do |app|
 end
 
 Capybara.configure do |config|
+  Capybara.app_host = LEIHS_PROCURE_HTTP_BASE_URL
+  Capybara.server_port = LEIHS_PROCURE_HTTP_PORT
+  Capybara.default_driver = :firefox
+  Capybara.current_driver = :firefox
+
   config.default_max_wait_time = 15
 end

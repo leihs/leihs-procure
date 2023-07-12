@@ -14,8 +14,6 @@ export const CURRENT_USER_QUERY = gql`
         id
         firstname
         lastname
-        login
-        email
         permissions {
           isAdmin
           isRequester

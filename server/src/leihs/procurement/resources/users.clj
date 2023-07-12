@@ -10,7 +10,7 @@
     (sql/call :concat :users.firstname :users.lastname :users.login :users.id)))
 
 (def users-base-query
-  (-> (sql/select :users.*)
+  (-> (sql/select :users.id :users.firstname :users.lastname)
       (sql/from :users)
       sql-order-users))
 

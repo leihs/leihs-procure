@@ -413,11 +413,9 @@
                       :price_currency {:type (non-null String)},
                       :supplier {:resolve :supplier, :type :Supplier},
                       :supplier_name {:type String}}},
-  :User {:fields {:email {:type String},
+  :User {:fields {:id {:type (non-null ID)},
                   :firstname {:type String},
-                  :id {:type (non-null ID)},
                   :lastname {:type String},
-                  :login {:type String},
                   :permissions {:resolve :permissions,
                                 :type :UserPermissions}}},
   :UserPermissions {:fields

@@ -3,7 +3,7 @@
             [leihs.procurement.utils.sql :as sql]))
 
 (def user-base-query
-  (-> (sql/select :users.*)
+  (-> (sql/select :users.id :users.firstname :users.lastname)
       (sql/from :users)))
 
 (defn get-user

@@ -169,13 +169,10 @@ describe 'main categories' do
           procurement_account
           inspectors {
             id
-            login
-            firstname
             lastname
           }
           viewers {
             id
-            login
             firstname
             lastname
           }

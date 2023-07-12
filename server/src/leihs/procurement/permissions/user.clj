@@ -1,8 +1,10 @@
 (ns leihs.procurement.permissions.user
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+            [leihs.core.core :refer [raise]]
             [leihs.procurement.permissions.categories :as categories-perms]
-            [leihs.procurement.utils.sql :as sql]))
+            [leihs.procurement.utils.sql :as sql]
+            [taoensso.timbre :refer [debug info warn error spy]]))
 
 (defn admin?
   [tx auth-entity]
@@ -79,12 +81,10 @@
        (some true?)))
 
 (defn get-permissions
-  [context args value]
-  (let [tx (-> context
-               :request
-               :tx)
-        auth-entity {:user_id (:id value)}]
-    {:isAdmin (admin? tx auth-entity),
-     :isRequester (requester? tx auth-entity),
-     :isInspectorForCategories (categories-perms/inspected-categories tx value),
-     :isViewerForCategories (categories-perms/viewed-categories tx value)}))
+  [{{:keys [tx authenticated-entity]} :request} args value]
+  (when (not= (:user_id authenticated-entity) (:id value))
+    (raise "Not allowed to query permissions for a user other then the authenticated one."))
+  {:isAdmin (admin? tx authenticated-entity),
+   :isRequester (requester? tx authenticated-entity),
+   :isInspectorForCategories (categories-perms/inspected-categories tx value),
+   :isViewerForCategories (categories-perms/viewed-categories tx value)})
