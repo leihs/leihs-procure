@@ -4,7 +4,6 @@
   (:require
     [clojure.java.jdbc :as jdbc]
     [clojure.set :refer [rename-keys]]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
@@ -15,13 +14,12 @@
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [slingshot.slingshot :refer [try+]]
-    )
+    [taoensso.timbre :refer [error warn info debug spy]])
   (:import
     [java.awt.image BufferedImage]
     [java.io ByteArrayInputStream ByteArrayOutputStream]
-    [javax.imageio ImageIO]
     [java.util Base64]
-    ))
+    [javax.imageio ImageIO]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -279,7 +277,9 @@
 
 (defn prepare-write-data [data]
   (-> data
+      spy
       (select-keys user-write-keys)
+      spy
       (rename-keys user-write-keymap)))
 
 (defn protect-admin! [data user]
@@ -332,6 +332,7 @@
    (when-not (requester-is-system-admin? request)
             (users-and-groups/assert-attributes-are-not-set!
               data system-admin-restricted-attributes))
+   (warn data)
    (if-let [user (first (jdbc/insert! tx :users data))]
      {:body user}
      {:status 422

@@ -1,28 +1,21 @@
 (ns leihs.admin.resources.users.user.create
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [timeout go]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
     [leihs.admin.resources.users.user.edit-main :as edit-main]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
     [reagent.core :as reagent]
-
-    [taoensso.timbre :as logging]
-    ))
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 (defn post [& args]
   (go (when-let
@@ -40,7 +33,9 @@
           (path :user {:user-id (:id data)})))))
 
 (defn clean [& _]
-  (reset! data* {}))
+  (warn 'clean "cleaning data")
+  (reset! data* {:password_sign_in_enabled true
+                 :account_enabled true}))
 
 (defn submit-component []
   [:div

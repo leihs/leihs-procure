@@ -94,6 +94,7 @@ feature 'Creating a user', type: :feature do
 
     context 'as a system-admin' do
       before(:each){ @current_user = @system_admin}
+
       context 'via the UI' do
         include_context :sign_in_to_admin
         include_context :basic_user_properties
@@ -102,7 +103,16 @@ feature 'Creating a user', type: :feature do
            is_system_admin: true, system_admin_protected: true,
            organization: 'example-com', org_id: '123'}
       end
+
+      context 'via the UI' do
+        context "disabling default true values in table definition" do
+          include_context :sign_in_to_admin
+          include_context :basic_user_properties
+          include_examples :create_with_extra_props,
+            {account_enabled: false,
+             password_sign_in_enabled: false}
+        end
+      end
     end
   end
 end
-

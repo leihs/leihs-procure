@@ -1,14 +1,11 @@
 (ns leihs.admin.resources.users.user.edit-main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [go timeout]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
@@ -16,12 +13,10 @@
     [leihs.admin.resources.users.user.edit-image :as edit-image]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
     [reagent.core :as reagent]
-    [taoensso.timbre :as logging]
+    [taoensso.timbre :refer [error warn info debug spy]]
     ))
 
 
