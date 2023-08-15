@@ -38,7 +38,7 @@ class GraphqlQuery
 
   def get_csrf_token
     r = Faraday.get("#{http_base_url}/sign-in")
-    r.body.match(/name="csrf-token" value="(.*?)"\/>/)[1]
+    r.body.match(/name="csrf-token".+value="(.*?)".*\/?>/)[1]
   end
 
   def get_cookies(user_id, csrf_token)
