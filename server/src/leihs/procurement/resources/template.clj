@@ -67,3 +67,5 @@
                            :tx)))
       first
       :result))
+
+(def can-update? can-delete?)

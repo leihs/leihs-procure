@@ -102,6 +102,7 @@
                            :article_number {:type String},
                            :category_id {:type (non-null ID)},
                            :id {:type ID},
+                           :is_archived {:type Boolean}
                            :model {:type ID},
                            :price_cents {:type Int},
                            :supplier_id {:type ID},
@@ -404,6 +405,8 @@
   :Template {:fields {:article_name {:type String},
                       :article_number {:type String},
                       :can_delete {:resolve :can-delete-template?,
+                                   :type (non-null Boolean)},
+                      :can_update {:resolve :can-update-template?,
                                    :type (non-null Boolean)},
                       :category {:resolve :category,
                                  :type (non-null :Category)},

@@ -56,6 +56,9 @@
    :can-delete-template? (-> template/can-delete?
                              (authorization/wrap-ensure-one-of
                                [user-perms/admin? user-perms/inspector?])),
+   :can-update-template? (-> template/can-update?
+                             (authorization/wrap-ensure-one-of
+                               [user-perms/admin? user-perms/inspector?])),
    :category category/get-category,
    :categories categories/get-categories,
    :current-user current-user/get-current-user,
