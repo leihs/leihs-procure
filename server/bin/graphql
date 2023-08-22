@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# set -eux
+
+if test -z $LEIHS_USER_SESSION; then
+  echo "LEIHS_USER_SESSION must be set!"
+  exit 1
+fi
+
+if test -z $LEIHS_ANTI_CSRF_TOKEN; then
+  echo "LEIHS_ANTI_CSRF_TOKEN must be set!"
+  exit 1
+fi
+
+if test -z "$1"; then
+  echo "Provide a query as 1st argument!"
+  exit 1
+fi
+
+http POST :3230/procure/graphql \
+  "Cookie:leihs-user-session=$LEIHS_USER_SESSION;leihs-anti-csrf-token=$LEIHS_ANTI_CSRF_TOKEN" \
+  X-Csrf-Token:$LEIHS_ANTI_CSRF_TOKEN \
+  query="$1"
