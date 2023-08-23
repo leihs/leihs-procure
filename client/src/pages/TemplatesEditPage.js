@@ -34,6 +34,7 @@ const TEMPLATES_FRAGMENT = gql`
       product
       version
     }
+    is_archived
     price_cents
     price_currency
     supplier_name
@@ -83,6 +84,8 @@ const updateTemplates = {
       sc =>
         !!f.find(me.user.permissions.isInspectorForCategories, { id: sc.id })
     )
+
+    console.debug('hello')
     const templates = f.flatMap(onlyEditableCats, sc =>
       f.flatMap(sc.templates, tpl => ({
         id: tpl.id,
@@ -99,8 +102,12 @@ const updateTemplates = {
       }))
     )
 
+    const addedTemplates = templates.filter(
+      template => template.id === undefined
+    )
+
     mutate({
-      variables: { templates }
+      variables: { addedTemplates }
     })
   }
 }
