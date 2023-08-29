@@ -127,7 +127,7 @@
             "text/html" :qs 1 :as :html]}))
 
 (defn init []
-  (I> wrap-handler-with-logging
+  (-> #_I> #_wrap-handler-with-logging
       dispatch-to-handler
       anti-csrf/wrap
       locale/wrap

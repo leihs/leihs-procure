@@ -5,6 +5,8 @@
             [leihs.procurement.utils.sql :as sql]
             [taoensso.timbre :refer [debug info warn error]]))
 
+(def ALLOWED-KEYS-FOR-USED-TEMPLATE #{:is_archived})
+
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
       (sql/from :procurement_templates)))
@@ -31,7 +33,11 @@
                        sql/format
                        (->> (jdbc/query tx))
                        first :count (> 0))]
-    (cond-> tmpl req-exist? (select-keys [:is_archived]))))
+    (if req-exist?
+      (do (warn (str "Stripping template of attributes due to being used by requests. "
+                     "This should have been prevented by client!"))
+          (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE)))
+      tmpl))
 
 (defn update-template!
   [tx tmpl]

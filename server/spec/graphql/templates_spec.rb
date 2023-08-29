@@ -68,30 +68,6 @@ describe 'templates' do
                           template_id: @tmpl.id)
       end
 
-      it 'throws if update on a used template' do
-        q = <<-GRAPHQL
-        mutation {
-          update_templates(input_data: [
-            { id: "#{@tmpl.id}",
-              article_name: "test",
-              category_id: "#{@category_A.id}",
-              price_cents: 100 }
-          ]) {
-            id
-            templates {
-              article_name
-            }
-          }
-        }
-        GRAPHQL
-
-        result = query(q, @user.id)
-        expect(result['data']['update_templates']).to be_blank
-        expect(result['errors'].first['message']).to match(/The template has already been used by one or more requests./)
-        expect(Template.all.count).to be == 1
-        expect(Template.find(id: @tmpl.id, article_name: @tmpl.article_name)).to be
-      end
-
       it 'throws if delete on a used template' do
         q = <<-GRAPHQL
         mutation {
@@ -116,7 +92,6 @@ describe 'templates' do
         expect(Template.all.count).to be == 1
         expect(Template.find(id: @tmpl.id, article_name: @tmpl.article_name)).to be
       end
-
     end
 
     it 'updates correctly' do
