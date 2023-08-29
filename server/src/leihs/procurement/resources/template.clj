@@ -51,9 +51,10 @@
 
 (defn validate-update-attributes! [tx tmpl-after]
   (let [tmpl-before (get-template-by-id tx (:id tmpl-after))
-        req-exist? (-> (sql/select (sql/call :count :*))
+        req-exist? (-> (sql/select :%count.*)
                        (sql/from :procurement_requests)
                        (sql/where [:= :template_id (:id tmpl-before)])
+                       sql/format
                        (->> (jdbc/query tx))
                        first :count (> 0))]
     (when (and req-exist?
