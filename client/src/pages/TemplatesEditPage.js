@@ -1,4 +1,4 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -86,28 +86,62 @@ const updateTemplates = {
     )
 
     console.debug('hello')
-    const templates = f.flatMap(onlyEditableCats, sc =>
-      f.flatMap(sc.templates, tpl => ({
-        id: tpl.id,
-        article_name: tpl.article_name,
-        article_number: tpl.article_number,
-        price_cents: tpl.price_cents,
-        to_delete: tpl.toDelete,
+    let templates = f
+      .flatMap(onlyEditableCats, sc =>
+        f.flatMap(sc.templates, tpl => ({
+          id: tpl.id,
+          article_name: tpl.article_name,
+          article_number: tpl.article_number,
+          price_cents: tpl.price_cents,
+          to_delete: tpl.can_delete,
 
-        category_id: sc.id,
-        // TODO: model/supplier
-        supplier_name: f.presence(tpl.supplier_name) || null
-        // ...(!!tpl.model && { model: tpl.model.id }),
-        // ...(!!tpl.supplier && { model: tpl.supplier.id }),
-      }))
+          category_id: sc.id,
+          // TODO: model/supplier
+          supplier_name: f.presence(tpl.supplier_name) || null
+          // ...(!!tpl.model && { model: tpl.model.id }),
+          // ...(!!tpl.supplier && { model: tpl.supplier.id }),
+        }))
+      )
+      .filter(template => !template.id)
+
+    const templatesToUpdate = Array.from(
+      document.querySelectorAll("[data-remove='true'], [data-archive]")
     )
 
-    const addedTemplates = templates.filter(
-      template => template.id === undefined
-    )
+    // const templatesToUpdate = [...templatesToAdd, ...templatesToEdit]
+
+    onlyEditableCats.forEach(category => {
+      templatesToUpdate.forEach(templateToUpdate => {
+        const updateId = templateToUpdate.getAttribute('data-id')
+
+        const toDelete = JSON.parse(
+          templateToUpdate.getAttribute('data-remove')
+        )
+        const toArchive = JSON.parse(
+          templateToUpdate.getAttribute('data-archive')
+        )
+
+        const data = category.templates.find(
+          template => template.id === updateId
+        )
+
+        if (data) {
+          toDelete ? (data.to_delete = toDelete) : delete data.to_delete
+
+          data.is_archived = toArchive
+          data.category_id = category.id
+          delete data.__typename
+          delete data.model
+          delete data.supplier
+          delete data.can_delete
+          delete data.price_currency
+          templates.push(data)
+        }
+      })
+    })
 
     mutate({
-      variables: { addedTemplates }
+      variables: { templates }
     })
   }
 }
@@ -271,50 +305,14 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
                                                 </div>
                                               ) : (
                                                 <div className="table-responsive">
-                                                  <table className="table table-sm table-hover">
-                                                    <thead className="small">
-                                                      <tr className="row no-gutters">
-                                                        {f.map(
-                                                          tableCols,
-                                                          ({ key, size }) => (
-                                                            <th
-                                                              key={key}
-                                                              className={`col-${size}`}
-                                                            >
-                                                              {t(
-                                                                `templates.formfield.${key}`
-                                                              )}
-                                                            </th>
-                                                          )
-                                                        )}
-                                                      </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                      {sc.templates.map(
-                                                        (tpl, i) => (
-                                                          <TemplateRow
-                                                            key={tpl.id || i}
-                                                            cols={tableCols}
-                                                            formPropsFor={key =>
-                                                              formPropsFor(
-                                                                `mainCategories.${mci}.categories.${sci}.templates.${i}.${key}`
-                                                              )
-                                                            }
-                                                            {...tpl}
-                                                          />
-                                                        )
-                                                      )}
-                                                    </tbody>
-
-                                                    <tfoot>
-                                                      <tr>
-                                                        <td className="col-12">
-                                                          {addButton}
-                                                        </td>
-                                                      </tr>
-                                                    </tfoot>
-                                                  </table>
+                                                  <Table
+                                                    tableCols={tableCols}
+                                                    addButton={addButton}
+                                                    mci={mci}
+                                                    sci={sci}
+                                                    sc={sc}
+                                                    formPropsFor={formPropsFor}
+                                                  ></Table>
                                                 </div>
                                               )}
                                             </li>
@@ -344,11 +342,88 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
   )
 }
 
-const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
-  const isEditing = true // TODO: edit on click
-  const inputFieldCls = cx({ 'text-strike bg-danger-light': tpl.toDelete })
+function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
+  const [showArchived, setShowArchived] = useState(false)
+
   return (
-    <tr className="row no-gutters" onClick={onClick}>
+    <>
+      <label className="custom-control-label">
+        <input
+          type="checkbox"
+          className=""
+          checked={showArchived}
+          onChange={e => setShowArchived(e.target.checked)}
+        />
+        Show Archived
+      </label>
+      <table className="table table-sm table-hover">
+        <thead className="small">
+          <tr className="row no-gutters">
+            {f.map(tableCols, ({ key, size }) => (
+              <th key={key} className={`col-${size}`}>
+                {t(`templates.formfield.${key}`)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {sc.templates.map((tpl, i) =>
+            !tpl.is_archived || showArchived ? (
+              <TemplateRow
+                key={tpl.id || i}
+                cols={tableCols}
+                formPropsFor={key =>
+                  formPropsFor(
+                    `mainCategories.${mci}.categories.${sci}.templates.${i}.${key}`
+                  )
+                }
+                {...tpl}
+              />
+            ) : null
+          )}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td className="col-12">{addButton}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </>
+  )
+}
+
+const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
+  const [remove, setRemove] = useState(false)
+  const [archive, setArchive] = useState(tpl.is_archived)
+
+  const rowRef = useRef(null)
+
+  const isEditing = true // TODO: edit on click
+  const inputFieldCls = cx({
+    'text-strike bg-danger-light': remove
+  })
+
+  // disabling all inputs by hand, since input componets are nested quite alot...
+  useEffect(() => {
+    if (!tpl.can_delete && tpl.id) {
+      const inputs = rowRef.current.querySelectorAll('input')
+      inputs.forEach(
+        input => input.type !== 'checkbox' && input.setAttribute('disabled', '')
+      )
+    }
+  })
+
+  return (
+    <tr
+      ref={rowRef}
+      data-id={tpl.id}
+      data-archive={archive}
+      data-remove={remove}
+      className="row no-gutters templates"
+      onClick={onClick}
+    >
       {cols.map(({ key, size, required }, i) => (
         <td
           key={i}
@@ -358,26 +433,36 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              tpl.can_delete && (
-                <Let field={formPropsFor('toDelete')}>
-                  {({ field }) => (
-                    <label id={`btn_del_${tpl.id}`} className="pt-1">
-                      <Icon.Trash
-                        size="lg"
-                        className={cx(
-                          tpl.toDelete ? 'text-dark' : 'text-danger'
-                        )}
-                      />
-                      <input
-                        type="checkbox"
-                        className="sr-only"
-                        name={field.name}
-                        checked={!!field.value}
-                        onChange={field.onChange}
-                      />
-                    </label>
-                  )}
-                </Let>
+              tpl.can_delete ? (
+                <label id={`btn_del_${tpl.id}`} className="pt-1">
+                  <Icon.Trash
+                    size="lg"
+                    className={cx(remove ? 'text-danger' : 'text-dark')}
+                  />
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    name="remove"
+                    checked={remove}
+                    onChange={e => setRemove(e.target.checked)}
+                  />
+                </label>
+              ) : tpl.is_archived !== undefined ? (
+                <label id={`btn_del_${tpl.id}`} className="pt-1">
+                  <Icon.Archive
+                    size="lg"
+                    className={cx(archive ? 'text-warning' : 'text-dark')}
+                  />
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    name="remove"
+                    checked={archive}
+                    onChange={e => setArchive(e.target.checked)}
+                  />
+                </label>
+              ) : (
+                <></>
               )
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>

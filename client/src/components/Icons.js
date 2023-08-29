@@ -48,7 +48,8 @@ import {
   faSearch,
   faExclamationTriangle,
   faTable,
-  faFileDownload
+  faFileDownload,
+  faArchive
 } from '@fortawesome/free-solid-svg-icons'
 import { faCircle as faCircleEmpty } from '@fortawesome/free-regular-svg-icons'
 
@@ -99,6 +100,10 @@ const ICONS = {
   },
   Trash: {
     src: faTrashAlt,
+    description: 'Deleting things'
+  },
+  Archive: {
+    src: faArchive,
     description: 'Deleting things'
   },
   LeihsProcurement: { src: faChartPie },
