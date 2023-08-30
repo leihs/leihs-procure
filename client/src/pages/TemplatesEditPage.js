@@ -20,6 +20,7 @@ import { ErrorPanel } from '../components/Error'
 import ImageThumbnail from '../components/ImageThumbnail'
 import { mutationErrorHandler } from '../apollo-client'
 import CurrentUser from '../containers/CurrentUserProvider'
+import { UncontrolledTooltip } from 'reactstrap'
 
 // # DATA
 //
@@ -84,29 +85,28 @@ const updateTemplates = {
       .filter(
         sc =>
           !!me.user.permissions.isInspectorForCategories.find(
-            el => el.id === sc.id 
+            el => el.id === sc.id
           )
       )
 
-    let templates = onlyEditableCats
-      .flatMap(sc =>
-        sc.templates.flatMap(tpl => ({
-          id: tpl.id,
-          article_name: tpl.article_name,
-          article_number: tpl.article_number,
-          price_cents: tpl.price_cents,
-          to_delete: tpl.toDelete,
-          is_archived: tpl.toArchive,
-          category_id: sc.id,
-          supplier_name: f.presence(tpl.supplier_name) || null
+    let templates = onlyEditableCats.flatMap(sc =>
+      sc.templates.flatMap(tpl => ({
+        id: tpl.id,
+        article_name: tpl.article_name,
+        article_number: tpl.article_number,
+        price_cents: tpl.price_cents,
+        to_delete: tpl.toDelete,
+        is_archived: tpl.is_archived,
+        category_id: sc.id,
+        supplier_name: f.presence(tpl.supplier_name) || null
 
-          // ...(!!tpl.model && { model: tpl.model.id }),
-          // ...(!!tpl.supplier && { model: tpl.supplier.id }),
-        }))
-      )
-      .filter(
-        template => !template.id || template.to_delete || template.is_archived
-      )
+        // ...(!!tpl.model && { model: tpl.model.id }),
+        // ...(!!tpl.supplier && { model: tpl.supplier.id }),
+      }))
+    )
+    // .filter(
+    //   template => !template.id || template.to_delete || template.is_archived
+    // )
 
     mutate({
       variables: { templates }
@@ -307,14 +307,26 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
 }
 
 function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
+  const switchRef = useRef(null)
   const [showArchived, setShowArchived] = useState(false)
+
+  useEffect(() => {
+    const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
+    !!hasArchivedEntry
+      ? switchRef.current.removeAttribute('disabled', '')
+      : switchRef.current.setAttribute('disabled', '')
+  })
 
   return (
     <>
       <div className="d-flex">
+        {/* Table Heading  */}
         <h3 className="h5 py-2">{sc.name}</h3>
+
+        {/*  Switch Archived Entries */}
         <div className="custom-control custom-switch align-self-center ml-auto">
           <input
+            ref={switchRef}
             type="checkbox"
             id="customSwitch1"
             className="custom-control-input"
@@ -326,6 +338,7 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
           </label>
         </div>
       </div>
+
       <table className="table table-sm table-hover">
         <thead className="small">
           <tr className="row no-gutters">
@@ -366,6 +379,8 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
 
 const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
   const rowRef = useRef(null)
+  const toArchiveRef = useRef(null)
+  const toDeleteRef = useRef(null)
 
   const isEditing = true // TODO: edit on click
   const inputFieldCls = cx({
@@ -409,6 +424,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                         )}
                       />
                       <input
+                        ref={toDeleteRef}
                         type="checkbox"
                         className="sr-only"
                         name="delete"
@@ -423,36 +439,47 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                           })
                         }
                       />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_del_${tpl.id}`}
+                      >
+                        This will delete the Entry permanently from the Database
+                      </UncontrolledTooltip>
                     </label>
                   )}
                 </Let>
               ) : tpl.is_archived !== undefined ? (
-                <Let toArchive={formPropsFor('toArchive')}>
-                  {({ toArchive }) => (
-                    <label id={`btn_del_${tpl.id}`} className="pt-1">
+                <Let is_archived={formPropsFor('is_archived')}>
+                  {({ is_archived }) => (
+                    <label id={`btn_archive_${tpl.id}`} className="pt-1">
                       <Icon.Archive
                         size="lg"
                         className={cx(
-                          tpl?.is_archived || tpl?.toArchive
-                            ? 'text-warning'
-                            : 'text-dark'
+                          !!tpl?.is_archived ? 'text-warning' : 'text-dark'
                         )}
                       />
                       <input
                         type="checkbox"
                         className="sr-only"
                         name="archive"
-                        checked={tpl?.toArchive || false}
+                        checked={!!tpl.is_archived}
                         onChange={e =>
-                          toArchive.onChange({
+                          is_archived.onChange({
                             target: {
-                              name: toArchive.name,
+                              name: is_archived.name,
                               checked: e.target.checked,
                               value: e.target.checked
                             }
                           })
                         }
                       />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_archive_${tpl.id}`}
+                      >
+                        This will archive the Entry, you can revert this later
+                        again
+                      </UncontrolledTooltip>
                     </label>
                   )}
                 </Let>
