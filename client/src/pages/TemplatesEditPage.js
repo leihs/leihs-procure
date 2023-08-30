@@ -20,6 +20,7 @@ import { ErrorPanel } from '../components/Error'
 import ImageThumbnail from '../components/ImageThumbnail'
 import { mutationErrorHandler } from '../apollo-client'
 import CurrentUser from '../containers/CurrentUserProvider'
+import { UncontrolledTooltip } from 'reactstrap'
 
 // # DATA
 //
@@ -79,66 +80,33 @@ const updateTemplates = {
     }
   },
   doUpdate: (mutate, me, { mainCategories }) => {
-    const onlyEditableCats = f.filter(
-      f.flatMap(mainCategories, 'categories'),
-      sc =>
-        !!f.find(me.user.permissions.isInspectorForCategories, { id: sc.id })
-    )
-
-    console.debug('hello')
-    let templates = f
-      .flatMap(onlyEditableCats, sc =>
-        f.flatMap(sc.templates, tpl => ({
-          id: tpl.id,
-          article_name: tpl.article_name,
-          article_number: tpl.article_number,
-          price_cents: tpl.price_cents,
-          to_delete: tpl.can_delete,
-
-          category_id: sc.id,
-          // TODO: model/supplier
-          supplier_name: f.presence(tpl.supplier_name) || null
-          // ...(!!tpl.model && { model: tpl.model.id }),
-          // ...(!!tpl.supplier && { model: tpl.supplier.id }),
-        }))
+    const onlyEditableCats = mainCategories
+      .flatMap(cat => cat['categories'])
+      .filter(
+        sc =>
+          !!me.user.permissions.isInspectorForCategories.find(
+            el => el.id === sc.id
+          )
       )
-      .filter(template => !template.id)
 
-    const templatesToUpdate = Array.from(
-      document.querySelectorAll("[data-remove='true'], [data-archive]")
+    let templates = onlyEditableCats.flatMap(sc =>
+      sc.templates.flatMap(tpl => ({
+        id: tpl.id,
+        article_name: tpl.article_name,
+        article_number: tpl.article_number,
+        price_cents: tpl.price_cents,
+        is_archived: tpl.is_archived,
+        category_id: sc.id,
+        supplier_name: f.presence(tpl.supplier_name) || null,
+        ...(!!tpl.toDelete && { to_delete: tpl.toDelete })
+
+        // ...(!!tpl.model && { model: tpl.model.id }),
+        // ...(!!tpl.supplier && { model: tpl.supplier.id }),
+      }))
     )
-
-    // const templatesToUpdate = [...templatesToAdd, ...templatesToEdit]
-
-    onlyEditableCats.forEach(category => {
-      templatesToUpdate.forEach(templateToUpdate => {
-        const updateId = templateToUpdate.getAttribute('data-id')
-
-        const toDelete = JSON.parse(
-          templateToUpdate.getAttribute('data-remove')
-        )
-        const toArchive = JSON.parse(
-          templateToUpdate.getAttribute('data-archive')
-        )
-
-        const data = category.templates.find(
-          template => template.id === updateId
-        )
-
-        if (data) {
-          toDelete ? (data.to_delete = toDelete) : delete data.to_delete
-
-          data.is_archived = toArchive
-          data.category_id = category.id
-          delete data.__typename
-          delete data.model
-          delete data.supplier
-          delete data.can_delete
-          delete data.price_currency
-          templates.push(data)
-        }
-      })
-    })
+    // .filter(
+    //   template => !template.id || template.to_delete || template.is_archived
+    // )
 
     mutate({
       variables: { templates }
@@ -290,10 +258,6 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
                                         canEditCat(sc) && (
                                           <F key={sc.id}>
                                             <li className="list-group-item">
-                                              <h3 className="h5 py-2">
-                                                {sc.name}
-                                              </h3>
-
                                               {!f.any(sc.templates) ? (
                                                 <div>
                                                   <p className="mb-2 small">
@@ -343,19 +307,38 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
 }
 
 function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
+  const switchRef = useRef(null)
   const [showArchived, setShowArchived] = useState(false)
+
+  useEffect(() => {
+    const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
+    !!hasArchivedEntry
+      ? switchRef.current.removeAttribute('disabled', '')
+      : switchRef.current.setAttribute('disabled', '')
+  })
 
   return (
     <>
-      <label className="custom-control-label">
-        <input
-          type="checkbox"
-          className=""
-          checked={showArchived}
-          onChange={e => setShowArchived(e.target.checked)}
-        />
-        Show Archived
-      </label>
+      <div className="d-flex">
+        {/* Table Heading  */}
+        <h3 className="h5 py-2">{sc.name}</h3>
+
+        {/*  Switch Archived Entries */}
+        <div className="custom-control custom-switch align-self-center ml-auto">
+          <input
+            ref={switchRef}
+            type="checkbox"
+            id="customSwitch1"
+            className="custom-control-input"
+            checked={showArchived}
+            onChange={e => setShowArchived(e.target.checked)}
+          />
+          <label className="custom-control-label" htmlFor="customSwitch1">
+            Show Archived
+          </label>
+        </div>
+      </div>
+
       <table className="table table-sm table-hover">
         <thead className="small">
           <tr className="row no-gutters">
@@ -395,14 +378,13 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
 }
 
 const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
-  const [remove, setRemove] = useState(false)
-  const [archive, setArchive] = useState(tpl.is_archived)
-
   const rowRef = useRef(null)
+  const toArchiveRef = useRef(null)
+  const toDeleteRef = useRef(null)
 
   const isEditing = true // TODO: edit on click
   const inputFieldCls = cx({
-    'text-strike bg-danger-light': remove
+    'text-strike bg-danger-light': tpl?.toDelete || false
   })
 
   // disabling all inputs by hand, since input componets are nested quite alot...
@@ -419,8 +401,6 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
     <tr
       ref={rowRef}
       data-id={tpl.id}
-      data-archive={archive}
-      data-remove={remove}
       className="row no-gutters templates"
       onClick={onClick}
     >
@@ -434,33 +414,75 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
           {isEditing ? (
             key === 'toDelete' ? (
               tpl.can_delete ? (
-                <label id={`btn_del_${tpl.id}`} className="pt-1">
-                  <Icon.Trash
-                    size="lg"
-                    className={cx(remove ? 'text-danger' : 'text-dark')}
-                  />
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    name="remove"
-                    checked={remove}
-                    onChange={e => setRemove(e.target.checked)}
-                  />
-                </label>
+                <Let toDelete={formPropsFor('toDelete')}>
+                  {({ toDelete }) => (
+                    <label id={`btn_del_${tpl.id}`} className="pt-1">
+                      <Icon.Trash
+                        size="lg"
+                        className={cx(
+                          tpl?.toDelete ? 'text-danger' : 'text-dark'
+                        )}
+                      />
+                      <input
+                        ref={toDeleteRef}
+                        type="checkbox"
+                        className="sr-only"
+                        name="delete"
+                        checked={tpl?.toDelete || false}
+                        onChange={e =>
+                          toDelete.onChange({
+                            target: {
+                              name: toDelete.name,
+                              checked: e.target.checked,
+                              value: e.target.checked
+                            }
+                          })
+                        }
+                      />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_del_${tpl.id}`}
+                      >
+                        This will delete the Entry permanently from the Database
+                      </UncontrolledTooltip>
+                    </label>
+                  )}
+                </Let>
               ) : tpl.is_archived !== undefined ? (
-                <label id={`btn_del_${tpl.id}`} className="pt-1">
-                  <Icon.Archive
-                    size="lg"
-                    className={cx(archive ? 'text-warning' : 'text-dark')}
-                  />
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    name="remove"
-                    checked={archive}
-                    onChange={e => setArchive(e.target.checked)}
-                  />
-                </label>
+                <Let is_archived={formPropsFor('is_archived')}>
+                  {({ is_archived }) => (
+                    <label id={`btn_archive_${tpl.id}`} className="pt-1">
+                      <Icon.Archive
+                        size="lg"
+                        className={cx(
+                          !!tpl?.is_archived ? 'text-warning' : 'text-dark'
+                        )}
+                      />
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        name="archive"
+                        checked={!!tpl.is_archived}
+                        onChange={e =>
+                          is_archived.onChange({
+                            target: {
+                              name: is_archived.name,
+                              checked: e.target.checked,
+                              value: e.target.checked
+                            }
+                          })
+                        }
+                      />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_archive_${tpl.id}`}
+                      >
+                        This will archive the Entry, you can revert this later
+                        again
+                      </UncontrolledTooltip>
+                    </label>
+                  )}
+                </Let>
               ) : (
                 <></>
               )
