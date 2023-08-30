@@ -104,9 +104,6 @@ const updateTemplates = {
         // ...(!!tpl.supplier && { model: tpl.supplier.id }),
       }))
     )
-    // .filter(
-    //   template => !template.id || template.to_delete || template.is_archived
-    // )
 
     mutate({
       variables: { templates }
@@ -171,7 +168,8 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
     !!f.find(me.user.permissions.isInspectorForCategories, { id })
 
   const tableCols = [
-    { key: 'article_name', size: 4, required: true },
+    { key: 'link', size: 1 },
+    { key: 'article_name', size: 3, required: true },
     { key: 'article_number', size: 3 },
     { key: 'price_cents', size: 2, required: true },
     { key: 'supplier_name', size: 2 },
@@ -334,7 +332,7 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
             onChange={e => setShowArchived(e.target.checked)}
           />
           <label className="custom-control-label" htmlFor="customSwitch1">
-            Show Archived
+            {t(`templates.show_archived`)}
           </label>
         </div>
       </div>
@@ -486,6 +484,12 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
               ) : (
                 <></>
               )
+            ) : key === 'link' ? (
+              !tpl.can_delete ? (
+                <div className="d-flex h-100 align-items-center justify-content-center">
+                  <Icon.Link size="lg" />
+                </div>
+              ) : null
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>
                 {({ priceField }) => (
