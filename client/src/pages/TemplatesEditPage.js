@@ -79,15 +79,18 @@ const updateTemplates = {
     }
   },
   doUpdate: (mutate, me, { mainCategories }) => {
-    const onlyEditableCats = f.filter(
-      f.flatMap(mainCategories, 'categories'),
-      sc =>
-        !!f.find(me.user.permissions.isInspectorForCategories, { id: sc.id })
-    )
+    const onlyEditableCats = mainCategories
+      .flatMap(cat => cat['categories'])
+      .filter(
+        sc =>
+          !!me.user.permissions.isInspectorForCategories.find(
+            el => el.id === sc.id 
+          )
+      )
 
-    let templates = f
-      .flatMap(onlyEditableCats, sc =>
-        f.flatMap(sc.templates, tpl => ({
+    let templates = onlyEditableCats
+      .flatMap(sc =>
+        sc.templates.flatMap(tpl => ({
           id: tpl.id,
           article_name: tpl.article_name,
           article_number: tpl.article_number,
@@ -104,42 +107,6 @@ const updateTemplates = {
       .filter(
         template => !template.id || template.to_delete || template.is_archived
       )
-
-    // const templatesToUpdate = Array.from(
-    //   document.querySelectorAll("[data-remove='true'], [data-archive]")
-    // )
-    //
-    // // const templatesToUpdate = [...templatesToAdd, ...templatesToEdit]
-    //
-    // onlyEditableCats.forEach(category => {
-    //   templatesToUpdate.forEach(templateToUpdate => {
-    //     const updateId = templateToUpdate.getAttribute('data-id')
-    //
-    //     const toDelete = JSON.parse(
-    //       templateToUpdate.getAttribute('data-remove')
-    //     )
-    //     const toArchive = JSON.parse(
-    //       templateToUpdate.getAttribute('data-archive')
-    //     )
-    //
-    //     const data = category.templates.find(
-    //       template => template.id === updateId
-    //     )
-    //
-    //     if (data) {
-    //       toDelete ? (data.to_delete = toDelete) : delete data.to_delete
-    //
-    //       data.is_archived = toArchive
-    //       data.category_id = category.id
-    //       delete data.__typename
-    //       delete data.model
-    //       delete data.supplier
-    //       delete data.can_delete
-    //       delete data.price_currency
-    //       templates.push(data)
-    //     }
-    //   })
-    // })
 
     mutate({
       variables: { templates }
@@ -344,7 +311,7 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
 
   return (
     <>
-      <div class="d-flex">
+      <div className="d-flex">
         <h3 className="h5 py-2">{sc.name}</h3>
         <div className="custom-control custom-switch align-self-center ml-auto">
           <input
@@ -404,8 +371,6 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
   const inputFieldCls = cx({
     'text-strike bg-danger-light': tpl?.toDelete || false
   })
-
-  console.debug(tpl)
 
   // disabling all inputs by hand, since input componets are nested quite alot...
   useEffect(() => {
