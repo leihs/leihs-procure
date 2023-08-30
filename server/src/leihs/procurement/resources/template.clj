@@ -34,9 +34,7 @@
                        (->> (jdbc/query tx))
                        first :count (> 0))]
     (if req-exist?
-      (do (warn (str "Stripping template of attributes due to being used by requests. "
-                     "This should have been prevented by client!"))
-          (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE)))
+      (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE))
       tmpl))
 
 (defn update-template!
