@@ -95,10 +95,10 @@ const updateTemplates = {
         article_name: tpl.article_name,
         article_number: tpl.article_number,
         price_cents: tpl.price_cents,
-        to_delete: tpl.toDelete,
         is_archived: tpl.is_archived,
         category_id: sc.id,
-        supplier_name: f.presence(tpl.supplier_name) || null
+        supplier_name: f.presence(tpl.supplier_name) || null,
+        ...(!!tpl.toDelete && { to_delete: tpl.toDelete })
 
         // ...(!!tpl.model && { model: tpl.model.id }),
         // ...(!!tpl.supplier && { model: tpl.supplier.id }),
