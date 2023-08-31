@@ -53,12 +53,6 @@
    :can-delete-main-category? (-> main-category/can-delete?
                                   (authorization/wrap-ensure-one-of
                                     [user-perms/admin?])),
-   :can-delete-template? (-> template/can-delete?
-                             (authorization/wrap-ensure-one-of
-                               [user-perms/admin? user-perms/inspector?])),
-   :can-update-template? (-> template/can-update?
-                             (authorization/wrap-ensure-one-of
-                               [user-perms/admin? user-perms/inspector?])),
    :category category/get-category,
    :categories categories/get-categories,
    :current-user current-user/get-current-user,
@@ -79,6 +73,7 @@
    :requesters-organizations
      (-> requesters-organizations/get-requesters-organizations
          (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   :requests-count template/requests-count,
    :permissions user-perms/get-permissions,
    :room room/get-room,
    :rooms rooms/get-rooms,

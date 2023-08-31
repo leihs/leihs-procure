@@ -67,21 +67,11 @@
          (->> (jdbc/query tx))
          first))))
 
-(defn can-delete?
-  [context _ value]
-  (-> (sql/call
-        :not
-        (sql/call :exists
-                  (-> (sql/select true)
-                      (sql/from [:procurement_requests :pr])
-                      (sql/merge-where [:= :pr.template_id (:id value)]))))
-      (vector :result)
-      sql/select
+(defn requests-count [{{:keys [tx]} :request} _ {:keys [id]}]
+  (-> (sql/select :%count.*)
+      (sql/from :procurement_requests)
+      (sql/where [:= :template_id id])
       sql/format
-      (->> (jdbc/query (-> context
-                           :request
-                           :tx)))
+      (->> (jdbc/query tx))
       first
-      :result))
-
-(def can-update? can-delete?)
+      :count))
