@@ -1,7 +1,9 @@
 {:paths [:cljc-paths :resource-paths]
 
  :deps {
+        buddy/buddy-sign {:mvn/version "3.4.333"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
+        clj-commons/clj-yaml {:mvn/version "0.7.107"}
         clj-http/clj-http {:mvn/version "3.12.3"}
         cljs-http/cljs-http {:mvn/version "0.1.46"}
         clojure-humanize/clojure-humanize {:mvn/version "0.2.2"}
@@ -23,15 +25,12 @@
         }
 
  :aliases {
-           ; we do not use this for now; issue: files behind linked
-           ; directories in resource/public are missing!
-           :build-orig {:deps
-                        {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}}
-                        :ns-default scripts.build}
 
-           :build-leihs {:deps
-                         {io.github.leihs/tools.build {:git/sha "700af097d4a7d2bf4739d0d4b1d1ac2c11019ff7"}}
-                         :ns-default scripts.build}
+           :build {:deps
+                   {io.github.leihs/tools.build 
+                    {:git/tag "v0.9.5-leihs"
+                     :git/sha "94a26a9"}}
+                   :ns-default scripts.build}
 
            :cljc-paths ["src" "shared-clj/src"]
 
