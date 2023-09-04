@@ -27,7 +27,6 @@ import { UncontrolledTooltip } from 'reactstrap'
 const TEMPLATES_FRAGMENT = gql`
   fragment TemplateProps on Template {
     id
-    can_delete
     article_name
     article_number
     model {
@@ -35,6 +34,7 @@ const TEMPLATES_FRAGMENT = gql`
       product
       version
     }
+    requests_count
     is_archived
     price_cents
     price_currency
@@ -395,7 +395,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
 
   // disabling all inputs by hand, since input componets are nested quite alot...
   useEffect(() => {
-    if (!tpl.can_delete && tpl.id) {
+    if (tpl.requests_count && tpl.id) {
       const inputs = rowRef.current.querySelectorAll('input')
       inputs.forEach(
         input => input.type !== 'checkbox' && input.setAttribute('disabled', '')
@@ -419,7 +419,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              tpl.can_delete ? (
+              !tpl.requests_count ? (
                 <Let toDelete={formPropsFor('toDelete')}>
                   {({ toDelete }) => (
                     <label id={`btn_del_${tpl.id}`} className="pt-1">
@@ -496,19 +496,17 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                 <></>
               )
             ) : key === 'link' ? (
-              !tpl.can_delete ? (
-                <>
-                  <div className="d-flex h-100 align-items-center justify-content-center">
-                    <Icon.Link id={`link_${tpl.id}`} size="lg" />
-                    <UncontrolledTooltip
-                      placement="right"
-                      target={`link_${tpl.id}`}
-                    >
-                      {t(`templates.tooltips.template_references`)}
-                    </UncontrolledTooltip>
-                  </div>
-                </>
-              ) : null
+              <div className="d-flex h-100 align-items-center justify-content-center">
+                <p className="h3 mb-0 mr-2">{tpl.requests_count}</p>
+                <Icon.Link id={`link_${tpl.id}`} size="lg" />
+                <UncontrolledTooltip
+                  placement="right"
+                  target={`link_${tpl.id}`}
+                >
+                  {tpl.requests_count}{' '}
+                  {t(`templates.tooltips.template_references`)}
+                </UncontrolledTooltip>
+              </div>
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>
                 {({ priceField }) => (
