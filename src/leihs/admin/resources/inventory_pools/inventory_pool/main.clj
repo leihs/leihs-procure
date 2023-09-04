@@ -2,20 +2,15 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.sql :as sql]
-    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
-
-    [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
     [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
+    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
-    ))
+    [logbug.debug :as debug]))
 
 (def fields
   #{:description

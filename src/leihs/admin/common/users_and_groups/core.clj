@@ -4,14 +4,12 @@
   (:require
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.utils.seq :as seq]
     [leihs.core.routing.back :as routing :refer []]
     [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug]))
 
 
 (defn org-id-filter [query request]

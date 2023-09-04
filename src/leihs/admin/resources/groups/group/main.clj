@@ -4,7 +4,6 @@
   (:require
     [clojure.java.jdbc :as jdbc]
     [clojure.set :refer [rename-keys]]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]

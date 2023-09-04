@@ -20,7 +20,6 @@
     [leihs.admin.utils.seq :as seq]
     [leihs.core.auth.core :as auth :refer []]
     [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.log.helpers :refer [spy]]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as current-user]
     [reagent.core :as reagent]

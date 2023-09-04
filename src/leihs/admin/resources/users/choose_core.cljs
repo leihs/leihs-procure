@@ -6,9 +6,6 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.paths :as paths :refer [path]]
-
-    [taoensso.timbre :as logging]
     ))

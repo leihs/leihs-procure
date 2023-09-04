@@ -1,14 +1,10 @@
 (ns leihs.admin.resources.inventory-pools.authorization
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]])
   (:require
+    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.user.front :as current-user]
-
-    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
-
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre]))
 
 (defn some-lending-manager? [current-user-state routing-state]
   (if (some
@@ -47,15 +43,3 @@
 
 
 ;#### debug ###################################################################
-;(logging-config/set-logger! :level :debug)
-;(debug/wrap-with-log-debug #'activity-filter)
-;(debug/wrap-with-log-debug #'set-order)
-;(debug/wrap-with-log-debug #'inventory-pools-query)
-;(debug/wrap-with-log-debug #'inventory-pools-formated-query)
-;(logging-config/set-logger! :level :info)
-;(debug/debug-ns *ns*)
-
-;(-> *request* :route-params :inventory-pool-id)
-
-;(pool-access-right-for-route *request*)
-;(pool-lending-manager? *request*)

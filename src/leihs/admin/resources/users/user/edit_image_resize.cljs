@@ -1,8 +1,5 @@
 (ns leihs.admin.resources.users.user.edit-image-resize
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
     ["@jimp/custom"]
     ["jimp" :as Jimp]
@@ -16,9 +13,7 @@
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]
-    ))
+    [reagent.core :as reagent]))
 
 (defn resize-to-b64
   [data max-dimension & {:keys [error-handler success-handler]

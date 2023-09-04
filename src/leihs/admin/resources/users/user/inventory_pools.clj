@@ -1,21 +1,15 @@
 (ns leihs.admin.resources.users.user.inventory-pools
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
-
-    [clojure.set :refer [rename-keys]]
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
-    ))
+    [logbug.debug :as debug]))
 
 
 (def contracts-count

@@ -1,16 +1,14 @@
 (ns leihs.admin.resources.audits.requests.request.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [go timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.string :as str]
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.audits.changes.change.main :as change]
     [leihs.admin.resources.audits.core :as audits]
@@ -20,13 +18,10 @@
     [leihs.admin.state :as state]
     [leihs.admin.utils.clipboard :as clipboard]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-
-    [clojure.string :as str]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent :refer [reaction]]
+    [taoensso.timbre :refer []]))
 
 
 (def request-id* (reaction (or (-> @routing/state* :route-params :request-id) ":request-id")))

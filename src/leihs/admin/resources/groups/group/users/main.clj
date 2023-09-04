@@ -2,24 +2,19 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-    [leihs.core.auth.core :as auth]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.common.users-and-groups.core :as  users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.group.main :as group]
     [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
     [leihs.admin.resources.users.main :as users]
-
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-    [clojure.tools.logging :as logging]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.sql :as sql]
     [logbug.debug :as debug]
     ))
 
@@ -116,9 +111,6 @@
         existing-ids (existing-ids group-id tx)
         to-be-removed-ids (set/difference existing-ids target-ids)
         to-be-added-ids (set/difference target-ids existing-ids)]
-    (logging/info 'target-ids target-ids 'existing-ids existing-ids
-                  'to-be-removed-ids to-be-removed-ids
-                  'to-be-added-ids to-be-added-ids)
     (when-not (empty? to-be-removed-ids)
       (->> (-> (sql/delete-from :groups_users)
                (sql/merge-where [:= :group_id group-id])

@@ -4,11 +4,6 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go go-loop]])
   (:require
-    [leihs.core.anti-csrf.front :as anti-csrf]
-    [leihs.core.core :refer [str keyword deep-merge presence]]
-    [leihs.core.constants :as constants]
-    [leihs.core.routing.front :as routing]
-
     [cljs-http.client :as http-client]
     [cljs-uuid-utils.core :as uuid]
     [cljs.core.async :as async :refer [timeout]]
@@ -16,8 +11,12 @@
     [clojure.string :as str]
     [goog.string :as gstring]
     [goog.string.format]
+    [leihs.core.anti-csrf.front :as anti-csrf]
+    [leihs.core.constants :as constants]
+    [leihs.core.core :refer [str keyword deep-merge presence]]
+    [leihs.core.routing.front :as routing]
     [reagent.core :as reagent]
-    [taoensso.timbre :as logging]
+    [taoensso.timbre :refer [error]]
     ))
 
 
@@ -118,7 +117,7 @@
        [routing/hidden-state-component
         {:did-mount (fn [& _]
                       (if (:chan req-opts)
-                        (logging/error ":chan may not be set for managed request-response-component")
+                        (error ":chan may not be set for managed request-response-component")
                         (let [chan (async/chan)]
                           (reset! req* (request (assoc req-opts
                                                        :chan chan

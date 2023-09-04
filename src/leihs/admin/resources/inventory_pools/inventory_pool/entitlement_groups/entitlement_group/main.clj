@@ -2,20 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
     [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]))
 
 (defn query [inventory-pool-id entitlement-group-id]

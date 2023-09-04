@@ -1,16 +1,13 @@
 (ns leihs.admin.auth.token
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
-    [leihs.core.ring-exception :as ring-exception]
-    [leihs.core.sql :as sql]
-
+    [clj-time.core :as time]
     [clojure.java.jdbc :as jdbc]
     [clojure.walk :refer [keywordize-keys]]
-    [clj-time.core :as time]
-
-    [clojure.tools.logging :as logging]
+    [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.ring-exception :as ring-exception]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [logbug.thrown :as thrown]

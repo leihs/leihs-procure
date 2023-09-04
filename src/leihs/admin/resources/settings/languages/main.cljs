@@ -1,28 +1,22 @@
 (ns leihs.admin.resources.settings.languages.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.breadcrumbs :as core-breadcrumbs]
-    [leihs.admin.common.icons :as admin.common.icons]
-
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.utils.misc :refer [wait-component]]
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [<! go timeout]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.components :as components]
+    [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as admin.common.icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.settings.icons :as icons]
     [leihs.admin.resources.settings.languages.breadcrumbs :as breadcrumbs]
     [leihs.admin.state :as state]
-
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [leihs.admin.utils.misc :refer [wait-component]]
+    [leihs.core.breadcrumbs :as core-breadcrumbs]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent]))
 
 
 (defonce data* (reagent/atom nil))

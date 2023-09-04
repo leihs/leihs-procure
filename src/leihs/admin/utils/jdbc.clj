@@ -1,13 +1,10 @@
 (ns leihs.admin.utils.jdbc
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
     [clojure.java.jdbc :as jdbc]
-
-    [clojure.tools.logging :as logging]
+    [leihs.core.core :refer [keyword str presence]]
     [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug]))
 
 (defn insert-or-update! [tx table where-clause values]
   (let [[clause & params] where-clause]

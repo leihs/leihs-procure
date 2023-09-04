@@ -8,7 +8,6 @@
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.resources.users.user.core :refer [sql-where-unique-user]]
     [leihs.core.auth.core :as auth]
     [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]

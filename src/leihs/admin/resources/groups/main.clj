@@ -2,8 +2,9 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set]
+    [compojure.core :as cpj]
     [leihs.admin.common.users-and-groups.core :as users-and-groups]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.group.main :as group]
@@ -11,13 +12,7 @@
     [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.utils.regex :refer [uuid-pattern]]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
+    [leihs.core.sql :as sql]
     [logbug.debug :as debug]
     ))
 

@@ -1,21 +1,16 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
+    [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
     [logbug.debug :as debug]))
 
 (defn member-expr [delegation-id]

@@ -2,23 +2,17 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
+    [clj-time.coerce]
+    [clj-time.format]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.main :as users]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-    [clj-time.format]
-    [clj-time.coerce]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    )
+    [logbug.debug :as debug])
   (:import [java.sql Date]))
 
 (defn suspension-query [inventory-pool-id user-id]

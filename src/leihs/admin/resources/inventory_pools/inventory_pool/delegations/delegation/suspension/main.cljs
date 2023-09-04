@@ -1,32 +1,27 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    ["date-fns" :as date-fns]
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [go]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
     [leihs.admin.utils.regex :as regex]
-
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
     [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [taoensso.timbre]))
 
 (defonce data* (reagent/atom nil))
 

@@ -1,22 +1,20 @@
 (ns leihs.admin.resources.mail-templates.mail-template.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [clojure.set :refer [rename-keys]]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.mail-templates.shared :as shared]
     [leihs.core.auth.core :as auth]
+    [leihs.core.core :refer [keyword str presence]]
     [leihs.core.uuid :refer [uuid]]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [next.jdbc :as jdbc]
     [next.jdbc.sql :refer [query update!] :rename {query jdbc-query update! jdbc-update!}]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

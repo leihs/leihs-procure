@@ -1,13 +1,7 @@
 (ns leihs.admin.utils.clipboard
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-
-    [taoensso.timbre :as logging]))
-
+    [leihs.core.core :refer [keyword str presence]]))
 
 ; copy-text taken from
 ; https://github.com/metosin/komponentit/blob/master/src/cljs/komponentit/clipboard.cljs

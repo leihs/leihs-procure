@@ -2,9 +2,8 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset mixin-default-query-params]]
-
+    [clojure.java.jdbc :as jdbc]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
@@ -13,14 +12,9 @@
     [leihs.admin.resources.users.choose-core :as choose-user]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset mixin-default-query-params]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 
 (def delegations-base-query

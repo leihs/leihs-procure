@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [clojure.java.jdbc :as jdbc]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [leihs.admin.common.membership.groups.shared :as shared]
     [leihs.admin.paths :refer [path]]

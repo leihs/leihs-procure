@@ -2,23 +2,17 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-
-    [leihs.admin.paths :refer [path]]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
+    [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

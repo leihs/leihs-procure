@@ -2,20 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
+    [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :refer [protect-inventory-manager-escalation-by-lending-manager! protect-inventory-manager-restriction-by-lending-manager!]]
     [leihs.admin.resources.users.main :as users]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     ))
 
@@ -48,8 +44,7 @@
                                      (into [])
                                      (filter #(= roles (second %)))
                                      first first)]
-    (do (logging/info 'allowed-role-key allowed-role-key)
-        (jdbc/delete! tx :direct_access_rights ["inventory_pool_id = ? AND user_id =? " inventory-pool-id user-id])
+    (do (jdbc/delete! tx :direct_access_rights ["inventory_pool_id = ? AND user_id =? " inventory-pool-id user-id])
         (when (not= allowed-role-key :none)
           (jdbc/insert! tx :direct_access_rights {:inventory_pool_id inventory-pool-id
                                                   :user_id user-id

@@ -1,18 +1,12 @@
 (ns leihs.admin.resources.users.choose-core
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-
-    [leihs.admin.utils.regex :refer [uuid-pattern]]
-    [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
-
     [clojure.java.jdbc :as jdbc]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
+    [leihs.admin.utils.regex :refer [uuid-pattern]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 (defn find-by-some-uid-query [unique-id]
   (-> (sql/select :*)

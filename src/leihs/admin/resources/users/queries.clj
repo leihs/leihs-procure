@@ -1,20 +1,15 @@
 (ns leihs.admin.resources.users.queries
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.sql :as sql]
-    [leihs.admin.resources.users.user.main :as user]
-    [leihs.admin.resources.users.shared :as shared]
-
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
     [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.users.shared :as shared]
+    [leihs.admin.resources.users.user.main :as user]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 (def open-contracts-sub
   (-> (sql/select :%count.*)

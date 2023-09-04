@@ -2,20 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.users.user.main :as root-user]
-    [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
     [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
     [clojure.set :refer [rename-keys]]
     [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
+    [leihs.admin.resources.users.user.main :as root-user]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.core.sql :as sql]
     [logbug.debug :as debug]))
 
 

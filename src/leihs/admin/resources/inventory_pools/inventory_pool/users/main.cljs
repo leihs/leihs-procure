@@ -1,34 +1,28 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    ["date-fns" :as date-fns]
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [<! go timeout]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.components :as components]
-    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
+    [leihs.admin.common.roles.core :as roles]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
     [leihs.admin.resources.users.main :as users]
     [leihs.admin.resources.users.user.core :as user2]
     [leihs.admin.resources.users.user.shared :as user]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
     [leihs.admin.utils.regex :as regex]
-
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent :refer [reaction]]))
 
 
 (def inventory-pool-users-count*

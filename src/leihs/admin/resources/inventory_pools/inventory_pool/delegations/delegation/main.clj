@@ -2,22 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-    [leihs.core.db :as db]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
-
-    [clojure.set :refer [rename-keys]]
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.core.db :as db]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
-    ))
+    [logbug.debug :as debug]))
 
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

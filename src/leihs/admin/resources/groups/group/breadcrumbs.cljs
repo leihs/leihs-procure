@@ -1,25 +1,19 @@
 (ns leihs.admin.resources.groups.group.breadcrumbs
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+    [cljs.core.async :as async :refer [timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.string :refer [split trim]]
     [leihs.admin.common.icons :as icons]
-    [leihs.core.auth.core :as auth]
-
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
     [leihs.admin.resources.groups.group.core :refer [data*]]
     [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
     [leihs.admin.state :as state]
-
-    [cljs.pprint :refer [pprint]]
-    [cljs.core.async :as async :refer [timeout]]
-    [clojure.string :refer [split trim]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent :refer [reaction]]
     ))
 
 (def li breadcrumbs/li)

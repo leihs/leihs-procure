@@ -1,26 +1,20 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-
-    [leihs.admin.paths :refer [path]]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
+    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
     [leihs.admin.resources.users.main :as users]
-    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 
 ;;; users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

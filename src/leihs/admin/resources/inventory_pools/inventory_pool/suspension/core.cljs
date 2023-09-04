@@ -1,16 +1,15 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.suspension.core
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
-
+    ["@leihs/ui-components" :as UI]
+    ["date-fns" :as date-fns]
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [go]]
+    [cljs.pprint :refer [pprint]]
     [leihs.admin.common.components :as components]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http-client]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
@@ -18,15 +17,10 @@
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
     [leihs.admin.utils.regex :as regex]
-
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]
-    ["@leihs/ui-components" :as UI]
-    ))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent :refer [reaction]]
+    [taoensso.timbre]))
 
 (defn suspended? [suspended-until ref-date]
   (if-not suspended-until

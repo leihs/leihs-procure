@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [str keyword])
   (:require
     [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout go]]
+    [cljs.core.async :as async :refer [<! go timeout]]
     [cljs.pprint :refer [pprint]]
     [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.common.icons :as icons]

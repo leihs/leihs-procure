@@ -1,20 +1,14 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.main
   (:refer-clojure :exclude [str keyword])
   (:require
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
+    [compojure.core :as cpj]
+    [leihs.admin.paths :refer [path]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
-
-    [leihs.admin.paths :refer [path]]
-
-    [clojure.set :refer [rename-keys]]
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
     [logbug.catcher :as catcher]
-    )
+    [logbug.debug :as debug])
   (:import
     [java.awt.image BufferedImage]
     [java.io ByteArrayInputStream ByteArrayOutputStream]

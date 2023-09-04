@@ -1,7 +1,6 @@
 (ns leihs.admin.html
   (:require
     [clj-http.client :as client]
-    [clojure.tools.logging :as logging]
     [hiccup.page :refer [html5 include-js]]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.state :refer [state*]]
@@ -14,6 +13,7 @@
     [logbug.debug :as debug :refer [I>]]
     [logbug.ring :refer [wrap-handler-with-logging]]
     [logbug.thrown :as thrown]
+    [taoensso.timbre :refer [debug info warn error spy]]
     ))
 
 (defn include-site-css []
@@ -58,7 +58,7 @@
              (try
                (ssr/render-navbar request {:admin false})
                (catch Exception e
-                 (logging/warn "Failed to load navbar: " (ex-message e))
+                 (warn "Failed to load navbar: " (ex-message e))
                  [:div]))
              [:div#app.container-fluid
               [:div.alert.alert-warning

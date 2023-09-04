@@ -4,7 +4,6 @@
   (:require
     [clojure.set :refer [rename-keys intersection]]
     [clojure.spec.alpha :as spec]
-    [clojure.tools.logging :as logging]
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]

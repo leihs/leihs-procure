@@ -5,7 +5,6 @@
     [cljs.core.async.macros :refer [go]])
   (:require
     [leihs.core.core :refer [detect keyword str presence]]
-    [leihs.core.log.helpers :refer [log spy]]
     [leihs.core.routing.front :as routing]
     [leihs.core.user.front :as core-user]
     [leihs.core.user.shared :refer [short-id]]

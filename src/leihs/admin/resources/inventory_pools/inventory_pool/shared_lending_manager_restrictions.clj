@@ -2,14 +2,10 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-
+    [clojure.java.jdbc :as jdbc]
     [leihs.admin.common.roles.core :as roles]
     [leihs.admin.resources.inventory-pools.authorization :refer [pool-access-right-for-route]]
-
     [leihs.core.sql :as sql]
-    [clojure.java.jdbc :as jdbc]
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]))
 
 

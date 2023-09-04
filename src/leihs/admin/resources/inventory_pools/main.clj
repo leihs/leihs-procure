@@ -1,24 +1,18 @@
 (ns leihs.admin.resources.inventory-pools.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-
+    [clojure.java.jdbc :as jdbc]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
     [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
     [leihs.admin.utils.seq :as seq]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+    [logbug.debug :as debug]
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def users-count-sub
   (-> (sql/select :%count.*)

@@ -3,7 +3,6 @@
   (:require
     [clojure.java.jdbc :as jdbc]
     [clojure.set :refer [rename-keys subset?]]
-    [clojure.tools.logging :as logging]
     [clojure.walk]
     [compojure.core :as cpj]
     [leihs.admin.auth.authorize :as authorize]

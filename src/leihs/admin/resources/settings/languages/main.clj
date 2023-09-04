@@ -1,27 +1,19 @@
 (ns leihs.admin.resources.settings.languages.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-
-    [leihs.core.json :refer [to-json]]
-
-    [leihs.admin.resources.users.choose-core :as choose-user]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.string :as string]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
     [leihs.admin.utils.jdbc :as utils-jdbc]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.string :as string]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.json :refer [to-json]]
+    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+    [leihs.core.sql :as sql]
     [logbug.catcher :as catcher]
-    ))
+    [logbug.debug :as debug]))
 
 (defn get-languages-settings [{tx :tx}]
   {:body

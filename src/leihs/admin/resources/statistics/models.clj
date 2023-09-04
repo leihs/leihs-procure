@@ -1,16 +1,13 @@
 (ns leihs.admin.resources.statistics.models
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-
     [clojure.java.jdbc :as jdbc]
     [clojure.set]
-    [clojure.tools.logging :as logging]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.statistics.shared :as shared]
+    [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug]))
 
 
 ;;; models ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

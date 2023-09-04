@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     [logbug.catcher :as catcher]))
 
@@ -27,8 +26,6 @@
              :scope_admin_write not))))
 
 (defn admin-and-safe? [request]
-  (logging/debug ((:request-method request) HTTP-SAFE-VERBS))
-  (logging/debug (-> request :authenticated-entity :is_admin))
   (boolean
     (and ((:request-method request) HTTP-SAFE-VERBS)
          (-> request :authenticated-entity :is_admin))))

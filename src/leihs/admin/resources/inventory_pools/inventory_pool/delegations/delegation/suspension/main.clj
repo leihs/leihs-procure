@@ -2,16 +2,12 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
-    [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
     [clojure.java.jdbc :as jdbc]
     [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.core.sql :as sql]
     [logbug.debug :as debug]))
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

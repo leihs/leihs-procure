@@ -4,16 +4,13 @@
     [reagent.ratom :as ratom :refer [reaction]]
     [cljs.core.async.macros :refer [go]])
   (:require
+    [cljs.pprint :refer [pprint]]
+    [clojure.string :as string]
+    [leihs.admin.common.icons :as icons]
+    [leihs.admin.utils.clipboard :as clipboard]
+    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
-    [leihs.admin.common.icons :as icons]
-
-    [leihs.admin.utils.clipboard :as clipboard]
-
-    [clojure.string :as string]
-    [taoensso.timbre :as logging]
-    [cljs.pprint :refer [pprint]]
     ))
 
 

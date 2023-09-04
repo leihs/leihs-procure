@@ -2,21 +2,17 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [group-roles]]
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :as lmr]
+    [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.groups.main :as groups]
+    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [group-roles]]
+    [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :as lmr]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     ))
 
@@ -39,7 +35,6 @@
     tx :tx roles :body :as request}]
   (lmr/protect-inventory-manager-escalation-by-lending-manager! request)
   (lmr/protect-inventory-manager-restriction-by-lending-manager! role-query request)
-  (logging/debug 'roles roles)
   (if-let [allowed-role-key (some->> roles/allowed-states
                                      (into [])
                                      (filter #(= roles (second %)))

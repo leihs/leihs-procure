@@ -1,22 +1,16 @@
 (ns leihs.admin.resources.inventory-pools.authorization
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-
-    [leihs.core.auth.core :refer [http-safe?]]
-
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
-
-    [clojure.set :refer [rename-keys]]
     [clojure.java.jdbc :as jdbc]
+    [clojure.set :refer [rename-keys]]
     [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
+    [leihs.admin.common.roles.core :as roles]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
+    [leihs.core.auth.core :refer [http-safe?]]
+    [leihs.core.core :refer [keyword str presence]]
     [logbug.catcher :as catcher]
+    [logbug.debug :as debug]
     ))
 
 (defn some-lending-manager? [request]

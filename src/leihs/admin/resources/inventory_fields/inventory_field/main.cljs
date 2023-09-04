@@ -22,7 +22,6 @@
              new-dynamic-field-defaults]]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.core.log.helpers :refer [spy log]]
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [timeout]]
     [cljs.pprint :refer [pprint]]

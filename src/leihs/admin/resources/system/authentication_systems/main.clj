@@ -1,20 +1,15 @@
 (ns leihs.admin.resources.system.authentication-systems.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set]
+    [compojure.core :as cpj]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
     [leihs.admin.resources.system.authentication-systems.shared :as shared]
     [leihs.admin.utils.seq :as seq]
-
+    [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set]
-    [compojure.core :as cpj]
-
-
-    [clojure.tools.logging :as logging]
     [logbug.debug :as debug]
     ))
 

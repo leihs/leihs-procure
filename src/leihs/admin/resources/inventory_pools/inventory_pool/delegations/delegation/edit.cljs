@@ -1,13 +1,10 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-
+    [accountant.core :as accountant]
+    [cljs.core.async :as async :refer [<! go timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.set :refer [rename-keys]]
     [leihs.admin.common.form-components :as form-components]
     [leihs.admin.common.http-client.core :as http-client]
     [leihs.admin.paths :as paths :refer [path]]
@@ -17,13 +14,11 @@
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
     [leihs.admin.state :as state]
     [leihs.admin.utils.regex :as regex]
-
-    [clojure.set :refer [rename-keys]]
-    [cljs.core.async :as async :refer [timeout]]
-    [accountant.core :as accountant]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [leihs.core.user.shared :refer [short-id]]
+    [reagent.core :as reagent :refer [reaction]]
+    [taoensso.timbre]))
 
 (defonce data* (reagent/atom {}))
 

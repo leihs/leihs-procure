@@ -1,12 +1,11 @@
 (ns leihs.admin.resources.users.user.edit-image
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-
+    [accountant.core :as accountant]
+    [cljs.core.async :as async]
+    [cljs.core.async :refer [timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.contrib.inflect :refer [pluralize-noun]]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
     [leihs.admin.common.form-components :refer [input-component]]
     [leihs.admin.paths :as paths :refer [path]]
@@ -15,16 +14,9 @@
     [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
     [leihs.admin.state :as state]
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-
-    [taoensso.timbre :as logging]
-    ))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent]))
 
 
 ;;; image ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

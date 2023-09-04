@@ -3,11 +3,8 @@
   (:require
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
-
-    [clojure.tools.logging :as logging]
     [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug]))
 
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]

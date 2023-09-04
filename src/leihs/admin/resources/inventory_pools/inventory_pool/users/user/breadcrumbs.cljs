@@ -1,25 +1,18 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.auth.core :as auth]
-    ;[leihs.core.breadcrumbs :as breadcrumbs-core :refer [li]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-
+    [cljs.core.async :as async :refer [timeout]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.string :refer [split trim]]
     [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs-parent]
+    [leihs.admin.common.icons :as icons]
     [leihs.admin.paths :as paths :refer [path]]
     [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-
-    [cljs.pprint :refer [pprint]]
-    [cljs.core.async :as async :refer [timeout]]
-    [clojure.string :refer [split trim]]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging]))
+    [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs-parent]
+    [leihs.core.auth.core :as auth]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.routing.front :as routing]
+    [reagent.core :as reagent :refer [reaction]]))
 
 
 (def li breadcrumbs-parent/li)

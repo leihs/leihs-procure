@@ -1,13 +1,10 @@
 (ns leihs.admin.resources.statistics.shared
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-
     [clojure.set]
-    [clojure.tools.logging :as logging]
+    [leihs.core.core :refer [keyword str presence]]
     [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+    [logbug.debug :as debug]))
 
 
 (def now (sql/raw " now() "))

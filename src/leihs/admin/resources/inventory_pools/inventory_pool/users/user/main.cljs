@@ -1,34 +1,29 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
-     [leihs.core.core :refer [keyword str presence]]
-     [leihs.core.routing.front :as routing]
-     [leihs.admin.common.icons :as icons]
-
+     [accountant.core :as accountant]
+     [cljs.core.async :as async :refer [<! go]]
+     [cljs.pprint :refer [pprint]]
      [leihs.admin.common.components :as components]
-     [leihs.admin.state :as state]
+     [leihs.admin.common.icons :as icons]
+     [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
+     [leihs.admin.common.roles.core :refer []]
      [leihs.admin.paths :as paths :refer [path]]
      [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-     [leihs.admin.common.roles.core :refer []]
-     [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
+     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
-     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
      [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
      [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
      [leihs.admin.resources.users.user.shared :as user-shared]
+     [leihs.admin.state :as state]
      [leihs.admin.utils.regex :as regex]
-
-     [accountant.core :as accountant]
-     [cljs.core.async :as async]
-     [cljs.pprint :refer [pprint]]
+     [leihs.core.core :refer [keyword str presence]]
+     [leihs.core.routing.front :as routing]
      [reagent.core :as reagent]
-     [taoensso.timbre :as logging]))
+     ))
 
 (defonce inventory-pool-user-data* (reagent/atom nil))
 

@@ -1,14 +1,13 @@
 (ns leihs.admin.run
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
     [clojure.pprint :refer [pprint]]
     [clojure.tools.cli :as cli :refer [parse-opts]]
-    [clojure.tools.logging :as logging]
     [leihs.admin.paths]
     [leihs.admin.routes :as routes]
     [leihs.admin.state :as state]
     [leihs.admin.utils.ssr]
+    [leihs.core.core :refer [keyword str presence]]
     [leihs.core.db :as db]
     [leihs.core.http-server :as http-server]
     [leihs.core.shutdown :as shutdown]
@@ -20,13 +19,13 @@
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [logbug.thrown :as thrown]
-    ))
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 
 (defn run [options]
   (catcher/snatch
     {:return-fn (fn [e] (System/exit -1))}
-    (logging/info "Invoking run with options: " options)
+    (info "Invoking run with options: " options)
     (shutdown/init options)
     (ssr-engine/init options)
     (leihs.core.ssr/init leihs.admin.utils.ssr/render-page-base)

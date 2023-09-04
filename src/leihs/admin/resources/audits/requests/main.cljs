@@ -1,11 +1,8 @@
 (ns leihs.admin.resources.audits.requests.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
   (:require
     [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
+    [cljs.core.async :as async :refer [timeout go]]
     [cljs.pprint :refer [pprint]]
     [clojure.set :refer [rename-keys]]
     [clojure.string :as string]
@@ -23,8 +20,8 @@
     [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :as logging :refer [error warn info debug spy]]))
+    [reagent.core :as reagent :refer [reaction]]
+    [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def requests* (reagent/atom {}))
 

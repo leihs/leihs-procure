@@ -1,26 +1,24 @@
 (ns leihs.admin.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.paths]
-    [leihs.core.url.query-params :as query-params]
-
-    [leihs.admin.resources.settings.paths :as settings]
+    [bidi.bidi :refer [path-for match-route]]
+    [bidi.verbose :refer [branch param leaf]]
     [leihs.admin.resources.audits.paths :as audits]
     [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
     [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
     [leihs.admin.resources.inventory.paths :as inventory]
+    [leihs.admin.resources.settings.paths :as settings]
     [leihs.admin.resources.system.paths :as system]
-
-    [bidi.verbose :refer [branch param leaf]]
-    [bidi.bidi :refer [path-for match-route]]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.paths]
+    [leihs.core.url.query-params :as query-params]
+    [taoensso.timbre :refer [debug info warn error spy]]
     #?@(:clj
-         [[clojure.tools.logging :as logging]
-          [logbug.catcher :as catcher]
+         [[logbug.catcher :as catcher]
           [logbug.debug :as debug]
           [logbug.thrown :as thrown]])
     #?@(:cljs
-         [[taoensso.timbre :as logging]])))
+         [])))
 
 (def external-handlers
   #{:admin-audits-legacy
@@ -170,7 +168,7 @@
     (apply leihs.core.paths/path args)
     #?(:cljs
        (catch :default e
-         (logging/error e args)
+         (error e args)
          (throw e)))))
 
 ;(path :system-admins-direct-user {:user-id "foo"})

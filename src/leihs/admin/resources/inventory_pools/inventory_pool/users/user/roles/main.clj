@@ -1,22 +1,17 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-
     [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
     [clojure.set :as set]
-
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [compojure.core :as cpj]
+    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
+    [leihs.admin.paths :refer [path]]
+    [leihs.admin.resources.users.main :as users]
+    [leihs.admin.utils.jdbc :as utils.jdbc]
+    [leihs.admin.utils.regex :as regex]
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [leihs.core.sql :as sql]
-
+    [clojure.java.jdbc :as jdbc]
+    [clojure.set :as set]
+    [compojure.core :as cpj]
     [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
     [leihs.admin.paths :refer [path]]
     [leihs.admin.resources.system.authentication-systems.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
@@ -11,15 +11,9 @@
     [leihs.admin.utils.jdbc :as utils.jdbc]
     [leihs.admin.utils.regex :as regex]
     [leihs.admin.utils.seq :as seq]
-
-
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [clojure.set :as set]
-
-    [clojure.tools.logging :as logging]
-    [logbug.debug :as debug]
-    ))
+    [leihs.core.core :refer [keyword str presence]]
+    [leihs.core.sql :as sql]
+    [logbug.debug :as debug]))
 
 
 (defn direct-member-expr [authentication-system-id]
@@ -128,9 +122,6 @@
         existing-ids (existing-ids authentication-system-id tx)
         to-be-removed-ids (set/difference existing-ids target-ids)
         to-be-added-ids (set/difference target-ids existing-ids)]
-    (logging/info 'target-ids target-ids 'existing-ids existing-ids
-                  'to-be-removed-ids to-be-removed-ids
-                  'to-be-added-ids to-be-added-ids)
     (when-not (empty? to-be-removed-ids)
       (->> (-> (sql/delete-from :authentication-systems_users)
                (sql/merge-where [:= :authentication-system_id authentication-system-id])
