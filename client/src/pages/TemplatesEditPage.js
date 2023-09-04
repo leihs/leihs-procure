@@ -385,7 +385,6 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
 
 const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
   const rowRef = useRef(null)
-  const toArchiveRef = useRef(null)
   const toDeleteRef = useRef(null)
 
   const isEditing = true // TODO: edit on click
@@ -457,11 +456,11 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
               ) : tpl.is_archived !== undefined ? (
                 <Let is_archived={formPropsFor('is_archived')}>
                   {({ is_archived }) => (
-                    <label id={`btn_archive_${tpl.id}`} className="pt-1">
+                    <label id={`btn_archive_${tpl.id}`} className="pt-1 ">
                       <Icon.Archive
                         size="lg"
                         className={cx(
-                          !!tpl?.is_archived ? 'text-warning' : 'text-dark'
+                          tpl?.is_archived ? 'text-warning' : 'text-dark'
                         )}
                       />
                       <input
