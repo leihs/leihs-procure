@@ -503,7 +503,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                   target={`link_${tpl.id}`}
                 >
                   {tpl.requests_count}{' '}
-                  {t(`templates.tooltips.template_references`)}
+                  {t(`templates.tooltips.template_requests`)}
                 </UncontrolledTooltip>
               </div>
             ) : key === 'price_cents' ? (

@@ -124,7 +124,7 @@
     "title_edit": "Edit Templates",
     "category_has_no_templates": "No existing templates",
     "tooltips": {
-      "template_references": "Referenzen",
+      "template_requests": "Requests use this template",
       "delete_template": "Delete",
       "archive_template": "Archive",
       "unarchive_template": "Unarchive",

@@ -124,7 +124,7 @@
     "title_edit": "Vorlagen bearbeiten",
     "category_has_no_templates": "Keine Vorlagen",
     "tooltips": {
-      "template_references": "References",
+      "template_requests": "Anträge verwenden dieses Template",
       "delete_template": "Löschen",
       "archive_template": "Archivieren",
       "unarchive_template": "Dearchivieren",
