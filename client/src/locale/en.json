@@ -123,7 +123,13 @@
     "title": "Templates",
     "title_edit": "Edit Templates",
     "category_has_no_templates": "No existing templates",
-    "show_archived": "Show Archived",
+    "tooltips": {
+      "template_references": "Referenzen",
+      "delete_template": "Delete",
+      "archive_template": "Archive",
+      "unarchive_template": "Unarchive",
+      "show_archived": "Display Archived"
+    },
     "formfield": {
       "link": "",
       "model": "Existing Model",

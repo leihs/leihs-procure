@@ -123,7 +123,13 @@
     "title": "Vorlagen",
     "title_edit": "Vorlagen bearbeiten",
     "category_has_no_templates": "Keine Vorlagen",
-    "show_archived": "Archivierte Anzeigen",
+    "tooltips": {
+      "template_references": "References",
+      "delete_template": "Löschen",
+      "archive_template": "Archivieren",
+      "unarchive_template": "Dearchivieren",
+      "show_archived": "Archivierte Anzeigen"
+    },
     "formfield": {
       "link": "",
       "model": "Bestehendes Modell",

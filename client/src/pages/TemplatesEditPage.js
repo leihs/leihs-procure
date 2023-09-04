@@ -306,14 +306,14 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
 
 function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
   const switchRef = useRef(null)
+  const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
   const [showArchived, setShowArchived] = useState(false)
 
-  useEffect(() => {
-    const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
-    !!hasArchivedEntry
-      ? switchRef.current.removeAttribute('disabled', '')
-      : switchRef.current.setAttribute('disabled', '')
-  })
+  // useEffect(() => {
+  //   !!hasArchivedEntry
+  //     ? switchRef.current.removeAttribute('disabled', '')
+  //     : switchRef.current.setAttribute('disabled', '')
+  // })
 
   return (
     <>
@@ -322,17 +322,25 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
         <h3 className="h5 py-2">{sc.name}</h3>
 
         {/*  Switch Archived Entries */}
-        <div className="custom-control custom-switch align-self-center ml-auto">
+        <div
+          className={cx(
+            'custom-control custom-switch align-self-center ml-auto',
+            hasArchivedEntry ? 'visible' : 'invisible'
+          )}
+        >
           <input
             ref={switchRef}
             type="checkbox"
-            id="customSwitch1"
-            className="custom-control-input"
+            id={'archiveSwitch' + mci}
+            className={cx('custom-control-input')}
             checked={showArchived}
             onChange={e => setShowArchived(e.target.checked)}
           />
-          <label className="custom-control-label" htmlFor="customSwitch1">
-            {t(`templates.show_archived`)}
+          <label
+            className="custom-control-label"
+            htmlFor={'archiveSwitch' + mci}
+          >
+            {t(`templates.tooltips.show_archived`)}
           </label>
         </div>
       </div>
@@ -441,7 +449,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                         placement="left"
                         target={`btn_del_${tpl.id}`}
                       >
-                        This will delete the Entry permanently from the Database
+                        {t(`templates.tooltips.delete_template`)}
                       </UncontrolledTooltip>
                     </label>
                   )}
@@ -475,8 +483,11 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                         placement="left"
                         target={`btn_archive_${tpl.id}`}
                       >
-                        This will archive the Entry, you can revert this later
-                        again
+                        {tpl.is_archived ? (
+                          <>{t(`templates.tooltips.unarchive_template`)}</>
+                        ) : (
+                          <>{t(`templates.tooltips.archive_template`)}</>
+                        )}
                       </UncontrolledTooltip>
                     </label>
                   )}
@@ -486,9 +497,17 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
               )
             ) : key === 'link' ? (
               !tpl.can_delete ? (
-                <div className="d-flex h-100 align-items-center justify-content-center">
-                  <Icon.Link size="lg" />
-                </div>
+                <>
+                  <div className="d-flex h-100 align-items-center justify-content-center">
+                    <Icon.Link id={`link_${tpl.id}`} size="lg" />
+                    <UncontrolledTooltip
+                      placement="right"
+                      target={`link_${tpl.id}`}
+                    >
+                      {t(`templates.tooltips.template_references`)}
+                    </UncontrolledTooltip>
+                  </div>
+                </>
               ) : null
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>
