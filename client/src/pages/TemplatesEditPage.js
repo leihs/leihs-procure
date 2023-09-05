@@ -256,27 +256,16 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
                                         canEditCat(sc) && (
                                           <F key={sc.id}>
                                             <li className="list-group-item">
-                                              {!f.any(sc.templates) ? (
-                                                <div>
-                                                  <p className="mb-2 small">
-                                                    {t(
-                                                      'templates.category_has_no_templates'
-                                                    )}
-                                                  </p>
-                                                  {addButton}
-                                                </div>
-                                              ) : (
-                                                <div className="table-responsive">
-                                                  <Table
-                                                    tableCols={tableCols}
-                                                    addButton={addButton}
-                                                    mci={mci}
-                                                    sci={sci}
-                                                    sc={sc}
-                                                    formPropsFor={formPropsFor}
-                                                  ></Table>
-                                                </div>
-                                              )}
+                                              <div className="table-responsive">
+                                                <Table
+                                                  tableCols={tableCols}
+                                                  addButton={addButton}
+                                                  mci={mci}
+                                                  sci={sci}
+                                                  sc={sc}
+                                                  formPropsFor={formPropsFor}
+                                                ></Table>
+                                              </div>
                                             </li>
                                           </F>
                                         )
@@ -345,16 +334,22 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
         </div>
       </div>
 
+      {sc.templates.length === 0 && (
+        <p className="mb-2 small">{t('templates.category_has_no_templates')}</p>
+      )}
+
       <table className="table table-sm table-hover">
-        <thead className="small">
-          <tr className="row no-gutters">
-            {f.map(tableCols, ({ key, size }) => (
-              <th key={key} className={`col-${size}`}>
-                {t(`templates.formfield.${key}`)}
-              </th>
-            ))}
-          </tr>
-        </thead>
+        {sc.templates.length > 0 && (
+          <thead className="small">
+            <tr className="row no-gutters">
+              {f.map(tableCols, ({ key, size }) => (
+                <th key={key} className={`col-${size}`}>
+                  {t(`templates.formfield.${key}`)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
 
         <tbody>
           {sc.templates.map((tpl, i) =>
