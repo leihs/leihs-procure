@@ -24,6 +24,7 @@ feature 'System and Security-Settings' do
           fill_in "sessions_max_lifetime_secs", with: "3600"
           check "sessions_force_secure"
           check "sessions_force_uniquenes"
+          uncheck "public_image_caching_enabled"
           click_on "Save"
           sleep 0.5
           wait_until{ all(".modal").empty? }
@@ -32,6 +33,8 @@ feature 'System and Security-Settings' do
           expect(find_field('sessions_max_lifetime_secs', disabled: true).value).to eq '3600'
           expect(find_field('sessions_force_secure', disabled: true)).to be_checked
           expect(find_field('sessions_force_uniquenes', disabled: true)).to be_checked
+          expect(find_field('public_image_caching_enabled', disabled: true)).not_to be_checked
+
         end
 
       end
@@ -53,14 +56,20 @@ feature 'System and Security-Settings' do
           get = @http_client.get "/admin/settings/syssec/"
           expect(get).to be_success
           expect(get.body["sessions_force_uniqueness"]).to be false
+          expect(get.body["public_image_caching_enabled"]).to be true
 
-          patch = @http_client.patch "/admin/settings/syssec/", {sessions_force_uniqueness: true}.to_json
+
+          patch = @http_client.patch "/admin/settings/syssec/", 
+            {sessions_force_uniqueness: true,
+             public_image_caching_enabled: false}.to_json
           expect(patch).to be_success
           expect(patch.body["sessions_force_uniqueness"]).to be true
+          expect(patch.body["public_image_caching_enabled"]).to be false
 
           get = @http_client.get "/admin/settings/syssec/"
           expect(get).to be_success
           expect(get.body["sessions_force_uniqueness"]).to be true
+          expect(patch.body["public_image_caching_enabled"]).to be false
 
         end
 

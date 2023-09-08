@@ -69,6 +69,17 @@
     [:div.col-sm
      [form-components/checkbox-component data* [:sessions_force_uniqueness]
       :disabled (not @edit?*)]]]
+
+   [:div.row
+    [:div.col-sm
+     [form-components/checkbox-component data* [:public_image_caching_enabled]
+      :hint [:div
+             [:p (str "Sets http-headers such that images are treated as public available resources. "
+                      "This enables caching of the images at various stages. "
+                      "It does not expose the images to crawlers since the listing of the images is not public! ")]
+             [:p (str "We recommend leave this setting enabled as it generally improves user experience and lifts load from the application server. ")]]
+      :disabled (not @edit?*)]]]
+   
    (when @edit?*
      [form-components/save-submit-component])])
 
