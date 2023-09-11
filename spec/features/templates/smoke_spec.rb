@@ -9,6 +9,7 @@ feature 'smoke test' do
 
   scenario 'checks templates are available or throw errors' do
     visit('/templates/edit')
+    binding.pry
     click_on(@category.name)
   end
 end
