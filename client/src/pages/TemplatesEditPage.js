@@ -413,7 +413,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              !tpl.requests_count ? (
+              !tpl.requests_count || tpl.is_archived === false ? (
                 <Let toDelete={formPropsFor('toDelete')}>
                   {({ toDelete }) => (
                     <label id={`btn_del_${tpl.id}`} className="pt-1">
@@ -448,7 +448,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                     </label>
                   )}
                 </Let>
-              ) : tpl.is_archived !== undefined ? (
+              ) : (
                 <Let is_archived={formPropsFor('is_archived')}>
                   {({ is_archived }) => (
                     <label id={`btn_archive_${tpl.id}`} className="pt-1 ">
@@ -486,10 +486,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                     </label>
                   )}
                 </Let>
-              ) : (
-                <></>
-              )
-            ) : key === 'link' ? (
+              )             ) : key === 'link' ? (
               <div className="d-flex h-100 align-items-center justify-content-center">
                 <p className="h3 mb-0 mr-2">{tpl.requests_count}</p>
                 <Icon.Link id={`link_${tpl.id}`} size="lg" />
