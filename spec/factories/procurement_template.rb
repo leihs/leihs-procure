@@ -11,7 +11,7 @@ FactoryBot.define do
     price_cents { Faker::Commerce.price }
     price_currency { Faker::Currency.code }
     supplier_name { Faker::Camera.brand }
-    is_archived { true }
+    is_archived { false }
     association :category, factory: :procurement_category
   end
 end
