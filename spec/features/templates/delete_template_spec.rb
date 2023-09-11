@@ -5,7 +5,7 @@ feature 'Delete Template' do
     @user = FactoryBot.create(:user)
     @category = FactoryBot.create(:procurement_category)
     @inspector = FactoryBot.create(:procurement_inspector, user: @user, category: @category)
-    @templates = Array(1..5).map { |_| FactoryBot.create(:procurement_template, category: @category) }
+    @templates = Array(1..5).map { |_| FactoryBot.create(:procurement_template, :deletable, category: @category) }
 
     visit('/templates/edit')
     fill_in('inputEmail', with: @user.email)
