@@ -486,7 +486,8 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                     </label>
                   )}
                 </Let>
-              )             ) : key === 'link' ? (
+              )
+            ) : key === 'link' ? (
               <div className="d-flex h-100 align-items-center justify-content-center">
                 <p className="h3 mb-0 mr-2">{tpl.requests_count}</p>
                 <Icon.Link id={`link_${tpl.id}`} size="lg" />
