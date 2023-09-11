@@ -45,9 +45,9 @@ feature 'Add Template to Category' do
           when 1
             input.set('Text for Field 2')
           when 2
-            input.set('Text for Field 2')
+            input.set('Text for Field 3')
           when 3
-            input.set('Text for Field 2')
+            input.set('Text for Field 4')
           end
         end
       end
