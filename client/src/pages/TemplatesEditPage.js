@@ -413,7 +413,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              !tpl.requests_count || tpl.is_archived === false ? (
+              !tpl.requests_count && !tpl.is_archived ? (
                 <Let toDelete={formPropsFor('toDelete')}>
                   {({ toDelete }) => (
                     <label id={`btn_del_${tpl.id}`} className="pt-1">
