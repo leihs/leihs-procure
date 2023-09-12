@@ -504,6 +504,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                 {({ priceField }) => (
                   <InputText
                     cls={inputFieldCls}
+                    type="number"
                     required={required}
                     value={tpl.price_cents / 100 || ''}
                     onChange={e =>

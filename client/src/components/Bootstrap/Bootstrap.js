@@ -179,7 +179,7 @@ export const InputText = props => (
         {...props}
         {...inputProps}
         tag="input"
-        type="text"
+        type={props.type || 'text'}
         cls={['form-control', inputProps.cls]}
         value={inputProps.value || props.value}
         autoComplete={
