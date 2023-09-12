@@ -2,6 +2,7 @@
 
 class ProcurementTemplate < Sequel::Model(:procurement_templates)
   many_to_one :category, class: ProcurementCategory
+  one_to_many :request, class: ProcurementRequest
 end
 
 FactoryBot.define do

@@ -1,5 +1,7 @@
+require_relative './procurement_template'
+
 class ProcurementRequest < Sequel::Model(:procurement_requests)
-  one_to_many :template, class: ProcurementTemplate
+  many_to_one :template, class: ProcurementTemplate
   many_to_one :budget_period, class: ProcurementBudgetPeriod
   many_to_one :category, class: ProcurementCategory
   many_to_one :organization, class: ProcurementOrganization
