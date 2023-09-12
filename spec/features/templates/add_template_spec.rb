@@ -52,7 +52,6 @@ feature 'Add Template to Category' do
         end
       end
       find('button[type="submit"]').click
-      binding.pry
     end
   end
 end

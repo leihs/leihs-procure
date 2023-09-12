@@ -3,11 +3,18 @@
 feature 'Unarchive Template(s)' do
   before(:each) do
     @user = FactoryBot.create(:user)
+    @budget_period = FactoryBot.create(:procurement_budget_period, :inspection_phase)
     @category = FactoryBot.create(:procurement_category)
-    @budget_period = FactoryBot.create(:budget_period, :inspection_phase)
     @inspector = FactoryBot.create(:procurement_inspector, user: @user, category: @category)
+    @requester = FactoryBot.create(:procurement_requester, user: @user)
     @templates = Array(1..5).map do |_|
-      FactoryBot.create(:procurement_template, :unarchiveable, category: @category, budget_period: @budget_period)
+      FactoryBot.create(:procurement_template, :unarchiveable, category: @category)
+    end
+
+    @requests = Array(1..5).map.with_index do |_element, index|
+      template_object = @templates[index]
+      FactoryBot.create(:procurement_request, category: @category, template_id: template_object.id, user: @user,
+                                              budget_period: @budget_period)
     end
 
     visit('/templates/edit')
@@ -20,21 +27,22 @@ feature 'Unarchive Template(s)' do
   end
 
   context 'user is logged in' do
-    scenario 'user wants to delete single template' do
+    scenario 'user wants to unarchive single template' do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click
-      binding.pry
       archive_buttons = all('label[id^="btn_archive"]')
-      binding.pry
+      archive_buttons.first.click
       find('button[type="submit"]').click
-      binding.pry
     end
 
-    # scenario 'user wants to delete multiple templates' do
-    #   delete_buttons = all('label[id^="btn_del"]')
-    #   delete_buttons.each(&:click)
-    #   find('button[type="submit"]').click
-    # end
+    scenario 'user wants to unarchive single template' do
+      show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
+      # unhide archived templates
+      show_archived_buttons.first.click
+      archive_buttons = all('label[id^="btn_archive"]')
+      archive_buttons.each(&:click)
+      find('button[type="submit"]').click
+    end
   end
 end

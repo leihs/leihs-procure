@@ -30,14 +30,12 @@ feature 'Archive Template(s)' do
     scenario 'user wants to archive single template' do
       archive_buttons = all('label[id^="btn_archive"]')
       archive_buttons.first.click
-      binding.pry
       find('button[type="submit"]').click
     end
 
     scenario 'user wants to delete multiple templates' do
       archive_buttons = all('label[id^="btn_archive"]')
       archive_buttons.each(&:click)
-      binding.pry
       find('button[type="submit"]').click
     end
   end
