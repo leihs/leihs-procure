@@ -1,7 +1,4 @@
-require_relative './procurement_template'
-
 class ProcurementRequest < Sequel::Model(:procurement_requests)
-  many_to_one :template, class: ProcurementTemplate
   many_to_one :budget_period, class: ProcurementBudgetPeriod
   many_to_one :category, class: ProcurementCategory
   many_to_one :organization, class: ProcurementOrganization
@@ -19,10 +16,6 @@ FactoryBot.define do
     requested_quantity { 1 }
     motivation { Faker::Lorem.sentence }
     article_name { Faker::Commerce.product_name }
-
-    trait :requested do
-      association :template, factory: %i[procurement_template archiveable]
-    end
 
     after :build do |r|
       r.organization = ProcurementRequester.find(user: r.user).organization
