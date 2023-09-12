@@ -40,17 +40,19 @@ feature 'Add Template to Category' do
           next unless input
 
           case column_index
-          when 0
-            input.set('Text for Field 1')
           when 1
-            input.set('Text for Field 2')
+            input.set(Faker::Device.model_name)
           when 2
-            input.set('Text for Field 3')
+            input.set(Faker::Device.model_name)
           when 3
-            input.set('Text for Field 4')
+            input.set(Faker::Device.model_name)
+          when 4
+            input.set(Faker::Device.model_name)
           end
         end
       end
+      find('button[type="submit"]').click
+      binding.pry
     end
   end
 end

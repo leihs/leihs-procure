@@ -4,8 +4,11 @@ feature 'Unarchive Template(s)' do
   before(:each) do
     @user = FactoryBot.create(:user)
     @category = FactoryBot.create(:procurement_category)
+    @budget_period = FactoryBot.create(:budget_period, :inspection_phase)
     @inspector = FactoryBot.create(:procurement_inspector, user: @user, category: @category)
-    @templates = Array(1..5).map { |_| FactoryBot.create(:procurement_template, :unarchiveable, category: @category) }
+    @templates = Array(1..5).map do |_|
+      FactoryBot.create(:procurement_template, :unarchiveable, category: @category, budget_period: @budget_period)
+    end
 
     visit('/templates/edit')
     fill_in('inputEmail', with: @user.email)
