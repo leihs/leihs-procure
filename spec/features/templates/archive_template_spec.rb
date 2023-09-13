@@ -33,7 +33,7 @@ feature 'Archive Template(s)' do
       find('button[type="submit"]').click
     end
 
-    scenario 'user wants to delete multiple templates' do
+    scenario 'user wants to darchive multiple templates' do
       archive_buttons = all('label[id^="btn_archive"]')
       archive_buttons.each(&:click)
       find('button[type="submit"]').click

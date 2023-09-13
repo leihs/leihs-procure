@@ -36,7 +36,7 @@ feature 'Unarchive Template(s)' do
       find('button[type="submit"]').click
     end
 
-    scenario 'user wants to unarchive single template' do
+    scenario 'user wants to unarchive multiple templates' do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click

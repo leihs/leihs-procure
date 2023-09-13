@@ -45,9 +45,9 @@ feature 'Add Template to Category' do
           when 2
             input.set(Faker::Device.model_name)
           when 3
-            input.set(Faker::Device.model_name)
+            price_cents { Faker::Commerce.price }
           when 4
-            input.set(Faker::Device.model_name)
+            supplier_name { Faker::Camera.brand }
           end
         end
       end
