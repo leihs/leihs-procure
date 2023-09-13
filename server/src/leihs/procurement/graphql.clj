@@ -5,6 +5,7 @@
     [com.walmartlabs.lacinia :as lacinia]
     [com.walmartlabs.lacinia [parser :as graphql-parser]
      [schema :as graphql-schema] [util :as graphql-util]]
+    [leihs.core.graphql :as core-graphql]
     [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
@@ -17,8 +18,6 @@
                   (if (number? v) v (Integer/parseInt v)))
          :serialize identity}})
 
-(def schema* (atom nil))
-
 (defn load-schema! []
   (or (some-> (io/resource "schema.edn")
               slurp edn/read-string
@@ -27,20 +26,13 @@
               graphql-schema/compile)
       (throw (ex-info "Failed to load schema" {}))))
 
-(defn init-schema! []
-  (reset! schema* (load-schema!))
-  (or @schema* ))
-
-(defn schema []
-  (or @schema* (throw (ex-info  "Schema not initialized " {}))))
-
 (defn exec-query
   [query-string request]
   (debug "graphql query" query-string
-             "with variables" (-> request
-                                  :body
-                                  :variables))
-  (lacinia/execute (schema)
+         "with variables" (-> request
+                              :body
+                              :variables))
+  (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
                        :body
@@ -71,7 +63,7 @@
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
-                       (parse-query-with-exception-handling (schema))
+                       (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
@@ -93,6 +85,4 @@
 
 
 (defn init []
-  (info "Initializing graphQL schema...")
-  (init-schema!)
-  (info "initialized graphQL schema."))
+  (core-graphql/init-schema! (load-schema!)))
