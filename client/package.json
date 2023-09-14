@@ -29,7 +29,6 @@
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
     "test": "react-scripts test --env=jsdom"
   },
-  "proxy": "http://localhost:3230",
   "jest": {
     "collectCoverageFrom": [
       "src/components/Bootstrap/*.{js,jsx}",

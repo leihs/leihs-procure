@@ -6,6 +6,9 @@ export default defineConfig({
   base: '/',
   plugins: [react()],
   server: {
-    port: 4000
+    port: 4000,
+    proxy: {
+      '/procure/graphql': 'http://localhost:3230'
+    }
   }
 })
