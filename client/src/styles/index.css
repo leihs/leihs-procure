@@ -1,7 +1,7 @@
 @import './bootstrap-leihs.css';
 @import './graphiql-fixes.css';
 
-@import '~tachyons-type-scale';
+@import 'tachyons-type-scale';
 
 /* variables (used in React inline styles, needs browser support)
    vars used but not defined here come from bootstrap.

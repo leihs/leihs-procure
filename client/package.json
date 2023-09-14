@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "serve": "9.1.0"
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "serve": "9.1.0",
+    "vite": "^4.4.9",
+    "vite-plugin-svgr": "^3.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "vite",
+    "serve": "vite preview",
     "build": "npm run -s build:i18n && npm run -s build:ui && npm run -s build:app",
     "ci-build": "npm run -s build:i18n && npm run -s build:app",
-    "build:app": "react-scripts build",
+    "build:app": "vite build",
     "build:ui": "cd leihs-ui && bin/build",
     "build:i18n": "node src/locale/make-pseudoloc.js",
     "postinstall": "npm run cleanup-typescript",

@@ -1,11 +1,11 @@
 // NOTE: https://en.wikipedia.org/wiki/Pseudolocalization
 
-const f = require('lodash')
-const fs = require('fs')
-const path = require('path')
-const pseudoloc = require('pseudoloc')
+import f from 'lodash';
+import fs from 'fs'
+import path from 'path'
+import pseudoloc from 'pseudoloc';
 
-const orgLang = require('./de.json')
+import orgLang from './de.json';
 
 // pseudoloc.option.delimiter = null
 

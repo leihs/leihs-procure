@@ -14,7 +14,7 @@ import {
   Routed
 } from './Bootstrap'
 
-import { Components as LeihsUI } from '../leihs-ui/dist/leihs-ui-client-side'
+// import { Components as LeihsUI } from '../leihs-ui/dist/leihs-ui-client-side'
 
 import Icon from './Icons'
 // import { DisplayName } from './decorators'
@@ -131,14 +131,7 @@ export default class MainNav extends React.Component {
     )
 
     return (
-      <LeihsUI.Navbar
-        {...sharedNavbarProps}
-        bgColor={'#343a40'} // bootstrap bg-dark
-        brand={brand}
-        tag="div"
-      >
-        {innerMenu}
-      </LeihsUI.Navbar>
+      <></>
     )
   }
 }

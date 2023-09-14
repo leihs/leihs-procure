@@ -31,7 +31,7 @@ import DevUiCatalog from './pages/_dev/UiCatalogPage'
 import DevConsole from './pages/_dev/ConsolePage'
 
 // webpack: inject styles
-require('./styles/index.css')
+import './styles/index.css'
 
 // lodash setup
 f.mixin(lodashMixins)
