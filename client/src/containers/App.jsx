@@ -1,6 +1,5 @@
 import React, { Component, Fragment as F } from 'react'
 import f from 'lodash'
-import { withRouter } from 'react-router'
 import { Query } from 'react-apollo'
 
 import t from '../locale/translate'
@@ -11,18 +10,13 @@ import { Routed } from '../components/Router'
 import MainNav from '../components/MainNav'
 import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
 
-const MainNavWithRouter = withRouter(MainNav)
-
 // NOTE: uses fetchPolicy="cache-and-network" to be quick on refreshes
 //       but also make sure the data is correct and connection is possible.
 //       We re-use the query from `CurrentUserProvider` (to ensure caching),
 //       but not the component because the "AppShell" handles errors differently.
 //
-// FIXME: when using `refetch` to reload, subsequent requests
-//      are merged into the previous ones, breaking error handling!
 
-class App extends Component {
-  render({ props: { children, isDev } } = this) {
+function App({children, isDev}) {
     return (
       <Routed>
         {({ location, dismissFlash }) => {
@@ -47,16 +41,16 @@ class App extends Component {
 
                   if (error) {
                     return (
-                      <F>
+                      <>
                         <div className="minh-100vh">
-                          <MainNavWithRouter isDev={isDev} me={false} />
+                          <MainNav isDev={isDev} me={false} />
                           <ErrorHandler
                             error={error}
                             data={data}
                             refetch={e => window.location.reload()}
                           />
                         </div>
-                      </F>
+                      </>
                     )
                   }
 
@@ -68,7 +62,7 @@ class App extends Component {
                   return (
                     <F>
                       <div lang={userLocale}>
-                        <MainNavWithRouter
+                        <MainNav
                           isDev={isDev}
                           me={UserWithShortcuts(currentUser)}
                           contactUrl={f.get(data, 'settings.contact_url')}
@@ -90,7 +84,6 @@ class App extends Component {
         }}
       </Routed>
     )
-  }
 }
 
 export default App

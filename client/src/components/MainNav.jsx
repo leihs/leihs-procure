@@ -23,10 +23,10 @@ import Icon from './Icons'
 const TITLE = 'Bedarfsermittlung'
 
 const Brand = () => (
-  <F>
+  <>
     <Icon.LeihsProcurement className="mr-2" />
     {TITLE}
-  </F>
+  </>
 )
 
 export default class MainNav extends React.Component {
@@ -48,9 +48,9 @@ export default class MainNav extends React.Component {
     )
 
     const innerMenu = (
-      <F>
+      <>
         {!f.isEmpty(me) && (
-          <F>
+          <>
             <NavItemLink exact to="/requests">
               <Icon.Requests fixedWidth spaced /> Anträge
             </NavItemLink>
@@ -106,7 +106,7 @@ export default class MainNav extends React.Component {
                 <Icon.Contact fixedWidth spaced /> Kontakt
               </NavItemAnchor>
             )}
-          </F>
+          </>
         )}
 
         {!!isDev && (
@@ -128,7 +128,7 @@ export default class MainNav extends React.Component {
             </DropdownMenu>
           </UncontrolledDropdown>
         )}
-      </F>
+      </>
     )
     return (
        <Navbar 
