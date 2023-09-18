@@ -1,21 +1,20 @@
 # frozen_string_literal: true
 
+# require_relative '../../helpers/users'
+
 feature 'Add Template to Category' do
   before(:each) do
-    @user = FactoryBot.create(:user)
+    @inspector = FactoryBot.create(:user)
     @category = FactoryBot.create(:procurement_category)
-    FactoryBot.create(:procurement_inspector, user: @user, category: @category)
-
-    visit('/templates/edit')
-    fill_in('inputEmail', with: @user.email)
-    # find(@user.email).send_keys(:enter)
-    find_button('Continue').click
-
-    fill_in('inputPassword', with: 'password')
-    find_button('Continue').click
+    FactoryBot.create(:procurement_inspector, user: @inspector, category: @category)
   end
 
-  context 'is logged in' do
+  context 'as inspector' do
+    before(:each) do
+      Helpers::User.sign_in_as @inspector
+      visit('/templates/edit')
+    end
+
     scenario 'insert data into form' do
       # find add button and click it
       find('.m-0.p-0.btn.btn-link').click
@@ -26,30 +25,11 @@ feature 'Add Template to Category' do
         # Locate all table data (<td>) elements within the row
         tds = row.all('td')
 
-        # Iterate over the table data elements
-        tds.each_with_index do |td, column_index|
-          # Replace 'input' with the appropriate input element selector
-          # input = td.find('input') # Use visible: false to locate hidden inputs
-          begin
-            input = td.find('input', visible: :all)
-          rescue Capybara::ElementNotFound
-            # Handle the case when no <input> element is found
-            input = nil # or any other appropriate action
-          end
-          # Check if an input field exists within the <td> element
-          next unless input
-
-          case column_index
-          when 1
-            input.set(Faker::Device.model_name)
-          when 2
-            input.set(Faker::Device.model_name)
-          when 3
-            input.set(Faker::Commerce.price)
-          when 4
-            input.set(Faker::Camera.brand)
-          end
-        end
+        # Replace 'input' with the appropriate input element selector
+        tds[1].find('input').set Faker::Device.model_name
+        tds[2].find('input').set Faker::Device.model_name
+        tds[3].find('input').set Faker::Commerce.price
+        tds[4].find('input').set Faker::Camera.brand
       end
       find('button[type="submit"]').click
     end

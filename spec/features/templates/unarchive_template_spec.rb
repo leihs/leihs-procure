@@ -2,32 +2,30 @@
 
 feature 'Unarchive Template(s)' do
   before(:each) do
-    @user = FactoryBot.create(:user)
+    @requester = FactoryBot.create(:user)
     @budget_period = FactoryBot.create(:procurement_budget_period, :inspection_phase)
     @category = FactoryBot.create(:procurement_category)
-    @inspector = FactoryBot.create(:procurement_inspector, user: @user, category: @category)
-    @requester = FactoryBot.create(:procurement_requester, user: @user)
+    FactoryBot.create(:procurement_inspector, user: @requester, category: @category)
+    FactoryBot.create(:procurement_requester, user: @requester)
+
     @templates = Array(1..5).map do |_|
       FactoryBot.create(:procurement_template, :unarchiveable, category: @category)
     end
 
     @requests = Array(1..5).map.with_index do |_element, index|
       template_object = @templates[index]
-      FactoryBot.create(:procurement_request, category: @category, template_id: template_object.id, user: @user,
+      FactoryBot.create(:procurement_request, category: @category, template_id: template_object.id, user: @requester,
                                               budget_period: @budget_period)
     end
-
-    visit('/templates/edit')
-    fill_in('inputEmail', with: @user.email)
-    # find(@user.email).send_keys(:enter)
-    find_button('Continue').click
-
-    fill_in('inputPassword', with: 'password')
-    find_button('Continue').click
   end
 
-  context 'user is logged in' do
-    scenario 'user wants to unarchive single template' do
+  context 'as requester' do
+    before(:each) do
+      Helpers::User.sign_in_as @requester
+      visit('/templates/edit')
+    end
+
+    scenario 'unarchive single template' do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click
@@ -36,7 +34,7 @@ feature 'Unarchive Template(s)' do
       find('button[type="submit"]').click
     end
 
-    scenario 'user wants to unarchive multiple templates' do
+    scenario 'unarchive multiple templates' do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click
