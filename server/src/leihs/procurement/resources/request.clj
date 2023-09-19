@@ -415,31 +415,32 @@
                        (assoc :user user-id)
                        (assoc :organization (:id organization))
                        to-name-and-lower-case-enums)]
-    (with-local-vars [req-id nil]
+    (let [req-id (atom nil)]
       (authorization/authorize-and-apply
         #(do (insert! tx
                       (-> write-data
-                          (cond-> template (merge data-from-template))
+                          (cond-> template (merge (dissoc data-from-template :is_archived)))
                           exchange-attrs))
-             (var-set req-id
-                      (-> (get-last-created-request tx auth-entity)
-                          :id))
+             (reset! req-id
+                     (-> (get-last-created-request tx auth-entity)
+                         :id))
              (if-not (empty? attachments)
-               (deal-with-attachments! tx (var-get req-id) attachments)))
-        :if-only
-        #(->> input-data
-              submap-with-id-for-associated-resources
-              (request-perms/authorized-to-write-all-fields? tx auth-entity)))
-      (as-> (var-get req-id) <>
-        (get-request-by-id tx auth-entity <>)
-        (request-perms/apply-permissions tx
-                                         auth-entity
-                                         <>
-                                         #(assoc %
-                                           :request-id (var-get req-id)))))))
+               (deal-with-attachments! tx @req-id attachments)))
+        :if-all
+        [#(->> input-data
+               submap-with-id-for-associated-resources
+               (request-perms/authorized-to-write-all-fields? tx auth-entity))
+         #(or (not template) (not (:is_archived template)))])
+        (as-> @req-id <>
+          (get-request-by-id tx auth-entity <>)
+          (request-perms/apply-permissions tx
+                                           auth-entity
+                                           <>
+                                           #(assoc %
+                                             :request-id @req-id))))))
 
-(defn update-request!
-  [context args _]
+  (defn update-request!
+    [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)

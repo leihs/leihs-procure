@@ -36,7 +36,8 @@
            (->> preds
                 (map ifn?)
                 (every? true?))
-           true) (= (count (filter nil? [if-only if-any if-all])) 2)]}
+           true)
+         (= (count (filter nil? [if-only if-any if-all])) 2)]}
   (let [auth-func (cond if-only if-only
                         if-any (fn []
                                  (->> if-any
