@@ -15,7 +15,7 @@ import {
 } from './Bootstrap'
 
 // import { Components as LeihsUI } from '../leihs-ui/dist/leihs-ui-client-side'
-import Navbar from "./navbar/Navbar";
+import Navbar from './navbar/Navbar'
 
 import Icon from './Icons'
 // import { DisplayName } from './decorators'
@@ -33,16 +33,18 @@ export default class MainNav extends React.Component {
   state = {
     isOpen: false
   }
+
   toggleOpen() {
     this.setState({
       isOpen: !this.state.isOpen
     })
   }
+
   render({ props: { me, contactUrl, isDev }, state } = this) {
     const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
 
     const brand = (
-      <NavbarBrand key="brand" exact to="/">
+      <NavbarBrand key="brand" to="/">
         <Brand />
       </NavbarBrand>
     )
@@ -51,7 +53,7 @@ export default class MainNav extends React.Component {
       <>
         {!f.isEmpty(me) && (
           <>
-            <NavItemLink exact to="/requests">
+            <NavItemLink href="/requests">
               <Icon.Requests fixedWidth spaced /> Anträge
             </NavItemLink>
 
@@ -131,16 +133,13 @@ export default class MainNav extends React.Component {
       </>
     )
     return (
-       <Navbar 
-         {...sharedNavbarProps} 
-         bgColor={'#343a40'} // bootstrap bg-dark 
-         brand={brand} 
-         tag="div" 
-       > 
-         {innerMenu} 
-       </Navbar> 
+      <Navbar
+        {...sharedNavbarProps}
+        bgColor={'#343a40'} // bootstrap bg-dark
+        brand={brand}
+      >
+        {innerMenu}
+      </Navbar>
     )
   }
 }
-
-

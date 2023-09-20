@@ -33,27 +33,25 @@ export { DropdownToggle }
 export { DropdownMenu }
 export { DropdownItem }
 
-export const NavLink = p => (
-  <BsNavLink activeClassName="active" tag={RouterNavLink} {...p} />
-)
+export const NavLink = (p) => <BsNavLink {...p} />
 
-export const NavItemAnchor = p => (
+export const NavItemAnchor = (p) => (
   <NavItem>
     <BsNavLink tag={Anchor} {...p} />
   </NavItem>
 )
 
-export const NavItemLink = p => (
+export const NavItemLink = (p) => (
   <NavItem>
     <NavLink {...p} />
   </NavItem>
 )
 
 export const NavbarBrand = ({ tag, to, ...p }) => (
-  <BsNavbarBrand tag={tag || to ? RouterNavLink : 'span'} to={to} {...p} />
+  <BsNavbarBrand href={to} {...p} />
 )
 
-export const DropdownItemLink = p => <DropdownItem tag={RouterNavLink} {...p} />
+export const DropdownItemLink = (p) => <DropdownItem href={p.to} {...p} />
 
 // TODO: move most of those to ../Router:
 
