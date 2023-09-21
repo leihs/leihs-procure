@@ -1,27 +1,36 @@
 import React from 'react'
-import f from 'lodash'
 import cx from 'classnames'
+
+import Navbar from './navbar/Navbar'
+import Icon from './Icons'
+import { useLocation } from 'react-router'
+import { Link, NavLink as RouterNavLink } from 'react-router-dom'
 
 import {
   NavbarBrand,
-  NavItemLink,
-  NavItemAnchor,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  DropdownItemLink,
-  Routed
-} from './Bootstrap'
+  NavItem,
+  NavLink
+} from 'reactstrap'
 
-import Navbar from './navbar/Navbar'
-import Icon from './Icons'
+// TODO: translate navigation items
 
 function MainNav({ me, contactUrl, isDev }) {
-  const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
+  const { pathname } = useLocation()
+
+  const sharedNavbarProps = (() => {
+    try {
+      return JSON.parse(me.navbarProps)
+    } catch (e) {
+      console.warn('Could not parse navbarProps', e)
+    }
+  })()
 
   const brand = (
-    <NavbarBrand key="brand" to="/">
+    <NavbarBrand href="/">
       <Icon.LeihsProcurement className="mr-2" />
       Bedarfsermittlung
     </NavbarBrand>
@@ -34,82 +43,100 @@ function MainNav({ me, contactUrl, isDev }) {
       brand={brand}
     >
       <>
-        {!f.isEmpty(me) && (
+        {Object.keys(me).length > 0 && (
           <>
-            <NavItemLink href="/requests">
-              <Icon.Requests fixedWidth spaced /> Anträge
-            </NavItemLink>
+            <NavItem>
+              <RouterNavLink to="/requests" className="nav-link">
+                <Icon.Requests fixedWidth spaced /> Anträge
+              </RouterNavLink>
+            </NavItem>
 
             {me.roles.isAdmin && (
               <UncontrolledDropdown nav inNavbar>
-                <Routed path="/admin">
-                  {({ isActive }) => (
-                    <DropdownToggle
-                      nav
-                      caret
-                      className={cx({ active: isActive })}
-                    >
-                      <Icon.Settings /> Admin
-                    </DropdownToggle>
-                  )}
-                </Routed>
+                <DropdownToggle
+                  nav
+                  caret
+                  className={cx({ active: pathname.match('admin') })}
+                >
+                  <Icon.Settings /> Admin
+                </DropdownToggle>
 
-                <DropdownMenu right>
-                  <DropdownItemLink className="pl-3" to="/admin/budget-periods">
-                    <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
-                  </DropdownItemLink>
+                <DropdownMenu>
+                  <Link
+                    to="/admin/budget-periods"
+                    className="text-decoration-none"
+                  >
+                    <DropdownItem tag="div" className="pl-3">
+                      <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+                    </DropdownItem>
+                  </Link>
 
-                  <DropdownItemLink className="pl-3" to="/admin/categories">
-                    <Icon.Categories fixedWidth spaced /> Kategorien
-                  </DropdownItemLink>
+                  <Link to="/admin/categories" className="text-decoration-none">
+                    <DropdownItem className="pl-3">
+                      <Icon.Categories fixedWidth spaced /> Kategorien
+                    </DropdownItem>
+                  </Link>
 
-                  <DropdownItemLink className="pl-3" to="/admin/users">
-                    <Icon.Users fixedWidth spaced /> Benutzer
-                  </DropdownItemLink>
+                  <Link to="/admin/users" className="text-decoration-none">
+                    <DropdownItem className="pl-3">
+                      <Icon.Users fixedWidth spaced /> Benutzer
+                    </DropdownItem>
+                  </Link>
 
-                  <DropdownItemLink className="pl-3" to="/admin/organizations">
-                    <Icon.Organizations fixedWidth spaced /> Organisationen
-                  </DropdownItemLink>
+                  <Link
+                    to="/admin/organizations"
+                    className="text-decoration-none"
+                  >
+                    <DropdownItem className="pl-3">
+                      <Icon.Organizations fixedWidth spaced /> Organisationen
+                    </DropdownItem>
+                  </Link>
 
                   <DropdownItem divider />
 
-                  <DropdownItemLink className="pl-3" to="/admin/settings">
-                    <Icon.Settings fixedWidth spaced /> Einstellungen
-                  </DropdownItemLink>
+                  <Link to="/admin/settings" className="text-decoration-none">
+                    <DropdownItem className="pl-3">
+                      <Icon.Settings fixedWidth spaced /> Einstellungen
+                    </DropdownItem>
+                  </Link>
                 </DropdownMenu>
               </UncontrolledDropdown>
             )}
 
             {me.roles.isInspector && (
-              <NavItemLink exact to="/templates/edit">
-                <Icon.Templates fixedWidth spaced /> Vorlagen
-              </NavItemLink>
+              <NavItem>
+                <Link exact to="/templates/edit" classNam="nav-link">
+                  <Icon.Templates fixedWidth spaced /> Vorlagen
+                </Link>
+              </NavItem>
             )}
 
             {!!contactUrl && (
-              <NavItemAnchor href={contactUrl} target="_blank">
+              <NavLink href={contactUrl} target="_blank">
                 <Icon.Contact fixedWidth spaced /> Kontakt
-              </NavItemAnchor>
+              </NavLink>
             )}
           </>
         )}
 
         {!!isDev && (
           <UncontrolledDropdown nav inNavbar>
-            <Routed path="/dev">
-              {({ isActive }) => (
-                <DropdownToggle nav caret className={cx({ active: isActive })}>
-                  <samp>
-                    <i>dev</i>
-                  </samp>
-                </DropdownToggle>
-              )}
-            </Routed>
+            <DropdownToggle
+              nav
+              caret
+              className={cx({ active: pathname.match('dev') })}
+            >
+              <samp>
+                <i>dev</i>
+              </samp>
+            </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItemLink to="/dev/playground">
-                UI Catalog
-              </DropdownItemLink>
-              <DropdownItemLink to="/dev/console">API Console</DropdownItemLink>
+              <Link to="/dev/playground" className="text-decoration-none">
+                <DropdownItem to="/dev/playground">UI Catalog</DropdownItem>
+              </Link>
+              <Link to="/dev/console" className="text-decoration-none">
+                <DropdownItem to="/dev/console">API Console</DropdownItem>
+              </Link>
             </DropdownMenu>
           </UncontrolledDropdown>
         )}
