@@ -79,7 +79,7 @@ ReactDOM.render(<Root />, document.getElementById('root'))
 //
 function initDevHelpers() {
   window.f = f
-  window.debugObj = obj => {
+  window.debugObj = (obj) => {
     console.debug(obj) // eslint-disable-line no-console
     return obj
   }

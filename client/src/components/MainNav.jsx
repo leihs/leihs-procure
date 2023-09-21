@@ -1,4 +1,4 @@
-import React, { Fragment as F } from 'react'
+import React from 'react'
 import f from 'lodash'
 import cx from 'classnames'
 
@@ -14,42 +14,25 @@ import {
   Routed
 } from './Bootstrap'
 
-// import { Components as LeihsUI } from '../leihs-ui/dist/leihs-ui-client-side'
 import Navbar from './navbar/Navbar'
-
 import Icon from './Icons'
-// import { DisplayName } from './decorators'
 
-const TITLE = 'Bedarfsermittlung'
+function MainNav({ me, contactUrl, isDev }) {
+  const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
 
-const Brand = () => (
-  <>
-    <Icon.LeihsProcurement className="mr-2" />
-    {TITLE}
-  </>
-)
+  const brand = (
+    <NavbarBrand key="brand" to="/">
+      <Icon.LeihsProcurement className="mr-2" />
+      Bedarfsermittlung
+    </NavbarBrand>
+  )
 
-export default class MainNav extends React.Component {
-  state = {
-    isOpen: false
-  }
-
-  toggleOpen() {
-    this.setState({
-      isOpen: !this.state.isOpen
-    })
-  }
-
-  render({ props: { me, contactUrl, isDev }, state } = this) {
-    const sharedNavbarProps = f.try(() => JSON.parse(me.navbarProps))
-
-    const brand = (
-      <NavbarBrand key="brand" to="/">
-        <Brand />
-      </NavbarBrand>
-    )
-
-    const innerMenu = (
+  return (
+    <Navbar
+      {...sharedNavbarProps}
+      bgColor={'#343a40'} // bootstrap bg-dark
+      brand={brand}
+    >
       <>
         {!f.isEmpty(me) && (
           <>
@@ -131,15 +114,8 @@ export default class MainNav extends React.Component {
           </UncontrolledDropdown>
         )}
       </>
-    )
-    return (
-      <Navbar
-        {...sharedNavbarProps}
-        bgColor={'#343a40'} // bootstrap bg-dark
-        brand={brand}
-      >
-        {innerMenu}
-      </Navbar>
-    )
-  }
+    </Navbar>
+  )
 }
+
+export default MainNav
