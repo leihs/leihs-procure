@@ -46,8 +46,10 @@ const Root = () => (
     <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
       <App isDev={isDev}>
         <Switch>
-          <Route path="/" element={<HomePage />}></Route>
-          {/* <Route exact path="/requests" component={RequestsIndex} />
+          <Route exact path="/">
+            <HomePage />
+          </Route>
+          <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/requests/new" component={RequestNew} />
           <Route exact path="/requests/:id" component={RequestShow} />
           <Route exact path="/admin/users" component={AdminUsers} />
@@ -67,7 +69,7 @@ const Root = () => (
 
           <Route
             component={() => <center className="h1">404 not found</center>}
-          /> */}
+          />
         </Switch>
       </App>
     </BrowserRouter>

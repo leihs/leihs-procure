@@ -64,7 +64,7 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "react-test-renderer": "^16.7.0",
-    "reactstrap": "^9.2.0",
+    "reactstrap": "^8.10.1",
     "serve": "9.1.0",
     "source-map-explorer": "^2.5.3",
     "tachyons-type-scale": "^6.1.1",

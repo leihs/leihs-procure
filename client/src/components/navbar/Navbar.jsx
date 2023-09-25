@@ -127,7 +127,7 @@ const UserMenu = ({ t, user, csrfToken }) => (
       <Icon.User size="lg" />
     </DropdownToggle>
 
-    <DropdownMenu end>
+    <DropdownMenu>
       <DropdownItem tag="span" disabled className="text-body">
         <b>{decorateUser(user)}</b>
       </DropdownItem>
@@ -166,7 +166,7 @@ const SubAppDropdown = ({ t, subApps }) => {
         <DropdownToggle nav caret>
           <Icon.LeihsProcurement />
         </DropdownToggle>
-        <DropdownMenu end>
+        <DropdownMenu>
           {f.map(
             f.keys(f.fromPairs(f.filter(f.toPairs(subApps), '1'))),
             (subApp, i, a) => {
@@ -249,7 +249,7 @@ const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
         <DropdownToggle nav caret>
           <Icon.Language />
         </DropdownToggle>
-        <DropdownMenu end>
+        <DropdownMenu>
           {/* <DropdownItem divider >Sprachen</DropdownItem> */}
           {f.map(locales, (lang) => {
             const isCurrent =
