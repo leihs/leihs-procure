@@ -2,7 +2,7 @@ import React from 'react'
 import f from 'lodash'
 import {
   Route as RRRoute,
-  Navigate as RRNavigate,
+  Redirect as RRRedirect,
   Link
 } from 'react-router-dom'
 import { RouteParams } from './Bootstrap/Navs'
@@ -26,7 +26,7 @@ export const RoutedStatus = ({ code, children, ...p }) => (
 )
 
 // like ReactRouter.Redirect but with extra features
-export const Navigate = ({ scrollTop = true, to, ...props }) => (
+export const Redirect = ({ scrollTop = true, to, ...props }) => (
   <RouteParams>
     {({ location }) => {
       // handle to=path shortcut
@@ -42,7 +42,7 @@ export const Navigate = ({ scrollTop = true, to, ...props }) => (
         setTimeout(() => window.scrollTo(0, 0), 1)
       }
 
-      return <RRNavigate {...props} to={to} />
+      return <RRRedirect {...props} to={to} />
     }}
   </RouteParams>
 )

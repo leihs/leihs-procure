@@ -8,7 +8,7 @@ import qs from 'qs'
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
-import { Navigate } from '../components/Router'
+import { Redirect } from '../components/Router'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -393,7 +393,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
 
               if (mutReq.called) {
                 return (
-                  <Navigate
+                  <Redirect
                     push // dont replace current route!
                     scrollTop
                     to={{

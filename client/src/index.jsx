@@ -5,13 +5,13 @@ import 'react-app-polyfill/ie11'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route, BrowserRouter, Navigate } from 'react-router-dom'
+import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
 import App from './containers/App'
-// import { Navigate } from './components/Router'
+// import { Redirect } from './components/Router'
 import { isDev, supportsHistory } from './env'
 
 // all the pages
@@ -59,7 +59,7 @@ const Root = () => (
           <Route path="/templates/edit" component={TemplatesEdit} />
           <Route
             path="/templates**"
-            render={() => <Navigate to="/templates/edit" />}
+            render={() => <Redirect to="/templates/edit" />}
           />
 
           <Route strict path="/dev/playground" component={DevUiCatalog} />

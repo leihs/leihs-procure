@@ -22,7 +22,7 @@ import {
   InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Navigate, Routed } from '../../components/Router'
+import { Redirect, Routed } from '../../components/Router'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -237,7 +237,7 @@ class CategoryPage extends React.Component {
 
               if (!mainCat) {
                 // debugger
-                return <Navigate push to={'/admin/categories'} />
+                return <Redirect push to={'/admin/categories'} />
               }
 
               return (

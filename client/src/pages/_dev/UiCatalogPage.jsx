@@ -21,7 +21,7 @@ import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
-import { Navigate } from '../../components/Router'
+import { Redirect } from '../../components/Router'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
@@ -288,7 +288,7 @@ const PAGES = [
                     click to redirect!
                   </button>
                   {!!getValue('redirect') && (
-                    <Navigate
+                    <Redirect
                       push
                       scrollTop
                       to={{
@@ -374,7 +374,7 @@ const PageById = ({ match, baseUrl }) => {
   const page = f.find(PAGES, { id: pageId })
   if (!page) {
     return (
-      <Navigate
+      <Redirect
         to={{
           pathname: baseUrl,
           state: { localFlash: `The page ${pageId} doesn't exist!` }

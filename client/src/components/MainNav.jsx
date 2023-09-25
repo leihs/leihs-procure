@@ -130,7 +130,7 @@ function MainNav({ me, contactUrl, isDev }) {
                 <i>dev</i>
               </samp>
             </DropdownToggle>
-            <DropdownMenu right>
+            <DropdownMenu end>
               <Link to="/dev/playground" className="text-decoration-none">
                 <DropdownItem to="/dev/playground">UI Catalog</DropdownItem>
               </Link>

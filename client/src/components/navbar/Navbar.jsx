@@ -21,7 +21,7 @@ const defaults = {
   homeUrl: '/'
 }
 
-const DropdownItem = p => <BsDropdownItem data-trigger {...p} />
+const DropdownItem = (p) => <BsDropdownItem data-trigger {...p} />
 
 const Brand = ({ title }) => (
   <F>
@@ -76,7 +76,7 @@ export default class Navbar extends React.Component {
           </NavbarBrand>
         )}
 
-        <NavbarToggler onClick={e => this.toggleOpen()} />
+        <NavbarToggler onClick={(e) => this.toggleOpen()} />
 
         <Collapse isOpen={state.isOpen} navbar>
           <Nav className="mr-auto" navbar>
@@ -127,7 +127,7 @@ const UserMenu = ({ t, user, csrfToken }) => (
       <Icon.User size="lg" />
     </DropdownToggle>
 
-    <DropdownMenu right>
+    <DropdownMenu end>
       <DropdownItem tag="span" disabled className="text-body">
         <b>{decorateUser(user)}</b>
       </DropdownItem>
@@ -152,7 +152,7 @@ const UserMenu = ({ t, user, csrfToken }) => (
 )
 
 const SubAppDropdown = ({ t, subApps }) => {
-  const otherPermittedSubapps = f.filter(f.toPairs(subApps), kv => {
+  const otherPermittedSubapps = f.filter(f.toPairs(subApps), (kv) => {
     if (f.isArray(kv[1])) {
       return kv[1].length > 0
     } else {
@@ -166,7 +166,7 @@ const SubAppDropdown = ({ t, subApps }) => {
         <DropdownToggle nav caret>
           <Icon.LeihsProcurement />
         </DropdownToggle>
-        <DropdownMenu right>
+        <DropdownMenu end>
           {f.map(
             f.keys(f.fromPairs(f.filter(f.toPairs(subApps), '1'))),
             (subApp, i, a) => {
@@ -238,7 +238,7 @@ const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
   // NOTE: `locale` is the pkey (instead of `id`)
   if (f.isEmpty(locales)) return false
   const currentLang =
-    f.find(locales, l => l.isSelected) || f.find(locales, l => l.isDefault)
+    f.find(locales, (l) => l.isSelected) || f.find(locales, (l) => l.isDefault)
   return (
     <form
       method="POST"
@@ -249,9 +249,9 @@ const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
         <DropdownToggle nav caret>
           <Icon.Language />
         </DropdownToggle>
-        <DropdownMenu right>
+        <DropdownMenu end>
           {/* <DropdownItem divider >Sprachen</DropdownItem> */}
-          {f.map(locales, lang => {
+          {f.map(locales, (lang) => {
             const isCurrent =
               !!currentLang && lang.locale === currentLang.locale
             return (
@@ -328,8 +328,8 @@ function decorateUser(u) {
   }
   return f.first(
     f.filter(
-      ['lastname', 'login', 'email', 'id'].map(key => f.get(u, key)),
-      i => !f.isEmpty(i)
+      ['lastname', 'login', 'email', 'id'].map((key) => f.get(u, key)),
+      (i) => !f.isEmpty(i)
     )
   )
 }
