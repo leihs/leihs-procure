@@ -20,7 +20,6 @@ import {
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
-import { Routed } from '../../components/Router'
 import { formatCurrency } from '../../components/decorators'
 
 // # DATA & ACTIONS

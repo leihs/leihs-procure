@@ -1,9 +1,6 @@
 import React from 'react'
 import { parse as parseQuery } from 'qs'
-import {
-  Route as RouterRoute,
-  NavLink as RouterNavLink
-} from 'react-router-dom'
+import { Route as RouterRoute } from 'react-router-dom'
 
 import Collapse from 'reactstrap/lib/Collapse'
 import Navbar from 'reactstrap/lib/Navbar'
@@ -35,12 +32,6 @@ export { DropdownItem }
 
 export const NavLink = (p) => <BsNavLink {...p} />
 
-export const NavItemAnchor = (p) => (
-  <NavItem>
-    <BsNavLink tag={Anchor} {...p} />
-  </NavItem>
-)
-
 export const NavItemLink = (p) => (
   <NavItem>
     <NavLink {...p} />
@@ -49,17 +40,6 @@ export const NavItemLink = (p) => (
 
 export const NavbarBrand = ({ tag, to, ...p }) => (
   <BsNavbarBrand href={to} {...p} />
-)
-
-export const DropdownItemLink = (p) => <DropdownItem href={p.to} {...p} />
-
-// TODO: move most of those to ../Router:
-
-// like ReactRouter.NavLink but for anything that wants to know if its "active".
-export const Routed = ({ children, ...p }) => (
-  <RouterRoute {...p}>
-    {({ match }) => children({ isActive: !!match })}
-  </RouterRoute>
 )
 
 // like ReactRouter.Route but additionally with parsed params

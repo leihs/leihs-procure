@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import qs from 'qs'
+import { useLocation, useHistory, useParams } from 'react-router-dom'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
@@ -122,43 +123,45 @@ const updateQueryParams = ({ fields, params, location }) => {
   }
 }
 
-const RequestNewPage = () => (
-  <RouteParams>
-    {({ params, location, history }) => (
-      <CurrentUser>
-        {(me) => (
-          <MainWithSidebar>
-            <h1>Antrag erstellen</h1>
+const RequestNewPage = () => {
+  const params = useParams()
+  const location = useLocation()
+  const history = useHistory()
 
-            <Query
-              query={NEW_REQUEST_PRESELECTION_QUERY}
-              fetchPolicy="cache-then-network"
-            >
-              {({ loading, error, data }) => {
-                if (loading) return <Loading />
-                if (error) return <ErrorPanel error={error} data={data} />
+  return (
+    <CurrentUser>
+      {(me) => (
+        <MainWithSidebar>
+          <h1>Antrag erstellen</h1>
 
-                return (
-                  <NewRequestPreselection
-                    key={location.key} // reset state on location change!
-                    me={me}
-                    data={data}
-                    selection={readFromQueryParams(params)}
-                    onChange={(fields) => {
-                      history.replace(
-                        updateQueryParams({ params, location, fields })
-                      )
-                    }}
-                  />
-                )
-              }}
-            </Query>
-          </MainWithSidebar>
-        )}
-      </CurrentUser>
-    )}
-  </RouteParams>
-)
+          <Query
+            query={NEW_REQUEST_PRESELECTION_QUERY}
+            fetchPolicy="cache-then-network"
+          >
+            {({ loading, error, data }) => {
+              if (loading) return <Loading />
+              if (error) return <ErrorPanel error={error} data={data} />
+
+              return (
+                <NewRequestPreselection
+                  key={location.key} // reset state on location change!
+                  me={me}
+                  data={data}
+                  selection={readFromQueryParams(params)}
+                  onChange={(fields) => {
+                    history.replace(
+                      updateQueryParams({ params, location, fields })
+                    )
+                  }}
+                />
+              )
+            }}
+          </Query>
+        </MainWithSidebar>
+      )}
+    </CurrentUser>
+  )
+}
 
 export default RequestNewPage
 

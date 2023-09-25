@@ -20,7 +20,6 @@ import {
 } from '../../components/Bootstrap'
 import Loading from '../../components/Loading'
 import { MainWithSidebar } from '../../components/Layout'
-import { Routed } from '../../components/Router'
 import { DisplayName } from '../../components/decorators'
 import { ErrorPanel } from '../../components/Error'
 import UserAutocomplete from '../../components/UserAutocomplete'
@@ -94,7 +93,7 @@ class AdminUsersPage extends React.Component {
               mutate({
                 variables: {
                   adminUserList: data.admins
-                    .filter(u => id !== u.id)
+                    .filter((u) => id !== u.id)
                     .map(({ id }) => ({ user_id: id }))
                 }
               })
@@ -126,8 +125,8 @@ class AdminUsersPage extends React.Component {
             doUpdate: (mutate, fields) => {
               const data = f
                 .toArray(fields)
-                .filter(f => !f.toDelete)
-                .map(f => ({
+                .filter((f) => !f.toDelete)
+                .map((f) => ({
                   user_id: f.user.id,
                   department: f.department.name,
                   organization: f.organization.name
@@ -181,7 +180,7 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
           <Col sm="6">
             <FormGroup label={t('admin.users.current_admins')} hideLabel>
               <ul className="list-group list-group-compact">
-                {admins.map(user => (
+                {admins.map((user) => (
                   <li
                     key={user.id}
                     className="list-group-item d-flex justify-content-between align-items-center"
@@ -212,7 +211,7 @@ const ListOfAdmins = ({ admins, updateAdmins }) => (
                 excludeIds={
                   f.isEmpty(admins) ? null : admins.map(({ id }) => id)
                 }
-                onSelect={user => updateAdmins.doAddAdmin(mutate, user.id)}
+                onSelect={(user) => updateAdmins.doAddAdmin(mutate, user.id)}
               />
             </FormGroup>
           </Col>
@@ -227,198 +226,186 @@ const ListOfRequestersAndOrgs = ({
   id = 'requesters_orgs',
   updateRequestersOrgs
 }) => (
-  <Routed>
-    {({ setFlash }) => (
-      <Mutation
-        {...updateRequestersOrgs.mutation}
-        onCompleted={() => {
-          setFlash({ message: updateRequestersOrgs.successFlash })
-          window && window.scrollTo(0, 0)
-        }}
-      >
-        {(mutate, updatingInfo) => {
-          const requestersList = f.sortBy(requesters, 'user.firstname')
-          return (
-            <Div cls="mt-2 form-group-lines">
-              <Row form cls="d-none d-sm-flex">
-                <Col>
-                  <b>{t('admin.users.requesters_list_heading_name')}</b>
-                </Col>
-                <Col>
-                  <b>{t('admin.users.requesters_list_heading_department')}</b>
-                </Col>
-                <Col>
-                  <b>{t('admin.users.requesters_list_heading_organization')}</b>
-                </Col>
-                <Col sm="2" />
-              </Row>
+  <Mutation
+    {...updateRequestersOrgs.mutation}
+    onCompleted={() => {
+      window && window.scrollTo(0, 0)
+    }}
+  >
+    {(mutate, updatingInfo) => {
+      const requestersList = f.sortBy(requesters, 'user.firstname')
+      return (
+        <Div cls="mt-2 form-group-lines">
+          <Row form cls="d-none d-sm-flex">
+            <Col>
+              <b>{t('admin.users.requesters_list_heading_name')}</b>
+            </Col>
+            <Col>
+              <b>{t('admin.users.requesters_list_heading_department')}</b>
+            </Col>
+            <Col>
+              <b>{t('admin.users.requesters_list_heading_organization')}</b>
+            </Col>
+            <Col sm="2" />
+          </Row>
 
-              <StatefulForm idPrefix={id} values={requestersList}>
-                {({ fields, formPropsFor, getValue, setValue }) => (
-                  <React.Fragment>
-                    <form
-                      id={id}
-                      onSubmit={e => {
-                        e.preventDefault()
-                        updateRequestersOrgs.doUpdate(mutate, fields)
-                      }}
-                    >
-                      {f
-                        .toArray(fields)
-                        .map(
-                          (
+          <StatefulForm idPrefix={id} values={requestersList}>
+            {({ fields, formPropsFor, getValue, setValue }) => (
+              <React.Fragment>
+                <form
+                  id={id}
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    updateRequestersOrgs.doUpdate(mutate, fields)
+                  }}
+                >
+                  {f
+                    .toArray(fields)
+                    .map(
+                      (
+                        {
+                          id,
+                          user,
+                          department,
+                          organization,
+                          toDelete = false
+                        },
+                        n
+                      ) => (
+                        <Row
+                          form
+                          key={id || n}
+                          cls={[
+                            'rounded',
                             {
-                              id,
-                              user,
-                              department,
-                              organization,
-                              toDelete = false
-                            },
-                            n
-                          ) => (
-                            <Row
-                              form
-                              key={id || n}
-                              cls={[
-                                'rounded',
-                                {
-                                  'text-strike bg-danger-light': toDelete,
-                                  // new lines are marked and should show form validation styles
-                                  'was-validated bg-info-light': !id
-                                }
-                              ]}
+                              'text-strike bg-danger-light': toDelete,
+                              // new lines are marked and should show form validation styles
+                              'was-validated bg-info-light': !id
+                            }
+                          ]}
+                        >
+                          <Col sm>
+                            <FormGroup
+                              label={t(
+                                'admin.users.requesters_list_heading_user'
+                              )}
+                              hideLabel
                             >
-                              <Col sm>
-                                <FormGroup
-                                  label={t(
-                                    'admin.users.requesters_list_heading_user'
-                                  )}
-                                  hideLabel
-                                >
-                                  {/* TODO: make and use autocomplete-style version of InlineSearch
+                              {/* TODO: make and use autocomplete-style version of InlineSearch
                           - field will get 'invalid' styles if no user id present
                       */}
-                                  <InputText
-                                    readOnly
-                                    required
-                                    cls="bg-light"
-                                    value={DisplayName(user)}
-                                  />
-                                </FormGroup>
-                              </Col>
-                              <Col sm>
-                                <FormGroup
-                                  label={t(
-                                    'admin.users.requesters_list_heading_department'
-                                  )}
-                                  hideLabel
-                                >
-                                  <InputText
-                                    readOnly={toDelete}
-                                    required
-                                    value={department && department.name}
-                                    onChange={e => {
+                              <InputText
+                                readOnly
+                                required
+                                cls="bg-light"
+                                value={DisplayName(user)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm>
+                            <FormGroup
+                              label={t(
+                                'admin.users.requesters_list_heading_department'
+                              )}
+                              hideLabel
+                            >
+                              <InputText
+                                readOnly={toDelete}
+                                required
+                                value={department && department.name}
+                                onChange={(e) => {
+                                  setValue(
+                                    `${n}.department.name`,
+                                    e.target.value
+                                  )
+                                }}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm>
+                            <FormGroup
+                              label={t(
+                                'admin.users.requesters_list_heading_organization'
+                              )}
+                              hideLabel
+                            >
+                              <InputText
+                                readOnly={toDelete}
+                                required
+                                value={organization && organization.name}
+                                onChange={(e) => {
+                                  setValue(`${n}.organization`, {
+                                    name: e.target.value
+                                  })
+                                }}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm="2">
+                            <FormGroup>
+                              <div className="form-check mt-2">
+                                <label className="form-check-label">
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={toDelete}
+                                    onChange={(e) => {
                                       setValue(
-                                        `${n}.department.name`,
-                                        e.target.value
+                                        `${n}.toDelete`,
+                                        !!e.target.checked
                                       )
                                     }}
                                   />
-                                </FormGroup>
-                              </Col>
-                              <Col sm>
-                                <FormGroup
-                                  label={t(
-                                    'admin.users.requesters_list_heading_organization'
-                                  )}
-                                  hideLabel
-                                >
-                                  <InputText
-                                    readOnly={toDelete}
-                                    required
-                                    value={organization && organization.name}
-                                    onChange={e => {
-                                      setValue(`${n}.organization`, {
-                                        name: e.target.value
-                                      })
-                                    }}
-                                  />
-                                </FormGroup>
-                              </Col>
-                              <Col sm="2">
-                                <FormGroup>
-                                  <div className="form-check mt-2">
-                                    <label className="form-check-label">
-                                      <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        checked={toDelete}
-                                        onChange={e => {
-                                          setValue(
-                                            `${n}.toDelete`,
-                                            !!e.target.checked
-                                          )
-                                        }}
-                                      />
-                                      {t(
-                                        'admin.users.requesters_list_remove_user'
-                                      )}
-                                    </label>
-                                  </div>
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          )
-                        )}
-
-                      <FormGroup
-                        label={t('admin.users.requesters_list_add_user')}
-                        cls="mt-2"
-                      >
-                        <Row form>
-                          <Col>
-                            <UserAutocomplete
-                              onSelect={user =>
-                                // adds a line to the form
-                                setValue(
-                                  `${Object.keys(fields).length}.user`,
-                                  user
-                                )
-                              }
-                            />
+                                  {t('admin.users.requesters_list_remove_user')}
+                                </label>
+                              </div>
+                            </FormGroup>
                           </Col>
-                          <Col>
-                            {/* <FormField label={'department'} hideLabel /> */}
-                          </Col>
-                          <Col>
-                            {/* <FormField label={'organization'} hideLabel /> */}
-                          </Col>
-                          <Col sm="2" />
                         </Row>
-                      </FormGroup>
+                      )
+                    )}
 
-                      <button
-                        type="submit"
-                        className="btn m-1 btn-primary btn-massive"
-                      >
-                        <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
-                      </button>
-                      {/* <button type="button" className="btn m-1 btn-outline-secondary btn-massive">
+                  <FormGroup
+                    label={t('admin.users.requesters_list_add_user')}
+                    cls="mt-2"
+                  >
+                    <Row form>
+                      <Col>
+                        <UserAutocomplete
+                          onSelect={(user) =>
+                            // adds a line to the form
+                            setValue(`${Object.keys(fields).length}.user`, user)
+                          }
+                        />
+                      </Col>
+                      <Col>
+                        {/* <FormField label={'department'} hideLabel /> */}
+                      </Col>
+                      <Col>
+                        {/* <FormField label={'organization'} hideLabel /> */}
+                      </Col>
+                      <Col sm="2" />
+                    </Row>
+                  </FormGroup>
+
+                  <button
+                    type="submit"
+                    className="btn m-1 btn-primary btn-massive"
+                  >
+                    <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
+                  </button>
+                  {/* <button type="button" className="btn m-1 btn-outline-secondary btn-massive">
             {t('form_btn_cancel')}
           </button> */}
-                    </form>
-                    {window.isDebug && (
-                      <pre>{JSON.stringify(fields, 0, 2)}</pre>
-                    )}
-                  </React.Fragment>
-                )}
-              </StatefulForm>
-              {/* bottom spacer for autocomplete: */}
-              <div className="m-5 p-5" />
-            </Div>
-          )
-        }}
-      </Mutation>
-    )}
-  </Routed>
+                </form>
+                {window.isDebug && <pre>{JSON.stringify(fields, 0, 2)}</pre>}
+              </React.Fragment>
+            )}
+          </StatefulForm>
+          {/* bottom spacer for autocomplete: */}
+          <div className="m-5 p-5" />
+        </Div>
+      )
+    }}
+  </Mutation>
 )
