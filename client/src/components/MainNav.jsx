@@ -105,7 +105,7 @@ function MainNav({ me, contactUrl, isDev }) {
 
             {me.roles.isInspector && (
               <NavItem>
-                <Link exact to="/templates/edit" classNam="nav-link">
+                <Link to="/templates/edit" className="nav-link">
                   <Icon.Templates fixedWidth spaced /> Vorlagen
                 </Link>
               </NavItem>
