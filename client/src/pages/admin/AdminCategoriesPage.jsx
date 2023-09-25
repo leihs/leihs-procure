@@ -6,8 +6,7 @@ import {
   NavLink,
   useMatch,
   useNavigate,
-  useParams,
-  useLocation
+  useParams
 } from 'react-router-dom'
 import f from 'lodash'
 
@@ -166,10 +165,8 @@ const updateCategories = {
 // # PAGE
 //
 const AdminCategoriesPage = () => {
-  // const match = useMatch()
-  const location = useLocation()
+  const match = useMatch('/admin/categories/*')
 
-  console.debug(location)
   return (
     <Query query={CATEGORIES_INDEX_QUERY}>
       {({ loading, error, data }) => {
@@ -179,7 +176,7 @@ const AdminCategoriesPage = () => {
         const categoriesToc = data.main_categories
         const sidebar = (
           <>
-            <SideNav categories={categoriesToc} baseUrl={location.pathname} />
+            <SideNav categories={categoriesToc} baseUrl={match.pathnameBase} />
             <hr className="d-xl-none" />
           </>
         )
@@ -197,7 +194,7 @@ const AdminCategoriesPage = () => {
               <TableOfContents
                 withSubcats
                 categories={categoriesToc}
-                baseUrl={location.pathname}
+                baseUrl={match.pathnameBase}
               />
 
               {/* preload rest of content */}
