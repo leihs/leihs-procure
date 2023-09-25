@@ -42,16 +42,6 @@ export const NavbarBrand = ({ tag, to, ...p }) => (
   <BsNavbarBrand href={to} {...p} />
 )
 
-// like ReactRouter.Route but additionally with parsed params
-export const RouteParams = ({ children, ...p }) => (
-  <RouterRoute {...p}>
-    {({ location, ...routerProps }) => {
-      const params = parseQuery(location.search.slice(1))
-      return children({ ...routerProps, location, params })
-    }}
-  </RouterRoute>
-)
-
 // sets HTTP status for server-side render
 export const RoutedStatus = ({ code, children, ...p }) => (
   <RouterRoute {...p}>

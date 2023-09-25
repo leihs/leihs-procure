@@ -19,8 +19,7 @@ import {
   Collapsing,
   FormGroup,
   Select,
-  StatefulForm,
-  RouteParams
+  StatefulForm
 } from '../components/Bootstrap'
 import { MainWithSidebar } from '../components/Layout'
 import Loading from '../components/Loading'
