@@ -1,5 +1,5 @@
 import React, { Fragment as F } from 'react'
-import { Route, Switch, NavLink } from 'react-router-dom'
+import { Route, NavLink } from 'react-router-dom'
 // import cx from 'classnames'
 import f from 'lodash'
 
@@ -21,7 +21,7 @@ import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
-import { Redirect } from '../../components/Router'
+import { Navigate } from '../../components/Router'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
@@ -90,7 +90,7 @@ const PAGES = [
               <F>
                 <form
                   id="mock-form"
-                  onSubmit={e => {
+                  onSubmit={(e) => {
                     e.preventDefault()
                     window.alert(JSON.stringify(fields, 0, 2))
                   }}
@@ -121,7 +121,7 @@ const PAGES = [
               <F>
                 <form
                   id="mock-form"
-                  onSubmit={e => {
+                  onSubmit={(e) => {
                     e.preventDefault()
                     window.alert(JSON.stringify(fields, 0, 2))
                   }}
@@ -177,7 +177,7 @@ const PAGES = [
         title: 'User',
         content: (
           <UserAutocomplete
-            onSelect={o => window.alert(JSON.stringify(o, 0, 2))}
+            onSelect={(o) => window.alert(JSON.stringify(o, 0, 2))}
           />
         )
       },
@@ -185,7 +185,7 @@ const PAGES = [
         title: 'Model',
         content: (
           <ModelAutocomplete
-            onSelect={o => window.alert(JSON.stringify(o, 0, 2))}
+            onSelect={(o) => window.alert(JSON.stringify(o, 0, 2))}
           />
         )
       },
@@ -193,7 +193,7 @@ const PAGES = [
         title: 'Supplier',
         content: (
           <SupplierAutocomplete
-            onSelect={o => window.alert(JSON.stringify(o, 0, 2))}
+            onSelect={(o) => window.alert(JSON.stringify(o, 0, 2))}
           />
         )
       }
@@ -225,7 +225,7 @@ const PAGES = [
               <F>
                 <form
                   id="input-file-upload-mock-form"
-                  onSubmit={e => {
+                  onSubmit={(e) => {
                     e.preventDefault()
                     window.alert(JSON.stringify(fields, 0, 2))
                   }}
@@ -249,7 +249,7 @@ const PAGES = [
               <F>
                 <form
                   id="input-file-upload-mock-form"
-                  onSubmit={e => {
+                  onSubmit={(e) => {
                     e.preventDefault()
                     window.alert(JSON.stringify(fields, 0, 2))
                   }}
@@ -288,7 +288,7 @@ const PAGES = [
                     click to redirect!
                   </button>
                   {!!getValue('redirect') && (
-                    <Redirect
+                    <Navigate
                       push
                       scrollTop
                       to={{
@@ -331,17 +331,15 @@ const UiPlayground = ({ match, location }) => {
         </div>
       )}
 
-      <Switch>
-        <Route
-          path={`${match.url}/:pageId`}
-          render={p => <PageById {...p} baseUrl={baseUrl} />}
-        />
-        <Route
-          exact
-          path={match.url}
-          render={() => 'select a page from the menu'}
-        />
-      </Switch>
+      <Route
+        path={`${match.url}/:pageId`}
+        render={(p) => <PageById {...p} baseUrl={baseUrl} />}
+      />
+      <Route
+        exact
+        path={match.url}
+        render={() => 'select a page from the menu'}
+      />
     </MainWithSidebar>
   )
 }
@@ -352,7 +350,7 @@ export default UiPlayground
 
 const titleOrById = (title, id) => title || String(id).toUpperCase()
 
-const NavItem = p => (
+const NavItem = (p) => (
   <li className="nav-item">
     <NavLink className="nav-link" activeClassName="text-dark" {...p} />
   </li>
@@ -376,7 +374,7 @@ const PageById = ({ match, baseUrl }) => {
   const page = f.find(PAGES, { id: pageId })
   if (!page) {
     return (
-      <Redirect
+      <Navigate
         to={{
           pathname: baseUrl,
           state: { localFlash: `The page ${pageId} doesn't exist!` }

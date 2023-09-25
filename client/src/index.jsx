@@ -5,13 +5,13 @@ import 'react-app-polyfill/ie11'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route, BrowserRouter } from 'react-router-dom'
+import { Switch, Route, BrowserRouter, Navigate } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
 import App from './containers/App'
-import { Redirect } from './components/Router'
+// import { Navigate } from './components/Router'
 import { isDev, supportsHistory } from './env'
 
 // all the pages
@@ -46,8 +46,8 @@ const Root = () => (
     <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
       <App isDev={isDev}>
         <Switch>
-          <Route exact path="/" component={HomePage} />
-          <Route exact path="/requests" component={RequestsIndex} />
+          <Route path="/" element={<HomePage />}></Route>
+          {/* <Route exact path="/requests" component={RequestsIndex} />
           <Route exact path="/requests/new" component={RequestNew} />
           <Route exact path="/requests/:id" component={RequestShow} />
           <Route exact path="/admin/users" component={AdminUsers} />
@@ -59,7 +59,7 @@ const Root = () => (
           <Route path="/templates/edit" component={TemplatesEdit} />
           <Route
             path="/templates**"
-            render={() => <Redirect to="/templates/edit" />}
+            render={() => <Navigate to="/templates/edit" />}
           />
 
           <Route strict path="/dev/playground" component={DevUiCatalog} />
@@ -67,7 +67,7 @@ const Root = () => (
 
           <Route
             component={() => <center className="h1">404 not found</center>}
-          />
+          /> */}
         </Switch>
       </App>
     </BrowserRouter>

@@ -9,6 +9,7 @@ import { Alert } from '../components/Bootstrap'
 import { Routed } from '../components/Router'
 import MainNav from '../components/MainNav'
 import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
+import { useLocation } from 'react-router'
 
 // NOTE: uses fetchPolicy="cache-and-network" to be quick on refreshes
 //       but also make sure the data is correct and connection is possible.
@@ -16,74 +17,69 @@ import { CURRENT_USER_QUERY, UserWithShortcuts } from './CurrentUserProvider'
 //       but not the component because the "AppShell" handles errors differently.
 //
 
-function App({children, isDev}) {
-    return (
-      <Routed>
-        {({ location, dismissFlash }) => {
-          const locationKey = location.key || JSON.stringify(location)
+function App({ children, isDev }) {
+  let location = useLocation()
+  const locationKey = location.key || JSON.stringify(location)
+
+  return (
+    // TODO: set lang to instance default language
+    <div className="ui-app" lang="de">
+      <Query
+        key={locationKey}
+        query={CURRENT_USER_QUERY}
+        fetchPolicy="cache-and-network"
+        notifyOnNetworkStatusChange
+      >
+        {({ error, loading, data, refetch, networkStatus }) => {
+          const currentUser = f.get(data, 'current_user')
+          // refetch *in background* for every navigation,
+          // don't flicker UI by only using `loading`!
+          const isLoading = !currentUser && loading
+
+          if (isLoading) return <Loading />
+
+          if (error) {
+            return (
+              <>
+                <div className="minh-100vh">
+                  <MainNav isDev={isDev} me={false} />
+                  <ErrorHandler
+                    error={error}
+                    data={data}
+                    refetch={(e) => window.location.reload()}
+                  />
+                </div>
+              </>
+            )
+          }
+
+          // XXX hacky getting locale from navbarprops - should be field on user
+          const userLocale = getUserLocale(data)
+          // XXX global variable for lang - should use props or context
+          if (window && userLocale) window.setLang(userLocale)
 
           return (
-            // TODO: set lang to instance default language
-            <div className="ui-app" lang="de">
-              <Query
-                key={locationKey}
-                query={CURRENT_USER_QUERY}
-                fetchPolicy="cache-and-network"
-                notifyOnNetworkStatusChange
-              >
-                {({ error, loading, data, refetch, networkStatus }) => {
-                  const currentUser = f.get(data, 'current_user')
-                  // refetch *in background* for every navigation,
-                  // don't flicker UI by only using `loading`!
-                  const isLoading = !currentUser && loading
-
-                  if (isLoading) return <Loading />
-
-                  if (error) {
-                    return (
-                      <>
-                        <div className="minh-100vh">
-                          <MainNav isDev={isDev} me={false} />
-                          <ErrorHandler
-                            error={error}
-                            data={data}
-                            refetch={e => window.location.reload()}
-                          />
-                        </div>
-                      </>
-                    )
-                  }
-
-                  // XXX hacky getting locale from navbarprops - should be field on user
-                  const userLocale = getUserLocale(data)
-                  // XXX global variable for lang - should use props or context
-                  if (window && userLocale) window.setLang(userLocale)
-
-                  return (
-                    <F>
-                      <div lang={userLocale}>
-                        <MainNav
-                          isDev={isDev}
-                          me={UserWithShortcuts(currentUser)}
-                          contactUrl={f.get(data, 'settings.contact_url')}
-                        />
-                        <div className="minh-100vh">
-                          <FlashAlert
-                            flash={f.get(location, 'state.flash')}
-                            dismiss={dismissFlash}
-                          />
-                          {children}
-                        </div>
-                      </div>
-                    </F>
-                  )
-                }}
-              </Query>
-            </div>
+            <F>
+              <div lang={userLocale}>
+                <MainNav
+                  isDev={isDev}
+                  me={UserWithShortcuts(currentUser)}
+                  contactUrl={f.get(data, 'settings.contact_url')}
+                />
+                <div className="minh-100vh">
+                  {/* <FlashAlert
+                    flash={f.get(location, 'state.flash')}
+                    dismiss={dismissFlash}
+                  /> */}
+                  {children}
+                </div>
+              </div>
+            </F>
           )
         }}
-      </Routed>
-    )
+      </Query>
+    </div>
+  )
 }
 
 export default App
@@ -162,7 +158,7 @@ function getUserLocale(data) {
   return f.try(
     () =>
       JSON.parse(data.current_user.navbarProps).config.locales.filter(
-        l => l.isSelected
+        (l) => l.isSelected
       )[0].locale_name
   )
 }

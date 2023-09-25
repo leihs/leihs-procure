@@ -2,7 +2,7 @@ import React from 'react'
 import f from 'lodash'
 import {
   Route as RRRoute,
-  Redirect as RRRedirect,
+  Navigate as RRNavigate,
   Link
 } from 'react-router-dom'
 import { RouteParams } from './Bootstrap/Navs'
@@ -26,7 +26,7 @@ export const RoutedStatus = ({ code, children, ...p }) => (
 )
 
 // like ReactRouter.Redirect but with extra features
-export const Redirect = ({ scrollTop = true, to, ...props }) => (
+export const Navigate = ({ scrollTop = true, to, ...props }) => (
   <RouteParams>
     {({ location }) => {
       // handle to=path shortcut
@@ -42,7 +42,7 @@ export const Redirect = ({ scrollTop = true, to, ...props }) => (
         setTimeout(() => window.scrollTo(0, 0), 1)
       }
 
-      return <RRRedirect {...props} to={to} />
+      return <RRNavigate {...props} to={to} />
     }}
   </RouteParams>
 )
@@ -52,10 +52,10 @@ export const Routed = ({ children, ...p }) => (
   <RRRoute {...p}>
     {({ location, history, ...routerProps }) => {
       // flash helpers
-      const setFlash = flash => setFlashIn(history, 'flash', flash)
-      const setLocalFlash = flash => setFlashIn(history, 'localFlash', flash)
-      const dismissFlash = flash => dismissFlashIn(history, 'flash')
-      const dismissLocalFlash = flash => dismissFlashIn(history, 'localFlash')
+      const setFlash = (flash) => setFlashIn(history, 'flash', flash)
+      const setLocalFlash = (flash) => setFlashIn(history, 'localFlash', flash)
+      const dismissFlash = (flash) => dismissFlashIn(history, 'flash')
+      const dismissLocalFlash = (flash) => dismissFlashIn(history, 'localFlash')
 
       // parse query params into object
       const params = parseQuery(location.search.slice(1))

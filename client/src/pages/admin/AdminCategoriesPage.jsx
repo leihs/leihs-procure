@@ -1,6 +1,6 @@
 import React, { Fragment as F } from 'react'
 import cx from 'classnames'
-import { Route, Switch, NavLink } from 'react-router-dom'
+import { Route, NavLink } from 'react-router-dom'
 import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
@@ -22,7 +22,7 @@ import {
   InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Redirect, Routed } from '../../components/Router'
+import { Navigate, Routed } from '../../components/Router'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -115,11 +115,11 @@ const updateCategories = {
     }
   },
   doUpdate: (mutate, mainCats) => {
-    const data = mainCats.map(mainCat => {
+    const data = mainCats.map((mainCat) => {
       return {
         ...f.pick(mainCat, ['id', 'name', 'toDelete']),
 
-        new_image_url: f.map(mainCat.new_image_url, o => ({
+        new_image_url: f.map(mainCat.new_image_url, (o) => ({
           ...f.pick(o, 'id', 'typename'),
           to_delete: !!o.toDelete
         })),
@@ -131,8 +131,8 @@ const updateCategories = {
         // })),
 
         categories: f
-          .filter(mainCat.categories, mc => !mc.toDelete)
-          .map(sc => ({
+          .filter(mainCat.categories, (mc) => !mc.toDelete)
+          .map((sc) => ({
             ...f.pick(sc, [
               'id',
               'name',
@@ -141,9 +141,9 @@ const updateCategories = {
               'cost_center'
             ]),
             inspectors: f
-              .filter(sc.inspectors, u => !u.toDelete)
-              .map(i => i.id),
-            viewers: f.filter(sc.viewers, u => !u.toDelete).map(i => i.id)
+              .filter(sc.inspectors, (u) => !u.toDelete)
+              .map((i) => i.id),
+            viewers: f.filter(sc.viewers, (u) => !u.toDelete).map((i) => i.id)
           }))
       }
     })
@@ -174,16 +174,15 @@ const AdminCategoriesPage = ({ match }) => (
 
       return (
         <MainWithSidebar sidebar={sidebar}>
-          <Switch>
-            <Route
-              exact
-              path={`${match.url}/:mainCatId`}
-              render={route => <CategoryPage {...route} />}
-            />
-            {/* fallback/index content: */}
-            <F>
-              {/* NOTE: dont show index for now, only a TOC */}
-              {/* <Route exact path={match.url}>
+          <Route
+            exact
+            path={`${match.url}/:mainCatId`}
+            render={(route) => <CategoryPage {...route} />}
+          />
+          {/* fallback/index content: */}
+          <F>
+            {/* NOTE: dont show index for now, only a TOC */}
+            {/* <Route exact path={match.url}>
                   <Query query={CATEGORIES_QUERY}>
                     {({ loading, error, data }) => {
                       if (loading) return <Loading />
@@ -195,17 +194,16 @@ const AdminCategoriesPage = ({ match }) => (
                     }}
                   </Query>
                 </Route> */}
-              {/*  show toc */}
-              <TableOfContents
-                withSubcats
-                categories={categoriesToc}
-                baseUrl={match.url}
-              />
+            {/*  show toc */}
+            <TableOfContents
+              withSubcats
+              categories={categoriesToc}
+              baseUrl={match.url}
+            />
 
-              {/* preload rest of content */}
-              <Query query={CATEGORIES_QUERY}>{() => false}</Query>
-            </F>
-          </Switch>
+            {/* preload rest of content */}
+            <Query query={CATEGORIES_QUERY}>{() => false}</Query>
+          </F>
         </MainWithSidebar>
       )
     }}
@@ -234,18 +232,18 @@ class CategoryPage extends React.Component {
               const mainCat = isNew
                 ? { name: '', categories: [] }
                 : f.find(data.main_categories, {
-                    id: mainCatId
-                  })
+                  id: mainCatId
+                })
 
               if (!mainCat) {
                 // debugger
-                return <Redirect push to={'/admin/categories'} />
+                return <Navigate push to={'/admin/categories'} />
               }
 
               return (
                 <Mutation
                   {...updateCategories.mutation}
-                  onCompleted={newData => {
+                  onCompleted={(newData) => {
                     this.setState({ formKey: Date.now() })
                     setFlash({ message: updateCategories.successFlash })
                     window.scrollTo(0, 0)
@@ -258,10 +256,10 @@ class CategoryPage extends React.Component {
                       {...mainCat}
                       isNew={isNew}
                       formKey={this.state.formKey}
-                      onSubmit={mainCat =>
+                      onSubmit={(mainCat) =>
                         updateCategories.doUpdate(mutate, [mainCat])
                       }
-                      onDelete={mainCat => {
+                      onDelete={(mainCat) => {
                         // debugger
                         updateCategories.doUpdate(mutate, [
                           { id: mainCat.id, toDelete: true }
@@ -280,7 +278,7 @@ class CategoryPage extends React.Component {
 }
 
 const extendWhere = (id, list, fn) =>
-  list.map(o => (o.id !== id ? o : { ...o, ...fn(o) }))
+  list.map((o) => (o.id !== id ? o : { ...o, ...fn(o) }))
 
 const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
@@ -318,7 +316,7 @@ class CategoryCard extends React.Component {
           const addUser = (fieldKey, cat, user) => {
             setValue(
               'categories',
-              extendWhere(cat.id, fields.categories, c => ({
+              extendWhere(cat.id, fields.categories, (c) => ({
                 [fieldKey]: [...f.get(c, fieldKey), user]
               }))
             )
@@ -326,7 +324,7 @@ class CategoryCard extends React.Component {
           const removeUser = (fieldKey, cat, { id, toDelete = false }) => {
             setValue(
               'categories',
-              extendWhere(cat.id, fields.categories, c => ({
+              extendWhere(cat.id, fields.categories, (c) => ({
                 [fieldKey]: setAsDeleted(!toDelete, id, c[fieldKey])
               }))
             )
@@ -340,7 +338,7 @@ class CategoryCard extends React.Component {
             <F>
               <form
                 className={cx(state.showValidations && 'was-validated')}
-                onSubmit={e => {
+                onSubmit={(e) => {
                   e.preventDefault()
                   onSubmit({ id, ...fields })
                 }}
@@ -452,7 +450,9 @@ class CategoryCard extends React.Component {
                                     type="checkbox"
                                     className="sr-only"
                                     checked={!!cat.toDelete}
-                                    onClick={e => onMarkSubCatForDeletion(cat)}
+                                    onClick={(e) =>
+                                      onMarkSubCatForDeletion(cat)
+                                    }
                                   />
                                 </label>
                               </Tooltipped>
@@ -501,8 +501,8 @@ class CategoryCard extends React.Component {
                                   <ListOfUsers
                                     keyName="inspectors"
                                     users={cat.inspectors}
-                                    onAddUser={u => onAddInspector(cat, u)}
-                                    onRemoveUser={u =>
+                                    onAddUser={(u) => onAddInspector(cat, u)}
+                                    onRemoveUser={(u) =>
                                       onRemoveInspector(cat, u)
                                     }
                                   />
@@ -512,8 +512,8 @@ class CategoryCard extends React.Component {
                                   <ListOfUsers
                                     keyName="viewers"
                                     users={cat.viewers}
-                                    onAddUser={u => onAddViewer(cat, u)}
-                                    onRemoveUser={u => onRemoveViewer(cat, u)}
+                                    onAddUser={(u) => onAddViewer(cat, u)}
+                                    onRemoveUser={(u) => onRemoveViewer(cat, u)}
                                   />
                                 </Col>
                               </F>
@@ -537,7 +537,7 @@ class CategoryCard extends React.Component {
                       <Button
                         color="primary"
                         type="submit"
-                        onClick={e => this.showValidations()}
+                        onClick={(e) => this.showValidations()}
                       >
                         <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                       </Button>{' '}
@@ -557,7 +557,7 @@ class CategoryCard extends React.Component {
                             <Button
                               color="danger"
                               disabled={!props.can_delete}
-                              onClick={e => onDelete({ id })}
+                              onClick={(e) => onDelete({ id })}
                             >
                               <Icon.Trash /> <span>{t('form_btn_delete')}</span>
                             </Button>
@@ -595,7 +595,7 @@ const SideNav = ({ children, categories, baseUrl, withSubcats = false }) => (
 
 const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
   <ul className="nav flex-column">
-    {categories.map(c => (
+    {categories.map((c) => (
       <li key={c.id} className="nav-item">
         <NavLink
           className="nav-link"
@@ -607,7 +607,7 @@ const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
 
         {!!withSubcats && (
           <ul className="list-unstyled text-muted ml-3 pl-3">
-            {c.categories.map(subcat => (
+            {c.categories.map((subcat) => (
               <F key={subcat.id}>
                 <li>{subcat.name}</li>
               </F>

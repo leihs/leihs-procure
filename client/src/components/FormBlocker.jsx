@@ -1,12 +1,12 @@
 import React from 'react'
-import { Prompt } from 'react-router-dom'
+// import { Prompt } from 'react-router-dom'
 import t from '../locale/translate'
 
 export const initialState = { isBlocking: false }
-export const block = comp => {
+export const block = (comp) => {
   comp.setState({ isBlocking: true })
 }
-export const unblock = comp => {
+export const unblock = (comp) => {
   comp.setState({ isBlocking: false })
 }
 
@@ -35,10 +35,11 @@ export class ConfirmFormNav extends React.Component {
   render() {
     const { when } = this.props
     return (
-      <Prompt
-        when={when}
-        message={location => t('ui.form.confirm_navigation_when_editing')}
-      />
+      <></>
+      // <Prompt
+      //   when={when}
+      //   message={location => t('ui.form.confirm_navigation_when_editing')}
+      // />
     )
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 // import f from 'lodash'
-import { Redirect } from '../components/Router'
+import { Navigate } from '../components/Router'
 
-const Homepage = p => <Redirect to="/requests" />
+const Homepage = (p) => <Navigate to="/requests" />
 
 export default Homepage

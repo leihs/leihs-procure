@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import Navbar from './navbar/Navbar'
 import Icon from './Icons'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { Link, NavLink as RouterNavLink } from 'react-router-dom'
 
 import {
