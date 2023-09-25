@@ -1,4 +1,4 @@
-import ApolloClient from 'apollo-boost'
+import { ApolloClient } from '@apollo/client'
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory'
 import { isDev, store } from './env'
 
@@ -12,9 +12,9 @@ export const defaultHeaders = { accept: 'application/json' }
 export const buildAuthHeaders = () =>
   isDev
     ? {
-        'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID'),
-        'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME)
-      }
+      'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID'),
+      'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME)
+    }
     : { 'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME) }
 
 export const fetchOptions = {
@@ -22,7 +22,7 @@ export const fetchOptions = {
 }
 
 const cache = new InMemoryCache({
-  dataIdFromObject: object => {
+  dataIdFromObject: (object) => {
     // NOTE: workaround buggy apollo cache, use `cacheKey` if given,
     //       otherwise fall back to default handling.
     if (object.cacheKey) return `${object.__typename}:^:${object.cacheKey}`
@@ -36,7 +36,7 @@ export const apolloClient = new ApolloClient({
   // static options for fetch requests:
   fetchOptions,
   // dynamic options for fetch requests:
-  request: operation =>
+  request: (operation) =>
     operation.setContext({
       headers: { ...defaultHeaders, ...buildAuthHeaders() }
     })
@@ -44,7 +44,7 @@ export const apolloClient = new ApolloClient({
 
 // util
 
-export const mutationErrorHandler = err => {
+export const mutationErrorHandler = (err) => {
   // not much we can do on backend error
   // eslint-disable-next-line no-console
   console.error(err)
@@ -57,8 +57,8 @@ const getCookieValue = (cookies, name) =>
   (
     (cookies || '')
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s && s.indexOf(name) === 0)[0] || ''
+      .map((s) => s.trim())
+      .filter((s) => s && s.indexOf(name) === 0)[0] || ''
   ).replace(`${name}=`, '')
 
 // DEV FAKE AUTH
@@ -68,7 +68,7 @@ isDev &&
       mfa: '7da6733c-c819-5613-8cad-2a40f51c90da',
       gasser: 'f721d6b7-8275-5ee0-b225-aa7c13781f45'
     }
-    const fakeLogin = nameOrId => {
+    const fakeLogin = (nameOrId) => {
       store.setItem('LEIHS_DEV_FAKE_USER_ID', USER_IDS[nameOrId] || nameOrId)
       window.location.reload()
     }
