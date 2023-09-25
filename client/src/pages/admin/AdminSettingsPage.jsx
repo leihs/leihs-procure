@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 // import cx from 'classnames'
 import f from 'lodash'
 
@@ -12,7 +12,6 @@ import { Button, StatefulForm, FormField } from '../../components/Bootstrap'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import { MainWithSidebar } from '../../components/Layout'
-import { Routed } from '../../components/Router'
 
 // # DATA & ACTIONS
 //
@@ -57,7 +56,7 @@ const updateSettings = {
       ...fields,
       inspection_comments: fields.inspection_comments
         .split('\n')
-        .filter(l => !f.isEmpty(l))
+        .filter((l) => !f.isEmpty(l))
     }
 
     mutate({ variables: { settings } })
@@ -67,59 +66,50 @@ const updateSettings = {
 
 // # PAGE
 //
-class AdminSettingsPage extends React.Component {
-  state = { formKey: Date.now() }
-  render() {
-    return (
-      <Routed>
-        {({ setFlash }) => (
-          <Mutation
-            {...updateSettings.mutation}
-            onCompleted={() => {
-              this.setState({ formKey: Date.now() })
-              setFlash({ message: updateSettings.successFlash })
-              window && window.scrollTo(0, 0)
-            }}
-          >
-            {(mutate, info) => (
-              <Query query={ADMIN_SETTINGS_PAGE_QUERY}>
-                {({ loading, error, data }) => {
-                  if (loading) return <Loading />
-                  if (error) return <ErrorPanel error={error} data={data} />
+function AdminSettingsPage() {
+  const [formKey, setFormKey] = useState(Date.now())
 
-                  const settings = {
-                    contact_url: f.get(data, 'settings.contact_url'),
-                    inspection_comments: f
-                      .get(data, 'settings.inspection_comments')
-                      .join('\n\n')
+  return (
+    <Mutation
+      {...updateSettings.mutation}
+      onCompleted={() => {
+        setFormKey({ formKey: Date.now() })
+        window && window.scrollTo(0, 0)
+      }}
+    >
+      {(mutate, info) => (
+        <Query query={ADMIN_SETTINGS_PAGE_QUERY}>
+          {({ loading, error, data }) => {
+            if (loading) return <Loading />
+            if (error) return <ErrorPanel error={error} data={data} />
+
+            const settings = {
+              contact_url: f.get(data, 'settings.contact_url'),
+              inspection_comments: f
+                .get(data, 'settings.inspection_comments')
+                .join('\n\n')
+            }
+
+            return (
+              <MainWithSidebar>
+                <h1 className="h2">Einstellungen</h1>
+                <SettingsTable
+                  settings={settings}
+                  updateAction={(fields) =>
+                    updateSettings.doUpdate(mutate, fields)
                   }
-
-                  return (
-                    <MainWithSidebar>
-                      <h1 className="h2">Einstellungen</h1>
-                      <SettingsTable
-                        settings={settings}
-                        updateAction={fields =>
-                          updateSettings.doUpdate(mutate, fields)
-                        }
-                        key={this.state.formKey}
-                      />
-                    </MainWithSidebar>
-                  )
-                }}
-              </Query>
-            )}
-          </Mutation>
-        )}
-      </Routed>
-    )
-  }
+                  key={formKey}
+                />
+              </MainWithSidebar>
+            )
+          }}
+        </Query>
+      )}
+    </Mutation>
+  )
 }
 
 export default AdminSettingsPage
-
-// # VIEW PARTIALS
-//
 
 const SettingsTable = ({ settings, updateAction }) => (
   <StatefulForm idPrefix="settings" values={settings}>
