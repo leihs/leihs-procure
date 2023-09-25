@@ -51,7 +51,7 @@ const Root = () => (
           <Route path="/requests/new" element={<RequestNew />} />
           <Route path="/requests/:id" element={<RequestShow />} />
           <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/categories/*" element={<AdminCategories />} />
           <Route path="/admin/organizations" element={<AdminOrgs />} />
           <Route
             path="/admin/budget-periods"

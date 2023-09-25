@@ -2,10 +2,12 @@ import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
 import {
   Route,
+  Routes,
   NavLink,
   useMatch,
   useNavigate,
-  useParams
+  useParams,
+  useLocation
 } from 'react-router-dom'
 import f from 'lodash'
 
@@ -121,11 +123,11 @@ const updateCategories = {
     }
   },
   doUpdate: (mutate, mainCats) => {
-    const data = mainCats.map((mainCat) => {
+    const data = mainCats.map(mainCat => {
       return {
         ...f.pick(mainCat, ['id', 'name', 'toDelete']),
 
-        new_image_url: f.map(mainCat.new_image_url, (o) => ({
+        new_image_url: f.map(mainCat.new_image_url, o => ({
           ...f.pick(o, 'id', 'typename'),
           to_delete: !!o.toDelete
         })),
@@ -137,8 +139,8 @@ const updateCategories = {
         // })),
 
         categories: f
-          .filter(mainCat.categories, (mc) => !mc.toDelete)
-          .map((sc) => ({
+          .filter(mainCat.categories, mc => !mc.toDelete)
+          .map(sc => ({
             ...f.pick(sc, [
               'id',
               'name',
@@ -147,9 +149,9 @@ const updateCategories = {
               'cost_center'
             ]),
             inspectors: f
-              .filter(sc.inspectors, (u) => !u.toDelete)
-              .map((i) => i.id),
-            viewers: f.filter(sc.viewers, (u) => !u.toDelete).map((i) => i.id)
+              .filter(sc.inspectors, u => !u.toDelete)
+              .map(i => i.id),
+            viewers: f.filter(sc.viewers, u => !u.toDelete).map(i => i.id)
           }))
       }
     })
@@ -164,8 +166,10 @@ const updateCategories = {
 // # PAGE
 //
 const AdminCategoriesPage = () => {
-  const match = useMatch()
+  // const match = useMatch()
+  const location = useLocation()
 
+  console.debug(location)
   return (
     <Query query={CATEGORIES_INDEX_QUERY}>
       {({ loading, error, data }) => {
@@ -175,23 +179,25 @@ const AdminCategoriesPage = () => {
         const categoriesToc = data.main_categories
         const sidebar = (
           <>
-            <SideNav categories={categoriesToc} baseUrl={match.url} />
+            <SideNav categories={categoriesToc} baseUrl={location.pathname} />
             <hr className="d-xl-none" />
           </>
         )
 
         return (
           <MainWithSidebar sidebar={sidebar}>
-            <Route
-              path={`${match.url}/:mainCatId`}
-              element={<CategoryPage />}
-              render={(route) => <CategoryPage {...route} />}
-            />
+            <Routes>
+              <Route
+                path=":mainCatId"
+                element={<CategoryPage />}
+                render={route => <CategoryPage {...route} />}
+              />
+            </Routes>
             <>
               <TableOfContents
                 withSubcats
                 categories={categoriesToc}
-                baseUrl={match.url}
+                baseUrl={location.pathname}
               />
 
               {/* preload rest of content */}
@@ -237,7 +243,7 @@ function CategoryPage(props) {
         return (
           <Mutation
             {...updateCategories.mutation}
-            onCompleted={(newData) => {
+            onCompleted={newData => {
               setFormKey({ formKey: Date.now() })
               window.scrollTo(0, 0)
               // FIXME: redirect to new ID if created
@@ -249,10 +255,10 @@ function CategoryPage(props) {
                 {...mainCat}
                 isNew={isNew}
                 formKey={formKey}
-                onSubmit={(mainCat) =>
+                onSubmit={mainCat =>
                   updateCategories.doUpdate(mutate, [mainCat])
                 }
-                onDelete={(mainCat) => {
+                onDelete={mainCat => {
                   // debugger
                   updateCategories.doUpdate(mutate, [
                     { id: mainCat.id, toDelete: true }
@@ -268,7 +274,7 @@ function CategoryPage(props) {
 }
 
 const extendWhere = (id, list, fn) =>
-  list.map((o) => (o.id !== id ? o : { ...o, ...fn(o) }))
+  list.map(o => (o.id !== id ? o : { ...o, ...fn(o) }))
 
 const setAsDeleted = (toDelete, id, list) =>
   extendWhere(id, list, () => ({ toDelete }))
@@ -306,7 +312,7 @@ class CategoryCard extends React.Component {
           const addUser = (fieldKey, cat, user) => {
             setValue(
               'categories',
-              extendWhere(cat.id, fields.categories, (c) => ({
+              extendWhere(cat.id, fields.categories, c => ({
                 [fieldKey]: [...f.get(c, fieldKey), user]
               }))
             )
@@ -314,7 +320,7 @@ class CategoryCard extends React.Component {
           const removeUser = (fieldKey, cat, { id, toDelete = false }) => {
             setValue(
               'categories',
-              extendWhere(cat.id, fields.categories, (c) => ({
+              extendWhere(cat.id, fields.categories, c => ({
                 [fieldKey]: setAsDeleted(!toDelete, id, c[fieldKey])
               }))
             )
@@ -328,7 +334,7 @@ class CategoryCard extends React.Component {
             <F>
               <form
                 className={cx(state.showValidations && 'was-validated')}
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault()
                   onSubmit({ id, ...fields })
                 }}
@@ -440,9 +446,7 @@ class CategoryCard extends React.Component {
                                     type="checkbox"
                                     className="sr-only"
                                     checked={!!cat.toDelete}
-                                    onClick={(e) =>
-                                      onMarkSubCatForDeletion(cat)
-                                    }
+                                    onClick={e => onMarkSubCatForDeletion(cat)}
                                   />
                                 </label>
                               </Tooltipped>
@@ -491,8 +495,8 @@ class CategoryCard extends React.Component {
                                   <ListOfUsers
                                     keyName="inspectors"
                                     users={cat.inspectors}
-                                    onAddUser={(u) => onAddInspector(cat, u)}
-                                    onRemoveUser={(u) =>
+                                    onAddUser={u => onAddInspector(cat, u)}
+                                    onRemoveUser={u =>
                                       onRemoveInspector(cat, u)
                                     }
                                   />
@@ -502,8 +506,8 @@ class CategoryCard extends React.Component {
                                   <ListOfUsers
                                     keyName="viewers"
                                     users={cat.viewers}
-                                    onAddUser={(u) => onAddViewer(cat, u)}
-                                    onRemoveUser={(u) => onRemoveViewer(cat, u)}
+                                    onAddUser={u => onAddViewer(cat, u)}
+                                    onRemoveUser={u => onRemoveViewer(cat, u)}
                                   />
                                 </Col>
                               </F>
@@ -527,7 +531,7 @@ class CategoryCard extends React.Component {
                       <Button
                         color="primary"
                         type="submit"
-                        onClick={(e) => this.showValidations()}
+                        onClick={e => this.showValidations()}
                       >
                         <Icon.Checkmark /> <span>{t('form_btn_save')}</span>
                       </Button>{' '}
@@ -547,7 +551,7 @@ class CategoryCard extends React.Component {
                             <Button
                               color="danger"
                               disabled={!props.can_delete}
-                              onClick={(e) => onDelete({ id })}
+                              onClick={e => onDelete({ id })}
                             >
                               <Icon.Trash /> <span>{t('form_btn_delete')}</span>
                             </Button>
@@ -585,11 +589,12 @@ const SideNav = ({ children, categories, baseUrl, withSubcats = false }) => (
 
 const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
   <ul className="nav flex-column">
-    {categories.map((c) => (
+    {categories.map(c => (
       <li key={c.id} className="nav-item">
         <NavLink
-          className="nav-link"
-          activeClassName="disabled text-dark"
+          className={cx('nav-link', ({ isActive }) =>
+            isActive ? 'disabled text-dark' : ''
+          )}
           to={`${baseUrl}/${f.dehyphenUUID(c.id)}`}
         >
           {c.name}
@@ -597,7 +602,7 @@ const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
 
         {!!withSubcats && (
           <ul className="list-unstyled text-muted ml-3 pl-3">
-            {c.categories.map((subcat) => (
+            {c.categories.map(subcat => (
               <F key={subcat.id}>
                 <li>{subcat.name}</li>
               </F>
@@ -609,8 +614,9 @@ const TableOfContents = ({ categories, baseUrl, withSubcats = false }) => (
     <li className="nav-item">
       <NavLink
         to={`${baseUrl}/new`}
-        className="nav-link"
-        activeClassName="disabled text-dark"
+        className={cx('nav-link', ({ isActive }) =>
+          isActive ? 'disabled text-dark' : ''
+        )}
       >
         <Icon.PlusCircle color="success" size="2x" />
         <span className="sr-only">Neue Hauptkategorie hinzufügen</span>
