@@ -22,7 +22,7 @@ import {
   InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Redirect } from '../../components/Router'
+import { Redirect } from 'react-router-dom'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'

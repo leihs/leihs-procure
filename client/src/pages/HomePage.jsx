@@ -1,6 +1,5 @@
 import React from 'react'
-// import f from 'lodash'
-import { Redirect } from '../components/Router'
+import { Redirect } from 'react-router-dom'
 
 const Homepage = (p) => <Redirect to="/requests" />
 

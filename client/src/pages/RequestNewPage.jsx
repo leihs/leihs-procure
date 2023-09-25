@@ -9,7 +9,7 @@ import { useLocation, useHistory, useParams } from 'react-router-dom'
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
-import { Redirect } from '../components/Router'
+import { Redirect } from 'react-router-dom'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -398,7 +398,6 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                 return (
                   <Redirect
                     push // dont replace current route!
-                    scrollTop
                     to={{
                       pathname: `/requests/${mutReq.data.create_request.id}`,
                       state: {

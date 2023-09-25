@@ -21,7 +21,7 @@ import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
-import { Redirect } from '../../components/Router'
+import { Redirect } from 'react-router-dom'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
@@ -290,15 +290,8 @@ const PAGES = [
                   {!!getValue('redirect') && (
                     <Redirect
                       push
-                      scrollTop
                       to={{
                         pathname: '/',
-                        state: {
-                          flash: {
-                            level: 'success',
-                            message: 'Should have scrolled to top!'
-                          }
-                        }
                       }}
                     />
                   )}
@@ -377,7 +370,6 @@ const PageById = ({ match, baseUrl }) => {
       <Redirect
         to={{
           pathname: baseUrl,
-          state: { localFlash: `The page ${pageId} doesn't exist!` }
         }}
       />
     )
