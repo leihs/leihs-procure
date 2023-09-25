@@ -1,6 +1,6 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
-import { Route, NavLink } from 'react-router-dom'
+import { Route, NavLink, useHistory } from 'react-router-dom'
 import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
@@ -215,66 +215,62 @@ export default AdminCategoriesPage
 // # VIEW PARTIALS
 //
 
-class CategoryPage extends React.Component {
-  state = { formKey: 1 }
-  render({ match } = this.props) {
-    return (
-      <Routed>
-        {({ location, history, setFlash }) => (
-          <Query query={CATEGORIES_QUERY}>
-            {({ loading, error, data, refetch }) => {
-              if (loading) return <Loading />
-              if (error) return <ErrorPanel error={error} data={data} />
+function CategoryPage(props) {
+  const [formKey, setFormKey] = useState(Date.now())
+  const history = useHistory()
+  const { match } = props
 
-              const mainCatId = f.enhyphenUUID(match.params.mainCatId)
-              const isNew = mainCatId === 'new'
+  return (
+    <Query query={CATEGORIES_QUERY}>
+      {({ loading, error, data, refetch }) => {
+        if (loading) return <Loading />
+        if (error) return <ErrorPanel error={error} data={data} />
 
-              const mainCat = isNew
-                ? { name: '', categories: [] }
-                : f.find(data.main_categories, {
-                  id: mainCatId
-                })
+        const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+        const isNew = mainCatId === 'new'
 
-              if (!mainCat) {
-                // debugger
-                return <Redirect push to={'/admin/categories'} />
-              }
+        const mainCat = isNew
+          ? { name: '', categories: [] }
+          : f.find(data.main_categories, {
+            id: mainCatId
+          })
 
-              return (
-                <Mutation
-                  {...updateCategories.mutation}
-                  onCompleted={(newData) => {
-                    this.setState({ formKey: Date.now() })
-                    setFlash({ message: updateCategories.successFlash })
-                    window.scrollTo(0, 0)
-                    // FIXME: redirect to new ID if created
-                    if (isNew) history.push(`/admin/categories`)
-                  }}
-                >
-                  {(mutate, info) => (
-                    <CategoryCard
-                      {...mainCat}
-                      isNew={isNew}
-                      formKey={this.state.formKey}
-                      onSubmit={(mainCat) =>
-                        updateCategories.doUpdate(mutate, [mainCat])
-                      }
-                      onDelete={(mainCat) => {
-                        // debugger
-                        updateCategories.doUpdate(mutate, [
-                          { id: mainCat.id, toDelete: true }
-                        ])
-                      }}
-                    />
-                  )}
-                </Mutation>
-              )
+        if (!mainCat) {
+          // debugger
+          return <Redirect push to={'/admin/categories'} />
+        }
+
+        return (
+          <Mutation
+            {...updateCategories.mutation}
+            onCompleted={(newData) => {
+              setFormKey({ formKey: Date.now() })
+              window.scrollTo(0, 0)
+              // FIXME: redirect to new ID if created
+              if (isNew) history.push(`/admin/categories`)
             }}
-          </Query>
-        )}
-      </Routed>
-    )
-  }
+          >
+            {(mutate, info) => (
+              <CategoryCard
+                {...mainCat}
+                isNew={isNew}
+                formKey={formKey}
+                onSubmit={(mainCat) =>
+                  updateCategories.doUpdate(mutate, [mainCat])
+                }
+                onDelete={(mainCat) => {
+                  // debugger
+                  updateCategories.doUpdate(mutate, [
+                    { id: mainCat.id, toDelete: true }
+                  ])
+                }}
+              />
+            )}
+          </Mutation>
+        )
+      }}
+    </Query>
+  )
 }
 
 const extendWhere = (id, list, fn) =>

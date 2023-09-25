@@ -1,4 +1,4 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -69,8 +69,10 @@ const updateBudgetPeriods = {
   },
   doUpdate: (mutate, fields) => {
     const data = fields
-      .filter(i => !i.toDelete && !f.isEmpty(i.name))
-      .map(i => f.pick(i, ['id', 'name', 'inspection_start_date', 'end_date']))
+      .filter((i) => !i.toDelete && !f.isEmpty(i.name))
+      .map((i) =>
+        f.pick(i, ['id', 'name', 'inspection_start_date', 'end_date'])
+      )
 
     mutate({
       variables: { budgetPeriods: data }
@@ -81,48 +83,42 @@ const updateBudgetPeriods = {
 
 // # PAGE
 //
-class AdminBudgetPeriodsPage extends React.Component {
-  state = { formKey: Date.now() }
-  render() {
-    return (
-      <Routed>
-        {({ setFlash }) => (
-          <Mutation
-            {...updateBudgetPeriods.mutation}
-            onCompleted={() => {
-              this.setState({ formKey: Date.now() })
-              setFlash({ message: updateBudgetPeriods.successFlash })
-              window && window.scrollTo(0, 0)
-            }}
-          >
-            {(mutate, info) => (
-              <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
-                {({ loading, error, data }) => {
-                  if (loading) return <Loading />
-                  if (error) return <ErrorPanel error={error} data={data} />
+function AdminBudgetPeriodsPage() {
+  const [formKey, setFormKey] = useState(Date.now())
 
-                  const budgetPeriods = [...data.budget_periods].reverse()
+  return (
+    <Mutation
+      {...updateBudgetPeriods.mutation}
+      onCompleted={() => {
+        setFormKey({ formKey: Date.now() })
+        window && window.scrollTo(0, 0)
+      }}
+    >
+      {(mutate, info) => (
+        <Query query={ADMIN_BUDGET_PERIODS_PAGE_QUERY} errorPolicy="all">
+          {({ loading, error, data }) => {
+            if (loading) return <Loading />
+            if (error) return <ErrorPanel error={error} data={data} />
 
-                  return (
-                    <MainWithSidebar>
-                      <h1 className="h2">Budgetperioden</h1>
-                      <BudgetPeriodsTable
-                        budgetPeriods={budgetPeriods}
-                        updateAction={fields => {
-                          updateBudgetPeriods.doUpdate(mutate, fields)
-                        }}
-                        key={this.state.formKey}
-                      />
-                    </MainWithSidebar>
-                  )
-                }}
-              </Query>
-            )}
-          </Mutation>
-        )}
-      </Routed>
-    )
-  }
+            const budgetPeriods = [...data.budget_periods].reverse()
+
+            return (
+              <MainWithSidebar>
+                <h1 className="h2">Budgetperioden</h1>
+                <BudgetPeriodsTable
+                  budgetPeriods={budgetPeriods}
+                  updateAction={(fields) => {
+                    updateBudgetPeriods.doUpdate(mutate, fields)
+                  }}
+                  key={formKey}
+                />
+              </MainWithSidebar>
+            )
+          }}
+        </Query>
+      )}
+    </Mutation>
+  )
 }
 
 export default AdminBudgetPeriodsPage
@@ -238,7 +234,7 @@ const BudgetPeriodsTable = ({ budgetPeriods, updateAction }) => {
                                   className="form-check-input"
                                   type="checkbox"
                                   checked={toDelete}
-                                  onChange={e => {
+                                  onChange={(e) => {
                                     setValue(
                                       `${n}.toDelete`,
                                       !!e.target.checked
