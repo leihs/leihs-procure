@@ -5,7 +5,7 @@ import 'react-app-polyfill/ie11'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
-import { Switch, Route, BrowserRouter, Navigate } from 'react-router-dom'
+import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
 import lodashMixins from './lodash-mixins'
@@ -45,32 +45,32 @@ const Root = () => (
   <ApolloProvider client={apolloClient}>
     <BrowserRouter basename={baseName} forceRefresh={!supportsHistory}>
       <App isDev={isDev}>
-        <Switch>
-          <Route exact path="/">
-            <HomePage />
-          </Route>
-          <Route exact path="/requests" component={RequestsIndex} />
-          <Route exact path="/requests/new" component={RequestNew} />
-          <Route exact path="/requests/:id" component={RequestShow} />
-          <Route exact path="/admin/users" component={AdminUsers} />
-          <Route path="/admin/categories" component={AdminCategories} />
-          <Route path="/admin/organizations" component={AdminOrgs} />
-          <Route path="/admin/budget-periods" component={AdminBudgetPeriods} />
-          <Route path="/admin/settings" component={AdminSettings} />
-
-          <Route path="/templates/edit" component={TemplatesEdit} />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/requests" element={<RequestsIndex />} />
+          <Route path="/requests/new" element={<RequestNew />} />
+          <Route path="/requests/:id" element={<RequestShow />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/organizations" element={<AdminOrgs />} />
           <Route
-            path="/templates**"
-            render={() => <Navigate to="/templates/edit" />}
+            path="/admin/budget-periods"
+            element={<AdminBudgetPeriods />}
           />
-
-          <Route strict path="/dev/playground" component={DevUiCatalog} />
-          <Route strict path="/dev/console" component={DevConsole} />
-
-          <Route
-            component={() => <center className="h1">404 not found</center>}
-          />
-        </Switch>
+          <Route path="/admin/settings" element={<AdminSettings />} />
+          {/* <Route path="/templates/edit" component={TemplatesEdit} /> */}
+          {/* <Route */}
+          {/*   path="/templates**" */}
+          {/*   render={() => <Navigate to="/templates/edit" />} */}
+          {/* /> */}
+          {/**/}
+          {/* <Route strict path="/dev/playground" component={DevUiCatalog} /> */}
+          {/* <Route strict path="/dev/console" component={DevConsole} /> */}
+          {/**/}
+          {/* <Route */}
+          {/*   component={() => <center className="h1">404 not found</center>} */}
+          {/* /> */}
+        </Routes>
       </App>
     </BrowserRouter>
   </ApolloProvider>

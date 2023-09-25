@@ -1,6 +1,12 @@
 import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
-import { Route, NavLink, useNavigate } from 'react-router-dom'
+import {
+  Route,
+  NavLink,
+  useMatch,
+  useNavigate,
+  useParams
+} from 'react-router-dom'
 import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
@@ -157,58 +163,46 @@ const updateCategories = {
 
 // # PAGE
 //
-const AdminCategoriesPage = ({ match }) => (
-  <Query query={CATEGORIES_INDEX_QUERY}>
-    {({ loading, error, data }) => {
-      if (loading) return <Loading />
-      if (error) return <ErrorPanel error={error} data={data} />
+const AdminCategoriesPage = () => {
+  const match = useMatch()
 
-      const categoriesToc = data.main_categories
-      const sidebar = (
-        <F>
-          <SideNav categories={categoriesToc} baseUrl={match.url} />
+  return (
+    <Query query={CATEGORIES_INDEX_QUERY}>
+      {({ loading, error, data }) => {
+        if (loading) return <Loading />
+        if (error) return <ErrorPanel error={error} data={data} />
 
-          <hr className="d-xl-none" />
-        </F>
-      )
+        const categoriesToc = data.main_categories
+        const sidebar = (
+          <>
+            <SideNav categories={categoriesToc} baseUrl={match.url} />
+            <hr className="d-xl-none" />
+          </>
+        )
 
-      return (
-        <MainWithSidebar sidebar={sidebar}>
-          <Route
-            exact
-            path={`${match.url}/:mainCatId`}
-            render={(route) => <CategoryPage {...route} />}
-          />
-          {/* fallback/index content: */}
-          <F>
-            {/* NOTE: dont show index for now, only a TOC */}
-            {/* <Route exact path={match.url}>
-                  <Query query={CATEGORIES_QUERY}>
-                    {({ loading, error, data }) => {
-                      if (loading) return <Loading />
-                      if (error) return <ErrorPanel error={error} data={data} />
-
-                      return data.main_categories.map(c => (
-                        <CategoryCard key={c.id} {...c} />
-                      ))
-                    }}
-                  </Query>
-                </Route> */}
-            {/*  show toc */}
-            <TableOfContents
-              withSubcats
-              categories={categoriesToc}
-              baseUrl={match.url}
+        return (
+          <MainWithSidebar sidebar={sidebar}>
+            <Route
+              path={`${match.url}/:mainCatId`}
+              element={<CategoryPage />}
+              render={(route) => <CategoryPage {...route} />}
             />
+            <>
+              <TableOfContents
+                withSubcats
+                categories={categoriesToc}
+                baseUrl={match.url}
+              />
 
-            {/* preload rest of content */}
-            <Query query={CATEGORIES_QUERY}>{() => false}</Query>
-          </F>
-        </MainWithSidebar>
-      )
-    }}
-  </Query>
-)
+              {/* preload rest of content */}
+              <Query query={CATEGORIES_QUERY}>{() => false}</Query>
+            </>
+          </MainWithSidebar>
+        )
+      }}
+    </Query>
+  )
+}
 
 export default AdminCategoriesPage
 
@@ -218,7 +212,7 @@ export default AdminCategoriesPage
 function CategoryPage(props) {
   const [formKey, setFormKey] = useState(Date.now())
   const navigate = useNavigate()
-  const { match } = props
+  const params = useParams()
 
   return (
     <Query query={CATEGORIES_QUERY}>
@@ -226,7 +220,7 @@ function CategoryPage(props) {
         if (loading) return <Loading />
         if (error) return <ErrorPanel error={error} data={data} />
 
-        const mainCatId = f.enhyphenUUID(match.params.mainCatId)
+        const mainCatId = f.enhyphenUUID(params.mainCatId)
         const isNew = mainCatId === 'new'
 
         const mainCat = isNew
