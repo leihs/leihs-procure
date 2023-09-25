@@ -58,18 +58,18 @@ const Root = () => (
             element={<AdminBudgetPeriods />}
           />
           <Route path="/admin/settings" element={<AdminSettings />} />
-          {/* <Route path="/templates/edit" component={TemplatesEdit} /> */}
-          {/* <Route */}
-          {/*   path="/templates**" */}
-          {/*   render={() => <Navigate to="/templates/edit" />} */}
-          {/* /> */}
-          {/**/}
-          {/* <Route strict path="/dev/playground" component={DevUiCatalog} /> */}
-          {/* <Route strict path="/dev/console" component={DevConsole} /> */}
-          {/**/}
-          {/* <Route */}
-          {/*   component={() => <center className="h1">404 not found</center>} */}
-          {/* /> */}
+          <Route path="/templates/edit" element={<TemplatesEdit />} />
+          <Route
+            path="/templates*/*"
+            render={() => <Navigate to="/templates/edit" />}
+          />
+
+          <Route strict path="/dev/playground" element={<DevUiCatalog />} />
+          <Route strict path="/dev/console" element={<DevConsole />} />
+
+          <Route
+            element={() => <center className="h1">404 not found</center>}
+          />
         </Routes>
       </App>
     </BrowserRouter>

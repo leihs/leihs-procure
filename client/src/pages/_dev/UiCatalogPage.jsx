@@ -1,6 +1,6 @@
 import React, { Fragment as F } from 'react'
-import { Route, NavLink } from 'react-router-dom'
-// import cx from 'classnames'
+import { Route, Routes, NavLink, useMatch, useLocation } from 'react-router-dom'
+import cx from 'classnames'
 import f from 'lodash'
 
 // import t from '../locale/translate'
@@ -291,7 +291,7 @@ const PAGES = [
                     <Navigate
                       push
                       to={{
-                        pathname: '/',
+                        pathname: '/'
                       }}
                     />
                   )}
@@ -307,32 +307,25 @@ const PAGES = [
 
 // # PAGE
 //
-const UiPlayground = ({ match, location }) => {
-  const baseUrl = match.url
-  const flashMsg = f.get(location, 'state.localFlash')
+const UiPlayground = () => {
+  const match = useMatch('dev/playground/*')
+  const baseUrl = match.pathnameBase
+
   const sidebar = (
-    <F>
+    <>
       <TableofContents baseUrl={baseUrl} />
       <hr className="d-xl-none" />
-    </F>
+    </>
   )
   return (
     <MainWithSidebar sidebar={sidebar}>
-      {!!flashMsg && (
-        <div className="alert alert-warning" role="alert">
-          {flashMsg}
-        </div>
-      )}
-
-      <Route
-        path={`${match.url}/:pageId`}
-        render={(p) => <PageById {...p} baseUrl={baseUrl} />}
-      />
-      <Route
-        exact
-        path={match.url}
-        render={() => 'select a page from the menu'}
-      />
+      <Routes>
+        <Route
+          path=":pageId"
+          render={(p) => <PageById {...p} baseUrl={baseUrl} />}
+        />
+        <Route path={match.url} render={() => 'select a page from the menu'} />
+      </Routes>
     </MainWithSidebar>
   )
 }
@@ -340,12 +333,16 @@ const UiPlayground = ({ match, location }) => {
 export default UiPlayground
 
 // # PARTIALS
-
 const titleOrById = (title, id) => title || String(id).toUpperCase()
 
 const NavItem = (p) => (
   <li className="nav-item">
-    <NavLink className="nav-link" activeClassName="text-dark" {...p} />
+    <NavLink
+      className={cx('nav-link', ({ isActive }) =>
+        isActive ? 'text-dark' : ''
+      )}
+      {...p}
+    />
   </li>
 )
 
@@ -369,7 +366,7 @@ const PageById = ({ match, baseUrl }) => {
     return (
       <Navigate
         to={{
-          pathname: baseUrl,
+          pathname: baseUrl
         }}
       />
     )
