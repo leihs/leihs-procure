@@ -1,6 +1,6 @@
 import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
-import { Route, NavLink, useHistory } from 'react-router-dom'
+import { Route, NavLink, useNavigate } from 'react-router-dom'
 import f from 'lodash'
 
 import { Query, Mutation } from 'react-apollo'
@@ -22,7 +22,7 @@ import {
   InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -217,7 +217,7 @@ export default AdminCategoriesPage
 
 function CategoryPage(props) {
   const [formKey, setFormKey] = useState(Date.now())
-  const history = useHistory()
+  const navigate = useNavigate()
   const { match } = props
 
   return (
@@ -237,7 +237,7 @@ function CategoryPage(props) {
 
         if (!mainCat) {
           // debugger
-          return <Redirect push to={'/admin/categories'} />
+          return <Navigate push to={'/admin/categories'} />
         }
 
         return (
@@ -247,7 +247,7 @@ function CategoryPage(props) {
               setFormKey({ formKey: Date.now() })
               window.scrollTo(0, 0)
               // FIXME: redirect to new ID if created
-              if (isNew) history.push(`/admin/categories`)
+              if (isNew) navigate.push(`/admin/categories`)
             }}
           >
             {(mutate, info) => (

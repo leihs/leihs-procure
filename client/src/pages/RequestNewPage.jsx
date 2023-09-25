@@ -4,12 +4,12 @@ import cx from 'classnames'
 import { Query, Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import qs from 'qs'
-import { useLocation, useHistory, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -125,7 +125,7 @@ const updateQueryParams = ({ fields, params, location }) => {
 const RequestNewPage = () => {
   const params = useParams()
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <CurrentUser>
@@ -148,7 +148,7 @@ const RequestNewPage = () => {
                   data={data}
                   selection={readFromQueryParams(params)}
                   onChange={(fields) => {
-                    history.replace(
+                    navigate.replace(
                       updateQueryParams({ params, location, fields })
                     )
                   }}
@@ -395,7 +395,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
 
               if (mutReq.called) {
                 return (
-                  <Redirect
+                  <Navigate
                     push // dont replace current route!
                     to={{
                       pathname: `/requests/${mutReq.data.create_request.id}`,

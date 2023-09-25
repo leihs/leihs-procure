@@ -1,6 +1,6 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
-const Homepage = () => <Redirect to="/requests" />
+const Homepage = () => <Navigate to="/requests" />
 
 export default Homepage

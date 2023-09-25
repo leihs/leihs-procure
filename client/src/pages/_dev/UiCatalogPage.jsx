@@ -21,7 +21,7 @@ import Loading from '../../components/Loading'
 import UserAutocomplete from '../../components/UserAutocomplete'
 import SupplierAutocomplete from '../../components/SupplierAutocomplete'
 import ModelAutocomplete from '../../components/ModelAutocomplete'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 import { examples as BootstrapExamples } from '../../components/Bootstrap/Bootstrap.examples'
 import { examples as MultiSelectExamples } from '../../components/Bootstrap/MultiSelect.examples'
@@ -268,7 +268,7 @@ const PAGES = [
   },
   {
     id: 'redirect-and-scroll-to-top',
-    title: 'Redirect And Scroll To Top',
+    title: 'Navigate And Scroll To Top',
     content: (
       <Let btnId={'button-way-down-on-page'}>
         {({ btnId }) => (
@@ -288,7 +288,7 @@ const PAGES = [
                     click to redirect!
                   </button>
                   {!!getValue('redirect') && (
-                    <Redirect
+                    <Navigate
                       push
                       to={{
                         pathname: '/',
@@ -367,7 +367,7 @@ const PageById = ({ match, baseUrl }) => {
   const page = f.find(PAGES, { id: pageId })
   if (!page) {
     return (
-      <Redirect
+      <Navigate
         to={{
           pathname: baseUrl,
         }}
