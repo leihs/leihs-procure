@@ -81,8 +81,6 @@ const container = document.getElementById('app')
 const root = createRoot(container) // createRoot(container!) if you use TypeScript
 root.render(<Root />)
 
-// ReactDOM.render(<Root />, document.getElementById('root'))
-
 //
 function initDevHelpers() {
   window.f = f

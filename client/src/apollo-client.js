@@ -12,7 +12,6 @@ export const endpointURL = '/procure/graphql'
 export const defaultHeaders = { accept: 'application/json' }
 
 export const buildAuthHeaders = () => {
-  console.debug('building headers')
   return isDev
     ? {
       'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID'),

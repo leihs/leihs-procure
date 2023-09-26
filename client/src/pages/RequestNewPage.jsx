@@ -116,6 +116,8 @@ const updateQueryParams = ({ fields, params, location }) => {
     c: f.dehyphenUUID(fields.category),
     t: f.dehyphenUUID(fields.template)
   }
+
+  console.debug(location)
   return {
     ...location,
     search: '?' + qs.stringify({ ...params, ...formParams })
@@ -126,6 +128,8 @@ const RequestNewPage = () => {
   const params = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+
+  console.debug(params);
 
   return (
     <CurrentUser>
@@ -148,9 +152,7 @@ const RequestNewPage = () => {
                   data={data}
                   selection={readFromQueryParams(params)}
                   onChange={(fields) => {
-                    navigate.replace(
-                      updateQueryParams({ params, location, fields })
-                    )
+                    navigate(updateQueryParams({ params, location, fields }))
                   }}
                 />
               )
