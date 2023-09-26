@@ -1,5 +1,5 @@
 import { ApolloClient } from '@apollo/client'
-import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory'
+import { InMemoryCache, defaultDataIdFromObject } from '@apollo/client/cache'
 import { isDev, store } from './env'
 
 import logger from 'debug'

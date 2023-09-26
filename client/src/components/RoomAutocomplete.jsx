@@ -1,7 +1,7 @@
 import React from 'react'
 // import f from 'lodash'
 import gql from 'graphql-tag'
-import { Query } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 
 // NOTE: just a simple Select/Dropdown for now
 // TODO: loading state should look like an empty select (minimize flickering!)

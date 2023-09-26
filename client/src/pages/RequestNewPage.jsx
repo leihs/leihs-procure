@@ -1,7 +1,7 @@
 import React, { Fragment as F } from 'react'
 import f from 'lodash'
 import cx from 'classnames'
-import { Query, Mutation } from '@apollo/client'
+import { Query, Mutation } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 import qs from 'qs'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'

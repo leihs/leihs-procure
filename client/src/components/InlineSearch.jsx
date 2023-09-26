@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import f from 'lodash'
 import cx from 'classnames'
 import Downshift from 'downshift'
-import { Query } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 import Highlighter from 'react-highlight-words'
 // TODO: pgUnaccent
 // import pgUnaccent from 'postgres-unaccent'

@@ -1,7 +1,8 @@
 import React from 'react'
 import f from 'lodash'
 // import x from 'lodash'
-import { Query, ApolloConsumer } from '@apollo/client'
+import { ApolloConsumer } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 
 import t from '../locale/translate'
@@ -166,7 +167,7 @@ const doChangeRequestCategory = (client, requestId, newCatId, callback) => {
       variables: { input: { id: requestId, category: newCatId } },
       update: callback
     })
-    .catch(error => window.alert(error))
+    .catch((error) => window.alert(error))
 }
 
 const doChangeBudgetPeriod = (client, requestId, newBudPeriodId, callback) => {
@@ -185,7 +186,7 @@ const doChangeBudgetPeriod = (client, requestId, newBudPeriodId, callback) => {
       variables: { input: { id: requestId, budget_period: newBudPeriodId } },
       update: callback
     })
-    .catch(error => window.alert(t('client.mutate_error') + error))
+    .catch((error) => window.alert(t('client.mutate_error') + error))
 }
 
 const doDeleteRequest = (client, request, callback) => {
@@ -225,7 +226,7 @@ const doDeleteRequest = (client, request, callback) => {
         callback() // does a full reload :/
       }
     })
-    .catch(error => window.alert(t('client.mutate_error') + error))
+    .catch((error) => window.alert(t('client.mutate_error') + error))
 }
 
 // TODO: modularize `storageFactory`
@@ -233,7 +234,7 @@ const LOCAL_STORE_KEY = 'leihs-procure'
 const storageFactory = ({ KEY }) => {
   return {
     get: () => f.try(() => JSON.parse(window.localStorage.getItem(KEY))),
-    set: o => f.try(() => window.localStorage.setItem(KEY, JSON.stringify(o)))
+    set: (o) => f.try(() => window.localStorage.setItem(KEY, JSON.stringify(o)))
   }
 }
 // TODO: use user.savedFilters from server, scope cache by user.id!!!
@@ -260,9 +261,9 @@ class RequestsIndexPage extends React.Component {
   }
   onPanelToggle(isOpen, id, key = 'cats') {
     const current = this.state.openPanels[key]
-    const list = isOpen ? current.concat(id) : current.filter(i => i !== id)
+    const list = isOpen ? current.concat(id) : current.filter((i) => i !== id)
     this.setState(
-      state => ({
+      (state) => ({
         openPanels: { ...state.openPanels, [key]: list }
       }),
       () => savedPanelTree.set(this.state.openPanels)
@@ -276,7 +277,7 @@ class RequestsIndexPage extends React.Component {
   }
   onFilterChange(filters) {
     this.setState(
-      state => ({
+      (state) => ({
         currentFilters: { ...state.filters, ...filters }
       }),
       () => userSavedFilters.set(this.state.currentFilters)
@@ -286,9 +287,9 @@ class RequestsIndexPage extends React.Component {
   render({ state } = this) {
     return (
       <ApolloConsumer>
-        {client => (
+        {(client) => (
           <CurrentUser>
-            {me => {
+            {(me) => {
               const inspectedCategories = f.map(
                 me.user.permissions.isInspectorForCategories,
                 'id'
@@ -303,7 +304,7 @@ class RequestsIndexPage extends React.Component {
                   // fetchPolicy="cache-and-network"
                   notifyOnNetworkStatusChange
                 >
-                  {filtersQuery => {
+                  {(filtersQuery) => {
                     const variables = prepareFilters(
                       state.currentFilters,
                       inspectedCategories,
@@ -320,7 +321,7 @@ class RequestsIndexPage extends React.Component {
                         fetchPolicy="cache-and-network"
                         notifyOnNetworkStatusChange
                       >
-                        {requestsQuery => {
+                        {(requestsQuery) => {
                           const refetchAllData = async () => {
                             await filtersQuery.refetch()
                             await requestsQuery.refetch()
@@ -337,7 +338,7 @@ class RequestsIndexPage extends React.Component {
                               openPanels={state.openPanels}
                               onPanelToggle={this.onPanelToggle}
                               onSetViewMode={this.onSetViewMode}
-                              doDeleteRequest={r =>
+                              doDeleteRequest={(r) =>
                                 doDeleteRequest(client, r, refetchAllData)
                               }
                               doChangeRequestCategory={(r, categoryId) =>

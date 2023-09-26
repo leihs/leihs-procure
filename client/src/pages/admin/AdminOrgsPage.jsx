@@ -2,7 +2,7 @@ import React from 'react'
 // import cx from 'classnames'
 import f from 'lodash'
 
-import { Query } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 
 // import t from '../../locale/translate'

@@ -1,7 +1,7 @@
 import React, { Fragment as F } from 'react'
 import PropTypes from 'prop-types'
 import f from 'lodash'
-import { Query, Mutation } from '@apollo/client'
+import { Query, Mutation } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 
 import Loading from '../components/Loading'
@@ -274,6 +274,81 @@ const RequestHeader = ({ data }) => {
   )
 }
 
-// helpers
+const valueIfWritable = (fields, requestData, key) => {
+  const reqField = f.get(requestData, key)
+  // eslint-disable-next-line no-debugger
+  if (!reqField) debugger // should not happen, ignore in prod
+  if (reqField.write) return f.get(fields, key)
+}
 
-// FIXME: `valueIfWrita
+const getField = (fields, requestData, key, fallback = undefined) => {
+  return { [key]: f.get(fields, key) }
+}
+
+const withOnlyWritable = (formdata, requestFields) => {
+  return f.pick(
+    formdata,
+    f.filter(f.map(requestFields, (v, k) => f.get(v, 'write') === true && k))
+  )
+}
+
+export const requestDataFromFields = (request, fields) => {
+  const boolify = (val, name) => f.presence(val) && name === val
+
+  const model = valueIfWritable(fields, request, 'model')
+  const user = valueIfWritable(fields, request, 'user')
+  const room = valueIfWritable(fields, request, 'room')
+  const approvedQ = valueIfWritable(fields, request, 'approved_quantity')
+  const orderQ = valueIfWritable(fields, request, 'order_quantity')
+  const supplierObj = valueIfWritable(fields, request, 'supplier')
+  const supplierName = valueIfWritable(fields, request, 'supplier_name')
+
+  const requestData = {
+    ...getField(fields, request, 'article_number'),
+    ...getField(fields, request, 'receiver'),
+    ...getField(fields, request, 'price_cents'),
+
+    ...getField(fields, request, 'requested_quantity'),
+    approved_quantity: f.present(approvedQ) ? approvedQ : null,
+    order_quantity: f.present(orderQ) ? orderQ : null,
+
+    ...getField(fields, request, 'motivation'),
+    ...getField(fields, request, 'priority'),
+    ...getField(fields, request, 'inspector_priority'),
+    ...getField(fields, request, 'inspection_comment'),
+
+    ...getField(fields, request, 'order_status'),
+    ...getField(fields, request, 'order_comment'),
+
+    ...getField(fields, request, 'accounting_type'),
+    ...getField(fields, request, 'internal_order_number'),
+
+    ...(user ? { user: user.id } : null),
+
+    replacement: boolify(
+      valueIfWritable(fields, request, 'replacement'),
+      'replacement'
+    ),
+
+    attachments: f.map(
+      valueIfWritable(fields, request, 'attachments'),
+      (o) => ({
+        ...f.pick(o, 'id', 'typename'),
+        to_delete: !!o.toDelete
+      })
+    ),
+
+    ...(model
+      ? { model: model.id }
+      : getField(fields, request, 'article_name')),
+
+    ...(fields._supplier_as_id
+      ? { supplier: supplierObj ? supplierObj.id : null }
+      : { supplier_name: f.present(supplierName) ? supplierName : null }),
+
+    // NOTE: no building, just room!
+    ...(!room ? null : { room })
+  }
+
+  return withOnlyWritable(requestData, request)
+}

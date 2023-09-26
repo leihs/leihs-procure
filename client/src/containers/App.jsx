@@ -1,6 +1,6 @@
 import React, { Component, Fragment as F } from 'react'
 import f from 'lodash'
-import { Query } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 
 import t from '../locale/translate'
 import Loading from '../components/Loading'

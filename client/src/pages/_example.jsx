@@ -1,7 +1,7 @@
 import React from 'react'
 // import f from 'lodash'
 
-import { Query } from '@apollo/client'
+import { Query } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 
 // import StatefulForm from '../components/StatefulForm'
