@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 // import cx from 'classnames'
 import f from 'lodash'
 
-import { Query, Mutation } from 'react-apollo'
+import { Query, Mutation } from '@apollo/client'
 import gql from 'graphql-tag'
 
 import t from '../../locale/translate'
@@ -56,7 +56,7 @@ const updateSettings = {
       ...fields,
       inspection_comments: fields.inspection_comments
         .split('\n')
-        .filter((l) => !f.isEmpty(l))
+        .filter(l => !f.isEmpty(l))
     }
 
     mutate({ variables: { settings } })
@@ -95,7 +95,7 @@ function AdminSettingsPage() {
                 <h1 className="h2">Einstellungen</h1>
                 <SettingsTable
                   settings={settings}
-                  updateAction={(fields) =>
+                  updateAction={fields =>
                     updateSettings.doUpdate(mutate, fields)
                   }
                   key={formKey}

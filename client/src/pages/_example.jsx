@@ -1,7 +1,7 @@
 import React from 'react'
 // import f from 'lodash'
 
-import { Query } from 'react-apollo'
+import { Query } from '@apollo/client'
 import gql from 'graphql-tag'
 
 // import StatefulForm from '../components/StatefulForm'
@@ -39,7 +39,7 @@ export default SomePage
 // # VIEW PARTIALS
 //
 
-const SomeSection = props => (
+const SomeSection = (props) => (
   <Div>
     <h2>Hello World</h2>
     <pre>{JSON.stringify(props, 0, 2)}</pre>

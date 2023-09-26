@@ -2,7 +2,7 @@ import React, { Fragment as F, useState } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
-import { Query, Mutation } from 'react-apollo'
+import { Query, Mutation } from '@apollo/client'
 import gql from 'graphql-tag'
 
 import t from '../../locale/translate'

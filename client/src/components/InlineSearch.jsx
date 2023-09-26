@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import f from 'lodash'
 import cx from 'classnames'
 import Downshift from 'downshift'
-import { Query } from 'react-apollo'
+import { Query } from '@apollo/client'
 import Highlighter from 'react-highlight-words'
 // TODO: pgUnaccent
 // import pgUnaccent from 'postgres-unaccent'
@@ -14,7 +14,7 @@ const log = logger('app:ui:InlineSearch')
 
 // # COMPONENT
 const defaultProps = {
-  itemToString: item => String(item)
+  itemToString: (item) => String(item)
 }
 const propTypes = {
   onSelect: PropTypes.func,
@@ -41,7 +41,7 @@ const InlineSearch = ({
     <Downshift
       {...props}
       selectedItem={value}
-      itemToString={i => itemToString(i) || ''}
+      itemToString={(i) => itemToString(i) || ''}
       onSelect={(selectedItem, instance) => {
         log('onSelect', selectedItem)
         if (!selectedItem) return
@@ -65,8 +65,8 @@ const InlineSearch = ({
         >
           <input
             value=""
-            onChange={() => {}}
-            onFocus={e => e.target.select()}
+            onChange={() => { }}
+            onFocus={(e) => e.target.select()}
             {...getInputProps({
               required,
               readOnly: isDisabled,
@@ -170,7 +170,7 @@ const highlightTextParts = (highlight, text) => {
     <Highlighter
       textToHighlight={text}
       searchWords={highlight.split(/\s+/g)}
-      sanitize={s => pgUnaccent(s).toLowerCase()}
+      sanitize={(s) => pgUnaccent(s).toLowerCase()}
       highlightTag="mark"
       highlightClass={cx(UICLASS, `${UICLASS}-result-item-highlight`)}
       highlightStyle={{

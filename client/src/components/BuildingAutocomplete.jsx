@@ -1,7 +1,7 @@
 import React from 'react'
 // import f from 'lodash'
 import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
+import { Query } from '@apollo/client'
 
 // NOTE: just a simple Select/Dropdown for now
 
@@ -19,7 +19,7 @@ const GET_BUILDINGS_QUERY = gql`
   }
 `
 
-const BuildingAutocomplete = props => (
+const BuildingAutocomplete = (props) => (
   <Query query={GET_BUILDINGS_QUERY}>
     {({ loading, error, data, data: { buildings } }) => {
       if (loading) return 'Loading'

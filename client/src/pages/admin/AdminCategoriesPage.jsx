@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom'
 import f from 'lodash'
 
-import { Query, Mutation } from 'react-apollo'
+import { Query, Mutation } from '@apollo/client'
 import gql from 'graphql-tag'
 import t from '../../locale/translate'
 import { mutationErrorHandler } from '../../apollo-client'

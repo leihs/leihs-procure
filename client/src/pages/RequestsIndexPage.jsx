@@ -1,7 +1,7 @@
 import React from 'react'
 import f from 'lodash'
 // import x from 'lodash'
-import { Query, ApolloConsumer } from 'react-apollo'
+import { Query, ApolloConsumer } from '@apollo/client'
 import gql from 'graphql-tag'
 
 import t from '../locale/translate'
@@ -380,8 +380,8 @@ const prepareFilters = (filters, inspectedCategories, viewedCategories) => {
   forAPI.categories = filters.onlyInspectedCategories
     ? f.intersection(filters.categories, inspectedCategories)
     : filters.onlyViewedCategories
-    ? f.intersection(filters.categories, viewedCategories)
-    : filters.categories
+      ? f.intersection(filters.categories, viewedCategories)
+      : filters.categories
 
   return forAPI
 }

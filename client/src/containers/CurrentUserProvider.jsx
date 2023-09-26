@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import f from 'lodash'
-import { Query } from 'react-apollo'
+import { Query } from '@apollo/client'
 import gql from 'graphql-tag'
 import { ErrorPanel } from '../components/Error'
 
@@ -33,8 +33,8 @@ export const CURRENT_USER_QUERY = gql`
 `
 
 // add some roles shortcutes
-export const UserWithShortcuts = user => {
-  const Roles = me => {
+export const UserWithShortcuts = (user) => {
+  const Roles = (me) => {
     const p = me.user.permissions
     const r = f.pick(p, 'isAdmin', 'isRequester')
     r.isInspector = f.some(p.isInspectorForCategories)

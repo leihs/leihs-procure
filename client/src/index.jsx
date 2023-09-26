@@ -6,7 +6,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import f from 'lodash'
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
-import { ApolloProvider } from 'react-apollo'
+import { ApolloProvider } from '@apollo/client'
 
 import lodashMixins from './lodash-mixins'
 import { apolloClient } from './apollo-client'
