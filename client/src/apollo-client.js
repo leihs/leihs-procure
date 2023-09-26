@@ -36,7 +36,7 @@ export const fetchOptions = {
 
 const httpLink = createHttpLink({
   uri: endpointURL,
-  credentials: isDev ? 'omit' : 'same-origin'
+  credentials: 'include'
 })
 
 const authLink = setContext((_, { headers }) => {
