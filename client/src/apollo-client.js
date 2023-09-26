@@ -35,7 +35,7 @@ export const fetchOptions = {
 // })
 
 const httpLink = createHttpLink({
-  uri: 'request/graphql',
+  uri: endpointURL,
   credentials: isDev ? 'omit' : 'same-origin'
 })
 
