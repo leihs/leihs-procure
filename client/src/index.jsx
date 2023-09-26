@@ -4,6 +4,7 @@ import 'react-app-polyfill/ie11'
 // non-polyfill imports
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import f from 'lodash'
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom'
 import { ApolloProvider } from '@apollo/client'
@@ -76,7 +77,11 @@ const Root = () => (
   </ApolloProvider>
 )
 
-ReactDOM.render(<Root />, document.getElementById('root'))
+const container = document.getElementById('app')
+const root = createRoot(container) // createRoot(container!) if you use TypeScript
+root.render(<Root />)
+
+// ReactDOM.render(<Root />, document.getElementById('root'))
 
 //
 function initDevHelpers() {
