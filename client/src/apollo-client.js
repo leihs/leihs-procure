@@ -1,49 +1,65 @@
-import { ApolloClient } from '@apollo/client'
-import { InMemoryCache, defaultDataIdFromObject } from '@apollo/client/cache'
+import { ApolloClient, createHttpLink } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import { InMemoryCache } from '@apollo/client/cache'
 import { isDev, store } from './env'
 
 import logger from 'debug'
+
 const log = logger('app:apollo')
 
 const CSRF_COOKIE_NAME = 'leihs-anti-csrf-token'
 export const endpointURL = '/procure/graphql'
 export const defaultHeaders = { accept: 'application/json' }
 
-export const buildAuthHeaders = () =>
-  isDev
+export const buildAuthHeaders = () => {
+  console.debug('building headers')
+  return isDev
     ? {
       'X-Fake-Token-Authorization': store.getItem('LEIHS_DEV_FAKE_USER_ID'),
       'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME)
     }
     : { 'X-CSRF-Token': getCookieValue(document.cookie, CSRF_COOKIE_NAME) }
+}
 
 export const fetchOptions = {
   credentials: isDev ? 'omit' : 'same-origin' // send the cookie(s)
 }
 
-const cache = new InMemoryCache({
-  dataIdFromObject: (object) => {
-    // NOTE: workaround buggy apollo cache, use `cacheKey` if given,
-    //       otherwise fall back to default handling.
-    if (object.cacheKey) return `${object.__typename}:^:${object.cacheKey}`
-    return defaultDataIdFromObject(object)
+// const cache = new InMemoryCache({
+//   dataIdFromObject: (object) => {
+//     // NOTE: workaround buggy apollo cache, use `cacheKey` if given,
+//     //       otherwise fall back to default handling.
+//     if (object.cacheKey) return `${object.__typename}:^:${object.cacheKey}`
+//     return defaultDataIdFromObject(object)
+//   }
+// })
+
+const httpLink = createHttpLink({
+  uri: 'request/graphql',
+  credentials: isDev ? 'omit' : 'same-origin'
+})
+
+const authLink = setContext((_, { headers }) => {
+  // Add your custom headers here, for example, authorization headers.
+  return {
+    headers: {
+      ...headers,
+      ...defaultHeaders,
+      ...buildAuthHeaders()
+    }
   }
 })
 
 export const apolloClient = new ApolloClient({
-  cache,
-  uri: endpointURL,
-  // static options for fetch requests:
-  fetchOptions,
-  // dynamic options for fetch requests:
-  request: (operation) =>
-    operation.setContext({
-      headers: { ...defaultHeaders, ...buildAuthHeaders() }
-    })
+  cache: new InMemoryCache(),
+  link: authLink.concat(httpLink)
+  // request: (operation) =>
+  //   operation.setContext({
+  //     headers: { ...defaultHeaders, ...buildAuthHeaders() }
+  //   })
 })
 
 // util
-
 export const mutationErrorHandler = (err) => {
   // not much we can do on backend error
   // eslint-disable-next-line no-console
@@ -52,7 +68,6 @@ export const mutationErrorHandler = (err) => {
 }
 
 // helper
-
 const getCookieValue = (cookies, name) =>
   (
     (cookies || '')

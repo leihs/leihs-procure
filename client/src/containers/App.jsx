@@ -17,7 +17,7 @@ import { useLocation } from 'react-router'
 //
 
 function App({ children, isDev }) {
-  let location = useLocation()
+  const location = useLocation()
   const locationKey = location.key || JSON.stringify(location)
 
   return (
@@ -58,7 +58,7 @@ function App({ children, isDev }) {
           if (window && userLocale) window.setLang(userLocale)
 
           return (
-            <F>
+            <>
               <div lang={userLocale}>
                 <MainNav
                   isDev={isDev}
@@ -73,7 +73,7 @@ function App({ children, isDev }) {
                   {children}
                 </div>
               </div>
-            </F>
+            </>
           )
         }}
       </Query>

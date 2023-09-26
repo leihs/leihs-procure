@@ -22,6 +22,7 @@ function MainNav({ me, contactUrl, isDev }) {
   const { pathname } = useLocation()
 
   const sharedNavbarProps = (() => {
+    if (!me) return
     try {
       return JSON.parse(me.navbarProps)
     } catch (e) {
