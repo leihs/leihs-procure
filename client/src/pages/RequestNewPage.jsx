@@ -1,15 +1,17 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, useEffect, useState } from 'react'
 import f from 'lodash'
 import cx from 'classnames'
-import { Query, Mutation } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 import qs from 'qs'
+
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useQuery } from '@apollo/client'
+import { Query, Mutation } from '@apollo/client/react/components'
 
 // import * as CONSTANTS from '../constants'
 import * as Fragments from '../graphql-fragments'
 // import t from '../locale/translate'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import Icon from '../components/Icons'
 import {
   Row,
@@ -102,62 +104,84 @@ const requestDataFromFields = (request, fields, preselection) => ({
   template: preselection.template
 })
 
-const readFromQueryParams = (params) => ({
+const readFromQueryParams = params => ({
   budgetPeriod: f.enhyphenUUID(params.bp),
   mainCategory: f.enhyphenUUID(params.mc),
   category: f.enhyphenUUID(params.c),
   template: f.enhyphenUUID(params.t)
 })
 
-const updateQueryParams = ({ fields, params, location }) => {
-  const formParams = {
-    bp: f.dehyphenUUID(fields.budgetPeriod),
-    mc: f.dehyphenUUID(fields.mainCategory),
-    c: f.dehyphenUUID(fields.category),
-    t: f.dehyphenUUID(fields.template)
-  }
+// const updateQueryParams = ({ fields, params, location }) => {
+//   const formParams = {
+//     bp: f.dehyphenUUID(fields.budgetPeriod),
+//     mc: f.dehyphenUUID(fields.mainCategory),
+//     c: f.dehyphenUUID(fields.category),
+//     t: f.dehyphenUUID(fields.template)
+//   }
+//
+//   console.debug('hello query')
 
-  console.debug(location)
-  return {
-    ...location,
-    search: '?' + qs.stringify({ ...params, ...formParams })
-  }
-}
+// return {
+//   ...location,
+//   search: '?' + qs.stringify({ ...params, ...formParams })
+// }
+// }
 
-const RequestNewPage = () => {
-  const params = useParams()
+function RequestNewPage() {
+  const [selectedParams, setSelectedParams] = useState({})
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { loading, error, data } = useQuery(NEW_REQUEST_PRESELECTION_QUERY)
+
   const location = useLocation()
-  const navigate = useNavigate()
 
-  console.debug(params);
+  useEffect(() => {
+    console.debug('hello effect')
+    const selection = Array.from(searchParams)
+      .map(([key, value]) => {
+        return {
+          [key]: value
+        }
+      })
+      .reduce((acc, obj) => {
+        return { ...acc, ...obj }
+      }, {})
+
+    setSelectedParams(selection)
+    console.debug(selection)
+  }, [searchParams])
+
+  const handleSetQueryParams = fields => {
+    const params = {
+      ...(fields.budgetPeriod ? { budgetPeriod: fields.budgetPeriod } : {}),
+      ...(fields.mainCategory ? { mainCategory: fields.mainCategory } : {}),
+      ...(fields.category ? { category: fields.category } : {}),
+      ...(fields.template ? { template: fields.template } : {})
+    }
+
+    console.log(params)
+
+    setSearchParams(params, { replace: true })
+  }
+
+  if (loading) return <Loading />
+  if (error) return <ErrorPanel error={error} data={data} />
 
   return (
     <CurrentUser>
-      {(me) => (
+      {me => (
         <MainWithSidebar>
           <h1>Antrag erstellen</h1>
 
-          <Query
-            query={NEW_REQUEST_PRESELECTION_QUERY}
-            fetchPolicy="cache-then-network"
-          >
-            {({ loading, error, data }) => {
-              if (loading) return <Loading />
-              if (error) return <ErrorPanel error={error} data={data} />
-
-              return (
-                <NewRequestPreselection
-                  key={location.key} // reset state on location change!
-                  me={me}
-                  data={data}
-                  selection={readFromQueryParams(params)}
-                  onChange={(fields) => {
-                    navigate(updateQueryParams({ params, location, fields }))
-                  }}
-                />
-              )
+          <NewRequestPreselection
+            key={location.key} // reset state on location change!
+            me={me}
+            data={data}
+            selection={selectedParams}
+            onChange={fields => {
+              handleSetQueryParams(fields)
             }}
-          </Query>
+          />
         </MainWithSidebar>
       )}
     </CurrentUser>
@@ -168,15 +192,18 @@ export default RequestNewPage
 
 class NewRequestPreselection extends React.Component {
   render({ props: { me, data, selection, onChange, formKey } } = this) {
-    const budgetPeriods = f.map(data.budget_periods, (bp) => ({
+    const budgetPeriods = f.map(data.budget_periods, bp => ({
       ...bp,
       ...budgetPeriodDates(bp)
     }))
 
-    const CatWithMainCat = (catId) => {
-      const mc = f.find(data.main_categories, {
-        categories: [{ id: catId }]
-      })
+    const CatWithMainCat = catId => {
+      const mc = data.main_categories.reduce((acc, mainCategory) => {
+        const category = mainCategory.categories.find(el => el.id === catId)
+        if (category !== undefined) return category
+        return acc
+      }, null)
+
       const sc = f.find(mc.categories, { id: catId })
       return { ...sc, main_category: { ...mc, categories: undefined } }
     }
@@ -191,6 +218,9 @@ class NewRequestPreselection extends React.Component {
           const selectedBudgetPeriod = f.find(budgetPeriods, {
             id: fields.budgetPeriod
           })
+
+          console.debug('preselection: ', budgetPeriods, fields)
+
           const selectedCategory = fields.category
           const selectedMainCat = f.find(data.main_categories, {
             id: fields.mainCategory
@@ -204,13 +234,13 @@ class NewRequestPreselection extends React.Component {
             (selectedTemplate || selectedCategory)
           )
 
-          const setSelection = (selection) => {
+          const setSelection = selection => {
             onChange({ ...fields, ...selection })
           }
 
-          const formPropsFor = (name) => ({
+          const formPropsFor = name => ({
             ...formHelpers.formPropsFor(name),
-            onChange: (e) => setSelection({ [name]: e.target.value })
+            onChange: e => setSelection({ [name]: e.target.value })
           })
 
           const resetTemplate = () => {
@@ -224,7 +254,7 @@ class NewRequestPreselection extends React.Component {
           const shownBudgetPeriods = onlyAllowedBudgetPeriods(
             me,
             budgetPeriods
-          ).map((bp) => {
+          ).map(bp => {
             const labelPost = bp.isInspecting
               ? `Prüfungsphase bis ${fmtDate(bp.end_date)}`
               : `Antragsphase bis ${fmtDate(bp.inspection_start_date)}`
@@ -244,9 +274,9 @@ class NewRequestPreselection extends React.Component {
             !selectedMainCat ? {} : { id: selectedMainCat.id }
           )
 
-          const categoryTree = shownMainCats.map((mc) => ({
+          const categoryTree = shownMainCats.map(mc => ({
             ...mc,
-            categories: mc.categories.map((sc) => ({
+            categories: mc.categories.map(sc => ({
               ...sc,
               templates: f.filter(data.templates, { category: { id: sc.id } })
             }))
@@ -325,12 +355,8 @@ class NewRequestPreselection extends React.Component {
 
                     {!hasPreselected && (
                       <Let
-                        onSelectCategory={(c) =>
-                          setSelection({ category: c.id })
-                        }
-                        onSelectTemplate={(t) =>
-                          setSelection({ template: t.id })
-                        }
+                        onSelectCategory={c => setSelection({ category: c.id })}
+                        onSelectTemplate={t => setSelection({ template: t.id })}
                       >
                         {({ onSelectCategory, onSelectTemplate }) =>
                           selectedMainCat ? (
@@ -346,7 +372,7 @@ class NewRequestPreselection extends React.Component {
                               mainCategories={categoryTree}
                               onSelectCategory={onSelectCategory}
                               onSelectTemplate={onSelectTemplate}
-                              onSelectMaincat={(m) =>
+                              onSelectMaincat={m =>
                                 setSelection({ mainCategory: m.id })
                               }
                             />
@@ -422,7 +448,7 @@ const NewRequestForm = ({ budgetPeriod, template, category, onCancel }) => (
                     categories={data.main_categories}
                     budgetPeriods={data.budgetPeriods}
                     onCancel={onCancel}
-                    onSubmit={(fields) =>
+                    onSubmit={fields =>
                       mutate({
                         variables: {
                           requestData: requestDataFromFields(request, fields, {
@@ -456,7 +482,7 @@ const CategoriesTemplatesTree = ({
   return (
     <F>
       <ul className="list-unstyled">
-        {mainCategories.map((mc) => (
+        {mainCategories.map(mc => (
           <F key={mc.id}>
             <Collapsing
               id={'mc' + mc.id}
@@ -505,15 +531,15 @@ const CategoriesTemplatesTree = ({
 }
 
 const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
-  const hasAnyTemplates = f.any(f.map(items, 'templates'), (l) => !f.isEmpty(l))
+  const hasAnyTemplates = f.any(f.map(items, 'templates'), l => !f.isEmpty(l))
 
   return (
     <ul className="list-group list-group-flush">
-      {items.map((sc) => (
+      {items.map(sc => (
         <F key={sc.id}>
           <li className="card list-group-item p-0">
             {!hasAnyTemplates ? (
-              <AddButtonLine onClick={(e) => onSelectCategory(sc)}>
+              <AddButtonLine onClick={e => onSelectCategory(sc)}>
                 {sc.name}
               </AddButtonLine>
             ) : (
@@ -521,11 +547,11 @@ const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
                 <h4 className="card-header h5">{sc.name}</h4>
 
                 <div className="list-group list-group-flush">
-                  {sc.templates.map((t) => (
+                  {sc.templates.map(t => (
                     <AddButtonLine
                       key={t.id}
                       t={t}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
                         onSelectTemplate(t)
                       }}
@@ -537,7 +563,7 @@ const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
                     </AddButtonLine>
                   ))}
 
-                  <AddButtonLine onClick={(e) => onSelectCategory(sc)}>
+                  <AddButtonLine onClick={e => onSelectCategory(sc)}>
                     {'Ohne Vorlage erstellen'}
                   </AddButtonLine>
                 </div>
@@ -555,7 +581,7 @@ const SelectionCard = ({ children, onRemoveClick }) => (
     <div className="card-body px-3 py-2 d-flex justify-content-between align-items-center">
       <div>{children}</div>
       {!!onRemoveClick && (
-        <Button color="link" outline size="sm" onClick={(e) => onRemoveClick()}>
+        <Button color="link" outline size="sm" onClick={e => onRemoveClick()}>
           <Icon.Cross />
         </Button>
       )}
@@ -576,7 +602,7 @@ const AddButtonLine = ({ children, ...props }) => (
 const Let = ({ children, ...props }) => children(props)
 
 const onlyAllowedBudgetPeriods = (me, bps) =>
-  bps.filter((bp) => {
+  bps.filter(bp => {
     const d = budgetPeriodDates(bp)
     return (
       (d.isRequesting && me.roles.isRequester) ||
@@ -591,11 +617,11 @@ const onlyAllowedCategories = (me, selectedBudgetPeriod, allCats) => {
   if (me.roles.isAdmin) return allCats
   if (selectedBudgetPeriod.isInspecting)
     return allCats
-      .map((mc) => ({
+      .map(mc => ({
         ...mc,
-        categories: mc.categories.filter((sc) => f.includes(inspected, sc.id))
+        categories: mc.categories.filter(sc => f.includes(inspected, sc.id))
       }))
-      .filter((mc) => mc.categories.length > 0)
+      .filter(mc => mc.categories.length > 0)
 }
 
-const fmtDate = (d) => new Date(d).toLocaleDateString()
+const fmtDate = d => new Date(d).toLocaleDateString()
