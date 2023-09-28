@@ -2,9 +2,8 @@ import React, { Fragment as F, useEffect, useState } from 'react'
 import f from 'lodash'
 import cx from 'classnames'
 import gql from 'graphql-tag'
-import qs from 'qs'
 
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { Query, Mutation } from '@apollo/client/react/components'
 
@@ -104,29 +103,6 @@ const requestDataFromFields = (request, fields, preselection) => ({
   template: preselection.template
 })
 
-const readFromQueryParams = params => ({
-  budgetPeriod: f.enhyphenUUID(params.bp),
-  mainCategory: f.enhyphenUUID(params.mc),
-  category: f.enhyphenUUID(params.c),
-  template: f.enhyphenUUID(params.t)
-})
-
-// const updateQueryParams = ({ fields, params, location }) => {
-//   const formParams = {
-//     bp: f.dehyphenUUID(fields.budgetPeriod),
-//     mc: f.dehyphenUUID(fields.mainCategory),
-//     c: f.dehyphenUUID(fields.category),
-//     t: f.dehyphenUUID(fields.template)
-//   }
-//
-//   console.debug('hello query')
-
-// return {
-//   ...location,
-//   search: '?' + qs.stringify({ ...params, ...formParams })
-// }
-// }
-
 function RequestNewPage() {
   const [selectedParams, setSelectedParams] = useState({})
 
@@ -135,8 +111,6 @@ function RequestNewPage() {
 
   const location = useLocation()
 
-  // This useEffect hook is used to convert the 'searchParams' object into an array of key-value pairs
-  // and then into an object. It updates the 'selectedParams' state whenever 'searchParams' changes.
   useEffect(() => {
     // Convert 'searchParams' to an array of key-value pairs and then to an object.
     const selection = Array.from(searchParams)
@@ -218,8 +192,6 @@ class NewRequestPreselection extends React.Component {
           const selectedBudgetPeriod = f.find(budgetPeriods, {
             id: fields.budgetPeriod
           })
-
-          console.debug('preselection: ', budgetPeriods, fields)
 
           const selectedCategory = fields.category
           const selectedMainCat = f.find(data.main_categories, {
