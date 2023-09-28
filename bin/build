@@ -9,7 +9,6 @@ PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && p
 
 SERVER_DIR=${PROJECT_DIR}/server
 CLIENT_DIR=${PROJECT_DIR}/client
-UI_DIR="${CLIENT_DIR}/leihs-ui"
 
 ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 DIGEST="$(git -C "$PROJECT_DIR" log -n 1 HEAD --pretty=%T)"
@@ -32,7 +31,6 @@ fi
 ### functions #################################################################
 
 function build {
-  ${UI_DIR}/bin/build || { echo "UI build error!"; exit 1; }
   ${CLIENT_DIR}/bin/build || { echo "CLIENT build error!"; exit 1; }
   ${SERVER_DIR}/bin/clj-uberjar || { echo "CLIENT uberjar error!"; exit 1; }
 }
@@ -53,8 +51,6 @@ if [ $BUILD_CACHE_DISABLED == "YES" ]; then
   echo "INFO: BUILD_CACHE_DISABLED is YES, building and nothing else"
   build
 else
-  source ${UI_DIR}/bin/require-clean-working-tree.sh
-  require-clean-working-tree
   echo "LOCAL_CACHED_ARTEFACT_PATH: $LOCAL_CACHED_ARTEFACT_PATH"
 
   if [ -e $LOCAL_CACHED_ARTEFACT_PATH ]; then
