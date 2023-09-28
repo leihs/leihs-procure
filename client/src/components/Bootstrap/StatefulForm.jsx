@@ -30,7 +30,7 @@ const log = logger('app:ui:StatefulForm')
 */
 
 export default class StatefulForm extends React.PureComponent {
-  static defaultProps = { values: {}, children: () => {}, onChange: () => {} }
+  static defaultProps = { values: {}, children: () => { }, onChange: () => { } }
   static propTypes = {
     // values: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     //   .isRequired,
@@ -50,13 +50,13 @@ export default class StatefulForm extends React.PureComponent {
   handleInputChange(event) {
     log('handleInputChange', { event })
     const callback = this.props.onChange
-    this.updateField(getFieldFromEvent(event), fields => callback(fields))
+    this.updateField(getFieldFromEvent(event), (fields) => callback(fields))
   }
 
   updateField({ name, value }, callback) {
     log('updateField', { name, value })
     this.setState(
-      state => ({
+      (state) => ({
         ...state,
         fields: fpSet(name, value, state.fields)
       }),
@@ -80,12 +80,13 @@ export default class StatefulForm extends React.PureComponent {
       const defaultConf = { idPrefix: this.props.idPrefix }
       const conf = { ...defaultConf, ...opts }
       const { idPrefix } = conf
-      const getValue = name => f.defaultTo(f.presence(f.get(fields, name)), '')
+      const getValue = (name) =>
+        f.defaultTo(f.presence(f.get(fields, name)), '')
       const setValue = (name, value) =>
         this.updateField({ name, value }, props.onChange)
 
       return {
-        formPropsFor: name => ({
+        formPropsFor: (name) => ({
           name,
           id: !idPrefix ? name : `${idPrefix}.${name}`,
           value: getValue(name),
@@ -111,7 +112,7 @@ export default class StatefulForm extends React.PureComponent {
 // its more performant to keep the state in the field,
 // and only "proxy" the change events with a slight debounce
 export class StatefulInput extends React.PureComponent {
-  static defaultProps = { value: '', onChange: () => {} }
+  static defaultProps = { value: '', onChange: () => { } }
   static propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onChange: PropTypes.func.isRequired,
@@ -136,7 +137,7 @@ export class StatefulInput extends React.PureComponent {
     const callback = this.onChangeCallbackDebounced
     const { value } = event.target
     this.setState(
-      state => (state.value === value ? false : { value }),
+      (state) => (state.value === value ? false : { value }),
       () =>
         f.isFunction(callback) &&
         callback({ target: { name: this.props.name, value: this.state.value } })
@@ -167,8 +168,8 @@ function getFieldFromEvent({ target }) {
     target.type === 'checkbox'
       ? target.checked
       : target.type === 'radio'
-      ? target.selected
-      : // text, number, etc:
+        ? target.selected
+        : // text, number, etc:
         target.value
 
   return { name, value: value }

@@ -135,8 +135,10 @@ function RequestNewPage() {
 
   const location = useLocation()
 
+  // This useEffect hook is used to convert the 'searchParams' object into an array of key-value pairs
+  // and then into an object. It updates the 'selectedParams' state whenever 'searchParams' changes.
   useEffect(() => {
-    console.debug('hello effect')
+    // Convert 'searchParams' to an array of key-value pairs and then to an object.
     const selection = Array.from(searchParams)
       .map(([key, value]) => {
         return {
@@ -147,8 +149,8 @@ function RequestNewPage() {
         return { ...acc, ...obj }
       }, {})
 
+    // Update the 'selectedParams' state with the newly created selection object.
     setSelectedParams(selection)
-    console.debug(selection)
   }, [searchParams])
 
   const handleSetQueryParams = fields => {
@@ -158,8 +160,6 @@ function RequestNewPage() {
       ...(fields.category ? { category: fields.category } : {}),
       ...(fields.template ? { template: fields.template } : {})
     }
-
-    console.log(params)
 
     setSearchParams(params, { replace: true })
   }

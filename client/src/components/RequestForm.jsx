@@ -97,9 +97,6 @@ class RequestForm extends React.Component {
           const formPropsFor = key => {
             const required = request[key] ? request[key].required : null
             const readOnly = request[key] ? !request[key].write : null
-            const readOrWrite = request[key]
-              ? request[key].read || request[key].write
-              : null
             const labelTxt = t(`request_form_field.${key}`)
             return {
               ...formHelpers.formPropsFor(key),
@@ -108,7 +105,6 @@ class RequestForm extends React.Component {
               hidden: request[key] ? !request[key].read : false,
               required,
               readOnly,
-              readOrWrite,
               ...(readOnly && { type: 'text-static' })
             }
           }
@@ -317,8 +313,8 @@ class RequestForm extends React.Component {
                           value={
                             f.isBoolean(field.value)
                               ? CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[
-                                  field.value
-                                ]
+                              field.value
+                              ]
                               : field.value
                           }
                           options={CONSTANTS.REQUEST_REPLACEMENT_VALUES.map(
@@ -485,8 +481,8 @@ class RequestForm extends React.Component {
                                   setValue(
                                     'inspection_comment',
                                     value +
-                                      '\n' +
-                                      getValue('inspection_comment')
+                                    '\n' +
+                                    getValue('inspection_comment')
                                   )
                                 }}
                               />
@@ -517,8 +513,8 @@ class RequestForm extends React.Component {
                   </RequestInput>
                   <Let accTypeField={formPropsFor('accounting_type')}>
                     {({ accTypeField }) =>
-                      accTypeField.readOrWrite && (
-                        <F>
+                      !accTypeField.hidden && (
+                        <>
                           <FormGroup
                             horizontal={compactView}
                             label={accTypeField.label}
@@ -577,7 +573,7 @@ class RequestForm extends React.Component {
                               }
                             </Let>
                           )}
-                        </F>
+                        </>
                       )
                     }
                   </Let>
