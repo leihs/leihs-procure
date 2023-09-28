@@ -161,7 +161,7 @@ function RequestNewPage() {
       ...(fields.template ? { template: fields.template } : {})
     }
 
-    setSearchParams(params, { replace: true })
+    setSearchParams(params)
   }
 
   if (loading) return <Loading />
