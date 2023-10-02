@@ -11,14 +11,14 @@ import MomentLocaleUtils, {
 } from 'react-day-picker/moment'
 
 // TODO: import globally?
-import 'react-day-picker/lib/style.css'
+// import 'react-day-picker/lib/style.css'
 
 // FIXME: choose locale/language/format
 import 'moment/locale/de'
 const DATE_LANG = 'de'
 const DATE_FMT = 'L'
 
-const defaultProps = { onChange: () => {} }
+const defaultProps = { onChange: () => { } }
 
 const DatePicker = ({
   name,

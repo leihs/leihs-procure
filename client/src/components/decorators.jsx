@@ -1,4 +1,5 @@
 import f from 'lodash'
+import { isNonEmptyValue } from '../lib/utils'
 
 import { DateTime } from 'luxon'
 import { formatMoney } from 'accounting-js'
@@ -16,10 +17,10 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   const expectKeys = !isDev
     ? f.noop
     : wanted => {
-        if (!isDev) return
-        const missing = f.difference(wanted, Object.keys(o))
-        if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
-      }
+      if (!isDev) return
+      const missing = f.difference(wanted, Object.keys(o))
+      if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
+    }
 
   if (!o) return false
 
@@ -87,8 +88,7 @@ export const RequestFieldValue = (name, request) => {
       return t(`request_state_label_${r.state}`)
     case 'replacement':
       return t(
-        `request_replacement_labels_${
-          CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[r.replacement.value]
+        `request_replacement_labels_${CONSTANTS.REQUEST_REPLACEMENT_VALUES_MAP[r.replacement.value]
         }`
       )
     case 'priority':
@@ -107,14 +107,15 @@ export const RequestFieldValue = (name, request) => {
 }
 
 export const RequestTotalAmount = fields => {
+  debugger;
   const allQuantities = ['requested', 'approved', 'order'].map(k => {
-    const v = f.get(fields, [`${k}_quantity`])
-    return f.isObject(v) ? v.value : v
+    const value = fields[`${k}_quantity`]
+    return typeof value === 'object' && value !== null ? value.value : value
   })
-  const quantity = f.last(f.filter(allQuantities, f.present))
 
+  const quantity = allQuantities.filter(el => isNonEmptyValue(el)).at(-1)
   const price_cents =
-    f.get(fields, 'price_cents.value') || f.get(fields, 'price_cents') || '0'
+    fields?.price_cents?.value || fields?.price_cents || '0'
 
   const price = parseInt(price_cents, 10)
   return (parseInt(quantity, 10) || 0) * price
