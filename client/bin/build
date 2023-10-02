@@ -28,7 +28,6 @@ fi
 
 function build {
   export PUBLIC_URL="/procure"
-  echo "CHCK ##############3"
   ${PROJECT_DIR}/bin/env/nodejs-setup
   npm ci --no-audit
   npm run ci-build
