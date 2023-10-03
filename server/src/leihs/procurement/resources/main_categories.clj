@@ -60,33 +60,30 @@
         mcs (:input_data args)]
     (loop [[mc & rest-mcs] mcs]
       (when mc
-        (with-local-vars [mc-id (:id mc)]
+        (let [mc-id (atom (:id mc))]
           (if (:toDelete mc)
-            (main-category/delete! tx (var-get mc-id))
+            (main-category/delete! tx @mc-id)
             (do
-              (if (var-get mc-id)
+              (if @mc-id
                 (main-category/update! tx (select-keys mc [:id :name]))
                 (do (main-category/insert! tx (select-keys mc [:name]))
-                    (var-set mc-id
-                             (->> mc
-                                  :name
-                                  (main-category/get-main-category-by-name tx)
-                                  :id))))
+                    (reset! mc-id
+                            (->> mc
+                                 :name
+                                 (main-category/get-main-category-by-name tx)
+                                 :id))))
               (let [image (:new_image_url mc)
                     budget-limits
                       (->> mc
                            :budget_limits
-                           (map #(merge % {:main_category_id (var-get mc-id)})))
+                           (map #(merge % {:main_category_id @mc-id})))
                     categories (->> mc
                                     :categories
                                     (map #(merge %
-                                                 {:main_category_id
-                                                    (var-get mc-id)})))]
+                                                 {:main_category_id @mc-id})))]
                 (if-not (empty? image)
-                  (main-category/deal-with-image! tx (var-get mc-id) image))
+                  (main-category/deal-with-image! tx @mc-id image))
                 (budget-limits/update-budget-limits! tx budget-limits)
-                (categories/update-categories! tx
-                                               (var-get mc-id)
-                                               categories)))))
+                (categories/update-categories! tx @mc-id categories)))))
         (recur rest-mcs)))
     (get-main-categories tx)))

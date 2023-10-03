@@ -13,6 +13,15 @@ describe 'request' do
       category_id: FactoryBot.create(:category).id
     )
   end
+  let(:archived_template) do
+    FactoryBot.create(
+      :template,
+      article_name: 'archived template',
+      price_cents: 2300,
+      category_id: FactoryBot.create(:category).id,
+      is_archived: true
+    )
+  end
   let :requester do
     requester = FactoryBot.create(:user)
     FactoryBot.create(:requester_organization, user_id: requester.id)
@@ -286,33 +295,49 @@ describe 'request' do
         expect(Attachment.count).to be == 1
       end
 
-      example 'from template' do
-        variables = {
-          input: minimal_input.without(:article_name).merge({
-            template: template.id,
-            attachments: [{ id: uploads[0].id, to_delete: false, typename: 'Upload' },
-                          { id: uploads[1].id, to_delete: true, typename: 'Upload' }]
-          })
-        }
+      context 'from template' do
+        example 'ok if not archived' do
+          variables = {
+            input: minimal_input.without(:article_name).merge({
+              template: template.id,
+              attachments: [{ id: uploads[0].id, to_delete: false, typename: 'Upload' },
+                            { id: uploads[1].id, to_delete: true, typename: 'Upload' }]
+            })
+          }
 
-        result = query(q, requester.id, variables).deep_symbolize_keys
+          result = query(q, requester.id, variables).deep_symbolize_keys
 
-        request = Request.order(:created_at).reverse.first
-        expect(result[:errors]).to be_nil
-        data = result[:data][:create_request]
-        expect(data[:id]).to be == request.id
-        expect(data[:attachments][:value].count).to be == 1
-        expect(data[:article_name][:value]).to eq template[:article_name]
+          request = Request.order(:created_at).reverse.first
+          expect(result[:errors]).to be_nil
+          data = result[:data][:create_request]
+          expect(data[:id]).to be == request.id
+          expect(data[:attachments][:value].count).to be == 1
+          expect(data[:article_name][:value]).to eq template[:article_name]
 
-        expect(data[:motivation][:value]).to eq variables[:input][:motivation]
-        expect(Upload.count).to be == 0
-        expect(Attachment.count).to be == 1
+          expect(data[:motivation][:value]).to eq variables[:input][:motivation]
+          expect(Upload.count).to be == 0
+          expect(Attachment.count).to be == 1
 
-        # fields where value comes from template and is not writable
-        expect(data[:article_name]).to eq(
-          { value: template.article_name, read: true, write: false })
-        expect(data[:price_cents]).to eq(
-          { value: template.price_cents, read: true, write: false })
+          # fields where value comes from template and is not writable
+          expect(data[:article_name]).to eq(
+            { value: template.article_name, read: true, write: false })
+          expect(data[:price_cents]).to eq(
+            { value: template.price_cents, read: true, write: false })
+        end
+
+        example 'error if archived' do
+          variables = {
+            input: minimal_input.without(:article_name).merge({
+              template: archived_template.id,
+              attachments: [{ id: uploads[0].id, to_delete: false, typename: 'Upload' },
+                            { id: uploads[1].id, to_delete: true, typename: 'Upload' }]
+            })
+          }
+
+          result = query(q, requester.id, variables).deep_symbolize_keys
+          expect(result[:data][:create_request]).to be_nil
+          expect(result[:errors].first[:message]).to include('UnauthorizedException')
+        end
       end
 
       example 'not allowed if past phase' do

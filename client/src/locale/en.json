@@ -8,59 +8,47 @@
   "form_btn_delete": "Delete",
   "form_filepicker_label": "Select File",
   "form_message_save_success": "Saved!",
-
   "upload_error_click_to_show": "Upload did not work! Please click for more details.",
   "upload_error_click_to_retry": "Try again",
-
   "request": {
     "confirm_move_budget_period": "Move to another budget period?",
     "confirm_move_category": "Move to another category?",
     "confirm_delete": "Delete Request?",
     "give_reason_when_partially_accepting_or_denying": "When rejecting or partially rejecting you need to provide an inspection comment"
   },
-
   "client": {
     "mutate_error": "Processing Error!",
     "delete_error": "Deletion Error!"
   },
-
   "budget_period": "Budget Period",
   "request_state": "Status",
   "category": "Category",
-
   "budget_period_filter_label_state": {
     "isRequesting": "Requesting Phase",
     "isInspecting": "Inspection Phase",
     "isPast": "Completed"
   },
-
   "request_state_label_NEW": "New",
   "request_state_label_APPROVED": "Accepted",
   "request_state_label_PARTIALLY_APPROVED": "Partially Accepted",
   "request_state_label_DENIED": "Rejected",
   "request_state_label_IN_APPROVAL": "In Inspection",
-
   "order_status_label_ALTERNATIVE_PROCURED": "Alternative Procured",
   "order_status_label_IN_PROGRESS": "In Progress",
   "order_status_label_NOT_PROCESSED": "Not Processed",
   "order_status_label_NOT_PROCURED": "Not Procured",
   "order_status_label_PROCURED": "Procured",
-
   "request_short_id": "Number",
-
   "request_replacement_labels_new": "New",
   "request_replacement_labels_replacement": "Replacement",
-
   "priority": "Priority",
   "priority_label_NORMAL": "Normal",
   "priority_label_HIGH": "High",
-
   "inspector_priority": "Inspector's Priority",
   "inspector_priority_label_LOW": "Low",
   "inspector_priority_label_MEDIUM": "Middle",
   "inspector_priority_label_HIGH": "High",
   "inspector_priority_label_MANDATORY": "Mandatory",
-
   "dashboard": {
     "filters_title": "Filter",
     "reset_filters": "Reset Filter",
@@ -91,7 +79,6 @@
     "create_request_for_maincat": "Create request for this main category",
     "create_request_for_subcat": "Create request for this sub-category"
   },
-
   "request_form_field": {
     "article_name": "Item or Project",
     "article_number": "Item Nº or Supplier Nº",
@@ -105,7 +92,6 @@
     "motivation": "Reason",
     "user": "Requester",
     "state": "Status",
-
     "replacement": "Replacement / New",
     "price_cents": "Price in CHF",
     "price_help": "incl. value-added tax",
@@ -123,10 +109,8 @@
     "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto Ⅰ (ER)",
-
     "order_status": "Procuring-State",
     "order_comment": "Procuring-Comment",
-
     "id": "ID",
     "model": "Model",
     "organization": "Organisation",
@@ -135,12 +119,19 @@
   },
   "accounting_type_investment": "Investments",
   "accounting_type_aquisition": "Procurement",
-
   "templates": {
     "title": "Templates",
     "title_edit": "Edit Templates",
     "category_has_no_templates": "No existing templates",
+    "tooltips": {
+      "template_requests": "Requests use this template",
+      "delete_template": "Delete",
+      "archive_template": "Archive",
+      "unarchive_template": "Unarchive",
+      "show_archived": "Display Archived"
+    },
     "formfield": {
+      "link": "",
       "model": "Existing Model",
       "article_name": "Item or Project",
       "article_number": "Item Nº or Supplier Nº",
@@ -150,7 +141,6 @@
       "toDelete": ""
     }
   },
-
   "admin": {
     "users": {
       "title": "Users",
@@ -194,9 +184,10 @@
     "form": {
       "confirm_navigation_when_editing": "Changes have not been save, do you want to delete changes?"
     },
-    "InlineSearch": { "placeholder": "Search" }
+    "InlineSearch": {
+      "placeholder": "Search"
+    }
   },
-
   "errors": {
     "error_title": "ERROR",
     "error_btn_retry": "try again",

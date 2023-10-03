@@ -1,3 +1,4 @@
+require 'pry'
 require 'active_support/all'
 
 SERVER_DIR = Pathname.new(__dir__).join("..")

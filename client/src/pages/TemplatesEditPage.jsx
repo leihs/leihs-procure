@@ -1,4 +1,4 @@
-import React, { Fragment as F } from 'react'
+import React, { Fragment as F, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
 import f from 'lodash'
 
@@ -20,13 +20,13 @@ import { ErrorPanel } from '../components/Error'
 import ImageThumbnail from '../components/ImageThumbnail'
 import { mutationErrorHandler } from '../apollo-client'
 import CurrentUser from '../containers/CurrentUserProvider'
+import { UncontrolledTooltip } from 'reactstrap'
 
 // # DATA
 //
 const TEMPLATES_FRAGMENT = gql`
   fragment TemplateProps on Template {
     id
-    can_delete
     article_name
     article_number
     model {
@@ -34,6 +34,8 @@ const TEMPLATES_FRAGMENT = gql`
       product
       version
     }
+    requests_count
+    is_archived
     price_cents
     price_currency
     supplier_name
@@ -78,22 +80,26 @@ const updateTemplates = {
     }
   },
   doUpdate: (mutate, me, { mainCategories }) => {
-    const onlyEditableCats = f.filter(
-      f.flatMap(mainCategories, 'categories'),
-      sc =>
-        !!f.find(me.user.permissions.isInspectorForCategories, { id: sc.id })
-    )
-    const templates = f.flatMap(onlyEditableCats, sc =>
-      f.flatMap(sc.templates, tpl => ({
+    const onlyEditableCats = mainCategories
+      .flatMap(cat => cat['categories'])
+      .filter(
+        sc =>
+          !!me.user.permissions.isInspectorForCategories.find(
+            el => el.id === sc.id
+          )
+      )
+
+    let templates = onlyEditableCats.flatMap(sc =>
+      sc.templates.flatMap(tpl => ({
         id: tpl.id,
         article_name: tpl.article_name,
         article_number: tpl.article_number,
         price_cents: tpl.price_cents,
-        to_delete: tpl.toDelete,
-
+        is_archived: tpl.is_archived,
         category_id: sc.id,
-        // TODO: model/supplier
-        supplier_name: f.presence(tpl.supplier_name) || null
+        supplier_name: f.presence(tpl.supplier_name) || null,
+        ...(!!tpl.toDelete && { to_delete: tpl.toDelete })
+
         // ...(!!tpl.model && { model: tpl.model.id }),
         // ...(!!tpl.supplier && { model: tpl.supplier.id }),
       }))
@@ -162,7 +168,8 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
     !!f.find(me.user.permissions.isInspectorForCategories, { id })
 
   const tableCols = [
-    { key: 'article_name', size: 4, required: true },
+    { key: 'link', size: 1 },
+    { key: 'article_name', size: 3, required: true },
     { key: 'article_number', size: 3 },
     { key: 'price_cents', size: 2, required: true },
     { key: 'supplier_name', size: 2 },
@@ -249,67 +256,16 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
                                         canEditCat(sc) && (
                                           <F key={sc.id}>
                                             <li className="list-group-item">
-                                              <h3 className="h5 py-2">
-                                                {sc.name}
-                                              </h3>
-
-                                              {!f.any(sc.templates) ? (
-                                                <div>
-                                                  <p className="mb-2 small">
-                                                    {t(
-                                                      'templates.category_has_no_templates'
-                                                    )}
-                                                  </p>
-                                                  {addButton}
-                                                </div>
-                                              ) : (
-                                                <div className="table-responsive">
-                                                  <table className="table table-sm table-hover">
-                                                    <thead className="small">
-                                                      <tr className="row no-gutters">
-                                                        {f.map(
-                                                          tableCols,
-                                                          ({ key, size }) => (
-                                                            <th
-                                                              key={key}
-                                                              className={`col-${size}`}
-                                                            >
-                                                              {t(
-                                                                `templates.formfield.${key}`
-                                                              )}
-                                                            </th>
-                                                          )
-                                                        )}
-                                                      </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                      {sc.templates.map(
-                                                        (tpl, i) => (
-                                                          <TemplateRow
-                                                            key={tpl.id || i}
-                                                            cols={tableCols}
-                                                            formPropsFor={key =>
-                                                              formPropsFor(
-                                                                `mainCategories.${mci}.categories.${sci}.templates.${i}.${key}`
-                                                              )
-                                                            }
-                                                            {...tpl}
-                                                          />
-                                                        )
-                                                      )}
-                                                    </tbody>
-
-                                                    <tfoot>
-                                                      <tr>
-                                                        <td className="col-12">
-                                                          {addButton}
-                                                        </td>
-                                                      </tr>
-                                                    </tfoot>
-                                                  </table>
-                                                </div>
-                                              )}
+                                              <div className="table-responsive">
+                                                <Table
+                                                  tableCols={tableCols}
+                                                  addButton={addButton}
+                                                  mci={mci}
+                                                  sci={sci}
+                                                  sc={sc}
+                                                  formPropsFor={formPropsFor}
+                                                ></Table>
+                                              </div>
                                             </li>
                                           </F>
                                         )
@@ -337,11 +293,117 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
   )
 }
 
-const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
-  const isEditing = true // TODO: edit on click
-  const inputFieldCls = cx({ 'text-strike bg-danger-light': tpl.toDelete })
+function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
+  const switchRef = useRef(null)
+  const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
+  const [showArchived, setShowArchived] = useState(false)
+
+  // useEffect(() => {
+  //   !!hasArchivedEntry
+  //     ? switchRef.current.removeAttribute('disabled', '')
+  //     : switchRef.current.setAttribute('disabled', '')
+  // })
+
   return (
-    <tr className="row no-gutters" onClick={onClick}>
+    <>
+      <div className="d-flex">
+        {/* Table Heading  */}
+        <h3 className="h5 py-2">{sc.name}</h3>
+
+        {/*  Switch Archived Entries */}
+        <div
+          className={cx(
+            'custom-control custom-switch align-self-center ml-auto',
+            hasArchivedEntry ? 'visible' : 'invisible'
+          )}
+        >
+          <input
+            ref={switchRef}
+            type="checkbox"
+            id={'archiveSwitch' + mci}
+            className={cx('custom-control-input')}
+            checked={showArchived}
+            onChange={e => setShowArchived(e.target.checked)}
+          />
+          <label
+            className="custom-control-label"
+            htmlFor={'archiveSwitch' + mci}
+          >
+            {t(`templates.tooltips.show_archived`)}
+          </label>
+        </div>
+      </div>
+
+      {sc.templates.length === 0 && (
+        <p className="mb-2 small">{t('templates.category_has_no_templates')}</p>
+      )}
+
+      <table className="table table-sm table-hover">
+        {sc.templates.length > 0 && (
+          <thead className="small">
+            <tr className="row no-gutters">
+              {f.map(tableCols, ({ key, size }) => (
+                <th key={key} className={`col-${size}`}>
+                  {t(`templates.formfield.${key}`)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
+
+        <tbody>
+          {sc.templates.map((tpl, i) =>
+            !tpl.is_archived || showArchived ? (
+              <TemplateRow
+                key={tpl.id || i}
+                cols={tableCols}
+                formPropsFor={key =>
+                  formPropsFor(
+                    `mainCategories.${mci}.categories.${sci}.templates.${i}.${key}`
+                  )
+                }
+                {...tpl}
+              />
+            ) : null
+          )}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td className="col-12">{addButton}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </>
+  )
+}
+
+const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
+  const rowRef = useRef(null)
+  const toDeleteRef = useRef(null)
+
+  const isEditing = true // TODO: edit on click
+  const inputFieldCls = cx({
+    'text-strike bg-danger-light': tpl?.toDelete || false
+  })
+
+  // disabling all inputs by hand, since input componets are nested quite alot...
+  useEffect(() => {
+    if (tpl.requests_count && tpl.id) {
+      const inputs = rowRef.current.querySelectorAll('input')
+      inputs.forEach(
+        input => input.type !== 'checkbox' && input.setAttribute('disabled', '')
+      )
+    }
+  })
+
+  return (
+    <tr
+      ref={rowRef}
+      data-id={tpl.id}
+      className="row no-gutters templates"
+      onClick={onClick}
+    >
       {cols.map(({ key, size, required }, i) => (
         <td
           key={i}
@@ -351,32 +413,98 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              tpl.can_delete && (
-                <Let field={formPropsFor('toDelete')}>
-                  {({ field }) => (
+              !tpl.requests_count && !tpl.is_archived ? (
+                <Let toDelete={formPropsFor('toDelete')}>
+                  {({ toDelete }) => (
                     <label id={`btn_del_${tpl.id}`} className="pt-1">
                       <Icon.Trash
                         size="lg"
                         className={cx(
-                          tpl.toDelete ? 'text-dark' : 'text-danger'
+                          tpl?.toDelete ? 'text-danger' : 'text-dark'
+                        )}
+                      />
+                      <input
+                        ref={toDeleteRef}
+                        type="checkbox"
+                        className="sr-only"
+                        name="delete"
+                        checked={tpl?.toDelete || false}
+                        onChange={e =>
+                          toDelete.onChange({
+                            target: {
+                              name: toDelete.name,
+                              checked: e.target.checked,
+                              value: e.target.checked
+                            }
+                          })
+                        }
+                      />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_del_${tpl.id}`}
+                      >
+                        {t(`templates.tooltips.delete_template`)}
+                      </UncontrolledTooltip>
+                    </label>
+                  )}
+                </Let>
+              ) : (
+                <Let is_archived={formPropsFor('is_archived')}>
+                  {({ is_archived }) => (
+                    <label id={`btn_archive_${tpl.id}`} className="pt-1 ">
+                      <Icon.Archive
+                        size="lg"
+                        className={cx(
+                          tpl?.is_archived ? 'text-warning' : 'text-dark'
                         )}
                       />
                       <input
                         type="checkbox"
                         className="sr-only"
-                        name={field.name}
-                        checked={!!field.value}
-                        onChange={field.onChange}
+                        name="archive"
+                        checked={!!tpl.is_archived}
+                        onChange={e =>
+                          is_archived.onChange({
+                            target: {
+                              name: is_archived.name,
+                              checked: e.target.checked,
+                              value: e.target.checked
+                            }
+                          })
+                        }
                       />
+                      <UncontrolledTooltip
+                        placement="left"
+                        target={`btn_archive_${tpl.id}`}
+                      >
+                        {tpl.is_archived ? (
+                          <>{t(`templates.tooltips.unarchive_template`)}</>
+                        ) : (
+                          <>{t(`templates.tooltips.archive_template`)}</>
+                        )}
+                      </UncontrolledTooltip>
                     </label>
                   )}
                 </Let>
               )
+            ) : key === 'link' ? (
+              <div className="d-flex h-100 align-items-center justify-content-center">
+                <p className="h3 mb-0 mr-2">{tpl.requests_count}</p>
+                <Icon.Link id={`link_${tpl.id}`} size="lg" />
+                <UncontrolledTooltip
+                  placement="right"
+                  target={`link_${tpl.id}`}
+                >
+                  {tpl.requests_count}{' '}
+                  {t(`templates.tooltips.template_requests`)}
+                </UncontrolledTooltip>
+              </div>
             ) : key === 'price_cents' ? (
               <Let priceField={formPropsFor('price_cents')}>
                 {({ priceField }) => (
                   <InputText
                     cls={inputFieldCls}
+                    type="number"
                     required={required}
                     value={tpl.price_cents / 100 || ''}
                     onChange={e =>

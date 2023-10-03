@@ -102,6 +102,7 @@
                            :article_number {:type String},
                            :category_id {:type (non-null ID)},
                            :id {:type ID},
+                           :is_archived {:type Boolean}
                            :model {:type ID},
                            :price_cents {:type Int},
                            :supplier_id {:type ID},
@@ -403,12 +404,12 @@
                       :name {:type (non-null String)}}},
   :Template {:fields {:article_name {:type String},
                       :article_number {:type String},
-                      :can_delete {:resolve :can-delete-template?,
-                                   :type (non-null Boolean)},
                       :category {:resolve :category,
                                  :type (non-null :Category)},
                       :id {:type (non-null ID)},
+                      :is_archived {:type (non-null Boolean)},
                       :model {:resolve :model, :type :Model},
+                      :requests_count {:resolve :requests-count, :type (non-null Int)}
                       :price_cents {:type (non-null Int)},
                       :price_currency {:type (non-null String)},
                       :supplier {:resolve :supplier, :type :Supplier},

@@ -8,58 +8,47 @@
   "form_btn_delete": "Löschen",
   "form_filepicker_label": "Datei auswählen",
   "form_message_save_success": "Gespeichert!",
-
   "upload_error_click_to_show": "Hochladen fehlgeschlagen! Klicken für Details.",
   "upload_error_click_to_retry": "Nochmals versuchen",
-
   "request": {
     "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
     "confirm_move_category": "In andere Kategorie verschieben?",
     "confirm_delete": "Antrag löschen?",
     "give_reason_when_partially_accepting_or_denying": "Bei Ablehnung oder Teilbewilligung muss ein Inspektionskommentar vorhanden sein"
   },
-
   "client": {
     "mutate_error": "Bearbeitung fehlgeschlagen!",
     "delete_error": "Löschen fehlgeschlagen!"
   },
-
   "budget_period": "Budgetperiode",
   "request_state": "Status",
   "category": "Kategorie",
-
   "budget_period_filter_label_state": {
     "isRequesting": "Antragsphase",
     "isInspecting": "In Prüfung",
     "isPast": "Beendet"
   },
-
   "request_state_label_NEW": "Neu",
   "request_state_label_APPROVED": "Genehmigt",
   "request_state_label_PARTIALLY_APPROVED": "Teilweise bewilligt",
   "request_state_label_DENIED": "Abgelehnt",
   "request_state_label_IN_APPROVAL": "In Prüfung",
-
   "order_status_label_ALTERNATIVE_PROCURED": "Alternative beschafft",
   "order_status_label_IN_PROGRESS": "In Bearbeitung",
   "order_status_label_NOT_PROCESSED": "Nicht bearbeitet",
   "order_status_label_NOT_PROCURED": "Nicht beschafft",
   "order_status_label_PROCURED": "Beschafft",
-
   "request_replacement_labels_new": "Neu",
   "request_replacement_labels_replacement": "Ersatz",
   "request_short_id": "Nummer",
-
   "priority": "Priorität",
   "priority_label_NORMAL": "Normal",
   "priority_label_HIGH": "Hoch",
-
   "inspector_priority": "Priorität des Prüfers",
   "inspector_priority_label_LOW": "Tief",
   "inspector_priority_label_MEDIUM": "Mittel",
   "inspector_priority_label_HIGH": "Hoch",
   "inspector_priority_label_MANDATORY": "Zwingend",
-
   "dashboard": {
     "filters_title": "Filter",
     "reset_filters": "Filter zurücksetzen",
@@ -90,7 +79,6 @@
     "create_request_for_maincat": "Antrag für diese Haupkategorie erfassen",
     "create_request_for_subcat": "Antrag für diese Kategorie erfassen"
   },
-
   "request_form_field": {
     "article_name": "Artikel oder Projekt",
     "article_number": "Artikelnr. oder Herstellernr.",
@@ -104,7 +92,6 @@
     "motivation": "Begründung",
     "user": "Antragsteller",
     "state": "Status",
-
     "replacement": "Ersatz / Neu",
     "price_cents": "Stückpreis CHF",
     "price_help": "inkl. MwSt",
@@ -122,10 +109,8 @@
     "general_ledger_account": "Sachkonto II (IR)",
     "internal_order_number": "Innenauftrag",
     "procurement_account": "Sachkonto I (ER)",
-
     "order_status": "Beschaffungs-Status",
     "order_comment": "Beschaffungs-Kommentar",
-
     "id": "ID",
     "model": "Model",
     "organization": "Organisation",
@@ -134,12 +119,19 @@
   },
   "accounting_type_investment": "Investition",
   "accounting_type_aquisition": "Beschaffung",
-
   "templates": {
     "title": "Vorlagen",
     "title_edit": "Vorlagen bearbeiten",
     "category_has_no_templates": "Keine Vorlagen",
+    "tooltips": {
+      "template_requests": "Anträge verwenden dieses Template",
+      "delete_template": "Löschen",
+      "archive_template": "Archivieren",
+      "unarchive_template": "Dearchivieren",
+      "show_archived": "Archivierte Anzeigen"
+    },
     "formfield": {
+      "link": "",
       "model": "Bestehendes Modell",
       "article_name": "Artikel oder Projekt",
       "article_number": "Artikelnr. oder Herstellernr.",
@@ -149,7 +141,6 @@
       "toDelete": ""
     }
   },
-
   "admin": {
     "users": {
       "title": "Benutzer",
@@ -193,9 +184,10 @@
     "form": {
       "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
     },
-    "InlineSearch": { "placeholder": "Suchen" }
+    "InlineSearch": {
+      "placeholder": "Suchen"
+    }
   },
-
   "errors": {
     "error_title": "FEHLER",
     "error_btn_retry": "neu versuchen",

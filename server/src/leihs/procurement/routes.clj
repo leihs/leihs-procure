@@ -8,6 +8,7 @@
     [leihs.core.anti-csrf.back :as anti-csrf]
     [leihs.core.auth.session :as session]
     [leihs.core.db :as db]
+    [leihs.core.graphql :as core-graphql]
     [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
     [leihs.core.locale :as locale]
     [leihs.core.routes :as core-routes]
@@ -127,7 +128,7 @@
             "text/html" :qs 1 :as :html]}))
 
 (defn init []
-  (I> wrap-handler-with-logging
+  (-> #_I> #_wrap-handler-with-logging
       dispatch-to-handler
       anti-csrf/wrap
       locale/wrap
@@ -137,10 +138,11 @@
       wrap-cookies
       settings/wrap
       (status/wrap (path :status))
+      db/wrap-tx
       wrap-json-response
       (wrap-json-body {:keywords? true})
       wrap-empty
-      db/wrap-tx
+      core-graphql/wrap-with-schema
       core-routing/wrap-canonicalize-params-maps
       wrap-params
       wrap-multipart-params
