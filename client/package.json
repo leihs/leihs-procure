@@ -20,7 +20,7 @@
     "ci:lint": "npx eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
     "lint:json": "npx prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
-    "test": "NODE_ENV=test jest --updateSnapshot"
+    "test": "vitest"
   },
   "dependencies": {
     "@apollo/client": "^3.8.4",
@@ -73,13 +73,10 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.22.20",
-    "@babel/preset-react": "^7.22.15",
-    "babel-jest": "^29.7.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "jscodeshift": "^0.15.0",
-    "jsdom": "^22.1.0"
+    "@vitest/coverage-v8": "^0.34.6",
+    "@vitest/ui": "^0.34.6",
+    "jsdom": "^22.1.0",
+    "vitest": "^0.34.6"
   },
   "prettier": {
     "printWidth": 80,
@@ -116,19 +113,6 @@
     "collectCoverageFrom": [
       "src/components/Bootstrap/*.{js,jsx}",
       "!**/*.examples.{js,jsx}"
-    ]
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-react",
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "current"
-          }
-        }
-      ]
     ]
   },
   "browserslist": [

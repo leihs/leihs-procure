@@ -11,5 +11,14 @@ export default defineConfig({
     proxy: {
       '/procure/graphql': 'http://localhost:3230'
     }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    reporters: ['default', 'html'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html']
+    }
   }
 })
