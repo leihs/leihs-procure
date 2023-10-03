@@ -4,6 +4,7 @@ import f from 'lodash'
 import fpSet from 'lodash/fp/set'
 import logger from 'debug'
 const log = logger('app:ui:StatefulForm')
+import { isNonEmptyValue } from '../../lib/utils'
 
 /*
 
@@ -81,7 +82,7 @@ export default class StatefulForm extends React.PureComponent {
       const conf = { ...defaultConf, ...opts }
       const { idPrefix } = conf
       const getValue = (name) =>
-        f.defaultTo(f.presence(f.get(fields, name)), '')
+        isNonEmptyValue(fields[name]) ? fields[name] : ''
       const setValue = (name, value) =>
         this.updateField({ name, value }, props.onChange)
 

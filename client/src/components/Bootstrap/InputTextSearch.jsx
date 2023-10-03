@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import PropTypes from 'prop-types'
 import f from 'lodash'
+import { isNonEmptyValue } from '../../lib/utils'
 
 import Icon from '../Icons'
 
@@ -9,12 +10,12 @@ const InputTextSearch = ({
   size,
   label,
   name,
-  value,
+  value: inputValue,
   onChange,
   clearLabel,
   className
 }) => {
-  value = f.isString(value) && f.presence(value)
+  const value = typeof inputValue === "string" && isNonEmptyValue(inputValue) ? value : ''
   const onClear = e => onChange({ target: { name, value: '' } })
   return (
     <div

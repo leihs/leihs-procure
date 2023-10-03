@@ -2,6 +2,7 @@ import React, { Fragment as F } from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames/dedupe'
 import f from 'lodash'
+import { isNonEmptyValue } from '../../lib/utils'
 
 import BsButton from 'reactstrap/lib/Button'
 import BsButtonGroup from 'reactstrap/lib/ButtonGroup'
@@ -273,8 +274,8 @@ export const InputField = ({
   if (type === 'textarea') {
     tag = type
     type = null
-    minRows = f.presence(minRows) || 3
-    maxRows = f.presence(maxRows) || 7
+    minRows = isNonEmptyValue(minRows) ? minRows : 3
+    maxRows = isNonEmptyValue(maxRows) ? maxRows : 7
     inputProps = {
       rows: Math.max(
         minRows,

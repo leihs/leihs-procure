@@ -20,7 +20,8 @@
     "ci:lint": "npx eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
     "lint:json": "npx prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
-    "test": "jest"
+    "test": "jest --updateSnapshot"
+
   },
   "dependencies": {
     "@apollo/client": "^3.8.4",
@@ -39,6 +40,7 @@
     "bootstrap": "^4.2.1",
     "browser-info": "^1.2.0",
     "classnames": "^2.3.2",
+    "cross-fetch": "^4.0.0",
     "debug": "^3.2.6",
     "downshift": "^1.31.16",
     "eslint": "^8.49.0",

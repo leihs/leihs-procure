@@ -1,6 +1,7 @@
 import { ApolloClient, createHttpLink } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { InMemoryCache } from '@apollo/client/cache'
+import fetch from 'cross-fetch';
 import { isDev, store } from './env'
 
 import logger from 'debug'
@@ -35,7 +36,8 @@ export const fetchOptions = {
 
 const httpLink = createHttpLink({
   uri: endpointURL,
-  credentials: 'include'
+  credentials: 'include',
+  fetch
 })
 
 const authLink = setContext((_, { headers }) => {

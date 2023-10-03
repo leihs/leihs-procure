@@ -4,6 +4,7 @@ import cx from 'classnames'
 import f from 'lodash'
 import { Label } from './Bootstrap'
 import Icon from '../Icons'
+import { isNonEmptyValue } from '../../lib/utils'
 
 const BASE_CLASS = 'ui-btn-radio'
 
@@ -16,12 +17,12 @@ class ButtonRadio extends React.PureComponent {
   getSelectedValueProp(value, selected) {
     // `value` or `selected` is accepted, depending on consistency
     // with DOM or between components is desired.
-    if (f.present(value) && f.present(selected)) {
+    if (isNonEmptyValue(value) && isNonEmptyValue(selected)) {
       throw new Error(
         'Props `value` and `selected` were given, please only use 1 of them!'
       )
     }
-    return f.present(value) ? value : selected
+    return isNonEmptyValue(value) ? value : selected
   }
 
   isDisabled = (p = this.props) => p.disabled || p.readOnly
