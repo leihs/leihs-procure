@@ -9,7 +9,6 @@
 .shadow-cljs/
 /client/src/locale/xx.json
 /client/src/locale/zz.json
-/leihs-ui.tgz
 /node_modules
 /resources/public/admin/js/
 /target

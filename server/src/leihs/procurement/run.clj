@@ -9,12 +9,9 @@
     [leihs.core.http-server :as http-server]
     [leihs.core.json-protocol]
     [leihs.core.shutdown :as shutdown]
-    [leihs.core.ssr-engine :as ssr-engine]
-    [leihs.core.ssr]
     [leihs.core.status :as status]
     [leihs.procurement.graphql :as graphql]
     [leihs.procurement.routes :as routes]
-    [leihs.procurement.ssr]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug]
     [logbug.thrown :as thrown]
@@ -26,8 +23,6 @@
     {:return-fn (fn [e] (System/exit -1))}
     (logging/info "Invoking run with options: " options)
     (shutdown/init options)
-    (ssr-engine/init options)
-    (leihs.core.ssr/init leihs.procurement.ssr/render-page-base)
     (graphql/init)
     (let [status (status/init)]
       (db/init options (:health-check-registry status)))
