@@ -20,8 +20,7 @@
     "ci:lint": "npx eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
     "lint:json": "npx prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
-    "test": "jest --updateSnapshot"
-
+    "test": "NODE_ENV=test jest --updateSnapshot"
   },
   "dependencies": {
     "@apollo/client": "^3.8.4",
@@ -111,13 +110,25 @@
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/",
-      "\\.css$",
-      "node_modules/(?!(react-day-picker)/)"
+      "\\.css$"
     ],
     "testEnvironment": "jsdom",
     "collectCoverageFrom": [
       "src/components/Bootstrap/*.{js,jsx}",
       "!**/*.examples.{js,jsx}"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react",
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
     ]
   },
   "browserslist": [

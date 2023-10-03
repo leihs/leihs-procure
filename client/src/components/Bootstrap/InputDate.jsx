@@ -1,6 +1,5 @@
 import React from 'react'
 import cx from 'classnames'
-// import f from 'lodash'
 
 import DayPickerInput from 'react-day-picker/DayPickerInput'
 import { DateTime } from 'luxon'
@@ -11,7 +10,7 @@ import MomentLocaleUtils, {
 } from 'react-day-picker/moment'
 
 // TODO: import globally?
-// import 'react-day-picker/lib/style.css'
+import 'react-day-picker/lib/style.css'
 
 // FIXME: choose locale/language/format
 import 'moment/locale/de'
