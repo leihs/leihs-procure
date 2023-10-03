@@ -93,7 +93,7 @@ describe('RequestTotalAmount', () => {
   ]
 
   cases.forEach(({ fields, result }, i) => {
-    debugger;
-    return test(`case ${i}`, () => expect(RequestTotalAmount(fields)).toEqual(result))
+    return test(`case ${i}`, () =>
+      expect(RequestTotalAmount(fields)).toEqual(result))
   })
 })

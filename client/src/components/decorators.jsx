@@ -16,7 +16,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   //       Guards against forgetting to query the keys/fields (via GraphQL)!
   const expectKeys = !isDev
     ? f.noop
-    : wanted => {
+    : (wanted) => {
       if (!isDev) return
       const missing = f.difference(wanted, Object.keys(o))
       if (missing.length > 0) throw new Error(`Missing keys! ${missing}`)
@@ -54,7 +54,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
         return `${o.firstname || ''} ${o.lastname || ''}`
           .split(/\W/)
           .filter(f.presence)
-          .map(s => f.first(s).toUpperCase())
+          .map((s) => f.first(s).toUpperCase())
           .filter((s, i, a) => i < 2 || a.length - i <= 3)
           .join('')
 
@@ -71,7 +71,7 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
   }
 }
 
-export const budgetPeriodDates = bp => {
+export const budgetPeriodDates = (bp) => {
   const now = DateTime.local()
   const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
   const endDate = DateTime.fromISO(bp.end_date)
@@ -106,16 +106,14 @@ export const RequestFieldValue = (name, request) => {
   }
 }
 
-export const RequestTotalAmount = fields => {
-  debugger;
-  const allQuantities = ['requested', 'approved', 'order'].map(k => {
+export const RequestTotalAmount = (fields) => {
+  const allQuantities = ['requested', 'approved', 'order'].map((k) => {
     const value = fields[`${k}_quantity`]
     return typeof value === 'object' && value !== null ? value.value : value
   })
 
-  const quantity = allQuantities.filter(el => isNonEmptyValue(el)).at(-1)
-  const price_cents =
-    fields?.price_cents?.value || fields?.price_cents || '0'
+  const quantity = allQuantities.filter((el) => isNonEmptyValue(el)).at(-1)
+  const price_cents = fields?.price_cents?.value || fields?.price_cents || '0'
 
   const price = parseInt(price_cents, 10)
   return (parseInt(quantity, 10) || 0) * price
