@@ -23,27 +23,6 @@ import CurrentUser from '../containers/CurrentUserProvider'
 import { UncontrolledTooltip } from 'reactstrap'
 
 // # DATA
-//
-const TEMPLATES_FRAGMENT = gql`
-  fragment TemplateProps on Template {
-    id
-    article_name
-    article_number
-    model {
-      id
-      product
-      version
-    }
-    requests_count
-    is_archived
-    price_cents
-    price_currency
-    supplier_name
-    supplier {
-      id
-    }
-  }
-`
 const TEMPLATES_PAGE_QUERY = gql`
   query adminTemplates {
     main_categories {
@@ -54,12 +33,26 @@ const TEMPLATES_PAGE_QUERY = gql`
         id
         name
         templates {
-          ...TemplateProps
+          id
+          article_name
+          article_number
+          model {
+            id
+            product
+            version
+          }
+          requests_count
+          is_archived
+          price_cents
+          price_currency
+          supplier_name
+          supplier {
+            id
+          }
         }
       }
     }
   }
-  ${TEMPLATES_FRAGMENT}
 `
 
 const UPDATE_TEMPLATES_MUTATION = gql`
@@ -124,10 +117,12 @@ class AdminTemplates extends React.Component {
             onCompleted={() => this.setState({ formKey: Date.now() })}
           >
             {(mutate, info) => (
+
               <Query query={TEMPLATES_PAGE_QUERY}>
                 {({ loading, error, data }) => {
                   if (loading) return <Loading />
                   if (error) return <ErrorPanel error={error} data={data} />
+
 
                   return (
                     <MainWithSidebar>
