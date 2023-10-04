@@ -1,11 +1,8 @@
 @import './bootstrap-leihs.css';
 @import './graphiql-fixes.css';
-
 @import 'tachyons-type-scale';
+@import './bootstrap-extensions.css';
 
-/* variables (used in React inline styles, needs browser support)
-   vars used but not defined here come from bootstrap.
-*/
 :root {
   --content-color: var(--black);
   --content-bg-color: var(--white);
@@ -14,8 +11,6 @@
 body {
   background: var(--content-bg-color);
 }
-
-@import './bootstrap-extensions.css';
 
 /*
  TODO: form field styles for 'to be deleted' (muted .bg-danger, .text-strike)
