@@ -1,4 +1,5 @@
 import { RequestTotalAmount } from './decorators'
+import { test, expect } from 'vitest'
 
 describe('RequestTotalAmount', () => {
   const cases = [

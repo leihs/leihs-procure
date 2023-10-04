@@ -15,12 +15,12 @@
     "cleanup-typescript": "find . -type f -name '*.ts' -or -name '*.tsx' | xargs rm",
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
-    "coverage": "npm test -- --coverage",
     "lint": "npx eslint --fix 'src/' && npm run -s lint:json",
     "ci:lint": "npx eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
     "lint:json": "npx prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest --coverage"
   },
   "dependencies": {
     "@apollo/client": "^3.8.4",
@@ -34,7 +34,6 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "accounting-js": "^1.1.1",
-    "babel-eslint": "^10.1.0",
     "bootstrap": "^4.2.1",
     "browser-info": "^1.2.0",
     "classnames": "^2.3.2",
@@ -73,6 +72,8 @@
   "devDependencies": {
     "@vitest/coverage-v8": "^0.34.6",
     "@vitest/ui": "^0.34.6",
+    "eslint-plugin-vitest": "^0.3.2",
+    "eslint-plugin-vitest-globals": "^1.4.0",
     "jsdom": "^22.1.0",
     "vitest": "^0.34.6"
   },
@@ -87,20 +88,27 @@
   "eslintConfig": {
     "env": {
       "browser": true,
-      "es2021": true
+      "es2021": true,
+      "vitest-globals/env": true
     },
+    "plugins": [
+      "react",
+      "vitest"
+    ],
     "extends": [
       "eslint:recommended",
-      "plugin:react/recommended"
+      "plugin:react/recommended",
+      "plugin:vitest/recommended",
+      "plugin:vitest-globals/recommended"
     ],
     "parserOptions": {
       "ecmaVersion": "latest",
       "sourceType": "module"
     },
-    "plugins": [
-      "react"
-    ],
-    "rules": {}
+    "rules": {
+      "no-unused-vars": "warn",
+      "vitest/prefer-to-be": "off"
+    }
   },
   "browserslist": [
     ">0.2%",
