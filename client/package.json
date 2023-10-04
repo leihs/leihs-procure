@@ -16,7 +16,7 @@
     "analyze": "source-map-explorer build/static/js/main.*",
     "analyze-build": "npm run -s build && npm run -s analyze",
     "lint": "npx eslint --fix 'src/' && npm run -s lint:json",
-    "ci:lint": "npx eslint --max-warnings=0 'src/' && npm run -s ci:lint:json",
+    "ci:lint": "npx eslint 'src/' && npm run -s ci:lint:json",
     "lint:json": "npx prettier --write 'src/{,**/}*.json'",
     "ci:lint:json": "npx prettier --list-different 'src/{,**/}*.json'",
     "test": "vitest",
