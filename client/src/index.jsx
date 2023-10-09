@@ -40,7 +40,8 @@ f.mixin(lodashMixins)
 // dev helpers
 initDevHelpers()
 
-const baseName = process.env.PUBLIC_URL // set in package.json/homepage
+const baseName = import.meta.env.BASE_URL // set in package.json/homepage
+console.debug(baseName)
 
 const Root = () => (
   <ApolloProvider client={apolloClient}>

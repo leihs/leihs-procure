@@ -6,7 +6,7 @@ set -euo pipefail
 PROJECT_NAME="leihs-procure-client"
 
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-ARTEFACT_PATHS="./dist"
+ARTEFACT_PATHS="./build"
 DIGEST="$(git -C "$PROJECT_DIR" rev-parse HEAD:client)" # NOTE: check only the tree of the *subdirectory* or caching will be useless
 LOCAL_CACHE_DIR="${LOCAL_CACHE_DIR:-"${TMPDIR:-/tmp/}/leihs-build-cache"}"
 LOCAL_CACHED_ARTEFACT_PATH="${LOCAL_CACHE_DIR}/${PROJECT_NAME}_${DIGEST}.tgz"

@@ -4,7 +4,10 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/procure/',
+  build: {
+    outDir: 'build'
+  },
   plugins: [react(), nodePolyfills()],
   server: {
     port: 4000,
