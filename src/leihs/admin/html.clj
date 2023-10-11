@@ -46,9 +46,6 @@
             [:div.container-fluid
              [:h1.text-danger "Error 404 - Not Found"]]])})
 
-(defn navbar [request]
-  )
-
 (defn html-handler [request]
   {:headers {"Content-Type" "text/html"}
    :body (html5

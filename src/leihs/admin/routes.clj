@@ -291,7 +291,7 @@
 
 (defn init []
   (routing/init paths resolve-table)
-  (I> wrap-handler-with-logging
+  (-> ; I> wrap-handler-with-logging
       routing/dispatch-to-handler
       (auth/wrap resolve-table)
       wrap-dispatch-content-type
