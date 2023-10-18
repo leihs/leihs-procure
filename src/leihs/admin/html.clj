@@ -7,18 +7,18 @@
     [leihs.admin.utils.release-info :as release-info]
     [leihs.core.http-cache-buster2 :as cache-buster]
     [leihs.core.json :refer [to-json]]
-    [leihs.core.ssr :as ssr]
     [leihs.core.url.core :as url]
     [logbug.catcher :as catcher]
     [logbug.debug :as debug :refer [I>]]
     [logbug.ring :refer [wrap-handler-with-logging]]
     [logbug.thrown :as thrown]
     [taoensso.timbre :refer [debug info warn error spy]]
+    [leihs.core.remote-navbar.shared :refer [navbar-props]]
     ))
 
 (defn include-site-css []
   (hiccup.page/include-css
-    (cache-buster/cache-busted-path "/admin/css/site.css")))
+    (cache-buster/cache-busted-path "/admin/ui/admin-ui.css")))
 
 (defn head []
   [:head
@@ -28,13 +28,18 @@
    [:style "ol.breadcrumb.leihs-nav-right:empty {display: none}"]
    (include-site-css)])
 
+(defn navbar-attribute [request]
+  (let [navbar (navbar-props request {:admin false})]
+    (-> navbar to-json url/encode)))
+
 (defn body-attributes [request]
   {:data-user (some-> (:authenticated-entity request) to-json url/encode)
    :data-server-state (some-> @state*
                               (assoc :settings
                                      (-> request :settings
                                          (select-keys [:external_base_url])))
-                              to-json url/encode)})
+                              to-json url/encode)
+   :data-navbar (navbar-attribute request)})
 
 (defn not-found-handler [request]
   {:status 404
@@ -52,17 +57,10 @@
            (head)
            [:body (body-attributes request)
             [:div
-             (try
-               (ssr/render-navbar request {:admin false})
-               (catch Exception e
-                 (warn "Failed to load navbar: " (ex-message e))
-                 [:div]))
-             [:div#app.container-fluid
-              [:div.alert.alert-warning
+             [:div#app
+              [:div.container-fluid.alert.alert-warning
                [:h1 "Leihs Admin2"]
                [:p "This application requires Javascript."]]]]
-            (hiccup.page/include-js (cache-buster/cache-busted-path
-                                      "/admin/leihs-shared-bundle.js"))
             (hiccup.page/include-js
               (cache-buster/cache-busted-path "/admin/js/main.js"))])})
 

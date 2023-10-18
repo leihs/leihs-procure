@@ -1,7 +1,7 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.suspension.core
   (:refer-clojure :exclude [str keyword])
   (:require
-    ["@leihs/ui-components" :as UI]
+    ["/admin-ui" :as UI]
     ["date-fns" :as date-fns]
     [accountant.core :as accountant]
     [cljs.core.async :as async :refer [go]]
@@ -65,7 +65,7 @@
 (defn supension-inner-form-component [disabled data*]
   [:div.my-3
    [form-components/input-component data* [:suspended_until]
-    :element (reagent/adapt-react-class UI/DatePicker)
+    :element (reagent/adapt-react-class UI/Components.DatePicker)
     :disabled disabled
     :extra-props { :minDate "tomorrow" }
     :placeholder (when disabled "")

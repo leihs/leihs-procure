@@ -39,6 +39,19 @@ jobs:
       include:
         - cider-ci/specs_job-context.yml
 
+  ui-checks:
+    name: Check UI package
+    run_when: *ON_BRANCH_UPDATE
+    tasks:
+      ui-lint:
+        git_options:
+          submodules:
+            include_match: ^.*$
+        scripts:
+          test:
+            body: |
+              ./ui/bin/lint
+              
   good-to-merge:
     name: ⚑ Good To Merge
     description: |

@@ -7,7 +7,6 @@
 /.cpcache
 /.sass-cache
 /.shadow-cljs
-/leihs-ui.tgz
 /log
 /node_modules
 /resources/public/admin/js/
@@ -16,3 +15,8 @@
 figwheel_server.log
 profiles.clj
 resources/built-info.yml
+
+# ui
+ui/storybook-static
+ui/node_modules
+ui/dist

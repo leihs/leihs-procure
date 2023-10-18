@@ -1,0 +1,17 @@
+@import './variables';
+
+@import './custom/reset';
+@import '~bootstrap/scss/bootstrap';
+
+@import '~@fortawesome/fontawesome-svg-core/styles.css';
+
+@import '~@leihs/calendar/dist/styles.css'; // main css file
+@import '~@leihs/calendar/dist/theme/default.css'; // theme css file
+
+@import './custom/globals';
+@import './custom/typography';
+@import './custom/bootstrap-extensions';
+
+// styling of react components
+@import './custom/navbar';
+@import './custom/datepicker';

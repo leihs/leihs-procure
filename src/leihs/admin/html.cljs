@@ -4,7 +4,6 @@
     [reagent.ratom :as ratom :refer [reaction]]
     )
   (:require
-    ["@leihs/ui-components" :as UI]
     ["react-bootstrap" :as BS]
     [accountant.core :as accountant]
     [clojure.pprint :refer [pprint]]
@@ -17,9 +16,11 @@
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.env :refer [use-global-navbar?]]
     [leihs.core.routing.front :as routing]
+    [leihs.core.dom :as dom]
     [leihs.core.user.front :as core-user]
     [leihs.core.user.shared :refer [short-id]]
     [reagent.dom :as rdom]
+    ["/admin-ui" :as UI]
     ))
 
 (defn li-navitem [handler-key display-string]
@@ -79,13 +80,14 @@
 (defn current-page []
   [:div
    [leihs.admin.common.http-client.modals/modal-component]
-   [:div
+   (let [navbar-data (dom/data-attribute "body" "navbar")]
+     [:> UI/Components.Navbar navbar-data])
+   [:div.container-fluid
     (if-let [page (:page @routing/state*)]
       [page]
       [:div.page
        [:h1.text-danger
-        ;; NOTE: usage of this Bold component from leihs-ui seems pointless, but acts as a smoke test for the build system!
-        [:> UI/Bold "Error 404 - There is no handler for the current path defined."]]])]
+        [:b "Error 404 - There is no handler for the current path defined."]]])]
    [state/debug-component]
    [footer]])
 

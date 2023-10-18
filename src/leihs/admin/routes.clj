@@ -313,10 +313,9 @@
       wrap-content-type
       (wrap-resource
         "public" {:allow-symlinks? true
-                  :cache-bust-paths ["/admin/css/site.css"
-                                     "/admin/css/site.min.css"
-                                     "/admin/js/main.js"
-                                     "/admin/leihs-shared-bundle.js"]
+                  :cache-bust-paths ["/admin/ui/admin-ui.css"
+                                     "/admin/ui/admin-ui.min.css"
+                                     "/admin/js/main.js"]
                   :never-expire-paths [#".*fontawesome-[^\/]*\d+\.\d+\.\d+\/.*"
                                        #".+_[0-9a-f]{40}\..+"]
                   :enabled? true})

@@ -6,12 +6,10 @@
     [leihs.admin.paths]
     [leihs.admin.routes :as routes]
     [leihs.admin.state :as state]
-    [leihs.admin.utils.ssr]
     [leihs.core.core :refer [keyword str presence]]
     [leihs.core.db :as db]
     [leihs.core.http-server :as http-server]
     [leihs.core.shutdown :as shutdown]
-    [leihs.core.ssr-engine :as ssr-engine]
     [leihs.core.status :as status]
     [leihs.core.url.http :as http-url]
     [leihs.core.url.jdbc :as jdbc-url]
@@ -27,8 +25,6 @@
     {:return-fn (fn [e] (System/exit -1))}
     (info "Invoking run with options: " options)
     (shutdown/init options)
-    (ssr-engine/init options)
-    (leihs.core.ssr/init leihs.admin.utils.ssr/render-page-base)
     (let [status (status/init)]
       (db/init options (:health-check-registry status)))
     (state/init)
