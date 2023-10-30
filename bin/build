@@ -4,66 +4,24 @@ set -euo pipefail
 ### VARIABLES and PWD #########################################################
 
 PROJECT_NAME="leihs-procure"
-
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-
-SERVER_DIR=${PROJECT_DIR}/server
-CLIENT_DIR=${PROJECT_DIR}/client
-
-ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
-DIGEST="$(git -C "$PROJECT_DIR" log -n 1 HEAD --pretty=%T)"
-LOCAL_CACHE_DIR="${LOCAL_CACHE_DIR:-"${TMPDIR:-/tmp/}/leihs-build-cache"}"
-LOCAL_CACHED_ARTEFACT_PATH="${LOCAL_CACHE_DIR}/${PROJECT_NAME}_${DIGEST}.jar"
-BUILD_CACHE_DISABLED="${BUILD_CACHE_DISABLED:-NO}"
-
 cd "${PROJECT_DIR}"
-echo "PWD: $PWD"
+source "server/shared-clj/bin/helpers/build.sh"
 
-if [ $BUILD_CACHE_DISABLED == "YES" ] ||  [ $BUILD_CACHE_DISABLED == "NO" ]; then
-  echo "BUILD_CACHE_DISABLED=$BUILD_CACHE_DISABLED"
-  mkdir -p "$LOCAL_CACHE_DIR"
-else
-  echo 'BUILD_CACHE_DISABLED must be initially unset, or "YES", or "NO"'
-  exit 1
-fi
-
+SHARED_CLJ_DIR="${PROJECT_DIR}/server/shared-clj"
+ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 
 ### functions #################################################################
 
-function build {
-  ${CLIENT_DIR}/bin/build || { echo "CLIENT build error!"; exit 1; }
-  ${SERVER_DIR}/bin/clj-uberjar || { echo "CLIENT uberjar error!"; exit 1; }
+function build_core {
+  ./client/bin/build
+  ./server/bin/clj-uberjar
 }
-
-function pack {
-  cp "$ARTEFACT_PATH" "$LOCAL_CACHED_ARTEFACT_PATH"
-}
-
-function extract {
-  mkdir -p $(dirname $ARTEFACT_PATH)
-  cp "$LOCAL_CACHED_ARTEFACT_PATH" "$ARTEFACT_PATH"
-}
-
 
 ### MAIN ######################################################################
 
-if [ $BUILD_CACHE_DISABLED == "YES" ]; then
-  echo "INFO: BUILD_CACHE_DISABLED is YES, building and nothing else"
-  build
-else
-  echo "LOCAL_CACHED_ARTEFACT_PATH: $LOCAL_CACHED_ARTEFACT_PATH"
-
-  if [ -e $LOCAL_CACHED_ARTEFACT_PATH ]; then
-    echo "INFO: locally cached artefact found, extracting, and caching ..."
-    extract
-  else
-    build
-    pack
-  fi
-fi
-
+build
 cd -
-
 echo "OK ✔"
 
 # vi: ft=sh

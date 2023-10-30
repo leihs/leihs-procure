@@ -1,68 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-### VARIABLES and PWD #########################################################
-
-PROJECT_NAME="leihs-procure-client"
-
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-ARTEFACT_PATHS="./build"
-DIGEST="$(git -C "$PROJECT_DIR" rev-parse HEAD:client)" # NOTE: check only the tree of the *subdirectory* or caching will be useless
-LOCAL_CACHE_DIR="${LOCAL_CACHE_DIR:-"${TMPDIR:-/tmp/}/leihs-build-cache"}"
-LOCAL_CACHED_ARTEFACT_PATH="${LOCAL_CACHE_DIR}/${PROJECT_NAME}_${DIGEST}.tgz"
-BUILD_CACHE_DISABLED="${BUILD_CACHE_DISABLED:-NO}"
+cd $PROJECT_DIR
+echo $PROJECT_DIR
 
-cd "${PROJECT_DIR}"
-echo "PWD: $PWD"
+$PROJECT_DIR/bin/env/nodejs-setup
 
-if [ $BUILD_CACHE_DISABLED == "YES" ] ||  [ $BUILD_CACHE_DISABLED == "NO" ]; then
-  echo "BUILD_CACHE_DISABLED=$BUILD_CACHE_DISABLED"
-  mkdir -p "$LOCAL_CACHE_DIR"
-else
-  echo 'BUILD_CACHE_DISABLED must be initially unset, or "YES", or "NO"'
-  exit 1
-fi
-
-
-### functions #################################################################
-
-function build {
-  export PUBLIC_URL="/procure"
-  ${PROJECT_DIR}/bin/env/nodejs-setup
-  npm ci --no-audit
-  npm run ci-build
-}
-
-function pack {
-  # NOTE: only move to final destination after packing is done, to not create invalid archives when the script is aborted
-  TMP_TAR_FILE="$(mktemp -t "${PROJECT_NAME}.XXXXXXX")"
-  tar -cvz -f "$TMP_TAR_FILE" $ARTEFACT_PATHS \
-  && mv "$TMP_TAR_FILE" "$LOCAL_CACHED_ARTEFACT_PATH"
-}
-
-function extract {
-  tar -xvz -f "$LOCAL_CACHED_ARTEFACT_PATH"
-}
-
-
-### MAIN ######################################################################
-if [ $BUILD_CACHE_DISABLED == "YES" ]; then
-  echo "INFO: BUILD_CACHE_DISABLED is YES, building and nothing else"
-  build
-else
-  echo "LOCAL_CACHED_ARTEFACT_PATH: $LOCAL_CACHED_ARTEFACT_PATH"
-
-  if [ -e $LOCAL_CACHED_ARTEFACT_PATH ]; then
-    echo "INFO: locally cached artefact found, extracting, and caching ..."
-    extract
-  else
-    build
-    pack
-  fi
-fi
-
-cd -
-
-echo "OK ✔"
+npm ci --no-audit
+npm run build
 
 # vi: ft=sh
