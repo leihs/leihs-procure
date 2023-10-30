@@ -4,8 +4,4 @@ set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
 $PROJECT_DIR/client/bin/dev-run-frontend "$@"
 
-test -d node_modules && npm i || { npm ci || npm i ;}
-npm run build:ui
-npm start
-
 # vi: ft=sh
