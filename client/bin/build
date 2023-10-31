@@ -6,7 +6,6 @@ set -euo pipefail
 PROJECT_NAME="leihs-procure-client"
 
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-UI_DIR="${PROJECT_DIR}/leihs-ui"
 ARTEFACT_PATHS="./build"
 DIGEST="$(git -C "$PROJECT_DIR" rev-parse HEAD:client)" # NOTE: check only the tree of the *subdirectory* or caching will be useless
 LOCAL_CACHE_DIR="${LOCAL_CACHE_DIR:-"${TMPDIR:-/tmp/}/leihs-build-cache"}"
@@ -47,14 +46,10 @@ function extract {
 
 
 ### MAIN ######################################################################
-
 if [ $BUILD_CACHE_DISABLED == "YES" ]; then
   echo "INFO: BUILD_CACHE_DISABLED is YES, building and nothing else"
   build
 else
-
-  source ${UI_DIR}/bin/require-clean-working-tree.sh
-  require-clean-working-tree
   echo "LOCAL_CACHED_ARTEFACT_PATH: $LOCAL_CACHED_ARTEFACT_PATH"
 
   if [ -e $LOCAL_CACHED_ARTEFACT_PATH ]; then

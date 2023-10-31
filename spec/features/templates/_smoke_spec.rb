@@ -11,7 +11,7 @@ feature 'smoke test' do
   context 'as inspector' do
     before(:each) do
       Helpers::User.sign_in_as @inspector
-      visit('/templates/edit')
+      click_on('Vorlagen')
     end
 
     scenario 'click on category' do

@@ -1,11 +1,14 @@
 @import './bootstrap-leihs.css';
 @import './graphiql-fixes.css';
+@import 'tachyons-type-scale';
+@import './bootstrap-extensions.css';
 
-@import '~tachyons-type-scale';
+.rdp-head_cell,
+.rdp-cell {
+  padding: 0 !important;
+  border: 0 !important;
+}
 
-/* variables (used in React inline styles, needs browser support)
-   vars used but not defined here come from bootstrap.
-*/
 :root {
   --content-color: var(--black);
   --content-bg-color: var(--white);
@@ -14,8 +17,6 @@
 body {
   background: var(--content-bg-color);
 }
-
-@import './bootstrap-extensions.css';
 
 /*
  TODO: form field styles for 'to be deleted' (muted .bg-danger, .text-strike)
@@ -33,6 +34,10 @@ body {
   hyphens: auto;
 }
 
+.w-unset > .popover {
+  max-width: unset;
+}
+
 /* ??? action buttons ??? */
 .btn-massive {
   /* box-shadow: 0 0.2rem 0 0 rgba(52, 58, 64, 0.25); */
@@ -45,5 +50,57 @@ body {
 @media print {
   .container {
     width: auto;
+  }
+}
+
+.slide-wrapper {
+  position: absolute;
+  z-index: 1000;
+  top: 5%;
+  right: 0;
+  width: 350px;
+  padding-right: 1rem;
+  height: auto;
+  transform: translateX(100%);
+  -webkit-transform: translateX(100%);
+}
+
+.slide-in {
+  animation: slide-in 0.5s forwards;
+  -webkit-animation: slide-in 0.5s forwards;
+}
+
+.slide-out {
+  animation: slide-out 0.5s forwards;
+  -webkit-animation: slide-out 0.5s forwards;
+}
+
+@keyframes slide-in {
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@-webkit-keyframes slide-in {
+  100% {
+    -webkit-transform: translateX(0%);
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@-webkit-keyframes slide-out {
+  0% {
+    -webkit-transform: translateX(0%);
+  }
+  100% {
+    -webkit-transform: translateX(100%);
   }
 }

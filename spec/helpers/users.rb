@@ -13,7 +13,7 @@ module Helpers
       Capybara.fill_in('password', with: 'password')
       Capybara.click_on('Continue')
       # expect(page).to have_content user.lastname
-      # visit '/admin/'
+      Capybara.visit('/procure')
     end
   end
 end

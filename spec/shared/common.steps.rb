@@ -10,8 +10,15 @@ step "there is an empty database" do
   reset_database
 end
 
+step "I click on button :txt" do |txt|
+  # FIXME: remove this sleep, after upgrading to vite/apollo this throws a api error
+  sleep 0.1
+  find_button(txt).click()
+end
+
 step "I click on :txt" do |txt|
-  click_on txt
+  sleep 0.1
+  click_on(txt)
 end
 
 step "I click on :txt and accept the alert" do |txt|
@@ -59,6 +66,13 @@ step "I log in with the email :email" do |email|
   end
 end
 
+step "I take Screenshot" do
+  page.execute_script('console.log("Opening the console.")')
+  # Pause for a moment to allow time for the console to open
+  sleep 1
+  take_screenshot('tmp/error-screenshots')
+end
+
 step "I log in as the user" do
   step "I log in with the email '#{@user.email}'"
 end
@@ -76,4 +90,8 @@ step "I log out" do
   visit "/my/user/me"
   find(".fa-user-circle").click
   click_on "Logout"
+end
+
+step "I wait for :seconds seconds" do |seconds|
+  sleep seconds.to_i
 end

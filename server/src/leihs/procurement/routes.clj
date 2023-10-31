@@ -109,10 +109,9 @@
       (let [uri (:uri request)
             new-uri (some (fn [[s1 s2]]
                             (and (starts-with? uri s1) (replace uri s1 s2)))
-                          {"/procure/static" "/procure/client/static",
-                           "/procure/theme" "/procure/theme",
+                          {"/procure/assets" "/procure/client/assets",
                            "/procure/manifest.json"
-                             "/procure/client/manifest.json"})]
+                           "/procure/client/manifest.json"})]
         (if new-uri (handler (assoc request :uri new-uri)) (handler request)))
       (handler request))))
 
@@ -122,6 +121,7 @@
     handler
     {:mime ["application/json" :qs 1 :as :json
             "application/javascript" :qs 1 :as :javascript
+            "text/javascript" :qs 1 :as :javascript
             "image/apng" :qs 1 :as :apng
             "image/*" :qs 1 :as :image
             "text/css" :qs 1 :as :css
@@ -146,7 +146,6 @@
       core-routing/wrap-canonicalize-params-maps
       wrap-params
       wrap-multipart-params
-      wrap-content-type
       (wrap-resource "public"
                      {:allow-symlinks? true,
                       :cache-bust-paths [],
@@ -155,6 +154,7 @@
       wrap-rewrite-uri-for-static-paths
       wrap-resolve-handler
       wrap-accept
+      wrap-content-type
       ring-exception/wrap))
 
 ;#### debug ###################################################################
