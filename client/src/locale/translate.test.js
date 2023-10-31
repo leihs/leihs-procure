@@ -1,4 +1,5 @@
 import t from './translate'
+import { it, expect } from 'vitest'
 
 it('translates simple key', () => {
   expect(t('form_btn_save')).toEqual('Speichern')

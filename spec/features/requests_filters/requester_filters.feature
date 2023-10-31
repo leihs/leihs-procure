@@ -27,84 +27,84 @@ Feature: Requests' filter
     # requests for Requester One
     ############################################################################
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-requesting-phase |
-      | Kategorie                     | Category 1       |
-      | Artikel oder Projekt          | Product A        |
-      | Menge beantragt               | 1                |
-      | Priorität                     | Normal           |
+      | field                | value               |
+      | Requester            | Requester One       |
+      | Organization         | Organization 1      |
+      | Budgetperiode        | BP-requesting-phase |
+      | Kategorie            | Category 1          |
+      | Artikel oder Projekt | Product A           |
+      | Menge beantragt      | 1                   |
+      | Priorität            | Normal              |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-inspection-phase |
-      | Kategorie                     | Category 2       |
-      | Artikel oder Projekt          | Product B        |
-      | Menge beantragt               | 1                |
-      | Priorität                     | Normal           |
+      | field                | value               |
+      | Requester            | Requester One       |
+      | Organization         | Organization 1      |
+      | Budgetperiode        | BP-inspection-phase |
+      | Kategorie            | Category 2          |
+      | Artikel oder Projekt | Product B           |
+      | Menge beantragt      | 1                   |
+      | Priorität            | Normal              |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-past          |
-      | Kategorie                     | Category 3       |
-      | Artikel oder Projekt          | Product C        |
-      | Menge beantragt               | 1                |
-      | Priorität                     | Normal           |
+      | field                | value          |
+      | Requester            | Requester One  |
+      | Organization         | Organization 1 |
+      | Budgetperiode        | BP-past        |
+      | Kategorie            | Category 3     |
+      | Artikel oder Projekt | Product C      |
+      | Menge beantragt      | 1              |
+      | Priorität            | Normal         |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-past          |
-      | Kategorie                     | Category 3       |
-      | Artikel oder Projekt          | Product D        |
-      | Menge beantragt               | 2                |
-      | Menge bewilligt               | 1                |
-      | Priorität                     | Hoch             |
+      | field                | value          |
+      | Requester            | Requester One  |
+      | Organization         | Organization 1 |
+      | Budgetperiode        | BP-past        |
+      | Kategorie            | Category 3     |
+      | Artikel oder Projekt | Product D      |
+      | Menge beantragt      | 2              |
+      | Menge bewilligt      | 1              |
+      | Priorität            | Hoch           |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-past          |
-      | Kategorie                     | Category 3       |
-      | Artikel oder Projekt          | Product E        |
-      | Menge beantragt               | 1                |
-      | Menge bewilligt               | 1                |
-      | Priorität                     | Normal           |
+      | field                | value          |
+      | Requester            | Requester One  |
+      | Organization         | Organization 1 |
+      | Budgetperiode        | BP-past        |
+      | Kategorie            | Category 3     |
+      | Artikel oder Projekt | Product E      |
+      | Menge beantragt      | 1              |
+      | Menge bewilligt      | 1              |
+      | Priorität            | Normal         |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester One    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-past          |
-      | Kategorie                     | Category 3       |
-      | Artikel oder Projekt          | Product F        |
-      | Menge beantragt               | 1                |
-      | Menge bewilligt               | 0                |
-      | Priorität                     | Normal           |
+      | field                | value          |
+      | Requester            | Requester One  |
+      | Organization         | Organization 1 |
+      | Budgetperiode        | BP-past        |
+      | Kategorie            | Category 3     |
+      | Artikel oder Projekt | Product F      |
+      | Menge beantragt      | 1              |
+      | Menge bewilligt      | 0              |
+      | Priorität            | Normal         |
 
     ############################################################################
     # requests for Requester Two
     ###########################################################################
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester Two    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-requesting-phase |
-      | Kategorie                     | Category 1       |
+      | field         | value               |
+      | Requester     | Requester Two       |
+      | Organization  | Organization 1      |
+      | Budgetperiode | BP-requesting-phase |
+      | Kategorie     | Category 1          |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester Two    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-inspection-phase |
-      | Kategorie                     | Category 2       |
+      | field         | value               |
+      | Requester     | Requester Two       |
+      | Organization  | Organization 1      |
+      | Budgetperiode | BP-inspection-phase |
+      | Kategorie     | Category 2          |
     And there is a request with the following data:
-      | field                         | value            |
-      | Requester                     | Requester Two    |
-      | Organization                  | Organization 1   |
-      | Budgetperiode                 | BP-past          |
-      | Kategorie                     | Category 3       |
+      | field         | value          |
+      | Requester     | Requester Two  |
+      | Organization  | Organization 1 |
+      | Budgetperiode | BP-past        |
+      | Kategorie     | Category 3     |
 
     When I log in as the requester "Requester One"
     Then I see following budget periods:
@@ -113,13 +113,13 @@ Feature: Requests' filter
       | BP-past             |
     When I expand all categories
     Then I see requests for the following articles:
-      | article   | state      |
-      | Product A | Neu        |
-      | Product B | In Prüfung |
-      | Product C | Neu        |
+      | article   | state               |
+      | Product A | Neu                 |
+      | Product B | In Prüfung          |
+      | Product C | Neu                 |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
 
     When "Budgetperioden" filter name is "Alle 3 ausgewählt"
     And I uncheck all items for "Budgetperioden" filter
@@ -140,28 +140,28 @@ Feature: Requests' filter
     When I uncheck "Neu" for "Status Antrag" filter
     Then I see "4 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
-      | Product B | In Prüfung |
+      | article   | state               |
+      | Product B | In Prüfung          |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
     When I uncheck "In Prüfung" for "Status Antrag" filter
     Then I see "3 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
+      | article   | state               |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
     When I uncheck "Teilweise bewilligt" for "Status Antrag" filter
     Then I see "2 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
+      | article   | state     |
       | Product E | Genehmigt |
       | Product F | Abgelehnt |
     When I uncheck "Genehmigt" for "Status Antrag" filter
     Then I see "1 Antrag"
     And I see requests for the following articles:
-      | article   | state      |
+      | article   | state     |
       | Product F | Abgelehnt |
     When I uncheck "Abgelehnt" for "Status Antrag" filter
     Then I see "0 Anträge"
@@ -173,41 +173,41 @@ Feature: Requests' filter
     Then "Budgetperioden" filter name is "BP-inspection-phase, BP-past"
     And I see "5 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
-      | Product B | In Prüfung |
-      | Product C | Neu        |
+      | article   | state               |
+      | Product B | In Prüfung          |
+      | Product C | Neu                 |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
     When I uncheck "Category 2" for "Kategorien" filter
     Then "Kategorien" filter name is "Category 1, Category 3, Category 4"
     And I see "4 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
-      | Product C | Neu        |
+      | article   | state               |
+      | Product C | Neu                 |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
     When I uncheck "Neu" for "Status Antrag" filter
     And I see "3 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
+      | article   | state               |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |
     When I uncheck "Hoch" for "Priorität" filter
     Then "Priorität" filter name is "Normal"
     And I see "2 Anträge"
     And I see requests for the following articles:
-      | article   | state      |
+      | article   | state     |
       | Product E | Genehmigt |
       | Product F | Abgelehnt |
 
     When I search for "Product E"
     Then I see "1 Antrag"
     And I see requests for the following articles:
-      | article   | state      |
-      | Product E | Genehmigt  |          
+      | article   | state     |
+      | Product E | Genehmigt |
 
     When I click on "Filter zurücksetzen"
     Then I see following budget periods:
@@ -215,10 +215,10 @@ Feature: Requests' filter
       | BP-inspection-phase |
       | BP-past             |
     And I see requests for the following articles:
-      | article   | state      |
-      | Product A | Neu        |
-      | Product B | In Prüfung |
-      | Product C | Neu        |
+      | article   | state               |
+      | Product A | Neu                 |
+      | Product B | In Prüfung          |
+      | Product C | Neu                 |
       | Product D | Teilweise bewilligt |
-      | Product E | Genehmigt |
-      | Product F | Abgelehnt |
+      | Product E | Genehmigt           |
+      | Product F | Abgelehnt           |

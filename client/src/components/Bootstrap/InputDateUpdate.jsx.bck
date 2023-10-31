@@ -1,0 +1,68 @@
+import React, { useState, useEffect } from 'react'
+
+import { format } from 'date-fns'
+import { DayPicker } from 'react-day-picker'
+import 'react-day-picker/dist/style.css'
+
+import { Input, Popover, PopoverBody } from 'reactstrap'
+
+export default function DatePickerDialog({ bing, ...props }) {
+  const [selected, setSelected] = useState(
+    format(Date.parse(props.value), 'y-dd-MM') || ''
+  )
+  const [id, setId] = useState(crypto.randomUUID())
+  const [isOpen, setIsOpen] = useState(false)
+
+  // useEffect(() => {
+  //   setId(crypto.randomUUID()), [props]
+  // }, [])
+
+  const handleDaySelect = date => {
+    setSelected(date)
+    if (date) {
+      setIsOpen(false)
+      setSelected(format(date, 'y-MM-dd'))
+    } else {
+      setSelected('')
+    }
+  }
+
+  function handleChange() {
+    return () => {}
+  }
+  function handleToggle() {
+    return () => {
+      setIsOpen(true)
+    }
+  }
+
+  return (
+    <div>
+      <div>
+        <Input
+          type="date"
+          id={`date-picker-${id}`}
+          placeholder={format(new Date(), 'y-MM-dd')}
+          value={selected}
+          onChange={e => setSelected(e.target.value)}
+          // onFocus={handleToggle()}
+        />
+      </div>
+      {/* <Popover
+        className="w-unset"
+        target={`date-picker-${id}`}
+        placement="bottom"
+        toggle={() => setIsOpen(true)}
+        isOpen={isOpen}
+      >
+        <PopoverBody>
+          <DayPicker
+            mode="single"
+            selected={selected}
+            onSelect={handleDaySelect}
+          />
+        </PopoverBody>
+      </Popover> */}
+    </div>
+  )
+}

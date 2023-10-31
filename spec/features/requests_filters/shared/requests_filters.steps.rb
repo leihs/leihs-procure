@@ -66,10 +66,10 @@ step 'there is a(n) :role for categories:' do |role, table|
                       user: @user,
                       category: c)
   end
-  if role = 'inspector'
+  if role == 'inspector'
     @inspector = @user
   end
-  if role = 'viewer'
+  if role == 'viewer'
     @viewer = @user
   end
 end

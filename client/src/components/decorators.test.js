@@ -1,4 +1,5 @@
 import { RequestTotalAmount } from './decorators'
+import { test, expect } from 'vitest'
 
 describe('RequestTotalAmount', () => {
   const cases = [
@@ -30,7 +31,6 @@ describe('RequestTotalAmount', () => {
       },
       result: 0
     },
-
     {
       fields: {
         price_cents: { value: 100 },
@@ -93,7 +93,8 @@ describe('RequestTotalAmount', () => {
     }
   ]
 
-  cases.forEach(({ fields, result }, i) =>
-    test(`case ${i}`, () => expect(RequestTotalAmount(fields)).toEqual(result))
-  )
+  cases.forEach(({ fields, result }, i) => {
+    return test(`case ${i}`, () =>
+      expect(RequestTotalAmount(fields)).toEqual(result))
+  })
 })

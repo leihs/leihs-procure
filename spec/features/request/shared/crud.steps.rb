@@ -123,7 +123,7 @@ step 'I enter the following data into the request form:' do |table|
 end
 
 step 'I see a success message' do
-  expect(page).to have_selector '.alert-success'
+  expect(page).to have_selector '.text-success'
 end
 
 step 'the request form has the following data:' do |table|
@@ -235,6 +235,10 @@ end
 
 step 'I set the end date as :date on line :n' do |date, n|
   fill_in("#{n.to_i - 1}.end_date", with: date)
+end
+
+step "I select the first budget period" do 
+  first('select#request_new.budgetPeriod option').select_option  
 end
 
 step "I select budget period :bp" do |bp|

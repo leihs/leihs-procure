@@ -12,7 +12,7 @@ feature 'Add Template to Category' do
   context 'as inspector' do
     before(:each) do
       Helpers::User.sign_in_as @inspector
-      visit('/templates/edit')
+      click_on('Vorlagen')
     end
 
     scenario 'insert data into form' do

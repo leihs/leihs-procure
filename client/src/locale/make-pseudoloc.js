@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const pseudoloc = require('pseudoloc')
 
-const orgLang = require('./de.json')
+const orgLang = require('./de.json');
 
 // pseudoloc.option.delimiter = null
 
@@ -29,8 +29,8 @@ function makePseudoloc(translations, filename, type = 'zalgo') {
     !f.isString(v)
       ? v
       : type === 'empty'
-      ? convertString(v, '', '', '_')
-      : convertString(v)
+        ? convertString(v, '', '', '_')
+        : convertString(v)
   )
 
   fs.writeFileSync(

@@ -1,6 +1,5 @@
-// import React from 'react'
+import { it, expect } from 'vitest'
 import renderer from 'react-test-renderer'
-
 import { examples } from './MultiSelect.examples'
 
 examples.forEach(({ name, content }) => {

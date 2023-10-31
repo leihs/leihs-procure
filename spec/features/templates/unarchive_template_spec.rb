@@ -22,7 +22,7 @@ feature 'Unarchive Template(s)' do
   context 'as requester' do
     before(:each) do
       Helpers::User.sign_in_as @requester
-      visit('/templates/edit')
+      click_on('Vorlagen')
     end
 
     scenario 'unarchive single template' do
