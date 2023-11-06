@@ -46,6 +46,7 @@ export default class StatefulForm extends React.PureComponent {
     this.handleInputChange = this.handleInputChange.bind(this)
     this.updateField = this.updateField.bind(this)
     this.setValues = this.setValues.bind(this)
+    this.deleteField = this.deleteField.bind(this)
   }
 
   handleInputChange(event) {
@@ -63,6 +64,17 @@ export default class StatefulForm extends React.PureComponent {
       }),
       () => f.isFunction(callback) && callback(this.state.fields)
     )
+  }
+
+  deleteField(path, index) {
+    log('deleteField', { path })
+    f.unset(this.state.fields, path)
+    const updatedFields = { ...this.state.fields }
+
+    this.setState(state => ({
+      ...state,
+      fields: updatedFields
+    }))
   }
 
   // reset ALL fields in one go
@@ -89,6 +101,8 @@ export default class StatefulForm extends React.PureComponent {
         return this.updateField({ name, value }, props.onChange)
       }
 
+      const deleteField = name => this.deleteField(name)
+
       return {
         formPropsFor: name => ({
           name,
@@ -98,7 +112,8 @@ export default class StatefulForm extends React.PureComponent {
         }),
         setValues: this.setValues,
         getValue,
-        setValue
+        setValue,
+        deleteField
       }
     }
     const connected = connectFormProps(state.fields)

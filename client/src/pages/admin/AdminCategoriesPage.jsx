@@ -34,6 +34,7 @@ import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
 import UserAutocomplete from '../../components/UserAutocomplete'
+import { useQuery } from '@apollo/client/react/hooks'
 
 const CATEGORIES_INDEX_QUERY = gql`
   query MainCategoriesIndex {
@@ -217,56 +218,50 @@ function CategoryPage(props) {
   const navigate = useNavigate()
   const params = useParams()
 
+  const query = useQuery(CATEGORIES_QUERY)
+  if (query.loading) return <Loading />
+  if (query.error) return <ErrorPanel error={query.error} data={query.data} />
+
+  const categories = query.data.main_categories
+
+  const mainCatId = f.enhyphenUUID(params.mainCatId)
+  const isNew = mainCatId === 'new'
+
+  const mainCat = isNew
+    ? { name: '', categories: [] }
+    : f.find(categories, {
+        id: mainCatId
+      })
+
+  if (!mainCat) {
+    return <Navigate push to={'/admin/categories'} />
+  }
+
   return (
-    <Query query={CATEGORIES_QUERY}>
-      {({ loading, error, data, refetch }) => {
-        if (loading) return <Loading />
-        if (error) return <ErrorPanel error={error} data={data} />
-
-        const mainCatId = f.enhyphenUUID(params.mainCatId)
-        const isNew = mainCatId === 'new'
-
-        const mainCat = isNew
-          ? { name: '', categories: [] }
-          : f.find(data.main_categories, {
-            id: mainCatId
-          })
-
-        if (!mainCat) {
-          // debugger
-          return <Navigate push to={'/admin/categories'} />
-        }
-
-        return (
-          <Mutation
-            {...updateCategories.mutation}
-            onCompleted={newData => {
-              setFormKey({ formKey: Date.now() })
-              window.scrollTo(0, 0)
-              // FIXME: redirect to new ID if created
-              if (isNew) navigate.push(`/admin/categories`)
-            }}
-          >
-            {(mutate, info) => (
-              <CategoryCard
-                {...mainCat}
-                isNew={isNew}
-                formKey={formKey}
-                onSubmit={mainCat =>
-                  updateCategories.doUpdate(mutate, [mainCat])
-                }
-                onDelete={mainCat => {
-                  // debugger
-                  updateCategories.doUpdate(mutate, [
-                    { id: mainCat.id, toDelete: true }
-                  ])
-                }}
-              />
-            )}
-          </Mutation>
-        )
+    <Mutation
+      {...updateCategories.mutation}
+      onCompleted={newData => {
+        setFormKey({ formKey: Date.now() })
+        window.scrollTo(0, 0)
+        // FIXME: redirect to new ID if created
+        if (isNew) navigate.push(`/admin/categories`)
       }}
-    </Query>
+    >
+      {(mutate, info) => (
+        <CategoryCard
+          {...mainCat}
+          isNew={isNew}
+          formKey={formKey}
+          onSubmit={mainCat => updateCategories.doUpdate(mutate, [mainCat])}
+          onDelete={mainCat => {
+            // debugger
+            updateCategories.doUpdate(mutate, [
+              { id: mainCat.id, toDelete: true }
+            ])
+          }}
+        />
+      )}
+    </Mutation>
   )
 }
 
@@ -348,7 +343,6 @@ class CategoryCard extends React.Component {
                       required
                       {...formPropsFor('name')}
                     />
-
                     <Row>
                       <Col sm="4">
                         <h6>{t('admin.categories.image')}</h6>
@@ -401,7 +395,6 @@ class CategoryCard extends React.Component {
                       ))}
                     </Col> */}
                     </Row>
-
                     <Row>
                       <Col>
                         <h5 className="mt-4 mb-3">
@@ -409,7 +402,6 @@ class CategoryCard extends React.Component {
                         </h5>
                       </Col>
                     </Row>
-
                     {fields.categories.map((cat, i) => (
                       <React.Fragment key={cat.id}>
                         <Row>
@@ -514,7 +506,6 @@ class CategoryCard extends React.Component {
                         <hr />
                       </React.Fragment>
                     ))}
-
                     <div>
                       <Tooltipped text={t('admin.categories.add_subcat')}>
                         <Button

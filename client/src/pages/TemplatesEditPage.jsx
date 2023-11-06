@@ -82,8 +82,17 @@ const updateTemplates = {
           )
       )
 
-    let templates = onlyEditableCats.flatMap(sc =>
-      sc.templates.flatMap(tpl => ({
+    let templates = onlyEditableCats.flatMap(sc => {
+      // removing all undefined templates that stick around because of probably event listener leftovers
+      // not nice but works for now.
+      // the whole crud thing should be refactored anyway
+      sc.templates.forEach((tpl, index) => {
+        if (tpl === undefined) {
+          delete sc.templates[index]
+        }
+      })
+
+      return sc.templates.flatMap(tpl => ({
         id: tpl.id,
         article_name: tpl.article_name,
         article_number: tpl.article_number,
@@ -96,7 +105,7 @@ const updateTemplates = {
         // ...(!!tpl.model && { model: tpl.model.id }),
         // ...(!!tpl.supplier && { model: tpl.supplier.id }),
       }))
-    )
+    })
 
     mutate({
       variables: { templates }
@@ -117,12 +126,11 @@ class AdminTemplates extends React.Component {
             onCompleted={() => this.setState({ formKey: Date.now() })}
           >
             {(mutate, info) => (
-
-              <Query query={TEMPLATES_PAGE_QUERY}>
+              <Query fetchPolicy="no-cache" query={TEMPLATES_PAGE_QUERY}>
                 {({ loading, error, data }) => {
+                  console.debug('hello templates page', data)
                   if (loading) return <Loading />
                   if (error) return <ErrorPanel error={error} data={data} />
-
 
                   return (
                     <MainWithSidebar>
@@ -178,11 +186,12 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
         idPrefix="templates"
         values={{ mainCategories }}
       >
-        {({ fields, formPropsFor, setValue }) => {
+        {({ fields, formPropsFor, deleteField, setValue }) => {
           const onAddTemplate = ({ id }) => {
             const mci = f.findIndex(fields.mainCategories, {
               categories: [{ id: id }]
             })
+
             const mc = fields.mainCategories[mci]
             const sci = f.findIndex(mc.categories, { id: id })
             setValue(
@@ -259,6 +268,7 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
                                                   sci={sci}
                                                   sc={sc}
                                                   formPropsFor={formPropsFor}
+                                                  deleteField={deleteField}
                                                 ></Table>
                                               </div>
                                             </li>
@@ -288,16 +298,19 @@ const CategoriesList = ({ me, mainCategories, onSubmit, formKey }) => {
   )
 }
 
-function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
+function Table({
+  children,
+  tableCols,
+  addButton,
+  mci,
+  sci,
+  sc,
+  formPropsFor,
+  deleteField
+}) {
   const switchRef = useRef(null)
-  const hasArchivedEntry = sc.templates.find(el => el.is_archived === true)
+  const hasArchivedEntry = sc?.templates?.find(el => el?.is_archived === true)
   const [showArchived, setShowArchived] = useState(false)
-
-  // useEffect(() => {
-  //   !!hasArchivedEntry
-  //     ? switchRef.current.removeAttribute('disabled', '')
-  //     : switchRef.current.setAttribute('disabled', '')
-  // })
 
   return (
     <>
@@ -315,14 +328,14 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
           <input
             ref={switchRef}
             type="checkbox"
-            id={'archiveSwitch' + mci}
+            id={'archiveSwitch' + mci + sci}
             className={cx('custom-control-input')}
             checked={showArchived}
             onChange={e => setShowArchived(e.target.checked)}
           />
           <label
             className="custom-control-label"
-            htmlFor={'archiveSwitch' + mci}
+            htmlFor={'archiveSwitch' + mci + sci}
           >
             {t(`templates.tooltips.show_archived`)}
           </label>
@@ -347,11 +360,13 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
         )}
 
         <tbody>
-          {sc.templates.map((tpl, i) =>
-            !tpl.is_archived || showArchived ? (
+          {sc.templates?.map((tpl, i) =>
+            (tpl && !tpl?.is_archived) || showArchived ? (
               <TemplateRow
-                key={tpl.id || i}
+                key={tpl?.id || i}
                 cols={tableCols}
+                sc={sc}
+                deleteField={deleteField}
                 formPropsFor={key =>
                   formPropsFor(
                     `mainCategories.${mci}.categories.${sci}.templates.${i}.${key}`
@@ -373,7 +388,7 @@ function Table({ children, tableCols, addButton, mci, sci, sc, formPropsFor }) {
   )
 }
 
-const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
+function TemplateRow({ cols, onClick, formPropsFor, sc, deleteField, ...tpl }) {
   const rowRef = useRef(null)
   const toDeleteRef = useRef(null)
 
@@ -382,9 +397,30 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
     'text-strike bg-danger-light': tpl?.toDelete || false
   })
 
-  // disabling all inputs by hand, since input componets are nested quite alot...
+  function handleDelete(action) {
+    return e => {
+      const valuePath = action.name.split('.')
+      const templatesPath = valuePath.slice(0, -1).join('.')
+      const index = valuePath[valuePath.length - 1]
+
+      if (Object.keys(tpl).length === 0 || !('requests_count' in tpl)) {
+        deleteField(templatesPath, index)
+        return
+      }
+
+      action.onChange({
+        target: {
+          name: action.name,
+          checked: e.target.checked,
+          value: e.target.checked
+        }
+      })
+    }
+  }
+
+  // disabling all inputs manually, since input componets are nested quite alot...
   useEffect(() => {
-    if (tpl.requests_count && tpl.id) {
+    if (tpl?.requests_count && tpl?.id) {
       const inputs = rowRef.current.querySelectorAll('input')
       inputs.forEach(
         input => input.type !== 'checkbox' && input.setAttribute('disabled', '')
@@ -408,7 +444,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
         >
           {isEditing ? (
             key === 'toDelete' ? (
-              !tpl.requests_count && !tpl.is_archived ? (
+              !tpl?.requests_count && !tpl?.is_archived ? (
                 <Let toDelete={formPropsFor('toDelete')}>
                   {({ toDelete }) => (
                     <label id={`btn_del_${tpl.id}`} className="pt-1">
@@ -424,15 +460,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                         className="sr-only"
                         name="delete"
                         checked={tpl?.toDelete || false}
-                        onChange={e =>
-                          toDelete.onChange({
-                            target: {
-                              name: toDelete.name,
-                              checked: e.target.checked,
-                              value: e.target.checked
-                            }
-                          })
-                        }
+                        onChange={handleDelete(toDelete)}
                       />
                       <UncontrolledTooltip
                         placement="left"
@@ -472,7 +500,7 @@ const TemplateRow = ({ cols, onClick, formPropsFor, ...tpl }) => {
                         placement="left"
                         target={`btn_archive_${tpl.id}`}
                       >
-                        {tpl.is_archived ? (
+                        {tpl?.is_archived ? (
                           <>{t(`templates.tooltips.unarchive_template`)}</>
                         ) : (
                           <>{t(`templates.tooltips.archive_template`)}</>
