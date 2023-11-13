@@ -83,9 +83,6 @@ const updateTemplates = {
       )
 
     let templates = onlyEditableCats.flatMap(sc => {
-      // removing all undefined templates that stick around because of probably event listener leftovers
-      // not nice but works for now.
-      // the whole crud thing should be refactored anyway
       sc.templates.forEach((tpl, index) => {
         if (tpl === undefined) {
           delete sc.templates[index]

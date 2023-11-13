@@ -1,4 +1,4 @@
-import React, { Fragment as F, useState } from 'react'
+import React, { Fragment as F, useState, useEffect } from 'react'
 import cx from 'classnames'
 import {
   Route,
@@ -9,7 +9,6 @@ import {
   useParams
 } from 'react-router-dom'
 import f from 'lodash'
-
 import { Query, Mutation } from '@apollo/client/react/components'
 import gql from 'graphql-tag'
 import t from '../../locale/translate'
@@ -22,14 +21,11 @@ import {
   Button,
   StatefulForm,
   FormGroup,
-  // InputText,
   FormField,
-  // InputField,
   Tooltipped,
   InputFileUpload
 } from '../../components/Bootstrap'
 import { MainWithSidebar } from '../../components/Layout'
-import { Navigate } from 'react-router-dom'
 import { DisplayName } from '../../components/decorators'
 import Loading from '../../components/Loading'
 import { ErrorPanel } from '../../components/Error'
@@ -58,18 +54,6 @@ const MAINCAT_PROPS_FRAGMENT = gql`
     name
     can_delete
     image_url
-    # NOTE: NO_BUDGET_LIMITS: disabled for now, data is not used in App
-    # # FIXME: should return all *possible* limits (if set or not!)
-    # budget_limits {
-    #   id
-    #   amount_cents
-    #   amount_currency
-    #   budget_period {
-    #     id
-    #     name
-    #     end_date
-    #   }
-    # }
     categories {
       id
       name
@@ -117,6 +101,7 @@ const updateCategories = {
   mutation: {
     mutation: UPDATE_CATEGORIES_MUTATION,
     onError: mutationErrorHandler,
+    fetchPolicy: 'no-cache',
 
     update: (cache, { data: { main_categories } }) => {
       cache.writeQuery({ query: CATEGORIES_QUERY, data: { main_categories } })
@@ -131,13 +116,6 @@ const updateCategories = {
           ...f.pick(o, 'id', 'typename'),
           to_delete: !!o.toDelete
         })),
-
-        // NOTE: NO_BUDGET_LIMITS
-        // budget_limits: f.map(mainCat.budget_limits, l => ({
-        //   amount_cents: l.amount_cents,
-        //   budget_period_id: l.budget_period.id
-        // })),
-
         categories: f
           .filter(mainCat.categories, mc => !mc.toDelete)
           .map(sc => ({
@@ -230,11 +208,11 @@ function CategoryPage(props) {
   const mainCat = isNew
     ? { name: '', categories: [] }
     : f.find(categories, {
-        id: mainCatId
-      })
+      id: mainCatId
+    })
 
   if (!mainCat) {
-    return <Navigate push to={'/admin/categories'} />
+    navigate('/admin/categories')
   }
 
   return (
@@ -243,8 +221,20 @@ function CategoryPage(props) {
       onCompleted={newData => {
         setFormKey({ formKey: Date.now() })
         window.scrollTo(0, 0)
-        // FIXME: redirect to new ID if created
-        if (isNew) navigate.push(`/admin/categories`)
+        const successMessage = t('admin.categories.add_category_success')
+        const newCategory = newData.main_categories.at(-1)
+        const newCategoryID = newCategory.id.replace(/-/g, '')
+
+        if (isNew) {
+          navigate(`/admin/categories/${newCategoryID}`, {
+            state: {
+              flash: {
+                level: 'success',
+                message: successMessage
+              }
+            }
+          })
+        }
       }}
     >
       {(mutate, info) => (
@@ -254,7 +244,15 @@ function CategoryPage(props) {
           formKey={formKey}
           onSubmit={mainCat => updateCategories.doUpdate(mutate, [mainCat])}
           onDelete={mainCat => {
-            // debugger
+            const successMessage = t('admin.categories.delete_category_success')
+            navigate(`/admin/categories/`, {
+              state: {
+                flash: {
+                  level: 'success',
+                  message: successMessage
+                }
+              }
+            })
             updateCategories.doUpdate(mutate, [
               { id: mainCat.id, toDelete: true }
             ])
@@ -280,8 +278,6 @@ class CategoryCard extends React.Component {
       props: { id, formKey, isNew, onSubmit, onDelete, ...props }
     } = this
   ) {
-    // NOTE: NO_BUDGET_LIMITS
-    // const formProps = ['name', 'image_url', 'budget_limits', 'categories']
     const formProps = ['name', 'image_url', 'categories']
     const formValues = f.pick(props, formProps)
 
@@ -332,13 +328,9 @@ class CategoryCard extends React.Component {
                 }}
               >
                 <div className="card mb-3" id={`mc${id}`}>
-                  {/* <div className="card-header">
-                    <h4 className="mb-0">Hauptkategorie</h4>
-                  </div> */}
                   <div className="card-body">
                     <FormField
                       label="Name"
-                      // hideLabel
                       className="f3 py-4 font-weight-bold"
                       required
                       {...formPropsFor('name')}
@@ -361,39 +353,6 @@ class CategoryCard extends React.Component {
                           {...formPropsFor('new_image_url')}
                         />
                       </Col>
-
-                      {/* NOTE: NO_BUDGET_LIMITS
-                    <Col sm>
-                      <h6>{t('admin.categories.budget_limits')}</h6>
-
-                      {fields.budget_limits.map((l, i) => (
-                        <Row key={l.id}>
-                          <Col sm="4">{l.budget_period.name}</Col>
-                          <Col sm>
-                            <Let
-                              limitField={formPropsFor(
-                                `budget_limits.${i}.amount_cents`
-                              )}
-                            >
-                              {({ limitField }) => (
-                                <InputText
-                                  cls="form-control-sm"
-                                  {...limitField}
-                                  value={(limitField.value || 0) / 100}
-                                  onChange={e =>
-                                    setValue(
-                                      limitField.name,
-                                      f.try(() => e.target.value * 100)
-                                    )
-                                  }
-                                />
-                              )}
-                            </Let>
-                          </Col>
-                          <Col sm="4">{l.amount_currency}</Col>
-                        </Row>
-                      ))}
-                    </Col> */}
                     </Row>
                     <Row>
                       <Col>
@@ -471,7 +430,6 @@ class CategoryCard extends React.Component {
                                 )}
                               />
                             </Col>
-
                             {/* FIXME: support adding user to *NEW* subcats */}
                             {!cat.id ? (
                               <F>
