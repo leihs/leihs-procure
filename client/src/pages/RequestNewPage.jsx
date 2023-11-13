@@ -60,6 +60,7 @@ const NEW_REQUEST_PRESELECTION_QUERY = gql`
       category {
         id
       }
+      is_archived
       article_name
       article_number
       model {
@@ -524,19 +525,22 @@ const CategoryItemsList = ({ items, onSelectCategory, onSelectTemplate }) => {
 
                 <div className="list-group list-group-flush">
                   {sc.templates.map(t => (
-                    <AddButtonLine
-                      key={t.id}
-                      t={t}
-                      onClick={e => {
-                        e.preventDefault()
-                        onSelectTemplate(t)
-                      }}
-                    >
-                      <Icon.Templates /> {t.article_name}{' '}
-                      <Badge secondary>
-                        <samp>{formatCurrency(t.price_cents)}</samp>
-                      </Badge>
-                    </AddButtonLine>
+                    <F key={t.id}>
+                      {!t.is_archived && (
+                        <AddButtonLine
+                          t={t}
+                          onClick={e => {
+                            e.preventDefault()
+                            onSelectTemplate(t)
+                          }}
+                        >
+                          <Icon.Templates /> {t.article_name}{' '}
+                          <Badge secondary>
+                            <samp>{formatCurrency(t.price_cents)}</samp>
+                          </Badge>
+                        </AddButtonLine>
+                      )}
+                    </F>
                   ))}
 
                   <AddButtonLine onClick={e => onSelectCategory(sc)}>

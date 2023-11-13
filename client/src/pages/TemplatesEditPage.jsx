@@ -128,7 +128,6 @@ class AdminTemplates extends React.Component {
             {(mutate, info) => (
               <Query fetchPolicy="no-cache" query={TEMPLATES_PAGE_QUERY}>
                 {({ loading, error, data }) => {
-                  console.debug('hello templates page', data)
                   if (loading) return <Loading />
                   if (error) return <ErrorPanel error={error} data={data} />
 
