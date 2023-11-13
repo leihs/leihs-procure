@@ -54,7 +54,7 @@ body {
 }
 
 .slide-wrapper {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   top: 5%;
   right: 0;

@@ -172,6 +172,8 @@
       "remove_from_viewers": "als Betrachter entfernen",
       "add_to_viewers": "zu Betrachtern hinzufügen",
       "user_list_empty": "(Keine)",
+      "add_category_success": "Kategorie hinzugefügt",
+      "delete_category_success": "Kategorie wurde entfernt",
       "subcategories": {
         "cost_center": "Kostenstelle",
         "general_ledger_account": "Sachkonto ⅠI (IR)",
