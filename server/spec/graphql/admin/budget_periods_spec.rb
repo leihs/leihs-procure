@@ -1,5 +1,8 @@
 require 'spec_helper'
 require_relative '../graphql_helper'
+require 'json'
+require 'date'
+require 'time'
 
 describe 'budget periods' do
   context 'query' do
@@ -205,7 +208,6 @@ describe 'budget periods' do
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']
     end
 
-
     it 'updates successfully for an authorized user' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)
@@ -232,6 +234,13 @@ describe 'budget periods' do
       ]
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
+        response_data = JSON.parse(data.to_json)
+        name = response_data['name']
+
+        budget_period = BudgetPeriod.find(name: name)
+        db_data = JSON.parse(budget_period.to_json)
+
+        expect(compare_ts_as_UTC(db_data, response_data)).to be true
         expect(BudgetPeriod.find(data)).to be
       end
 
@@ -246,4 +255,32 @@ describe 'budget periods' do
       end
     end
   end
+end
+
+def parse_date_ignoring_timezone(date_str)
+  begin
+    parsed_date = Time.parse(date_str)
+    utc_date = parsed_date.getutc
+    utc_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z')
+  rescue ArgumentError => e
+    puts "Error parsing date: #{e.message}"
+    nil
+  end
+end
+
+def compare_ts_as_UTC(map1, map2)
+  fields = ["inspection_start_date", "end_date"]
+
+  fields.each do |field|
+    if map1[field] && map2[field]
+      date1 = parse_date_ignoring_timezone(map1[field])
+      date2 = parse_date_ignoring_timezone(map2[field])
+
+      return false if date1 != date2
+    else
+      return false
+    end
+  end
+
+  true
 end

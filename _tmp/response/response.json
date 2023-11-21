@@ -1,0 +1,208 @@
+{
+  "dashboard": {
+    "cacheKey": "1608672852",
+    "total_count": 1,
+    "budget_periods": [
+      {
+        "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+        "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+        "name": "Budget-Period-Past",
+        "inspection_start_date": "2023-08-23T22:00:00Z",
+        "end_date": "2023-11-22T23:00:00Z",
+        "total_price_cents": "0",
+        "main_categories": [
+          {
+            "id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+            "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+            "name": "Main Category MC1",
+            "image_url": null,
+            "total_price_cents": "0",
+            "categories": [
+              {
+                "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb_7d5ba731-edd9-41ba-8773-7337d24c2327",
+                "name": "Category C1",
+                "total_price_cents": "0",
+                "requests": [
+                  {
+                    "id": "40284a6b-cf5e-41c1-af6c-dc423894ee11",
+                    "short_id": "Budget-Period-Past.001",
+                    "user": {
+                      "value": {
+                        "id": "2187a76b-557a-4775-9a1e-778142161819",
+                        "firstname": "Lynsey",
+                        "lastname": "Kertzmann",
+                        "__typename": "User"
+                      },
+                      "__typename": "RequestFieldUser"
+                    },
+                    "category": {
+                      "read": true,
+                      "write": false,
+                      "required": true,
+                      "value": {
+                        "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                        "name": "Category C1",
+                        "main_category": {
+                          "id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+                          "name": "Main Category MC1",
+                          "__typename": "MainCategory"
+                        },
+                        "__typename": "Category"
+                      },
+                      "__typename": "RequestFieldCategory"
+                    },
+                    "budget_period": {
+                      "read": true,
+                      "write": false,
+                      "required": true,
+                      "value": {
+                        "name": "Budget-Period-Past",
+                        "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+                        "__typename": "BudgetPeriod"
+                      },
+                      "__typename": "RequestFieldBudgetPeriod"
+                    },
+                    "article_name": {
+                      "value": "Mediocre Aluminum Shoes",
+                      "__typename": "RequestFieldString"
+                    },
+                    "model": {
+                      "value": null,
+                      "__typename": "RequestFieldModel"
+                    },
+                    "receiver": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "organization": {
+                      "value": {
+                        "id": "fb664326-a8ef-4556-af02-07d3127cd9ec",
+                        "name": "Beauty & Kids",
+                        "shortname": null,
+                        "department": {
+                          "id": "d6f9842f-4a7f-45ed-8ac5-c708cd6f8ca9",
+                          "name": "Home, Jewelry & Computers",
+                          "__typename": "Organization"
+                        },
+                        "__typename": "Organization"
+                      },
+                      "__typename": "RequestFieldOrganization"
+                    },
+                    "price_cents": {
+                      "value": 0,
+                      "__typename": "RequestFieldInt"
+                    },
+                    "price_currency": {
+                      "value": "CHF",
+                      "__typename": "RequestFieldString"
+                    },
+                    "requested_quantity": {
+                      "read": true,
+                      "value": 1,
+                      "__typename": "RequestFieldInt"
+                    },
+                    "approved_quantity": {
+                      "read": true,
+                      "value": null,
+                      "__typename": "RequestFieldInt"
+                    },
+                    "order_quantity": {
+                      "read": true,
+                      "value": null,
+                      "__typename": "RequestFieldInt"
+                    },
+                    "replacement": {
+                      "value": true,
+                      "__typename": "RequestFieldBoolean"
+                    },
+                    "priority": {
+                      "value": "NORMAL",
+                      "__typename": "RequestFieldPriority"
+                    },
+                    "state": "NEW",
+                    "article_number": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "supplier": {
+                      "value": null,
+                      "__typename": "RequestFieldSupplier"
+                    },
+                    "supplier_name": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "room": {
+                      "value": {
+                        "id": "64bfb152-ea6c-42da-98c6-325afeb462bc",
+                        "name": "reception room",
+                        "building": {
+                          "id": "3eaa2152-ebd3-4b7c-b370-f107fa7b4d7c",
+                          "name": "9594 Beer Extension",
+                          "__typename": "Building"
+                        },
+                        "__typename": "Room"
+                      },
+                      "__typename": "RequestFieldRoom"
+                    },
+                    "motivation": {
+                      "value": "Corporis commodi provident nam.",
+                      "__typename": "RequestFieldString"
+                    },
+                    "inspection_comment": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "inspector_priority": {
+                      "value": "MEDIUM",
+                      "__typename": "RequestFieldInspectorPriority"
+                    },
+                    "accounting_type": {
+                      "value": "aquisition",
+                      "__typename": "RequestFieldString"
+                    },
+                    "cost_center": {
+                      "value": null,
+                      "__typename": "RequestFieldCostCenter"
+                    },
+                    "general_ledger_account": {
+                      "value": null,
+                      "__typename": "RequestFieldGeneralLedgerAccount"
+                    },
+                    "procurement_account": {
+                      "value": null,
+                      "__typename": "RequestFieldProcurementAccount"
+                    },
+                    "internal_order_number": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "order_status": {
+                      "value": "NOT_PROCESSED",
+                      "__typename": "RequestFieldOrderStatus"
+                    },
+                    "order_comment": {
+                      "value": null,
+                      "__typename": "RequestFieldString"
+                    },
+                    "__typename": "Request",
+                    "total_price_cents": "0",
+                    "actionPermissions": {
+                      "edit": true,
+                      "__typename": "RequestActionPermissions"
+                    }
+                  }
+                ],
+                "__typename": "Category"
+              }
+            ],
+            "__typename": "MainCategory"
+          }
+        ],
+        "__typename": "BudgetPeriod"
+      }
+    ],
+    "__typename": "Dashboard"
+  }
+}

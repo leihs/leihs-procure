@@ -45,9 +45,9 @@ class GraphqlQuery
     resp = if user = User.find(id: user_id)
              Faraday.post("#{http_base_url}/sign-in",
                           { user: user.email, password: 'password' }) do |req|
-                            req.headers['X-CSRF-Token'] = csrf_token
-                            req.headers['Cookie'] = "leihs-anti-csrf-token=#{csrf_token}"
-                          end
+               req.headers['X-CSRF-Token'] = csrf_token
+               req.headers['Cookie'] = "leihs-anti-csrf-token=#{csrf_token}"
+             end
            else
              Faraday.post(http_base_url)
            end

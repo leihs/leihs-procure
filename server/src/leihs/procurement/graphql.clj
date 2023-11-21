@@ -1,16 +1,19 @@
 (ns leihs.procurement.graphql
   (:require
     [clojure.edn :as edn]
-    [clojure.java [io :as io] [jdbc :as jdbc]]
+    (clojure.java [io :as io])
+    (clojure.java [io :as io])
+    ;; all needed imports
     [com.walmartlabs.lacinia :as lacinia]
-    [com.walmartlabs.lacinia [parser :as graphql-parser]
-     [schema :as graphql-schema] [util :as graphql-util]]
+    (com.walmartlabs.lacinia [parser :as graphql-parser]
+                             [schema :as graphql-schema] [util :as graphql-util])
+    [leihs.core.db :as db]
     [leihs.core.graphql :as core-graphql]
-    [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.graphql.helpers :as helpers]
+    [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
-    [taoensso.timbre :refer [debug info warn error spy]]
-    ))
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def CUSTOM_SCALARS
   {:ID {:parse identity :serialize str}
@@ -68,19 +71,20 @@
                        :type
                        (= :mutation))]
     (if mutation?
-      (jdbc/with-db-transaction
-        [tx (:tx request)]
-        (try (let [response (->> tx
-                                 (assoc request :tx)
-                                 pure-handler)]
-               (when (:graphql-error response)
-                 (warn "Rolling back transaction because of graphql error: " response)
-                 (jdbc/db-set-rollback-only! tx))
-               response)
-             (catch Throwable th
-               (warn "Rolling back transaction because of " th)
-               (jdbc/db-set-rollback-only! tx)
-               (throw th))))
+      (jdbc/with-transaction+options [tx-next (db/get-ds-next)]
+                                     (letfn [(rollback-both-tx! []
+                                               (.rollback (:connectable tx-next)))]
+                                       (try (let [response (-> request
+                                                               (assoc :tx-next tx-next)
+                                                               pure-handler)]
+                                              (when (:graphql-error response)
+                                                (warn "Rolling back transaction because of graphql error: " response)
+                                                (rollback-both-tx!))
+                                              response)
+                                            (catch Throwable th
+                                              (warn "Rolling back transaction because of " th)
+                                              (rollback-both-tx!)
+                                              (throw th)))))
       (pure-handler request))))
 
 

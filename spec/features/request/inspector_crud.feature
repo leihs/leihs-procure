@@ -1,6 +1,6 @@
 Feature: Request CRUD as a inspector
 
-  Background: 
+  Background:
     Given there is an initial admin
     And there are procurement settings
 

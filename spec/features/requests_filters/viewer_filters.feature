@@ -173,7 +173,7 @@ Feature: Requests' filter for viewer
       | Product I | Neu        |
 
     And I click on "Filter zurücksetzen"
- 
+
     When I uncheck "nur Kategorien mit Anträgen" filter
     And I expand all categories
     And I see "7 Anträge"

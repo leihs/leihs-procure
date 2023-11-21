@@ -1,0 +1,1777 @@
+[
+  {
+    "category": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "d2f4aa74-77fd-446d-8ba2-809af6b8aded",
+        "name": "category_1_B",
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "general_ledger_account": "5762959998",
+        "cost_center": "7429400349",
+        "procurement_account": "4912540823"
+      },
+      "required": true,
+      "value": {
+        "id": "d2f4aa74-77fd-446d-8ba2-809af6b8aded",
+        "name": "category_1_B",
+        "cost_center": "7429400349",
+        "main_category": {
+          "id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+          "name": "main_category_1"
+        },
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "procurement_account": "4912540823",
+        "general_ledger_account": "5762959998"
+      },
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "supplier": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "motivation": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": "Repudiandae voluptas dolorem mollitia.",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "accounting_type": {
+      "read": true,
+      "write": false,
+      "default": "aquisition",
+      "required": true,
+      "value": "aquisition",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "actionPermissions": {
+      "edit": true,
+      "delete": false,
+      "moveBudgetPeriod": false,
+      "moveCategory": false
+    },
+    "article_number": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "inspector_priority": {
+      "read": false,
+      "write": false,
+      "default": "MEDIUM",
+      "required": true,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "price_cents": {
+      "read": true,
+      "write": false,
+      "default": 0,
+      "required": true,
+      "value": 103,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "budget_period": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T10:23:53.417Z",
+        "end_date": "2023-12-14T10:23:53.417Z",
+        "created_at": "2023-12-15T10:23:53.418Z",
+        "updated_at": "2023-12-15T10:23:53.418Z"
+      },
+      "required": true,
+      "value": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T11:23:53.417785+01:00",
+        "end_date": "2023-12-14T11:23:53.417966+01:00",
+        "created_at": "2023-12-15T11:23:53.41806",
+        "updated_at": "2023-12-15T11:23:53.41806",
+        "is_past": true
+      },
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "article_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": "Anaphoric Macro",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "replacement": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": true,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "attachments": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "unqueried",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "DELETE": false,
+    "template": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "state": "APPROVED",
+    "organization": {
+      "value": {
+        "id": "b08586be-a35d-42e3-acd1-d296334085ac",
+        "name": "Grocery & Electronics",
+        "parent_id": "83383488-b96a-4636-a8ca-7ec7827f2094",
+        "shortname": null,
+        "department": {
+          "id": "83383488-b96a-4636-a8ca-7ec7827f2094",
+          "name": "Tools",
+          "parent_id": null,
+          "shortname": null
+        }
+      },
+      "read": false,
+      "write": false,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "supplier_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": "Gulgowski-Gulgowski",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "order_status": {
+      "read": true,
+      "write": true,
+      "default": "NOT_PROCURED",
+      "required": true,
+      "value": "NOT_PROCESSED",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "requested_quantity": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": 1,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "general_ledger_account": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "5762959998",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "updated_at": {
+      "value": "2023-12-15T10:23:54.283Z",
+      "read": false,
+      "write": false,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "priority": {
+      "read": true,
+      "write": false,
+      "default": "NORMAL",
+      "required": true,
+      "value": "NORMAL",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f",
+    "total_price_cents": 0,
+    "price_currency": {
+      "read": true,
+      "write": false,
+      "default": "CHF",
+      "required": true,
+      "value": "CHF",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "procurement_account": {
+      "read": true,
+      "write": false,
+      "value": "4912540823",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "room": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+        "name": "general room",
+        "description": null,
+        "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+        "general": true,
+        "building": {
+          "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+          "name": "general building",
+          "code": null
+        }
+      },
+      "required": true,
+      "value": {
+        "id": "45d68e4a-653d-449a-88ed-8080e8ecfb19",
+        "name": "263",
+        "general": false,
+        "building": {
+          "id": "99e3e19f-8611-4bc8-aa39-8f1ae57db7c5",
+          "code": null,
+          "name": "997 Jessika Valley"
+        },
+        "building_id": "99e3e19f-8611-4bc8-aa39-8f1ae57db7c5",
+        "description": null
+      },
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "inspection_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "approved_quantity": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": 1,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "order_quantity": {
+      "read": false,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "cost_center": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "7429400349",
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "user": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "default": {
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "firstname": "Joaquin",
+        "lastname": "Volkman"
+      },
+      "value": {
+        "system_admin_protected": false,
+        "address": null,
+        "email": "haywood@feeney.biz",
+        "pool_protected": false,
+        "last_sign_in_at": "2023-12-15T11:23:54.595065+01:00",
+        "img32_url": null,
+        "account_enabled": true,
+        "lastname": "Volkman",
+        "phone": null,
+        "img_digest": null,
+        "org_id": null,
+        "extended_info": null,
+        "secondary_email": null,
+        "city": null,
+        "settings": null,
+        "is_admin": false,
+        "organization": "local",
+        "login": null,
+        "searchable": "Joaquin Volkman haywood@feeney.biz    Volkman Joaquin",
+        "updated_at": "2023-12-15T11:23:54.595065+01:00",
+        "firstname": "Joaquin",
+        "zip": null,
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "url": null,
+        "password_sign_in_enabled": true,
+        "account_disabled_at": null,
+        "is_system_admin": false,
+        "badge_id": null,
+        "language_locale": null,
+        "img256_url": null,
+        "country": null,
+        "delegator_user_id": null,
+        "created_at": "2023-12-15T00:00:00+01:00",
+        "admin_protected": false
+      },
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "receiver": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "internal_order_number": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "created_at": {
+      "value": "2023-12-15T10:23:54.283Z",
+      "read": false,
+      "write": false,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "order_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    },
+    "short_id": "budget_period_I.002",
+    "model": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "05112e71-8053-4fcb-af6c-8eb6ac39d56f"
+    }
+  },
+  {
+    "category": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "9ac5fd2c-fb12-4b5f-841b-5aeb1140774c",
+        "name": "category_1_A",
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "general_ledger_account": "6895001769",
+        "cost_center": "3452424779",
+        "procurement_account": "2706997691"
+      },
+      "required": true,
+      "value": {
+        "id": "9ac5fd2c-fb12-4b5f-841b-5aeb1140774c",
+        "name": "category_1_A",
+        "cost_center": "3452424779",
+        "main_category": {
+          "id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+          "name": "main_category_1"
+        },
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "procurement_account": "2706997691",
+        "general_ledger_account": "6895001769"
+      },
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "supplier": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "motivation": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": "Dolores dignissimos quia non.",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "accounting_type": {
+      "read": true,
+      "write": false,
+      "default": "aquisition",
+      "required": true,
+      "value": "aquisition",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "actionPermissions": {
+      "edit": true,
+      "delete": false,
+      "moveBudgetPeriod": false,
+      "moveCategory": false
+    },
+    "article_number": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "inspector_priority": {
+      "read": false,
+      "write": false,
+      "default": "MEDIUM",
+      "required": true,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "price_cents": {
+      "read": true,
+      "write": false,
+      "default": 0,
+      "required": true,
+      "value": 101,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "budget_period": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T10:23:53.417Z",
+        "end_date": "2023-12-14T10:23:53.417Z",
+        "created_at": "2023-12-15T10:23:53.418Z",
+        "updated_at": "2023-12-15T10:23:53.418Z"
+      },
+      "required": true,
+      "value": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T11:23:53.417785+01:00",
+        "end_date": "2023-12-14T11:23:53.417966+01:00",
+        "created_at": "2023-12-15T11:23:53.41806",
+        "updated_at": "2023-12-15T11:23:53.41806",
+        "is_past": true
+      },
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "article_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": "Practical Silk Plate",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "replacement": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": true,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "attachments": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "unqueried",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "DELETE": false,
+    "template": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "state": "DENIED",
+    "organization": {
+      "value": {
+        "id": "5ee627f1-a7e9-40c5-bb29-12ee287336ce",
+        "name": "Electronics, Home & Industrial",
+        "parent_id": "e82c2f76-a96b-467e-b2f7-28310c9a2797",
+        "shortname": null,
+        "department": {
+          "id": "e82c2f76-a96b-467e-b2f7-28310c9a2797",
+          "name": "Tools, Books & Games",
+          "parent_id": null,
+          "shortname": null
+        }
+      },
+      "read": false,
+      "write": false,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "supplier_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": "Pacocha LLC",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "order_status": {
+      "read": true,
+      "write": true,
+      "default": "NOT_PROCURED",
+      "required": true,
+      "value": "NOT_PROCESSED",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "requested_quantity": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": 1,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "general_ledger_account": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "6895001769",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "updated_at": {
+      "value": "2023-12-15T10:23:54.261Z",
+      "read": false,
+      "write": false,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "priority": {
+      "read": true,
+      "write": false,
+      "default": "NORMAL",
+      "required": true,
+      "value": "NORMAL",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "id": "18f857f7-077d-4766-85c3-28f3490eeca3",
+    "total_price_cents": 0,
+    "price_currency": {
+      "read": true,
+      "write": false,
+      "default": "CHF",
+      "required": true,
+      "value": "CHF",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "procurement_account": {
+      "read": true,
+      "write": false,
+      "value": "2706997691",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "room": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+        "name": "general room",
+        "description": null,
+        "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+        "general": true,
+        "building": {
+          "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+          "name": "general building",
+          "code": null
+        }
+      },
+      "required": true,
+      "value": {
+        "id": "49ec0d4d-743a-4c90-a85b-87e57a70cd7a",
+        "name": "879",
+        "general": false,
+        "building": {
+          "id": "9f8aab66-081f-403f-b481-ffadabbe36a5",
+          "code": null,
+          "name": "18771 Quigley Bridge"
+        },
+        "building_id": "9f8aab66-081f-403f-b481-ffadabbe36a5",
+        "description": null
+      },
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "inspection_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "approved_quantity": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": 0,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "order_quantity": {
+      "read": false,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "cost_center": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "3452424779",
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "user": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "default": {
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "firstname": "Joaquin",
+        "lastname": "Volkman"
+      },
+      "value": {
+        "system_admin_protected": false,
+        "address": null,
+        "email": "haywood@feeney.biz",
+        "pool_protected": false,
+        "last_sign_in_at": "2023-12-15T11:23:54.595065+01:00",
+        "img32_url": null,
+        "account_enabled": true,
+        "lastname": "Volkman",
+        "phone": null,
+        "img_digest": null,
+        "org_id": null,
+        "extended_info": null,
+        "secondary_email": null,
+        "city": null,
+        "settings": null,
+        "is_admin": false,
+        "organization": "local",
+        "login": null,
+        "searchable": "Joaquin Volkman haywood@feeney.biz    Volkman Joaquin",
+        "updated_at": "2023-12-15T11:23:54.595065+01:00",
+        "firstname": "Joaquin",
+        "zip": null,
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "url": null,
+        "password_sign_in_enabled": true,
+        "account_disabled_at": null,
+        "is_system_admin": false,
+        "badge_id": null,
+        "language_locale": null,
+        "img256_url": null,
+        "country": null,
+        "delegator_user_id": null,
+        "created_at": "2023-12-15T00:00:00+01:00",
+        "admin_protected": false
+      },
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "receiver": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "internal_order_number": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "created_at": {
+      "value": "2023-12-15T10:23:54.261Z",
+      "read": false,
+      "write": false,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "order_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    },
+    "short_id": "budget_period_I.001",
+    "model": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "18f857f7-077d-4766-85c3-28f3490eeca3"
+    }
+  },
+  {
+    "category": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "d2f4aa74-77fd-446d-8ba2-809af6b8aded",
+        "name": "category_1_B",
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "general_ledger_account": "5762959998",
+        "cost_center": "7429400349",
+        "procurement_account": "4912540823"
+      },
+      "required": true,
+      "value": {
+        "id": "d2f4aa74-77fd-446d-8ba2-809af6b8aded",
+        "name": "category_1_B",
+        "cost_center": "7429400349",
+        "main_category": {
+          "id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+          "name": "main_category_1"
+        },
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "procurement_account": "4912540823",
+        "general_ledger_account": "5762959998"
+      },
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "supplier": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "motivation": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": "Nihil qui accusantium cum.",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "accounting_type": {
+      "read": true,
+      "write": false,
+      "default": "aquisition",
+      "required": true,
+      "value": "aquisition",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "actionPermissions": {
+      "edit": true,
+      "delete": false,
+      "moveBudgetPeriod": false,
+      "moveCategory": false
+    },
+    "article_number": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "inspector_priority": {
+      "read": false,
+      "write": false,
+      "default": "MEDIUM",
+      "required": true,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "price_cents": {
+      "read": true,
+      "write": false,
+      "default": 0,
+      "required": true,
+      "value": 107,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "budget_period": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T10:23:53.417Z",
+        "end_date": "2023-12-14T10:23:53.417Z",
+        "created_at": "2023-12-15T10:23:53.418Z",
+        "updated_at": "2023-12-15T10:23:53.418Z"
+      },
+      "required": true,
+      "value": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T11:23:53.417785+01:00",
+        "end_date": "2023-12-14T11:23:53.417966+01:00",
+        "created_at": "2023-12-15T11:23:53.41806",
+        "updated_at": "2023-12-15T11:23:53.41806",
+        "is_past": true
+      },
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "article_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": "Pandoric Macro",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "replacement": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": true,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "attachments": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "unqueried",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "DELETE": false,
+    "template": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "state": "PARTIALLY_APPROVED",
+    "organization": {
+      "value": {
+        "id": "181ad837-80d2-4854-952f-ccb51aa68d74",
+        "name": "Automotive & Toys",
+        "parent_id": "1c5e0068-b445-45f5-bfeb-5bfd99c4da39",
+        "shortname": null,
+        "department": {
+          "id": "1c5e0068-b445-45f5-bfeb-5bfd99c4da39",
+          "name": "Kids",
+          "parent_id": null,
+          "shortname": null
+        }
+      },
+      "read": false,
+      "write": false,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "supplier_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": "Brown-Torp",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "order_status": {
+      "read": true,
+      "write": true,
+      "default": "NOT_PROCURED",
+      "required": true,
+      "value": "NOT_PROCESSED",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "requested_quantity": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": 2,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "general_ledger_account": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "5762959998",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "updated_at": {
+      "value": "2023-12-15T10:23:54.289Z",
+      "read": false,
+      "write": false,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "priority": {
+      "read": true,
+      "write": false,
+      "default": "NORMAL",
+      "required": true,
+      "value": "NORMAL",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9",
+    "total_price_cents": 107,
+    "price_currency": {
+      "read": true,
+      "write": false,
+      "default": "CHF",
+      "required": true,
+      "value": "CHF",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "procurement_account": {
+      "read": true,
+      "write": false,
+      "value": "4912540823",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "room": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+        "name": "general room",
+        "description": null,
+        "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+        "general": true,
+        "building": {
+          "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+          "name": "general building",
+          "code": null
+        }
+      },
+      "required": true,
+      "value": {
+        "id": "0bbadc24-e8ea-497e-a96c-370f3fbf6441",
+        "name": "97761",
+        "general": false,
+        "building": {
+          "id": "88c87eb5-32f5-4934-b0df-d22484d7f158",
+          "code": null,
+          "name": "824 Welch Mountain"
+        },
+        "building_id": "88c87eb5-32f5-4934-b0df-d22484d7f158",
+        "description": null
+      },
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "inspection_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "approved_quantity": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": 1,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "order_quantity": {
+      "read": false,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "cost_center": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "7429400349",
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "user": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "default": {
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "firstname": "Joaquin",
+        "lastname": "Volkman"
+      },
+      "value": {
+        "system_admin_protected": false,
+        "address": null,
+        "email": "haywood@feeney.biz",
+        "pool_protected": false,
+        "last_sign_in_at": "2023-12-15T11:23:54.595065+01:00",
+        "img32_url": null,
+        "account_enabled": true,
+        "lastname": "Volkman",
+        "phone": null,
+        "img_digest": null,
+        "org_id": null,
+        "extended_info": null,
+        "secondary_email": null,
+        "city": null,
+        "settings": null,
+        "is_admin": false,
+        "organization": "local",
+        "login": null,
+        "searchable": "Joaquin Volkman haywood@feeney.biz    Volkman Joaquin",
+        "updated_at": "2023-12-15T11:23:54.595065+01:00",
+        "firstname": "Joaquin",
+        "zip": null,
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "url": null,
+        "password_sign_in_enabled": true,
+        "account_disabled_at": null,
+        "is_system_admin": false,
+        "badge_id": null,
+        "language_locale": null,
+        "img256_url": null,
+        "country": null,
+        "delegator_user_id": null,
+        "created_at": "2023-12-15T00:00:00+01:00",
+        "admin_protected": false
+      },
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "receiver": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "internal_order_number": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "created_at": {
+      "value": "2023-12-15T10:23:54.289Z",
+      "read": false,
+      "write": false,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "order_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    },
+    "short_id": "budget_period_I.003",
+    "model": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "2b58cc2d-147d-4bf4-a15d-cfdab16477a9"
+    }
+  },
+  {
+    "category": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "62035d81-b1f8-46ec-a603-caedf518b175",
+        "name": "category_2_A",
+        "main_category_id": "1292a8a6-dff7-4413-864b-4d00cad806dd",
+        "general_ledger_account": "3517987317",
+        "cost_center": "4793874989",
+        "procurement_account": "6603351852"
+      },
+      "required": true,
+      "value": {
+        "id": "62035d81-b1f8-46ec-a603-caedf518b175",
+        "name": "category_2_A",
+        "cost_center": "4793874989",
+        "main_category": {
+          "id": "1292a8a6-dff7-4413-864b-4d00cad806dd",
+          "name": "main_category_2"
+        },
+        "main_category_id": "1292a8a6-dff7-4413-864b-4d00cad806dd",
+        "procurement_account": "6603351852",
+        "general_ledger_account": "3517987317"
+      },
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "supplier": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "motivation": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": "Reiciendis nisi porro voluptate.",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "accounting_type": {
+      "read": true,
+      "write": false,
+      "default": "aquisition",
+      "required": true,
+      "value": "aquisition",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "actionPermissions": {
+      "edit": true,
+      "delete": false,
+      "moveBudgetPeriod": false,
+      "moveCategory": false
+    },
+    "article_number": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "inspector_priority": {
+      "read": false,
+      "write": false,
+      "default": "MEDIUM",
+      "required": true,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "price_cents": {
+      "read": true,
+      "write": false,
+      "default": 0,
+      "required": true,
+      "value": 113,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "budget_period": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T10:23:53.417Z",
+        "end_date": "2023-12-14T10:23:53.417Z",
+        "created_at": "2023-12-15T10:23:53.418Z",
+        "updated_at": "2023-12-15T10:23:53.418Z"
+      },
+      "required": true,
+      "value": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T11:23:53.417785+01:00",
+        "end_date": "2023-12-14T11:23:53.417966+01:00",
+        "created_at": "2023-12-15T11:23:53.41806",
+        "updated_at": "2023-12-15T11:23:53.41806",
+        "is_past": true
+      },
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "article_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": "Intelligent Plastic Shoes",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "replacement": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": true,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "attachments": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "unqueried",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "DELETE": false,
+    "template": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "state": "APPROVED",
+    "organization": {
+      "value": {
+        "id": "b59b375a-c2e1-4dac-99e0-48cc8c00423a",
+        "name": "Health, Beauty & Tools",
+        "parent_id": "642f4e37-f588-48d0-9474-f68d60a8af56",
+        "shortname": null,
+        "department": {
+          "id": "642f4e37-f588-48d0-9474-f68d60a8af56",
+          "name": "Sports",
+          "parent_id": null,
+          "shortname": null
+        }
+      },
+      "read": false,
+      "write": false,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "supplier_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": "Schowalter-Homenick",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "order_status": {
+      "read": true,
+      "write": true,
+      "default": "NOT_PROCURED",
+      "required": true,
+      "value": "NOT_PROCESSED",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "requested_quantity": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": 1,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "general_ledger_account": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "3517987317",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "updated_at": {
+      "value": "2023-12-15T10:23:54.305Z",
+      "read": false,
+      "write": false,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "priority": {
+      "read": true,
+      "write": false,
+      "default": "NORMAL",
+      "required": true,
+      "value": "NORMAL",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42",
+    "total_price_cents": 113,
+    "price_currency": {
+      "read": true,
+      "write": false,
+      "default": "CHF",
+      "required": true,
+      "value": "CHF",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "procurement_account": {
+      "read": true,
+      "write": false,
+      "value": "6603351852",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "room": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+        "name": "general room",
+        "description": null,
+        "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+        "general": true,
+        "building": {
+          "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+          "name": "general building",
+          "code": null
+        }
+      },
+      "required": true,
+      "value": {
+        "id": "60fe2c63-97d8-4c5d-ab1e-2a6a7a8c015c",
+        "name": "82370",
+        "general": false,
+        "building": {
+          "id": "b2e4954c-4387-4a91-908b-12322c57959f",
+          "code": null,
+          "name": "508 Hoyt Lights"
+        },
+        "building_id": "b2e4954c-4387-4a91-908b-12322c57959f",
+        "description": null
+      },
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "inspection_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "approved_quantity": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": 1,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "order_quantity": {
+      "read": false,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "cost_center": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "4793874989",
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "user": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "default": {
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "firstname": "Joaquin",
+        "lastname": "Volkman"
+      },
+      "value": {
+        "system_admin_protected": false,
+        "address": null,
+        "email": "haywood@feeney.biz",
+        "pool_protected": false,
+        "last_sign_in_at": "2023-12-15T11:23:54.595065+01:00",
+        "img32_url": null,
+        "account_enabled": true,
+        "lastname": "Volkman",
+        "phone": null,
+        "img_digest": null,
+        "org_id": null,
+        "extended_info": null,
+        "secondary_email": null,
+        "city": null,
+        "settings": null,
+        "is_admin": false,
+        "organization": "local",
+        "login": null,
+        "searchable": "Joaquin Volkman haywood@feeney.biz    Volkman Joaquin",
+        "updated_at": "2023-12-15T11:23:54.595065+01:00",
+        "firstname": "Joaquin",
+        "zip": null,
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "url": null,
+        "password_sign_in_enabled": true,
+        "account_disabled_at": null,
+        "is_system_admin": false,
+        "badge_id": null,
+        "language_locale": null,
+        "img256_url": null,
+        "country": null,
+        "delegator_user_id": null,
+        "created_at": "2023-12-15T00:00:00+01:00",
+        "admin_protected": false
+      },
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "receiver": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "internal_order_number": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "created_at": {
+      "value": "2023-12-15T10:23:54.305Z",
+      "read": false,
+      "write": false,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "order_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    },
+    "short_id": "budget_period_I.005",
+    "model": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "55e668f4-f6f6-4ca3-96ac-20e30840ba42"
+    }
+  },
+  {
+    "category": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "66caa82c-0c6a-45bf-81ce-6dae2bed29c8",
+        "name": "category_1_C",
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "general_ledger_account": "7981816261",
+        "cost_center": "9370700739",
+        "procurement_account": "6251253361"
+      },
+      "required": true,
+      "value": {
+        "id": "66caa82c-0c6a-45bf-81ce-6dae2bed29c8",
+        "name": "category_1_C",
+        "cost_center": "9370700739",
+        "main_category": {
+          "id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+          "name": "main_category_1"
+        },
+        "main_category_id": "913310f6-b4fd-4adf-8f0e-b5b558984f5c",
+        "procurement_account": "6251253361",
+        "general_ledger_account": "7981816261"
+      },
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "supplier": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "motivation": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": "Neque consequatur ab vel.",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "accounting_type": {
+      "read": true,
+      "write": false,
+      "default": "aquisition",
+      "required": true,
+      "value": "aquisition",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "actionPermissions": {
+      "edit": true,
+      "delete": false,
+      "moveBudgetPeriod": false,
+      "moveCategory": false
+    },
+    "article_number": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "inspector_priority": {
+      "read": false,
+      "write": false,
+      "default": "MEDIUM",
+      "required": true,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "price_cents": {
+      "read": true,
+      "write": false,
+      "default": 0,
+      "required": true,
+      "value": 109,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "budget_period": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T10:23:53.417Z",
+        "end_date": "2023-12-14T10:23:53.417Z",
+        "created_at": "2023-12-15T10:23:53.418Z",
+        "updated_at": "2023-12-15T10:23:53.418Z"
+      },
+      "required": true,
+      "value": {
+        "id": "100699bc-fd86-4955-bc2e-84809db64df5",
+        "name": "budget_period_I",
+        "inspection_start_date": "2023-12-08T11:23:53.417785+01:00",
+        "end_date": "2023-12-14T11:23:53.417966+01:00",
+        "created_at": "2023-12-15T11:23:53.41806",
+        "updated_at": "2023-12-15T11:23:53.41806",
+        "is_past": true
+      },
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "article_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": "Heavy Duty Silk Table",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "replacement": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": true,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "attachments": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "unqueried",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "DELETE": false,
+    "template": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": true,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "state": "NEW",
+    "organization": {
+      "value": {
+        "id": "22c81145-9e76-4263-9693-d472cbd03fcb",
+        "name": "Home",
+        "parent_id": "395d028f-d85e-41ca-8b7f-7b6ad7c4af58",
+        "shortname": null,
+        "department": {
+          "id": "395d028f-d85e-41ca-8b7f-7b6ad7c4af58",
+          "name": "Grocery",
+          "parent_id": null,
+          "shortname": null
+        }
+      },
+      "read": false,
+      "write": false,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "supplier_name": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": "Ritchie-Will",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "order_status": {
+      "read": true,
+      "write": true,
+      "default": "NOT_PROCURED",
+      "required": true,
+      "value": "NOT_PROCESSED",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "requested_quantity": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "value": 1,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "general_ledger_account": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "7981816261",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "updated_at": {
+      "value": "2023-12-15T10:23:54.296Z",
+      "read": false,
+      "write": false,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "priority": {
+      "read": true,
+      "write": false,
+      "default": "NORMAL",
+      "required": true,
+      "value": "NORMAL",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5",
+    "total_price_cents": 109,
+    "price_currency": {
+      "read": true,
+      "write": false,
+      "default": "CHF",
+      "required": true,
+      "value": "CHF",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "procurement_account": {
+      "read": true,
+      "write": false,
+      "value": "6251253361",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "room": {
+      "read": true,
+      "write": false,
+      "default": {
+        "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+        "name": "general room",
+        "description": null,
+        "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+        "general": true,
+        "building": {
+          "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+          "name": "general building",
+          "code": null
+        }
+      },
+      "required": true,
+      "value": {
+        "id": "fcbe6480-1301-4e5c-a5e6-c6f4d8415323",
+        "name": "5720",
+        "general": false,
+        "building": {
+          "id": "1b67392d-5051-40ab-96ff-7b748ab01a45",
+          "code": null,
+          "name": "305 Wisozk Walk"
+        },
+        "building_id": "1b67392d-5051-40ab-96ff-7b748ab01a45",
+        "description": null
+      },
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "inspection_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "approved_quantity": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "order_quantity": {
+      "read": false,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "cost_center": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": "9370700739",
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "user": {
+      "read": true,
+      "write": false,
+      "required": true,
+      "default": {
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "firstname": "Joaquin",
+        "lastname": "Volkman"
+      },
+      "value": {
+        "system_admin_protected": false,
+        "address": null,
+        "email": "haywood@feeney.biz",
+        "pool_protected": false,
+        "last_sign_in_at": "2023-12-15T11:23:54.595065+01:00",
+        "img32_url": null,
+        "account_enabled": true,
+        "lastname": "Volkman",
+        "phone": null,
+        "img_digest": null,
+        "org_id": null,
+        "extended_info": null,
+        "secondary_email": null,
+        "city": null,
+        "settings": null,
+        "is_admin": false,
+        "organization": "local",
+        "login": null,
+        "searchable": "Joaquin Volkman haywood@feeney.biz    Volkman Joaquin",
+        "updated_at": "2023-12-15T11:23:54.595065+01:00",
+        "firstname": "Joaquin",
+        "zip": null,
+        "id": "d61eab79-c3d0-49f7-a617-d8883266b2e1",
+        "url": null,
+        "password_sign_in_enabled": true,
+        "account_disabled_at": null,
+        "is_system_admin": false,
+        "badge_id": null,
+        "language_locale": null,
+        "img256_url": null,
+        "country": null,
+        "delegator_user_id": null,
+        "created_at": "2023-12-15T00:00:00+01:00",
+        "admin_protected": false
+      },
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "receiver": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "internal_order_number": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "created_at": {
+      "value": "2023-12-15T10:23:54.296Z",
+      "read": false,
+      "write": false,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "order_comment": {
+      "read": true,
+      "write": false,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    },
+    "short_id": "budget_period_I.004",
+    "model": {
+      "read": true,
+      "write": false,
+      "default": null,
+      "required": false,
+      "value": null,
+      "request-id": "a490e2fc-bf3e-46c4-8a61-5f441113c5a5"
+    }
+  }
+]

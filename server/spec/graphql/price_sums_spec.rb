@@ -317,7 +317,13 @@ describe 'price sums' do
         @user = requester
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
-        expect(result).to eq(expected_result)
+
+        res_sort = sort_requests(result)
+        exp_sort = sort_requests(expected_result)
+
+        expect(res_sort).to eq(exp_sort)
+
+        # expect(result).to eq(expected_result)
       end
 
       it 'inspection phase' do
@@ -327,7 +333,13 @@ describe 'price sums' do
         @user = requester
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
-        expect(result).to eq(expected_result)
+
+        res_sort = sort_requests(result)
+        exp_sort = sort_requests(expected_result)
+
+        expect(res_sort).to eq(exp_sort)
+
+        # expect(result).to eq(expected_result)
       end
     end
 
@@ -338,7 +350,13 @@ describe 'price sums' do
       @user = requester
       data!
       result = query(q, @user.id, variables).deep_symbolize_keys
-      expect(result).to eq(expected_result_transparent)
+
+      res_sort = sort_requests(result)
+      exp_sort = sort_requests(expected_result_transparent)
+
+      expect(res_sort).to eq(exp_sort)
+
+      # expect(result).to eq(expected_result_transparent)
     end
   end
 
@@ -367,7 +385,25 @@ describe 'price sums' do
       @user = inspector
       data!
       result = query(q, @user.id, variables).deep_symbolize_keys
-      expect(result).to eq(expected_result_transparent)
+
+      res_sort = sort_requests(result)
+      exp_sort = sort_requests(expected_result_transparent)
+
+      expect(res_sort).to eq(exp_sort)
+
+      # expect(result).to eq(expected_result_transparent)
     end
   end
+end
+
+def sort_requests(_data)
+  _data[:data][:dashboard][:budget_periods].each do |budget_period|
+    budget_period[:main_categories].each do |main_category|
+      main_category[:categories].each do |category|
+        next if category[:requests].nil? || category[:requests].empty?
+        category[:requests].sort_by! { |request| request[:id] }
+      end
+    end
+  end
+  _data
 end

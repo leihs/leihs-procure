@@ -237,13 +237,13 @@ step 'I set the end date as :date on line :n' do |date, n|
   fill_in("#{n.to_i - 1}.end_date", with: date)
 end
 
-step "I select the first budget period" do 
-  first('select#request_new.budgetPeriod option').select_option  
+step "I select the first budget period" do
+  first('select#request_new.budgetPeriod option').select_option
 end
 
 step "I select budget period :bp" do |bp|
   within(".form-group", text: "Budgetperioden") do
-    find(".dropdown-toggle").click 
+    find(".dropdown-toggle").click
     find(".dropdown-item-subgroup", text: bp).click
   end
 end

@@ -101,7 +101,7 @@
    :users (-> users/get-users (authorization/wrap-ensure-one-of [user-perms/admin? user-perms/inspector?])),
    :viewers (fn [context args value]
               (let [rrequest (:request context)
-                    tx (:tx rrequest)
+                    tx (:tx-next rrequest)
                     auth-entity (:authenticated-entity rrequest)]
                 ((-> viewers/get-viewers
                      (authorization/wrap-ensure-one-of

@@ -1,6 +1,6 @@
 Feature: Create, read, update, delete, etc.
 
-  Background: 
+  Background:
     Given there is an initial admin
     And there are procurement settings
 

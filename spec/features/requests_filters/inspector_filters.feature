@@ -172,7 +172,7 @@ Feature: Requests' filter for inspector
       | Product I | Neu        |
 
     And I click on "Filter zurücksetzen"
- 
+
     When I uncheck "nur eigene (als Prüfer)" filter
     And I expand all categories
     And I see "9 Anträge"
