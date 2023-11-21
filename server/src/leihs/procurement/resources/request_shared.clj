@@ -1,4 +1,7 @@
 (ns leihs.procurement.resources.request-shared
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require
             [clojure.tools.logging :as log]
-            [leihs.procurement.utils.sql :as sql]))
+
+    ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+    ))
