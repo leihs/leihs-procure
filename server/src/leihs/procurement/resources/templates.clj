@@ -1,46 +1,57 @@
 (ns leihs.procurement.resources.templates
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require 
+    
+    ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
+    
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources [categories :as categories]
              [template :as template]]
-            [leihs.procurement.utils.sql :as sql]))
+    ))
 
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
       (sql/from :procurement_templates)
-      (sql/merge-left-join :models
+      (sql/left-join :models
                            [:= :models.id :procurement_templates.model_id])
       (sql/order-by (->> [:procurement_templates.article_name :models.product
                           :models.version]
-                         (map #(->> (sql/call :coalesce % "")
-                                    (sql/call :lower)))
-                         (sql/call :concat)))))
+                         (map #(->> ( :coalesce % "")
+                                    ( :lower)))
+                         ( :concat)))))
 
 (defn get-templates
   [context _ value]
   (let [query (cond-> templates-base-query
-                value (sql/merge-where [:= :procurement_templates.category_id
+                value (sql/where [:= :procurement_templates.category_id
                                         (:id value)]))]
     (->> query
-         sql/format
-         (jdbc/query (-> context
+         sql-format
+         (jdbc/execute! (-> context
                          :request
                          :tx)))))
 
 (defn get-templates-for-ids
   [tx ids]
   (-> categories/categories-base-query
-      (sql/merge-where [:in :procurement_categories.id ids])
-      sql/format
-      (->> (jdbc/query tx))))
+      (sql/where [:in :procurement_categories.id ids])
+      sql-format
+      (->> (jdbc/execute! tx))))
 
 (defn delete-templates-not-in-ids!
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
                      (sql/where [:not-in :procurement_templates.id ids])
-                     sql/format)))
+                     sql-format)))
 
 (defn get-template-id
   [tx tmpl]
