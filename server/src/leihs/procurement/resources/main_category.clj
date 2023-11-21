@@ -1,10 +1,20 @@
 (ns leihs.procurement.resources.main-category
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require 
+    ;[clojure.java.jdbc :as jdbc]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
             [clojure.tools.logging :as log]
             [leihs.procurement.resources [budget-limits :as budget-limits]
              [categories :as categories] [image :as image] [images :as images]
              [uploads :as uploads]]
-            [leihs.procurement.utils [helpers :refer [submap?]] [sql :as sql]]))
+            [leihs.procurement.utils [helpers :refer [submap?]] 
+             ;[sql :as sql]
+             ]
+    ))
 
 (def main-category-base-query
   (-> (sql/select :procurement_main_categories.*)
@@ -14,34 +24,34 @@
   [id]
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.id id])
-      sql/format))
+      sql-format))
 
 (defn main-category-query-by-name
   [mc-name]
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.name mc-name])
-      sql/format))
+      sql-format))
 
 (defn get-main-category
   [context _ value]
   (-> value
       :main_category_id
       main-category-query-by-id
-      (->> (jdbc/query (-> context
+      (->> (jdbc/execute! (-> context
                            :request
                            :tx)))
       first))
 
 (defn get-main-category-by-name
   [tx mc-name]
-  (first (jdbc/query tx (main-category-query-by-name mc-name))))
+  (first (jdbc/execute! tx (main-category-query-by-name mc-name))))
 
 (defn insert!
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_main_categories)
                      (sql/values [mc])
-                     sql/format
+                     sql-format
                      log/spy)))
 
 (defn- filter-images [m is] (filter #(submap? m %) is))
@@ -56,7 +66,7 @@
                    (-> (sql/delete-from :procurement_images)
                        (sql/where [:= :procurement_images.main_category_id
                                    mc-id])
-                       sql/format))
+                       sql-format))
     (image/create-for-main-category-id-and-upload! tx mc-id new-image-upload))
   (when-let [uploads-to-delete (-> {:to_delete true, :typename "Upload"}
                                    (filter-images images)
@@ -67,40 +77,39 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sql/sset mc)
+                     (sql/set mc)
                      (sql/where [:= :procurement_main_categories.id (:id mc)])
-                     sql/format)))
+                     sql-format)))
 
 (defn can-delete?
   [context _ value]
   (->
-    (jdbc/query
+    (jdbc/execute-one!
       (-> context
           :request
           :tx)
       (->
-        (sql/call
+        (
           :and
-          (sql/call :not
-                    (sql/call :exists
+          ( :not
+                    ( :exists
                               (-> (sql/select true)
                                   (sql/from [:procurement_requests :pr])
-                                  (sql/merge-join [:procurement_categories :pc]
+                                  (sql/join [:procurement_categories :pc]
                                                   [:= :pc.id :pr.category_id])
-                                  (sql/merge-where [:= :pc.main_category_id
+                                  (sql/where [:= :pc.main_category_id
                                                     (:id value)]))))
-          (sql/call :not
-                    (sql/call :exists
+          ( :not
+                    ( :exists
                               (-> (sql/select true)
                                   (sql/from [:procurement_templates :pt])
-                                  (sql/merge-join [:procurement_categories :pc]
+                                  (sql/join [:procurement_categories :pc]
                                                   [:= :pc.id :pt.category_id])
-                                  (sql/merge-where [:= :pc.main_category_id
+                                  (sql/where [:= :pc.main_category_id
                                                     (:id value)])))))
         (vector :result)
         sql/select
-        sql/format))
-    first
+        sql-format))
     :result))
 
 (defn delete!
@@ -108,4 +117,4 @@
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)
                      (sql/where [:= :procurement_main_categories.id id])
-                     sql/format)))
+                     sql-format)))
