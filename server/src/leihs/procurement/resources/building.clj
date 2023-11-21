@@ -1,27 +1,35 @@
 (ns leihs.procurement.resources.building
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require 
+    ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
             [leihs.procurement.resources.buildings :as buildings]
-            [leihs.procurement.utils.sql :as sql]))
+    ))
 
 (defn building-query
   [id]
   (-> (sql/select :buildings.*)
       (sql/from :buildings)
       (sql/where [:= :buildings.id id])
-      sql/format))
+      sql-format))
 
 (defn get-building-by-id
   [tx id]
   (-> id
       building-query
-      (->> (jdbc/query tx))
-      first))
+      (->> (jdbc/execute-one! tx))
+      ))
 
 (defn get-general [tx] (get-building-by-id tx buildings/general-id))
 
 (defn get-building
   [context args value]
-  (first (jdbc/query (-> context
+  (first (jdbc/execute! (-> context
                          :request
                          :tx)
                      (building-query (:building_id value)))))
