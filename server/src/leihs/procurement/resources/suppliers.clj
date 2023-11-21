@@ -1,8 +1,14 @@
 (ns leihs.procurement.resources.suppliers
   (:require
-    [clojure.java.jdbc :as jdbc]
+    ;[clojure.java.jdbc :as jdbc]
+    ;[leihs.procurement.utils.sql :as sql]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
     [clojure.string :as clj-str]
-    [leihs.procurement.utils.sql :as sql]
     [logbug.debug :as debug]))
 
 (def suppliers-base-query
@@ -11,7 +17,7 @@
 
 (defn get-suppliers
   [context args _]
-  (jdbc/query
+  (jdbc/execute!
     (-> context
         :request
         :tx)
@@ -21,13 +27,13 @@
                         (->> (map #(str "%" % "%"))))
           offset (:offset args)
           limit (:limit args)]
-      (sql/format
+      (sql-format
         (cond-> suppliers-base-query
           (not-empty terms)
-            (sql/merge-where
+            (sql/where
               (into [:and]
-                    (map (fn [term] ["~~*" (sql/call :unaccent :suppliers.name)
-                                     (sql/call :unaccent term)])
+                    (map (fn [term] ["~~*" ( :unaccent :suppliers.name)
+                                     ( :unaccent term)])
                       terms)))
           offset (sql/offset offset)
           limit (sql/limit limit))))))
