@@ -1,13 +1,21 @@
 (ns leihs.procurement.resources.users
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require
+    ;[ clojure.java.jdbc :as jdbc]
+            ;[leihs.procurement.utils.sql :as sql]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
             [clojure.string :as clj-str]
-            [leihs.procurement.utils.sql :as sql]))
+    ))
 
 (defn sql-order-users
   [sqlmap]
   (sql/order-by
     sqlmap
-    (sql/call :concat :users.firstname :users.lastname :users.login :users.id)))
+    (concat :users.firstname :users.lastname :users.login :users.id)))
 
 (def users-base-query
   (-> (sql/select :users.id :users.firstname :users.lastname)
@@ -16,7 +24,7 @@
 
 (defn get-users
   [context args _]
-  (jdbc/query
+  (jdbc/execute!
     (-> context
         :request
         :tx)
@@ -29,25 +37,25 @@
           offset (:offset args)
           limit (:limit args)]
       (-> (cond-> users-base-query is-requester
-                  (sql/merge-join :procurement_requesters_organizations
+                  (sql/join :procurement_requesters_organizations
                                   [:=
                                    :procurement_requesters_organizations.user_id
                                    :users.id])
                     term-parts
-                  (sql/merge-where
+                  (sql/where
                     (into [:and]
                           (map
                             (fn [term-percent]
                               ["~~*"
-                               (->> (sql/call :concat
+                               (->> (concat
                                               :users.firstname
-                                              (sql/call :cast " " :varchar)
+                                              ( :cast " " :varchar)
                                               :users.lastname)
-                                    (sql/call :unaccent))
-                               (sql/call :unaccent term-percent)])
+                                    ( :unaccent))
+                               ( :unaccent term-percent)])
                             term-parts)))
                     exclude-ids
-                  (sql/merge-where [:not-in :users.id exclude-ids]) offset
+                  (sql/where [:not-in :users.id exclude-ids]) offset
                   (sql/offset offset) limit
                   (sql/limit limit))
-          sql/format))))
+          sql-format))))
