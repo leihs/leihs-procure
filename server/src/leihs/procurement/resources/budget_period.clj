@@ -1,8 +1,16 @@
 (ns leihs.procurement.resources.budget-period
   (:require
-    [clojure.java.jdbc :as jdbc]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
+    ;[clojure.java.jdbc :as jdbc]
+    [leihs.procurement.utils.sql :as sqlp]
+    
+    
     [clojure.tools.logging :as log]
-    [leihs.procurement.utils.sql :as sql]
     [logbug.debug :as debug]
     [tick.core :as tick]
     ))
@@ -13,10 +21,10 @@
 
 (defn get-budget-period-by-id
   [tx id]
-  (first (jdbc/query tx
+  (first (jdbc/execute! tx
                      (-> budget-period-base-query
                          (sql/where [:= :procurement_budget_periods.id id])
-                         sql/format))))
+                         sql-format))))
 
 (defn get-budget-period
   ([context _ value]
@@ -29,12 +37,12 @@
                                 ; for RequestFieldBudgetPeriod
                               )))
   ([tx bp-map]
-   (let [where-clause (sql/map->where-clause :procurement_budget_periods
+   (let [where-clause (sqlp/map->where-clause :procurement_budget_periods
                                              bp-map)]
-     (first (jdbc/query tx
+     (first (jdbc/execute! tx
                         (-> budget-period-base-query
-                            (sql/merge-where where-clause)
-                            sql/format))))))
+                            (sql/where where-clause)
+                            sql-format))))))
 
 (defn sql-format-date [inst]
   (-> inst tick/date str))
@@ -44,12 +52,11 @@
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:inspection_start_date <>)
                                  (sql-format-date <>)
-                                 (sql/call :cast <> :date)
-                                 (sql/call :< :current_date <>)) :result])
-                  sql/format)]
+                                 (:cast <> :date)
+                                 (:< :current_date <>)) :result])
+                  sql-format)]
     (->> query
-         (jdbc/query tx)
-         first
+         (jdbc/execute-one! tx)
          :result)))
 
 (defn in-inspection-phase?
@@ -57,21 +64,20 @@
   (let [inspection-start-date (as-> budget-period <>
                                 (:inspection_start_date <>)
                                 (sql-format-date <>)
-                                (sql/call :cast <> :date))
+                                (:cast <> :date))
         end-date (as-> budget-period <>
                    (:end_date <>)
                    (sql-format-date <>)
-                   (sql/call :cast <> :date))
+                   ( :cast <> :date))
         query (->
                 (sql/select
-                  [(sql/call :and
-                             (sql/call :>= :current_date inspection-start-date)
-                             (sql/call :< :current_date end-date))
+                  [( :and
+                             ( :>= :current_date inspection-start-date)
+                             ( :< :current_date end-date))
                    :result])
-                sql/format)]
+                sql-format)]
     (->> query
-         (jdbc/query tx)
-         first
+         (jdbc/execute-one! tx)
          :result)))
 
 (defn past?
@@ -79,55 +85,54 @@
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:end_date <>)
                                  (sql-format-date <>)
-                                 (sql/call :cast <> :date)
-                                 (sql/call :> :current_date <>)) :result])
-                  sql/format)]
+                                 ( :cast <> :date)
+                                 ( :> :current_date <>)) :result])
+                  sql-format)]
     (->> query
-         (jdbc/query tx)
-         first
+         (jdbc/execute-one! tx)
          :result)))
 
 (defn can-delete?
   [context _ value]
   (->
-    (jdbc/query
+    (jdbc/execute-one!
       (-> context
           :request
           :tx)
-      (-> (sql/call
+      (-> (
             :and
-            (sql/call :not
-                      (sql/call :exists
+            ( :not
+                      (:exists
                                 (-> (sql/select true)
                                     (sql/from [:procurement_requests :pr])
-                                    (sql/merge-where [:= :pr.budget_period_id
+                                    (sql/where [:= :pr.budget_period_id
                                                       (:id value)]))))
-            (sql/call :not
-                      (sql/call :exists
+            ( :not
+                      (:exists
                                 (-> (sql/select true)
                                     (sql/from [:procurement_budget_limits :pbl])
-                                    (sql/merge-where [:= :pbl.budget_period_id
+                                    (sql/where [:= :pbl.budget_period_id
                                                       (:id value)])))))
           (vector :result)
           sql/select
-          sql/format))
-    first
+          sql-format))
+
     :result))
 
 (defn update-budget-period!
   [tx bp]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_budget_periods)
-                     (sql/sset bp)
+                     (sql/set bp)
                      (sql/where [:= :procurement_budget_periods.id (:id bp)])
-                     sql/format)))
+                     sql-format)))
 
 (defn insert-budget-period!
   [tx bp]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_budget_periods)
                      (sql/values [bp])
-                     sql/format)))
+                     sql-format)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)
