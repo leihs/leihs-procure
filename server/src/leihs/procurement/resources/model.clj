@@ -1,15 +1,25 @@
 (ns leihs.procurement.resources.model
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
+    ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+    
+    
+    ))
 
 (defn model-query
   [id]
   (-> (sql/select :models.*)
       (sql/from :models)
       (sql/where [:= :models.id id])
-      sql/format))
+      sql-format))
 
-(defn get-model-by-id [tx id] (first (jdbc/query tx (model-query id))))
+(defn get-model-by-id [tx id] ((jdbc/execute-one! tx (model-query id))))
 
 (defn get-model
   [context _ value]
