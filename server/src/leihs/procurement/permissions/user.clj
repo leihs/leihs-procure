@@ -81,10 +81,10 @@
        (some true?)))
 
 (defn get-permissions
-  [{{:keys [tx authenticated-entity]} :request} args value]
+  [{{:keys [tx-next tx authenticated-entity]} :request} args value]
   (when (not= (:user_id authenticated-entity) (:id value))
     (raise "Not allowed to query permissions for a user other then the authenticated one."))
   {:isAdmin (admin? tx authenticated-entity),
    :isRequester (requester? tx authenticated-entity),
-   :isInspectorForCategories (categories-perms/inspected-categories tx value),
-   :isViewerForCategories (categories-perms/viewed-categories tx value)})
+   :isInspectorForCategories (categories-perms/inspected-categories tx-next value),
+   :isViewerForCategories (categories-perms/viewed-categories tx-next value)})
