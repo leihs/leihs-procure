@@ -1,6 +1,15 @@
 (ns leihs.procurement.resources.organizations
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+
+    
+    ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+    ))
 
 (def organizations-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -11,15 +20,15 @@
   [_ args value]
   (let [root-only (:root_only args)
         id (:id value)]
-    (sql/format
+    (sql-format
       (cond-> organizations-base-query
-        root-only (sql/merge-where [:= :procurement_organizations.parent_id
+        root-only (sql/where [:= :procurement_organizations.parent_id
                                     nil])
-        id (sql/merge-where [:= :procurement_organizations.parent_id id])))))
+        id (sql/where [:= :procurement_organizations.parent_id id])))))
 
 (defn get-organizations
   [context args value]
-  (jdbc/query (-> context
+  (jdbc/execute! (-> context
                   :request
                   :tx)
               (organizations-query context args value)))
@@ -31,28 +40,28 @@
   (jdbc/execute!
     tx
     (-> (sql/delete-from [:procurement_organizations :po])
-        (sql/merge-where [:<> :po.parent_id nil])
-        (sql/merge-where
+        (sql/where [:<> :po.parent_id nil])
+        (sql/where
           [:not
-           (sql/call :exists
+           ( :exists
                      (-> (sql/select true)
                          (sql/from [:procurement_requesters_organizations :pro])
                          (sql/where [:= :pro.organization_id :po.id])))])
-        (sql/merge-where
+        (sql/where
           [:not
-           (sql/call :exists
+           ( :exists
                      (-> (sql/select true)
                          (sql/from [:procurement_requests :pr])
                          (sql/where [:= :pr.organization_id :po.id])))])
-        sql/format))
+        sql-format))
   (jdbc/execute!
     tx
     (-> (sql/delete-from [:procurement_organizations :po1])
-        (sql/merge-where [:= :po1.parent_id nil])
-        (sql/merge-where
+        (sql/where [:= :po1.parent_id nil])
+        (sql/where
           [:not
-           (sql/call :exists
+           ( :exists
                      (-> (sql/select true)
                          (sql/from [:procurement_organizations :po2])
                          (sql/where [:= :po2.parent_id :po1.id])))])
-        sql/format)))
+        sql-format)))
