@@ -1,16 +1,11 @@
 (ns leihs.procurement.dashboard
   (:require [clojure.string :as string]
-            ;[clojure.java.jdbc :as jdbc]
+            [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-periods :as budget-periods]
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-
             [leihs.procurement.utils.sql :as sql]))
 
 (defn sum-total-price
@@ -32,14 +27,14 @@
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
         main-cats (-> main-categories/main-categories-base-query
-                      sql-format
-                      (->> (jdbc/execute tx)))
+                      sql/format
+                      (->> (jdbc/query tx)))
         bps (if (or (not bp-ids) (not-empty bp-ids))
               (-> budget-periods/budget-periods-base-query
                   (cond-> bp-ids (sql/merge-where
                                    [:in :procurement_budget_periods.id bp-ids]))
-                  sql-format
-                  (->> (jdbc/execute tx)))
+                  sql/format
+                  (->> (jdbc/query tx)))
               [])
         requests (requests/get-requests ctx args value)
         dashboard-cache-key {:id (hash args)}]

@@ -6,15 +6,7 @@
             [leihs.procurement.resources.model :as model]
             [leihs.procurement.resources.template :as template]
             [leihs.procurement.resources.user :as user]
-
-            ;[clojure.java.jdbc :as jdbc]
-
-            [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
-            [honey.sql.helpers :as sql]
-
-
+            [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]))
 

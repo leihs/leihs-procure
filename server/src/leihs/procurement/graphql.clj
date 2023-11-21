@@ -1,14 +1,7 @@
 (ns leihs.procurement.graphql
   (:require
     [clojure.edn :as edn]
-
-    ;[clojure.java [io :as io] [jdbc :as jdbc]]
-    [clojure.java [io :as io]]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-
+    [clojure.java [io :as io] [jdbc :as jdbc]]
     [com.walmartlabs.lacinia :as lacinia]
     [com.walmartlabs.lacinia [parser :as graphql-parser]
      [schema :as graphql-schema] [util :as graphql-util]]
@@ -75,28 +68,19 @@
                        :type
                        (= :mutation))]
     (if mutation?
-      (jdbc/with-transaction
-        [tx (:tx-next request)]
+      (jdbc/with-db-transaction
+        [tx (:tx request)]
         (try (let [response (->> tx
                                  (assoc request :tx)
-                                 pure-handler)
-                   p (println ">>r" response)
-                   ]
+                                 pure-handler)]
                (when (:graphql-error response)
                  (warn "Rolling back transaction because of graphql error: " response)
-                 (.rollback tx)
-                     ;(.rollback tx)
-
-                     ;(throw "Throw error")
-                     )
+                 (jdbc/db-set-rollback-only! tx))
                response)
              (catch Throwable th
                (warn "Rolling back transaction because of " th)
-
-               (.rollback tx)
-               ;(jdbc/db-set-rollback-only! tx))              ;;old
-               ;(throw "Throw error to force rollback"))
-             ))
+               (jdbc/db-set-rollback-only! tx)
+               (throw th))))
       (pure-handler request))))
 
 
