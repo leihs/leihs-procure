@@ -1,78 +1,91 @@
 (ns leihs.procurement.permissions.user
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require
+    ;[clojure.java.jdbc :as jdbc]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
             [clojure.tools.logging :as log]
             [leihs.core.core :refer [raise]]
             [leihs.procurement.permissions.categories :as categories-perms]
-            [leihs.procurement.utils.sql :as sql]
+            ;[leihs.procurement.utils.sql :as sql]
             [taoensso.timbre :refer [debug info warn error spy]]))
 
 (defn admin?
   [tx auth-entity]
   (:result
     (first
-      (jdbc/query
+      (jdbc/execute!
         tx
         (-> (sql/select
-              [(sql/call :exists
+              [(
+                 ;sql/call
+                 :exists
                          (-> (sql/select true)
                              (sql/from :procurement_admins)
                              (sql/where [:= :procurement_admins.user_id
                                          (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql-format)))))
 
 (defn inspector?
   ([tx auth-entity] (inspector? tx auth-entity nil))
   ([tx auth-entity c-id]
    (:result
      (first
-       (jdbc/query
+       (jdbc/execute!
          tx
          (-> (sql/select
-               [(sql/call
+               [(
+                  ;sql/call
                   :exists
                   (cond-> (-> (sql/select true)
                               (sql/from :procurement_category_inspectors)
-                              (sql/merge-where
+                              (sql/where
                                 [:= :procurement_category_inspectors.user_id
                                  (:user_id auth-entity)]))
-                    c-id (sql/merge-where
+                    c-id (sql/where
                            [:= :procurement_category_inspectors.category_id
                             c-id]))) :result])
-             sql/format))))))
+             sql-format))))))
 
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
   ([tx auth-entity c-id]
    (:result
-     (first (jdbc/query
+     (first (jdbc/execute!
               tx
               (-> (sql/select
-                    [(sql/call
+                    [(
+                       ;sql/call
                        :exists
                        (cond-> (-> (sql/select true)
                                    (sql/from :procurement_category_viewers)
-                                   (sql/merge-where
+                                   (sql/where
                                      [:= :procurement_category_viewers.user_id
                                       (:user_id auth-entity)]))
-                         c-id (sql/merge-where
+                         c-id (sql/where
                                 [:= :procurement_category_viewers.category_id
                                  c-id]))) :result])
-                  sql/format))))))
+                  sql-format))))))
 
 (defn requester?
   [tx auth-entity]
   (:result
     (first
-      (jdbc/query
+      (jdbc/execute!
         tx
         (-> (sql/select
-              [(sql/call :exists
+              [(
+                 ;sql/call
+                 :exists
                          (-> (sql/select true)
                              (sql/from :procurement_requesters_organizations)
                              (sql/where
                                [:= :procurement_requesters_organizations.user_id
                                 (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql-format)))))
 
 (defn advanced?
   [tx auth-entity]
