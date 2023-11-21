@@ -1,30 +1,31 @@
 (ns leihs.procurement.resources.building
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.resources.buildings :as buildings]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.procurement.resources.buildings :as buildings]
+    [next.jdbc :as jdbc]))
 
 (defn building-query
   [id]
   (-> (sql/select :buildings.*)
       (sql/from :buildings)
       (sql/where [:= :buildings.id id])
-      sql/format))
+      sql-format))
 
 (defn get-building-by-id
   [tx id]
   (-> id
       building-query
-      (->> (jdbc/query tx))
-      first))
+      (->> (jdbc/execute-one! tx))))
 
 (defn get-general [tx] (get-building-by-id tx buildings/general-id))
 
 (defn get-building
   [context args value]
-  (first (jdbc/query (-> context
+  (jdbc/execute-one! (-> context
                          :request
-                         :tx)
-                     (building-query (:building_id value)))))
+                         :tx-next)
+                     (building-query (:building_id value))))
 
 ;#### debug ###################################################################
 

@@ -1,20 +1,25 @@
 (ns leihs.procurement.resources.upload
-  (:require [clojure.string :as string]
-            [cheshire.core :refer [generate-string] :rename
+  (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            [clojure.java.jdbc :as jdbc]
+            [clojure.string :as string]
             [compojure.core :as cpj]
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
+            [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils [exif :as exif] [sql :as sql]])
+            (leihs.procurement.utils [exif :as exif])
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]])
+
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))
 
 (defn insert-file-upload!
   [tx m]
-  (jdbc/execute! tx
-                 (-> (sql/insert-into :procurement_uploads)
+  (let [result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
                      (sql/values [m])
-                     sql/format)))
+                     sql-format))]
+    (:update-count result)))
 
 (defn prepare-upload-row-map
   [file-data]
@@ -24,8 +29,7 @@
                      (.encodeToString (Base64/getMimeEncoder)))
         metadata (-> tempfile
                      exif/extract-metadata
-                     to-json
-                     (#(sql/call :cast % :json)))
+                     cast-to-json)
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")
                          "application/octet-stream")]
@@ -41,13 +45,12 @@
   [tx id]
   (-> (sql/select :procurement_uploads.*)
       (sql/from :procurement_uploads)
-      (sql/merge-where [:= :procurement_uploads.id id])
-      sql/format
-      (->> (jdbc/query tx))
-      first))
+      (sql/where [:= :procurement_uploads.id id])
+      sql-format
+      (->> (jdbc/execute-one! tx))))
 
 (defn upload
-  [{params :params, tx :tx}]
+  [{params :params, tx :tx-next}]
   (let [files (:files params)
         files-data (if (vector? files) files [files])]
     (doseq [fd files-data]
@@ -58,8 +61,8 @@
                           (sql/from :procurement_uploads)
                           (sql/order-by [:created_at :desc])
                           (sql/limit (count files-data))
-                          sql/format
-                          (->> (jdbc/query tx)))]
+                          sql-format
+                          (->> (jdbc/execute! tx)))]
       {:body upload-rows})))
 
 (def routes (cpj/routes (cpj/POST (path :upload) [] #'upload)))
@@ -69,4 +72,4 @@
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_uploads)
                      (sql/where [:= :procurement_uploads.id id])
-                     sql/format)))
+                     sql-format)))

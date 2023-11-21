@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.models
   (:require
-    [clojure.java.jdbc :as jdbc]
     [clojure.string :as clj-str]
-    [leihs.procurement.utils.sql :as sql]
-    [logbug.debug :as debug]))
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [next.jdbc :as jdbc]))
 
 (def sql-name
-  (sql/call :concat :product (sql/call :cast " " :varchar) :version))
+  (concat :product (:cast " " :varchar) :version))
 
 (def models-base-query
   (-> (sql/select :* [sql-name :name])
@@ -14,23 +14,22 @@
 
 (defn get-models
   [context args _]
-  (jdbc/query
+  (jdbc/execute!
     (-> context
         :request
-        :tx)
+        :tx-next)
     (let [terms (some-> args
                         :search_term
                         (clj-str/split #"\s+")
                         (->> (map #(str "%" % "%"))))
           offset (:offset args)
           limit (:limit args)]
-      (sql/format
+      (sql-format
         (cond-> models-base-query
           (not-empty terms)
-            (sql/merge-where
+            (sql/where
               (into [:and]
-                    (map (fn [term] ["~~*" (sql/call :unaccent sql-name)
-                                     (sql/call :unaccent term)])
+                    (map (fn [term] [:ilike (:unaccent sql-name) (:unaccent term)])
                       terms)))
           offset (sql/offset offset)
           limit (sql/limit limit))))))

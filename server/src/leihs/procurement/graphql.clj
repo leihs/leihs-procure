@@ -1,28 +1,21 @@
 (ns leihs.procurement.graphql
   (:require
     [clojure.edn :as edn]
-    [clojure.java [io :as io] [jdbc :as jdbc]]
+    (clojure.java [io :as io])
+    (clojure.java [io :as io])
+    ;; all needed imports
     [com.walmartlabs.lacinia :as lacinia]
-    [com.walmartlabs.lacinia [parser :as graphql-parser]
-     [schema :as graphql-schema] [util :as graphql-util]]
+    (com.walmartlabs.lacinia [schema :as graphql-schema] [util :as graphql-util])
     [leihs.core.graphql :as core-graphql]
     [leihs.procurement.graphql.resolver :as resolver]
-    [leihs.procurement.graphql.helpers :as helpers]
-    [leihs.procurement.utils.ring-exception :refer [get-cause]]
-    [taoensso.timbre :refer [debug info warn error spy]]
-    ))
-
-(def CUSTOM_SCALARS
-  {:ID {:parse identity :serialize str}
-   :Int {:parse (fn [v]
-                  (if (number? v) v (Integer/parseInt v)))
-         :serialize identity}})
+    [leihs.procurement.graphql.scalars :as scalars]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn load-schema! []
   (or (some-> (io/resource "schema.edn")
               slurp edn/read-string
               (graphql-util/attach-resolvers resolver/resolvers)
-              (assoc-in [:scalars] CUSTOM_SCALARS)
+              (graphql-util/attach-scalar-transformers scalars/scalars)
               graphql-schema/compile)
       (throw (ex-info "Failed to load schema" {}))))
 

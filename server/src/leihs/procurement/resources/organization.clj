@@ -1,6 +1,9 @@
 (ns leihs.procurement.resources.organization
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def organization-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -13,54 +16,52 @@
       (sql/where [:= :procurement_organizations.id
                   (-> (sql/select :procurement_organizations.parent_id)
                       (sql/from :procurement_organizations)
-                      (sql/merge-where [:= :procurement_organizations.id
+                      (sql/where [:= :procurement_organizations.id
                                         organization-id]))])
-      sql/format))
+      sql-format))
 
 (def department-base-query
   (-> organization-base-query
-      (sql/merge-where [:= :procurement_organizations.parent_id nil])))
+      (sql/where [:= :procurement_organizations.parent_id nil])))
 
 (defn department-by-id-query
   [id]
   (-> department-base-query
-      (sql/merge-where [:= :procurement_organizations.id id])
-      sql/format))
+      (sql/where [:= :procurement_organizations.id id])
+      sql-format))
 
 (defn department-by-name-query
   [dep-name]
   (-> department-base-query
-      (sql/merge-where [:= :procurement_organizations.name dep-name])
-      sql/format))
+      (sql/where [:= :procurement_organizations.name dep-name])
+      sql-format))
 
 (defn get-department-by-name
   [tx dep-name]
   (->> dep-name
        department-by-name-query
-       (jdbc/query tx)
-       first))
+       (jdbc/execute-one! tx)))
 
 (defn get-department-by-id
   [tx id]
   (->> id
        department-by-id-query
-       (jdbc/query tx)
-       first))
+       (jdbc/execute-one! tx)))
 
 (defn get-organization-by-id
   [tx id]
-  (first (jdbc/query tx
+  (jdbc/execute-one! tx
                      (-> organization-base-query
-                         (sql/merge-where [:= :procurement_organizations.id id])
-                         sql/format))))
+                         (sql/where [:= :procurement_organizations.id id])
+                         sql-format)))
 
 (defn get-organization
   [context _ value]
-  (first (jdbc/query (-> context
+  (jdbc/execute-one! (-> context
                          :request
-                         :tx)
+                         :tx-next)
                      (-> organization-base-query
-                         (sql/merge-where [:= :procurement_organizations.id
+                         (sql/where [:= :procurement_organizations.id
                                            (or (:organization_id value)
                                                ; for
                                                ; RequesterOrganization
@@ -68,33 +69,32 @@
                                                ; for
                                                ; RequestFieldOrganization
                                              )])
-                         sql/format))))
+                         sql-format)))
 
 (defn get-organization-by-name-and-dep-id
   [tx org-name dep-id]
-  (first
-    (jdbc/query
-      tx
-      (-> organization-base-query
-          (sql/merge-where [:= :procurement_organizations.name org-name])
-          (sql/merge-where [:= :procurement_organizations.parent_id dep-id])
-          sql/format))))
+
+  (jdbc/execute-one!
+    tx
+    (-> organization-base-query
+        (sql/where [:and [:= :procurement_organizations.name org-name]
+                    [:= :procurement_organizations.parent_id dep-id]])
+        sql-format)))
 
 (defn get-department-of-requester-organization
   [context _ value]
   (->> value
        :organization_id
        department-query
-       (jdbc/query (-> context
+       (jdbc/execute-one! (-> context
                        :request
-                       :tx))
-       first))
+                       :tx-next))))
 
 (defn get-department-of-organization
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)]
+               :tx-next)]
     (->> value
          :parent_id
          (get-department-by-id tx))))
