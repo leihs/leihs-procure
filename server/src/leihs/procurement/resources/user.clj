@@ -1,27 +1,28 @@
 (ns leihs.procurement.resources.user
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def user-base-query
-  (-> (sql/select :users.id :users.firstname :users.lastname)
+  (-> (sql/select :id :firstname :lastname)
       (sql/from :users)))
 
 (defn get-user
   [context _ value]
-  (first (jdbc/query (-> context
+  (jdbc/execute-one! (-> context
                          :request
-                         :tx)
+                         :tx-next)
                      (-> user-base-query
-                         (sql/where [:= :users.id
-                                     (or (:user_id value) ; for
-                                         ; RequesterOrganization
-                                         (:value value) ; for RequestFieldUser
-                                       )])
-                         sql/format))))
+                         (sql/where [:= :users.id [:cast (or (:user_id value) ; for
+                                                             ; RequesterOrganization
+                                                             (:value value) ; for RequestFieldUser
+                                                             ) :uuid]])
+                         sql-format)))
 
 (defn get-user-by-id
   [tx id]
-  (first (jdbc/query tx
-                     (-> user-base-query
-                         (sql/where [:= :users.id id])
-                         sql/format))))
+  (jdbc/execute-one! tx (-> user-base-query
+                            (sql/where [:= :id [:cast id :uuid]])
+                            sql-format)))

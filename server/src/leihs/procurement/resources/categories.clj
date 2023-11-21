@@ -1,11 +1,14 @@
 (ns leihs.procurement.resources.categories
-  (:require [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources [category :as category]
-             [inspectors :as inspectors] [viewers :as viewers]]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.permissions.user :as user-perms]
+    (leihs.procurement.resources [category :as category]
+                                 [inspectors :as inspectors] [viewers :as viewers])
+    [leihs.procurement.utils.helpers :refer [cast-uuids]]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def categories-base-query
   (-> (sql/select :procurement_categories.*)
@@ -17,55 +20,51 @@
   (let [id (:id arguments)
         inspected-by-auth-user (:inspected_by_auth_user arguments)
         main-category-id (:id value)]
-    (sql/format
+    (sql-format
       (cond-> categories-base-query
-        id (sql/merge-where [:in :procurement_categories.id id])
-        main-category-id (sql/merge-where
-                           [:= :procurement_categories.main_category_id
-                            main-category-id])
-        inspected-by-auth-user
-          (-> (sql/merge-join :procurement_category_inspectors
-                              [:= :procurement_category_inspectors.category_id
-                               :procurement_categories.id])
-              (sql/merge-where [:= :procurement_category_inspectors.user_id
-                                (-> context
-                                    :request
-                                    :authenticated-entity
-                                    :user_id)]))))))
+              id (sql/where [:in :procurement_categories.id (cast-uuids id)])
+              main-category-id (sql/where
+                                 [:= :procurement_categories.main_category_id
+                                  main-category-id])
+              inspected-by-auth-user
+              (-> (sql/join :procurement_category_inspectors
+                            [:= :procurement_category_inspectors.category_id
+                             :procurement_categories.id])
+                  (sql/where [:= :procurement_category_inspectors.user_id
+                              (-> context
+                                  :request
+                                  :authenticated-entity
+                                  :user_id)]))))))
 
 (defn get-categories-for-ids
   [tx ids]
-  (-> categories-base-query
-      (sql/merge-where [:in :procurement_categories.id ids])
-      sql/format
-      (->> (jdbc/query tx))))
+  (if (empty? ids)
+    []
+    (jdbc/execute! tx (-> categories-base-query
+                               (sql/where [:in :procurement_categories.id (cast-uuids ids)])
+                               sql-format))))
 
 (defn get-for-main-category-id
   [tx main-cat-id]
-  (-> categories-base-query
-      (sql/merge-where [:= :procurement_categories.main_category_id
-                        main-cat-id])
-      sql/format
-      (->> (jdbc/query tx))))
+  (jdbc/execute! tx (-> categories-base-query
+                        (sql/where [:= :procurement_categories.main_category_id [:cast main-cat-id :uuid]])
+                        sql-format)))
 
 (defn get-categories
   [context arguments value]
   (if (= (:id arguments) [])
     []
     (->> (categories-query context arguments value)
-         (jdbc/query (-> context
-                         :request
-                         :tx)))))
+         (jdbc/execute! (-> context
+                            :request
+                            :tx-next)))))
 
 (defn delete-categories-for-main-category-id-and-not-in-ids!
   [tx mc-id ids]
-  (jdbc/execute!
-    tx
-    (-> (sql/delete-from :procurement_categories)
-        (sql/merge-where [:= :procurement_categories.main_category_id mc-id])
-        (cond-> (not (empty? ids)) (sql/merge-where
-                                     [:not-in :procurement_categories.id ids]))
-        sql/format)))
+  (jdbc/execute! tx (-> (sql/delete-from :procurement_categories)
+                        (sql/where [:= :procurement_categories.main_category_id [:cast mc-id :uuid]])
+                        (cond-> (not (empty? ids)) (sql/where [:not-in :procurement_categories.id (cast-uuids ids)]))
+                        sql-format)))
 
 (defn update-categories!
   [tx mc-id cs]
@@ -88,7 +87,7 @@
 (defn update-categories-viewers!
   [context args value]
   (let [request (:request context)
-        tx (:tx request)
+        tx (:tx-next request)
         auth-user (:authenticated-entity request)
         categories (:input_data args)]
     (loop [[c & rest-cs] categories]
@@ -99,9 +98,6 @@
               [#(user-perms/admin? tx auth-user)
                #(user-perms/inspector? tx auth-user c-id)])
             (recur rest-cs))
-        (jdbc/query tx
-                    (-> categories-base-query
-                        (sql/merge-where [:in :procurement_categories.id
-                                          (map :id categories)])
-                        sql/format))))))
-
+        (jdbc/execute! tx (-> categories-base-query
+                              (sql/where [:in :procurement_categories.id (cast-uuids (map :id categories))])
+                              sql-format))))))
