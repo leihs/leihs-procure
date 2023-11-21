@@ -1,18 +1,18 @@
 (ns leihs.procurement.resources.request
-  (:require [clojure [set :refer [map-invert]]
-             [string :refer [lower-case upper-case]]]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
+  (:require (clojure [set :refer [map-invert]]
+                     [string :refer [lower-case upper-case]])
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [honey.sql.helpers :as sql]
             [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions [request-helpers :as request-perms]
-             [request-fields :as request-fields-perms] [user :as user-perms]]
-            [leihs.procurement.resources [attachments :as attachments]
-             [budget-period :as budget-period] [category :as category]
-             [request-helpers :as request-helpers]
-             [requesters-organizations :as requesters] [template :as template]
-             [uploads :as uploads] [user :as user]]
-            [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
-             [sql :as sql]]))
+            (leihs.procurement.permissions [request-fields :as request-fields-perms]
+                                           [request-helpers :as request-perms] [user :as user-perms])
+            (leihs.procurement.resources [attachments :as attachments]
+                                         [budget-period :as budget-period] [request-helpers :as request-helpers]
+                                         [requesters-organizations :as requesters] [template :as template]
+                                         [uploads :as uploads])
+            (leihs.procurement.utils [helpers :refer [reject-keys submap?]])
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -106,13 +106,13 @@
 
 (defn state-sql
   [advanced-user?]
-  (let [s-map (states-conds-map advanced-user?)]
-    (->> s-map
+  (let [s-map (states-conds-map advanced-user?)
+   map (->> s-map
          keys
          (map name)
          (interleave (vals s-map))
-         (cons :case)
-         (apply sql/call))))
+         (cons :case))]
+    [map]))
 
 (def sql-order-by-expr
   (str "concat("
@@ -121,19 +121,19 @@
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query
-  (-> (sql/select (sql/raw (str "DISTINCT ON (procurement_requests.id, "
-                                sql-order-by-expr
-                                ") procurement_requests.*")))
+  (let [conc sql-order-by-expr]
+    (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+                                conc
+                                ") procurement_requests.*")]])
       (sql/from :procurement_requests)
-      (sql/merge-left-join :models
-                           [:= :models.id :procurement_requests.model_id])
-      (sql/order-by (sql/raw sql-order-by-expr))))
+      (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+      (sql/order-by [[:raw conc]] :procurement_requests.id))))
 
 (defn requests-base-query-with-state
   [advanced-user?]
   (-> requests-base-query
-      (sql/merge-select [(state-sql advanced-user?) :state])
-      (sql/merge-join :procurement_budget_periods
+      (sql/select [(state-sql advanced-user?) :state])
+      (sql/join :procurement_budget_periods
                       [:= :procurement_budget_periods.id
                        :procurement_requests.budget_period_id])))
 
@@ -229,7 +229,8 @@
 (defn query-requests
   [tx auth-entity query]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})))
+    (->> (jdbc/execute! tx query)
+         (map #(transform-row % advanced-user?)))))
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
@@ -243,7 +244,7 @@
   (->> id
        (get-request-by-id-sqlmap tx auth-entity)
        request-helpers/join-and-nest-associated-resources
-       sql/format
+       sql-format
        (query-requests tx auth-entity)
        first))
 
@@ -260,11 +261,11 @@
 (defn get-new
   [context args value]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
-                   (not user-arg) (assoc :user (:user_id auth-entity)))
+                         (not user-arg) (assoc :user (:user_id auth-entity)))
         fields
           (->> req-stub
                submap-with-id-for-associated-resources
@@ -288,31 +289,29 @@
         (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
-        sql/format
+        sql-format
         (->> (query-requests tx auth-entity))
         first)))
 
 (defn insert!
   [tx data]
-  (jdbc/execute! tx
-                 (-> (sql/insert-into :procurement_requests)
+  (jdbc/execute! tx (-> (sql/insert-into :procurement_requests)
                      (sql/values [data])
-                     sql/format)))
+                     sql-format)))
 
 (defn update!
   [tx req-id data]
-  (jdbc/execute! tx
-                 (-> (sql/update :procurement_requests)
-                     (sql/sset data)
+  (jdbc/execute-one! tx (-> (sql/update :procurement_requests)
+                     (sql/set data)
                      (sql/where [:= :procurement_requests.id req-id])
-                     sql/format)))
+                     sql-format)))
 
 (defn- filter-attachments [m as] (filter #(submap? m %) as))
 
 (defn deal-with-attachments!
   [tx req-id attachments]
   (let [uploads-to-delete
-          (filter-attachments {:to_delete true, :typename "Upload"} attachments)
+        (filter-attachments {:to_delete true, :typename "Upload"} attachments)
         uploads-to-attachments (filter-attachments {:to_delete false,
                                                     :typename "Upload"}
                                                    attachments)
@@ -337,20 +336,20 @@
 (defn change-budget-period!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
         new-budget-period-id (:budget_period input-data)
         budget-period-new
-          (budget-period/get-budget-period-by-id tx new-budget-period-id)
+        (budget-period/get-budget-period-by-id tx new-budget-period-id)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/sset {:budget_period_id new-budget-period-id})
+                          (sql/set {:budget_period_id new-budget-period-id})
                           (sql/where [:= :procurement_requests.id req-id])
-                          sql/format))
+                          sql-format))
       :if-only
       #(and (not (budget-period/past? tx budget-period-new))
             (request-perms/authorized-to-write-all-fields?
@@ -371,7 +370,7 @@
 (defn change-category!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -381,13 +380,13 @@
       #(jdbc/execute!
          tx
          (-> (sql/update :procurement_requests)
-             (sql/sset
+             (sql/set
                (cond-> {:category_id cat-id}
                  (and (not (user-perms/inspector? tx auth-entity cat-id))
                       (not (user-perms/admin? tx auth-entity)))
                    (merge change-category-reset-attrs)))
              (sql/where [:= :procurement_requests.id req-id])
-             sql/format))
+             sql-format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-entity
@@ -400,7 +399,7 @@
 (defn create-request!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         attachments (:attachments input-data)
@@ -439,10 +438,13 @@
                                            #(assoc %
                                              :request-id @req-id))))))
 
-  (defn update-request!
-    [context args _]
+(defn cast-to-order-status-enum [a]
+  [[:cast (to-name-and-lower-case a) :order_status_enum]])
+
+(defn update-request!
+  [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -457,7 +459,7 @@
             (dissoc <> :attachments)
             (cond-> <> (:order_status <>)
               (update :order_status
-                      #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
+                      cast-to-order-status-enum))
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority
@@ -487,7 +489,7 @@
 (defn delete-request!
   [context args _]
   (let [ring-request (:request context)
-        tx (:tx ring-request)
+        tx (:tx-next ring-request)
         auth-entity (:authenticated-entity ring-request)
         req-id (-> args
                    :input_data
@@ -497,12 +499,12 @@
                                                                    auth-entity
                                                                    request)]
     (authorization/authorize-and-apply
-      #(let [result (jdbc/execute! tx
+      #(let [result (jdbc/execute-one! tx
                                    (-> (sql/delete-from :procurement_requests)
-                                       (sql/where [:= :procurement_requests.id
-                                                   req-id])
-                                       sql/format))]
-        (= result '(1)))
+                                       (sql/where [:= :procurement_requests.id req-id])
+                                       sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
+             result-count (:next.jdbc/update-count result)]
+         (= result-count 1))
       :if-only
       #(:DELETE field-perms))))
 
@@ -510,8 +512,8 @@
   [tx auth-entity request]
   (= (:user_id auth-entity)
      (-> requests-base-query
-         (sql/merge-where [:= :procurement_requests.id (:id request)])
-         sql/format
+         (sql/where [:= :procurement_requests.id (:id request)])
+         sql-format
          (->> (query-requests tx auth-entity))
          first
          :user_id)))

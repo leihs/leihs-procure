@@ -1,8 +1,11 @@
 (ns leihs.procurement.resources.attachment
-  (:require [clojure.java.jdbc :as jdbc]
-            [compojure.core :as cpj]
-            [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils.sql :as sql])
+  (:require
+    [compojure.core :as cpj]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.procurement.paths :refer [path]]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
 
 (def attachment-base-query
@@ -15,12 +18,11 @@
       (sql/where [:= :procurement_attachments.id id])))
 
 (defn attachment
-  [{tx :tx, {attachment-id :attachment-id} :route-params}]
+  [{tx :tx-next, {attachment-id :attachment-id} :route-params}]
   (if-let [a (->> attachment-id
                   attachment-query
-                  sql/format
-                  (jdbc/query tx)
-                  first)]
+                  sql-format
+                  (jdbc/execute-one! tx))]
     (->> a
          :content
          (.decode (Base64/getMimeDecoder))
@@ -41,5 +43,5 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_attachments)
                      (sql/values [data])
-                     sql/format)))
+                     sql-format)))
 

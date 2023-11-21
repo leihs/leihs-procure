@@ -1,14 +1,10 @@
 (ns leihs.procurement.permissions.request-fields
-  (:require [leihs.procurement.resources.rooms :as rooms]
-            [leihs.procurement.resources.building :as building]
+  (:require [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.category :as category]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.model :as model]
+            [leihs.procurement.resources.rooms :as rooms]
             [leihs.procurement.resources.template :as template]
-            [leihs.procurement.resources.user :as user]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [leihs.procurement.resources.budget-period :as budget-period]))
+            [leihs.procurement.resources.user :as user]))
 
 (defn get-for-user-and-request
   "Read permissions always apply only to an existing request.
@@ -45,10 +41,10 @@
         inspection-phase (budget-period/in-inspection-phase? tx budget-period)
         category-inspector (user-perms/inspector? tx auth-entity category-id)
         category-viewer (user-perms/viewer? tx auth-entity category-id)
-        can-edit-order-status-fields (and existing-request 
+        can-edit-order-status-fields (and existing-request
                                           (or admin category-inspector))
-        can-read-order-status-fields (and existing-request 
-                                          (or can-edit-order-status-fields category-viewer 
+        can-read-order-status-fields (and existing-request
+                                          (or can-edit-order-status-fields category-viewer
                                               (and requester own-request)))]
     {:accounting_type
        {:read (or (and requester own-request (or inspection-phase past-phase))

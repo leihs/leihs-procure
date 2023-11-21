@@ -1,5 +1,8 @@
 require 'spec_helper'
 require_relative '../graphql_helper'
+require 'json'
+require 'date'
+require 'time'
 
 describe 'budget periods' do
   context 'query' do
@@ -189,6 +192,27 @@ describe 'budget periods' do
           }
         }
       GRAPHQL
+
+      @q_tz = <<-GRAPHQL
+        mutation {
+          budget_periods (
+            input_data: [
+              { id: "#{BudgetPeriod.find(name: 'bp_1').id}",
+                name: "bp_1_new_name",
+                inspection_start_date: "2024-01-17T01:30:00+02:00",
+                end_date: "2024-06-17T01:30:00-03:00" },
+              { id: null,
+                name: "new_bp",
+                inspection_start_date: "2026-01-17T01:30:00+02:00",
+                end_date: "2026-06-17T01:30:00-03:00" },
+            ]
+          ) {
+            name
+            inspection_start_date
+            end_date
+          }
+        }
+      GRAPHQL
     end
 
     #############################################################################
@@ -232,6 +256,13 @@ describe 'budget periods' do
       ]
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
+        response_data = JSON.parse(data.to_json)
+        name = response_data['name']
+
+        budget_period = BudgetPeriod.find(name: name)
+        db_data = JSON.parse(budget_period.to_json)
+
+        expect(compare_ts_as_UTC(db_data, response_data)).to be true
         expect(BudgetPeriod.find(data)).to be
       end
 
@@ -245,5 +276,65 @@ describe 'budget periods' do
         )
       end
     end
+
+    it 'updates timestamp with timezone successfully for an authorized user' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:admin, user_id: user.id)
+
+      result = query(@q_tz, user.id)
+
+      # sorted after `inspection_start_date DESC`
+      expect(result).to eq({
+       'data' => {
+         'budget_periods' => [
+           { "name" => "new_bp",
+             "inspection_start_date" => "2026-01-16T23:30:00Z",
+             "end_date" => "2026-06-17T04:30:00Z" },
+           { "name" => "bp_1_new_name",
+             "inspection_start_date" => "2024-01-16T23:30:00Z",
+             "end_date" => "2024-06-17T04:30:00Z" }
+         ]
+       }
+      })
+
+      budget_periods_after = [
+        { name: 'new_bp',
+          inspection_start_date: @new_inspection_start_date_2,
+          end_date: @new_end_date_2 },
+        { name: 'bp_1_new_name',
+          inspection_start_date: @new_inspection_start_date_1,
+          end_date: @new_end_date_1 }
+      ]
+
+      expect(BudgetPeriod.count).to be == budget_periods_after.count
+    end
   end
+end
+
+def parse_date_ignoring_timezone(date_str)
+  begin
+    parsed_date = Time.parse(date_str)
+    utc_date = parsed_date.getutc
+    utc_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z')
+  rescue ArgumentError => e
+    puts "Error parsing date: #{e.message}"
+    nil
+  end
+end
+
+def compare_ts_as_UTC(map1, map2)
+  fields = ["inspection_start_date", "end_date"]
+
+  fields.each do |field|
+    if map1[field] && map2[field]
+      date1 = parse_date_ignoring_timezone(map1[field])
+      date2 = parse_date_ignoring_timezone(map2[field])
+
+      return false if date1 != date2
+    else
+      return false
+    end
+  end
+
+  true
 end

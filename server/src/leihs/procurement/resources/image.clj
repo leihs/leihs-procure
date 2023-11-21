@@ -1,11 +1,14 @@
 (ns leihs.procurement.resources.image
-  (:require [cheshire.core :refer [generate-string] :rename
-             {generate-string to-json}]
-            [clojure.java.jdbc :as jdbc]
+  (:require [cheshire.core :refer [generate-string] :rename {generate-string to-json}]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [compojure.core :as cpj]
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [leihs.procurement.resources.upload :as upload]
-            [leihs.procurement.utils.sql :as sql])
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
 
 (def image-base-query
@@ -23,12 +26,11 @@
       (sql/where [:= :procurement_images.main_category_id id])))
 
 (defn image
-  [{tx :tx, {image-id :image-id} :route-params}]
+  [{tx :tx-next, {image-id :image-id} :route-params}]
   (if-let [i (->> image-id
                   image-query
-                  sql/format
-                  (jdbc/query tx)
-                  first)]
+                  sql-format
+                  (jdbc/execute-one! tx))]
     (->> i
          :content
          (.decode (Base64/getMimeDecoder))
@@ -42,7 +44,7 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_images)
                      (sql/values [data])
-                     sql/format)))
+                     sql-format)))
 
 (defn create-for-main-category-id-and-upload!
   [tx mc-id upload]
@@ -51,7 +53,7 @@
         md (-> u-row
                :metadata
                to-json
-               (#(sql/call :cast % :json)))]
+               cast-to-json)]
     (insert! tx
              (-> u-row
                  (dissoc :id)

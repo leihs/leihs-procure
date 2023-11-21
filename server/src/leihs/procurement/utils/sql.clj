@@ -1,17 +1,16 @@
 (ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format update])
-  (:require [honeysql [format :as format] [helpers :as helpers]
-             [types :as types] [util :as util :refer [defalias]]]))
+  (:require
+    ;; all needed imports
+    [honey.sql.helpers :as sql]
+    (honeysql [format :as format] [helpers :as helpers]
+              [types :as types] [util :refer [defalias]])
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 ; regex
 (defmethod format/fn-handler "~*"
   [_ field value]
   (str (format/to-sql field) " ~* " (format/to-sql value)))
-
-; ilike
-(defmethod format/fn-handler "~~*"
-  [_ field value]
-  (str (format/to-sql field) " ~~* " (format/to-sql value)))
 
 (defn dedup-join
   [honeymap]
@@ -49,7 +48,7 @@
 
 (defn select-nest
   [sqlmap tbl nest-key]
-  (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
+  (sql/select sqlmap [[:row_to_json tbl] nest-key]))
 
 (defn join-and-nest
   ([sqlmap tbl join-cond nest-key]

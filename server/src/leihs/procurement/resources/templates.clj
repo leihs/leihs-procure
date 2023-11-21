@@ -1,46 +1,44 @@
 (ns leihs.procurement.resources.templates
-  (:require [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources [categories :as categories]
-             [template :as template]]
-            [leihs.procurement.utils.sql :as sql]))
+  (:require
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.permissions.user :as user-perms]
+    (leihs.procurement.resources [categories :as categories]
+                                 [template :as template])
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]
+    ))
 
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
       (sql/from :procurement_templates)
-      (sql/merge-left-join :models
-                           [:= :models.id :procurement_templates.model_id])
-      (sql/order-by (->> [:procurement_templates.article_name :models.product
-                          :models.version]
-                         (map #(->> (sql/call :coalesce % "")
-                                    (sql/call :lower)))
-                         (sql/call :concat)))))
+      (sql/left-join :models [:= :models.id :procurement_templates.model_id])
+      (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
+                         (map #(->> [:lower [:coalesce % ""]])))]])))
 
 (defn get-templates
   [context _ value]
   (let [query (cond-> templates-base-query
-                value (sql/merge-where [:= :procurement_templates.category_id
-                                        (:id value)]))]
+                      value (sql/where [:= :procurement_templates.category_id (:id value)]))]
     (->> query
-         sql/format
-         (jdbc/query (-> context
+         sql-format
+         (jdbc/execute! (-> context
                          :request
-                         :tx)))))
+                         :tx-next)))))
 
 (defn get-templates-for-ids
   [tx ids]
-  (-> categories/categories-base-query
-      (sql/merge-where [:in :procurement_categories.id ids])
-      sql/format
-      (->> (jdbc/query tx))))
+  (jdbc/execute! tx (-> categories/categories-base-query
+      (sql/where [:in :procurement_categories.id ids])
+      sql-format)))
 
 (defn delete-templates-not-in-ids!
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
                      (sql/where [:not-in :procurement_templates.id ids])
-                     sql/format)))
+                     sql-format)))
 
 (defn get-template-id
   [tx tmpl]
@@ -50,7 +48,7 @@
 (defn update-templates!
   [context args _]
   (let [rrequest (:request context)
-        tx (:tx rrequest)
+        tx (:tx-next rrequest)
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
         cat-ids (map :category_id input-data)]
