@@ -25,7 +25,7 @@
   [sql-map & params-or-opts]
   (apply format/format [(dedup-join sql-map) params-or-opts]))
 
-(defn map->where-clause
+(defn map->where-clause                                     ;;TODO
   ([m] (map->where-clause nil m))
   ([table m]
    "transforms {:foo 1, :bar 2} of table :baz into
