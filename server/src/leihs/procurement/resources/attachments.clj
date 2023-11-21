@@ -1,11 +1,19 @@
 (ns leihs.procurement.resources.attachments
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            [clojure.java.jdbc :as jdbc]
-            [leihs.procurement.paths :refer [path]]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+
+            ;[clojure.java.jdbc :as jdbc]
+            ;[leihs.procurement.utils.sql :as sql]
+
+    [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources [attachment :as attachment]
              [upload :as upload]]
-            [leihs.procurement.utils.sql :as sql]))
+    ))
 
 (def attachments-base-query
   (-> (sql/select :procurement_attachments.*)
@@ -14,11 +22,11 @@
 (defn get-attachments-for-request-id
   [tx request-id]
   (let [query (-> attachments-base-query
-                  (sql/merge-where [:= :procurement_attachments.request_id
+                  (sql/where [:= :procurement_attachments.request_id
                                     request-id])
-                  sql/format)]
+                  sql-format)]
     (->> query
-         (jdbc/query tx)
+         (jdbc/execute! tx)
          (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))))
 
 (defn get-attachments
@@ -35,7 +43,7 @@
           md (-> u-row
                  :metadata
                  to-json
-                 (#(sql/call :cast % :json)))]
+                 (#(:cast % :json)))]
       (attachment/create! tx
                           (-> u-row
                               (dissoc :id)
@@ -49,4 +57,4 @@
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_attachments)
                      (sql/where [:in :procurement_attachments.id ids])
-                     sql/format)))
+                     sql-format)))
