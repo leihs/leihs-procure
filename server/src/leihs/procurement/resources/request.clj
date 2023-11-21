@@ -1,7 +1,15 @@
 (ns leihs.procurement.resources.request
   (:require [clojure [set :refer [map-invert]]
              [string :refer [lower-case upper-case]]]
-            [clojure.java.jdbc :as jdbc]
+            
+    ;[clojure.java.jdbc :as jdbc]
+    ;         [sql :as sql]
+
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
+    
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
             [leihs.procurement.permissions [request-helpers :as request-perms]
@@ -12,7 +20,7 @@
              [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads] [user :as user]]
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
-             [sql :as sql]]))
+             ]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -112,7 +120,7 @@
          (map name)
          (interleave (vals s-map))
          (cons :case)
-         (apply sql/call))))
+         (apply ))))
 
 (def sql-order-by-expr
   (str "concat("
@@ -121,19 +129,19 @@
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query
-  (-> (sql/select (sql/raw (str "DISTINCT ON (procurement_requests.id, "
+  (-> (sql/select (:raw (str "DISTINCT ON (procurement_requests.id, "
                                 sql-order-by-expr
                                 ") procurement_requests.*")))
       (sql/from :procurement_requests)
-      (sql/merge-left-join :models
+      (sql/left-join :models
                            [:= :models.id :procurement_requests.model_id])
-      (sql/order-by (sql/raw sql-order-by-expr))))
+      (sql/order-by (:raw sql-order-by-expr))))
 
 (defn requests-base-query-with-state
   [advanced-user?]
   (-> requests-base-query
-      (sql/merge-select [(state-sql advanced-user?) :state])
-      (sql/merge-join :procurement_budget_periods
+      (sql/select [(state-sql advanced-user?) :state])
+      (sql/join :procurement_budget_periods
                       [:= :procurement_budget_periods.id
                        :procurement_requests.budget_period_id])))
 
@@ -229,7 +237,7 @@
 (defn query-requests
   [tx auth-entity query]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})))
+    (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})))
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
@@ -243,7 +251,7 @@
   (->> id
        (get-request-by-id-sqlmap tx auth-entity)
        request-helpers/join-and-nest-associated-resources
-       sql/format
+       sql-format
        (query-requests tx auth-entity)
        first))
 
@@ -288,7 +296,7 @@
         (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
-        sql/format
+        sql-format
         (->> (query-requests tx auth-entity))
         first)))
 
@@ -297,15 +305,15 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_requests)
                      (sql/values [data])
-                     sql/format)))
+                     sql-format)))
 
 (defn update!
   [tx req-id data]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_requests)
-                     (sql/sset data)
+                     (sql/set data)
                      (sql/where [:= :procurement_requests.id req-id])
-                     sql/format)))
+                     sql-format)))
 
 (defn- filter-attachments [m as] (filter #(submap? m %) as))
 
@@ -348,9 +356,9 @@
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/sset {:budget_period_id new-budget-period-id})
+                          (sql/set {:budget_period_id new-budget-period-id})
                           (sql/where [:= :procurement_requests.id req-id])
-                          sql/format))
+                          sql-format))
       :if-only
       #(and (not (budget-period/past? tx budget-period-new))
             (request-perms/authorized-to-write-all-fields?
@@ -381,13 +389,13 @@
       #(jdbc/execute!
          tx
          (-> (sql/update :procurement_requests)
-             (sql/sset
+             (sql/set
                (cond-> {:category_id cat-id}
                  (and (not (user-perms/inspector? tx auth-entity cat-id))
                       (not (user-perms/admin? tx auth-entity)))
                    (merge change-category-reset-attrs)))
              (sql/where [:= :procurement_requests.id req-id])
-             sql/format))
+             sql-format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx
                                                       auth-entity
@@ -457,7 +465,7 @@
             (dissoc <> :attachments)
             (cond-> <> (:order_status <>)
               (update :order_status
-                      #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
+                      #( :cast (to-name-and-lower-case %) :order_status_enum)))
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority
@@ -501,7 +509,7 @@
                                    (-> (sql/delete-from :procurement_requests)
                                        (sql/where [:= :procurement_requests.id
                                                    req-id])
-                                       sql/format))]
+                                       sql-format))]
         (= result '(1)))
       :if-only
       #(:DELETE field-perms))))
@@ -510,8 +518,8 @@
   [tx auth-entity request]
   (= (:user_id auth-entity)
      (-> requests-base-query
-         (sql/merge-where [:= :procurement_requests.id (:id request)])
-         sql/format
+         (sql/where [:= :procurement_requests.id (:id request)])
+         sql-format
          (->> (query-requests tx auth-entity))
          first
          :user_id)))
