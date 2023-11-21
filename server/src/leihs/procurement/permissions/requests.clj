@@ -1,6 +1,15 @@
 (ns leihs.procurement.permissions.requests
   (:require [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.utils.sql :as sql]))
+
+            ;[leihs.procurement.utils.sql :as sql]
+
+          [honey.sql :refer [format] :rename {format sql-format}]
+          [leihs.core.db :as db]
+          [next.jdbc :as jdbc]
+          [honey.sql.helpers :as sql]
+
+
+    ))
 
 (defn apply-scope
   [tx sqlmap auth-entity]
@@ -12,9 +21,9 @@
             (user-perms/inspector? tx auth-entity))
       sqlmap
       (-> sqlmap
-          (sql/merge-left-join :procurement_category_viewers
+          (sql/left-join :procurement_category_viewers
                                [:= :procurement_category_viewers.category_id
                                 :procurement_requests.category_id])
-          (sql/merge-where [:or
+          (sql/where [:or
                             [:= :procurement_category_viewers.user_id user-id]
                             [:= :procurement_requests.user_id user-id]])))))

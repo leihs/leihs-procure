@@ -1,63 +1,69 @@
 (ns leihs.procurement.utils.sql
-  (:refer-clojure :exclude [format update])
-  (:require [honeysql [format :as format] [helpers :as helpers]
-             [types :as types] [util :as util :refer [defalias]]]))
+    (:refer-clojure :exclude [format update])
+    (:require
+      [honeysql [format :as format] [helpers :as helpers]
+
+       ;[honey.sql [format :as format] {format sql-format}]
+       ;[leihs.core.db :as db]
+       ;[next.jdbc :as jdbc]
+
+       [types :as types] [util :as util :refer [defalias]]]))
 
 ; regex
 (defmethod format/fn-handler "~*"
-  [_ field value]
-  (str (format/to-sql field) " ~* " (format/to-sql value)))
+           [_ field value]
+           (str (format/to-sql field) " ~* " (format/to-sql value)))
 
 ; ilike
 (defmethod format/fn-handler "~~*"
-  [_ field value]
-  (str (format/to-sql field) " ~~* " (format/to-sql value)))
+           [_ field value]
+           (str (format/to-sql field) " ~~* " (format/to-sql value)))
 
 (defn dedup-join
-  [honeymap]
-  (assoc honeymap
-    :join (reduce #(let [[k v] %2] (conj %1 k v))
-            []
-            (clojure.core/distinct (partition 2 (:join honeymap))))))
+      [honeymap]
+      (assoc honeymap
+             :join (reduce #(let [[k v] %2] (conj %1 k v))
+                           []
+                           (clojure.core/distinct (partition 2 (:join honeymap))))))
 
 (defn format
-  "Calls honeysql.format/format with removed join duplications in sql-map."
-  [sql-map & params-or-opts]
-  (apply format/format [(dedup-join sql-map) params-or-opts]))
+      "Calls honeysql.format/format with removed join duplications in sql-map."
+      [sql-map & params-or-opts]
+      (apply format/format [(dedup-join sql-map) params-or-opts]))
 
 (defn map->where-clause
-  ([m] (map->where-clause nil m))
-  ([table m]
-   "transforms {:foo 1, :bar 2} of table :baz into
-   [:and [:= baz.foo 1] [:= :baz.bar 2]] or
-   [:and [:in baz.foo [1 2]] [:= :baz.bar 3]]"
-   (letfn [(add-table-name [k]
-                           (if table
-                             (-> table
-                                 name
-                                 (str "." (name k))
-                                 keyword)
-                             k))]
-     (->> m
-          (map (fn [[k v]]
-                 (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))
-          (cons :and)))))
+      ([m] (map->where-clause nil m))
+      ([table m]
+       "transforms {:foo 1, :bar 2} of table :baz into
+       [:and [:= baz.foo 1] [:= :baz.bar 2]] or
+       [:and [:in baz.foo [1 2]] [:= :baz.bar 3]]"
+       (letfn [(add-table-name [k]
+                               (if table
+                                 (-> table
+                                     name
+                                     (str "." (name k))
+                                     keyword)
+                                 k))]
+              (->> m
+                   (map (fn [[k v]]
+                            (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))
+                   (cons :and)))))
 
 (defn merge-where-false-if-empty
-  [m c]
-  (cond-> m (empty? c) (helpers/where [:= true false])))
+      [m c]
+      (cond-> m (empty? c) (helpers/where [:= true false])))
 
 (defn select-nest
-  [sqlmap tbl nest-key]
-  (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
+      [sqlmap tbl nest-key]
+      (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
 
 (defn join-and-nest
-  ([sqlmap tbl join-cond nest-key]
-   (join-and-nest sqlmap tbl join-cond nest-key helpers/merge-left-join))
-  ([sqlmap tbl join-cond nest-key join-fn]
-   (-> sqlmap
-       (select-nest tbl nest-key)
-       (join-fn tbl join-cond))))
+      ([sqlmap tbl join-cond nest-key]
+       (join-and-nest sqlmap tbl join-cond nest-key helpers/merge-left-join))
+      ([sqlmap tbl join-cond nest-key join-fn]
+       (-> sqlmap
+           (select-nest tbl nest-key)
+           (join-fn tbl join-cond))))
 
 (defalias call types/call)
 (defalias param types/param)

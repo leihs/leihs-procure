@@ -14,3 +14,4 @@ Production build
 ----------------
 
 See `./bin/build`
+[spec](spec)
