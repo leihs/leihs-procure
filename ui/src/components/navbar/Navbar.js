@@ -1,5 +1,4 @@
 import f from 'lodash'
-import assert from 'assert'
 import React, { Fragment as F } from 'react'
 import cx from 'classnames'
 import {
@@ -244,7 +243,7 @@ const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
 }
 
 const CsrfTokenField = ({ name, value, isOptional = false }) => {
-  if (!isOptional) assert(value)
+  if (!isOptional && !value) throw new Error('CsrfTokenField: `value` prop is required')
   return <input type="hidden" name={name || 'csrf-token'} value={value} />
 }
 
