@@ -97,7 +97,7 @@
 (defn update-categories-viewers!
   [context args value]
   (let [request (:request context)
-        tx (:tx request)
+        tx (:tx-next request)
         auth-user (:authenticated-entity request)
         categories (:input_data args)]
     (loop [[c & rest-cs] categories]

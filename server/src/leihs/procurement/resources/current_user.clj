@@ -6,7 +6,7 @@
 
 (defn get-current-user
   [{request :request} _ _]
-  (let [tx (:tx request)
+  (let [tx (:tx-next request)
         user-id (-> request
                     :authenticated-entity
                     :user_id)
