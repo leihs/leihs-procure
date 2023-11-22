@@ -38,9 +38,7 @@ feature 'Manage buildings', type: :feature do
       input_values = all("input").map(&:value).join(" ")
       expect(page.text + input_values).to have_content name
       expect(page.text + input_values).to have_content code
-      within find(".nav-component nav", match: :first) do
-        click_on "Buildings"
-      end
+      click_on 'Back'
       wait_until { current_path ==  "/admin/buildings/" }
       expect(page).to have_content name
     end

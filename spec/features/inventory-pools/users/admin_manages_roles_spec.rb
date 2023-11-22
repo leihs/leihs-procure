@@ -17,14 +17,14 @@ feature 'Manage inventory-pool users ', type: :feature do
     scenario ' managing roles of a user' do
       @user = @users.first
 
-      click_on 'Inventory-Pools'
+      click_on 'Inventory Pools'
       click_on @pool.name
-      click_on "Users"
+      within('.nav-tabs') { click_on "Users" }
       select 'any', from: 'Role'
       fill_in 'Search', with: @user.email
-      wait_until { all("table.users tbody tr").count == 1 }
-      expect(page.find("table.users")).not_to have_content "customer"
-      expect(page.find("table.users")).not_to have_content "inventory_manager"
+      wait_until { all("table tbody tr").count == 1 }
+      expect(page.find("table")).not_to have_content "customer"
+      expect(page.find("table")).not_to have_content "inventory_manager"
 
       within_first("td.direct-roles", text: 'Edit'){ click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
@@ -46,10 +46,10 @@ feature 'Manage inventory-pool users ', type: :feature do
 
 
       # check on users page
-      click_on "Users"
+      click_on "Back" 
       # test filtering by role:
       select 'inventory_manager', from: 'Role'
-      wait_until { all("table.users tbody tr").count == 1 }
+      wait_until { all("table tbody tr").count == 1 }
       ['customer', 'group_manager', 'lending_manager', 'inventory_manager'].each do |role|
         expect(page).to have_field(role, disabled: true, checked: true)
       end
@@ -72,27 +72,27 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
 
       #check on users page
-      click_on "Users"
+      click_on "Back" 
       select 'any', from: 'Role'
       fill_in 'Search', with: @users.first.email
-      wait_until { all("table.users tbody tr").count == 1 }
+      wait_until { all("table tbody tr").count == 1 }
       ['customer', 'group_manager', 'lending_manager'].each do |role|
         expect(page).to have_field(role, disabled: true, checked: true)
       end
 
-      expect(find("table.users")).to have_content("customer")
-      expect(find("table.users")).to have_content("group_manager")
-      expect(find("table.users")).to have_content("lending_manager")
-      expect(find("table.users")).not_to have_content("inventory_manager")
+      expect(find("table")).to have_content("customer")
+      expect(find("table")).to have_content("group_manager")
+      expect(find("table")).to have_content("lending_manager")
+      expect(find("table")).not_to have_content("inventory_manager")
 
       # remove all roles
-      within("table.users td.direct-roles") { click_on 'Edit' }
+      within("table td.direct-roles") { click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
       uncheck 'customer'
       click_on "Save"
       wait_until{ all(".modal").empty? }
       wait_until do
-        not find("table.users").has_content? "customer"
+        not find("table").has_content? "customer"
       end
 
     end

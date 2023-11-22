@@ -8,13 +8,15 @@ shared_examples :create_password_reset_link_via_ui do
   scenario "Creating a password reset link for target_user via UI works" do
     click_on 'Users'
     click_on_first_user target_user
-    click_on 'Password reset'
-    select '3 days', from: 'Link valid for'
-    click_on 'Create'
+    click_on 'Reset Password'
+    # select '3 days', from: 'Link valid for'
+    click_on 'Create Reset Link - 3 days'
+    # click_on 'Create'
     # there is an "send pass word reset link via e-mail" button
-    expect(page).to have_content  'Send the password reset link via e-mail'
-    within("div.alert div", text: "or scan"){ expect(find("svg"))}
-    token = within("div.alert div div", text: "enter token"){find(".code").text}
+    expect(page).to have_content  'Send per Mail'
+    within('.modal-body'){ expect(find('svg'))}
+
+    token = find_field('reset-token', disabled: true).value
     user_password_reset = database[:user_password_resets].where(token: token).first
     expect( user_password_reset ).to be
     # it belongs to the user
@@ -30,7 +32,8 @@ shared_examples :password_reset_page_shows_warning do
   scenario 'The password reset link page shows an warning' do
     click_on 'Users'
     click_on_first_user target_user
-    click_on 'Password reset'
+    click_on 'Reset Password'
+    click_on 'Create Reset Link - 1 hour'
     expect(page).to have_content "Creating a Password Reset Link Is Not Possible"
   end
 end

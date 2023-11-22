@@ -13,7 +13,9 @@ feature 'Manage inventory-fields', type: :feature do
       sign_in_as @admin
 
       visit '/admin/'
-      click_on 'Inventory-Fields'
+      within find("aside nav", match: :first) do
+        click_on "Fields"
+      end
     end
 
     scenario 'is able to delete an inventory-field' do
@@ -26,10 +28,11 @@ feature 'Manage inventory-fields', type: :feature do
       @field_path = current_path
 
       click_on 'Delete' # delete page
-      click_on 'Delete' # submit / confirm
+      within '.modal' do
+        click_on 'Delete' # submit / confirm
+      end
 
       wait_until { current_path ==  "/admin/inventory-fields/" }
-
       select("1000", from: "Per page")
 
       @fields.reject { |f| f.id = @field.id }.each do |field|
@@ -37,24 +40,19 @@ feature 'Manage inventory-fields', type: :feature do
       end
 
       expect(page).not_to have_content @field.id
-
     end
 
     context 'cannot delete' do
-
       scenario 'a core field' do
-
         @field = @fields.detect { |f| not f.dynamic }
 
         click_on @field.id
         @field_path = current_path
 
         expect(page).not_to have_content /delete/i
-
       end
 
       scenario 'a dynamic used field' do
-
         @field = @fields.detect { |f| f.dynamic }
         @item.update(properties: { @field.data["attribute"].last => Faker::Lorem.word })
 

@@ -564,34 +564,34 @@
     FEATURE_NAME: "Inventory an admin via the UI 01"
     FEATURE: './spec/features/inventory_spec.rb[1:1:1]'
 './spec/features/mail-templates/edit_spec.rb[1:1:1]':
-  name: "Manage Mail-Templates an admin via the UI 01"
+  name: "Manage Mail Templates an admin via the UI 01"
   environment_variables:
-    FEATURE_NAME: "Manage Mail-Templates an admin via the UI 01"
+    FEATURE_NAME: "Manage Mail Templates an admin via the UI 01"
     FEATURE: './spec/features/mail-templates/edit_spec.rb[1:1:1]'
 './spec/features/mail-templates/listing_spec.rb[1:1:1]':
-  name: "Managing Mail-Templates: an admin via the UI 01"
+  name: "Managing Mail Templates: an admin via the UI 01"
   environment_variables:
-    FEATURE_NAME: "Managing Mail-Templates: an admin via the UI 01"
+    FEATURE_NAME: "Managing Mail Templates: an admin via the UI 01"
     FEATURE: './spec/features/mail-templates/listing_spec.rb[1:1:1]'
 './spec/features/mail-templates/listing_spec.rb[1:1:2:1]':
-  name: "Managing Mail-Templates: an admin via the UI searching for a mail_template 01"
+  name: "Managing Mail Templates: an admin via the UI searching for a mail_template 01"
   environment_variables:
-    FEATURE_NAME: "Managing Mail-Templates: an admin via the UI searching for a mail_template 01"
+    FEATURE_NAME: "Managing Mail Templates: an admin via the UI searching for a mail_template 01"
     FEATURE: './spec/features/mail-templates/listing_spec.rb[1:1:2:1]'
 './spec/features/mail-templates/listing_spec.rb[1:1:2:2]':
-  name: "Managing Mail-Templates: an admin via the UI searching for a mail_template 02"
+  name: "Managing Mail Templates: an admin via the UI searching for a mail_template 02"
   environment_variables:
-    FEATURE_NAME: "Managing Mail-Templates: an admin via the UI searching for a mail_template 02"
+    FEATURE_NAME: "Managing Mail Templates: an admin via the UI searching for a mail_template 02"
     FEATURE: './spec/features/mail-templates/listing_spec.rb[1:1:2:2]'
 './spec/features/mail-templates/listing_spec.rb[1:1:2:3]':
-  name: "Managing Mail-Templates: an admin via the UI searching for a mail_template 03"
+  name: "Managing Mail Templates: an admin via the UI searching for a mail_template 03"
   environment_variables:
-    FEATURE_NAME: "Managing Mail-Templates: an admin via the UI searching for a mail_template 03"
+    FEATURE_NAME: "Managing Mail Templates: an admin via the UI searching for a mail_template 03"
     FEATURE: './spec/features/mail-templates/listing_spec.rb[1:1:2:3]'
 './spec/features/mail-templates/listing_spec.rb[1:1:2:4]':
-  name: "Managing Mail-Templates: an admin via the UI searching for a mail_template 04"
+  name: "Managing Mail Templates: an admin via the UI searching for a mail_template 04"
   environment_variables:
-    FEATURE_NAME: "Managing Mail-Templates: an admin via the UI searching for a mail_template 04"
+    FEATURE_NAME: "Managing Mail Templates: an admin via the UI searching for a mail_template 04"
     FEATURE: './spec/features/mail-templates/listing_spec.rb[1:1:2:4]'
 './spec/features/rooms/create_spec.rb[1:1:1]':
   name: "Manage rooms an admin via the UI 01"

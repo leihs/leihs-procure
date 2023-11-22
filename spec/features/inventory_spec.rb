@@ -8,7 +8,7 @@ feature 'Inventory' do
       sign_in_as @admin
     end
     scenario 'Export inventory links exist' do
-      click_on 'Inventory'
+      click_on 'Inventory-Export'
       expect(all('a', text: 'CSV')).not_to be_empty
     end
   end

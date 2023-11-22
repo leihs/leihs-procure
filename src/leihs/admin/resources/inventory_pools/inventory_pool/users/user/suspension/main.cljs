@@ -77,7 +77,7 @@
     [:div.row.mt-1
      [:div.col
       (if @changed*
-        [:button.btn.btn-outline-warning
+        [:button.btn.btn-secondary
          {:type :button
           :on-click #(reset! edit-mode?* false)}
          [icons/delete] " Cancel"]
@@ -113,7 +113,7 @@
            [:div.row
             [:div.col
              [:div.float-right
-              [:button.btn.btn-outline-warning
+              [:button.btn.btn-secondary
                {:type :button
                 :on-click #(reset! edit-data* {})}
                [:span [icons/delete] " Reset suspension"]]]]]
@@ -129,7 +129,7 @@
    [:div.row
     [:div.col
      [:div.float-right
-      [:button.btn.btn-outline-warning
+      [:button.btn.btn-secondary
        {:type :button
         :on-click #(reset! edit-data* {})}
        [:span [icons/delete] " Reset suspension"]]]]]

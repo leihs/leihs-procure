@@ -16,8 +16,10 @@ feature 'System and Security-Settings' do
         before(:each){sign_in_as @user}
 
         scenario 'updates the System and Security-Settings' do
-          click_on "Settings"
-          click_on "System and Security"
+          within 'aside nav' do
+            click_on "Settings"
+            click_on "System and Security"
+          end
           wait_until { page.has_content? "Base URL" }
           click_on "Edit"
           fill_in "Base URL", with: "https://my-server"
@@ -30,13 +32,18 @@ feature 'System and Security-Settings' do
           wait_until{ all(".modal").empty? }
           visit current_url
           wait_until { page.has_content? "Base URL" }
-          expect(find_field('sessions_max_lifetime_secs', disabled: true).value).to eq '3600'
-          expect(find_field('sessions_force_secure', disabled: true)).to be_checked
-          expect(find_field('sessions_force_uniquenes', disabled: true)).to be_checked
-          expect(find_field('public_image_caching_enabled', disabled: true)).not_to be_checked
 
+          expect(page.text).to have_content '3600'
+          within find('tr', text: "Sessions Force Secure") do
+            expect(page.text).to have_content 'true'
+          end
+          within find('tr', text: "Sessions Force Uniqueness") do
+            expect(page.text).to have_content 'true'
+          end
+          within find('tr', text: "Public Image Caching Enabled ") do
+            expect(page.text).to have_content 'false'
+          end
         end
-
       end
 
 

@@ -1,20 +1,16 @@
 (ns leihs.admin.resources.users.user.edit-core
   (:refer-clojure :exclude [str keyword])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go timeout]]
    [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.form-components :refer [checkbox-component input-component]]
+   [leihs.admin.common.form-components :refer [checkbox-component
+                                               input-component]]
    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
+   [leihs.admin.resources.users.user.core :as core :refer [user-data*]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
+   [leihs.core.core :refer [presence]]
    [leihs.core.user.front :as current-user]
-   [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [react-bootstrap :as react-bootstrap :refer [Form]]
+   [reagent.core :as reagent :refer [reaction]]))
 
 (def data* user-data*)
 
@@ -69,13 +65,14 @@
                            [:strong "do not fill in made up email-addresses! "]
                            "Consider to use the " [:strong.text-monospace "login"] " field instead."]]]
     [:div.col-md-3 [input-component data* [:firstname]
-                    :label "First name"]]
+                    :label "First name"
+                    :required true]]
     [:div.col-md-4 [input-component data* [:lastname]
                     :label "Last name"]]]])
 
 (defn personal-and-contact-form-component []
   [:div
-   [:h3 "Personal and Contact Information "]
+   [:h3.mt-5 "Personal and Contact Information "]
    [:div.form-row
     [:div.col-md
      [input-component data* [:phone]
@@ -97,21 +94,37 @@
     [:div.col-md-3 [input-component data* [:city]
                     :label "City"]]
     [:div.col-md-3 [input-component data* [:country]
-                    :label "Country"]]]])
+                    :label "Country"]]]
+   [:hr]])
 
 (defn account-settings-form-component []
-  [:div.account-settings
+  [:div.account-settings.mt-5
    [:h3 "Account Settings "]
    [:div.form-row
     [:div.col-md-3
-     [checkbox-component data* [:account_enabled]
-      :label "Enabled"
-      :hint [:span  "A disabled account prevents sign ins. "
-             "This is used if a user leaves the organization but the account can not be deleted. "]]]
+     [:> Form.Check
+      {:className "font-weight-bold"
+       :type "checkbox"
+       :id "account_enabled"
+       :label "Enabled"
+       :checked (if (boolean? (:account_enabled @data*))
+                  (:account_enabled @data*)
+                  true)
+       :on-change #(swap! data* assoc :account_enabled (-> % .-target .-checked presence))}]
+     [:div.pl-4.mb-1 [:small  "A disabled account prevents sign ins. "
+                      "This is used if a user leaves the organization but the account can not be deleted. "]]]
+
     [:div.col-md-3
-     [checkbox-component data* [:password_sign_in_enabled]
-      :label "Password sign-in"
-      :hint [:span "This is often disabled when leihs is connected to an external authentication system."]]]]
+     [:> Form.Check
+      {:className "font-weight-bold"
+       :type "checkbox"
+       :id "password_sign_in_enabled"
+       :label "Password sign-in"
+       :checked (if (boolean? (:password_sign_in_enabled @data*))
+                  (:password_sign_in_enabled @data*)
+                  true)
+       :on-change #(swap! data* assoc :password_sign_in_enabled (-> % .-target .-checked presence))}]
+     [:div.pl-4.mb-1 [:small  "This is often disabled when leihs is connected to an external authentication system."]]]]
 
    [:div.form-row
     [:div.col-md-3
@@ -141,9 +154,10 @@
       :label "System admin protected"
       :hint [:span "This entity can only be modifed by system-admins. "]
       :invalid-feedback [:span "A system_admin must be system_admin_protected."]]]]
+   [:hr]
 
    [:div
-    [:h3  "Other Fields "]
+    [:h3.mt-5  "Other Fields "]
     [:div.form-row
      [:div.col-md
       [input-component data* [:badge_id]

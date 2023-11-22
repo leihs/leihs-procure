@@ -1,6 +1,7 @@
 (ns leihs.admin.resources.users.choose-main
   (:refer-clojure :exclude [str keyword])
   (:require
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.users.main :as users-main]
@@ -34,7 +35,7 @@
   [:td [users-main/user-td-inner-component user]])
 
 (defn table []
-  [users-main/table-component
+  [users-main/users-table
    [users-main/user-th-component
     choose-user-th-component]
    [user-td-component
@@ -45,6 +46,6 @@
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left* [breadcrumbs/users-choose-li]) []]
    [users-main/filter-component]
-   [routing/pagination-component]
+   [table/toolbar]
    [table]
-   [routing/pagination-component]])
+   [table/toolbar]])

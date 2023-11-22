@@ -33,23 +33,25 @@ feature 'Creating groups', type: :feature do
 
           visit '/admin/'
           click_on 'Groups'
-          click_on 'Create group'
-          fill_in 'name', with: name
-          fill_in '(organization)', with: 'example.com'
-          fill_in '(org_id)', with: '123'
-          fill_in 'description', with: description
+          click_on_first 'Add Group'
+          within(".modal") do
+            fill_in 'name', with: name
+            fill_in '(organization)', with: 'example.com'
+            fill_in '(org_id)', with: '123'
+            fill_in 'description', with: description
+          end
           check '(system_admin_protected)'
           check '(admin_protected)'
-          click_on 'Create'
+          click_on 'Add'
 
           wait_until{ all(".modal").empty? }
-          click_on_first ('Groups')
+          click_on_first 'Groups'
           fill_in 'term', with: name
           wait_until { all(".group").count == 1 }
 
           # we can open the group by clicking on the name
           click_on name
-          expect(page).to have_content "Group #{name}"
+          expect(page).to have_content "#{name}"
 
           within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
           within("dl", text: "System-admin protected"){ expect(find("dd").text).to be== "yes" }
@@ -85,14 +87,16 @@ feature 'Creating groups', type: :feature do
 
           visit '/admin/'
           click_on 'Groups'
-          click_on 'Create group'
-          fill_in 'name', with: name
-          fill_in '(organization)', with: 'example.com'
-          fill_in '(org_id)', with: '123'
-          fill_in 'description', with: description
+          click_on_first 'Add Group'
+          within ".modal" do
+            fill_in 'name', with: name
+            fill_in '(organization)', with: 'example.com'
+            fill_in '(org_id)', with: '123'
+            fill_in 'description', with: description
+          end
           expect(find_field('(system_admin_protected)', disabled: true)).not_to be_checked
           check '(admin_protected)'
-          click_on 'Create'
+          click_on 'Add'
 
           wait_until{ all(".modal").empty? }
           click_on_first ('Groups')
@@ -101,7 +105,7 @@ feature 'Creating groups', type: :feature do
 
           # we can open the group by clicking on the name
           click_on name
-          expect(page).to have_content "Group #{name}"
+          expect(page).to have_content "#{name}"
 
           within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
           within("dl", text: "System-admin protected"){ expect(find("dd").text).to be== "no" }
@@ -188,20 +192,22 @@ feature 'Creating groups', type: :feature do
 
           visit '/admin/'
           click_on 'Groups'
-          click_on 'Create group'
-          fill_in 'name', with: name
-          fill_in 'description', with: description
+          click_on_first 'Add Group'
+          within ".modal" do
+            fill_in 'name', with: name
+            fill_in 'description', with: description
+          end
           expect(find_field('(system_admin_protected)', disabled: true)).not_to be_checked
           expect(find_field('(admin_protected)', disabled: true)).not_to be_checked
           expect(find_field('(organization)', disabled: true)).to be
           expect(find_field('(org_id)', disabled: true)).to be
-          click_on 'Create'
+          click_on 'Add'
 
-          click_on_first ('Groups')
+          click_on_first 'Groups'
           fill_in 'term', with: name
           wait_until { all(".group").count == 1 }
           click_on name
-          expect(page).to have_content "Group #{name}"
+          expect(page).to have_content "#{name}"
 
           # we can see the full description here too
           expect(page.text.tr("\n\r\s"," ")).to have_content description.tr("\n\r\s"," ")

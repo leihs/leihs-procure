@@ -15,8 +15,11 @@ feature 'SMTP-Settings' do
         before(:each){sign_in_as @user}
 
         scenario 'updates the Miscellaneous-Settings' do
-          click_on "Settings"
-          click_on "Miscellaneous"
+          within "aside nav" do
+            click_on "Settings"
+            click_on "Miscellaneous"
+          end
+
           wait_until { page.has_content? "logo_url" }
           click_on "Edit"
           fill_in "logo_url", with: "https://my-server/leihs-logo.png"
@@ -32,27 +35,37 @@ feature 'SMTP-Settings' do
           fill_in "email_signature", with: "Your awesome Lending Desk"
           check "lending_terms_acceptance_required_for_order"
           fill_in "lending_terms_url", with: "https://example.org/fileadmin/leihs-terms-2000-01-01.pdf"
+          fill_in "home_page_image_url", with: "https://example.org/image.jpg"
+          
           click_on "Save"
           sleep 0.5
           wait_until{ all(".modal").empty? }
           visit current_url
           wait_until { page.has_content? "logo_url" }
-          expect(find_field('logo_url', disabled: true).value).to eq 'https://my-server/leihs-logo.png'
-          expect(find_field('documentation_link', disabled: true).value).to eq "https://my-server/leihs-docs"
-          expect(find_field('contract_lending_party_string', disabled: true).value).to eq 'Me'
-          expect(find_field('custom_head_tag', disabled: true).value).to eq 'My Header ???'
-          expect(find_field('time_zone', disabled: true).value).to eq 'Berlin'
-          expect(find_field('local_currency_string', disabled: true).value).to eq 'CHF'
-          expect(find_field('maximum_reservation_time', disabled: true).value).to eq '500'
-          expect(find_field('timeout_minutes', disabled: true).value).to eq '21'
-          expect(find_field('deliver_received_order_notifications', disabled: true)).to be_checked
-          expect(find_field('include_customer_email_in_contracts', disabled: true)).to be_checked
-          expect(find_field('email_signature', disabled: true).value).to eq 'Your awesome Lending Desk'
-          expect(find_field('lending_terms_acceptance_required_for_order', disabled: true)).to be_checked
-          expect(find_field('lending_terms_url', disabled: true).value).to eq 'https://example.org/fileadmin/leihs-terms-2000-01-01.pdf'
-
+          expect(page.text).to have_content 'https://my-server/leihs-logo.png'
+          expect(page.text).to have_content "https://my-server/leihs-docs"
+          expect(page.text).to have_content 'Me'
+          expect(page.text).to have_content 'My Header ???'
+          expect(page.text).to have_content 'Berlin'
+          expect(page.text).to have_content 'CHF'
+          expect(page.text).to have_content '500'
+          expect(page.text).to have_content '21'
+          within 'tr .deliver-received-order-notifications' do 
+            expect(page.text).to have_content 'true'
+          end
+          within 'tr .include-customer-email-in-contracts' do 
+            expect(page.text).to have_content 'true'
+          end
+          within 'tr .lending-terms-acceptance-required-for_order' do 
+            expect(page.text).to have_content 'true'
+          end
+          within 'tr .show-contact-details-on-customer-order' do 
+            expect(page.text).to have_content 'false'
+          end
+          expect(page.text).to have_content 'Your awesome Lending Desk'
+          expect(page.text).to have_content 'https://example.org/fileadmin/leihs-terms-2000-01-01.pdf'
+          expect(page.text).to have_content 'https://example.org/image.jpg'
         end
-
       end
 
 

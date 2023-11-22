@@ -6,9 +6,14 @@ shared_examples :create_with_extra_props do |extra_props = {}|
   scenario "I can create a user with all basic properties and #{extra_props}" do
     properties = BASIC_USER_PROPERTIES.merge(extra_props)
     click_on 'Users'
-    click_on 'Create'
-    fill_in_user_properties properties
-    click_on 'Create'
+    click_on_first 'Add User'
+    wait_until { page.has_css?('.modal') }
+    within '.modal' do
+      fill_in_user_properties properties
+    end
+    sleep 0.1
+    click_on 'Add'
+    wait_until { page.has_no_css?('.modal') }
     wait_until { current_path.match(%r"/admin/users/([^/]+)") }
     assert_user_properties current_path.match(%r"/admin/users/([^/]+)")[1], properties
   end
@@ -17,7 +22,7 @@ end
 shared_examples :can_not_set_the_attribure do |attr_name|
   scenario "I can not set the attribure #{attr_name}" do
     click_on 'Users'
-    click_on 'Create'
+    click_on_first 'Add User'
     fill_in_user_properties ::BASIC_USER_PROPERTIES
     expect(find_field(attr_name, disabled: :all)).to be_disabled
   end

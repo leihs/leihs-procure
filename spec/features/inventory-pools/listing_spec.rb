@@ -47,7 +47,7 @@ feature 'Managing inventory-pools:', type: :feature do
       context 'an admin via the UI' do
         before(:each){ sign_in_as @admins.sample }
         scenario "can see and click all pools" do
-          click_on "Inventory-Pools"
+          click_on "Inventory Pools"
           all("table.inventory-pools tbody tr").each do |tr|
             within(tr) do
               expect(all("a")).not_to be_empty
@@ -61,8 +61,8 @@ feature 'Managing inventory-pools:', type: :feature do
         before(:each){ sign_in_as @manager1 }
 
         scenario "can see all pools but only click on the ones where he is manager" do
-          click_on "Inventory-Pools"
-          expect(all("table.inventory-pools tbody tr").count).to be== 3
+          click_on "Inventory Pools"
+          expect(all("table.inventory-pools tbody tr").count).to be == 3
           pool2_row = find("table.inventory-pools tbody tr", text: @pool2.name)
           within pool2_row do
             expect(all("a")).to be_empty

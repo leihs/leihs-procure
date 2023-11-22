@@ -39,7 +39,7 @@
    :authorizers [auth/admin-scopes?]])
 
 (defn mail-templates-li []
-  [li :mail-templates [:span [icons/mail-templates] " Mail-Templates "] {} {}
+  [li :mail-templates [:span [icons/mail-templates] " Mail Templates "] {} {}
    :authorizers [auth/admin-scopes?]])
 
 (defn rooms-li []

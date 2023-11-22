@@ -1,27 +1,22 @@
 (ns leihs.admin.resources.inventory-fields.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-fields.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-fields.inventory-field.create :as create]
    [leihs.admin.resources.inventory-fields.shared :as shared]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as react-bootstrap :refer [Alert Button]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -48,14 +43,6 @@
                       http/filter-success!
                       :body :inventory-fields-groups sort))))
 
-;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn page-path-for-query-params [query-params]
-  (path (:handler-key @routing/state*)
-        (:route-params @routing/state*)
-        (merge @current-query-paramerters-normalized*
-               query-params)))
-
 (defn link-to-inventory-field
   [inventory-field inner & {:keys [authorizers] :or {authorizers []}}]
   (if (auth/allowed? authorizers)
@@ -65,37 +52,47 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/select-component
-      :label "Target-Type"
-      :query-params-key :target_type
-      :options {nil "(both)"
-                "item" "Item"
-                "license" "License"}]
-     [routing/select-component
-      :label "Configurable"
-      :query-params-key :dynamic
-      :options {nil "(any value)"
-                "yes" "yes"
-                "no" "no"}]
-     [routing/select-component
-      :label "Active"
-      :query-params-key :active
-      :options {nil "(any value)"
-                "yes" "yes"
-                "no" "no"}]
-     [routing/select-component
-      :label "Form-Group"
-      :query-params-key :group
-      :options (concat [[nil "(any value)"] ["none" "<none>"]]
-                       @inventory-fields-groups-data*)]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component {:placeholder "Enter Inventory Field Name"}]
+    [filter/select-component
+     :label "Target-Type"
+     :query-params-key :target_type
+     :options {nil "(both)"
+               "item" "Item"
+               "license" "License"}]
+    [filter/select-component
+     :label "Configurable"
+     :query-params-key :dynamic
+     :options {nil "(any value)"
+               "yes" "yes"
+               "no" "no"}]
+    [filter/select-component
+     :label "Active"
+     :query-params-key :active
+     :options {nil "(any value)"
+               "yes" "yes"
+               "no" "no"}]
+    [filter/select-component
+     :label "Form-Group"
+     :query-params-key :group
+     :options (concat [[nil "(any value)"] ["none" "<none>"]]
+                      @inventory-fields-groups-data*)]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn add-inventory-field-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        "Add Field"]
+       [create/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
 
 (defn id-th-component []
   [:th {:key :id} "ID"])
@@ -149,11 +146,10 @@
 ;;;;;
 
 (defn inventory-fields-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn inventory-field-row-component [inventory-field more-cols]
   ^{:key (:id inventory-field)}
@@ -164,15 +160,16 @@
 
 (defn core-table-component [hds tds inventory-fields]
   (if-let [inventory-fields (seq inventory-fields)]
-    [:table.inventory-fields.table.table-striped.table-sm
-     [inventory-fields-thead-component hds]
-     [:tbody
-      (let [page (:page @current-query-paramerters-normalized*)
-            per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [inventory-field inventory-fields]
-                 ^{:key (:id inventory-field)}
-                 [inventory-field-row-component inventory-field tds])))]]
-    [:div.alert.alert-warning.text-center "No (more) inventory-fields found."]))
+    [table/container
+     {:className "inventory-fields"
+      :actions [table/toolbar [add-inventory-field-button]]
+      :header  [inventory-fields-thead-component hds]
+      :body (doall (for [inventory-field inventory-fields]
+                     ^{:key (:id inventory-field)}
+                     [inventory-field-row-component inventory-field tds]))}]
+    [:> Alert {:variant "info"
+               :className "text-center"}
+     "No (more) inventory-fields found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))
@@ -200,32 +197,26 @@
       [:h3 "@inventory-fields-groups-data*"]
       [:pre (with-out-str (pprint @inventory-fields-groups-data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component {:did-change fetch-inventory-fields
-                                    :did-mount fetch-inventory-fields-groups}]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [id-th-component
-     target-type-th-component
-     dynamic-th-component
-     active-th-component
-     label-th-component
-     group-th-component]
-    [id-td-component
-     target-type-td-component
-     dynamic-td-component
-     active-td-component
-     label-td-component
-     group-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.inventory-fields
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]]
-   [:h1 [icons/inventory-fields] " Inventory-Fields"]
-   [main-page-content-component]])
+  [:article.inventory-fields
+   [:header.my-5
+    [:h1 [icons/table-list] " Inventory-Fields"]]
+   [:section
+    [routing/hidden-state-component
+     {:did-change fetch-inventory-fields
+      :did-mount fetch-inventory-fields-groups}]
+    [filter-component]
+    [table-component
+     [id-th-component
+      target-type-th-component
+      dynamic-th-component
+      active-th-component
+      label-th-component
+      group-th-component]
+     [id-td-component
+      target-type-td-component
+      dynamic-td-component
+      active-td-component
+      label-td-component
+      group-td-component]]
+    [debug-component]]])

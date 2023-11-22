@@ -31,7 +31,7 @@ feature 'Editing groups', type: :feature do
         fill_in 'name', with: name
         fill_in 'description', with: description
         click_on 'Save'
-        wait_until { page.has_content? "Group #{name}" }
+        wait_until { page.has_content? "#{name}" }
         expect(find("dl", text: 'Name')).to have_content name
         expect(find("dl", text: 'Description')).to have_content description
       end
@@ -56,9 +56,10 @@ feature 'Editing groups', type: :feature do
         # NOTE: Capybara finds the button and clicks it but nothing happens.
         # It has to be retried some times until the modal is displayed.
         # Some UI hooks/callbacks not initialized yet on first try?
+        sleep 1
+        click_on 'Edit'
         wait_until do
-          click_on 'Edit'
-          page.has_content?("Edit Group #{group.name}")
+          page.has_content?("Edit Group")
         end
         #####################################################################
        
@@ -67,7 +68,7 @@ feature 'Editing groups', type: :feature do
         fill_in 'name', with: name
         fill_in 'description', with: description
         click_on 'Save'
-        wait_until { page.has_content? "Group #{name}" }
+        wait_until { page.has_content? "#{name}" }
         within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
         expect(find("dl", text: 'Name')).to have_content name
         expect(find("dl", text: 'Description')).to have_content description
@@ -129,7 +130,7 @@ feature 'Editing groups', type: :feature do
           fill_in 'name', with: name
           fill_in 'description', with: description
           click_on 'Save'
-          wait_until { page.has_content? "Group #{name}" }
+          wait_until { page.has_content? "#{name}" }
           expect(find("dl", text: 'Admin protected')).to have_content 'no'
           expect(find("dl", text: 'Name')).to have_content name
           expect(find("dl", text: 'Description')).to have_content description

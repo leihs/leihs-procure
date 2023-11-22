@@ -1,29 +1,15 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-
-   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.users.main :as users-membership]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.core :as auth-core]
    [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
-   [leihs.admin.resources.system.authentication-systems.authentication-system.users.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.system.authentication-systems.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
    [leihs.admin.resources.users.main :as users]
-   [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.regex :as regex]
-
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [leihs.core.user.shared :refer [short-id]]
-   [reagent.core :as reagent]))
+   [leihs.core.core :refer [presence]]
+   [leihs.core.routing.front :as routing]))
 
 ;;; path helpers  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -45,7 +31,7 @@
           more-query-params))))
 
 (defn table-component []
-  [users/table-component
+  [users/users-table
    [users/user-th-component
     users-membership/member-user-th-component
     users-membership/direct-member-user-th-component
@@ -57,19 +43,19 @@
     (users-membership/create-group-member-user-td-component
      groups-path-fn)]])
 
-(defn main-component []
-  [:div
-   [users-membership/filter-component]
-   [routing/pagination-component]
-   [table-component]
-   [routing/pagination-component]
-   [users/debug-component]])
-
 (defn page []
-  [:div.authentication-system-users
-   [breadcrumbs/nav-component @breadcrumbs/left* []]
-   [:div
-    [:h1
-     [:span " Users in the Authentication-System "]
-     [authentication-system/name-component]]]
-   [main-component]])
+  [:<>
+   [routing/hidden-state-component
+    {:did-change auth-core/clean-and-fetch}]
+   (if-not @auth-core/data*
+     [:div.my-5
+      [wait-component " Loading Authentication System Data ..."]]
+     [:article.authentication-system.my-5
+      [auth-core/header]
+      [:section
+       [auth-core/tabs "users"]
+       [users-membership/filter-component]
+       [table/toolbar]
+       [table-component]
+       [table/toolbar]
+       [users/debug-component]]])])

@@ -3,10 +3,7 @@
   (:require-macros
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [bidi.bidi :as bidi]
-   [clojure.pprint :refer [pprint]]
-   [leihs.admin.paths :as paths :refer [path paths]]
+   [leihs.admin.paths :as paths :refer [paths]]
    [leihs.admin.resources.audits.changes.change.main :as audited-change]
    [leihs.admin.resources.audits.changes.main :as audited-changes]
    [leihs.admin.resources.audits.main :as audits]
@@ -15,9 +12,9 @@
    [leihs.admin.resources.buildings.building.main :as building]
    [leihs.admin.resources.buildings.main :as buildings]
    [leihs.admin.resources.groups.group.create :as group-create]
-   [leihs.admin.resources.groups.group.del :as group-delete]
-   [leihs.admin.resources.groups.group.edit :as group-edit]
-   [leihs.admin.resources.groups.group.show :as group-show]
+   ;; [leihs.admin.resources.groups.group.del :as group-delete]
+   ;; [leihs.admin.resources.groups.group.edit :as group-edit]
+   [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.main :as group-users]
    [leihs.admin.resources.groups.main :as groups]
    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
@@ -65,15 +62,9 @@
    [leihs.admin.resources.system.main :as system]
    [leihs.admin.resources.users.choose-main :as users-choose]
    [leihs.admin.resources.users.main :as users]
-   [leihs.admin.resources.users.user.create :as user-create]
-   [leihs.admin.resources.users.user.delete-main :as user-delete]
-   [leihs.admin.resources.users.user.edit-main :as user-edit]
+   [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
-   [leihs.admin.resources.users.user.show :as user-show]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [leihs.core.url.query-params :as query-params]
-   [reagent.core :as reagent]))
+   [leihs.core.routing.front :as routing]))
 
 (def resolve-table
   {:admin #'admin/page
@@ -82,81 +73,76 @@
    :audited-request #'audited-request/page
    :audited-requests #'audited-requests/page
    :audits #'audits/page
-   :authentication-system #'authentication-system/show-page
-   :authentication-system-create #'authentication-system/create-page
-   :authentication-system-delete #'authentication-system/delete-page
-   :authentication-system-edit #'authentication-system/edit-page
+   :authentication-system #'authentication-system/page
+   ;; :authentication-system-create #'authentication-system/create-page
+   ;; :authentication-system-delete #'authentication-system/delete-page
+   ;; :authentication-system-edit #'authentication-system/edit-page
    :authentication-system-groups #'authentication-system-groups/page
    :authentication-system-users #'authentication-system-users/page
    :authentication-systems #'authentication-systems/page
-   :building #'building/show-page
-   :building-create #'building/create-page
-   :building-delete #'building/delete-page
-   :building-edit #'building/edit-page
+   :building #'building/page
+   ;; :building-create #'building/create-page
+   ;; :building-delete #'building/delete-page
+   ;; :building-edit #'building/edit-page
    :buildings #'buildings/page
-   :inventory-field #'inventory-field/show-page
-   :inventory-field-create #'inventory-field/create-page
-   :inventory-field-delete #'inventory-field/delete-page
-   :inventory-field-edit #'inventory-field/edit-page
+   :inventory-field #'inventory-field/page
+   ;; :inventory-field-create #'inventory-field/create-page
+   ;; :inventory-field-delete #'inventory-field/delete-page
+   ;; :inventory-field-edit #'inventory-field/edit-page
    :inventory-fields #'inventory-fields/page
-   :group #'group-show/page
-   :group-create #'group-create/page
-   :group-delete #'group-delete/page
-   :group-edit #'group-edit/page
-   :group-users #'group-users/index-page
+   :group #'group/page
+   ;; :group-create #'group-create/page
+   ;; :group-delete #'group-delete/page
+   ;; :group-edit #'group-edit/page
+   :group-users #'group-users/page
    :groups #'groups/page
    :home #'home/page
    :inventory #'inventory/page
-   :inventory-pool #'inventory-pool/show-page
-   :inventory-pool-create #'inventory-pool/create-page
-   :inventory-pool-delegation #'delegation/show-page
-   :inventory-pool-delegation-create #'delegation-edit/new-page
-   :inventory-pool-delegation-edit #'delegation-edit/edit-page
+   :inventory-pool #'inventory-pool/page
+   :inventory-pool-delegation #'delegation/page
+   ;; :inventory-pool-delegation-create #'delegation-edit/new-page
+   :inventory-pool-delegation-edit #'delegation/page
    :inventory-pool-delegation-groups #'delegation-groups/page
    :inventory-pool-delegation-suspension #'delegation-suspension/page
-   :inventory-pool-delegation-users #'delegation-users/index-page
+   :inventory-pool-delegation-users #'delegation-users/page
    :inventory-pool-delegations #'delegations/page
-   :inventory-pool-delete #'inventory-pool/delete-page
-   :inventory-pool-edit #'inventory-pool/edit-page
    :inventory-pool-entitlement-group #'inventory-pool-entitlement-group/page
    :inventory-pool-entitlement-group-groups #'inventory-pool-entitlement-group-groups/page
    :inventory-pool-entitlement-group-users inventory-pool-entitlement-group-users/page
-   :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/index-page
+   :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/page
    :inventory-pool-group-roles #'inventory-pool-group-roles/page
-   :inventory-pool-groups #'inventory-pool-groups/index-page
+   :inventory-pool-groups #'inventory-pool-groups/page
    :inventory-pool-user #'inventory-pool-user/page
-   :inventory-pool-user-create #'inventory-pool-user-create/page
+   ;; :inventory-pool-user-create #'inventory-pool-user-create/page
    :inventory-pool-user-edit #'inventory-pool-user-edit/page
    :inventory-pool-user-direct-roles #'inventory-pool-user-direct-roles/page
    :inventory-pool-user-roles #'inventory-pool-user-roles/page
    :inventory-pool-user-suspension #'inventory-pool-user-suspension/page
-   :inventory-pool-users #'inventory-pool-users/index-page
+   :inventory-pool-users #'inventory-pool-users/page
    :inventory-pools #'inventory-pools/page
    :languages-settings #'languages-settings/page
    :misc-settings #'misc-settings/page
-   :mail-template #'mail-template/show-page
-   :mail-template-edit #'mail-template/edit-page
+   :mail-template #'mail-template/page
+   ;; :mail-template-edit #'mail-template/edit-page
    :mail-templates #'mail-templates/page
-   :room #'room/show-page
-   :room-create #'room/create-page
-   :room-delete #'room/delete-page
-   :room-edit #'room/edit-page
+   :room #'room/page
+   ;; :room-create #'room/create-page
+   ;; :room-delete #'room/delete-page
+   ;; :room-edit #'room/edit-page
    :rooms #'rooms/page
    :settings #'settings/page
    :smtp-settings #'smtp-settings/page
    :statistics #'statistics/page
-   :supplier #'supplier/show-page
-   :supplier-create #'supplier/create-page
-   :supplier-delete #'supplier/delete-page
-   :supplier-edit #'supplier/edit-page
+   :supplier #'supplier/page
+   ;; :supplier-create #'supplier/create-page
+   ;; :supplier-delete #'supplier/delete-page
+   ;; :supplier-edit #'supplier/edit-page
    :suppliers #'suppliers/page
    :syssec-settings #'syssec-settings/page
    :system #'system/page
-   :user #'user-show/page
-   :user-create #'user-create/page
-   :user-delete #'user-delete/page
+   :user #'user/page
+   ;; :user-delete #'user-delete/page
    :user-password-reset #'user-password-reset/page
-   :user-edit #'user-edit/page
    :users #'users/page
    :users-choose #'users-choose/page})
 

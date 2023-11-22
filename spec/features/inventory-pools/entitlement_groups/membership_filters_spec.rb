@@ -51,34 +51,34 @@ feature 'Entitlement-group Membership filtering ', type: :feature do
     shared_examples :filter_membership do
       scenario 'Filter membership' do
         visit '/admin/'
-        click_on 'Inventory-Pools'
+        click_on 'Inventory Pools'
         click_on @pool.name
         click_on 'Entitlement-Groups'
         click_on @entitlement_group.name
-        click_on 'Users'
+        within('.nav-tabs') { click_on 'Users' }
 
         select '1000', from: 'Per page'
 
         select 'members and non-members', from: 'Membership'
-        wait_until { all("table.users tbody tr").count == @users.count }
+        wait_until { all("tr .user").count == @users.count }
 
         # direct_members filter
         select 'direct members', from:  'Membership'
-        wait_until { all("table.users tbody tr").count == @direct_members.count }
+        wait_until { all("tr .user").count == @direct_members.count }
 
         select 'members and non-members', from: 'Membership'
-        wait_until { all("table.users tbody tr").count == @users.count }
+        wait_until { all("tr .user").count == @users.count }
 
         # group_members filter
         select 'group members', from:  'Membership'
-        wait_until { all("table.users tbody tr").count == @group_members.count }
+        wait_until { all("tr .user").count == @group_members.count }
 
         select 'members and non-members', from: 'Membership'
-        wait_until { all("table.users tbody tr").count == @users.count }
+        wait_until { all("tr .user").count == @users.count }
 
         # non member filter
         select 'non-members', from:  'Membership'
-        wait_until { all("table.users tbody tr").count == @non_members.count }
+        wait_until { all("tr .user").count == @non_members.count }
 
       end
     end

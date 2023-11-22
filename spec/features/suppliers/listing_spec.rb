@@ -17,7 +17,9 @@ feature 'Managing suppliers:', type: :feature do
       supplier
     end
     sign_in_as @admins.sample
-    click_on "Suppliers"
+    within 'aside nav' do
+      click_on "Suppliers"
+    end
   end
 
   context 'an admin via the UI' do

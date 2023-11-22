@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Manage Mail-Templates', type: :feature do
+feature 'Manage Mail Templates', type: :feature do
 
   let(:mt_body) { Faker::Markdown.sandwich }
 
@@ -16,7 +16,7 @@ feature 'Manage Mail-Templates', type: :feature do
 
     scenario 'edits a mail_template' do
       visit '/admin/'
-      click_on 'Mail-Templates'
+      click_on 'Mail Templates'
       within find("tr.mail-template",
                   text: /#{@mail_template.name}.*#{@mail_template.language_locale}/) do
         click_on @mail_template.name
@@ -33,9 +33,7 @@ feature 'Manage Mail-Templates', type: :feature do
       input_values = all("input").map(&:value).join(" ")
       expect(page.text + input_values).to have_content mt_body
 
-      within find(".nav-component nav", match: :first) do
-        click_on "Mail-Templates"
-      end
+      click_on 'Back'
       wait_until { current_path ==  "/admin/mail-templates/" }
       expect(page).to have_selector("tr.mail-template",
                                     text: /#{@mail_template.name}.*#{@mail_template.language_locale}/)

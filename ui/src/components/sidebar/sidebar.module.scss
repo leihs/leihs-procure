@@ -1,0 +1,165 @@
+@import '~bootstrap/scss/bootstrap';
+
+.open-menu {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    width: 1.5rem;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+
+    .arrow {
+      width: 0.5rem;
+      transition-delay: 0.5s;
+      transition: transform 0.2s ease-in-out;
+
+      .open & {
+        transform: rotate(-180deg);
+      }
+    }
+  }
+}
+
+.sidebar {
+  @media (max-width: 768px) {
+    // grid-template-columns: 2rem 1fr;
+    position: fixed;
+    left: -13.5rem;
+
+    &.open {
+      left: 0;
+    }
+  }
+
+  position: sticky;
+  top: 3.2rem;
+  z-index: 100;
+  display: flex;
+  min-height: 100vh;
+  width: 15rem;
+  border-right: 1px solid $gray-200;
+
+  background-color: white;
+  color: black;
+
+  transition: all 0.2s ease-in-out;
+
+  .list {
+    padding: 0;
+    margin: 0;
+    flex: 1 1;
+    position: sticky;
+    top: 0;
+  }
+
+  li {
+    list-style: none;
+
+    &:not(:first-child) {
+      padding-top: 0.5rem;
+    }
+  }
+
+  a,
+  li,
+  button {
+    touch-action: none;
+    user-select: none;
+  }
+
+  .group {
+    .group-button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: $gray-700;
+      text-decoration: none;
+      background-color: transparent;
+      border: none;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+
+    .arrow {
+      margin-left: auto;
+      transition: transform 0.3s ease-in-out;
+
+      &.open {
+        transform: rotate(-180deg);
+      }
+    }
+
+    .group-items {
+      max-height: 0px;
+      overflow: hidden;
+      visibility: hidden;
+      opacity: 0;
+
+      transition: all 0.3s ease-in-out;
+
+      &.open {
+        visibility: visible;
+        opacity: 1;
+        max-height: 1000px;
+        transition: all 0.3s ease-in-out;
+        padding-bottom: 0;
+      }
+
+      li:first-child {
+        padding-top: 1rem;
+      }
+
+      // add a little padding for outline
+      li:last-child {
+        padding-bottom: 2px;
+      }
+    }
+  }
+
+  .link {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $gray-700;
+    text-decoration: none;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &.active {
+      color: $primary;
+      font-weight: 600;
+    }
+  }
+
+  .icon {
+    width: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  .section-title {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: $gray-800;
+
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+
+    height: 2rem;
+    background-color: $gray-100;
+  }
+
+  .item {
+    padding: 0.5rem 1rem;
+    color: $gray-600;
+  }
+}

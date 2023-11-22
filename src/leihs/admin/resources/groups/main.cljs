@@ -1,29 +1,23 @@
 (ns leihs.admin.resources.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.common.users-and-groups.core :as users-and-groups]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.groups.group.create :as create]
    [leihs.admin.resources.groups.shared :as shared]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as react-bootstrap :refer [Button Alert]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -58,11 +52,10 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn form-term-filter []
-  [routing/form-term-filter-component
-   :placeholder "name of the group"])
+  [filter/form-term-filter-component :placeholder "Name of the Group"])
 
 (defn form-including-user-filter []
-  [routing/choose-user-component
+  [filter/choose-user-component
    :query-params-key :including-user
    :input-options {:placeholder "email, login, or id"}])
 
@@ -74,15 +67,14 @@
    {:placeholder "org_id or true or false"}])
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [form-term-filter]
-     [form-including-user-filter]
-     [users-and-groups/form-org-filter data*]
-     [users-and-groups/form-org-id-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [form-term-filter]
+    [filter/form-including-user]
+    [users-and-groups/form-org-filter data*]
+    [users-and-groups/form-org-id-filter]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -93,6 +85,10 @@
   [:td {:key :name}
    [link-to-group group [:span (:name group)]
     :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]]])
+
+(defn name-td-component-no-link [group]
+  [:td {:key :name}
+   (:name group)])
 
 (defn org-th-component []
   [:th {:key :organization} "Organization"])
@@ -126,11 +122,10 @@
 ;;;;;
 
 (defn groups-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn group-row-component [group more-cols]
   ^{:key (:id group)}
@@ -139,17 +134,28 @@
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col group])])
 
+(defn add-group-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        "Add Group"]
+       [create/dialog  {:show @show
+                        :onHide #(reset! show false)}]])))
+
 (defn core-table-component [hds tds groups]
   (if-let [groups (seq groups)]
-    [:table.groups.table.table-striped.table-sm
-     [groups-thead-component hds]
-     [:tbody
-      (let [page (:page @current-query-paramerters-normalized*)
-            per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [group groups]
-                 ^{:key (:id group)}
-                 [group-row-component group tds])))]]
-    [:div.alert.alert-warning.text-center "No (more) groups found."]))
+    [table/container
+     {:className "groups"
+      :header (groups-thead-component hds)
+      :body (doall (for [group groups]
+                     ^{:key (:id group)}
+                     [group-row-component group tds]))}]
+    [:> Alert {:variant "info"
+               :className "text-center"}
+     "No (more) groups found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))
@@ -174,28 +180,23 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component
-    {:did-change fetch-groups}]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [name-th-component
-     org-th-component
-     org-id-th-component
-     users-count-th-component]
-    [name-td-component
-     org-td-component
-     org-id-td-component
-     users-count-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.groups
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]]
-   [:h1 [icons/groups] " Groups"]
-   [main-page-content-component]])
+  [:article.groups.my-5
+   [:h1.my-5
+    [icons/groups] " Groups"]
+   [:section
+    [routing/hidden-state-component
+     {:did-change fetch-groups}]
+    [filter-component]
+    [table/toolbar [add-group-button]]
+    [table-component
+     [name-th-component
+      org-th-component
+      org-id-th-component
+      users-count-th-component]
+     [name-td-component
+      org-td-component
+      org-id-td-component
+      users-count-td-component]]
+    [table/toolbar [add-group-button]]
+    [debug-component]]])

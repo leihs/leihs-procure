@@ -1,164 +1,73 @@
 (ns leihs.admin.resources.suppliers.supplier.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.suppliers.breadcrumbs :as breadcrumbs-parent]
-   [leihs.admin.resources.suppliers.supplier.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.suppliers.supplier.core :as supplier :refer [clean-and-fetch id* data*]]
+   [leihs.admin.resources.suppliers.supplier.core :as supplier-core :refer [clean-and-fetch data*]]
+   [leihs.admin.resources.suppliers.supplier.delete :as delete]
+   [leihs.admin.resources.suppliers.supplier.edit :as edit]
    [leihs.admin.resources.suppliers.supplier.items :as items]
-   [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent]))
 
-(defonce edit-mode?*
-  (reaction
-   (and (map? @data*)
-        (boolean ((set '(:supplier-edit :supplier-create))
-                  (:handler-key @routing/state*))))))
+(defn info-table []
+  (let [data @supplier-core/data*]
+    (fn []
+      [table/container
+       {:borders false
+        :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+        :body
+        [:<>
+         [:tr.name
+          [:td "Name" [:small " (name)"]]
+          [:td.name (:name data)]]
+         [:tr.description
+          [:td "Note" [:small " (note)"]]
+          [:td.note {:style {:white-space "break-spaces"}} (:note data)]]]}])))
 
-;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn edit-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:onClick #(reset! show true)}
+        "Edit"]
+       [edit/dialog {:show @show
+                     :onHide #(reset! show false)}]])))
 
-(defn supplier-component []
-  (if-not @supplier/data*
-    [wait-component]
-    [:div.supplier.mt-3
-     [:div
-      [form-components/input-component supplier/data* [:name]
-       :label "Name"
-       :required true
-       :disabled (not @supplier/edit-mode?*)]]
-     [form-components/input-component supplier/data* [:note]
-      :label "Note"
-      :element :textarea
-      :rows 20
-      :disabled (not @supplier/edit-mode?*)]]))
+(defn delete-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:variant "danger"
+         :className "ml-3"
+         :onClick #(reset! show true)}
+        "Delete"]
+       [delete/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
 
-;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn header []
+  (let [name (:name @supplier-core/data*)]
+    (fn []
+      [:header.my-5
+       [back/button  {:to (path :suppliers)}]
+       [:h1.mt-3 name]])))
 
-(defn patch [& args]
-  (let [route (path :supplier {:supplier-id @supplier/id*})]
-    (go (when (some->
-               {:url route
-                :method :patch
-                :json-params  @supplier/data*
-                :chan (async/chan)}
-               http-client/request :chan <!
-               http-client/filter-success!)
-          (accountant/navigate! route)))))
-
-(defn edit-page []
-  [:div.edit-supplier
+(defn page []
+  [:<>
    [routing/hidden-state-component
-    {:did-mount supplier/clean-and-fetch}]
-   (breadcrumbs/nav-component
-    (conj @breadcrumbs/left*
-          [breadcrumbs/edit-li]) [])
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Edit Supplier "]
-      [supplier/name-link-component]]]]
-   [:form.form
-    {:on-submit (fn [e] (.preventDefault e) (patch))}
-    [supplier-component]
-    [form-components/save-submit-component]]
-   [supplier/debug-component]])
-
-;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn create []
-  (go (when-let [id (some->
-                     {:url (path :suppliers)
-                      :method :post
-                      :json-params  @supplier/data*
-                      :chan (async/chan)}
-                     http-client/request :chan <!
-                     http-client/filter-success!
-                     :body :id)]
-        (accountant/navigate!
-         (path :supplier {:supplier-id id})))))
-
-(defn create-submit-component []
-  (if @edit-mode?*
-    [:div
-     [:div.float-right
-      [:button.btn.btn-primary
-       " Create "]]
-     [:div.clearfix]]))
-
-(defn create-page []
-  [:div.new-supplier
-   [routing/hidden-state-component
-    {:did-mount #(reset! supplier/data* {})}]
-   (breadcrumbs/nav-component
-    (conj @breadcrumbs-parent/left*
-          [breadcrumbs-parent/create-li])
-    [])
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Create Supplier "]]]]
-   [:form.form
-    {:on-submit (fn [e] (.preventDefault e) (create))}
-    [supplier-component]
-    [create-submit-component]]
-   [supplier/debug-component]])
-
-;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn delete-supplier [& args]
-  (go (when (some->
-             {:url (path :supplier (-> @routing/state* :route-params))
-              :method :delete
-              :chan (async/chan)}
-             http-client/request :chan <!
-             http-client/filter-success!)
-        (accountant/navigate! (path :suppliers)))))
-
-(defn delete-form-component []
-  [:form.form
-   {:on-submit (fn [e]
-                 (.preventDefault e)
-                 (delete-supplier))}
-   [form-components/delete-submit-component]])
-
-(defn delete-page []
-  [:div.group-delete
-   [breadcrumbs/nav-component
-    (conj  @breadcrumbs/left* [breadcrumbs/delete-li]) []]
-   [:h1 "Delete Supplier "
-    [supplier/name-link-component]]
-   [supplier/id-component]
-   [delete-form-component]])
-
-;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn show-page []
-  [:div.supplier
-   [routing/hidden-state-component {:did-mount #(clean-and-fetch)}]
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/suppliers-li]
-     [breadcrumbs/delete-li]
-     [breadcrumbs/edit-li]]]
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Supplier "]
-      [supplier/name-link-component]]]]
-   [supplier-component]
-   [items/component]
-   [supplier/debug-component]])
+    {:did-change clean-and-fetch}]
+   (if-not @supplier-core/data*
+     [:div.my-5
+      [wait-component " Loading Room Data ..."]]
+     [:article.supplier
+      [header]
+      [info-table]
+      [edit-button]
+      [delete-button]
+      [items/component]
+      [supplier-core/debug-component]])])

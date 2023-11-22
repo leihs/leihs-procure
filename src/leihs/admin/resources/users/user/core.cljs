@@ -1,20 +1,18 @@
 (ns leihs.admin.resources.users.user.core
   (:refer-clojure :exclude [str keyword])
   (:require
-   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.core.async :as async :refer [go timeout <!]]
    [cljs.pprint :refer [pprint]]
    [clojure.string :refer [split trim]]
    [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.users.user.shared :as user-shared]
    [leihs.admin.state :as state]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence str]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [taoensso.timbre :refer [error]]))
 
 (defonce user-id*
   (reaction (or (some-> @routing/state* :route-params :user-id)
@@ -70,12 +68,12 @@
        (filter identity)))
 
 (defn name-component [user]
-  [:span
+  [:<>
    (when-not user
      (error "use name-link-component when you call wo argument and :user-id is in the routes"))
-   (let [p (path :user {:user-id (:id user)})
+   (let [path (path :user {:user-id (:id user)})
          name-or-id (fullname-or-some-uid user)]
-     [components/link [:em name-or-id] p])])
+     [components/link [:<> name-or-id] path])])
 
 (defn name-link-component []
   [:span
@@ -184,7 +182,3 @@
      [:div.user-data
       [:h3 "@user-data*"]
       [:pre (with-out-str (pprint @user-data*))]]]))
-
-
-
-

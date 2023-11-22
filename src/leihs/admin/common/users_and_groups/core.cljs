@@ -1,24 +1,12 @@
 (ns leihs.admin.common.users-and-groups.core
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :refer [checkbox-component input-component]]
-   [leihs.admin.common.http-client.core :as http]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.form-components :refer [checkbox-component
+                                               input-component]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
-   [reagent.core :as reagent]))
+   [leihs.core.user.front :as current-user]))
 
 (defn organizations [data*]
   (merge {"" "(any)"}
@@ -32,20 +20,20 @@
                       (into {})))))
 
 (defn form-org-filter [data*]
-  [routing/select-component
+  [filter/select-component
    :label "Organization"
    :query-params-key :organization
    :options (organizations data*)])
 
 (defn form-org-id-filter []
-  [routing/delayed-query-params-input-component
+  [filter/delayed-query-params-input-component
    :label "Organization ID"
    :query-params-key :org_id
    :input-options
    {:placeholder "id within the org"}])
 
 (defn protected-filter []
-  [routing/select-component
+  [filter/select-component
    :label "Protected by"
    :query-params-key :protected
    :options {"" "(any or none)"

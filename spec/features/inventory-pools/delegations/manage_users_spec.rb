@@ -4,16 +4,16 @@ require 'pry'
 shared_examples :direct_user do
   scenario 'adding and removing a direct user' do
     @user = @users.find { |u| u.id != @delegation.delegator_user_id }
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on @pool.name
     click_on 'Delegations'
     @delegations_path = current_path
     click_on @delegation.firstname
     @delegation_path = current_path
-    click_on 'Users'
+    within('.nav-tabs') { click_on 'Users' }
     select 'members and non-members', from: 'Membership'
     fill_in 'Search', with: @user.email
-    wait_until{ all('.users tbody tr').count == 1 }
+    wait_until{ all('.delegation table tbody tr').count == 1 }
     @delegation_users_url = current_url
     within(find('tr.user'))do
       expect(find(:checkbox, id: 'member', disabled: true)).not_to be_checked
@@ -58,13 +58,13 @@ end
 shared_examples :group_user do
   scenario 'adding and removing a group via included user' do
     @user = @users.sample
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on @pool.name
     click_on 'Delegations'
     @delegations_path = current_path
     click_on @delegation.firstname
     @delegation_path = current_path
-    click_on 'Users'
+    within('.nav-tabs') { click_on 'Users' }
     select 'members and non-members', from: 'Membership'
     fill_in 'Search', with: @user.email
     wait_until{ all('tr.user').count == 1 }

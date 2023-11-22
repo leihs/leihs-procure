@@ -29,7 +29,7 @@ feature 'Manage inventory-pool delegations ', type: :feature do
     scenario ' managing the suspension of a delegation' do
 
       # suspend on the delegations table
-      click_on 'Inventory-Pools'
+      click_on 'Inventory Pools'
       click_on @pool.name
       click_on "Delegations"
       select('members and non-members', from: 'Membership')

@@ -15,7 +15,7 @@
 (defn link [inner path]
   (if (not= (:path @routing/state*) path)
     [:a {:href path} inner]
-    [:span.text-info inner]))
+    [:<> inner]))
 
 (defn img-large-component [user]
   [:img.bg-light.user-image-256

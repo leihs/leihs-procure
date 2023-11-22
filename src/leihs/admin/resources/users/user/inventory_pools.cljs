@@ -1,27 +1,19 @@
 (ns leihs.admin.resources.users.user.inventory-pools
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
-
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-   [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
-
+   [leihs.admin.resources.users.user.core :as user-core :refer [user-data*
+                                                                user-id*]]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
    [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
@@ -58,7 +50,7 @@
         user-in-pool-path (path :inventory-pool-user
                                 {:inventory-pool-id (:inventory_pool_id row)
                                  :user-id @user-id*})
-        user-in-pool-inner [:em (user-core/fullname-or-some-uid @user-data*)]
+        user-in-pool-inner [:<> (user-core/fullname-or-some-uid @user-data*)]
         pool-inner [:em (:inventory_pool_name row)]]
     [:td
      [:span
@@ -90,26 +82,26 @@
    " / "
    (:reservations_count row)])
 
-(defn table-component []
+(defn table-component [& {:keys [chrome]
+                          :or {chrome true}}]
   [:div.user-inventory-pools
    [routing/hidden-state-component
     {:did-mount clean-and-fetch-inventory-pools
      :did-change clean-and-fetch-inventory-pools}]
    (if (and @data* @user-data*)
-     [:table.user-inventory-pools.table.table-sm.table-striped
-      [:thead
-       [:tr
-        [:th "User in pool"]
-        [:th "Roles"]
-        [:th "Submitted ; approved / total reservations"]
-        [:th "Open / total contracts"]]]
-      [:tbody
-       (for [row (->>  @data* (sort-by :inventory_pool_name))]
-         [:tr.pool {:key (:inventory_pool_id row)}
-          [user-in-pool-td-component row]
-          [roles-td-component row]
-          [reservations-td-component row]
-          [contracts-td-component row]])]]
+     [table/container
+      {:borders chrome
+       :header [:tr
+                [:th "User in pool"]
+                [:th "Roles"]
+                [:th "Submitted ; approved / total reservations"]
+                [:th "Open / total contracts"]]
+       :body (for [row (->>  @data* (sort-by :inventory_pool_name))]
+               [:tr.pool {:key (:inventory_pool_id row)}
+                [user-in-pool-td-component row]
+                [roles-td-component row]
+                [reservations-td-component row]
+                [contracts-td-component row]])}]
      [wait-component])
    [debug-component]])
 

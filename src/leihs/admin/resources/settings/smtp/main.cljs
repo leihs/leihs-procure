@@ -1,120 +1,86 @@
 (ns leihs.admin.resources.settings.smtp.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as admin.common.icons]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.settings.icons :as icons]
-   [leihs.admin.resources.settings.smtp.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.components.table :as table]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.resources.settings.smtp.core :as smtp-core]
+   [leihs.admin.resources.settings.smtp.edit :as edit]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-
-   [leihs.core.breadcrumbs :as core-breadcrumbs]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent]))
 
-(defonce data* (reagent/atom nil))
-
-(defonce edit?* (reagent/atom false))
-
-(defn fetch [& _]
-  (go (reset! data*
-              (some-> {:chan (async/chan)}
-                      http-client/request
-                      :chan <! http-client/filter-success :body))))
-
-(defn put [& _]
-  (go (when-let [data (some->
-                       {:chan (async/chan)
-                        :json-params @data*
-                        :method :put}
-                       http-client/request
-                       :chan <!
-                       http-client/filter-success :body)]
-        (reset! data* data)
-        (reset! edit?* false))))
-
-(defn form-component []
-  [:form.form
-   {:on-submit (fn [e]
-                 (.preventDefault e)
-                 (put))}
-   [:div.my-3
-    [form-components/checkbox-component data* [:enabled]
-     :disabled (not @edit?*) :label "Sending emails enabled"]]
-   [:div.row
-    [:div.col-sm-4
-     [form-components/input-component data* [:port]
-      :disabled (not @edit?*) :type :number :label "Server port"]]
-    [:div.col-sm-8
-     [form-components/input-component data* [:address]
-      :disabled (not @edit?*) :label "Server address"]]]
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:domain]
-      :disabled (not @edit?*) :label "Domain name"]]
-    [:div.col-sm
-     [form-components/input-component data* [:default_from_address]
-      :disabled (not @edit?*) :label "From"]]
-    [:div.col-sm
-     [form-components/input-component data* [:sender_address]
-      :disabled (not @edit?*) :label "Sender"]]]
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:username]
-      :disabled (not @edit?*) :label "User"]]
-    [:div.col-sm
-     [form-components/input-component data* [:password]
-      :disabled (not @edit?*) :label "Password"]]]
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:authentication_type]
-      :disabled (not @edit?*)]]
-    [:div.col-sm
-     [form-components/input-component data* [:openssl_verify_mode]
-      :disabled (not @edit?*)]]
-    [:div.col-sm
-     [form-components/checkbox-component data* [:enable_starttls_auto]
-      :disabled (not @edit?*)]]]
-   (when @edit?*
-     [form-components/save-submit-component])])
-
-(defn main-component []
-  (if-not @data*
-    [wait-component]
-    [form-component]))
+(defn info-table []
+  (let [data @smtp-core/data*]
+    (fn []
+      [table/container
+       {:borders false
+        :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+        :body
+        [:<>
+         [:tr.enabled
+          [:td "Sending EMails enabled" [:small " (enabled)"]]
+          [:td (str (:enabled data))]]
+         [:tr.port
+          [:td "Server Port" [:small " (port)"]]
+          [:td (:port data)]]
+         [:tr.address
+          [:td "Server Address" [:small " (address)"]]
+          [:td (:address data)]]
+         [:tr.domain
+          [:td "Domain Name" [:small " (domain)"]]
+          [:td (:domain data)]]
+         [:tr.default-from-address
+          [:td "From" [:small " (default_from_address)"]]
+          [:td (:default_from_address data)]]
+         [:tr.sender-address
+          [:td "Sender Address" [:small " (sender_address)"]]
+          [:td (:sender_address data)]]
+         [:tr.username
+          [:td "User Name" [:small " (username)"]]
+          [:td (:username data)]]
+         [:tr.password
+          [:td "Password" [:small " (password)"]]
+          [:td (:password data)]]
+         [:tr.authentication-type
+          [:td "Authentication Type" [:small " (authentication_type)"]]
+          [:td (:authentication_type data)]]
+         [:tr.openssl-verify-mode
+          [:td "OpenSSL Verify Mode" [:small " (openssl_verify_mode)"]]
+          [:td (:openssl_verify_mode data)]]
+         [:tr.enable-starttls-auto
+          [:td "Enable Starttls Auto" [:small " (enable_starttls_auto)"]]
+          [:td (str (:enable_starttls_auto data))]]]}])))
 
 (defn debug-component []
   (when @state/debug?*
     [:div.debug
      [:h3 "@data*"]
-     [:pre (with-out-str (pprint @data*))]]))
+     [:pre (with-out-str (pprint @smtp-core/data*))]]))
+
+(defn edit-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:onClick #(reset! show true)}
+        "Edit"]
+       [edit/dialog {:show @show
+                     :onHide #(reset! show false)}]])))
 
 (defn page []
-  [:div.settings-page
+  [:<>
    [routing/hidden-state-component
-    {:did-mount (fn [& _]
-                  (reset! edit?* false)
-                  (fetch))}]
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[:li.breadcrumb-item
-      [:button.btn
-       {:class (if @edit?*
-                 core-breadcrumbs/disabled-button-classes
-                 core-breadcrumbs/enabled-button-classes)
-        :on-click #(reset! edit?* true)}
-       [admin.common.icons/edit] " Edit"]]]]
-   [:h1 icons/smtp " SMTP Settings"]
-   [main-component]
-   [debug-component]])
+    {:did-change smtp-core/clean-and-fetch}]
+   (if-not @smtp-core/data*
+     [wait-component]
+     [:article.settings-page.smtp
+      [:header.my-5
+       [:h1 [icons/paper-plane] " SMTP Settings"]]
+      [:section
+       [info-table]
+       [edit-button]
+       [debug-component]]])])

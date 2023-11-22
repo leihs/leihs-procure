@@ -1,27 +1,22 @@
 (ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.suppliers.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.suppliers.shared :as shared]
+   [leihs.admin.resources.suppliers.supplier.create :as create]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as react-bootstrap :refer [Alert Button]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -44,20 +39,13 @@
   (go (reset! inventory-pools-data*
               (some->
                {:chan (async/chan)
-                :url (path :inventory-pools {} {:with_items_from_suppliers "yes"
-                                                :active "yes"
-                                                :per-page 1000})}
+                :url (path :inventory-pools {}
+                           {:with_items_from_suppliers "yes"
+                            :active "yes"
+                            :per-page 1000})}
                http/request :chan <!
                http/filter-success!
                :body))))
-
-;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn page-path-for-query-params [query-params]
-  (path (:handler-key @routing/state*)
-        (:route-params @routing/state*)
-        (merge @current-query-paramerters-normalized*
-               query-params)))
 
 (defn link-to-supplier
   [supplier inner & {:keys [authorizers]
@@ -69,21 +57,31 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/select-component
-      :label "Inventory Pool"
-      :query-params-key :inventory_pool_id
-      :options (cons ["" "(any)"]
-                     (->> @inventory-pools-data*
-                          :inventory-pools
-                          (map #(do [(:id %) (:name %)]))))]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component {:placeholder "Supplier Name"}]
+    [filter/select-component
+     :label "Inventory Pool"
+     :query-params-key :inventory_pool_id
+     :options (cons ["" "(any)"]
+                    (->> @inventory-pools-data*
+                         :inventory-pools
+                         (map #(do [(:id %) (:name %)]))))]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn add-supplier-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        "Add Supplier"]
+       [create/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
 
 (defn name-th-component []
   [:th {:key :name} "Name"])
@@ -99,14 +97,11 @@
 (defn items-count-td-component [supplier]
   [:td.text-left {:key :items_count} (:count_items supplier)])
 
-;;;;;
-
 (defn suppliers-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn supplier-row-component [supplier more-cols]
   ^{:key (:id supplier)}
@@ -117,15 +112,15 @@
 
 (defn core-table-component [hds tds suppliers]
   (if-let [suppliers (seq suppliers)]
-    [:table.suppliers.table.table-striped.table-sm
-     [suppliers-thead-component hds]
-     [:tbody
-      (let [page (:page @current-query-paramerters-normalized*)
-            per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [supplier suppliers]
-                 ^{:key (:id supplier)}
-                 [supplier-row-component supplier tds])))]]
-    [:div.alert.alert-warning.text-center "No (more) suppliers found."]))
+    [table/container
+     {:className "suppliers"
+      :header [suppliers-thead-component hds]
+      :body (doall (for [supplier suppliers]
+                     ^{:key (:id supplier)}
+                     [supplier-row-component supplier tds]))}]
+    [:> Alert {:variant "info"
+               :className "text-center"}
+     "No (more) suppliers found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))
@@ -153,25 +148,20 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component
-    {:did-change fetch-suppliers
-     :did-mount fetch-inventory-pools}]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [name-th-component
-     items-count-th-component]
-    [name-td-component
-     items-count-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.suppliers
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]]
-   [:h1 [icons/suppliers] " Suppliers"]
-   [main-page-content-component]])
+  [:article.suppliers
+   [:header.my-5
+    [:h1 [icons/suppliers] " Suppliers"]]
+   [:section
+    [routing/hidden-state-component
+     {:did-change fetch-suppliers
+      :did-mount fetch-inventory-pools}]
+    [filter-component]
+    [table/toolbar [add-supplier-button]]
+    [table-component
+     [name-th-component
+      items-count-th-component]
+     [name-td-component
+      items-count-td-component]]
+    [table/toolbar [add-supplier-button]]
+    [debug-component]]])

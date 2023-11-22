@@ -1,34 +1,26 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-
    [leihs.admin.common.components :as components :refer [link]]
+   [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.regex :as regex]
-
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.front]
    [leihs.core.user.shared :refer [short-id]]
+   [react-bootstrap :as react-bootstrap]
    [reagent.core :as reagent]))
 
 (defonce id* (reaction (or (-> @routing/state* :route-params :delegation-id)
                            ":delegation-id")))
 
 (defonce data* (reagent/atom nil))
-
 (defonce delegation* (reaction (get @data* @id*)))
 
 (defn fetch-delegation []
@@ -62,6 +54,44 @@
 
 ;; delegation components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn tabs [active]
+  [:> react-bootstrap/Nav {:className "mb-3"
+                           :justify false
+                           :variant "tabs"
+                           :defaultActiveKey active}
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-delegation
+                      {:inventory-pool-id @inventory-pool/id*
+                       :delegation-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Delegation"]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-delegation-users
+                      {:inventory-pool-id @inventory-pool/id*
+                       :delegation-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Users"]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-delegation-groups
+                      {:inventory-pool-id @inventory-pool/id*
+                       :delegation-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Groups "]]])
+
+(defn delegation-name []
+  [:<>
+   [routing/hidden-state-component
+    {:did-change fetch}]
+   (let [inner (when-let [dname (some-> @data* (get @id*) :name)]
+                 [:<> dname])]
+     [:<> inner])])
+
 (defn name-link-component []
   [:span.delegation-name
    [routing/hidden-state-component
@@ -73,6 +103,13 @@
                                {:inventory-pool-id @inventory-pool/id*
                                 :delegation-id @id*})]
      [link inner delegation-path])])
+
+(defn header []
+  [:header.mb-5
+   [back/button {:href (path :inventory-pool-delegations
+                             {:inventory-pool-id @inventory-pool/id*})}]
+   [:h1.mt-3 [delegation-name]]
+   [:h6 "Inventory Pool " [inventory-pool/name-component]]])
 
 (defn delegation-id-component []
   [:p "delegation id: " [:span {:style {:font-family "monospace"}} (:id @data*)]])

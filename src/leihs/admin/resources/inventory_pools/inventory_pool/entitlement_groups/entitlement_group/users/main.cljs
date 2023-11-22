@@ -1,26 +1,14 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.membership.users.main :as membership-users :refer []]
+   [leihs.admin.common.components.table :as table]
+   [leihs.admin.common.membership.users.main :as membership-users]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
-
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
    [leihs.admin.resources.users.main :as users]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [leihs.core.core :refer [presence]]))
 
 ;;; direct member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -42,13 +30,11 @@
          (merge {:including-user (or (-> user :email presence) (:id user))}
                 more-query-params))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; rendering ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn users-component []
-  [:div.entitlement-group-users
-   [membership-users/filter-component]
-   [routing/pagination-component]
-   [users/table-component
+(defn users-table-section []
+  [:section.entitlement-group-users
+   [users/users-table
     [pool-users/user-th-component
      membership-users/member-user-th-component
      membership-users/direct-member-user-th-component
@@ -59,25 +45,14 @@
       direct-member-path-fn)
      (membership-users/create-group-member-user-td-component
       groups-path-fn)]
-    :membership-filter? true]
-   [routing/pagination-component]])
-
-(defn header-component []
-  [:h1
-   [:span " Users of the Entitlement-Group "]
-   [entitlement-group/name-link-component]
-   " in the Inventory-Pool "
-   [inventory-pool/name-link-component]])
-
-(defn breadcrumbs-component []
-  (when (and @inventory-pool/id* @entitlement-group/id*)
-    [breadcrumbs/nav-component
-     (conj @breadcrumbs/left* [breadcrumbs/users-li])
-     []]))
+    :membership-filter? true]])
 
 (defn page []
-  [:div.inventory-pool-entitlement-group-users
-   [breadcrumbs-component]
-   [header-component]
-   [users-component]
+  [:article.inventory-pool-entitlement-group-users
+   [entitlement-group/header]
+   [entitlement-group/tabs]
+   [membership-users/filter-component]
+   [table/toolbar]
+   [users-table-section]
+   [table/toolbar]
    [users/debug-component]])

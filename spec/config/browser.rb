@@ -16,11 +16,10 @@ def http_base_url
   @http_base_url ||= "http://#{http_host}:#{http_port}"
 end
 
-
-
 def set_capybara_values
   Capybara.app_host = http_base_url
   Capybara.server_port = http_port
+  Capybara.test_id = 'data-test-id'
 end
 
 

@@ -1,24 +1,16 @@
 (ns leihs.admin.resources.groups.group.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-
    [clojure.string]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
-   [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
-
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.shared :refer [short-id]]
    [reagent.core :as reagent]))
 
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
@@ -40,15 +32,8 @@
   (reset! data* nil)
   (fetch-group))
 
-(defn group-id-component []
-  [:p "id: " [:span {:style {:font-family "monospace"}} (:id @data*)]])
-
 (defn group-name-component []
-  (let [inner (if-not @data*
-                [:span {:style {:font-family "monospace"}} (short-id @group-id*)]
-                [:em (str (:name @data*))])
-        p (path :group {:group-id @group-id*})]
-    [components/link inner p]))
+  [:<> (str (:name @data*))])
 
 (defn debug-component []
   (when (:debug @state/global-state*)

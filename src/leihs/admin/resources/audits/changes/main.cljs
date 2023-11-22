@@ -1,28 +1,24 @@
 (ns leihs.admin.resources.audits.changes.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
    [clojure.string :as str]
    [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.audits.changes.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
    [leihs.admin.resources.audits.core :as audits]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.clipboard :as clipboard]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence str]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]
-   [taoensso.timbre :refer [debug info warn error spy]]))
+   [reagent.core :as reagent]))
 
 ;;; data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -87,40 +83,38 @@
       ^{:key n} [:option {:value v} n])]])
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/delayed-query-params-input-component
-      :label "Search in changed data"
-      :query-params-key :term
-      :input-options {:placeholder "fuzzy term"}]
-     [routing/delayed-query-params-input-component
-      :label "TXID"
-      :query-params-key :txid
-      :input-options {:placeholder "transaction id"}]
-     [routing/delayed-query-params-input-component
-      :label "Primarky key"
-      :query-params-key :pkey]
-     [table-filter-component]
-     [tg-op-filter-component]
-     [routing/form-per-page-component]
-     [routing/form-reset-component :default-query-params default-query-params]]]])
+  [filter/container
+   [:<>
+    [filter/delayed-query-params-input-component
+     :label "Search in changed data"
+     :query-params-key :term
+     :input-options {:placeholder "fuzzy term"}]
+    [filter/delayed-query-params-input-component
+     :label "TXID"
+     :query-params-key :txid
+     :input-options {:placeholder "transaction id"}]
+    [filter/delayed-query-params-input-component
+     :label "Primarky key"
+     :query-params-key :pkey]
+    [table-filter-component]
+    [tg-op-filter-component]
+    [filter/form-per-page]
+    [filter/reset :default-query-params default-query-params]]])
 
 ;;; table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn thead-component [hds]
-  [:thead
-   [:tr
-    [:th {:key :timestamp} "Timestamp"]
-    [:th {:key :txid} "TX ID"]
-    [:th {:key :pkey} "Pkey"]
-    [:th {:key :table} "Table"]
-    [:th {:key :tg-op} "Operation"]
-    [:th {:key :changed-attributes} "Changed attributes"]
-    [:th {:key :request}]
-    [:th {:key :change}]
-    (for [[idx hd] (map-indexed vector hds)]
-      ^{:key idx} [hd])]])
+  [:tr
+   [:th {:key :timestamp} "Timestamp"]
+   [:th {:key :txid} "TX ID"]
+   [:th {:key :pkey} "Pkey"]
+   [:th {:key :table} "Table"]
+   [:th {:key :tg-op} "Operation"]
+   [:th {:key :changed-attributes} "Changed attributes"]
+   [:th {:key :request}]
+   [:th {:key :change}]
+   (for [[idx hd] (map-indexed vector hds)]
+     ^{:key idx} [hd])])
 
 (defn row-component [change tds]
   [:tr.user
@@ -144,25 +138,14 @@
      ^{:key idx} [col change])])
 
 (defn table-component [changes hds tds]
-  [:table.table.table-striped.table-sm.audited-changes
-   [thead-component hds]
-   [:tbody.audited-changes
+  [table/container
+   {:className "audited-changes"
+    :actions [table/toolbar]
+    :header
+    [thead-component hds]
+    :body
     (doall (for [change changes]
-             (row-component change tds)))]])
-
-(defn main-component []
-  [:div.main-component
-   [routing/hidden-state-component
-    {:did-change fetch-changes}]
-   [routing/pagination-component]
-   (if-not (contains? @data* (:route @routing/state*))
-     [wait-component]
-     (if-let [changes (-> @data* (get (:route @routing/state*) {}) :changes seq)]
-       [table-component changes]
-       [:div.alert.alert-warning.text-center "No (more) audited-changes found."]))
-   [routing/pagination-component]])
-
-;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+             (row-component change tds)))}])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -176,9 +159,16 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:div.audited-changes-page
-   [breadcrumbs/nav-component @breadcrumbs/left* []]
-   [:h1 audits/icon-changes " Audited Changes "]
-   [filter-component]
-   [main-component]
-   [debug-component]])
+  [:article.audited-changes-page
+   [:header.my-5
+    [:h1 [icons/arrow-right-arrow-left] " Audited Changes "]]
+   [:section
+    [filter-component]
+    [routing/hidden-state-component
+     {:did-change fetch-changes}]
+    (if-not (contains? @data* (:route @routing/state*))
+      [wait-component]
+      (if-let [changes (-> @data* (get (:route @routing/state*) {}) :changes seq)]
+        [table-component changes]
+        [:div.alert.alert-warning.text-center "No (more) audited-changes found."]))
+    [debug-component]]])

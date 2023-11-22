@@ -16,9 +16,12 @@ feature 'SMTP-Settings' do
         before(:each){sign_in_as @user}
 
         scenario 'updates the SMTP-Settings' do
-          click_on "Settings"
-          click_on "SMTP"
-          wait_until { page.has_content? "Domain name" }
+          within 'aside nav' do 
+            click_on "Settings"
+            click_on "SMTP"
+          end
+
+          wait_until { page.has_content? "Domain Name" }
           click_on "Edit"
           check "Sending emails enabled"
           fill_in "Server port", with: "2525"
@@ -34,19 +37,25 @@ feature 'SMTP-Settings' do
           click_on "Save"
           sleep 0.5
           wait_until{ all(".modal").empty? }
-          visit current_url
-          wait_until { page.has_content? "Domain name" }
-          expect(find_field('Sending emails enabled', disabled: true)).to be_checked
-          expect(find_field('Server port', disabled: true).value).to eq '2525'
-          expect(find_field('Server address', disabled: true).value).to eq 'my-smtp-host'
-          expect(find_field('Domain name', disabled: true).value).to eq 'my-domain'
-          expect(find_field('From', disabled: true).value).to eq 'noryply@my-domain'
-          expect(find_field('Sender', disabled: true).value).to eq 'smtp-sender@my-domain'
-          expect(find_field('User', disabled: true).value).to eq 'smtp-user'
-          expect(find_field('Password', disabled: true).value).to eq 'smtp-password'
-          expect(find_field('authentication_type', disabled: true).value).to eq 'CRAM-MD5'
-          expect(find_field('openssl_verify_mode', disabled: true).value).to eq 'peer'
-          expect(find_field('enable_starttls_auto', disabled: true)).to be_checked
+          wait_until { page.has_content? "Domain Name" }
+
+          within find('tr', text: "Sending EMails enabled") do
+            expect(page.text).to have_content 'true'
+          end
+
+          expect(page.text).to have_content '2525'
+          expect(page.text).to have_content 'my-smtp-host'
+          expect(page.text).to have_content 'my-domain'
+          expect(page.text).to have_content 'noryply@my-domain'
+          expect(page.text).to have_content 'smtp-sender@my-domain'
+          expect(page.text).to have_content 'smtp-user'
+          expect(page.text).to have_content 'smtp-password'
+          expect(page.text).to have_content 'CRAM-MD5'
+          expect(page.text).to have_content 'peer'
+
+          within find('tr', text: "Enable Starttls Auto") do
+            expect(page.text).to have_content 'true'
+          end
         end
 
       end

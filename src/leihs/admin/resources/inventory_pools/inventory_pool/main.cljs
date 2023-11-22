@@ -1,194 +1,88 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
+   [clojure.core :as core]
+   [clojure.string :as str]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.icons :as icons]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-parent]
-   [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.state :as state]
-
+   [leihs.admin.resources.inventory-pools.inventory-pool.delete :as delete]
+   [leihs.admin.resources.inventory-pools.inventory-pool.edit :as edit]
+   [leihs.admin.resources.inventory-pools.inventory-pool.nav :as nav]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as core-user]
-   [leihs.core.user.shared :refer [short-id]]
+   [react-bootstrap :as BS :refer [Button]]
    [reagent.core :as reagent]))
-
-(defonce edit-mode?*
-  (reaction
-   (and (map? @inventory-pool/data*)
-        (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
-                  (:handler-key @routing/state*))))))
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn inventory-pool-component []
+(defn edit-inventory-pool []
+  (when (auth/allowed? [pool-auth/pool-inventory-manager?
+                        auth/admin-scopes?])
+    (let [show (reagent/atom false)]
+      (fn []
+        [:<>
+         [:> Button
+          {:className ""
+           :onClick #(reset! show true)}
+          "Edit"]
+         [edit/dialog {:show @show
+                       :onHide #(reset! show false)}]]))))
+
+(defn delete-inventory-pool []
+  (when (auth/allowed? [auth/admin-scopes?])
+    (let [show (reagent/atom false)]
+      (fn []
+        [:<>
+         [:> Button
+          {:className "ml-3"
+           :variant "danger"
+           :onClick #(reset! show true)}
+          "Delete"]
+         [delete/dialog {:show @show
+                         :onHide #(reset! show false)}]]))))
+
+(defn inventory-pool-info-table []
   (if-not @inventory-pool/data*
     [wait-component]
-    [:div.inventory-pool.mt-3
-     [:div.mb-3
-      [form-components/checkbox-component inventory-pool/data* [:is_active]
-       :label "Active"
-       :disabled (not @edit-mode?*)]]
-     [:div
-      [form-components/input-component inventory-pool/data* [:shortname]
-       :label "Short name"
-       :required true
-       :disabled (not @edit-mode?*)]]
-     [:div
-      [form-components/input-component inventory-pool/data* [:name]
-       :label "Name"
-       :required true
-       :disabled (not @edit-mode?*)]]
-     [:div
-      [form-components/input-component inventory-pool/data* [:email]
-       :label "Email"
-       :type :email
-       :required true
-       :disabled (not @edit-mode?*)]]
-     [form-components/input-component inventory-pool/data* [:description]
-      :label "Description"
-      :element :textarea
-      :rows 20
-      :disabled (not @edit-mode?*)]]))
+    [table/container
+     {:borders false
+      :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+      :body
+      [:<>
+       [:tr.active
+        [:td "Active" [:small " (is_active)"]]
+        [:td.active (core/str  (:is_active @inventory-pool/data*))]]
+       [:tr.shortname
+        [:td "Short Name" [:small " (shortname)"]]
+        [:td.shortname (:shortname @inventory-pool/data*)]]
+       [:tr.name
+        [:td "Name" [:small " (name)"]]
+        [:td.name
+         (:name @inventory-pool/data*)]]
+       [:tr.email
+        [:td "Email" [:small " (email)"]]
+        [:td.email (:email @inventory-pool/data*)]]
+       [:tr.description
+        [:td "Description" [:small " (description)"]]
+        [:td.description
+         {:style {:white-space "break-spaces"}}
+         (:description @inventory-pool/data*)]]]}]))
 
-;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn patch [& args]
-  (let [route (path :inventory-pool
-                    {:inventory-pool-id @inventory-pool/id*})]
-    (go (when (some->
-               {:url route
-                :method :patch
-                :json-params  @inventory-pool/data*
-                :chan (async/chan)}
-               http-client/request :chan <!
-               http-client/filter-success!)
-          (accountant/navigate! route)))))
-
-(defn edit-page []
-  [:div.edit-inventory-pool
+(defn page []
+  [:<>
    [routing/hidden-state-component
     {:did-mount inventory-pool/clean-and-fetch}]
-   (breadcrumbs/nav-component
-    (conj @breadcrumbs/left*
-          [breadcrumbs/edit-li]) [])
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Edit Inventory-Pool "]
-      [inventory-pool/name-link-component]]]]
-   [:form.form
-    {:on-submit (fn [e] (.preventDefault e) (patch))}
-    [inventory-pool-component]
-    [form-components/save-submit-component]]
-   [inventory-pool/debug-component]])
-
-;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn create []
-  (go (when-let [id (some->
-                     {:url (path :inventory-pools)
-                      :method :post
-                      :json-params  @inventory-pool/data*
-                      :chan (async/chan)}
-                     http-client/request :chan <!
-                     http-client/filter-success!
-                     :body :id)]
-        (accountant/navigate!
-         (path :inventory-pool {:inventory-pool-id id})))))
-
-(defn create-submit-component []
-  (if @edit-mode?*
-    [:div
-     [:div.float-right
-      [:button.btn.btn-primary
-       " Create "]]
-     [:div.clearfix]]))
-
-(defn create-page []
-  [:div.new-inventory-pool
-   [routing/hidden-state-component
-    {:did-mount #(reset! inventory-pool/data* {})}]
-   (breadcrumbs/nav-component
-    (conj @breadcrumbs-parent/left*
-          [breadcrumbs/create-li])
-    [])
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Create Inventory-Pool "]]]]
-   [:form.form
-    {:on-submit (fn [e] (.preventDefault e) (create))}
-    [inventory-pool-component]
-    [create-submit-component]]
-   [inventory-pool/debug-component]])
-
-;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn delete-inventory-pool [& args]
-  (go (when (some->
-             {:url (path :inventory-pool (-> @routing/state* :route-params))
-              :method :delete
-              :chan (async/chan)}
-             http-client/request :chan <!
-             http-client/filter-success!)
-        (accountant/navigate! (path :inventory-pools)))))
-
-(defn delete-submit-component []
-  [:div.form
-   [:div.float-right
-    [:button.btn.btn-warning
-     {:on-click delete-inventory-pool}
-     [icons/delete]
-     " Delete "]]
-   [:div.clearfix]])
-
-(defn delete-page []
-  [:div.inventory-pool-delete
-   [routing/hidden-state-component
-    {:did-mount inventory-pool/clean-and-fetch}]
-   [:div.row
-    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
-           [breadcrumbs/delete-li])
-     [])
-    [:nav.col-lg {:role :navigation}]]
-   [:h1 "Delete Inventory-Pool "
-    [inventory-pool/name-link-component]]
-   [delete-submit-component]])
-
-;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn show-page []
-  [:div.inventory-pool
-   [routing/hidden-state-component
-    {:did-mount inventory-pool/clean-and-fetch}]
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/users-li]
-     [breadcrumbs/groups-li]
-     [breadcrumbs/delegations-li]
-     [breadcrumbs/entitlement-groups-li]
-     [breadcrumbs/delete-li]
-     [breadcrumbs/edit-li]]]
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Inventory-Pool "]
-      [inventory-pool/name-link-component]]]]
-   [inventory-pool/link-to-legacy-component]
-   [inventory-pool-component]
-   [inventory-pool/debug-component]])
+   (if-not @inventory-pool/data*
+     [:div.my-5
+      [wait-component " Loading Data ..."]]
+     [:article.inventory-pool.my-5
+      [:h1.my-5
+       [inventory-pool/name-component]]
+      [nav/tabs (str/join ["/admin/inventory-pools/" @inventory-pool/id*])]
+      [inventory-pool-info-table]
+      [edit-inventory-pool]
+      [delete-inventory-pool]
+      [inventory-pool/debug-component]])])

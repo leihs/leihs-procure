@@ -90,14 +90,13 @@ feature 'Show users inventory-pools', type: :feature do
           scenario "can see all pool's data but only click on the ones where he is manager" do
 
             visit "/admin/users/#{@manager2[:id]}"
-
-            pool1_row = find("table.user-inventory-pools tbody tr", text: @pool1.name)
+            pool1_row = find(".user-inventory-pools table tbody tr", text: @pool1.name)
             within pool1_row do
               expect(all("a")).not_to be_empty
             end
             expect(pool1_row).to have_content 'customer'
 
-            pool2_row = find("table.user-inventory-pools tbody tr", text: @pool2.name)
+            pool2_row = find(".user-inventory-pools table tbody tr", text: @pool2.name)
             within pool2_row do
               expect(all("a")).to be_empty
             end

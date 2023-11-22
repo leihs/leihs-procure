@@ -18,24 +18,34 @@ const baseConfig = {
       },
       {
         test: /\.(scss)$/,
+        exclude: /\.module\.scss$/, // Exclude SCSS modules
         use: [
+          miniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader',
+          'resolve-url-loader',
           {
-            loader: miniCssExtractPlugin.loader
-          },
-          {
-            loader: 'css-loader'
-          },
-          {
-            loader: 'postcss-loader',
+            loader: 'sass-loader',
             options: {
-              postcssOptions: {
-                plugins: () => [require('autoprefixer')]
+              sourceMap: true
+            }
+          }
+        ]
+      },
+      {
+        test: /\.module\.scss$/, // Handle SCSS modules separately
+        use: [
+          miniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[local]--[hash:base64:5]'
               }
             }
           },
-          {
-            loader: 'resolve-url-loader' // support paths relative to source file in url()
-          },
+          'postcss-loader',
+          'resolve-url-loader',
           {
             loader: 'sass-loader',
             options: {
@@ -54,7 +64,12 @@ const baseConfig = {
       }
     ]
   },
-  plugins: [new miniCssExtractPlugin()],
+  plugins: [
+    new miniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css'
+    })
+  ],
   performance: {
     maxEntrypointSize: 1000000,
     maxAssetSize: 1000000

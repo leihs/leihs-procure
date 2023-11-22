@@ -3,22 +3,14 @@
   (:require
    ["/admin-ui" :as UI]
    ["date-fns" :as date-fns]
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go]]
-   [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
+   [cljs.core.async :as async :refer [<! >! go]]
    [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
+   [leihs.core.core :refer [presence]]
+   [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent :refer [reaction]]
    [taoensso.timbre]))
 
@@ -81,11 +73,11 @@
     [:div.row.mt-1
      [:div.col
       (if @changed*
-        [:button.btn.btn-outline-warning
+        [:button.btn.btn-secondary
          {:type :button
           :on-click #(reset! edit-mode?* false)}
          [icons/delete] " Cancel"]
-        [:button.btn.btn-outline-secondary
+        [:button.btn.btn-secondary
          {:type :button
           :on-click #(reset! edit-mode?* false)}
          [icons/delete] " Close"])]
@@ -101,7 +93,7 @@
    [:div.row
     [:div.col
      [:div.float-right
-      [:button.btn.btn-outline-warning
+      [:button.btn.btn-secondary
        {:type :button
         :on-click #(reset! edit-data* {})}
        [:span [icons/delete] " Reset suspension"]]]]]
@@ -141,7 +133,7 @@
                {:class (when compact "btn-sm py-0")
                 :on-click #(update-handler {})}
                [:span [icons/delete] " Reset "]])
-            [:button.btn.btn-outline-primary
+            [:> Button
              {:class (when compact "btn-sm py-0")
               :on-click #(reset! edit-mode?* true)}
-             [:span [icons/edit] " Edit"]]]]]))]))
+             [:span "Edit"]]]]]))]))

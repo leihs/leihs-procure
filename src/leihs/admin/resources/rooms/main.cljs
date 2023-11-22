@@ -1,27 +1,24 @@
 (ns leihs.admin.resources.rooms.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
+   [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.rooms.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.rooms.room.core :as room :refer [buildings-data*]]
+   [leihs.admin.resources.rooms.room.create :as create]
    [leihs.admin.resources.rooms.shared :as shared]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence detect]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [detect str]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as react-bootstrap :refer [Alert Button]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -35,8 +32,6 @@
 
 (def data* (reagent/atom {}))
 
-(defonce buildings-data* (reagent/atom nil))
-
 (defn clean-and-fetch []
   (go (reset! buildings-data*
               (some->
@@ -46,14 +41,6 @@
                http/filter-success!
                :body :buildings))
       (http/route-cached-fetch data*)))
-
-;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn page-path-for-query-params [query-params]
-  (path (:handler-key @routing/state*)
-        (:route-params @routing/state*)
-        (merge @current-query-paramerters-normalized*
-               query-params)))
 
 (defn link-to-room
   [room inner & {:keys [authorizers]
@@ -65,24 +52,23 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/select-component
-      :label "Building"
-      :query-params-key :building_id
-      :options (cons [nil "(any)"]
-                     (->> @buildings-data*
-                          (map #(do [(:id %) (:name %)]))))]
-     [routing/select-component
-      :label "General"
-      :query-params-key :general
-      :options {nil "(any value)"
-                "yes" "yes"
-                "no" "no"}]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component]
+    [filter/select-component
+     :label "Building"
+     :query-params-key :building_id
+     :options (cons [nil "(any)"]
+                    (->> @buildings-data*
+                         (map #(do [(:id %) (:name %)]))))]
+    [filter/select-component
+     :label "General"
+     :query-params-key :general
+     :options {nil "(any value)"
+               "yes" "yes"
+               "no" "no"}]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -103,10 +89,8 @@
 
 (defn building-link-td-component [row]
   [:td [:a {:href (path :building {:building-id (:building_id row)})}
-        [:em (->> @buildings-data*
-                  (detect #(= (:id %) (:building_id row)))
-                  :name)]]
-   ""])
+        (->> @buildings-data*
+             (detect #(= (:id %) (:building_id row))) :name)]])
 
 (defn items-count-th-component []
   [:th.text-left {:key :items_count} "# Items"])
@@ -116,12 +100,22 @@
 
 ;;;;;
 
+(defn add-room-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        "Add Room"]
+       [create/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
+
 (defn rooms-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn room-row-component [room more-cols]
   ^{:key (:id room)}
@@ -132,18 +126,20 @@
 
 (defn core-table-component [hds tds rooms]
   (if-let [rooms (seq rooms)]
-    [:table.rooms.table.table-striped.table-sm
-     [rooms-thead-component hds]
-     [:tbody
-      (let [page (:page @current-query-paramerters-normalized*)
-            per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [room rooms]
-                 ^{:key (:id room)}
-                 [room-row-component room tds])))]]
-    [:div.alert.alert-warning.text-center "No (more) rooms found."]))
+    [table/container
+     {:className "rooms"
+      :actions [table/toolbar [add-room-button]]
+      :header [rooms-thead-component hds]
+      :body
+      (doall (for [room rooms]
+               ^{:key (:id room)}
+               [room-row-component room tds]))}]
+    [:> Alert {:variant "info"
+               :className "text-center"}
+     "No (more) rooms found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
+  (if (empty? @data*)
     [wait-component]
     [core-table-component hds tds
      (-> @data* (get (:route @routing/state*) {}) :rooms)]))
@@ -168,25 +164,19 @@
       [:h3 "@buildings-data*"]
       [:pre (with-out-str (pprint @buildings-data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component {:did-change clean-and-fetch}]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [name-th-component
-     building-link-th-component
-     items-count-th-component]
-    [name-td-component
-     building-link-td-component
-     items-count-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.rooms
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]]
-   [:h1 [icons/rooms] " Rooms"]
-   [main-page-content-component]])
+  [:article.rooms
+   [:header.my-5
+    [:h1 [icons/rooms] " Rooms"]]
+   [:section
+    [routing/hidden-state-component
+     {:did-change clean-and-fetch}]
+    [filter-component]
+    [table-component
+     [name-th-component
+      building-link-th-component
+      items-count-th-component]
+     [name-td-component
+      building-link-td-component
+      items-count-td-component]]
+    [debug-component]]])

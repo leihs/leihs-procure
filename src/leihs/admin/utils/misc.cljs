@@ -45,6 +45,6 @@
 
 ; the following should be moved to common.components
 
-(defn wait-component []
+(defn wait-component [text]
   [:h3.text-center.wait-component
-   [icons/waiting]])
+   [icons/waiting] text])

@@ -15,7 +15,8 @@ feature 'Editing users images', type: :feature do
       sign_in_as @user
 
       click_on "Users"
-      within 'tbody.users' do
+
+      within 'table.users tbody' do
         click_on_first_user @user
       end
       click_on 'Edit'

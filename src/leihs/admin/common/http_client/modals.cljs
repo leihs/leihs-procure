@@ -1,25 +1,16 @@
 (ns leihs.admin.common.http-client.modals
   (:refer-clojure :exclude [str keyword send-off])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [cljs-http.client :as http-client]
-   [cljs-uuid-utils.core :as uuid]
-   [cljs.core.async :as async :refer [timeout]]
    [clojure.pprint :refer [pprint]]
    [clojure.string :as string]
-   [goog.string :as gstring]
    [goog.string.format]
-   [leihs.admin.common.http-client.core :refer [requests* dismiss]]
-   [leihs.admin.state :as state]
+   [leihs.admin.common.http-client.core :refer [dismiss requests*]]
    [leihs.admin.utils.clipboard :as clipboard]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.anti-csrf.front :as anti-csrf]
    [leihs.core.constants :as constants]
-   [leihs.core.core :refer [str keyword deep-merge presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [leihs.core.core :refer [presence str]]))
 
 (defn status [request]
   (cond (empty? (-> request :response)) :pending

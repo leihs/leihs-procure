@@ -1,27 +1,22 @@
 (ns leihs.admin.resources.buildings.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.buildings.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.buildings.building.create :as create]
    [leihs.admin.resources.buildings.shared :as shared]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as BS :refer [Button]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -56,12 +51,11 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component {:placeholder "Search for buildings"}]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -75,7 +69,7 @@
                     [link-to-building building [:span building-name]
                      :authorizers [auth/admin-scopes?]]]]
     (cond->> inner-comp
-      (:is_general building) (vector :i))))
+      (:is_general building) (vector :<>))))
 
 (defn code-th-component []
   [:th {:key :code} "Code"])
@@ -97,12 +91,22 @@
 
 ;;;;;
 
+(defn add-building-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        "Add Building"]
+       [create/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
+
 (defn buildings-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn building-row-component [building more-cols]
   ^{:key (:id building)}
@@ -113,14 +117,13 @@
 
 (defn core-table-component [hds tds buildings]
   (if-let [buildings (seq buildings)]
-    [:table.buildings.table.table-striped.table-sm
-     [buildings-thead-component hds]
-     [:tbody
-      (let [page (:page @current-query-paramerters-normalized*)
-            per-page (:per-page @current-query-paramerters-normalized*)]
-        (doall (for [building buildings]
-                 ^{:key (:id building)}
-                 [building-row-component building tds])))]]
+    [table/container {:className "buildings"
+                      :actions [table/toolbar [add-building-button]]
+                      :header [buildings-thead-component hds]
+                      :body
+                      (doall (for [building buildings]
+                               ^{:key (:id building)}
+                               [building-row-component building tds]))}]
     [:div.alert.alert-warning.text-center "No (more) buildings found."]))
 
 (defn table-component [hds tds]
@@ -146,27 +149,21 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component {:did-change fetch-buildings}]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [name-th-component
-     code-th-component
-     rooms-count-th-component
-     items-count-th-component]
-    [name-td-component
-     code-td-component
-     rooms-count-td-component
-     items-count-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.buildings
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]]
-   [:h1 [icons/building] " Buildings"]
-   [main-page-content-component]])
+  [:article.buildings
+   [:header.my-5
+    [:h1 [icons/building] " Buildings"]]
+   [:section
+    [routing/hidden-state-component
+     {:did-change fetch-buildings}]
+    [filter-component]
+    [table-component
+     [name-th-component
+      code-th-component
+      rooms-count-th-component
+      items-count-th-component]
+     [name-td-component
+      code-td-component
+      rooms-count-td-component
+      items-count-td-component]]
+    [debug-component]]])

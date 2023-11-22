@@ -19,22 +19,21 @@ feature 'Audits' do
       end
 
       scenario 'I can inspect the audited request' do
-        click_on_first 'Admin'
         click_on 'Audits'
         click_on 'Requests'
 
         # 2x sign in 1x edited user
-        expect( find_all('table tbody.audited-requests tr').count ).to be==3
+        expect( find_all('table tbody tr').count ).to be==3
 
         fill_in "user-uid", with: @system_admin.id
         select "PATCH", from: 'method'
 
         # 1x edited user
-        expect( find_all('table tbody.audited-requests tr').count ).to be==1
+        expect( find_all('table tbody tr').count ).to be==1
 
         click_on_first 'Reset'
         # 2x sign in 1x edited user
-        expect( find_all('table tbody.audited-requests tr').count ).to be==3
+        expect( find_all('table tbody tr').count ).to be==3
 
 
         click_on 'Choose'
@@ -43,7 +42,7 @@ feature 'Audits' do
         select "PATCH", from: 'method'
 
         # 1x edited user
-        expect( find_all('table tbody.audited-requests tr').count ).to be==1
+        expect( find_all('table tbody tr').count ).to be==1
 
       end
     end

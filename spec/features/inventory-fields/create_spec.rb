@@ -16,8 +16,10 @@ feature 'Create inventory-fields', type: :feature do
 
     scenario 'creates a dynamic field' do
       visit '/admin/'
-      click_on 'Inventory-Fields'
-      click_on 'Create'
+      within find("aside nav", match: :first) do
+        click_on "Fields"
+      end
+      click_on_first 'Add Field'
 
       find("input#active").click
       fill_in 'Label', with: label
@@ -25,8 +27,11 @@ feature 'Create inventory-fields', type: :feature do
       find(:xpath, "//input[@id='data:forPackage']").click
       find(:xpath, "//input[@id='data:permissions:owner']").click
       select("inventory_manager", from: "Minimum role required for view")
-      select("License", from: "Target")
-      select("Checkbox", from: "Type")
+
+      within '.modal' do
+        select("License", from: "Target")
+        select("Checkbox", from: "Type")
+      end
       click_on("+")
 
       label_1 = Faker::Lorem.word
@@ -39,7 +44,7 @@ feature 'Create inventory-fields', type: :feature do
       find(".form-group", text: "data:type").all(".col-5 input")[1].set label_2
       find(".form-group", text: "data:type").all(".col-4 input")[1].set value_2
 
-      click_on 'Create'
+      click_on 'Save'
 
       wait_until { all(".modal").empty? }
       wait_until { all(".wait-component").empty? }
@@ -60,9 +65,16 @@ feature 'Create inventory-fields', type: :feature do
       expect(find(".form-group", text: "data:type").all(".col-5 input")[1].value).to eq label_2
       expect(find(".form-group", text: "data:type").all(".col-4 input")[1].value).to eq value_2
 
-      within find(".nav-component nav", match: :first) do
-        click_on "Inventory-Fields"
+
+      click_on 'Save'
+      
+      wait_until { all(".modal").empty? }
+      wait_until { all(".wait-component").empty? }
+
+      within find("aside nav", match: :first) do
+        click_on "Fields"
       end
+
       wait_until { current_path ==  "/admin/inventory-fields/" }
       expect(page).to have_content label
     end

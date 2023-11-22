@@ -1,176 +1,99 @@
 (ns leihs.admin.resources.settings.misc.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as admin.common.icons]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.settings.icons :as icons]
-   [leihs.admin.resources.settings.misc.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.components.table :as table]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.resources.settings.misc.core :as misc-core]
+   [leihs.admin.resources.settings.misc.edit :as edit]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-
-   [leihs.core.breadcrumbs :as core-breadcrumbs]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent]))
 
-(defonce data* (reagent/atom nil))
-
-(defonce edit?* (reagent/atom false))
-
-(defn fetch [& _]
-  (go (reset! data*
-              (some-> {:chan (async/chan)}
-                      http-client/request
-                      :chan <! http-client/filter-success :body))))
-
-(defn put [& _]
-  (go (when-let [data (some->
-                       {:chan (async/chan)
-                        :json-params @data*
-                        :method :put}
-                       http-client/request
-                       :chan <!
-                       http-client/filter-success :body)]
-        (reset! data* data)
-        (reset! edit?* false))))
-
-(defn form-component []
-  [:form.form
-   {:on-submit (fn [e]
-                 (.preventDefault e)
-                 (put))}
-
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:logo_url]
-      :disabled (not @edit?*)
-      :hint [:span
-             "Can be just a filename which is located under "
-             [:code "/leihs/legacy/public/assets"]
-             " or an absolute URL. "
-             "The logo is displayed in the topbar of the legacy application."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:documentation_link]
-      :disabled (not @edit?*)
-      :hint [:span "Absolute URL for a documentation resource if available. "
-             "It is displayed under " [:cite "leihs"]
-             " in the footer of the legacy application."]]]]
-
-   [:div.row
-    [:div.col-md
-     [form-components/input-component data* [:contract_lending_party_string]
-      :disabled (not @edit?*)
-      :hint [:span "Displayed in contracts in addition to the respective inventory pool name."]]]
-    [:div.col-md
-     [form-components/input-component data* [:custom_head_tag]
-      :disabled (not @edit?*) :rows 3 :element :textarea
-      :hint [:span "Custom html tag to be rendered in the layout of the legacy application."]]]]
-
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:time_zone]
-      :disabled (not @edit?*)
-      :label "Location"
-      :hint [:span
-             "The corresponding time zone is determined using "
-             [:a {:href "https://en.wikipedia.org/wiki/Tz_database"} "tz database"]
-             ". It is used for the configuration of the legacy application."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:local_currency_string]
-      :disabled (not @edit?*)
-      :hint [:span
-             "The international 3-letter code as defined by the "
-             [:a {:href "https://de.wikipedia.org/wiki/ISO_4217"} "ISO 4217 standard"]
-             "."]]]]
-
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:maximum_reservation_time]
-      :disabled (not @edit?*) :type :number
-      :hint [:span "Maximum duration of reservations in days which applies to all inventory pools."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:timeout_minutes]
-      :disabled (not @edit?*) :type :number
-      :hint [:span "Timeout of the borrow reservation cart in minutes."]]]]
-
-   [:div.row
-    [:div.col-sm-4
-     [form-components/checkbox-component data* [:deliver_received_order_notifications]
-      :disabled (not @edit?*)]]
-    [:div.col-sm
-     [form-components/input-component data* [:email_signature]
-      :disabled (not @edit?*) :rows 3 :element :textarea]]]
-
-   [:div.row
-    [:div.col-sm-4.mb-2
-     [form-components/checkbox-component data* [:include_customer_email_in_contracts]
-      :disabled (not @edit?*)
-      :hint [:span "If enabled, the contact email address of the lender will be included in the contract documents."]]]]
-
-   [:div.row
-    [:div.col-sm-4
-     [form-components/checkbox-component data* [:lending_terms_acceptance_required_for_order]
-      :disabled (not @edit?*)
-      :hint [:span "Option to activate the obligation to accept the lending terms before submiting an order."]]]
-    [:div.col-sm
-     [form-components/input-component data* [:lending_terms_url]
-      :disabled (not @edit?*)
-      :hint [:span "Absolute URL for the web resource containing the lending terms. Required if "
-             [:code "lending_terms_acceptance_required_for_order"]
-             " is checked."]]]]
-
-   [:div.row
-    [:div.col-sm-4.mb-2
-     [form-components/checkbox-component data* [:show_contact_details_on_customer_order]
-      :disabled (not @edit?*)
-      :hint [:span "If enabled, the contact details field will be shown on the customer order before submitting."]]]]
-
-   [:div.row
-    [:div.col-sm
-     [form-components/input-component data* [:home_page_image_url]
-      :label "Homepage Image"
-      :hint [:span "Absolute URL of the image to display on the home page (max 2000 characters). If left empty then the default image is used."]
-      :disabled (not @edit?*)]]]
-
-   (when @edit?*
-     [form-components/save-submit-component])])
-
-(defn main-component []
-  (if-not @data*
-    [wait-component]
-    [form-component]))
+(defn info-table []
+  (let [data @misc-core/data*]
+    (fn []
+      [table/container
+       {:borders false
+        :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+        :body
+        [:<>
+         [:tr.logo-url
+          [:td "Logo URL" [:small " (logo_url)"]]
+          [:td.logo-url (:logo_url data)]]
+         [:tr.documentation-link
+          [:td "Documentation Link" [:small " (documentation_link)"]]
+          [:td.documentation-link (:documentation_link data)]]
+         [:tr.contract-lending-party-string
+          [:td "Contract Lending Party String" [:small " (contract_lending_party_string)"]]
+          [:td.contract-lending-party-string (:contract_lending_party_string data)]]
+         [:tr.custom_head_tag
+          [:td "Custom Head Tag" [:small " (custom_head_tag)"]]
+          [:td.custom_head_tag (:custom_head_tag data)]]
+         [:tr.time-zone
+          [:td "Location" [:small " (time_zone)"]]
+          [:td.time-zone (:time_zone data)]]
+         [:tr.local-currency-string
+          [:td "Location" [:small " (local_currency_string)"]]
+          [:td.local-currency-string (:local_currency_string data)]]
+         [:tr.maximum-reservation-time
+          [:td "Maximum Reservation Time" [:small " (maximum_reservation_time)"]]
+          [:td.maximum-reservation-time (:maximum_reservation_time data)]]
+         [:tr.timeout-minutes
+          [:td "Timeout (minutes)" [:small " (timeout_minutes)"]]
+          [:td.timeout-minutes (:timeout_minutes data)]]
+         [:tr.deliver-received-order-notifications
+          [:td "Deliver Received Order Notifications" [:small " (deliver_received_order_notifications)"]]
+          [:td.deliver-received-order-notifications (str (:deliver_received_order_notifications data))]]
+         [:tr.email-signature
+          [:td "Email Signature" [:small " (email_signature)"]]
+          [:td.email-signature {:style {:white-pace "break-spaces"}}
+           (str (:email_signature data))]]
+         [:tr.include-customer-email-in-contracts
+          [:td "Include Customer Email in Contracts" [:small " (include_customer_email_in_contracts)"]]
+          [:td.include-customer-email-in-contracts (str (:include_customer_email_in_contracts data))]]
+         [:tr.lending-terms-acceptance-required-for_order
+          [:td "Lending Terms Acceptance required for Order" [:small " (lending_terms_acceptance_required_for_order)"]]
+          [:td.lending-terms-acceptance-required-for_order (str (:lending_terms_acceptance_required_for_order data))]]
+         [:tr.lending-terms-url
+          [:td "Lending Terms URL" [:small " (lending_terms_url)"]]
+          [:td.lending-terms-url (str (:lending_terms_url data))]]
+         [:tr.show-contact-details-on-customer-order
+          [:td "Show Contact Details on Customer Order" [:small " (show_contact_details_on_customer_order)"]]
+          [:td.show-contact-details-on-customer-order (str (:show_contact_details_on_customer_order data))]]
+         [:tr.home-page-image-url
+          [:td "Home Page Image URL" [:small " (home_page_image_url)"]]
+          [:td (str (:home_page_image_url data))]]]}])))
 
 (defn debug-component []
   (when @state/debug?*
     [:div.debug
-     [:h3 "@data*"]
-     [:pre (with-out-str (pprint @data*))]]))
+     [:h3 "@misc-core/data*"]
+     [:pre (with-out-str (pprint @misc-core/data*))]]))
+
+(defn edit-button []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:onClick #(reset! show true)}
+        "Edit"]
+       [edit/dialog {:show @show
+                     :onHide #(reset! show false)}]])))
 
 (defn page []
-  [:div.settings-page
+  [:<>
    [routing/hidden-state-component
-    {:did-mount (fn [& _]
-                  (reset! edit?* false)
-                  (fetch))}]
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[:li.breadcrumb-item
-      [:button.btn
-       {:class (if @edit?*
-                 core-breadcrumbs/disabled-button-classes
-                 core-breadcrumbs/enabled-button-classes)
-        :on-click #(reset! edit?* true)}
-       [admin.common.icons/edit] " Edit"]]]]
-   [:h1 icons/misc " Miscellaneous Settings"]
-   [main-component]
-   [debug-component]])
+    {:did-change misc-core/clean-and-fetch}]
+   (if-not @misc-core/data*
+     [wait-component]
+     [:article.settings-page
+      [:header.my-5
+       [:h1 [icons/list-icon] " Miscellaneous Settings"]]
+      [:section
+       [info-table]
+       [edit-button]
+       [debug-component]]])])

@@ -1,26 +1,24 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   ["date-fns" :as date-fns]
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [<! go timeout]]
+   ["react-bootstrap" :as react-bootstrap :refer [Button]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
+   [leihs.admin.common.roles.components :refer [put-roles< roles-component]]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.nav :as nav]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.create :as create]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.resources.users.user.core :as user2]
-   [leihs.admin.resources.users.user.shared :as user]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]))
 
@@ -123,8 +121,12 @@
 
 ;### filter ###################################################################
 
+(defn form-term-filter []
+  [filter/form-term-filter-component
+   :placeholder "part of the name, exact email-address"])
+
 (defn form-role-filter []
-  [routing/select-component
+  [filter/select-component
    :label "Role"
    :query-params-key :role
    :default-option "customer"
@@ -135,23 +137,22 @@
                         (into {})))])
 
 (defn form-suspension-filter []
-  [routing/select-component
+  [filter/select-component
    :label "Suspension"
    :query-params-key :suspension
    :options {"" "(suspended or not)"
              "suspended" "suspended"
              "unsuspended" "unsuspended"}])
 
-(defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [users/form-term-filter]
-     [users/form-enabled-filter]
-     [form-role-filter]
-     [form-suspension-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+(defn filter-section []
+  [filter/container
+   [:<>
+    [form-term-filter]
+    [users/form-enabled-filter]
+    [form-role-filter]
+    [form-suspension-filter]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;### main #####################################################################
 
@@ -163,12 +164,12 @@
      [:div "@current-query-params*"
       [:pre (with-out-str (pprint @current-query-params*))]]]))
 
-(defn table-component []
-  [users/table-component
+(defn table-section []
+  [users/users-table
    [user-th-component
     roles-th-component
     direct-roles-th-component
-    groups-roles-th-component
+    ;; groups-roles-th-component
     suspension-th-component]
    [user-td-component
     roles-td-component
@@ -177,25 +178,27 @@
     suspension-td-component]
    :role-filter? true])
 
-(defn main-page-component []
-  [:div
-   [filter-component]
-   [routing/pagination-component]
-   [table-component]
-   [routing/pagination-component]
-   [debug-component]
-   [users/debug-component]])
+(defn create-user []
+  (let [show (reagent/atom false)]
+    (fn []
+      [:<>
+       [:> Button
+        {:className "ml-3"
+         :onClick #(reset! show true)}
+        [icons/add]  " Add User"]
+       [create/dialog {:show @show
+                       :onHide #(reset! show false)}]])))
 
-(defn index-page []
-  [:div.inventory-pool-users
+(defn page []
+  [:article.inventory-pool-users
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch users/fetch-users))}]
-   (breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]])
-   [:div
-    [:h1
-     [:span "Users "
-      [:span " in the inventory-pool "]
-      [inventory-pool/name-link-component]]]
-    [main-page-component]]])
+   [:header.my-5
+    [:h1.mt-3 [inventory-pool/name-component]]]
+   [nav/tabs]
+   [filter-section]
+   [table/toolbar]
+   [table-section]
+   [table/toolbar]
+   [debug-component]
+   [users/debug-component]])

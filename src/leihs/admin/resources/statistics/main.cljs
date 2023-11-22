@@ -1,18 +1,13 @@
 (ns leihs.admin.resources.statistics.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go go-loop]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go-loop]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent]))
 
@@ -105,19 +100,16 @@
            :active_users_12m_24m_count "Active last 12 to 24 months"
            :users_count "Total"}])
 
-(defn main []
-  [:div.statistics-basic
-   [routing/hidden-state-component
-    {:did-mount fetch}]
-   [contracts-component]
-   [items-component]
-   [models-component]
-   [pools-component]
-   [users-component]
-   [debug-component]])
-
 (defn page []
-  [:div.statistics
-   [breadcrumbs/nav-component @breadcrumbs/left* []]
-   [:h1 "Statistics"]
-   [main]])
+  [:article.statistics
+   [:header.my-5
+    [:h1 [icons/chart-column] " Statistics"]]
+   [:section.statistics-basic
+    [routing/hidden-state-component
+     {:did-mount fetch}]
+    [contracts-component]
+    [items-component]
+    [models-component]
+    [pools-component]
+    [users-component]
+    [debug-component]]])

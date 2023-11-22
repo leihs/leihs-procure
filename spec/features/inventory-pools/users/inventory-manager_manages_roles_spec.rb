@@ -1,8 +1,6 @@
 require 'spec_helper'
 require 'pry'
 
-
-
 feature 'Manage inventory-pool users ', type: :feature do
 
   context ' an admin, a pool, an inventory_manager, and  several users ' do
@@ -21,12 +19,12 @@ feature 'Manage inventory-pool users ', type: :feature do
       @user = @users.first
 
       visit "/admin/inventory-pools/#{@pool.id}"
-      click_on "Users"
+      within('.nav-tabs') { click_on "Users" }
       select 'any', from: 'Role'
       fill_in 'Search', with: @user.email
-      wait_until { all("table.users tbody tr").count == 1 }
-      expect(page.find("table.users")).not_to have_content "customer"
-      expect(page.find("table.users")).not_to have_content "inventory_manager"
+      wait_until { all("table tbody tr").count == 1 }
+      expect(page.find("table")).not_to have_content "customer"
+      expect(page.find("table")).not_to have_content "inventory_manager"
 
       within_first("td.direct-roles", text: 'Edit'){ click_on 'Edit' }
       wait_until{ not all(".modal").empty? }
@@ -53,11 +51,11 @@ feature 'Manage inventory-pool users ', type: :feature do
         end
       end
 
-      click_on "Users"
+      click_on "Back"
       select 'any', from: 'Role'
       fill_in 'Search', with: @users.first.email
-      wait_until { all("table.users tbody tr").count == 1 }
-      expect(find("table.users")).to have_content "customer"
+      wait_until { all("table tbody tr").count == 1 }
+      expect(find("table")).to have_content "customer"
 
     end
   end

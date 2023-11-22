@@ -24,11 +24,16 @@ feature 'Deleting groups', type: :feature do
         click_on 'Groups'
         fill_in 'Search', with: @group.name
         click_on @group.name
+        sleep 1
         click_on 'Delete'
         wait_until do
-          page.has_content? "Delete Group #{@group.name}"
+          within ".modal" do
+            page.has_content? "Delete Group"
+          end
         end
-        click_on 'Delete'
+        within ".modal" do
+          click_on 'Delete'
+        end
         wait_until{ current_path == '/admin/groups/' }
         expect(database[:groups].where(id: @group.id).first).not_to be
       end
@@ -50,11 +55,14 @@ feature 'Deleting groups', type: :feature do
         click_on 'Groups'
         fill_in 'Search', with: @group.name
         click_on @group.name
+        sleep 1
         click_on 'Delete'
         wait_until do
-          page.has_content? "Delete Group #{@group.name}"
+          page.has_content? "Delete Group"
         end
-        click_on 'Delete'
+        within ".modal" do
+          click_on 'Delete'
+        end
         wait_until{ current_path == '/admin/groups/' }
         expect(database[:groups].where(id: @group.id).first).not_to be
       end
@@ -121,11 +129,16 @@ feature 'Deleting groups', type: :feature do
           click_on 'Groups'
           fill_in 'Search', with: @group.name
           click_on @group.name
+          sleep 1
           click_on 'Delete'
           wait_until do
-            page.has_content? "Delete Group #{@group.name}"
+            within ".modal" do
+              page.has_content? "Delete Group"
+            end
           end
-          click_on 'Delete'
+          within ".modal" do
+            click_on 'Delete'
+          end
           wait_until{ current_path == '/admin/groups/' }
           expect(database[:groups].where(id: @group.id).first).not_to be
         end

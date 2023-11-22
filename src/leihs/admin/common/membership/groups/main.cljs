@@ -6,16 +6,13 @@
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async]
+   [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.http-client.core :as http-client]
-
    [leihs.admin.common.icons :as icons]
    [leihs.admin.common.membership.groups.shared :refer [default-query-params]]
-   [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.main :as groups]
-
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [leihs.core.core :refer [presence]]
+   [leihs.core.routing.front :as routing]))
 
 (defn form-membership-filter []
   [:div.form-group.ml-2.mr-2.mt-2
@@ -34,14 +31,13 @@
              [:option {:key k :value k} n]))]])
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [groups/form-term-filter]
-     [groups/form-including-user-filter]
-     [form-membership-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component]
+    [filter/form-including-user]
+    [form-membership-filter]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 (defn member-th-component [] [:th {:key :member} " Member "])
 

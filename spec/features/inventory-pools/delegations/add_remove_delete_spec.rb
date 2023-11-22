@@ -3,8 +3,8 @@ require 'pry'
 
 
 shared_examples :listing do
-  scenario "the Inventory-Pools listing displays the correct number of delegations per pool" do
-    click_on 'Inventory-Pools'
+  scenario "the Inventory Pools listing displays the correct number of delegations per pool" do
+    click_on 'Inventory Pools'
     within('tr', text: "Pool 1") do
       expect(find("td.delegations_count")).to have_content "2"
     end
@@ -16,7 +16,7 @@ end
 
 shared_examples :overview do
   scenario "the delegation overview in the pool shows the member delegations by default" do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     expect(page).to have_content 'Delegation 1'
@@ -28,7 +28,7 @@ end
 
 shared_examples :add_protected_impossible do
   scenario 'can not add a protected delegation to the pool' do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     select 'members and non-members', from: 'Membership'
@@ -41,7 +41,7 @@ end
 
 shared_examples :add_unprotected do
   scenario 'can add an unprotected delegation to the pool' do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     select 'members and non-members', from: 'Membership'
@@ -58,7 +58,7 @@ end
 
 shared_examples :delete do
   scenario 'can delete a delegation' do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     select 'members', from: 'Membership'
@@ -73,7 +73,7 @@ end
 
 shared_examples :remove do
   scenario 'can remove a delegation from the pool' do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     select 'members', from: 'Membership'
@@ -91,7 +91,7 @@ shared_examples :delete_remove do
     FactoryBot.create :reservation,
       user_id: @delegation1.id,
       inventory_pool_id: @pool1.id
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on 'Pool 1'
     click_on 'Delegations'
     select 'members', from: 'Membership'

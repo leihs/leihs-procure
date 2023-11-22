@@ -18,7 +18,9 @@ feature 'Manage rooms', type: :feature do
 
     scenario 'edits a room' do
       visit '/admin/'
-      click_on 'Rooms'
+      within 'aside nav' do
+        click_on 'Rooms'
+      end
       click_on @room.name
       @room_path = current_path
 
@@ -31,15 +33,14 @@ feature 'Manage rooms', type: :feature do
       wait_until {current_path == @room_path}
       wait_until { all(".wait-component").empty? }
 
-      input_values = all("input").map(&:value).join(" ")
-      input_values += all("select").map(&:value).join(" ")
-      expect(page.text + input_values).to have_content name
-      expect(page.text + input_values).to have_content description
-      expect(page.text + input_values).to have_content @building.name
+      expect(page.text).to have_content name
+      expect(page.text).to have_content description
+      expect(page.text).to have_content @building.name
 
-      within find(".nav-component nav", match: :first) do
-        click_on "Rooms"
-      end
+      click_on 'Back'
+      # within find("aside nav", match: :first) do
+      #   click_on "Rooms"
+      # end
       wait_until { current_path ==  "/admin/rooms/" }
       expect(page).to have_content name
     end

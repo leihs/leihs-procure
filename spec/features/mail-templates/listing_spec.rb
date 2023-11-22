@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Managing Mail-Templates:', type: :feature do
+feature 'Managing Mail Templates:', type: :feature do
 
   before :each do
     @admins = 3.times.map { FactoryBot.create :admin }
@@ -11,7 +11,7 @@ feature 'Managing Mail-Templates:', type: :feature do
       .order(:name, :language_locale)
       .all
     sign_in_as @admins.sample
-    click_on "Mail-Templates"
+    click_on "Mail Templates"
   end
 
   context 'an admin via the UI' do

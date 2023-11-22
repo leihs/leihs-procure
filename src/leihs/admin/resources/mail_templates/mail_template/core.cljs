@@ -1,37 +1,22 @@
 (ns leihs.admin.resources.mail-templates.mail-template.core
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
-
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.mail-templates.mail-template.breadcrumbs :as breadcrumbs]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as core-user]
-   [leihs.core.user.shared :refer [short-id]]
-   [reagent.core :as reagent]))
+   [react-bootstrap :as react-bootstrap :refer [Col Form Row]]
+   [reagent.core :as reagent]
+   [reagent.ratom :as ratom :refer [reaction]]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :mail-template-id presence)
                 ":mail-template-id")))
 
 (defonce data* (reagent/atom nil))
-
-(defonce edit-mode?*
-  (reaction
-   (and (map? @data*)
-        (boolean ((set '(:mail-template-edit :mail-template-create))
-                  (:handler-key @routing/state*))))))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -44,11 +29,64 @@
                http-client/request :chan <!
                http-client/filter-success! :body))))
 
-(defn clean-and-fetch [& args]
+(defn clean-and-fetch []
   (reset! data* nil)
   (fetch))
 
-;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(def template-variables-for-order-component
+  [:ul
+   [:li [:code :comment]],
+   [:li [:code :email_signature]],
+   [:li [:code :inventory_pool.name]],
+   [:li [:code :inventory_pool.description]],
+   [:li [:code :order_url]]
+   [:li [:code :purpose]],
+   [:li [:code :reservations]
+    [:ul
+     [:li [:code :l.end_date]]
+     [:li [:code :l.model_name]],
+     [:li [:code :l.quantity]],
+     [:li [:code :l.start_date]]]],
+   [:li [:code :user.name]]])
+
+(def template-variables-for-user-component
+  [:ul
+   [:li [:code :due_date]],
+   [:li [:code :email_signature]],
+   [:li [:code :inventory_pool.name]],
+   [:li [:code :inventory_pool.description]],
+   [:li [:code :quantity]],
+   [:li [:code :reservations]
+    [:ul
+     [:li [:code :l.end_date]]
+     [:li [:code :l.item_inventory_code]]
+     [:li [:code :l.model_name]],
+     [:li [:code :l.quantity]],
+     [:li [:code :l.start_date]]]],
+   [:li [:code :user.name]]])
+
+(defn template-variables []
+  (case (:type @data* "order")
+    "order" template-variables-for-order-component
+    "user" template-variables-for-user-component
+    nil))
+
+(defn form [action]
+  [:> Row
+   [:> Col {:md 12 :lg 8}
+    [:> Form {:id "mail-template-form"
+              :on-submit (fn [e] (.preventDefault e) (action))}
+     [:> Form.Group {:control-id "body"}
+      [:> Form.Label "Mail Body"]
+      [:textarea.form-control
+       {:id "body"
+        :rows 30
+        :required true
+        :value (or (:body @data*) "")
+        :onChange (fn [e] (swap! data* assoc :body (-> e .-target .-value)))}]]]]
+   [:> Col
+    [:div "Variables"
+     (template-variables)]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -58,17 +96,3 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn id-component []
-  [:p "id: " [:span {:style {:font-family "monospace"}} (:id @data*)]])
-
-(defn name-link-component []
-  [:span
-   [routing/hidden-state-component
-    {:did-change fetch}]
-   (let [p (path :mail-template {:mail-template-id @id*})
-         inner (if @data*
-                 [:em (str (:name @data*))]
-                 [:span {:style {:font-family "monospace"}} (short-id @id*)])]
-     [components/link inner p])])

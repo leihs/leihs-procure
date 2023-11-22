@@ -122,7 +122,7 @@
                   :else {"" ""})
         default-option (or default-option
                            (-> options first first))]
-    [:div.form-group.m-2
+    [:div.form-group
      (when-not inline-label
        [:label {:for id}
         (if (= label id)

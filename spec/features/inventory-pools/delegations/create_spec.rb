@@ -3,10 +3,10 @@ require 'pry'
 
 shared_examples :create do
   scenario 'creating a delegation works' do
-    click_on 'Inventory-Pools'
+    click_on 'Inventory Pools'
     click_on @pool.name
     click_on 'Delegations'
-    click_on 'Create'
+    first("button", text: 'Add Delegation').click
     expect(find_field('pool_protected')).to be_checked
     fill_in :name , with: 'Foo-Delegation'
     uncheck :pool_protected
@@ -24,14 +24,14 @@ shared_examples :create do
       click_on 'Choose user'
     end
     expect(find_field('pool_protected')).to be_checked
-    click_on 'Create'
+    click_on 'Add'
     wait_until do
       current_path.match? %{/admin/inventory-pools/[^/]+/delegations/[^/]+}
     end
     expect(page).to have_content 'Foo-Delegation'
     expect(page).to have_content resp_user.email
     expect(find('tr', text: 'Protected').text).to have_content 'yes'
-    click_on 'Users'
+    click_link('Users', class: 'nav-link')
     expect(page).to have_content resp_user.email
   end
 end

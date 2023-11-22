@@ -1,22 +1,13 @@
 (ns leihs.admin.resources.audits.changes.change.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout go]]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
    [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http]
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.audits.changes.change.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
    [leihs.admin.resources.audits.core :as audits]
-   [leihs.admin.state :as state]
    [leihs.admin.utils.clipboard :as clipboard]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]))
 
@@ -66,8 +57,8 @@
    change-component])
 
 (defn page []
-  [:div.audited-change
-   [breadcrumbs/nav-component
-    @breadcrumbs/left* []]
-   [:h1 audits/icon-change " Audited-Change "]
-   [main-component @audited-change-id*]])
+  [:article.audited-change
+   [:header.my-5
+    [:h1 audits/icon-change " Audited-Change "]]
+   [:section
+    [main-component @audited-change-id*]]])

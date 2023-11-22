@@ -4,32 +4,29 @@
    [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async]
+   [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.membership.users.shared :refer [DEFAULT-QUERY-PARAMS QUERY-OPTIONS DEFAULT-MEMBERSHIP-QUERY-PARAM MEMBERSHIP-QUERY-PARAM-KEY]]
-   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.common.membership.users.shared :refer [DEFAULT-MEMBERSHIP-QUERY-PARAM
+                                                       MEMBERSHIP-QUERY-PARAM-KEY QUERY-OPTIONS]]
    [leihs.admin.resources.users.main :as users]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [leihs.core.routing.front :as routing]))
 
 ;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [users/form-term-filter]
-     [routing/select-component
-      :label "Membership"
-      :query-params-key MEMBERSHIP-QUERY-PARAM-KEY
-      :options QUERY-OPTIONS
-      :default-option DEFAULT-MEMBERSHIP-QUERY-PARAM]
-     [users/form-enabled-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component {:placeholder  "part of the name, exact email-address"}]
+    [filter/select-component
+     :label "Membership"
+     :query-params-key MEMBERSHIP-QUERY-PARAM-KEY
+     :options QUERY-OPTIONS
+     :default-option DEFAULT-MEMBERSHIP-QUERY-PARAM]
+    [users/form-enabled-filter]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; member td ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

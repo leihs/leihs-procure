@@ -1,27 +1,19 @@
 (ns leihs.admin.resources.audits.requests.request.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http]
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.audits.changes.change.main :as change]
    [leihs.admin.resources.audits.core :as audits]
    [leihs.admin.resources.audits.requests.request.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
    [leihs.admin.resources.users.user.core :as user]
    [leihs.admin.state :as state]
    [leihs.admin.utils.clipboard :as clipboard]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [keyword]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre :refer []]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (def request-id* (reaction (or (-> @routing/state* :route-params :request-id) ":request-id")))
 
@@ -131,16 +123,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn page []
-  [:div.audited-request
+  [:article.audited-request
    [routing/hidden-state-component
     {:did-mount (fn [& _]
                   (reset! requester-id* nil)
                   (reset! changes-index* {})
                   (fetch-changes-index))}]
-   [breadcrumbs/nav-component
-    @breadcrumbs/left* []]
-   [:h1 audits/icon-request " Audited-Request "]
-   [request-fetch-component]
-   [requester-component]
-   [changes-component]
-   [debug-component]])
+   [:header.my-5
+    [:h1 audits/icon-request " Audited-Request "]]
+   [:section
+    [request-fetch-component]
+    [requester-component]
+    [changes-component]
+    [debug-component]]])

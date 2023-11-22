@@ -19,23 +19,24 @@ feature 'Audits' do
       end
 
       scenario 'I can inspect the audited request' do
-        click_on_first 'Admin'
         click_on 'Audits'
         click_on 'Requests'
-        click_on_first 'Request'
+        within 'table' do
+          click_on_first 'Request'
+        end
+
         expect(page).to have_content @user.firstname
         expect(page).to have_content 'FooHans'
       end
 
       scenario 'I can inspect the audited changes after searching' do
-        click_on_first 'Admin'
         click_on 'Audits'
-        click_on 'Audited-Changes'
+        click_on 'Changes'
 
         fill_in 'term', with: @user.firstname
-        wait_until { all('table tbody.audited-changes tr').count == 2 } 
+        wait_until { all('table tbody tr').count == 2 } 
 
-        within(find_all('table tbody.audited-changes tr').first) do |node|
+        within(find_all('table tbody tr').first) do |node|
           expect(find('td.table-name')).to have_content 'users'
           expect(find('td.tg-op')).to have_content 'UPDATE'
           expect(find('td.changed-attributes')).to have_content 'firstname'

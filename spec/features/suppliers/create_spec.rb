@@ -17,25 +17,24 @@ feature 'Manage suppliers', type: :feature do
     scenario ' creates a new supplier ' do
 
       visit '/admin/'
-      click_on 'Suppliers'
-      expect(all("a, button", text: 'Create')).not_to be_empty
-      click_on 'Create'
+      within 'aside nav' do
+        click_on 'Suppliers'
+      end
+      expect(all("a, button", text: 'Add Supplier')).not_to be_empty
+      click_on_first 'Add Supplier'
       fill_in 'name', with: name
       fill_in 'note', with: note
-      click_on 'Create'
+      click_on 'Save'
       wait_until { all(".modal").empty? }
-      wait_until { not page.has_content? "Create Supplier" }
+      wait_until { not page.has_content? "Add Supplier" }
       @supplier_path = current_path
       @inventory_pool_id = current_path.match(/.*\/([^\/]+)/)[1]
-      input_values = all("input").map(&:value).join(" ")
-      expect(page.text + input_values).to have_content name
-      expect(page.text + input_values).to have_content note
+      # input_values = all("input").map(&:value).join(" ")
+      expect(page.text).to have_content name
+      expect(page.text).to have_content note
 
       # The inventory pools path includes the newly created inventory pool and
-      # we can get to it via clicking its name
-      within find(".nav-component nav", match: :first) do
-        click_on "Suppliers"
-      end
+      click_on 'Back'
       wait_until { current_path == "/admin/suppliers/" }
       wait_until { page.has_content? name }
       click_on name

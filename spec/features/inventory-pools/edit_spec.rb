@@ -21,26 +21,29 @@ feature 'Manage inventory-pools', type: :feature do
 
       scenario 'edits an inventory pool' do
         visit '/admin/'
-        click_on 'Inventory-Pools'
+        click_on 'Inventory Pools'
         click_on @pool.name
         @inventory_pool_path = current_path
         click_on 'Edit'
+        expect(page).to have_css('.modal')
+
         fill_in 'name', with: name
         fill_in 'description', with: description
-        fill_in 'shortname', with: shortname
+
+        expect(page).to have_selector('input#shortname[disabled]')
+        # fill_in 'shortname', with: shortname
         fill_in 'email', with: email
         uncheck 'is_active'
         click_on 'Save'
         wait_until { all(".modal").empty? }
-        wait_until {current_path == @inventory_pool_path}
+        wait_until { current_path == @inventory_pool_path }
         wait_until { all(".wait-component").empty? }
 
-        input_values = all("input").map(&:value).join(" ")
-        expect(page.text + input_values).to have_content name
-        expect(page.text + input_values).to have_content shortname
-        expect(page.text + input_values).to have_content email
-        expect(page.text + input_values).to have_content description
-        click_on 'Inventory-Pools'
+        expect(page.text).to have_content name
+        # expect(page.text).to have_content shortname
+        expect(page.text).to have_content email
+        expect(page.text).to have_content description
+        click_on 'Inventory Pools'
         wait_until { current_path ==  "/admin/inventory-pools/" }
         expect(page).to have_content name
       end
@@ -59,7 +62,7 @@ feature 'Manage inventory-pools', type: :feature do
         before(:each){ sign_in_as @manager }
         scenario 'edits the pool' do
           visit '/admin/'
-          click_on 'Inventory-Pools'
+          click_on 'Inventory Pools'
           click_on @pool.name
           @inventory_pool_path = current_path
           click_on 'Edit'
@@ -83,7 +86,7 @@ feature 'Manage inventory-pools', type: :feature do
           before(:each){ sign_in_as @manager }
           scenario 'edits the pool' do
             visit '/admin/'
-            click_on 'Inventory-Pools'
+            click_on 'Inventory Pools'
             click_on @pool.name
             expect(all("a, button", text: 'Edit')).to be_empty
           end

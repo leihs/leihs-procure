@@ -4,12 +4,10 @@
    [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
@@ -17,11 +15,10 @@
    [leihs.admin.resources.mail-templates.shared :as shared]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.auth.core :as auth :refer []]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as current-user]
+   [react-bootstrap :as react-bootstrap :refer [Alert Button]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -66,32 +63,30 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/select-component
-      :label "Name"
-      :query-params-key :name
-      :options [[nil "(any value)"]
-                "approved"
-                "deadline_soon_reminder"
-                "received"
-                "rejected"
-                "reminder"
-                "submitted"]]
-     [routing/select-component
-      :label "Type"
-      :query-params-key :type
-      :options {nil "(any value)"
-                "order" "order"
-                "user" "user"}]
-     [routing/select-component
-      :label "Language-Locale"
-      :query-params-key :language_locale
-      :options (language-locales-options @data*)]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component {:placeholder "Search for mail-templates"}]
+    [filter/select-component
+     :label "Name"
+     :query-params-key :name
+     :options [[nil "(any value)"]
+               "approved"
+               "deadline_soon_reminder"
+               "received"
+               "rejected"
+               "reminder"
+               "submitted"]]
+    [filter/select-component
+     :label "Type"
+     :query-params-key :type
+     :options {nil "(any value)"
+               "order" "order"
+               "user" "user"}]
+    [filter/select-component
+     :label "Language-Locale"
+     :query-params-key :language_locale
+     :options (language-locales-options @data*)]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -118,11 +113,10 @@
 ;;;;;
 
 (defn mail-templates-thead-component [more-cols]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    (for [[idx col] (map-indexed vector more-cols)]
-      ^{:key idx} [col])]])
+  [:tr
+   [:th {:key :index} "Index"]
+   (for [[idx col] (map-indexed vector more-cols)]
+     ^{:key idx} [col])])
 
 (defn mail-template-row-component [mail-template more-cols]
   ^{:key (:id mail-template)}
@@ -133,12 +127,12 @@
 
 (defn core-table-component [hds tds mail-templates]
   (if-let [mail-templates (seq mail-templates)]
-    [:table.mail-templates.table.table-striped.table-sm
-     [mail-templates-thead-component hds]
-     [:tbody
-      (doall (for [mail-template mail-templates]
-               ^{:key (:id mail-template)}
-               [mail-template-row-component mail-template tds]))]]
+    [table/container {:className "mail-templates"
+                      :actions [table/toolbar]
+                      :header [mail-templates-thead-component hds]
+                      :body (doall (for [mail-template mail-templates]
+                                     ^{:key (:id mail-template)}
+                                     [mail-template-row-component mail-template tds]))}]
     [:div.alert.alert-warning.text-center "No (more) mail-templates found."]))
 
 (defn table-component [hds tds]
@@ -167,23 +161,20 @@
       [:h3 "@languages-data*"]
       [:pre (with-out-str (pprint @languages-data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component {:did-change fetch-mail-templates
-                                    :did-mount fetch-languages}]
-   [:div.alert.alert-info {:role "alert"}
-    (str "These are intial mail templates which are copied for a new inventory pool when it gets created. "
-         "They can then be further edited inside a particular inventory pool.")]
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [name-th-component type-th-component language-locale-th-component]
-    [name-td-component type-td-component language-locale-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.mail-templates
-   [breadcrumbs/nav-component @breadcrumbs/left*]
-   [:h1 [icons/mail-template] " Mail-Templates"]
-   [main-page-content-component]])
+  [:article.mail-templates
+   [:header.my-5
+    [:h1 [icons/mail-template] " Mail Templates"]]
+   [:section
+    [routing/hidden-state-component
+     {:did-change fetch-mail-templates
+      :did-mount fetch-languages}]
+    [:> Alert {:variant "info"
+               :className "text-center"}
+     "These are intial mail templates which are copied for a new inventory pool when it gets created. "
+     "They can then be further edited inside a particular inventory pool."]
+    [filter-component]
+    [table-component
+     [name-th-component type-th-component language-locale-th-component]
+     [name-td-component type-td-component language-locale-td-component]]
+    [debug-component]]])

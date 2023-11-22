@@ -1,28 +1,28 @@
 (ns leihs.admin.resources.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
    [leihs.admin.common.components :as components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.common.membership.users.shared :as users-membership]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.common.users-and-groups.core :as users-and-groups]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.users.shared :as shared]
    [leihs.admin.resources.users.user.core :as user]
+   [leihs.admin.resources.users.user.create :as create]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button Alert]]
    [reagent.core :as reagent]))
 
 (def current-query-params*
@@ -50,38 +50,39 @@
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn form-term-filter []
-  [routing/form-term-filter-component
+  [filter/form-term-filter-component
    :placeholder "part of the name, exact email-address"])
 
 (defn form-enabled-filter []
-  [routing/select-component
+  [filter/select-component
    :query-params-key :account_enabled
    :label "Enabled"
    :options {"" "(any value)" "yes" "yes" "no" "no"}
    :default-option "yes"])
 
 (defn form-admins-filter []
-  [routing/select-component
+  [filter/select-component
    :label "Admin"
    :query-params-key :admin
    :options {"" "(any value)"
              "leihs-admin" "Leihs admin"
              "system-admin" "System admin"}])
 
-(defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [form-term-filter]
-     [form-enabled-filter]
-     [users-and-groups/form-org-filter data*]
-     [users-and-groups/form-org-id-filter]
-     [form-admins-filter]
-     [users-and-groups/protected-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component :default-query-params shared/default-query-params]]]])
+;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; user
+(defn filter-component []
+  [filter/container
+   [:<>
+    [form-term-filter]
+    [form-enabled-filter]
+    [users-and-groups/form-org-filter data*]
+    [users-and-groups/form-org-id-filter]
+    [form-admins-filter]
+    [users-and-groups/protected-filter]
+    [filter/form-per-page]
+    [filter/reset :default-query-params shared/default-query-params]]])
+
+;;; user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn user-th-component []
   [:th "User"])
@@ -104,8 +105,6 @@
   [:td (if (:account_enabled user)
          [:span.text-success "yes"]
          [:span.text-warning "no"])])
-
-;;; protected
 
 (defn protected-th-component []
   [:th {:key :admin_protected} "Protected"])
@@ -156,16 +155,15 @@
 
 ;; table stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn thead-component [hds]
-  [:thead
-   [:tr
-    [:th {:key :index} "Index"]
-    [account-enabled-th-component]
-    [:th {:key :image} "Image"]
-    (for [[idx hd] (map-indexed vector hds)]
-      ^{:key idx} [hd])]])
+(defn table-head [hds]
+  [:tr
+   [:th {:key :index} "Index"]
+   [account-enabled-th-component]
+   [:th {:key :image} "Image"]
+   (for [[idx hd] (map-indexed vector hds)]
+     ^{:key idx} [hd])])
 
-(defn row-component [user more-cols]
+(defn table-row [user more-cols]
   [:tr.user {:key (:id user)}
    [:td (:index user)]
    [account-enabled-td-component user]
@@ -173,30 +171,42 @@
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col user])])
 
-(defn table-component
+(defn add-button []
+  (let [show (reagent/atom false)]
+    (reset! user/user-data* {})
+    (fn []
+      (when (auth/allowed?
+             [auth/admin-scopes? pool-auth/some-lending-manager?])
+        [:<>
+         [:> Button
+          {:className "ml-3"
+           :onClick #(reset! show true)}
+          "Add User"]
+         [create/dialog {:show @show
+                         :onHide #(reset! show false)}]]))))
+
+(defn users-table
   [hds tds &
    {:keys [membership-filter? role-filter?]
     :or {membership-filter? false
          role-filer? false}}]
-  [:div
+  [:<>
    [routing/hidden-state-component
     {:did-change fetch-users}]
    (if-not (contains? @data* @current-route*)
      [wait-component]
      (if-let [users (-> @data* (get  @current-route* {}) :users seq)]
-       [:table.table.table-striped.table-sm.users
-        [thead-component hds]
-        [:tbody.users
-         (doall (for [user users]
-                  (row-component user tds)))]]
+       [table/container
+        {:className "users"
+         :header (table-head hds)
+         :body (doall (for [user users]
+                        (table-row user tds)))}]
        (if @on-first-page?*
          (cond
            (and membership-filter? @users-membership/filtered-by-member?*) (users-membership/empty-members-alert)
            (and role-filter? @roles/filtered-by-role?*) (roles/empty-alert)
-           :else [:div.alert.alert-warning.text-center "No users found."])
-         [:div.alert.alert-warning.text-center "No more users found."])))])
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+           :else [:> Alert {:variant "info" :className "my-3 text-center"} "No users found."])
+         [:> Alert {:variant "info" :className "my-3 text-center"} "No more users found."])))])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -213,30 +223,25 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn main-page-content-component []
-  [:div
-   [filter-component]
-   [routing/pagination-component]
-   [table-component
-    [user-th-component
-     org-th-component
-     org-id-th-component
-     contracts-count-th-component
-     pools-count-th-component
-     groups-count-th-component]
-    [user-td-component
-     org-td-component
-     org-id-td-component
-     contracts-count-td-component
-     pools-count-td-component
-     groups-count-td-component]]
-   [routing/pagination-component]
-   [debug-component]])
-
 (defn page []
-  [:div.users
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/user-create-li]]]
-   [:h1 [icons/users] " Users"]
-   [main-page-content-component]])
+  [:article.users.my-5
+   [:h1.my-5
+    [icons/users] " Users"]
+   [:section
+    [filter-component]
+    [table/toolbar  [add-button]]
+    [users-table
+     [user-th-component
+      org-th-component
+      org-id-th-component
+      contracts-count-th-component
+      pools-count-th-component
+      groups-count-th-component]
+     [user-td-component
+      org-td-component
+      org-id-td-component
+      contracts-count-td-component
+      pools-count-td-component
+      groups-count-td-component]]
+    [table/toolbar  [add-button]]
+    [debug-component]]])

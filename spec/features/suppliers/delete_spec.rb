@@ -15,7 +15,9 @@ feature 'Manage suppliers', type: :feature do
     scenario 'deleting a supplier' do
 
       visit '/admin/'
-      click_on 'Suppliers'
+      within 'aside nav' do
+        click_on 'Suppliers'
+      end
 
       @suppliers.each { |supplier| expect(page).to have_content supplier.name }
 
@@ -23,7 +25,9 @@ feature 'Manage suppliers', type: :feature do
       @supplier_path = current_path
 
       click_on 'Delete' # delete page
-      click_on 'Delete' # submit / confirm
+      within '.modal' do
+        click_on 'Delete' # submit / confirm
+      end
 
       wait_until { current_path ==  "/admin/suppliers/" }
 

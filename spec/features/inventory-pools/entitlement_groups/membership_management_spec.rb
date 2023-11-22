@@ -23,12 +23,12 @@ feature 'Manage inventory-pool users ', type: :feature do
     shared_examples :manage_membership_directly do
       scenario 'manage membership via direct membership' do
         visit '/admin/'
-        click_on 'Inventory-Pools'
+        click_on 'Inventory Pools'
         click_on @pool.name
-        click_on 'Entitlement-Groups'
+        within('.nav-tabs') { click_on 'Entitlement-Groups' }
         @entitlement_groups_path = current_path
         click_on @entitlement_group.name
-        click_on 'Users'
+        within('.nav-tabs') { click_on 'Users' }
         select 'members and non-members', from: 'Membership'
         click_on_first 'next' # go to the second page because we want also test some internal indexing complexity
         within(first 'tr.user') do
@@ -59,12 +59,12 @@ feature 'Manage inventory-pool users ', type: :feature do
       scenario 'manage membership via group membership' do
         visit '/admin/'
         user = @users.sample
-        click_on 'Inventory-Pools'
+        click_on 'Inventory Pools'
         click_on @pool.name
         click_on 'Entitlement-Groups'
         @entitlement_groups_path = current_path
         click_on @entitlement_group.name
-        click_on 'Users'
+        within('.nav-tabs') { click_on 'Users' }
         select 'members and non-members', from: 'Membership'
         fill_in 'Search', with: user.email
         wait_until{ all('tr.user').count == 1 }

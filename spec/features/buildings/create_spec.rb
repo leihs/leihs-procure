@@ -18,23 +18,21 @@ feature 'Manage Buildings', type: :feature do
 
       visit '/admin/'
       click_on 'Buildings'
-      expect(all("a, button", text: 'Create')).not_to be_empty
-      click_on 'Create'
+      expect(all("a, button", text: 'Add')).not_to be_empty
+      click_on_first 'Add Building'
+      wait_until { page.has_css?(".modal", text: "Add Building") }
+      # wait_until { page.has_content? "Add Building" }
       fill_in 'name', with: name
       fill_in 'code', with: code
-      click_on 'Create'
-      wait_until { all(".modal").empty? }
-      wait_until { not page.has_content? "Create Building" }
-      @building_path = current_path
-      input_values = all("input").map(&:value).join(" ")
-      expect(page.text + input_values).to have_content name
-      expect(page.text + input_values).to have_content code
+      click_on 'Save'
 
-      # The inventory pools path includes the newly created inventory pool and
-      # we can get to it via clicking its name
-      within find(".nav-component nav", match: :first) do
-        click_on "Buildings"
-      end
+      wait_until { all(".modal").empty? }
+      wait_until { not page.has_content? "Add Building" }
+      @building_path = current_path
+      expect(page.text).to have_content name
+      expect(page.text).to have_content code
+
+      click_on "Back"
       wait_until { current_path == "/admin/buildings/" }
       wait_until { page.has_content? name }
       click_on name

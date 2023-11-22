@@ -1,26 +1,25 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
+   [clojure.set :refer [rename-keys]]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool :refer [tabs]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.create :as create]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button Table]]
    [reagent.core :as reagent]))
 
 (def current-query-paramerters*
@@ -38,28 +37,47 @@
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn filter-form []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [routing/form-term-filter-component]
-     [routing/choose-user-component
-      :query-params-key :including-user
-      :input-options {:placeholder "email, login, or id"}]
-     [routing/select-component
-      :options {"any" "members and non-members"
-                "non" "non-members"
-                "member" "members"}
-      :default-option :member
-      :label "Membership"
-      :query-params-key :membership]
-     [users/form-suspension-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+(defn filter-section []
+  [filter/container
+   [:<>
+    [filter/form-term-filter-component :placeholder "Name of the Delegation"]
+    [filter/form-including-user]
+    [filter/select-component
+     :label "Membership"
+     :query-params-key :membership
+     :options {"member" "members"
+               "non" "non-members"
+               "any" "members and non-members"}]
+    [filter/form-suspension]
+    [filter/form-per-page]
+    [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn delegations-thead-component []
+;; NOTE: This is a workaround and should be fixed
+;; currently the issue is that a user is selected by navigating to the user route
+;; on mount it is checked if user uid exists in query params
+;; if so the modal opens
+;; it would be nicer if the user selection would happen in the modal with a e.g. a combobox
+(def show* (reagent/atom false))
+
+(defn check-user-chosen []
+  (when (contains?
+         (get @routing/state* :query-params) :user-uid)
+    (reset! show* true)))
+
+(defn add-button []
+  [:<>
+   [:> Button
+    {:className "ml-3"
+     :onClick #(reset! show* true)}
+    "Add Delegation"]])
+
+(defn create-delegation-dialog []
+  [create/dialog {:show @show*
+                  :onHide #(reset! show* false)}])
+
+(defn delegations-thead []
   [:thead
    [:tr
     [:th.text-left "Name"]
@@ -83,22 +101,22 @@
   [:button.btn.btn-warning
    [icons/delete] " Remove "])
 
-(defn name-td-component [id delegation]
+(defn name-td [id delegation]
   [:td.name.text-left
    (let [inner [:span (:firstname delegation)]]
      (if (:member delegation)
        (link-to-delegation id inner)
        inner))])
 
-(defn users-count-td-component [id delegation]
+(defn users-count-td [id delegation]
   [:td.users-count.text-right
    (-> delegation :users_count)])
 
-(defn direct-users-count-td-component [id delegation]
+(defn direct-users-count-td [id delegation]
   [:td.direct-users-count.text-right
    (-> delegation :direct_users_count)])
 
-(defn groups-count-td-component [id delegation]
+(defn groups-count-td [id delegation]
   [:td.groups-count.text-right
    (-> delegation :groups_count)])
 
@@ -113,7 +131,7 @@
              http-client/filter-success!)
         (fetch-delegations))))
 
-(defn action-td-component
+(defn action-td
   [{member :member id :id protected :pool_protected
     pools-count :pools_count :as delegation}]
   [:td.text-center
@@ -134,7 +152,7 @@
         [:button.btn.btn-danger.btn-sm
          [icons/delete] " Delete "])])])
 
-(defn suspension-td-component [delegation]
+(defn suspension-td [delegation]
   [:td.suspension.text-center
    (suspension/suspension-component
     (:suspension delegation)
@@ -149,17 +167,17 @@
                                    [(:route @routing/state*) :delegations
                                     (:page-index delegation) :suspension] data)))))])
 
-(defn delegation-row-component [{id :id :as delegation}]
+(defn delegation-row [{id :id :as delegation}]
   [:tr.delegation {:key (:id delegation)}
-   [name-td-component id delegation]
+   [name-td id delegation]
    [:td.responsible-user
     [users/user-inner-component (:responsible_user delegation)]]
    [:td.contracs-count.text-right [:span (:contracts_count_open_per_pool delegation)
                                    " / " (:contracts_count_per_pool delegation)
                                    " / " (:contracts_count delegation)]]
-   [users-count-td-component id delegation]
-   [direct-users-count-td-component id delegation]
-   [groups-count-td-component id delegation]
+   [users-count-td id delegation]
+   [direct-users-count-td id delegation]
+   [groups-count-td id delegation]
    [:td.text-right
     (let [pools-count (:pools_count delegation)]
       (if (> pools-count 1)
@@ -168,21 +186,25 @@
    [:td.text-center (if (:pool_protected delegation)
                       [:span.text-success "yes"]
                       [:span.text-warning "no"])]
-   [action-td-component delegation]
-   [suspension-td-component delegation]])
+   [action-td delegation]
+   [suspension-td delegation]])
 
-(defn delegations-table-component []
+(defn delegations-table []
   (let [current-url (:route @routing/state*)]
     (if-not (contains? @data* current-url)
       [wait-component]
       (if-let [delegations (-> @data* (get  current-url  {}) :delegations seq)]
-        [:table.table.table-striped.table-sm
-         [delegations-thead-component]
+        [:> Table {:striped true
+                   :hover true
+                   :borderless true
+                   :className "border-top border-bottom"}
+
+         [delegations-thead]
          [:tbody
           (let [page (:page @current-query-paramerters-normalized*)
                 per-page (:per-page @current-query-paramerters-normalized*)]
             (for [[k delegation] (map-indexed vector delegations)]
-              ^{:key k} [delegation-row-component delegation]))]]
+              ^{:key k} [delegation-row delegation]))]]
         [:div.alert.alert-warning.text-center "No (more) delegations found."]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -196,21 +218,20 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn breadcrumbs []
-  [breadcrumbs/nav-component
-   @breadcrumbs/left*
-   [[breadcrumbs/create-li]]])
-
 (defn page []
-  [:div.delegations
+  [:article.delegations
    [routing/hidden-state-component
-    {:did-change fetch-delegations}]
-   [breadcrumbs]
-   [:h1
-    [:span "Delegations in the Inventory-Pool "]
-    [inventory-pool/name-link-component]]
-   [filter-form]
-   [routing/pagination-component]
-   [delegations-table-component]
-   [routing/pagination-component]
+    {:did-change fetch-delegations}
+    {:did-mount (check-user-chosen)}]
+
+   [:h1.my-5
+    [inventory-pool/name-component]]
+   [tabs]
+   [filter-section]
+   [table/toolbar
+    [add-button]]
+   [delegations-table]
+   [table/toolbar
+    [add-button]]
+   [create-delegation-dialog]
    [debug-component]])

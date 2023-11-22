@@ -19,19 +19,20 @@ feature 'Manage inventory-pool users ', type: :feature do
       @group = @groups.first
 
       visit "/admin/inventory-pools/#{@pool.id}"
-      click_on "Groups"
+      within('.nav-tabs') { click_on 'Groups' }
       select 'any', from: 'Role'
       fill_in 'Search', with: @group.name
-      wait_until { find("table.groups").has_content?(@group.name) }
-      expect(page.find("table.groups ")).not_to have_content "customer"
-      expect(page.find("table.groups ")).not_to have_content "inventory_manager"
+      wait_until { find("table").has_content?(@group.name) }
+      expect(page.find("table ")).not_to have_content "customer"
+      expect(page.find("table ")).not_to have_content "inventory_manager"
 
       #####################################################################
       # NOTE: Capybara finds the button and clicks it but nothing happens.
       # It has to be retried some times until the modal is displayed.
       # Some UI hooks/callbacks not initialized yet on first try?
+      #
       wait_until do
-        within find("table.groups tbody tr", text: @group.name) do
+        within find("table tbody tr", text: @group.name) do
           find("button", text: "Edit").click
         end
         page.has_selector?(".modal")
@@ -47,7 +48,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
 
       # remove all access_rights
-      within("table.groups tbody tr", text: @group.name) do
+      within("table tbody tr", text: @group.name) do
         click_on "Edit"
       end
       wait_until{ not all(".modal").empty? }

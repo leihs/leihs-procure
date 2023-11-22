@@ -1,40 +1,37 @@
 (ns leihs.admin.resources.groups.group.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
+   [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
-
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.groups.group.core :as group :refer [group-id*]]
+   [leihs.admin.resources.groups.group.core :as group-core :refer [group-id*]]
+   [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.auth.core :as auth]
-
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.front :as current-user]
-   [reagent.core :as reagent]))
+   [react-bootstrap :as react-bootstrap :refer [Button Nav]]))
 
 ;### helpers ##################################################################
 
 (def not-protected*
   (reaction
-   (-> @group/data* :admin_protected not))); suffices because of hierarchy
+   (-> @group-core/data* :admin_protected not))); suffices because of hierarchy
 
 (def is-admin-and-not-system-admin-protected*
   (reaction
    (boolean
-    (and (-> @group/data* :system_admin_protected not)
+    (and (-> @group-core/data* :system_admin_protected not)
          @current-user/admin?*))))
 
 (def manage-membership-allowed?*
@@ -100,16 +97,15 @@
       [:option {:key k :value k} n])]])
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [users/form-term-filter]
-     [form-group-users-filter]
-     [routing/form-per-page-component]
-     [routing/form-reset-component]]]])
+  [filter/container
+   [:<>
+    [users/form-term-filter]
+    [form-group-users-filter]
+    [routing/form-per-page-component]
+    [routing/form-reset-component]]])
 
 (defn table-component []
-  [users/table-component
+  [users/users-table
    [users/user-th-component
     action-th-component]
    [users/user-td-component
@@ -122,13 +118,13 @@
     [:<>
      [:div
       [:h3 "@group/data"]
-      [:pre (with-out-str (pprint @group/data*))]]
+      [:pre (with-out-str (pprint @group-core/data*))]]
      [:div
       [:h3 "@current-user/admin?*"]
       [:pre (with-out-str (pprint @current-user/admin?*))]]
      [:div
       [:h3 "(-> @group/data* :system_admin_protected not)"]
-      [:pre (with-out-str (pprint (-> @group/data* :system_admin_protected not)))]]
+      [:pre (with-out-str (pprint (-> @group-core/data* :system_admin_protected not)))]]
      [:div
       [:h3 "@is-admin-and-not-system-admin-protected*"]
       [:pre (with-out-str (pprint @is-admin-and-not-system-admin-protected*))]]
@@ -138,26 +134,37 @@
 
 (defn main-page-component []
   [:div
-   (when (and @group/data*
+   (when (and @group-core/data*
               (not @manage-membership-allowed?*))
      [:div.alert.alert-warning
       "This group is " [:strong "protected"] ". "
       "Memebership can be inspected but not changed!"])
    [filter-component]
-   [routing/pagination-component]
+   [table/toolbar]
    [table-component]
-   [routing/pagination-component]
+   [table/toolbar]
    [debug-component]
    [users/debug-component]])
 
-(defn index-page []
-  [:div.group-users
+(defn page []
+  [:article.group.my-5
    [routing/hidden-state-component
-    {:did-mount (fn [_] (group/clean-and-fetch))}]
-   [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/users-li])]
-   [:div
-    [:h1
-     [:span "Users in the Group "]
-     [group/group-name-component]]
-    [main-page-component]]])
+    {:did-mount group-core/clean-and-fetch}]
+   [:header.my-5
+    [back/button  {:href (path :groups {})}]
+    [:h1.mt-3 [group-core/group-name-component]]]
+   [group/properties-component]
+
+   [:> Nav {:variant "tabs" :className "mt-5"
+            :defaultActiveKey "users"}
+    [:> Nav.Item
+     [:> Nav.Link
+      {:href (clojure.core/str
+              "/admin/groups/"
+              (-> @routing/state* :route-params :group-id))}
+      "Inventory-Pools"]]
+    [:> Nav.Item
+     [:> Nav.Link
+      {:active true}
+      "Users"]]]
+   [main-page-component]])

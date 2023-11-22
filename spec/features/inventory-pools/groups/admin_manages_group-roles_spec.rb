@@ -17,14 +17,14 @@ feature 'Manage inventory-pool groups ', type: :feature do
       scenario ' manages roles of a groups' do
         @group = @groups.sample
 
-        click_on 'Inventory-Pools'
+        click_on 'Inventory Pools'
         click_on @pool.name
-        click_on 'Groups'
+        within('.nav-tabs') { click_on 'Groups' }
         select "any", from: "Role"
         fill_in 'Search', with: @group.name
-        wait_until { all("table.groups tbody tr").count == 1 }
-        expect(page.find("table.groups ")).not_to have_content "customer"
-        expect(page.find("table.groups ")).not_to have_content "inventory_manager"
+        wait_until { all("table tbody tr").count == 1 }
+        expect(page.find("table")).not_to have_content "customer"
+        expect(page.find("table")).not_to have_content "inventory_manager"
         click_on "Edit"
         wait_until{ not all(".modal").empty? }
         # set access_right

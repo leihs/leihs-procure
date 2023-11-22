@@ -7,7 +7,9 @@ feature 'Managing inventory-fields:', type: :feature do
     @admin = FactoryBot.create(:admin, password: "password")
     @fields = Field.all
     sign_in_as @admin
-    click_on "Inventory-Fields"
+    within('aside nav') do
+      click_on "Fields"
+    end
   end
 
   context 'an admin via the UI' do

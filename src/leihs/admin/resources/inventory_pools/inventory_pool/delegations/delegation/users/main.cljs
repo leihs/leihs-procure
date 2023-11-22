@@ -1,27 +1,15 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.icons :as icons]
-
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.users.main :as users-membership]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation] ;; [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as dele]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-
-   [leihs.core.routing.front :as routing]
-   [leihs.core.user.shared :refer [short-id]]
-   [reagent.core :as reagent]))
+   [leihs.core.core :refer [presence]]))
 
 ;;; path helpers  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -39,6 +27,7 @@
            :delegation-id @delegation/id*
            :user-id (:id user)}
           more-route-params)
+
          (merge
           {:including-user (or (-> user :email presence) (:id user))}
           more-query-params))))
@@ -49,8 +38,8 @@
   (when (:debug @state/global-state*)
     [:div]))
 
-(defn table-component []
-  [users/table-component
+(defn table []
+  [users/users-table
    [pool-users/user-th-component
     users-membership/member-user-th-component
     users-membership/direct-member-user-th-component
@@ -62,27 +51,15 @@
     (users-membership/create-group-member-user-td-component
      groups-path-fn)]])
 
-(defn main-page-component []
-  [:div
-   [users-membership/filter-component]
-   [routing/pagination-component]
-   [table-component]
-   [routing/pagination-component]
-   [debug-component]
-   [users/debug-component]])
-
-(defn breadcrumbs []
-  [breadcrumbs/nav-component
-   (conj  @breadcrumbs/left*
-          [breadcrumbs/users-li]) []])
-
-(defn index-page []
-  [:div.delegation-users
-   [breadcrumbs]
-   [:div
-    [:h1
-     [:span " Users in the delegation "]
-     [delegation/name-link-component]
-     " in the Inventory-Pool "
-     [inventory-pool/name-link-component]]
-    [main-page-component]]])
+(defn page []
+  [:article.delegation.my-5
+   [delegation/header]
+   [delegation/tabs]
+   [:section
+    [users-membership/filter-component]
+    [table/toolbar]
+    [table]
+    [table/toolbar]
+    [debug-component]
+    [users/debug-component]
+    [delegation/debug-component]]])

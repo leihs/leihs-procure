@@ -28,7 +28,7 @@ def ui_no_delete_button user
   click_on 'Users'
   click_on_first_user user
   wait_until { current_path.match(%r"/admin/users/([^/]+)") }
-  within('ol.leihs-nav-right') do
+  within('.basic-properties') do
     expect(all("button, a", text: 'Delete')).to be_empty
   end
 end

@@ -1,41 +1,31 @@
 (ns leihs.admin.resources.groups.group.inventory-pools
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
-
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.roles.components :refer [put-roles< roles-component]]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
-
+   [leihs.admin.resources.groups.group.core :as group.shared]
+   [leihs.admin.resources.groups.main :as group-main]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as groups-main]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Alert]]
    [reagent.core :as reagent]))
 
+(defn get-roles [role]
+  (case role
+    :customer           {:customer true, :group_manager false, :lending_manager false, :inventory_manager false}
+    :group_manager      {:customer true, :group_manager true, :lending_manager false, :inventory_manager false}
+    :lending_manager    {:customer true, :group_manager true, :lending_manager true, :inventory_manager false}
+    :inventory_manager  {:customer true, :group_manager true, :lending_manager true, :inventory_manager true}))
+
 (defonce data* (reagent/atom nil))
-
-(defn prepare-inventory-pools-data [data]
-  (->> data
-       (reduce (fn [roles role]
-                 (-> roles
-                     (assoc-in [(:inventory_pool_id role) :name] (:inventory_pool_name role))
-                     (assoc-in [(:inventory_pool_id role) :id] (:inventory_pool_id role))
-                     (assoc-in [(:inventory_pool_id role) :key] (:inventory_pool_id role))
-                    ; (assoc-in [(:inventory_pool_id role) :role (:role role)] role)
-                     ))
-               {})
-       (map (fn [[_ v]] v))
-       (sort-by :name)
-       (into [])))
-
-(defonce fetch-inventory-pools-roles-id* (reagent/atom nil))
 
 (defn fetch-inventory-pools-roles []
   (go (reset! data*
@@ -61,25 +51,38 @@
        [:pre (with-out-str (pprint @data*))]]])
    [group.shared/debug-component]])
 
+(defn roles-update-handler [roles row]
+  (go (<! (put-roles<
+           (path :inventory-pool-group-roles
+                 {:inventory-pool-id (:inventory_pool_id row)
+                  :group-id (:group_id row)})
+           roles))
+      (clean-and-fetch)))
+
 (defn table-component []
   [:div
    [routing/hidden-state-component
     {:did-change clean-and-fetch}]
-   [:table.roles.table
-    [:thead
-     [:tr [:th "Pool"] [:th "Roles"]]]
-    [:tbody
-     (for [row (->>  @data*
-                     (sort-by :inventory_pool_name))]
-       [:tr.pool {:key (:inventory_pool_id row)}
-        [:td
-         [:a {:href (path :inventory-pool
-                          {:inventory-pool-id (:inventory_pool_id row)})}
-          [:em (:inventory_pool_name row)]] ""]
-        [:td
-         [:a {:href (path :inventory-pool-group-roles
-                          {:inventory-pool-id (:inventory_pool_id row)
-                           :group-id (:group_id row)})}
-          (->> row :role roles/expand-to-hierarchy
-               (map str)
-               (clojure.string/join ", "))]]])]]])
+   (if (seq @data*)
+     [table/container
+      {:borders false
+       :className "group"
+       :header [:tr [:th "Pool"] [:th "Roles"]]
+       :body
+       (for [row (->>  @data*
+                       (sort-by :inventory_pool_name))]
+         [:tr.pool {:key (:inventory_pool_id row)}
+          [:td
+           [:a {:href (path :inventory-pool
+                            {:inventory-pool-id (:inventory_pool_id row)})}
+            [:<> (:inventory_pool_name row)]] ""]
+          [:td
+           [roles-component
+            (get-roles (clojure.core/keyword (:role row)))
+            :compact true
+            :update-handler #(roles-update-handler % row)
+            :label "Role"
+            :query-params-key :role
+            :default-option "customer"]]])}]
+     [:> Alert {:variant "secondary" :className "mt-3"}
+      "Not part of any Inventory Pool"])])

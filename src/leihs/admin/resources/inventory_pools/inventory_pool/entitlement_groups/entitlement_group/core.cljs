@@ -4,21 +4,16 @@
    [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components :as components]
-
+   [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.users.main :as users]
-   [leihs.admin.state :as state]
-
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence str]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.shared :refer [short-id]]
+   [react-bootstrap :as react-bootstrap]
    [reagent.core :as reagent]))
 
 (defonce id*
@@ -45,14 +40,48 @@
   (reset! data* nil)
   (fetch))
 
-(defn name-link-component []
-  [:span
+(defn entitlement-group-name []
+  [:<>
    [routing/hidden-state-component
-    {:did-mount clean-and-fetch}]
-   [components/link
-    (if @data*
-      [:em (str (:name @data*))]
-      [:span {:style {:font-family "monospace"}} (short-id @id*)])
-    @path*]])
+    {:did-change fetch}]
+   (let [inner (when @data*
+                 [:<> (str (:name @data*))])]
+     [:<> inner])])
 
+(defn tabs [active]
+  [:> react-bootstrap/Nav {:className "mb-3"
+                           :justify false
+                           :variant "tabs"
+                           :defaultActiveKey active}
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
 
+     (let [href (path :inventory-pool-entitlement-group
+                      {:inventory-pool-id @inventory-pool/id*
+                       :entitlement-group-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Overview"]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-entitlement-group-users
+                      {:inventory-pool-id @inventory-pool/id*
+                       :entitlement-group-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Users"]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-entitlement-group-groups
+                      {:inventory-pool-id @inventory-pool/id*
+                       :entitlement-group-id @id*})]
+       {:active (= (:path @routing/state*) href)
+        :href href})
+     "Groups"]]])
+
+(defn header []
+  [:header.my-5
+   [back/button {:href (path :inventory-pool-entitlement-groups
+                             {:inventory-pool-id @inventory-pool/id*})}]
+   [:h1.mt-3 [entitlement-group-name]]
+   [:h6 "Inventory Pool " [inventory-pool/name-component]]])

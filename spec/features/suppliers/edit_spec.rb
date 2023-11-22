@@ -26,12 +26,14 @@ feature 'Manage suppliers', type: :feature do
 
     scenario 'edits a supplier' do
       visit '/admin/'
-      click_on 'Suppliers'
+      within 'aside nav' do
+        click_on 'Suppliers'
+      end
       click_on @supplier.name
       @supplier_path = current_path
 
       # check items
-      within("table") do
+      within("table.items") do
         @supplier.items.each do |item|
           within("tr.item", text: item.inventory_code) do
             expect(current_scope).to have_content item.responsible.name
@@ -52,12 +54,9 @@ feature 'Manage suppliers', type: :feature do
       wait_until {current_path == @supplier_path}
       wait_until { all(".wait-component").empty? }
 
-      input_values = all("input").map(&:value).join(" ")
-      expect(page.text + input_values).to have_content name
-      expect(page.text + input_values).to have_content note
-      within find(".nav-component nav", match: :first) do
-        click_on "Suppliers"
-      end
+      expect(page.text).to have_content name
+      expect(page.text).to have_content note
+      click_on 'Back'
       wait_until { current_path ==  "/admin/suppliers/" }
       expect(page).to have_content name
     end

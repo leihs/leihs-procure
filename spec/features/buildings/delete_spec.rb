@@ -22,7 +22,9 @@ feature 'Manage Buildings', type: :feature do
       @building_path = current_path
 
       click_on 'Delete' # delete page
-      click_on 'Delete' # submit / confirm
+      within '.modal' do
+        click_on 'Delete' # submit / confirm
+      end
 
       wait_until { current_path ==  "/admin/buildings/" }
 

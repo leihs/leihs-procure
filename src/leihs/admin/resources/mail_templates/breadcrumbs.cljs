@@ -16,7 +16,7 @@
 (def nav-component breadcrumbs/nav-component)
 
 (defn mail-templates-li []
-  [li :mail-templates [:span [icons/mail-templates] " Mail-Templates "] {} {}
+  [li :mail-templates [:span [icons/mail-templates] " Mail Templates "] {} {}
    :authorizers [auth/admin-scopes?]])
 
 (defn create-li []

@@ -29,11 +29,14 @@ feature 'Authentication-Systems', type: :feature do
         before(:each){ sign_in_as @current_user }
 
         scenario 'CRUD' do
-          click_on 'System'
-          click_on 'Authentication-Systems'
-          click_on 'Create Authentication-System'
+          binding.pry
+          within 'aside nav' do
+            click_on 'Settings'
+            click_on 'Authentication Systems'
+          end
+          click_on_first 'Add Authentication System'
           fill_in 'id', with: 'test-auth-system'
-          fill_in 'name', with: 'Test Authentication-System'
+          fill_in 'name', with: 'Test Authentication System'
           fill_in 'type', with: 'external'
           fill_in 'description', with: 'foo bar baz'
           fill_in 'internal_private_key', with: 'INT PRIV-KEY'
@@ -41,20 +44,20 @@ feature 'Authentication-Systems', type: :feature do
           fill_in 'external_public_key', with: 'EXT PUB-KEY'
           fill_in 'external_sign_in_url', with: 'http://exsys/sign-in'
           fill_in 'external_sign_out_url', with: 'http://exsys/sign-out'
-          click_on 'Create'
+          click_on 'Save'
           wait_until do
             current_path.match /authentication-systems\/test-auth-system$/
           end
           sleep 1
-          field_content = all("input, textarea").map(&:value).join(" ")
-          expect(page.text + field_content).to have_content /Test Authentication-System/
-          expect(page.text + field_content).to have_content /foo bar baz/
-          expect(page.text + field_content).to have_content /external/
-          expect(page.text + field_content).to have_content /INT PRIV-KEY/
-          expect(page.text + field_content).to have_content /INT PUB-KEY/
-          expect(page.text + field_content).to have_content /EXT PUB-KEY/
-          expect(page.text + field_content).to have_content %r{http://exsys/sign-in}
-          expect(page.text + field_content).to have_content %r{http://exsys/sign-out}
+          # field_content = all("input, textarea").map(&:value).join(" ")
+          expect(page.text).to have_content /Test Authentication System/
+          expect(page.text).to have_content /foo bar baz/
+          expect(page.text).to have_content /external/
+          expect(page.text).to have_content /INT PRIV-KEY/
+          expect(page.text).to have_content /INT PUB-KEY/
+          expect(page.text).to have_content /EXT PUB-KEY/
+          expect(page.text).to have_content %r{http://exsys/sign-in}
+          expect(page.text).to have_content %r{http://exsys/sign-out}
           click_on 'Edit'
           fill_in 'description', with: 'baz bar foo'
           click_on 'Save'
@@ -63,35 +66,40 @@ feature 'Authentication-Systems', type: :feature do
           end
           expect(page).to have_content 'baz bar foo'
           click_on 'Delete'
-          wait_until { current_path.match /delete$/ }
-          click_on 'Delete'
-          wait_until { current_path.match /authentication-systems\/$/ }
+          within '.modal' do
+            click_on 'Delete' 
+          end
         end
 
         scenario 'adding and removing a direct user' do
           @user = @users.sample
-          click_on "System"
-          click_on "Authentication-Systems"
+          within 'aside nav' do
+            click_on 'Settings'
+            click_on 'Authentication Systems'
+          end
+          binding.pry
           click_on @auth_system.id
-          click_on "Users"
+          within '.nav-tabs' do
+            click_on "Users"
+          end
           select "members and non-members", from: 'Membership'
           fill_in 'Search', with: @user.email
           wait_until{ all('.users tbody tr').count == 1 }
-          within('tbody.users tr')do
+          within('table.users tbody tr')do
             expect(find(:checkbox, id: 'member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'direct_member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked
           end
           within(".direct-member"){ click_on 'Add' }
           wait_until { all('.modal').empty? }
-          within('tbody.users tr')do
+          within('table.users tbody tr')do
             expect(find(:checkbox, id: 'member', disabled: true)).to be_checked
             expect(find(:checkbox, id: 'direct_member', disabled: true)).to be_checked
             expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked
           end
           within(".direct-member"){ click_on 'Remove' }
           wait_until { all('.modal').empty? }
-          within('.users tbody tr')do
+          within('table.users tbody tr')do
             expect(find(:checkbox, id: 'member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'direct_member', disabled: true)).not_to be_checked
             expect(find(:checkbox, id: 'group_member', disabled: true)).not_to be_checked
@@ -100,10 +108,14 @@ feature 'Authentication-Systems', type: :feature do
 
         scenario 'adding and removing a user via a group' do
           @user = @users.sample
-          click_on "System"
-          click_on "Authentication-Systems"
+          within 'aside nav' do
+            click_on 'Settings'
+            click_on 'Authentication Systems'
+          end
           click_on @auth_system.id
-          click_on "Users"
+          within '.nav-tabs' do
+            click_on "Users"
+          end
           select "members and non-members", from: 'Membership'
           fill_in 'Search', with: @user.email
           wait_until{ all('.users tbody tr').count == 1 }

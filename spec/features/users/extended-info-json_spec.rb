@@ -24,18 +24,20 @@ feature 'Extended info of users ', type: :feature do
 
       visit '/admin/'
       click_on 'Users'
-      click_on 'Create user'
+      click_on_first 'Add User'
       uncheck 'is_admin'
       check 'account_enabled'
       check 'password_sign_in_enabled'
+      fill_in 'firstname', with: 'test'
       fill_in 'email', with: 'test@example.com'
       fill_in 'extended_info', with: '{"foo": 42}'
       create_path = current_path
-      click_on 'Create'
+      click_on 'Add'
       wait_until do
         current_path.match "^\/admin\/users\/.+"
       end
 
+      click_on 'Extended Info'
       expect(page).to have_content "42"
     end
 

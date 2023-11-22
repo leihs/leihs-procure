@@ -1,26 +1,23 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
-   [leihs.admin.common.roles.core :refer []]
+   [leihs.admin.common.components.navigation.back :as  back]
+   [leihs.admin.common.roles.components :as roles-ui]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [roles-update-handler]]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups.main :as groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
-   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
-   [leihs.admin.resources.users.user.shared :as user-shared]
+   [leihs.admin.resources.users.user.core :as user :refer [user-data* user-id*]]
+   [leihs.admin.resources.users.user.main :as user-main]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent]))
 
@@ -42,7 +39,7 @@
    (let [p (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
                                        :user-id @user-id*})
          name-or-id (user/fullname-or-some-uid @user-data*)]
-     [components/link [:em name-or-id] p])])
+     [:<> name-or-id])])
 
 ;;; suspension ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -90,6 +87,21 @@
 
 ;;; overview ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn roles-th-component  []
+  [:th.pl-5 {:key :roles} " Roles "])
+
+(defn roles-td-component [group]
+  [:td.pl-5 {:key :roles}
+   [roles-component
+    (get group :roles)
+    :compact true
+    :update-handler #(roles-update-handler % group)]])
+
+(defn groups []
+  [:div
+   [:h3 "Groups"]
+   [groups/table-component]])
+
 (defn pool-data-li-dl-component [dt dd]
   ^{:key dt}
   [:li {:key dt}
@@ -132,12 +144,12 @@
    [:div.row
     [:div.col-lg-3
      [:hr]
-     [:h3 "Pool Related Properties"]
-     [overview-pool-data-component @user-data*]]
-    [:div.col-lg-3
-     [:hr]
      [:h3 " Image / Avatar "]
      [user/img-avatar-component @user-data*]]
+    [:div.col-lg-3
+     [:hr]
+     [:h3 "Pool Related Properties"]
+     [overview-pool-data-component @user-data*]]
     [:div.col-lg-3
      [:hr]
      [:h3 "Personal Properties"]
@@ -145,36 +157,33 @@
     [:div.col-lg-3
      [:hr]
      [:h3 "Account Properties"]
-     [user/account-properties-component @user-data*]]]])
+     [user/account-properties-component @user-data*]]
+    [user-main/edit-user-button]]])
 
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn page-title-component []
-  [:h1 "User "
-   [name-component]
-   " in the Inventory-Pool "
-   [inventory-pool/name-link-component]])
+(defn header []
+  [:header.my-5
+   [back/button {:href (path :inventory-pool-users {:inventory-pool-id @inventory-pool/id*})}]
+   [:h1.mt-3 [name-component]]
+   [:h6 "In Pool " [inventory-pool/name-component]]])
 
 (defn page []
-  [:div.user-roles
-   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/user-data-li]
-     [breadcrumbs/direct-roles-li]
-     [breadcrumbs/groups-roles-li
-      :user-uid (-> @user-data* :email presence)]
-     [breadcrumbs/suspension-li]]]
-   [page-title-component]
+  [:article.user-roles
+   [header]
    [overview-component]
    [:div.row
     [:div.col-md-6
      [:hr] [roles-component]]
     [:div.col-md-6
      [:hr] [suspension-component]]]
-   [:div
-    [:hr]
-    [:h2 "Extended User Info"]
-    (when-let [ext-info (-> @user-data* :extended_info presence)]
-      [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]
+   [:div.row
+    [:div.col-md-6
+     [:hr] [groups]]
+    [:div.col-md-6
+     [:hr]
+     [:h2 "Extended User Info"]
+     (when-let [ext-info (-> @user-data* :extended_info presence)]
+       [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]]
 
    [debug-component]])

@@ -1,24 +1,16 @@
 (ns leihs.admin.resources.suppliers.supplier.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [cljs.core.async.macros :refer [go]]
    [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
-
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.suppliers.supplier.breadcrumbs :as breadcrumbs]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as core-user]
-   [leihs.core.user.shared :refer [short-id]]
+   [react-bootstrap :as react-bootstrap :refer [Form]]
    [reagent.core :as reagent]))
 
 (defonce id*
@@ -26,14 +18,6 @@
                 ":supplier-id")))
 
 (defonce data* (reagent/atom nil))
-
-(defonce edit-mode?*
-  (reaction
-   (and (map? @data*)
-        (boolean ((set '(:supplier-edit :supplier-create))
-                  (:handler-key @routing/state*))))))
-
-;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn fetch []
   (go (reset! data*
@@ -44,11 +28,9 @@
                http-client/request :chan <!
                http-client/filter-success! :body))))
 
-(defn clean-and-fetch [& args]
+(defn clean-and-fetch []
   (reset! data* nil)
   (fetch))
-
-;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -58,17 +40,23 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn id-component []
-  [:p "id: " [:span {:style {:font-family "monospace"}} (:id @data*)]])
-
-(defn name-link-component []
-  [:span
-   [routing/hidden-state-component
-    {:did-change fetch}]
-   (let [p (path :supplier {:supplier-id @id*})
-         inner (if @data*
-                 [:em (str (:name @data*))]
-                 [:span {:style {:font-family "monospace"}} (short-id @id*)])]
-     [components/link inner p])])
+(defn form [action]
+  [:> Form {:id "supplier-form"
+            :on-submit (fn [e] (.preventDefault e) (action))}
+   [:> Form.Group {:id "name"}
+    [:> Form.Label "Name"]
+    [:input.form-control
+     {:type "text"
+      :id "name"
+      :required true
+      :placeholder "Enter Name"
+      :value (or (:name @data*) "")
+      :onChange (fn [e] (swap! data* assoc :name (-> e .-target .-value)))}]]
+   [:> Form.Group {:id "note"}
+    [:> Form.Label "Note"]
+    [:textarea.form-control
+     {:placeholder "Enter Note"
+      :id "note"
+      :rows 10
+      :value (or (:note @data*) "")
+      :onChange (fn [e] (swap! data* assoc :note (-> e .-target .-value)))}]]])

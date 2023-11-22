@@ -1,27 +1,15 @@
 (ns leihs.admin.resources.groups.group.edit
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
-
-   [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.form-components :refer [checkbox-component input-component save-submit-component]]
+   [cljs.core.async :as async :refer [go <!]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
+   [leihs.admin.resources.groups.group.core :refer [data* group-id*]]
    [leihs.admin.resources.groups.group.edit-core :as edit-core]
-   [leihs.admin.state :as state]
+   [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]))
 
-   [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
-
-(defn patch [& args]
+(defn patch []
   (go (when (some->
              {:chan (async/chan)
               :url (path :group {:group-id @group-id*})
@@ -32,25 +20,24 @@
         (accountant/navigate!
          (path :group {:group-id @group-id*})))))
 
-(defn edit-form-component []
-  [:form.form
-   {:auto-complete :off
-    :on-submit (fn [e]
-                 (.preventDefault e)
-                 (patch))}
-   [edit-core/inner-form-component]
-   [save-submit-component]])
-
-(defn page []
-  [:div.edit-group
-   [routing/hidden-state-component
-    {:did-mount clean-and-fetch
-     :did-change clean-and-fetch}]
-   [breadcrumbs/nav-component (conj @breadcrumbs/left* [breadcrumbs/edit-li]) []]
-   [:div.row
-    [:div.col-lg
-     [:h1
-      [:span " Edit Group "]
-      [group-name-component]]]]
-   [edit-form-component]
-   [debug-component]])
+(defn dialog [& {:keys [show onHide]
+                 :or {show false}}]
+  [:> Modal {:size "xl"
+             :centered true
+             :scrollable true
+             :show show}
+   [:> Modal.Header {:closeButton true
+                     :onHide onHide}
+    [:> Modal.Title "Edit Group"]]
+   [:> Modal.Body
+    [:> Form {:id "add-user-form"
+              :on-submit (fn [e] (.preventDefault e) (patch))}
+     [edit-core/inner-form-component]]]
+   [:> Modal.Footer
+    [:> Button {:variant "secondary"
+                :onClick onHide}
+     "Cancel"]
+    [:> Button {:type "submit"
+                :form "add-user-form"
+                :onClick #(onHide)}
+     "Save"]]])

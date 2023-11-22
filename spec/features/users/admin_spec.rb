@@ -38,7 +38,7 @@ feature 'Managing admin users:' do
 
         scenario 'I can not create an admin' do
           click_on 'Users'
-          click_on  'Create'
+          click_on_first 'Add User'
           expect(find_field("is_admin", disabled: :all)).to be_disabled
         end
 
@@ -105,7 +105,7 @@ feature 'Managing admin users:' do
 
         scenario 'I can not create an system_admin' do
           click_on 'Users'
-          click_on  'Create'
+          click_on_first  'Add User'
           expect(find_field("is_system_admin", disabled: :all)).to be_disabled
         end
 

@@ -19,7 +19,7 @@ feature 'Manage inventory-fields', type: :feature do
       end
 
       visit '/admin/'
-      click_on 'Inventory-Fields'
+      click_on 'Fields'
       click_on @required_core_field.id
       @field_path = current_path
 
@@ -34,8 +34,8 @@ feature 'Manage inventory-fields', type: :feature do
       input_values = all("input").map(&:value).join(" ")
       expect(page.text + input_values).to have_content label
 
-      within find(".nav-component nav", match: :first) do
-        click_on "Inventory-Fields"
+      within find("aside nav", match: :first) do
+        click_on 'Fields'
       end
       wait_until { current_path ==  "/admin/inventory-fields/" }
       expect(page).to have_content label
@@ -47,7 +47,7 @@ feature 'Manage inventory-fields', type: :feature do
       end
 
       visit '/admin/'
-      click_on 'Inventory-Fields'
+      click_on 'Fields'
       click_on @not_required_active_core_field.id
       @field_path = current_path
 
@@ -61,12 +61,7 @@ feature 'Manage inventory-fields', type: :feature do
 
       input_values = all("input").map(&:value).join(" ")
       expect(page.text + input_values).to have_content label
-      expect(find("input#active")).not_to be_checked
-
-      within find(".nav-component nav", match: :first) do
-        click_on "Inventory-Fields"
-      end
-      wait_until { current_path ==  "/admin/inventory-fields/" }
+      expect(find("tr.active")).to have_content 'false'
       expect(page).to have_content label
     end
 
@@ -74,7 +69,7 @@ feature 'Manage inventory-fields', type: :feature do
       @dynamic_field = @fields.detect { |f| f.id == "properties_mac_address" }
 
       visit '/admin/'
-      click_on 'Inventory-Fields'
+      click_on 'Fields'
       click_on @dynamic_field.id
       @field_path = current_path
 
@@ -123,10 +118,9 @@ feature 'Manage inventory-fields', type: :feature do
         find(".form-group", text: "data:type").all(".row input[type='radio']").map(&:checked?)
       ).to eq [false, true]
 
-      within find(".nav-component nav", match: :first) do
-        click_on "Inventory-Fields"
-      end
-      wait_until { current_path ==  "/admin/inventory-fields/" }
+      click_on 'Save'
+      wait_until { all(".modal").empty? }
+
       expect(page).to have_content label
     end
   end

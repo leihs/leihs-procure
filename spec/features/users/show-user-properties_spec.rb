@@ -26,7 +26,7 @@ feature 'Show users properties', type: :feature do
       wait_until{all( "table.users tbody tr").count == 1 }
       click_on_first_user @user
       wait_until(10) do
-        page.has_content? "User #{@user.firstname} #{@user.lastname}"
+        page.has_content? "#{@user.firstname} #{@user.lastname}"
       end
       expect(page).to have_content 'Email'
       expect(page).to have_content @user.email

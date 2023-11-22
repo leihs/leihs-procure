@@ -2,11 +2,13 @@
   (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout go]]
+   [cljs.core.async :as async :refer [go timeout <!]]
    [cljs.pprint :refer [pprint]]
    [clojure.set :refer [rename-keys]]
    [clojure.string :as string]
    [leihs.admin.common.components :as components]
+   [leihs.admin.common.components.filter :as filter]
+   [leihs.admin.common.components.table :as table]
    [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
@@ -18,10 +20,10 @@
    [leihs.admin.state :as state]
    [leihs.admin.utils.clipboard :as clipboard]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [warn]]))
 
 (def requests* (reagent/atom {}))
 
@@ -45,7 +47,7 @@
 
 (defn responsible-user-choose-component []
   [:div.input-group-prepend
-   [:a.btn.btn-info
+   [:a.btn.btn-primary
     {:tab-index form-components/TAB-INDEX
      :href (path :users-choose {}
                  {:return-to (:route @routing/state*)})}
@@ -69,33 +71,30 @@
       ^{:key n} [:option {:value v} n])]])
 
 (defn filter-component []
-  [:div.card.bg-light
-   [:div.card-body
-    [:div.form-row
-     [:div.col-md-3
-      [routing/delayed-query-params-input-component
-       :label "Requester"
-       :query-params-key :user-uid
-       :prepend responsible-user-choose-component]]
-     [:div.col-md-2 [method-filter-component]]
-     [:div.col-md-2 [routing/form-per-page-component]]
-     [:div.col-md-2 [routing/form-reset-component :default-query-params default-query-params]]]]])
+  [filter/container
+   [:<>
+    [filter/delayed-query-params-input-component
+     :label "Requester"
+     :query-params-key :user-uid
+     :prepend responsible-user-choose-component]
+    [:div.col-md-2 [method-filter-component]]
+    [:div.col-md-2 [filter/form-per-page]]
+    [:div.col-md-2 [filter/reset :default-query-params default-query-params]]]])
 
 ;;; table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn thead-component [hds]
-  [:thead
-   [:tr
-    [:th {:key :timestamp} "Timestamp"]
-    [:th {:key :txid} "TX ID"]
-    [:th {:key :http-uid} "HTTP-UID"]
-    [:th {:key :method} "Method"]
-    [:th {:key :status} "Status"]
-    [:th {:key :path} "Handler | Path"]
-    [:th {:key :requester} "Requester"]
-    [:th {:key :actions}]
-    (for [[idx hd] (map-indexed vector hds)]
-      ^{:key idx} [hd])]])
+  [:tr
+   [:th {:key :timestamp} "Timestamp"]
+   [:th {:key :txid} "TX ID"]
+   [:th {:key :http-uid} "HTTP-UID"]
+   [:th {:key :method} "Method"]
+   [:th {:key :status} "Status"]
+   [:th {:key :path} "Handler | Path"]
+   [:th {:key :requester} "Requester"]
+   [:th {:key :actions}]
+   (for [[idx hd] (map-indexed vector hds)]
+     ^{:key idx} [hd])])
 
 (defn td-requester [request]
   [:td.requester {:key :requester}
@@ -137,23 +136,22 @@
      ^{:key idx} [col request])])
 
 (defn table-component [requests hds tds]
-  [:table.table.table-striped.table-sm.audited-requests
-   [thead-component hds]
-   [:tbody.audited-requests
-    (doall (for [request requests]
-             ^{:key (:txid request)} [row-component request tds]))]])
+  [table/container {:actions [table/toolbar]
+                    :header
+                    [thead-component hds]
+                    :body
+                    (doall (for [request requests]
+                             ^{:key (:txid request)} [row-component request tds]))}])
 
 (defn main-component []
   [:div.audited-requests-main
    [routing/hidden-state-component
     {:did-change fetch}]
-   [routing/pagination-component]
    (if-not (contains? @requests* @routing/current-url*)
      [wait-component]
      (if-let [requests (-> @requests* (get  @routing/current-url* {}) seq)]
        [table-component requests]
-       [:div.alert.alert-warning.text-center "No (more) audited-requests found."]))
-   [routing/pagination-component]])
+       [:div.alert.alert-warning.text-center "No (more) audited-requests found."]))])
 
 (defn debug-component []
   (when @state/debug?*
@@ -164,9 +162,10 @@
       [:pre (with-out-str (pprint @requests*))]]]))
 
 (defn page []
-  [:div.audited-requests-page
-   [breadcrumbs/nav-component @breadcrumbs/left* []]
-   [:h1 audits/icon-requests " Audited Requests"]
-   [filter-component]
-   [main-component]
-   [debug-component]])
+  [:article.audited-requests-page
+   [:header.my-5
+    [:h1 [icons/code-pull-request] " Audited Requests"]]
+   [:section
+    [filter-component]
+    [main-component]
+    [debug-component]]])

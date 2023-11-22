@@ -41,7 +41,9 @@ feature 'Managing group users ', type: :feature do
         click_on 'Groups'
         fill_in 'Search', with: @group.name
         click_on @group.name
-        click_on 'Users'
+        within ".nav-tabs" do
+          click_on 'Users'
+        end
         select('members and non-members', from: 'Membership')
         fill_in "Search", with: @user.email
         wait_until{ all("table.users tbody tr").count == 1 }
@@ -75,7 +77,9 @@ feature 'Managing group users ', type: :feature do
         click_on 'Groups'
         fill_in 'Search', with: @group.name
         click_on @group.name
-        click_on 'Users'
+        within ".nav-tabs" do
+          click_on 'Users'
+        end
         select('members and non-members', from: 'Membership')
         fill_in "Search", with: @user.email
         wait_until{ all("table.users tbody tr").count == 1 }
@@ -101,7 +105,9 @@ feature 'Managing group users ', type: :feature do
         click_on 'Groups'
         fill_in 'Search', with: @group.name
         click_on @group.name
-        click_on 'Users'
+        within ".nav-tabs" do
+          click_on 'Users'
+        end
         select('members and non-members', from: 'Membership')
         select(1000, from: "Per page")
         within("table.users tbody") do
@@ -185,7 +191,9 @@ feature 'Managing group users ', type: :feature do
           click_on 'Groups'
           fill_in 'Search', with: @group.name
           click_on @group.name
-          click_on 'Users'
+          within ".nav-tabs" do
+            click_on 'Users'
+          end
           select('members and non-members', from: 'Membership')
           fill_in "Search", with: @user.email
           wait_until{ all("table.users tbody tr").count == 1 }
@@ -214,9 +222,12 @@ feature 'Managing group users ', type: :feature do
               find('table.groups').has_content? @group.name
           end
           click_on @group.name
-          click_on 'Users'
+          within ".nav-tabs" do
+            click_on 'Users'
+          end
           select('members and non-members', from: 'Membership')
           select(1000, from: "Per page")
+          sleep 2
           within("table.users tbody") do
             wait_until{ all("button").count >= 100 }
             all("button").each do |button|
