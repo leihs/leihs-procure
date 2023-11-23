@@ -9,6 +9,9 @@
     [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
+
+    [leihs.procurement.authorization :refer [myp]]
+
     [taoensso.timbre :refer [debug info warn error spy]]
     ))
 
@@ -62,18 +65,22 @@
 
 (defn handler
   [{{query :query} :body, :as request}]
+
+  (println ">>>graphql")
+  ;(println ">>>graphql-query" query)
+
   (let [mutation? (->> query
                        (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
-    (if mutation?
+    (if (spy mutation?)
       (jdbc/with-db-transaction
         [tx (:tx request)]
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)]
-               (when (:graphql-error response)
+               (when (:graphql-error (spy response))
                  (warn "Rolling back transaction because of graphql error: " response)
                  (jdbc/db-set-rollback-only! tx))
                response)

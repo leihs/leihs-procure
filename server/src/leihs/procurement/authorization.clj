@@ -6,6 +6,9 @@
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.paths :refer [path]]
     [leihs.procurement.permissions.user :as user-perms]
+
+    [taoensso.timbre :refer [debug info warn error spy]]
+
     [logbug.debug :as debug :refer [I>]]
     [ring.util.response :as response]))
 
@@ -20,7 +23,10 @@
   (fn [context args value]
     (let [rrequest (:request context)
           tx (:tx rrequest)
-          auth-entity (:authenticated-entity rrequest)]
+          p (println ">>1x" tx)
+          auth-entity (:authenticated-entity rrequest)
+          p (println ">>2x" auth-entity)
+          ]
       (if (->> predicates
                (map #(% tx auth-entity))
                (some true?))
@@ -71,6 +77,10 @@
   (some #(= handler-key %) skip-authorization-handler-keys))
 
 (defn authenticate [handler {:keys [uri query-string handler-key] :as request}]
+
+  (println ">>>a" (skip? handler-key))
+  (println ">>>b" (:authenticated-entity request))
+
   (cond
     (or (skip? handler-key) (:authenticated-entity request))
     (handler request)
@@ -83,20 +93,48 @@
       (path :sign-in
             nil
             {:return-to (cond-> uri
-                          (presence query-string)
-                          (str "?" query-string))}))))
+                                (presence query-string)
+                                (str "?" query-string))}))))
 
 (defn wrap-authenticate
   [handler]
   (fn [request]
+    (println ">>wrap-authenticate::handler" handler)
+    (println ">>wrap-authenticate::request" request)
+
     (authenticate handler request)))
 
+(defn myp [name var]
+  (println ">myprint> " name var)
+  var
+  )
+
 (defn authorize [handler request]
-  (if (or (skip? (:handler-key request))
-          (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
-                user-perms/requester?]
-               (map #(% (:tx request) (:authenticated-entity request)))
-               (some true?)))
+  (println "\n>>1 authorize")
+  (println "\n>>1 handler" handler)
+  (println "\n>>1 request" request)
+  (println "\n>>1 (:handler-key request)" (:handler-key request))
+
+  (let [
+
+        auth-ent (:authenticated-entity request)
+        p (myp "authEnt?" auth-ent)
+        txn (:tx request)
+        p (myp "txn" txn)
+
+        p (myp "admin" (user-perms/admin? txn auth-ent))
+        p (myp "inspector" (user-perms/inspector? txn auth-ent))
+        p (myp "viewer" (user-perms/viewer? txn auth-ent))
+        p (myp "requester" (user-perms/requester? txn auth-ent))
+        ]
+    )
+
+  (if (or (spy(skip? (:handler-key request)))
+          (spy(->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+                     user-perms/requester?]
+                    (map #(% (:tx request) (:authenticated-entity request)))
+                    (some true?)))
+          )
     (handler request)
     {:status 403,
      :body (helpers/error-as-graphql-object
