@@ -1,0 +1,1274 @@
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:cookies {}, :remote-addr 127.0.0.1, :start-time 371702403899416, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site none, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, sec-fetch-user ?1, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x3b1b4d95 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a true
+>>>b nil
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:cookies {}, :remote-addr 127.0.0.1, :start-time 371702403899416, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site none, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, sec-fetch-user ?1, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x3b1b4d95 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :sign-in
+>myprint>  authEnt? nil
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin false
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:26.500Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702600083333, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, referer http://localhost:3230/sign-in, connection keep-alive, accept image/avif,image/webp,*/*, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest image, accept-encoding gzip, deflate, br, sec-fetch-mode no-cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x5cc69df6 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /favicon.ico, :server-name localhost, :handler-key :not-found, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.backend.html$not_found_handler 0x6185808 leihs.procurement.backend.html$not_found_handler@6185808], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b nil
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702625497791, :params {:return-to /favicon.ico}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {:return-to /favicon.ico}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, referer http://localhost:3230/sign-in, connection keep-alive, accept image/avif,image/webp,*/*, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest image, accept-encoding gzip, deflate, br, sec-fetch-mode no-cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x52957844 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:return-to /favicon.ico}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {:return-to /favicon.ico}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string return-to=%2Ffavicon.ico, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a true
+>>>b nil
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702625497791, :params {:return-to /favicon.ico}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {:return-to /favicon.ico}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, referer http://localhost:3230/sign-in, connection keep-alive, accept image/avif,image/webp,*/*, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest image, accept-encoding gzip, deflate, br, sec-fetch-mode no-cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x52957844 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:return-to /favicon.ico}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {:return-to /favicon.ico}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string return-to=%2Ffavicon.ico, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :sign-in
+>myprint>  authEnt? nil
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin false
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:26.669Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702743327041, :params {:user jimmie@goyette.com, :password nil, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x7d6c3bbf HikariProxyConnection@2104245183 wrapping org.postgresql.jdbc.PgConnection@5c717a04], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/x-www-form-urlencoded, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, content-length 83, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x24dd784d /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:user jimmie@goyette.com, :password , :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x7d179a78 HikariProxyConnection@2098698872 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x55a2ff68 {:status :ready, :val false}]}, :content-length 83, :form-params {:user jimmie@goyette.com, :password nil, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :websocket? false, :query-params {}, :content-type application/x-www-form-urlencoded, :form-params-raw {:user jimmie@goyette.com, :password , :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body #object[org.httpkit.BytesInputStream 0x74f8eef9 BytesInputStream[len=83]], :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a true
+>>>b nil
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702743327041, :params {:user jimmie@goyette.com, :password nil, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x7d6c3bbf HikariProxyConnection@2104245183 wrapping org.postgresql.jdbc.PgConnection@5c717a04], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/x-www-form-urlencoded, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, content-length 83, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x24dd784d /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:user jimmie@goyette.com, :password , :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x7d179a78 HikariProxyConnection@2098698872 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x55a2ff68 {:status :ready, :val false}]}, :content-length 83, :form-params {:user jimmie@goyette.com, :password nil, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :websocket? false, :query-params {}, :content-type application/x-www-form-urlencoded, :form-params-raw {:user jimmie@goyette.com, :password , :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body #object[org.httpkit.BytesInputStream 0x74f8eef9 BytesInputStream[len=83]], :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :sign-in
+>myprint>  authEnt? nil
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x7d179a78 HikariProxyConnection@2098698872 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x55a2ff68 {:status :ready, :val false}]}
+>myprint>  admin false
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:26.797Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702835889041, :params {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x66b3bb9a HikariProxyConnection@1723055002 wrapping org.postgresql.jdbc.PgConnection@5c717a04], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/x-www-form-urlencoded, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, content-length 91, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x4bf4f5f8 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x590cc0f2 HikariProxyConnection@1494008050 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x2473eba6 {:status :ready, :val false}]}, :content-length 91, :form-params {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :websocket? false, :query-params {}, :content-type application/x-www-form-urlencoded, :form-params-raw {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body #object[org.httpkit.BytesInputStream 0x5f67ebd9 BytesInputStream[len=91]], :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a true
+>>>b nil
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}}, :remote-addr 127.0.0.1, :start-time 371702835889041, :params {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x66b3bb9a HikariProxyConnection@1723055002 wrapping org.postgresql.jdbc.PgConnection@5c717a04], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/x-www-form-urlencoded, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802, content-length 91, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x4bf4f5f8 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x590cc0f2 HikariProxyConnection@1494008050 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x2473eba6 {:status :ready, :val false}]}, :content-length 91, :form-params {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :websocket? false, :query-params {}, :content-type application/x-www-form-urlencoded, :form-params-raw {:user jimmie@goyette.com, :password password, :csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802}, :character-encoding utf8, :uri /sign-in, :server-name localhost, :handler-key :sign-in, :query-string nil, :body #object[org.httpkit.BytesInputStream 0x5f67ebd9 BytesInputStream[len=91]], :graphql-schema #CompiledSchema<>, :handler #object[compojure.core$routes$fn__27950 0x7e5e801d compojure.core$routes$fn__27950@7e5e801d], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :sign-in
+>myprint>  authEnt? nil
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)], :connection #object[com.zaxxer.hikari.pool.HikariProxyConnection 0x590cc0f2 HikariProxyConnection@1494008050 wrapping org.postgresql.jdbc.PgConnection@548359c6], :level 1, :rollback #object[clojure.lang.Atom 0x2473eba6 {:status :ready, :val false}]}
+>myprint>  admin false
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:26.879Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371702942194041, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x1c94ee88 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /procure, :server-name localhost, :handler-key :procurement, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.backend.html$not_found_handler 0x6185808 leihs.procurement.backend.html$not_found_handler@6185808], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371702942194041, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, sec-fetch-user ?1, referer http://localhost:3230/sign-in, connection keep-alive, upgrade-insecure-requests 1, accept text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest document, accept-encoding gzip, deflate, br, sec-fetch-mode navigate}, :async-channel #object[org.httpkit.server.AsyncChannel 0x1c94ee88 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /procure, :server-name localhost, :handler-key :procurement, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.backend.html$not_found_handler 0x6185808 leihs.procurement.backend.html$not_found_handler@6185808], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :procurement
+>myprint>  authEnt? {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin true
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:27.009Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+2023-11-22T17:12:27.012Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703190692958, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, referer http://localhost:3230/procure, connection keep-alive, accept image/avif,image/webp,*/*, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest image, accept-encoding gzip, deflate, br, sec-fetch-mode no-cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x24aebf34 /127.0.0.1:3230<->/127.0.0.1:59067], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /procure/favicon.ico, :server-name localhost, :handler-key :not-found, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.backend.html$not_found_handler 0x6185808 leihs.procurement.backend.html$not_found_handler@6185808], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703190692958, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, referer http://localhost:3230/procure, connection keep-alive, accept image/avif,image/webp,*/*, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest image, accept-encoding gzip, deflate, br, sec-fetch-mode no-cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x24aebf34 /127.0.0.1:3230<->/127.0.0.1:59067], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0, :form-params {}, :websocket? false, :query-params {}, :content-type nil, :form-params-raw {}, :character-encoding utf8, :uri /procure/favicon.ico, :server-name localhost, :handler-key :not-found, :query-string nil, :body nil, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.backend.html$not_found_handler 0x6185808 leihs.procurement.backend.html$not_found_handler@6185808], :multipart-params {}, :scheme :http, :request-method :get, :accept {:mime :html, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :not-found
+>myprint>  authEnt? {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin true
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:27.245Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+2023-11-22T17:12:27.249Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703194917208, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 502, referer http://localhost:3230/procure, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x2c2382c8 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 502, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName me, :variables {}, :query query me {
+  current_user {
+    navbarProps
+    user {
+      id
+      firstname
+      lastname
+      permissions {
+        isAdmin
+        isRequester
+        isInspectorForCategories {
+          id
+          __typename
+        }
+        isViewerForCategories {
+          id
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  settings {
+    contact_url
+    __typename
+  }
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703194917208, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 502, referer http://localhost:3230/procure, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x2c2382c8 /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 502, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName me, :variables {}, :query query me {
+  current_user {
+    navbarProps
+    user {
+      id
+      firstname
+      lastname
+      permissions {
+        isAdmin
+        isRequester
+        isInspectorForCategories {
+          id
+          __typename
+        }
+        isViewerForCategories {
+          id
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  settings {
+    contact_url
+    __typename
+  }
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :graphql
+>myprint>  authEnt? {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin true
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:27.288Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+2023-11-22T17:12:27.290Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703426918791, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 502, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x5f8ae62b /127.0.0.1:3230<->/127.0.0.1:59068], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 502, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName me, :variables {}, :query query me {
+  current_user {
+    navbarProps
+    user {
+      id
+      firstname
+      lastname
+      permissions {
+        isAdmin
+        isRequester
+        isInspectorForCategories {
+          id
+          __typename
+        }
+        isViewerForCategories {
+          id
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  settings {
+    contact_url
+    __typename
+  }
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703426918791, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 502, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x5f8ae62b /127.0.0.1:3230<->/127.0.0.1:59068], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 502, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName me, :variables {}, :query query me {
+  current_user {
+    navbarProps
+    user {
+      id
+      firstname
+      lastname
+      permissions {
+        isAdmin
+        isRequester
+        isInspectorForCategories {
+          id
+          __typename
+        }
+        isViewerForCategories {
+          id
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  settings {
+    contact_url
+    __typename
+  }
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :graphql
+>myprint>  authEnt? {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703426254333, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 3575, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x3d0decba /127.0.0.1:3230<->/127.0.0.1:59067], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 3575, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName RequestsIndexFiltered, :variables {}, :query query RequestsIndexFiltered($budgetPeriods: [ID!], $categories: [ID!], $search: String, $state: [State!], $order_status: [OrderStatus], $organizations: [ID!], $priority: [Priority!], $inspector_priority: [InspectorPriority!], $onlyOwnRequests: Boolean) {
+  dashboard(budget_period_id: $budgetPeriods, category_id: $categories, search: $search, state: $state, order_status: $order_status, organization_id: $organizations, priority: $priority, inspector_priority: $inspector_priority, requested_by_auth_user: $onlyOwnRequests) {
+    cacheKey
+    total_count
+    budget_periods {
+      id
+      cacheKey
+      name
+      inspection_start_date
+      end_date
+      total_price_cents
+      main_categories {
+        id
+        cacheKey
+        name
+        image_url
+        total_price_cents
+        categories {
+          id
+          cacheKey
+          name
+          total_price_cents
+          requests {
+            ...RequestFieldsForIndex
+            total_price_cents
+            actionPermissions {
+              edit
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment RequestFieldsForIndex on Request {
+  id
+  short_id
+  user {
+    value {
+      id
+      firstname
+      lastname
+      __typename
+    }
+    __typename
+  }
+  category {
+    read
+    write
+    required
+    value {
+      id
+      name
+      main_category {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  budget_period {
+    read
+    write
+    required
+    value {
+      name
+      id
+      __typename
+    }
+    __typename
+  }
+  article_name {
+    value
+    __typename
+  }
+  model {
+    value {
+      id
+      product
+      version
+      __typename
+    }
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  organization {
+    value {
+      id
+      name
+      shortname
+      department {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  price_cents {
+    value
+    __typename
+  }
+  price_currency {
+    value
+    __typename
+  }
+  requested_quantity {
+    read
+    value
+    __typename
+  }
+  approved_quantity {
+    read
+    value
+    __typename
+  }
+  order_quantity {
+    read
+    value
+    __typename
+  }
+  replacement {
+    value
+    __typename
+  }
+  priority {
+    value
+    __typename
+  }
+  state
+  article_number {
+    value
+    __typename
+  }
+  supplier {
+    value {
+      name
+      __typename
+    }
+    __typename
+  }
+  supplier_name {
+    value
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  room {
+    value {
+      id
+      name
+      building {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  motivation {
+    value
+    __typename
+  }
+  inspection_comment {
+    value
+    __typename
+  }
+  inspector_priority {
+    value
+    __typename
+  }
+  accounting_type {
+    value
+    __typename
+  }
+  cost_center {
+    value
+    __typename
+  }
+  general_ledger_account {
+    value
+    __typename
+  }
+  procurement_account {
+    value
+    __typename
+  }
+  internal_order_number {
+    value
+    __typename
+  }
+  order_status {
+    value
+    __typename
+  }
+  order_comment {
+    value
+    __typename
+  }
+  __typename
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+>myprint>  inspector false
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  >>wrap-authenticate::handler viewer false
+
+>>1 authorize
+#object[leihs.procurement.authorization$wrap_authorize$fn__39361
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 0x6e94df63 leihs.core.locale$wrap$fn__44257@6916bba6leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]]
+
+>>1 request
+{>>wrap-authenticate::request :authenticated-entity {{:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read :authenticated-entity true, :is_admin false, :authentication-method :session, {:login nil, :email :scope_system_admin_write falsejimmie@goyette.com, , :scope_write true:contracts_count,  :firstname Procurement, 0:scope_admin_write false, , :user_session_created_at:lastname  Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z"#time/instant "2023-11-22T17:12:26.878209Z", , :id :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb"#uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", , :user_session_id:user_session_id  #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96"#uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", , :scope_system_admin_read:scope_system_admin_read  false, false, :access-rights :access-rights (), :user_id (#uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb"), , :is_system_admin :user_idfalse,  :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin 0false, , :scope_admin_read:external_sign_out_url  false}nil, , :language_locale :cookies nil, :inventory_pool_roles_count 0, :scope_admin_read false}{, :cookies leihs-anti-csrf-token {leihs-anti-csrf-token {:value {574c56ce-26aa-4d17-a2b1-36a232bc4802}:value,  leihs-user-session 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, {:remote-addr :value127.0.0.1,  5847f015-c993-4cc8-88a1-84a81750988a}:start-time} , :remote-addr371703426254333 , 127.0.0.1:params , :start-time 371703426517416, :params {}, {}, :settings :settings {{:email_sending_enabled:email_sending_enabled  false, false, :sessions_max_lifetime_secs:sessions_max_lifetime_secs  432000432000, , :smtp_default_from_address :smtp_default_from_address your.lending.desk@example.com, your.lending.desk@example.com, :public_image_caching_enabled :public_image_caching_enabledtrue,  true:sessions_force_secure,  :sessions_force_securefalse,  :deliver_received_order_notifications false, :external_base_url false, nil, :deliver_received_order_notifications :sessions_force_uniqueness false, false, :external_base_url:email_signature  nil, Cheers,:sessions_force_uniqueness} , false, :tx-next:email_signature  Cheers,}, :tx-next ##next.jdbc.default_options.DefaultOptionsnext.jdbc.default_options.DefaultOptions{{:connectable:connectable  #object[#object[com.zaxxer.hikari.HikariDataSourcecom.zaxxer.hikari.HikariDataSource  0x3df69503 0x3df69503 HikariDataSource (HikariPool-1)]HikariDataSource (HikariPool-1), ], :options:options  {{:builder-fn :builder-fn #object[#object[next.jdbc.result_set$as_unqualified_lower_maps next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw 0x51291144 {}, :route-params nilnext.jdbc.result_set$as_unqualified_lower_maps@51291144, ]}}, :query-params-raw :headers {{}, origin:route-params  http://localhost:3230nil, , sec-fetch-site :headers same-origin, host localhost:3230, user-agent {Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-typeorigin  application/json, http://localhost:3230, cookie sec-fetch-site leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, same-origin, content-length host 3575, localhost:3230, referer user-agent http://localhost:3230/procure/requests, Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, connection content-typekeep-alive,  x-csrf-token application/json, 574c56ce-26aa-4d17-a2b1-36a232bc4802, cookie accept leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, application/json, content-length accept-language 534, de,en-US;q=0.7,en;q=0.3, referersec-fetch-dest  http://localhost:3230/procure/requestsempty, , connection accept-encoding keep-alive, gzip, deflate, br, x-csrf-token sec-fetch-mode 574c56ce-26aa-4d17-a2b1-36a232bc4802cors, }, accept :async-channelapplication/json , accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[#object[org.httpkit.server.AsyncChannelorg.httpkit.server.AsyncChannel  0x3d0decba 0x3e04260e /127.0.0.1:3230<->/127.0.0.1:59067], /127.0.0.1:3230<->/127.0.0.1:59065], :server-port :server-port 3230, 3230, :params-raw:params-raw  {}, :tx {{}:datasource , :tx {#object[:datasource com.zaxxer.hikari.HikariDataSource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 0x1d753ec 3575, HikariDataSource (db-pool)]}:form-params , :content-length 534, :form-params {}, {}:websocket? , false, :websocket? :query-params false, :query-params {}, {}:content-type , application/json, :content-type :form-params-raw application/json, :form-params-raw {}, {:character-encoding} , utf8:character-encoding,  :uri utf8, /procure/graphql, :uri :server-name /procure/graphql, localhost, :server-name localhost, :handler-key :handler-key :graphql, :graphql, :query-string :query-stringnil , nil, :body :body {{:operationName:operationName  RequestsIndexFilteredRequestFilters, , :variables:variables  {}, {}, :query:query  query RequestFilters {
+  budget_periods {
+    id
+    name
+    inspection_start_date
+    end_date
+    __typename
+  }
+  main_categories {
+    id
+    name
+    categories {
+      id
+      name
+      __typename
+    }
+    __typename
+  }
+  organizations(root_only: true) {
+    ...OrgProps
+    organizations {
+      ...OrgProps
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment OrgProps on Organization {
+  id
+  name
+  shortname
+  __typename
+}
+}, query RequestsIndexFiltered($budgetPeriods: [ID!], $categories: [ID!], $search: String, $state: [State!], $order_status: [OrderStatus], $organizations: [ID!], $priority: [Priority!], $inspector_priority: [InspectorPriority!], $onlyOwnRequests: Boolean) {
+  dashboard(budget_period_id: $budgetPeriods, category_id: $categories, search: $search, state: $state, order_status: $order_status, organization_id: $organizations, priority: $priority, inspector_priority: $inspector_priority, requested_by_auth_user: $onlyOwnRequests) {
+    cacheKey
+    total_count
+    budget_periods {
+      id
+      cacheKey
+      name
+      inspection_start_date
+      end_date
+      total_price_cents
+      main_categories {
+        id
+        cacheKey
+        name
+        image_url
+        total_price_cents
+        categories {
+          id
+          cacheKey
+          name
+          total_price_cents
+          requests {
+            ...RequestFieldsForIndex
+            total_price_cents
+            actionPermissions {
+              edit
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment RequestFieldsForIndex on Request {
+  id
+  short_id
+  user {
+    value {
+      id
+      firstname
+      lastname
+      __typename
+    }
+    __typename
+  }
+  category {
+    read
+    write
+    required
+    value {
+      id
+      name
+      main_category {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  budget_period {
+    read
+    write
+    required
+    value {
+      name
+      id
+      __typename
+    }
+    __typename
+  }
+  article_name {
+    value
+    __typename
+  }
+  model {
+    value {
+      id
+      product
+      version
+      __typename
+    }
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  organization {
+    value {
+      id
+      name
+      shortname
+      department {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  price_cents {
+    value
+    __typename
+  }
+  price_currency {
+    value
+    __typename
+  }
+  requested_quantity {
+    read
+    value
+    __typename
+  }
+  approved_quantity {
+    read
+    value
+    __typename
+  }
+  order_quantity {
+    read
+    value
+    __typename
+  }
+  replacement {
+    value
+    __typename
+  }
+  priority {
+    value
+    __typename
+  }
+  state
+  article_number {
+    value
+    __typename
+  }
+  supplier {
+    value {
+      name
+      __typename
+    }
+    __typename
+  }
+  supplier_name {
+    value
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  room {
+    value {
+      id
+      name
+      building {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  motivation {
+    value
+    __typename
+  }
+  inspection_comment {
+    value
+    __typename
+  }
+  inspector_priority {
+    value
+    __typename
+  }
+  accounting_type {
+    value
+    __typename
+  }
+  cost_center {
+    value
+    __typename
+  }
+  general_ledger_account {
+    value
+    __typename
+  }
+  procurement_account {
+    value
+    __typename
+  }
+  internal_order_number {
+    value
+    __typename
+  }
+  order_status {
+    value
+    __typename
+  }
+  order_comment {
+    value
+    __typename
+  }
+  __typename
+}
+>myprint> }, :graphql-schema :graphql-schemarequester   false
+#CompiledSchema<>, #CompiledSchema<>, :handler:handler  #object[#object[leihs.procurement.graphql$handlerleihs.procurement.graphql$handler  0x6e4914a5 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], leihs.procurement.graphql$handler@6e4914a5]:multipart-params,  :multipart-params {{}}, , :scheme:scheme  :http:http, , :request-method:request-method  :post:post, , :accept {:accept :mime {:json, :mime :charset:json , :charset nilnil, , :encoding:encoding  nilnil, , :language:language  nilnil}}}}
+
+2023-11-22T17:12:27.516Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+
+>>1 (:handler-key request) :graphql
+>>>a >myprint>  nilauthEnt?
+ >>>b {{:email:email  jimmie@goyette.comjimmie@goyette.com, , :contracts_count:contracts_count  00, , :lastname:lastname  AdminAdmin, , :org_id:org_id  nilnil, , :scope_read:scope_read  truetrue, , :is_admin:is_admin  falsefalse, , :authentication-method:authentication-method  :session:session, , :login:login  nilnil, , :scope_system_admin_write:scope_system_admin_write  falsefalse, , :scope_write:scope_write  truetrue, , :firstname:firstname  ProcurementProcurement, , :scope_admin_write:scope_admin_write  falsefalse, , :user_session_created_at :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", #time/instant "2023-11-22T17:12:26.878209Z":id,  :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb"#uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", , :user_session_id:user_session_id  #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96"#uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", , :scope_system_admin_read:scope_system_admin_read  falsefalse, , :access-rights:access-rights  (()), , :user_id:user_id  #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb"#uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", , :is_system_admin:is_system_admin  falsefalse, , :external_sign_out_url:external_sign_out_url  nilnil, , :language_locale:language_locale  nilnil, , :inventory_pool_roles_count:inventory_pool_roles_count  00, , :scope_admin_read:scope_admin_read  falsefalse}}
+
+2023-11-22T17:12:27.520Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>myprint>
+>>1 authorize txn
+{:datasource
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 #object[com.zaxxer.hikari.HikariDataSource 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+0x1d753ec HikariDataSource (db-pool)]}
+>>1 request
+{:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703426517416, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 534, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x3e04260e /127.0.0.1:3230<->/127.0.0.1:59065], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 534, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName RequestFilters, :variables {}, :query query RequestFilters {
+  budget_periods {
+    id
+    name
+    inspection_start_date
+    end_date
+    __typename
+  }
+  main_categories {
+    id
+    name
+    categories {
+      id
+      name
+      __typename
+    }
+    __typename
+  }
+  organizations(root_only: true) {
+    ...OrgProps
+    organizations {
+      ...OrgProps
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment OrgProps on Organization {
+  id
+  name
+  shortname
+  __typename
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept >myprint>  admin true
+{:mime :json, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :graphql
+>myprint> >myprint>   authEnt? inspector false
+{:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  viewer false
+>myprint>  admin true
+>myprint>  requester false
+2023-11-22T17:12:27.528Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+>myprint>  inspector false
+2023-11-22T17:12:27.531Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:27.534Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+2023-11-22T17:12:27.537Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+>>wrap-authenticate::handler #object[leihs.procurement.authorization$wrap_authorize$fn__39361 0x6e94df63 leihs.procurement.authorization$wrap_authorize$fn__39361@6e94df63]
+>>wrap-authenticate::request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703692314416, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 4058, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x484e1ffb /127.0.0.1:3230<->/127.0.0.1:59067], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 4058, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName RequestsIndexFiltered, :variables {:inspector_priority [LOW MEDIUM HIGH MANDATORY], :onlyOwnRequests false, :state [NEW APPROVED PARTIALLY_APPROVED DENIED], :order_status [NOT_PROCESSED IN_PROGRESS PROCURED ALTERNATIVE_PROCURED NOT_PROCURED], :search nil, :organizations [94793d05-5d12-48a3-a77b-05d0cc4d4982], :categories [c3947bc1-affe-4e0e-ac6b-554e95cc4922 1efc2279-bc42-490c-b004-dca03813a6ef], :priority [NORMAL HIGH], :budgetPeriods [8aafb4d4-7ce2-44a5-8ff9-8e370abc4a0d]}, :query query RequestsIndexFiltered($budgetPeriods: [ID!], $categories: [ID!], $search: String, $state: [State!], $order_status: [OrderStatus], $organizations: [ID!], $priority: [Priority!], $inspector_priority: [InspectorPriority!], $onlyOwnRequests: Boolean) {
+  dashboard(budget_period_id: $budgetPeriods, category_id: $categories, search: $search, state: $state, order_status: $order_status, organization_id: $organizations, priority: $priority, inspector_priority: $inspector_priority, requested_by_auth_user: $onlyOwnRequests) {
+    cacheKey
+    total_count
+    budget_periods {
+      id
+      cacheKey
+      name
+      inspection_start_date
+      end_date
+      total_price_cents
+      main_categories {
+        id
+        cacheKey
+        name
+        image_url
+        total_price_cents
+        categories {
+          id
+          cacheKey
+          name
+          total_price_cents
+          requests {
+            ...RequestFieldsForIndex
+            total_price_cents
+            actionPermissions {
+              edit
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment RequestFieldsForIndex on Request {
+  id
+  short_id
+  user {
+    value {
+      id
+      firstname
+      lastname
+      __typename
+    }
+    __typename
+  }
+  category {
+    read
+    write
+    required
+    value {
+      id
+      name
+      main_category {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  budget_period {
+    read
+    write
+    required
+    value {
+      name
+      id
+      __typename
+    }
+    __typename
+  }
+  article_name {
+    value
+    __typename
+  }
+  model {
+    value {
+      id
+      product
+      version
+      __typename
+    }
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  organization {
+    value {
+      id
+      name
+      shortname
+      department {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  price_cents {
+    value
+    __typename
+  }
+  price_currency {
+    value
+    __typename
+  }
+  requested_quantity {
+    read
+    value
+    __typename
+  }
+  approved_quantity {
+    read
+    value
+    __typename
+  }
+  order_quantity {
+    read
+    value
+    __typename
+  }
+  replacement {
+    value
+    __typename
+  }
+  priority {
+    value
+    __typename
+  }
+  state
+  article_number {
+    value
+    __typename
+  }
+  supplier {
+    value {
+      name
+      __typename
+    }
+    __typename
+  }
+  supplier_name {
+    value
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  room {
+    value {
+      id
+      name
+      building {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  motivation {
+    value
+    __typename
+  }
+  inspection_comment {
+    value
+    __typename
+  }
+  inspector_priority {
+    value
+    __typename
+  }
+  accounting_type {
+    value
+    __typename
+  }
+  cost_center {
+    value
+    __typename
+  }
+  general_ledger_account {
+    value
+    __typename
+  }
+  procurement_account {
+    value
+    __typename
+  }
+  internal_order_number {
+    value
+    __typename
+  }
+  order_status {
+    value
+    __typename
+  }
+  order_comment {
+    value
+    __typename
+  }
+  __typename
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+>>>a nil
+>>>b {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+
+>>1 authorize
+
+>>1 handler #object[leihs.core.locale$wrap$fn__44257 0x6916bba6 leihs.core.locale$wrap$fn__44257@6916bba6]
+
+>>1 request {:authenticated-entity {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 574c56ce-26aa-4d17-a2b1-36a232bc4802}, leihs-user-session {:value 5847f015-c993-4cc8-88a1-84a81750988a}}, :remote-addr 127.0.0.1, :start-time 371703692314416, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x3df69503 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x51291144 next.jdbc.result_set$as_unqualified_lower_maps@51291144]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=574c56ce-26aa-4d17-a2b1-36a232bc4802; leihs-user-session=5847f015-c993-4cc8-88a1-84a81750988a, content-length 4058, referer http://localhost:3230/procure/requests, connection keep-alive, x-csrf-token 574c56ce-26aa-4d17-a2b1-36a232bc4802, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors}, :async-channel #object[org.httpkit.server.AsyncChannel 0x484e1ffb /127.0.0.1:3230<->/127.0.0.1:59067], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}, :content-length 4058, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:operationName RequestsIndexFiltered, :variables {:inspector_priority [LOW MEDIUM HIGH MANDATORY], :onlyOwnRequests false, :state [NEW APPROVED PARTIALLY_APPROVED DENIED], :order_status [NOT_PROCESSED IN_PROGRESS PROCURED ALTERNATIVE_PROCURED NOT_PROCURED], :search nil, :organizations [94793d05-5d12-48a3-a77b-05d0cc4d4982], :categories [c3947bc1-affe-4e0e-ac6b-554e95cc4922 1efc2279-bc42-490c-b004-dca03813a6ef], :priority [NORMAL HIGH], :budgetPeriods [8aafb4d4-7ce2-44a5-8ff9-8e370abc4a0d]}, :query query RequestsIndexFiltered($budgetPeriods: [ID!], $categories: [ID!], $search: String, $state: [State!], $order_status: [OrderStatus], $organizations: [ID!], $priority: [Priority!], $inspector_priority: [InspectorPriority!], $onlyOwnRequests: Boolean) {
+  dashboard(budget_period_id: $budgetPeriods, category_id: $categories, search: $search, state: $state, order_status: $order_status, organization_id: $organizations, priority: $priority, inspector_priority: $inspector_priority, requested_by_auth_user: $onlyOwnRequests) {
+    cacheKey
+    total_count
+    budget_periods {
+      id
+      cacheKey
+      name
+      inspection_start_date
+      end_date
+      total_price_cents
+      main_categories {
+        id
+        cacheKey
+        name
+        image_url
+        total_price_cents
+        categories {
+          id
+          cacheKey
+          name
+          total_price_cents
+          requests {
+            ...RequestFieldsForIndex
+            total_price_cents
+            actionPermissions {
+              edit
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment RequestFieldsForIndex on Request {
+  id
+  short_id
+  user {
+    value {
+      id
+      firstname
+      lastname
+      __typename
+    }
+    __typename
+  }
+  category {
+    read
+    write
+    required
+    value {
+      id
+      name
+      main_category {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  budget_period {
+    read
+    write
+    required
+    value {
+      name
+      id
+      __typename
+    }
+    __typename
+  }
+  article_name {
+    value
+    __typename
+  }
+  model {
+    value {
+      id
+      product
+      version
+      __typename
+    }
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  organization {
+    value {
+      id
+      name
+      shortname
+      department {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  price_cents {
+    value
+    __typename
+  }
+  price_currency {
+    value
+    __typename
+  }
+  requested_quantity {
+    read
+    value
+    __typename
+  }
+  approved_quantity {
+    read
+    value
+    __typename
+  }
+  order_quantity {
+    read
+    value
+    __typename
+  }
+  replacement {
+    value
+    __typename
+  }
+  priority {
+    value
+    __typename
+  }
+  state
+  article_number {
+    value
+    __typename
+  }
+  supplier {
+    value {
+      name
+      __typename
+    }
+    __typename
+  }
+  supplier_name {
+    value
+    __typename
+  }
+  receiver {
+    value
+    __typename
+  }
+  room {
+    value {
+      id
+      name
+      building {
+        id
+        name
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  motivation {
+    value
+    __typename
+  }
+  inspection_comment {
+    value
+    __typename
+  }
+  inspector_priority {
+    value
+    __typename
+  }
+  accounting_type {
+    value
+    __typename
+  }
+  cost_center {
+    value
+    __typename
+  }
+  general_ledger_account {
+    value
+    __typename
+  }
+  procurement_account {
+    value
+    __typename
+  }
+  internal_order_number {
+    value
+    __typename
+  }
+  order_status {
+    value
+    __typename
+  }
+  order_comment {
+    value
+    __typename
+  }
+  __typename
+}
+}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6e4914a5 leihs.procurement.graphql$handler@6e4914a5], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+
+>>1 (:handler-key request) :graphql
+>myprint>  authEnt? {:email jimmie@goyette.com, :contracts_count 0, :lastname Admin, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Procurement, :scope_admin_write false, :user_session_created_at #time/instant "2023-11-22T17:12:26.878209Z", :id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :user_session_id #uuid "d94adcae-cbe8-41b7-9178-e13d75097e96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
+>myprint>  txn {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d753ec HikariDataSource (db-pool)]}
+>myprint>  admin true
+>myprint>  inspector false
+>myprint>  viewer false
+>myprint>  requester false
+2023-11-22T17:12:27.772Z NX-41294 DEBUG [leihs.procurement.authorization:134] - (skip? (:handler-key request)) => nil
+2023-11-22T17:12:27.775Z NX-41294 DEBUG [leihs.procurement.authorization:135] - (->> [user-perms/admin? user-perms/inspector? user-perms/viewer? user-perms/requester?] (map (fn* [p1__39342#] (p1__39342# (:tx request) (:authenticated-entity request)))) (some true?)) => true
+
+

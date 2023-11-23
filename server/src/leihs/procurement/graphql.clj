@@ -9,6 +9,11 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
 
+
+    [leihs.procurement.authorization :refer [myp]]
+
+    [taoensso.timbre :refer [debug info warn error spy]]
+
     [com.walmartlabs.lacinia :as lacinia]
     [com.walmartlabs.lacinia [parser :as graphql-parser]
      [schema :as graphql-schema] [util :as graphql-util]]
@@ -48,7 +53,7 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  (let [result (exec-query query request)
+  (let [result (spy(exec-query query request))
         resp {:body result}]
     (if (:errors result)
       (do (debug result) (assoc resp :graphql-error true))
@@ -69,12 +74,16 @@
 
 (defn handler
   [{{query :query} :body, :as request}]
+
+  (println ">>>graphql")
+  (println ">>>graphql-query" query)
+
   (let [mutation? (->> query
                        (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
-    (if mutation?
+    (if (myp "mutation?" mutation?)
       (jdbc/with-transaction
         [tx (:tx-next request)]
         (try (let [response (->> tx
