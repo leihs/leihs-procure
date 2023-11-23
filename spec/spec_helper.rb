@@ -23,6 +23,10 @@ end
 RSpec.configure do |config|
   config.include Helpers::User
 
+  # config.before(:each) do
+  #   Rails.config.logger.debug self.class.description
+  # end
+
   config.before(:example) do |_example|
     srand 1
     db_clean

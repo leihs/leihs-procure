@@ -12,6 +12,12 @@
     [logbug.debug :as debug :refer [I>]]
     [ring.util.response :as response]))
 
+
+(defn myp [name var]
+  (println ">myprint> " name var)
+  var
+  )
+
 (defn throw-unauthorized []
   (throw (ex-info
            (str "UnauthorizedException"
@@ -104,10 +110,7 @@
 
     (authenticate handler request)))
 
-(defn myp [name var]
-  (println ">myprint> " name var)
-  var
-  )
+
 
 (defn authorize [handler request]
   (println "\n>>1 authorize")
@@ -144,4 +147,4 @@
 (defn wrap-authorize
   [handler]
   (fn [request]
-    (authorize handler request)))
+    (spy (authorize handler request))))

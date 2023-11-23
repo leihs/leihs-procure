@@ -2,7 +2,7 @@
   (:require
     [clojure.edn :as edn]
 
-    ;[clojure.java [io :as io] [jdbc :as jdbc]]
+    [clojure.java [io :as io] [jdbc :as jdbco]]
     [clojure.java [io :as io]]
 
     [honey.sql :refer [format] :rename {format sql-format}]
@@ -71,41 +71,68 @@
            (debug e)
            (helpers/error-as-graphql-object "API_ERROR" m)))))
 
+;(defn handler
+;  [{{query :query} :body, :as request}]
+;
+;  (println ">>>graphql")
+;  ;(println ">>>graphql-query" query)
+;
+;  (let [mutation? (->> query
+;                       (parse-query-with-exception-handling (core-graphql/schema))
+;                       graphql-parser/operations
+;                       :type
+;                       (= :mutation))]
+;    (if (spy mutation?)
+;      (jdbc/with-transaction
+;        [tx (:tx-next request)]
+;        (try (let [response (->> tx
+;                                 (assoc request :tx)
+;                                 pure-handler)
+;                   p (println ">>r" response)
+;                   ]
+;               (when (:graphql-error (spy response))
+;                 (warn "Rolling back transaction because of graphql error: " response)
+;                 (.rollback tx)
+;                     ;(.rollback tx)
+;
+;                     ;(throw "Throw error")
+;                     )
+;               response)
+;             (catch Throwable th
+;               (warn "Rolling back transaction because of " th)
+;
+;               (.rollback tx)
+;               ;(jdbc/db-set-rollback-only! tx))              ;;old
+;               ;(throw "Throw error to force rollback"))
+;             ))
+;      (pure-handler request)))))
+
+
 (defn handler
   [{{query :query} :body, :as request}]
-
-  (println ">>>graphql")
-  ;(println ">>>graphql-query" query)
-
   (let [mutation? (->> query
                        (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
-    (if (spy mutation?)
-      (jdbc/with-transaction
-        [tx (:tx-next request)]
+    (if mutation?
+      (jdbco/with-db-transaction
+        [tx (:tx (spy request))
+
+         ;tx-next (:tx-next request)
+         ]
         (try (let [response (->> tx
                                  (assoc request :tx)
-                                 pure-handler)
-                   p (println ">>r" response)
-                   ]
-               (when (:graphql-error (spy response))
+                                 pure-handler)]
+               (when (:graphql-error response)
                  (warn "Rolling back transaction because of graphql error: " response)
-                 (.rollback tx)
-                     ;(.rollback tx)
-
-                     ;(throw "Throw error")
-                     )
+                 (jdbco/db-set-rollback-only! tx))
                response)
              (catch Throwable th
                (warn "Rolling back transaction because of " th)
-
-               (.rollback tx)
-               ;(jdbc/db-set-rollback-only! tx))              ;;old
-               ;(throw "Throw error to force rollback"))
-             ))
-      (pure-handler request)))))
+               (jdbco/db-set-rollback-only! tx)
+               (throw th))))
+      (pure-handler request))))
 
 
 (defn init []

@@ -18,6 +18,7 @@
 (defn wrap
   [handler]
   (fn [request]
+    (println "error-handler")
     (try
       (handler request)
       (catch Throwable _e
