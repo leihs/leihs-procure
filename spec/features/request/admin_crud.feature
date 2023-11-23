@@ -13,7 +13,7 @@ Feature: Request CRUD as procurement admin
     And there is a request of requester with the following data:
       | field         | value              |
       | Budgetperiode | Budget-Period-Past |
-#      | Kategorie     | Category C1        |
+      | Kategorie     | Category C1        |
     When I log in as the procurement admin
     And I expand the line of the main category "Main Category MC1"
     And I expand the line of the category "Category C"
@@ -25,14 +25,14 @@ Feature: Request CRUD as procurement admin
     And I enter the following data into the request form:
       | field                  | value                         |
       | Beschaffungs-Status    | Beschafft                     |
-#      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
+      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
 
     And I click on 'Speichern'
     And I expand the request line
     And the request form has the following data:
       | field                  | value                         |
       | Beschaffungs-Status    | Beschafft                     |
-#      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
+      | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
 
 
 

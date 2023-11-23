@@ -12,8 +12,6 @@
 
     [leihs.procurement.authorization :refer [myp]]
 
-    [taoensso.timbre :refer [debug info warn error spy]]
-
     [com.walmartlabs.lacinia :as lacinia]
     [com.walmartlabs.lacinia [parser :as graphql-parser]
      [schema :as graphql-schema] [util :as graphql-util]]
@@ -76,22 +74,22 @@
   [{{query :query} :body, :as request}]
 
   (println ">>>graphql")
-  (println ">>>graphql-query" query)
+  ;(println ">>>graphql-query" query)
 
   (let [mutation? (->> query
                        (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
-    (if (myp "mutation?" mutation?)
+    (if (spy mutation?)
       (jdbc/with-transaction
         [tx (:tx-next request)]
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)
-                   p (println ">>r" response)
+                   ;p (println ">>r" response)
                    ]
-               (when (:graphql-error response)
+               (when (:graphql-error (spy response))
                  (warn "Rolling back transaction because of graphql error: " response)
                  (.rollback tx)
                      ;(.rollback tx)

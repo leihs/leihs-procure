@@ -9,7 +9,6 @@
 
     [taoensso.timbre :refer [debug info warn error spy]]
 
-
     [logbug.debug :as debug :refer [I>]]
     [ring.util.response :as response]))
 
@@ -77,12 +76,6 @@
   [handler-key]
   (some #(= handler-key %) skip-authorization-handler-keys))
 
-
-(defn myp [name var]
-  (println ">myprint> " name var)
-  var
-  )
-
 (defn authenticate [handler {:keys [uri query-string handler-key] :as request}]
 
   (println ">>>a" (skip? handler-key))
@@ -110,6 +103,11 @@
     (println ">>wrap-authenticate::request" request)
 
     (authenticate handler request)))
+
+(defn myp [name var]
+  (println ">myprint> " name var)
+  var
+  )
 
 (defn authorize [handler request]
   (println "\n>>1 authorize")
