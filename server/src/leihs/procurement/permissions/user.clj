@@ -263,7 +263,7 @@
 
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
-  ([tx auth-entity c-id]
+  ([tx auth-entity c-id]                                    ;;FIXME
 
 
    (let [
@@ -338,7 +338,7 @@
   [{{:keys [tx-next tx authenticated-entity]} :request} args value]
   (when (not= (:user_id authenticated-entity) (:id value))
     (raise "Not allowed to query permissions for a user other then the authenticated one."))
-  {:isAdmin (admin? tx authenticated-entity),
-   :isRequester (requester? tx authenticated-entity),
+  (spy {:isAdmin (admin? tx-next authenticated-entity),
+   :isRequester (requester? tx-next authenticated-entity),
    :isInspectorForCategories (categories-perms/inspected-categories tx-next value),
-   :isViewerForCategories (categories-perms/viewed-categories tx-next value)})
+   :isViewerForCategories (categories-perms/viewed-categories tx-next value)}))

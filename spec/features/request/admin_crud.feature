@@ -14,19 +14,22 @@ Feature: Request CRUD as procurement admin
       | field         | value              |
       | Budgetperiode | Budget-Period-Past |
       | Kategorie     | Category C1        |
+#    And I spy
     When I log in as the procurement admin
     And I expand the line of the main category "Main Category MC1"
     And I expand the line of the category "Category C"
     And I expand the request line
+#    And I spy
     Then I see the link for the request
     And the "priority" field is readonly
     And the "inspector_priority" field is readonly
+#    And I spy
     But the "order_comment" field is not readonly
     And I enter the following data into the request form:
       | field                  | value                         |
       | Beschaffungs-Status    | Beschafft                     |
       | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
-
+#    And I spy
     And I click on 'Speichern'
     And I expand the request line
     And the request form has the following data:
