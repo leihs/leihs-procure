@@ -44,7 +44,7 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  (let [result (exec-query query request)
+  (let [result (spy (exec-query query request))
         resp {:body result}]
     (if (:errors result)
       (do (debug result) (assoc resp :graphql-error true))

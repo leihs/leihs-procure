@@ -12,13 +12,14 @@
     (first
       (jdbc/query
         tx
-        (-> (sql/select
+        (spy (-> (sql/select
               [(sql/call :exists
                          (-> (sql/select true)
                              (sql/from :procurement_admins)
                              (sql/where [:= :procurement_admins.user_id
                                          (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql/format))
+        ))))
 
 (defn inspector?
   ([tx auth-entity] (inspector? tx auth-entity nil))
@@ -27,7 +28,7 @@
      (first
        (jdbc/query
          tx
-         (-> (sql/select
+         (spy (-> (sql/select
                [(sql/call
                   :exists
                   (cond-> (-> (sql/select true)
@@ -38,7 +39,9 @@
                     c-id (sql/merge-where
                            [:= :procurement_category_inspectors.category_id
                             c-id]))) :result])
-             sql/format))))))
+             sql/format))
+
+         )))))
 
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
@@ -46,7 +49,7 @@
    (:result
      (first (jdbc/query
               tx
-              (-> (sql/select
+              (spy (-> (sql/select
                     [(sql/call
                        :exists
                        (cond-> (-> (sql/select true)
@@ -57,7 +60,8 @@
                          c-id (sql/merge-where
                                 [:= :procurement_category_viewers.category_id
                                  c-id]))) :result])
-                  sql/format))))))
+                  sql/format))
+              )))))
 
 (defn requester?
   [tx auth-entity]
@@ -65,20 +69,23 @@
     (first
       (jdbc/query
         tx
-        (-> (sql/select
+        (spy (-> (sql/select
               [(sql/call :exists
                          (-> (sql/select true)
                              (sql/from :procurement_requesters_organizations)
                              (sql/where
                                [:= :procurement_requesters_organizations.user_id
                                 (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql/format))
+
+        ))))
 
 (defn advanced?
   [tx auth-entity]
-  (->> [viewer? inspector? admin?]
+  (spy (->> [viewer? inspector? admin?]
        (map #(% tx auth-entity))
        (some true?)))
+  )
 
 (defn get-permissions
   [{{:keys [tx authenticated-entity]} :request} args value]
