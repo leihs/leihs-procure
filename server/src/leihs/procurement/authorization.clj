@@ -14,7 +14,7 @@
 
 (defn throw-unauthorized []
   (throw (ex-info
-           (str  "UnauthorizedException"
+           (str "UnauthorizedException"
                 " - " "Not authorized for this query path and arguments.")
            {:status 403})))
 
@@ -129,8 +129,8 @@
         ]
     )
 
-  (if (or (spy(skip? (:handler-key request)))
-          (spy(->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+  (if (or (spy (skip? (:handler-key request)))
+          (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
                      user-perms/requester?]
                     (map #(% (:tx request) (:authenticated-entity request)))
                     (some true?)))
