@@ -51,9 +51,10 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  (let [result (spy(exec-query query request))
+  ;(let [result (spy(exec-query query request))
+  (let [result (exec-query query request)
         resp {:body result}]
-    (if (:errors result)
+    (if (:errors (spy result))
       (do (debug result) (assoc resp :graphql-error true))
       resp)))
 
@@ -87,7 +88,7 @@
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)
-                   ;p (println ">>r" response)
+                   p (println ">>r" response)
                    ]
                (when (:graphql-error (spy response))
                  (warn "Rolling back transaction because of graphql error: " response)
