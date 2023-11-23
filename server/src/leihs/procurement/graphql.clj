@@ -76,7 +76,7 @@
                        (= :mutation))]
     (if (spy mutation?)
       (jdbc/with-db-transaction
-        [tx (:tx request)]
+        [tx (:tx (spy request))]
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)]

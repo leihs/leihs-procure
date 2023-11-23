@@ -144,4 +144,4 @@
 (defn wrap-authorize
   [handler]
   (fn [request]
-    (authorize handler request)))
+    (spy (authorize handler request))))
