@@ -12,7 +12,7 @@
     ))
 
 (def user-base-query
-  (-> (sql/select :users.id :users.firstname :users.lastname)
+  (-> (sql/select :id :firstname :lastname)
       (sql/from :users)))
 
 (defn get-user
@@ -76,5 +76,5 @@
   (jdbc/execute-one! tx
                      (-> user-base-query
                          ;(sql/where [:= :users.id (:cast id :uuid)])
-                         (sql/where [:= :users.id [:cast id :uuid]])
+                         (sql/where [:= :id [:cast id :uuid]])
                          sql-format)))

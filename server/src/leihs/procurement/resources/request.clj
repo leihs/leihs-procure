@@ -114,13 +114,19 @@
 
 (defn state-sql
   [advanced-user?]
-  (let [s-map (states-conds-map advanced-user?)]
+  (let [s-map (states-conds-map advanced-user?)
+        p (println ">> " s-map)
+        ]            ;;FIXME
+
+    ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
+
     (->> s-map
          keys
          (map name)
          (interleave (vals s-map))
          (cons :case)
-         (apply ))))
+         ;(apply )
+         )))
 
 (def sql-order-by-expr
   (str "concat("

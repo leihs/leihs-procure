@@ -8,14 +8,18 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
+
+
+    [taoensso.timbre :refer [debug info warn error spy]]
+
     ))
 
 (defn saved-filters-query
   [user-id]
-  (-> (sql/select :procurement_users_filters.*)
+  (spy (-> (sql/select :*)
       (sql/from :procurement_users_filters)
-      (sql/where [:= :procurement_users_filters.user_id user-id])
-      sql-format))
+      (sql/where [:= :user_id [:cast user-id :uuid]])
+      sql-format)))
 
 (defn get-saved-filters
   [context args value]
@@ -28,7 +32,8 @@
 
 (defn get-saved-filters-by-user-id
   [tx user-id]
-  ( (jdbc/execute-one! tx (saved-filters-query user-id))))
+  (println ">>oida>>" user-id)
+  (jdbc/execute-one! tx (saved-filters-query user-id)))
 
 (defn delete-unused
   [tx]
