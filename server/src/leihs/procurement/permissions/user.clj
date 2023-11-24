@@ -20,11 +20,21 @@
 
 (defn admin? "Returns boolean"
   [tx auth-entity]
+
+  (spy (-> (sql/select [true :has_entry])
+      (sql/from :procurement_admins)
+      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+      sql-format))
+
   (-> (sql/select [true :has_entry])
       (sql/from :procurement_admins)
       (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+
       sql-format
-      (spy)
+      ;(spy sql-format)
+
+      ;(spy)
+
       (->> (jdbc/execute-one! tx))
       (:has_entry)
       (is-truthy?))
@@ -77,11 +87,19 @@
 (defn requester?
   [tx auth-entity]
 
+  (spy(-> (sql/select [true :has_entry])
+      (sql/from :procurement_requesters_organizations)
+      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+      sql-format))
+
   (-> (sql/select [true :has_entry])
       (sql/from :procurement_requesters_organizations)
       (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+
+      ;(spy sql-format)
       sql-format
-      (spy)
+
+      ;(spy)
       (->> (jdbc/execute-one! tx))
       (:has_entry)
       (is-truthy?))
