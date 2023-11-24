@@ -26,6 +26,13 @@
 
 (defn get-dashboard
   [ctx args value]
+
+  ;(throw "my-error")
+
+  (println "\n>>>get-dashboard")
+  (spy args)                                                ; args => {:budget_period_id ["4574603b-28d7-4d80-bd35-698ca9ad7b19"], :category_id ["2f85f118-4c33-40f5-8688-66dad
+  (spy value)                                               ;nil .. ok
+
   (let [ring-request (:request ctx)
         tx (:tx ring-request)
         cat-ids (:category_id args)
