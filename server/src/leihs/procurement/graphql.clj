@@ -38,10 +38,21 @@
 
 (defn exec-query
   [query-string request]
-  (debug "graphql query" query-string
-         "with variables" (-> request
-                              :body
-                              :variables))
+
+  ;(throw "my-error")
+
+  ;(debug "graphql query" query-string
+  ;       "with variables" (-> request
+  ;                            :body
+  ;                            :variables))
+
+
+  (println "\n>>>exec-query::variables" (-> request
+                                 :body
+                                 :variables))
+
+  ;(println "\n>>>exec-query::graphql-query" query-string)
+
   (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
@@ -53,6 +64,9 @@
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
+        p   (println "\n>>>pure-handler" result)
+        ;p   (println "\n>>>pure-handler::query" query)
+        ;p   (println "\n>>>pure-handler" result)
         resp {:body result}]
     (if (:errors (spy result))
       (do (debug result) (assoc resp :graphql-error true))
@@ -71,43 +85,6 @@
            (debug e)
            (helpers/error-as-graphql-object "API_ERROR" m)))))
 
-;(defn handler
-;  [{{query :query} :body, :as request}]
-;
-;  (println ">>>graphql")
-;  ;(println ">>>graphql-query" query)
-;
-;  (let [mutation? (->> query
-;                       (parse-query-with-exception-handling (core-graphql/schema))
-;                       graphql-parser/operations
-;                       :type
-;                       (= :mutation))]
-;    (if (spy mutation?)
-;      (jdbc/with-transaction
-;        [tx (:tx-next request)]
-;        (try (let [response (->> tx
-;                                 (assoc request :tx)
-;                                 pure-handler)
-;                   p (println ">>r" response)
-;                   ]
-;               (when (:graphql-error (spy response))
-;                 (warn "Rolling back transaction because of graphql error: " response)
-;                 (.rollback tx)
-;                     ;(.rollback tx)
-;
-;                     ;(throw "Throw error")
-;                     )
-;               response)
-;             (catch Throwable th
-;               (warn "Rolling back transaction because of " th)
-;
-;               (.rollback tx)
-;               ;(jdbc/db-set-rollback-only! tx))              ;;old
-;               ;(throw "Throw error to force rollback"))
-;             ))
-;      (pure-handler request)))))
-
-
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
@@ -117,12 +94,13 @@
                        (= :mutation))]
     (if mutation?
       (jdbco/with-db-transaction
-        [tx (:tx (spy request))
+        ;[tx (:tx-next (spy request))
+        [tx (:tx-next request)
 
          ;tx-next (:tx-next request)
          ]
         (try (let [response (->> tx
-                                 (assoc request :tx)
+                                 (assoc request :tx-next)
                                  pure-handler)]
                (when (:graphql-error response)
                  (warn "Rolling back transaction because of graphql error: " response)
