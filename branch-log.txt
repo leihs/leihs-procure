@@ -489,7 +489,11 @@ fragment RequestFieldsForIndex on Request {
 2023-11-24T16:30:00.381Z NX-41294 DEBUG [leihs.procurement.permissions.user:60] - query => ["SELECT TRUE AS has_entry FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = ?" #uuid "9b770f07-a661-4403-9c80-3dd205c2b115"]
 2023-11-24T16:30:00.383Z NX-41294 DEBUG [leihs.procurement.permissions.user:24] - (-> (sql/select [true :has_entry]) (sql/from :procurement_admins) (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]]) sql-format) => ["SELECT TRUE AS has_entry FROM procurement_admins WHERE user_id = CAST(? AS UUID)" #uuid "9b770f07-a661-4403-9c80-3dd205c2b115"]
 2023-11-24T16:30:00.383Z NX-41294 DEBUG [leihs.procurement.permissions.user:110] - (->> [viewer? inspector? admin?] (map (fn* [p1__39094#] (p1__39094# tx auth-entity))) (some true?)) => true
+
+
 >>  {:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
+
+
 2023-11-24T16:30:00.384Z NX-41294 DEBUG [leihs.procurement.permissions.user:24] - (-> (sql/select [true :has_entry]) (sql/from :procurement_admins) (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]]) sql-format) => ["SELECT TRUE AS has_entry FROM procurement_admins WHERE user_id = CAST(? AS UUID)" #uuid "9b770f07-a661-4403-9c80-3dd205c2b115"]
 2023-11-24T16:30:00.387Z NX-41294 ERROR [leihs.procurement.resources.requests:119] -
                                                      java.lang.Thread.run              Thread.java:  829
