@@ -1,7 +1,10 @@
 (ns leihs.procurement.dashboard
   (:require [clojure.string :as string]
     
-    
+
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     
             ;[clojure.java.jdbc :as jdbc]
             ;[leihs.procurement.utils.sql :as sql]
@@ -32,8 +35,13 @@
 
 (defn get-dashboard
   [ctx args value]
+
+  (println ">>>get-dashboard")
+  (spy args)
+  (spy value)
+
   (let [ring-request (:request ctx)
-        tx (:tx ring-request)
+        tx (:tx-next ring-request)
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
         main-cats (-> main-categories/main-categories-base-query

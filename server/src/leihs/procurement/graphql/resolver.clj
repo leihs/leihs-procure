@@ -2,6 +2,10 @@
   (:require
     [clojure.tools.logging :as log]
     [com.walmartlabs.lacinia.resolve :as graphql-resolve]
+
+    [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [leihs.procurement.graphql [mutations :as mutations]
      [queries :as queries]]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]))

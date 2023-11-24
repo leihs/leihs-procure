@@ -4,8 +4,10 @@
             ;[clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sqlp]
 
+            [taoensso.timbre :refer [debug info warn error spy]]
 
-    [honey.sql :refer [format] :rename {format sql-format}]
+
+            [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
@@ -62,7 +64,7 @@
         search-term (:search arguments)
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
-        tx (:tx rrequest)
+        tx (:tx-next rrequest)
         advanced-user? (user-perms/advanced? tx
                                              (:authenticated-entity rrequest))
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
@@ -102,14 +104,23 @@
       search-term (search-query search-term))))
 
 (defn get-requests
-  [context arguments value]
+  [context  arguments value]
+
+  ;(spy context)
+  (spy arguments)
+  (spy value)
+
   (let [ring-request (:request context)
-        tx (:tx ring-request)
+        tx (:tx-next ring-request)
         auth-entity (:authenticated-entity ring-request)
         query (as-> context <>
-                (requests-query-map <> arguments value)
-                (requests-perms/apply-scope tx <> auth-entity)
-                (sql-format <>))
+                (spy (requests-query-map <> arguments value))
+                (spy (requests-perms/apply-scope tx <> auth-entity))
+                (spy (sql-format <>)))
+
+        p  (println ">>broken-query" (spy query))           ;;TODO: log broken query
+        ;p (throw "my-log-error")
+
         proc-requests (request/query-requests tx auth-entity query)]
     (->>
       proc-requests
@@ -155,7 +166,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx)
+                                  :tx-next)
                               :procurement_requests.requested_quantity
                               (:id value)))
 
@@ -163,7 +174,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx)
+                                  :tx-next)
                               :procurement_requests.approved_quantity
                               (:id value)))
 
@@ -171,7 +182,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx)
+                                  :tx-next)
                               :procurement_requests.order_quantity
                               (:id value)))
 
@@ -179,7 +190,7 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)
+               :tx-next)
         bp-id (:id value)]
     (-> :requested_quantity
         (total-price-sqlmap bp-id)
@@ -190,7 +201,7 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)
+               :tx-next)
         bp-id (:id value)]
     (-> ( :coalesce
                   :procurement_requests.order_quantity
