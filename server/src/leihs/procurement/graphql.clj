@@ -31,10 +31,21 @@
 
 (defn exec-query
   [query-string request]
-  (debug "graphql query" query-string
-         "with variables" (-> request
-                              :body
-                              :variables))
+
+  ;(throw "my-error")
+
+  ;(debug "graphql query" query-string
+  ;       "with variables" (-> request
+  ;                            :body
+  ;                            :variables))
+
+
+  (println "\n>>>exec-query::variables" (-> request
+                                 :body
+                                 :variables))
+
+  ;(println "\n>>>exec-query::graphql-query" query-string)
+
   (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
@@ -44,9 +55,13 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  (let [result (spy (exec-query query request))
+  ;(let [result (spy(exec-query query request))
+  (let [result (exec-query query request)
+        p   (println "\n>>>pure-handler" result)
+        ;p   (println "\n>>>pure-handler::query" query)
+        ;p   (println "\n>>>pure-handler" result)
         resp {:body result}]
-    (if (:errors result)
+    (if (:errors (spy result))
       (do (debug result) (assoc resp :graphql-error true))
       resp)))
 
@@ -65,22 +80,18 @@
 
 (defn handler
   [{{query :query} :body, :as request}]
-
-  (println ">>>graphql")
-  ;(println ">>>graphql-query" query)
-
   (let [mutation? (->> query
                        (parse-query-with-exception-handling (core-graphql/schema))
                        graphql-parser/operations
                        :type
                        (= :mutation))]
-    (if (spy mutation?)
+    (if mutation?
       (jdbc/with-db-transaction
-        [tx (:tx (spy request))]
+        [tx (:tx request)]
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)]
-               (when (:graphql-error (spy response))
+               (when (:graphql-error response)
                  (warn "Rolling back transaction because of graphql error: " response)
                  (jdbc/db-set-rollback-only! tx))
                response)

@@ -12,6 +12,12 @@
     [logbug.debug :as debug :refer [I>]]
     [ring.util.response :as response]))
 
+
+(defn myp [name var]
+  (println ">myprint> " name var)
+  var
+  )
+
 (defn throw-unauthorized []
   (throw (ex-info
            (str "UnauthorizedException"
@@ -78,8 +84,8 @@
 
 (defn authenticate [handler {:keys [uri query-string handler-key] :as request}]
 
-  (println ">>>a" (skip? handler-key))
-  (println ">>>b" (:authenticated-entity request))
+  (println ">>> authenticate::skip=" (skip? handler-key) " handler-key=" handler-key)
+  (println ">>> authenticate::authenticated-entity" (:authenticated-entity request))
 
   (cond
     (or (skip? handler-key) (:authenticated-entity request))
@@ -99,35 +105,32 @@
 (defn wrap-authenticate
   [handler]
   (fn [request]
-    (println ">>wrap-authenticate::handler" handler)
-    (println ">>wrap-authenticate::request" request)
+    ;(println ">>wrap-authenticate::handler" handler)
+    ;(println ">>wrap-authenticate::request" request)
 
     (authenticate handler request)))
 
-(defn myp [name var]
-  (println ">myprint> " name var)
-  var
-  )
+
 
 (defn authorize [handler request]
-  (println "\n>>1 authorize")
-  (println "\n>>1 handler" handler)
-  (println "\n>>1 request" request)
-  (println "\n>>1 (:handler-key request)" (:handler-key request))
+  (println "\n>> authorize >")
+  (println "\n>> authorize::handler >" handler)
+  (println "\n>> authorize::request >" request)
+  (println "\n>> authorize::handler-key >>" (:handler-key request))
 
-  (let [
-
-        auth-ent (:authenticated-entity request)
-        p (myp "authEnt?" auth-ent)
-        txn (:tx request)
-        p (myp "txn" txn)
-
-        p (myp "admin" (user-perms/admin? txn auth-ent))
-        p (myp "inspector" (user-perms/inspector? txn auth-ent))
-        p (myp "viewer" (user-perms/viewer? txn auth-ent))
-        p (myp "requester" (user-perms/requester? txn auth-ent))
-        ]
-    )
+  ;(let [
+  ;
+  ;      auth-ent (:authenticated-entity request)
+  ;      p (myp "authEnt?" auth-ent)
+  ;      txn (:tx request)
+  ;      p (myp "txn" txn)
+  ;
+  ;      p (myp "admin" (user-perms/admin? txn auth-ent))
+  ;      p (myp "inspector" (user-perms/inspector? txn auth-ent))
+  ;      p (myp "viewer" (user-perms/viewer? txn auth-ent))
+  ;      p (myp "requester" (user-perms/requester? txn auth-ent))
+  ;      ]
+  ;  )
 
   (if (or (spy (skip? (:handler-key request)))
           (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
