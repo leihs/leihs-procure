@@ -4,6 +4,10 @@
             [clojure.tools.logging :as log]
             [leihs.procurement.permissions [request-helpers :as request-perms]
              [requests :as requests-perms] [user :as user-perms]]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.resources.request-helpers :as request-helpers]
             [leihs.procurement.utils.sql :as sql]))
@@ -100,6 +104,9 @@
                 (requests-query-map <> arguments value)
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql/format <>))
+
+        p  (println ">>broken-query" (spy query))           ;;TODO: log broken query
+        ;p (throw "my-log-error")
         proc-requests (request/query-requests tx auth-entity query)]
     (->>
       proc-requests

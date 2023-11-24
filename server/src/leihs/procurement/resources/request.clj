@@ -11,6 +11,12 @@
              [request-helpers :as request-helpers]
              [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads] [user :as user]]
+
+
+
+            [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
              [sql :as sql]]))
 
@@ -34,8 +40,8 @@
                      (assoc attr2 value)
                      (dissoc attr1))
                  mem)))
-     req
-     mapping)))
+           req
+           mapping)))
 
 (defn reverse-exchange-attrs
   [req]
@@ -52,14 +58,14 @@
   [advanced-user?]
   (let [approved-not-set [:= :procurement_requests.approved_quantity nil]
         approved-greater-equal-than-requested
-          [:>= :procurement_requests.approved_quantity
-           :procurement_requests.requested_quantity]
+        [:>= :procurement_requests.approved_quantity
+         :procurement_requests.requested_quantity]
         approved-smaller-than-requested
-          ; but greater than zero
-          [:and
-           [:< :procurement_requests.approved_quantity
-            :procurement_requests.requested_quantity]
-           [:> :procurement_requests.approved_quantity 0]]
+        ; but greater than zero
+        [:and
+         [:< :procurement_requests.approved_quantity
+          :procurement_requests.requested_quantity]
+         [:> :procurement_requests.approved_quantity 0]]
         approved-zero [:= :procurement_requests.approved_quantity 0]]
     (cond->
       {:NEW (if advanced-user?
@@ -83,10 +89,10 @@
                  [:and [:< :procurement_budget_periods.end_date :current_date]
                   approved-zero])}
       (not advanced-user?)
-        (assoc :IN_APPROVAL
-          [:and
-           [:>= :current_date :procurement_budget_periods.inspection_start_date]
-           [:< :current_date :procurement_budget_periods.end_date]]))))
+      (assoc :IN_APPROVAL
+             [:and
+              [:>= :current_date :procurement_budget_periods.inspection_start_date]
+              [:< :current_date :procurement_budget_periods.end_date]]))))
 
 (defn get-where-conds-for-states
   [states advanced-user?]
@@ -95,8 +101,8 @@
               (->> sc-map
                    state
                    (conj or-conds))))
-    [:or]
-    states))
+          [:or]
+          states))
 
 (defn to-name-and-lower-case
   [x]
@@ -106,18 +112,32 @@
 
 (defn state-sql
   [advanced-user?]
-  (let [s-map (states-conds-map advanced-user?)]
-    (->> s-map
-         keys
-         (map name)
-         (interleave (vals s-map))
-         (cons :case)
-         (apply sql/call))))
+  (let [s-map (states-conds-map advanced-user?)
+        p (println ">>a " s-map)
+
+        ;p (throw "my-log-error")
+        result (->> s-map
+                    keys
+                    (map name)
+                    (interleave (vals s-map))
+                    (cons :case)
+                    (apply sql/call))
+
+        p (println ">>b " result)
+
+
+        ]                                                   ;;FIXME
+
+    ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
+
+    result
+
+    ))
 
 (def sql-order-by-expr
   (str "concat("
        "lower(coalesce(procurement_requests.article_name, '')), "
-         "lower(coalesce(models.product, '')), "
+       "lower(coalesce(models.product, '')), "
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query
@@ -131,19 +151,22 @@
 
 (defn requests-base-query-with-state
   [advanced-user?]
-  (-> requests-base-query
+
+
+
+  (spy (-> requests-base-query
       (sql/merge-select [(state-sql advanced-user?) :state])
       (sql/merge-join :procurement_budget_periods
                       [:= :procurement_budget_periods.id
-                       :procurement_requests.budget_period_id])))
+                       :procurement_requests.budget_period_id]))))
 
 (defn to-name-and-lower-case-enums
   [m]
   (cond-> m
-    (:order_status m) (update :order_status to-name-and-lower-case)
-    (:priority m) (update :priority to-name-and-lower-case)
-    (:inspector_priority m) (update :inspector_priority
-                                    to-name-and-lower-case)))
+          (:order_status m) (update :order_status to-name-and-lower-case)
+          (:priority m) (update :priority to-name-and-lower-case)
+          (:inspector_priority m) (update :inspector_priority
+                                          to-name-and-lower-case)))
 
 (defn upper-case-keyword-value
   [row attr]
@@ -171,11 +194,11 @@
                                  (:approved_quantity row)
                                  (:requested_quantity row))
         quantity
-          (if (-> row
-                  :budget_period
-                  :is_past)
-            transparent-quantity
-            (if advanced-user? transparent-quantity (:requested_quantity row)))]
+        (if (-> row
+                :budget_period
+                :is_past)
+          transparent-quantity
+          (if advanced-user? transparent-quantity (:requested_quantity row)))]
     (->> row
          :price_cents
          (* quantity)
@@ -234,9 +257,9 @@
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
+    (spy (-> advanced-user?
         requests-base-query-with-state
-        (sql/where [:= :procurement_requests.id id]))))
+        (sql/where [:= :procurement_requests.id id])))))
 
 (defn get-request-by-id
   [tx auth-entity id]
@@ -264,24 +287,24 @@
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
-                   (not user-arg) (assoc :user (:user_id auth-entity)))
+                         (not user-arg) (assoc :user (:user_id auth-entity)))
         fields
-          (->> req-stub
-               submap-with-id-for-associated-resources
-               (request-fields-perms/get-for-user-and-request tx auth-entity))]
+        (->> req-stub
+             submap-with-id-for-associated-resources
+             (request-fields-perms/get-for-user-and-request tx auth-entity))]
     (authorization/authorize-and-apply
       #(as-> fields <>
-        (reject-keys <> request-perms/special-perms)
-        (map (fn [f] (apply consider-default f)) <>)
-        (into {} <>)
-        (assoc <> :state :NEW))
+         (reject-keys <> request-perms/special-perms)
+         (map (fn [f] (apply consider-default f)) <>)
+         (into {} <>)
+         (assoc <> :state :NEW))
       :if-only
       #(request-perms/can-write-any-field? fields))))
 
 (defn get-last-created-request
   [tx auth-entity]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
+    (spy (-> advanced-user?
         requests-base-query-with-state
         ; NOTE: reselect because of:
         ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
@@ -290,7 +313,7 @@
         (sql/limit 1)
         sql/format
         (->> (query-requests tx auth-entity))
-        first)))
+        first))))
 
 (defn insert!
   [tx data]
@@ -312,7 +335,7 @@
 (defn deal-with-attachments!
   [tx req-id attachments]
   (let [uploads-to-delete
-          (filter-attachments {:to_delete true, :typename "Upload"} attachments)
+        (filter-attachments {:to_delete true, :typename "Upload"} attachments)
         uploads-to-attachments (filter-attachments {:to_delete false,
                                                     :typename "Upload"}
                                                    attachments)
@@ -343,7 +366,7 @@
         req-id (:id input-data)
         new-budget-period-id (:budget_period input-data)
         budget-period-new
-          (budget-period/get-budget-period-by-id tx new-budget-period-id)
+        (budget-period/get-budget-period-by-id tx new-budget-period-id)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
@@ -383,9 +406,9 @@
          (-> (sql/update :procurement_requests)
              (sql/sset
                (cond-> {:category_id cat-id}
-                 (and (not (user-perms/inspector? tx auth-entity cat-id))
-                      (not (user-perms/admin? tx auth-entity)))
-                   (merge change-category-reset-attrs)))
+                       (and (not (user-perms/inspector? tx auth-entity cat-id))
+                            (not (user-perms/admin? tx auth-entity)))
+                       (merge change-category-reset-attrs)))
              (sql/where [:= :procurement_requests.id req-id])
              sql/format))
       :if-only
@@ -431,16 +454,16 @@
                submap-with-id-for-associated-resources
                (request-perms/authorized-to-write-all-fields? tx auth-entity))
          #(or (not template) (not (:is_archived template)))])
-        (as-> @req-id <>
-          (get-request-by-id tx auth-entity <>)
-          (request-perms/apply-permissions tx
-                                           auth-entity
-                                           <>
-                                           #(assoc %
-                                             :request-id @req-id))))))
+      (as-> @req-id <>
+        (get-request-by-id tx auth-entity <>)
+        (request-perms/apply-permissions tx
+                                         auth-entity
+                                         <>
+                                         #(assoc %
+                                            :request-id @req-id))))))
 
-  (defn update-request!
-    [context args _]
+(defn update-request!
+  [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -448,22 +471,22 @@
         req-id (:id input-data)
         attachments (:attachments input-data)
         organization-id (some->> input-data
-                                 :user
-                                 (requesters/get-organization-of-requester tx)
-                                 :id)
+                          :user
+                          (requesters/get-organization-of-requester tx)
+                          :id)
         update-data
-          (as-> input-data <>
-            (dissoc <> :id)
-            (dissoc <> :attachments)
-            (cond-> <> (:order_status <>)
-              (update :order_status
-                      #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
-            (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
-            (cond-> <>
-              (:inspector_priority <>) (update :inspector_priority
-                                               to-name-and-lower-case))
-            (cond-> <>
-              organization-id (assoc :organization_id organization-id)))
+        (as-> input-data <>
+          (dissoc <> :id)
+          (dissoc <> :attachments)
+          (cond-> <> (:order_status <>)
+                  (update :order_status
+                          #(sql/call :cast (to-name-and-lower-case %) :order_status_enum)))
+          (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
+          (cond-> <>
+                  (:inspector_priority <>) (update :inspector_priority
+                                                   to-name-and-lower-case))
+          (cond-> <>
+                  organization-id (assoc :organization_id organization-id)))
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(do (update! tx req-id (exchange-attrs update-data))
@@ -502,7 +525,7 @@
                                        (sql/where [:= :procurement_requests.id
                                                    req-id])
                                        sql/format))]
-        (= result '(1)))
+         (= result '(1)))
       :if-only
       #(:DELETE field-perms))))
 

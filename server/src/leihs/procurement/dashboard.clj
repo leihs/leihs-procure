@@ -6,6 +6,10 @@
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.utils.sql :as sql]))
 
 (defn sum-total-price
@@ -36,7 +40,7 @@
                   sql/format
                   (->> (jdbc/query tx)))
               [])
-        requests (requests/get-requests ctx args value)
+        requests (spy (requests/get-requests ctx args value))
         dashboard-cache-key {:id (hash args)}]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
