@@ -44,8 +44,16 @@
                                  :body
                                  :variables))
 
+
+  (spy query-string)
+  (spy (-> request
+           :body
+           :variables))
+  (spy {:request request})
+
   ;(println "\n>>>exec-query::graphql-query" query-string)
 
+  ;; TODO FIXME
   (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
