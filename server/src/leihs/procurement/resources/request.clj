@@ -19,8 +19,14 @@
              [request-helpers :as request-helpers]
              [requesters-organizations :as requesters] [template :as template]
              [uploads :as uploads] [user :as user]]
+
+
+
+            [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.utils [helpers :refer [reject-keys submap?]]
-             ]))
+             [sql :as sqlo]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -125,13 +131,13 @@
          (map name)
          (interleave (vals s-map))
          (cons :case)
-         ;(apply )
+         (apply :call)
          )))
 
 (def sql-order-by-expr
   (str "concat("
        "lower(coalesce(procurement_requests.article_name, '')), "
-         "lower(coalesce(models.product, '')), "
+       "lower(coalesce(models.product, '')), "
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query
@@ -154,10 +160,10 @@
 (defn to-name-and-lower-case-enums
   [m]
   (cond-> m
-    (:order_status m) (update :order_status to-name-and-lower-case)
-    (:priority m) (update :priority to-name-and-lower-case)
-    (:inspector_priority m) (update :inspector_priority
-                                    to-name-and-lower-case)))
+          (:order_status m) (update :order_status to-name-and-lower-case)
+          (:priority m) (update :priority to-name-and-lower-case)
+          (:inspector_priority m) (update :inspector_priority
+                                          to-name-and-lower-case)))
 
 (defn upper-case-keyword-value
   [row attr]
@@ -471,7 +477,7 @@
             (dissoc <> :attachments)
             (cond-> <> (:order_status <>)
               (update :order_status
-                      #( :cast (to-name-and-lower-case %) :order_status_enum)))
+                      #(:call :cast (to-name-and-lower-case %) :order_status_enum)))
             (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
             (cond-> <>
               (:inspector_priority <>) (update :inspector_priority

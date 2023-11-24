@@ -144,9 +144,9 @@
 (defn- sql-sum
   [qty-type]
   (as-> qty-type <>
-    ( :* :procurement_requests.price_cents <>)
-    ( :cast <> :bigint)
-    ( :sum <>)))
+    (:call :* :procurement_requests.price_cents <>)
+    (:call :cast <> :bigint)
+    (:call :sum <>)))
 
 (defn total-price-sqlmap
   [qty-type bp-id]
@@ -203,7 +203,7 @@
                :request
                :tx-next)
         bp-id (:id value)]
-    (-> ( :coalesce
+    (-> (:call :coalesce
                   :procurement_requests.order_quantity
                   :procurement_requests.approved_quantity)
         (total-price-sqlmap bp-id)
