@@ -132,11 +132,17 @@
   ;      ]
   ;  )
 
-  (if (or (spy (skip? (:handler-key request)))
-          (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+  ;(if (or (spy (skip? (:handler-key request)))
+  ;        (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
+  ;                   user-perms/requester?]
+  ;                  (map #(% (:tx-next request) (:authenticated-entity request)))
+  ;                  (some true?)))
+
+  (if (or  (skip? (:handler-key request))
+          (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
                      user-perms/requester?]
                     (map #(% (:tx-next request) (:authenticated-entity request)))
-                    (some true?)))
+                    (some true?))
           )
     (handler request)
     {:status 403,
