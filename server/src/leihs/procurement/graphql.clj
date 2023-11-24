@@ -53,12 +53,13 @@
 
   ;(println "\n>>>exec-query::graphql-query" query-string)
 
+  ;; FIXME
   (lacinia/execute (core-graphql/schema)
-                   query-string
-                   (-> request
+                   (spy query-string)
+                   (spy (-> request
                        :body
-                       :variables)
-                   {:request request}))
+                       :variables))
+                   (spy {:request request})))
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
@@ -99,7 +100,9 @@
 
          ;tx-next (:tx-next request)
          ]
-        (try (let [response (->> tx
+        (try (let [
+                   p (println "pure-handler >> 1")
+                   response (->> tx
                                  (assoc request :tx-next)
                                  pure-handler)]
                (when (:graphql-error response)
@@ -110,7 +113,11 @@
                (warn "Rolling back transaction because of " th)
                (jdbco/db-set-rollback-only! tx)
                (throw th))))
-      (pure-handler request))))
+      (let [p (println "pure-handler >> 2")
+            ]
+        (pure-handler request))
+
+      )))
 
 
 (defn init []

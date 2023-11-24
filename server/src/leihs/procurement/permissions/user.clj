@@ -31,9 +31,6 @@
       (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
 
       sql-format
-      ;(spy sql-format)
-
-      ;(spy)
 
       (->> (jdbc/execute-one! tx))
       (:has_entry)
@@ -49,7 +46,7 @@
          has-entry (-> (sql/select [true :has_entry])
                        (sql/from :procurement_category_inspectors)
                        (sql/where
-                         [:= :procurement_category_inspectors.user_id
+                         [:= :user_id
                           (:user_id auth-entity)]))
 
          res (cond-> has-entry
@@ -112,7 +109,9 @@
             (some true?))))
 
 (defn get-permissions
-  [{{:keys [tx-next tx authenticated-entity]} :request} args value]
+  [{{:keys [tx-next authenticated-entity]} :request} args value]
+  ;[{{:keys [tx-next tx authenticated-entity]} :request} args value]
+
   (when (not= (:user_id authenticated-entity) (:id value))
     (raise "Not allowed to query permissions for a user other then the authenticated one."))
   {:isAdmin (admin? tx-next authenticated-entity),
