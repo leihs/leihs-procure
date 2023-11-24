@@ -121,22 +121,30 @@
                 ;(spy (requests-perms/apply-scope tx <> auth-entity))
                 (sql-format <>))
 
-        p (spy query)
+        p (println ">>>ring-request-1" query)
 
         query (as-> context <>
                 (requests-query-map <> arguments value)
                 ;(spy (requests-perms/apply-scope tx <> auth-entity))
                 (sql-format <>))
+        p (println ">>>ring-request-2" query)
 
         query (as-> context <>
                 (requests-query-map <> arguments value)
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql-format <>))
 
-        p (println ">>broken-query" (spy query))            ;;TODO: log broken query
+        p (println ">>>ring-request-2" query)
+
+        ;p (println ">>broken-query" (spy query))            ;;TODO: log broken query
         ;p (throw "my-log-error")
 
-        proc-requests (request/query-requests tx auth-entity query)]
+        proc-requests (request/query-requests tx auth-entity query)
+
+
+        p (println ">>>ring-request-procRequests" proc-requests)
+
+        ]
     (->>
       proc-requests
       (map (fn [proc-req]

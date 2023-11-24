@@ -23,7 +23,7 @@
   [args]
   (cond-> budget-periods-base-query
     (:id args) (sql/where [:in :procurement_budget_periods.id
-                                 (:id args)])
+                                 (:cast (:id args) :uuid)])
     (-> args
         :whereRequestsCanBeMovedTo
         empty?
@@ -33,9 +33,10 @@
 
 (defn get-budget-periods
   ([tx ids]
+   (println ">>> Causes issues")
    (jdbc/execute! tx
                (-> budget-periods-base-query
-                   (sql/where [:in :procurement_budget_periods.id ids])
+                   (sql/where [:in :procurement_budget_periods.id ids]) ;;TODO: FIXME
                    sql-format)))
   ([context args _]
    (if (= (:id args) [])

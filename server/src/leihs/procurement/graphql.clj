@@ -36,6 +36,42 @@
               graphql-schema/compile)
       (throw (ex-info "Failed to load schema" {}))))
 
+
+
+
+
+
+(defn str-to-uuid [s]
+  (java.util.UUID/fromString s))
+
+(def keys-to-cast [:budgetPeriods :organizations :categories])
+
+
+
+
+;(defn convert-uuids [m]
+;  (-> m
+;      (update :organizations #(map str-to-uuid %))
+;      (update :categories #(map str-to-uuid %))
+;      (update :budgetPeriods #(map str-to-uuid %))))
+
+;(defn update-uuid-keys [m keys]
+;  (reduce (fn [acc key]
+;            (update acc key #(map str-to-uuid %)))
+;          m
+;          keys))
+
+
+(defn cast-keys-to-uuids [m keys-to-cast]
+  (reduce (fn [acc key]
+            (if (contains? m key)
+              (update acc key (fn [v] (mapv #(java.util.UUID/fromString %) v)))
+              acc))
+          m
+          keys-to-cast))
+
+
+
 (defn exec-query
   [query-string request]
 
@@ -47,32 +83,82 @@
   ;                            :variables))
 
 
-  (println "\n>>>exec-query::variables" (-> request
-                                 :body
-                                 :variables))
+  ;(println "\n>>>exec-query::variables" (-> request
+  ;                               :body
+  ;                               :variables))
 
 
-  (spy query-string)
-  (spy (-> request
-           :body
-           :variables))
-  (spy {:request request})
+  ;(println "\n>>> requerst " request)
+  (println "\n>>> queryStr " query-string)
+  ;(println "\n>>> var-a" (-> request
+  ;                           :body
+  ;                           :variables))
+  ;
+  ;(println "\n>>> var-b" (-> request
+  ;                           :body
+  ;                           :variables))
+  ;
+  ;(println "\n>>> var-b1" (-> request
+  ;                           :body
+  ;                           :variables
+  ;                           :budgetPeriods
+  ;                           ))
+  ;
+  ;(println "\n>>> var-b2" (-> request
+  ;                           :body
+  ;                           :variables
+  ;                           :categories
+  ;                           ))
+  ;(spy {:request request})
+
+
+  (let [
+        vars (-> request
+                 :body
+                 :variables)
+
+        p (println "\n>>vars1" vars)
+
+        vars (cast-keys-to-uuids vars keys-to-cast)
+
+        ;vars (convert-uuids vars)
+        ;vars (update-uuid-keys vars [:organizations :categories :budgetPeriods])
+
+
+        p (println "\n>>vars2" vars "\n")
+
+        result (lacinia/execute (core-graphql/schema)
+                                (spy query-string)
+
+                                ;(-> request
+                                ;    :body
+                                ;    :variables)
+
+                                vars
+
+                                {:request request})
+
+        ]
+    result
+    )
 
   ;(println "\n>>>exec-query::graphql-query" query-string)
 
-  ;; TODO FIXME
-  (lacinia/execute (core-graphql/schema)
-                   query-string
-                   (-> request
-                       :body
-                       :variables)
-                   {:request request}))
+  ;;; TODO FIXME
+  ;(lacinia/execute (core-graphql/schema)
+  ;                 query-string
+  ;                 (-> request
+  ;                     :body
+  ;                     :variables)
+  ;
+  ;                 {:request request})
+  )
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p   (println "\n>>>pure-handler" result)
+        p (println "\n>>>pure-handler" result)
         ;p   (println "\n>>>pure-handler::query" query)
         ;p   (println "\n>>>pure-handler" result)
         resp {:body result}]

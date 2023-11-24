@@ -37,25 +37,61 @@
   [ctx args value]
 
   (println ">>>get-dashboard")
-  (spy args)
-  (spy value)
+  (println ">>args" args)
+  (println ">>value" value)
+  ;(spy value)
 
   (let [ring-request (:request ctx)
         tx (:tx-next ring-request)
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
+
+
+        p (println ">>mainCatsSql" (-> main-categories/main-categories-base-query
+                                    sql-format))
+
         main-cats (-> main-categories/main-categories-base-query
                       sql-format
                       (->> (jdbc/execute! tx)))
+
+        p (println ">>mainCats" main-cats)
+
         bps (if (or (not bp-ids) (not-empty bp-ids))
-              (-> budget-periods/budget-periods-base-query
-                  (cond-> bp-ids (sql/where
-                                   [:in :procurement_budget_periods.id bp-ids]))
-                  sql-format
-                  (->> (jdbc/execute! tx)))
+
+              ;(-> budget-periods/budget-periods-base-query
+              ;    (cond-> bp-ids (sql/where
+              ;                     [:in :procurement_budget_periods.id bp-ids]))
+              ;    sql-format
+              ;    (->> (jdbc/execute! tx)))
+
+
+              (let [
+                    query (-> budget-periods/budget-periods-base-query
+                              (cond-> bp-ids (sql/where
+                                               [:in :procurement_budget_periods.id bp-ids]))
+                              sql-format)
+                    p (println ">>queryA1" query)
+                    result (jdbc/execute! tx query)
+
+                    p (println ">>resultA1" result)
+
+                    ]result)
+
+
               [])
-        requests (requests/get-requests ctx args value)
-        dashboard-cache-key {:id (hash args)}]
+        ;p (println ">>requestsB2-triggerError" ctx args value)
+        p (println ">>requestsB2-triggerError" args value)
+
+        requests (requests/get-requests ctx args value)     ;; FIXME: this causes issues, value=nil
+
+        p (println ">>requestsB2" requests)
+
+        dashboard-cache-key {:id (hash args)}
+
+        p (println ">>dashboard-cache-keyB2" dashboard-cache-key)
+
+
+        ]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
      :budget_periods

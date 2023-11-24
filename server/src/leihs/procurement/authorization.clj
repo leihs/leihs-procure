@@ -153,4 +153,5 @@
 (defn wrap-authorize
   [handler]
   (fn [request]
-    (spy (authorize handler request))))
+    ;(spy (authorize handler request))))
+(authorize handler request)))

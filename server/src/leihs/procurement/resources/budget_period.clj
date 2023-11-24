@@ -23,7 +23,7 @@
   [tx id]
   (first (jdbc/execute! tx
                      (-> budget-period-base-query
-                         (sql/where [:= :procurement_budget_periods.id id])
+                         (sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
                          sql-format))))
 
 (defn get-budget-period
@@ -124,7 +124,7 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_budget_periods)
                      (sql/set bp)
-                     (sql/where [:= :procurement_budget_periods.id (:id bp)])
+                     (sql/where [:= :procurement_budget_periods.id (:cast (:id bp) :uuid)])
                      sql-format)))
 
 (defn insert-budget-period!
