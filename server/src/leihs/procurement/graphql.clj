@@ -51,15 +51,22 @@
                                  :body
                                  :variables))
 
+
+  (spy query-string)
+  (spy (-> request
+           :body
+           :variables))
+  (spy {:request request})
+
   ;(println "\n>>>exec-query::graphql-query" query-string)
 
-  ;; FIXME
+  ;; TODO FIXME
   (lacinia/execute (core-graphql/schema)
-                   (spy query-string)
-                   (spy (-> request
+                   query-string
+                   (-> request
                        :body
-                       :variables))
-                   (spy {:request request})))
+                       :variables)
+                   {:request request}))
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
