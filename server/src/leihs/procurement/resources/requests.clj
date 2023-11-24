@@ -97,13 +97,36 @@
 
 (defn get-requests
   [context arguments value]
+
+  ;(spy context)
+  (spy arguments)
+  (spy value)
+
   (let [ring-request (:request context)
         tx (:tx ring-request)
         auth-entity (:authenticated-entity ring-request)
+        p (println ">get-requests>> ???")
+        ;p  (spy context)
+        query (as-> context <>
+                ;(requests-query-map <> arguments value)
+                ;(requests-perms/apply-scope tx <> auth-entity)
+                (sql/format <>))
+
+        p (spy query)
+
+        query (as-> context <>
+                (requests-query-map <> arguments value)
+                ;(requests-perms/apply-scope tx <> auth-entity)
+                (sql/format <>))
+
+        p (spy query)
+
         query (as-> context <>
                 (requests-query-map <> arguments value)
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql/format <>))
+
+        p (spy query)
 
         p  (println ">>broken-query" (spy query))           ;;TODO: log broken query
         ;p (throw "my-log-error")
