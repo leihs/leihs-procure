@@ -113,11 +113,10 @@
 (defn state-sql
   [advanced-user?]
   (let [s-map (states-conds-map advanced-user?)
-        ;p (println ">>a " s-map)
 
-        p (spy s-map)
+        p (println ">o> class-0" (class result))
 
-        ;p (throw "my-log-error")
+
         result (->> s-map
                     keys
                     (map name)
@@ -125,12 +124,18 @@
                     (cons :case)
                     (apply sql/call))
 
-        ;p (println ">>b " result)
+        p (println ">o> state-sql" result)
+        p (println ">o> class" (class result))
 
+
+        p (println ">o> state-sql _> formatted" (sql/format result))
+        ;>o> state-sql _> formatted [CASE WHEN procurement_requests.approved_quantity IS NULL THEN ? WHEN procurement_requests.approved_quantity >= procurement_requests.requested_quantity THEN ? WHEN (procurement_requests.approved_quantity < procurement_requests.requested_quantity AND procurement_requests.approved_quantity > ?) THEN ? WHEN procurement_requests.approved_quantity = ? THEN ? END NEW APPROVED 0 PARTIALLY_APPROVED 0 DENIED]
 
         ]                                                   ;;FIXME
 
-    ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
+    ;>o> class-0 clojure.lang.Cons
+    ;>o> state-sql #sql/call [:case [:= :procurement_requests.approved_quantity nil] NEW [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] PARTIALLY_APPROVED [:= :procurement_requests.approved_quantity 0] DENIED]
+    ;>o> class honeysql.types.SqlCall
 
     (spy result)
 
