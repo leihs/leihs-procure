@@ -15,7 +15,7 @@
     ))
 
 (def budget-periods-base-query
-  (-> (sql/select :procurement_budget_periods.*)
+  (-> (sql/select :*)
       (sql/from :procurement_budget_periods)
       (sql/order-by [:end_date :desc])))
 

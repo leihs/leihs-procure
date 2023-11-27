@@ -1,25 +1,24 @@
 (ns leihs.procurement.dashboard
   (:require [clojure.string :as string]
-    
-
-        [taoensso.timbre :refer [debug info warn error spy]]
 
 
-    
-            ;[clojure.java.jdbc :as jdbc]
-            ;[leihs.procurement.utils.sql :as sql]
+            [taoensso.timbre :refer [debug info warn error spy]]
 
-                [honey.sql :refer [format] :rename {format sql-format}]
-                [leihs.core.db :as db]
-                [next.jdbc :as jdbc]
-                [honey.sql.helpers :as sql]
-    
+
+
+    ;[clojure.java.jdbc :as jdbc]
+    ;[leihs.procurement.utils.sql :as sql]
+
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [leihs.core.db :as db]
+            [next.jdbc :as jdbc]
+            [honey.sql.helpers :as sql]
+
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-periods :as budget-periods]
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
-            [leihs.procurement.resources.requests :as requests]
-    ))
+            [leihs.procurement.resources.requests :as requests]))
 
 (defn sum-total-price
   [coll]
@@ -39,7 +38,6 @@
   (println ">>>get-dashboard")
   (println ">>args" args)
   (println ">>value" value)
-  ;(spy value)
 
   (let [ring-request (:request ctx)
         tx (:tx-next ring-request)
@@ -48,7 +46,7 @@
 
 
         p (println ">>mainCatsSql" (-> main-categories/main-categories-base-query
-                                    sql-format))
+                                       sql-format))
 
         main-cats (-> main-categories/main-categories-base-query
                       sql-format
@@ -75,10 +73,13 @@
 
                     p (println ">>resultA1" result)
 
-                    ]result)
-
+                    ] result)
 
               [])
+
+        p (println ">>resultA1-2" bps)
+
+
         ;p (println ">>requestsB2-triggerError" ctx args value)
         p (println ">>requestsB2-triggerError" args value)
 
@@ -90,9 +91,8 @@
 
         p (println ">>dashboard-cache-keyB2" dashboard-cache-key)
 
-
         ]
-    {:total_count (count requests),
+    (spy {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
      :budget_periods
        (->>
@@ -147,4 +147,4 @@
                    (assoc :main_categories main-cats*)
                    (assoc :cacheKey (cache-key dashboard-cache-key bp))
                    (assoc :total_price_cents (sum-total-price
-                                               main-cats*)))))))}))
+                                               main-cats*)))))))})))

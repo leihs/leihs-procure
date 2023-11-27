@@ -21,6 +21,7 @@
 
 (defn join-and-nest-categories
   [sqlmap]
+  (println ">o>" "join-and-nest-categories")
   (->
     sqlmap
     (sql/select
@@ -57,6 +58,7 @@
 
 (defn join-and-nest-budget-periods
   [sqlmap]
+  (println ">o>" "join-and-nest-budget-periods")
   (-> sqlmap
       (sqlp/select-nest :procurement_budget_periods_2 :budget_period)
       (sql/join
@@ -68,6 +70,7 @@
 
 (defn join-and-nest-templates
   [sqlmap]
+  (println ">o>" "join-and-nest-templates")
   (sqlp/join-and-nest sqlmap
                      :procurement_templates
                      [:= :procurement_templates.id
@@ -87,6 +90,7 @@
 
 (defn join-and-nest-users
   [sqlmap]
+  (println ">o>" "join-and-nest-users")
   (sqlp/join-and-nest sqlmap
                      :users
                      [:= :users.id :procurement_requests.user_id]

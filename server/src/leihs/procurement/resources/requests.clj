@@ -46,30 +46,44 @@
            ["~~*" :users.firstname term-percent]
            ["~~*" :users.lastname term-percent]]))))
 
-(defn requests-query-map
+(defn requests-query-map                                    ;; TODO: FIXME
   [context arguments value]
   (let [id (:id arguments)
         ; short_id (:short_id arguments)
+        p (println ">o> helper1")
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
+        p (println ">o> helper2" category-id budget-period-id organization-id)
+
         priority (some->> arguments
                    :priority
                    (map request/to-name-and-lower-case))
+        p (println ">o> helper3")
+
         inspector-priority (some->> arguments
                              :inspector_priority
                              (map request/to-name-and-lower-case))
+        p (println ">o> helper4")
+
         requested-by-auth-user (:requested_by_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
+        p (println ">o> helper5")
+
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
         tx (:tx-next rrequest)
+        p (println ">o> helper6")
         advanced-user? (user-perms/advanced? tx
                                              (:authenticated-entity rrequest))
-        p (println ">requests-query-map>> ??")
+        p (println ">o> helper7" advanced-user?)
+        ;p (println ">requests-query-map>> ??")
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
-                         request-helpers/join-and-nest-associated-resources)]
+                         request-helpers/join-and-nest-associated-resources)
+        p (println ">o> helper8")
+        ]
+
     (cond-> start-sqlmap
             id (sql/where [:in :procurement_requests.id id])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
@@ -94,9 +108,11 @@
             state (-> (sql/where
                         (request/get-where-conds-for-states state advanced-user?))
                       (sqlp/merge-where-false-if-empty state))
+
             order-status (-> (sql/where [:in :procurement_requests.order_status
-                                         (map #(:cast % :order_status_enum) order-status)])
+                                         (map #(:call :cast % :order_status_enum) order-status)])
                              (sqlp/merge-where-false-if-empty order-status))
+
             requested-by-auth-user (sql/where [:= :procurement_requests.user_id
                                                (-> context
                                                    :request
@@ -107,34 +123,69 @@
 (defn get-requests
   [context arguments value]
 
-  ;(spy context)
-  (spy arguments)
-  (spy value)
+  (println ">>>requests::get-requests ======================")
+  (println ">>>args" arguments)
+  (println ">>>value" value)
 
   (let [ring-request (:request context)
         tx (:tx-next ring-request)
         auth-entity (:authenticated-entity ring-request)
-        p (println ">get-requests>> ???")
+        p (println ">>>auth-entity")
+        p (println ">>>get-requests>> before first")
+
         ;p  (spy context)
-        query (as-> context <>
-                ;(spy (requests-query-map <> arguments value))
-                ;(spy (requests-perms/apply-scope tx <> auth-entity))
-                (sql-format <>))
+        ;query (as-> context <>
+        ;        ;(spy (requests-query-map <> arguments value))
+        ;        ;(spy (requests-perms/apply-scope tx <> auth-entity))
+        ;        (sql-format <>))
+        ;
+        ;p (println ">>>ring-request-1" query)
 
-        p (println ">>>ring-request-1" query)
 
-        query (as-> context <>
-                (requests-query-map <> arguments value)
-                ;(spy (requests-perms/apply-scope tx <> auth-entity))
-                (sql-format <>))
-        p (println ">>>ring-request-2" query)
+        ;p (println ">>>test#1"  (requests-query-map <> arguments value))
+        ;p (println ">>>test#2"  (requests-perms/apply-scope tx <> auth-entity))
 
-        query (as-> context <>
-                (requests-query-map <> arguments value)
-                (requests-perms/apply-scope tx <> auth-entity)
-                (sql-format <>))
 
-        p (println ">>>ring-request-2" query)
+        ;query (as-> context <>
+        ;        (requests-query-map <> arguments value)
+        ;        ;(spy (requests-perms/apply-scope tx <> auth-entity))
+        ;        (sql-format <>))
+        ;p (println ">>>ring-request-2" query)
+
+        ;query (as-> (spy context <>)
+        ;        (spy (requests-query-map <> arguments value))
+        ;        (requests-perms/apply-scope tx <> auth-entity)
+        ;        (sql-format <>))
+
+
+        query (let [query (as-> context <>
+                      (do (println ">o>After requests-query-map:" <>)
+                          (requests-query-map <> arguments value))
+                      (do (println ">o>After apply-scope:" <>)
+                          (requests-perms/apply-scope tx <> auth-entity))
+                      (do (println ">o>After sql-format:" <>)
+                          (sql-format <>)))] query
+          ;; Execute the query with `query`, for example using a PostgreSQL function.
+          ;; Example: (execute-postgres-query tx query)
+          )
+
+        ;;# Initialize the context for the query
+        ;context_initialization (context <>)
+        ;
+        ;;# Map the request query with the provided arguments
+        ;mapped_query (requests-query-map <> arguments value)
+        ;
+        ;;# Apply the scope based on the authorization entity
+        ;scoped_query = requests-perms/apply-scope tx <> auth-entity
+        ;
+        ;;# Format the final SQL query
+        ;formatted_sql_query = sql-format <>
+        ;
+        ;;# Combine all parts to form the final query
+        ;final_query = context_initialization <> mapped_query <> scoped_query <> formatted_sql_query
+
+
+        p (println ">o>ring-request-3" query)
 
         ;p (println ">>broken-query" (spy query))            ;;TODO: log broken query
         ;p (throw "my-log-error")

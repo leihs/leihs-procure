@@ -118,21 +118,95 @@
       name
       lower-case))
 
+(defn debug-print [item]
+  (when (re-matches #"^>o>.*" (str item))
+    (println item))
+  item)
+
 (defn state-sql
   [advanced-user?]
+
+  (println ">o>" "state-sql" advanced-user?)
+
   (let [s-map (states-conds-map advanced-user?)
-        p (println ">> " s-map)
+        p (println ">o> s-map " s-map)
+        ;p (println ">o> s-map " s-map)
         ]            ;;FIXME
 
     ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
 
-    (->> s-map
-         keys
-         (map name)
-         (interleave (vals s-map))
-         (cons :case)
-         (apply :call)
-         )))
+    ;(spy (->> s-map
+    ;     keys
+    ;     (map name)
+    ;     (interleave (vals s-map))
+    ;     (cons :case)
+    ;     (apply :call)
+    ;     ))
+    ;
+
+    (let [
+          ;map (->> s-map
+          ;         keys
+          ;         (map name)
+          ;         (interleave (vals s-map))
+          ;         ;(cons :case)
+          ;         ;(apply :call)
+          ;         )
+          ;p (println ">o>map-1" map)
+          ;
+          ;map (->> s-map
+          ;         keys
+          ;         (map name)
+          ;         (interleave (vals s-map))
+          ;         (cons :case)
+          ;         ;(apply :call)
+          ;         )
+          ;p (println ">o>map-2" map)
+          ;
+          ;map (->> s-map
+          ;         keys
+          ;         (map name)
+          ;         (interleave (vals s-map))
+          ;         (cons :case)
+          ;         (apply :call)
+          ;         )
+          ;p (println ">o>map-3" map)
+
+
+          map (->> s-map
+                   keys
+                   (map name)
+                   (interleave (vals s-map))
+                   (cons :case)
+                   (cons :call)                             ;; should be replaced by [[?]]
+                   )
+          p (println ">o>map-4" map)                        ;;TODO: whats this, FIXME NOW
+
+          ;>o>map-4 (:call :case [:= :procurement_requests.approved_quantity nil] NEW [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] PARTIALLY_APPROVED [:= :procurement_requests.approved_quantity 0] DENIED)
+
+          ])
+
+        ;(spy (->> s-map
+        ; keys
+        ; (map name)
+        ; (interleave (vals s-map))
+        ; (cons :case)
+        ; (apply :call)
+        ; ))
+
+
+    (spy (->> s-map
+              keys
+              (map name)
+              (map debug-print)  ; Added print function for each key
+              (interleave (vals s-map))
+              (map debug-print)  ; Added print function for each value
+              (cons :case)
+              (cons :call)
+              ;(apply :call)
+              ))
+
+    ))
 
 (def sql-order-by-expr
   (str "concat("
@@ -151,6 +225,7 @@
 
 (defn requests-base-query-with-state
   [advanced-user?]
+  (println ">o>" "requests-base-query-with-state")
   (-> requests-base-query
       (sql/select [(state-sql advanced-user?) :state])
       (sql/join :procurement_budget_periods
