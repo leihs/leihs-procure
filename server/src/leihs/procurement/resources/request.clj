@@ -2,9 +2,6 @@
   (:require [clojure [set :refer [map-invert]]
              [string :refer [lower-case upper-case]]]
             
-    ;[clojure.java.jdbc :as jdbc]
-    ;         [sql :as sql]
-
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -135,44 +132,7 @@
 
     ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
 
-    ;(spy (->> s-map
-    ;     keys
-    ;     (map name)
-    ;     (interleave (vals s-map))
-    ;     (cons :case)
-    ;     (apply :call)
-    ;     ))
-    ;
-
     (let [
-          ;map (->> s-map
-          ;         keys
-          ;         (map name)
-          ;         (interleave (vals s-map))
-          ;         ;(cons :case)
-          ;         ;(apply :call)
-          ;         )
-          ;p (println ">o>map-1" map)
-          ;
-          ;map (->> s-map
-          ;         keys
-          ;         (map name)
-          ;         (interleave (vals s-map))
-          ;         (cons :case)
-          ;         ;(apply :call)
-          ;         )
-          ;p (println ">o>map-2" map)
-          ;
-          ;map (->> s-map
-          ;         keys
-          ;         (map name)
-          ;         (interleave (vals s-map))
-          ;         (cons :case)
-          ;         (apply :call)
-          ;         )
-          ;p (println ">o>map-3" map)
-
-
           map (->> s-map
                    keys
                    (map name)
@@ -202,7 +162,7 @@
               (interleave (vals s-map))
               (map debug-print)  ; Added print function for each value
               (cons :case)
-              (cons :call)
+              ;(cons :call)
               ;(apply :call)
               ))
 
@@ -372,6 +332,45 @@
         (assoc <> :state :NEW))
       :if-only
       #(request-perms/can-write-any-field? fields))))
+
+
+
+
+(comment
+
+  (let [
+
+
+
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds-next)
+        ;query (sql-format {:select :*
+        ;                   :from [:users]
+        ;                   :where [:= :id [:cast user-id :uuid]]})
+
+        advanced-user? true
+
+        ;res ((state-sql advanced-user?) :state)
+        ;p (println "\nres" res)
+
+        query2 (-> (sql/select :*  [[ [(state-sql advanced-user?) :state]  ]] )
+        ;query2 (-> (sql/select :* [res])
+                   (sql/from :procurement_requests)
+                   ;(sql/where [:= :id user-id])
+                   sql-format
+                   ;(->> (jdbc/execute! tx))
+                   )
+
+        ;p (println "\nquery" query)
+        p (println "\nquery2" query2)
+        p (println "\nquery3" (jdbc/execute! tx query2))
+        ]
+
+
+       )
+  )
+
+
 
 (defn get-last-created-request
   [tx auth-entity]
