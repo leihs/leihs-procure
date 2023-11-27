@@ -46,6 +46,18 @@
            ["~~*" :users.firstname term-percent]
            ["~~*" :users.lastname term-percent]]))))
 
+
+
+
+
+
+
+
+
+
+
+
+
 (defn requests-query-map                                    ;; TODO: FIXME
   [context arguments value]
   (let [id (:id arguments)
@@ -72,6 +84,9 @@
         p (println ">o> helper5")
 
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
+
+        p (println ">o> order-status" order-status)
+
         rrequest (:request context)
         tx (:tx-next rrequest)
         p (println ">o> helper6")
@@ -109,16 +124,34 @@
                         (request/get-where-conds-for-states state advanced-user?))
                       (sqlp/merge-where-false-if-empty state))
 
-            order-status (-> (sql/where [:in :procurement_requests.order_status
-                                         (map #(:call :cast % :order_status_enum) order-status)])
-                             (sqlp/merge-where-false-if-empty order-status))
+
+            ;order-status (-> (sql/where [:in :procurement_requests.order_status (map [[#(:cast % :order_status_enum)]] order-status)])
+            ;                 ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
+            ;                 (sqlp/merge-where-false-if-empty order-status))
+
 
             requested-by-auth-user (sql/where [:= :procurement_requests.user_id
                                                (-> context
                                                    :request
                                                    :authenticated-entity
                                                    :user_id)])
+
             search-term (search-query search-term))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 (defn get-requests
   [context arguments value]
@@ -133,56 +166,23 @@
         p (println ">>>auth-entity")
         p (println ">>>get-requests>> before first")
 
-        ;p  (spy context)
-        ;query (as-> context <>
-        ;        ;(spy (requests-query-map <> arguments value))
-        ;        ;(spy (requests-perms/apply-scope tx <> auth-entity))
-        ;        (sql-format <>))
-        ;
-        ;p (println ">>>ring-request-1" query)
-
-
-        ;p (println ">>>test#1"  (requests-query-map <> arguments value))
-        ;p (println ">>>test#2"  (requests-perms/apply-scope tx <> auth-entity))
-
-
-        ;query (as-> context <>
-        ;        (requests-query-map <> arguments value)
-        ;        ;(spy (requests-perms/apply-scope tx <> auth-entity))
-        ;        (sql-format <>))
-        ;p (println ">>>ring-request-2" query)
-
-        ;query (as-> (spy context <>)
-        ;        (spy (requests-query-map <> arguments value))
-        ;        (requests-perms/apply-scope tx <> auth-entity)
-        ;        (sql-format <>))
-
-
         query (let [query (as-> context <>
-                      (do (println ">o>After requests-query-map:" <>)
-                          (requests-query-map <> arguments value))
-                      (do (println ">o>After apply-scope:" <>)
-                          (requests-perms/apply-scope tx <> auth-entity))
-                      (do (println ">o>After sql-format:" <>)
-                          (sql-format <>)))] query
-          ;; Execute the query with `query`, for example using a PostgreSQL function.
-          ;; Example: (execute-postgres-query tx query)
-          )
+                            (do (println ">o> 1-After requests-query-map:")
+                                ;(do (println ">o> 1-After requests-query-map:" <>)
+                                (requests-query-map <> arguments value))
 
-        ;;# Initialize the context for the query
-        ;context_initialization (context <>)
-        ;
-        ;;# Map the request query with the provided arguments
-        ;mapped_query (requests-query-map <> arguments value)
-        ;
-        ;;# Apply the scope based on the authorization entity
-        ;scoped_query = requests-perms/apply-scope tx <> auth-entity
-        ;
-        ;;# Format the final SQL query
-        ;formatted_sql_query = sql-format <>
-        ;
-        ;;# Combine all parts to form the final query
-        ;final_query = context_initialization <> mapped_query <> scoped_query <> formatted_sql_query
+                            ;>o> 2-After apply-scope: {:select (nil [(:case [:= :procurement_requests.approved_quantity nil] NEW [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] PARTIALLY_APPROVED [:= :procurement_requests.approved_quantity 0] DENIED) :state] [#sql/call [:row_to_json :procurement_budget_periods_2] :budget_period] nil [#sql/call [:row_to_json :models] :model] nil [#sql/call [:row_to_json :procurement_templates] :template] nil [#sql/call [:row_to_json :suppliers] :supplier] [#sql/call [:row_to_json :users] :user]), :from [:procurement_requests], :left-join (:models [:= :models.id :procurement_requests.model_id] :procurement_templates [:= :procurement_templates.id :procurement_requests.template_id] :suppliers [:= :suppliers.id :procurement_requests.supplier_id] :users [:= :users.id :procurement_requests.user_id]), :order-by [nil], :join [:procurement_budget_periods [:= :procurement_budget_periods.id :procurement_requests.budget_period_id] [{:select [:* [:end_date :is_past]], :from [:procurement_budget_periods]} :procurement_budget_periods_2] [:= :procurement_budget_periods_2.id :procurement_requests.budget_period_id] :procurement_categories [:= :procurement_categories.id :procurement_requests.category_id] :procurement_main_categories [:= :procurement_main_categories.id :procurement_categories.main_category_id] :procurement_organizations [:= :procurement_organizations.id :procurement_requests.organization_id] [:procurement_organizations :procurement_departments] [:= :procurement_departments.id :procurement_organizations.parent_id] :rooms [:= :rooms.id :procurement_requests.room_id] :buildings [:= :buildings.id :rooms.building_id]], :where [:and [:in :procurement_requests.category_id [#uuid "7d5ba731-edd9-41ba-8773-7337d24c2327"]] [:in :procurement_requests.budget_period_id [#uuid "8b8fe440-cae5-4bf9-8048-d0ec2399faa1"]] [:in :procurement_requests.organization_id [#uuid "fb664326-a8ef-4556-af02-07d3127cd9ec"]] [:in :procurement_requests.priority (normal high)] [:in :procurement_requests.inspector_priority (low medium high mandatory)] [:or [:= :procurement_requests.approved_quantity nil] [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] [:= :procurement_requests.approved_quantity 0]]]}
+                            ;                                   ^  TODO:
+
+                            (do (println ">o> 2-After apply-scope:" <>)
+                                (requests-perms/apply-scope tx <> auth-entity))
+                            (do (println ">o> 3-After sql-format:" <>)
+                                (sql-format <>)))] query
+                                                   ;; Execute the query with `query`, for example using a PostgreSQL function.
+                                                   ;; Example: (execute-postgres-query tx query)
+                                                   )
+
+        p (spy query)
 
 
         p (println ">o>ring-request-3" query)
@@ -277,9 +277,13 @@
                :request
                :tx-next)
         bp-id (:id value)]
+
+
     (-> (:call :coalesce
           :procurement_requests.order_quantity
           :procurement_requests.approved_quantity)
         (total-price-sqlmap bp-id)
         (sql/where [:!= :procurement_requests.approved_quantity nil])
-        (->> (get-total-price-cents tx)))))
+        (->> (get-total-price-cents tx)))
+
+    ))
