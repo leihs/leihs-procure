@@ -194,12 +194,29 @@
   ;                   [:= :models.id :procurement_requests.model_id])
 
 
-  (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
-                              sql-order-by-expr
-                              ") procurement_requests.*")]])
-      (sql/from :procurement_requests)
-      (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-      (sql/order-by (:raw sql-order-by-expr))))
+  ;(-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+  ;                            sql-order-by-expr
+  ;                            ") procurement_requests.*")]])
+  ;    (sql/from :procurement_requests)
+  ;    (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+  ;    (sql/order-by (:raw sql-order-by-expr)))
+
+  (let [conc [[:concat
+               [:lower [:coalesce :procurement_requests/article_name ""]]
+               [:lower [:coalesce :models/product ""]]
+               [:lower [:coalesce :models/version ""]]
+               ]]]
+
+    (-> (sql/select-distinct :procurement_requests.id conc)
+        (sql/from :procurement_requests)
+        (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+        (sql/order-by :procurement_requests.id conc :procurement_requests.*)
+        )
+    )
+
+
+
+  )
 
 
 
@@ -276,12 +293,7 @@
         res (-> (sql/select-distinct :procurement_requests.id conc)
                 (sql/from :procurement_requests)
                 (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-                ;)
-
-                ;(sql/order-by [:raw sql-order-by-expr]))
-
                 (sql/order-by :procurement_requests.id conc :procurement_requests.*)
-                ;(sql/order-by :procurement_requests.id conc)
                 )
 
         ;>o> query [SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.* FROM procurement_requests LEFT JOIN models ON models.id = procurement_requests.model_id]
@@ -293,7 +305,6 @@
         ;             ERROR: for SELECT DISTINCT, ORDER BY expressions must appear in select list
         ;             Position: 305
         ;             println "\n>o>4 result" (jdbc/execute! tx (sql-format res)))
-
 
         ]
     )
