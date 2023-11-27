@@ -272,19 +272,28 @@
         ;; TODO: this works
         ;;res (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
         ;;res (-> (sql/select-distinct :procurement_requests.*)
-        res (-> (sql/select-distinct :procurement_requests.id conc :procurement_requests.*)
+        ;res (-> (sql/select-distinct :procurement_requests.id conc :procurement_requests.*)
+        res (-> (sql/select-distinct :procurement_requests.id conc)
                 (sql/from :procurement_requests)
                 (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+                ;)
+
+                ;(sql/order-by [:raw sql-order-by-expr]))
+
+                (sql/order-by :procurement_requests.id conc :procurement_requests.*)
+                ;(sql/order-by :procurement_requests.id conc)
                 )
-
-        ;(sql/order-by [:raw sql-order-by-expr]))
-
-        ;(sql/order-by conc))
 
         ;>o> query [SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.* FROM procurement_requests LEFT JOIN models ON models.id = procurement_requests.model_id]
 
+
+
         p (println "\n>o>3 query" (sql-format res))
-        p (println "\n>o>4 result" (jdbc/execute! tx (sql-format res)))
+        ;p (Execution error (PSQLException) at org.postgresql.core.v3.QueryExecutorImpl/receiveErrorResponse (QueryExecutorImpl.java:2533).
+        ;             ERROR: for SELECT DISTINCT, ORDER BY expressions must appear in select list
+        ;             Position: 305
+        ;             println "\n>o>4 result" (jdbc/execute! tx (sql-format res)))
+
 
         ]
     )
