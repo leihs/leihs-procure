@@ -13,6 +13,8 @@
              [uploads :as uploads] [user :as user]]
 
 
+            [leihs.core.db :as db]
+
 
             [taoensso.timbre :refer [debug info warn error spy]]
 
@@ -114,7 +116,7 @@
   [advanced-user?]
   (let [s-map (states-conds-map advanced-user?)
 
-        p (println ">o> class-0" (class result))
+        ;p (println ">o> class-0" (class result))
 
 
         result (->> s-map
@@ -162,10 +164,10 @@
 
 
   (spy (-> requests-base-query
-      (sql/merge-select [(state-sql advanced-user?) :state])
-      (sql/merge-join :procurement_budget_periods
-                      [:= :procurement_budget_periods.id
-                       :procurement_requests.budget_period_id]))))
+           (sql/merge-select [(state-sql advanced-user?) :state])
+           (sql/merge-join :procurement_budget_periods
+                           [:= :procurement_budget_periods.id
+                            :procurement_requests.budget_period_id]))))
 
 (defn to-name-and-lower-case-enums
   [m]
@@ -265,8 +267,8 @@
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (spy (-> advanced-user?
-        requests-base-query-with-state
-        (sql/where [:= :procurement_requests.id id])))))
+             requests-base-query-with-state
+             (sql/where [:= :procurement_requests.id id])))))
 
 (defn get-request-by-id
   [tx auth-entity id]
@@ -312,15 +314,15 @@
   [tx auth-entity]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (spy (-> advanced-user?
-        requests-base-query-with-state
-        ; NOTE: reselect because of:
-        ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-        (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
-        (sql/order-by [:created_at :desc])
-        (sql/limit 1)
-        sql/format
-        (->> (query-requests tx auth-entity))
-        first))))
+             requests-base-query-with-state
+             ; NOTE: reselect because of:
+             ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
+             (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
+             (sql/order-by [:created_at :desc])
+             (sql/limit 1)
+             sql/format
+             (->> (query-requests tx auth-entity))
+             first))))
 
 (defn insert!
   [tx data]
@@ -336,6 +338,39 @@
                      (sql/sset data)
                      (sql/where [:= :procurement_requests.id req-id])
                      sql/format)))
+
+
+
+
+(comment
+
+  (let [
+
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds-next)
+        tx (db/get-ds)
+
+        advanced-user? true
+
+        res [(state-sql advanced-user?) :state]
+        p (println "\nres" res)
+
+        query2 (-> (sql/select res)
+                   (sql/from :procurement_requests)
+                   sql/format
+                   )
+
+        p (println "\nquery2" query2)
+        p (println "\nquery3" (jdbc/query tx query2))
+
+
+        ;query2 [SELECT CASE WHEN procurement_requests.approved_quantity IS NULL THEN ? WHEN procurement_requests.approved_quantity >= procurement_requests.requested_quantity THEN ? WHEN (procurement_requests.approved_quantity < procurement_requests.requested_quantity AND procurement_requests.approved_quantity > ?) THEN ? WHEN procurement_requests.approved_quantity = ? THEN ? END AS state FROM procurement_requests  NEW APPROVED 0 PARTIALLY_APPROVED 0 DENIED]
+        ;query3 ({:state NEW})
+
+        ]
+
+    )
+  )
 
 (defn- filter-attachments [m as] (filter #(submap? m %) as))
 
