@@ -186,13 +186,100 @@
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query
-  (-> (sql/select (:raw (str "DISTINCT ON (procurement_requests.id, "
-                             sql-order-by-expr
-                             ") procurement_requests.*")))
+  ;(-> (sql/select (:raw (str "DISTINCT ON (procurement_requests.id, "
+  ;                           sql-order-by-expr
+  ;                           ") procurement_requests.*")))
+  ;    (sql/from :procurement_requests)
+  ;    (sql/left-join :models
+  ;                   [:= :models.id :procurement_requests.model_id])
+
+
+  (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+                              sql-order-by-expr
+                              ") procurement_requests.*")]])
       (sql/from :procurement_requests)
-      (sql/left-join :models
-                     [:= :models.id :procurement_requests.model_id])
+      (sql/left-join :models [:= :models.id :procurement_requests.model_id])
       (sql/order-by (:raw sql-order-by-expr))))
+
+
+
+(comment
+
+  ;[honey.sql :refer [format] :rename {format sql-format}]
+  ;[leihs.core.db :as db]
+  ;[next.jdbc :as jdbc]
+  ;[honey.sql.helpers :as sql]
+
+  (let [
+        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 [{:has_entry true}]
+        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3b2" ;; >>3 []
+        user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 []
+        user-id nil                                         ;; >>3 []
+        auth-entity {:user_id user-id}
+
+        c-id nil
+        c-id #uuid "1efc2279-bc42-490c-b004-dca03813a6ef"
+
+        advanced-user? true
+
+        tx (db/get-ds-next)
+
+        ;;; TODO: this works
+        ;res (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+        ;                                sql-order-by-expr
+        ;                                ") procurement_requests.*")]])
+        ;        (sql/from :procurement_requests)
+        ;        (sql/left-join :models [:= :models.id :procurement_requests.model_id]))
+
+
+        ;(def sql-order-by-expr
+        ;  (str "concat("
+        ;       "lower(coalesce(procurement_requests.article_name, '')), "
+        ;       "lower(coalesce(models.product, '')), "
+        ;       "lower(coalesce(models.version, ''))" ")"))
+
+        ;conc [:concat [:lower [:coalesce :procurement_requests.article_name ""]]]
+
+        ;conc [:concat
+        ;      [:lower [:coalesce :procurement_requests.article_name ""]]
+        ;      [:lower [:coalesce :models.product ""]]
+        ;      [:lower [:coalesce :models.version ""]]
+        ;      ]
+
+        conc [:concat
+              [[:lower [:coalesce [:procurement_requests.article_name ""]]]
+               [:lower [:coalesce [:models.product ""]]]
+               [:lower [:coalesce [:models.version ""]]]]
+              ]
+
+        p (println "\n>o>1 conc" conc)
+        p (println "\n>o>2 conc" (sql-format conc))
+        conc2 (sql-format conc)
+
+
+        ;res (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+        res (-> (sql/select-distinct :procurement_requests.*)
+                ;sql-order-by-expr
+                ;conc,
+                ;:procurement_requests.*])
+                ;:procurement_requests.*])
+                (sql/from :procurement_requests)
+                (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+                )
+
+        ;(sql/order-by [:raw sql-order-by-expr]))
+        ;(sql/order-by conc))
+
+        ;>o> query [SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.* FROM procurement_requests LEFT JOIN models ON models.id = procurement_requests.model_id]
+
+        p (println "\n>o>3 query" (sql-format res))
+        p (println "\n>o>4 result" (jdbc/execute! tx (sql-format res)))
+
+        ]
+    )
+
+  )
+
 
 (defn requests-base-query-with-state
   [advanced-user?]
@@ -201,7 +288,9 @@
       (sql/select [(state-sql advanced-user?) :state])
       (sql/join :procurement_budget_periods
                 [:= :procurement_budget_periods.id
-                 :procurement_requests.budget_period_id])))
+                 :procurement_requests.budget_period_id]))
+
+  )
 
 (defn to-name-and-lower-case-enums
   [m]
@@ -358,8 +447,8 @@
         advanced-user? false
 
 
-        query2 (-> (sql/select [[(state-sql advanced-user?)] :state])  ;;works
-        ;query2 (-> (sql/select [[[(state-sql advanced-user?)]] :state]) ;;works
+        query2 (-> (sql/select [[(state-sql advanced-user?)] :state]) ;;works
+                   ;query2 (-> (sql/select [[[(state-sql advanced-user?)]] :state]) ;;works
                    (sql/from :procurement_requests :procurement_budget_periods)
                    sql-format
                    )
