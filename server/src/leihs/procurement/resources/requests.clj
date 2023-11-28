@@ -20,6 +20,9 @@
             [leihs.procurement.resources.request-helpers :as request-helpers]
             ))
 
+(defn create-order-status-enum-entries [order-stati]
+  (map (fn [status] [[:cast status :order_status_enum]]) order-stati))
+
 (defn search-query
   [sql-query term]
   (let [term-percent (str "%" term "%")]
@@ -125,9 +128,13 @@
                       (sqlp/merge-where-false-if-empty state))
 
 
-            ;order-status (-> (sql/where [:in :procurement_requests.order_status (map [[#(:cast % :order_status_enum)]] order-status)])
-            ;                 ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
-            ;                 (sqlp/merge-where-false-if-empty order-status))
+            order-status (-> (sql/where [:in :procurement_requests.order_status
+                                         ;(map [[#(:cast % :order_status_enum)]] order-status)
+                                         (create-order-status-enum-entries order-status)
+
+                                         ])
+                             ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
+                             (sqlp/merge-where-false-if-empty order-status))
 
 
             requested-by-auth-user (sql/where [:= :procurement_requests.user_id
@@ -159,6 +166,9 @@
 ;      [next.jdbc :as jdbc]))
 
 
+
+
+
 (comment
   (let [
         user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
@@ -169,14 +179,20 @@
 
         order-status (some->> raw-order-status
                        (map request/to-name-and-lower-case))
-
         p (println ">o> order-status" order-status)
+
+        os-map (create-order-status-enum-entries order-status)
+        p (println ">o> order-os-map" os-map)
 
         sql (-> (sql/select :*)
                 (sql/from :procurement_requests)
                 (sql/where [:in :procurement_requests.order_status
-                            (map #([:call [:cast % :order_status_enum]]) order-status)])
-                            ;(map #(sql/call :cast % :order_status_enum) order-status)])
+                            os-map
+
+                            ;[[ [:cast (first order-status) :order_status_enum]]] ;;works, 1 entry
+                            ;[[ [:cast (second order-status) :order_status_enum]]] ;;works, no entry
+
+                            ])
                 )
 
         p (println "\nsql" sql)
