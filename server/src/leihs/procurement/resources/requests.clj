@@ -158,31 +158,34 @@
 ;      [leihs.core.db :as db]
 ;      [next.jdbc :as jdbc]))
 
-(comment
 
+(comment
   (let [
         user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
-        tx (db/get-ds-next)
+        tx (db/get-ds)
 
-        order-status ("not_processed" "in_progress" "procured" "alternative_procured" "not_procured")
+        raw-order-status '[NOT_PROCESSED IN_PROGRESS PROCURED ALTERNATIVE_PROCURED NOT_PROCURED]
+        p (println ">o> raw-order-status" raw-order-status)
 
-        query2 (-> (sql/select :*)
-                   (sql/from :procurement_requests)
-                   (sql/where [:in :procurement_requests.order_status (map [[#(:cast % :order_status_enum)]] order-status)])
+        order-status (some->> raw-order-status
+                       (map request/to-name-and-lower-case))
 
+        p (println ">o> order-status" order-status)
 
-                   sql-format
-                   )
-                                    ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
-                                    ;(sqlp/merge-where-false-if-empty order-status)
+        sql (-> (sql/select :*)
+                (sql/from :procurement_requests)
+                (sql/where [:in :procurement_requests.order_status
+                            (map #([:call [:cast % :order_status_enum]]) order-status)])
+                            ;(map #(sql/call :cast % :order_status_enum) order-status)])
+                )
 
-        p (println "\nquery2" query2)
-        p (println "\nquery2" (jdbc/execute-one! tx query2))
-        ]
+        p (println "\nsql" sql)
+        query (sql-format sql)
 
-       )
+        p (println "\nquery" query)
+        p (println "\nresult" (jdbc/execute! tx query))]
+    )
   )
-
 
 
 
