@@ -127,9 +127,9 @@
       lower-case))
 
 (defn debug-print [item]
-  (when (re-matches #"^>o>.*" (str item))
-    (println item))
+  (println ">o> map" item)
   item)
+
 
 (defn state-sql
   [advanced-user?]
@@ -157,43 +157,23 @@
 
           ])
 
-    ;(spy (->> s-map
-    ; keys
-    ; (map name)
-    ; (interleave (vals s-map))
-    ; (cons :case)
-    ; (apply :call)
-    ; ))
-
-
     (spy (->> s-map
               keys
               (map name)
               (map debug-print)                             ; Added print function for each key
               (interleave (vals s-map))
               (map debug-print)                             ; Added print function for each value
-              (cons :case)
-              ;(cons :call)
-              ;(apply :call)
-              ))
+              (cons :case)))
 
     ))
 
-(def sql-order-by-expr
+(def sql-order-by-expr                                      ;;toRemove
   (str "concat("
        "lower(coalesce(procurement_requests.article_name, '')), "
        "lower(coalesce(models.product, '')), "
        "lower(coalesce(models.version, ''))" ")"))
 
-(def requests-base-query
-  ;(-> (sql/select (:raw (str "DISTINCT ON (procurement_requests.id, "
-  ;                           sql-order-by-expr
-  ;                           ") procurement_requests.*")))
-  ;    (sql/from :procurement_requests)
-  ;    (sql/left-join :models
-  ;                   [:= :models.id :procurement_requests.model_id])
-
-
+(def requests-base-query                                    ;;ok
   ;(-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
   ;                            sql-order-by-expr
   ;                            ") procurement_requests.*")]])
@@ -213,9 +193,6 @@
         (sql/order-by :procurement_requests.id conc :procurement_requests.*)
         )
     )
-
-
-
   )
 
 

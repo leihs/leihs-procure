@@ -143,8 +143,45 @@
 
 
 
+;(ns leihs.my.back.html
+;    (:refer-clojure :exclude [keyword str])
+;    (:require
+;      [hiccup.page :refer [html5]]
+;      [honey.sql :refer [format] :rename {format sql-format}]
+;      [honey.sql.helpers :as sql]
+;      [leihs.core.http-cache-buster2 :as cache-buster]
+;      [leihs.core.json :refer [to-json]]
+;      [leihs.core.remote-navbar.shared :refer [navbar-props]]
+;      [leihs.core.shared :refer [head]]
+;      [leihs.core.url.core :as url]
+;      [leihs.my.authorization :as auth]
+;      [leihs.core.db :as db]
+;      [next.jdbc :as jdbc]))
+
+(comment
+
+  (let [
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds-next)
+
+        order-status ("not_processed" "in_progress" "procured" "alternative_procured" "not_procured")
+
+        query2 (-> (sql/select :*)
+                   (sql/from :procurement_requests)
+                   (sql/where [:in :procurement_requests.order_status (map [[#(:cast % :order_status_enum)]] order-status)])
 
 
+                   sql-format
+                   )
+                                    ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
+                                    ;(sqlp/merge-where-false-if-empty order-status)
+
+        p (println "\nquery2" query2)
+        p (println "\nquery2" (jdbc/execute-one! tx query2))
+        ]
+
+       )
+  )
 
 
 
