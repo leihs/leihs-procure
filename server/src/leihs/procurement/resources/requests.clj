@@ -233,7 +233,7 @@
                             (do (println ">o> 2-After apply-scope:" <>)
                                 (requests-perms/apply-scope tx <> auth-entity))
                             (do (println ">o> 3-After sql-format:" <>)
-                                (sql-format <>)))] query
+                                (spy (sql-format <>))))] query
                                                    ;; Execute the query with `query`, for example using a PostgreSQL function.
                                                    ;; Example: (execute-postgres-query tx query)
                                                    )

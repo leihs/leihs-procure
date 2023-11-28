@@ -88,8 +88,11 @@
         i (require '[clojure.data.json :as json])
 
         sql (-> (from :users))
-        query (select-nest sql :users :user)                ;works
+        ;query (select-nest sql :users :user)                ;works
         query (select-nest sql :users "user")               ;works
+        ;>o> nested {:from (:users), :select [[[[:row_to_json :users]] "user"]]}
+
+
         ;; FYI: creates following format
         ;"user": {
         ;             "system_admin_protected": true,
