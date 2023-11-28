@@ -1,6 +1,11 @@
 (ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format update])
-  (:require [honeysql [format :as format] [helpers :as helpers]
+  (:require
+
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
+    [honeysql [format :as format] [helpers :as helpers]
              [types :as types] [util :as util :refer [defalias]]]))
 
 ; regex
@@ -49,7 +54,14 @@
 
 (defn select-nest
   [sqlmap tbl nest-key]
-  (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
+
+  (println ">o> sqlmap" sqlmap)
+  (println ">o> tbl" tbl)
+  (println ">o> nest-key" nest-key)
+
+  ;;adds:  [#sql/call [:row_to_json :users] :user])
+
+  (spy (helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key])))
 
 (defn join-and-nest
   ([sqlmap tbl join-cond nest-key]
