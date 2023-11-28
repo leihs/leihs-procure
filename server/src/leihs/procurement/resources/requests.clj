@@ -8,6 +8,10 @@
             [taoensso.timbre :refer [debug info warn error spy]]
 
 
+            [leihs.core.db :as db]
+
+
+
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.resources.request-helpers :as request-helpers]
             [leihs.procurement.utils.sql :as sql]))
@@ -57,10 +61,10 @@
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
         tx (:tx rrequest)
-        advanced-user? (user-perms/advanced? tx
-                                             (:authenticated-entity rrequest))
-        start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
-                         request-helpers/join-and-nest-associated-resources)]
+        advanced-user? (spy (user-perms/advanced? tx
+                                                  (:authenticated-entity rrequest)))
+        start-sqlmap (spy (-> (request/requests-base-query-with-state advanced-user?)
+                              request-helpers/join-and-nest-associated-resources))]
     (cond-> start-sqlmap
             id (sql/merge-where [:in :procurement_requests.id id])
             ; short_id (sql/merge-where [:in :procurement_requests.short_id short_id])
@@ -94,6 +98,40 @@
                                                          :authenticated-entity
                                                          :user_id)])
             search-term (search-query search-term))))
+
+
+(comment
+  (let [
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds)
+
+        raw-order-status '[NOT_PROCESSED IN_PROGRESS PROCURED ALTERNATIVE_PROCURED NOT_PROCURED]
+        p (println ">o> raw-order-status" raw-order-status)
+
+        order-status (some->> raw-order-status
+                       (map request/to-name-and-lower-case))
+
+        p (println ">o> order-status" order-status)
+
+        os-map (map #(sql/call :cast % :order_status_enum) order-status)
+        p (println ">o> order-os-map" os-map)
+        ;>o> order-os-map (#sql/call [:cast not_processed :order_status_enum] #sql/call [:cast in_progress :order_status_enum] #sql/call [:cast procured :order_status_enum] #sql/call [:cast alternative_procured :order_status_enum] #sql/call [:cast not_procured :order_status_enum])
+
+
+        sql (-> (sql/select :*)
+                (sql/from :procurement_requests)
+                (sql/where [:in :procurement_requests.order_status
+                            (map #(sql/call :cast % :order_status_enum) order-status)
+                            ])
+                )
+
+        p (println "\nsql" sql)
+        query (sql/format sql)
+
+        p (println "\nquery" query)
+        p (println "\nresult" (jdbc/query tx query))]
+    )
+  )
 
 (defn get-requests
   [context arguments value]
