@@ -2,17 +2,19 @@
   (:refer-clojure :exclude [format update])
   (:require
 
-                   ;; all needed imports
-                         [honey.sql :refer [format] :rename {format sql-format}]
-                         [leihs.core.db :as db]
-                         [next.jdbc :as jdbc]
-                         [honey.sql.helpers :as sql]
+    ;; all needed imports
+    [clojure.data.json :as json]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    (honeysql [format :as format] [helpers :as helpers]
+              [types :as types] [util :refer [defalias]])
 
-                             [taoensso.timbre :refer [debug info warn error spy]]
+    [leihs.core.db :as db]
+
+    [next.jdbc :as jdbc]
 
 
-      [honeysql [format :as format] [helpers :as helpers]
-             [types :as types] [util :as util :refer [defalias]]]))
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 ; regex
 (defmethod format/fn-handler "~*"
@@ -28,8 +30,8 @@
   [honeymap]
   (assoc honeymap
     :join (reduce #(let [[k v] %2] (conj %1 k v))
-            []
-            (clojure.core/distinct (partition 2 (:join honeymap))))))
+                  []
+                  (clojure.core/distinct (partition 2 (:join honeymap))))))
 
 (defn format
   "Calls honeysql.format/format with removed join duplications in sql-map."
@@ -43,12 +45,12 @@
    [:and [:= baz.foo 1] [:= :baz.bar 2]] or
    [:and [:in baz.foo [1 2]] [:= :baz.bar 3]]"
    (letfn [(add-table-name [k]
-                           (if table
-                             (-> table
-                                 name
-                                 (str "." (name k))
-                                 keyword)
-                             k))]
+             (if table
+               (-> table
+                   name
+                   (str "." (name k))
+                   keyword)
+               k))]
      (->> m
           (map (fn [[k v]]
                  (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))
@@ -68,16 +70,55 @@
   ;(helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
   ;(sql/select sqlmap [:call :row_to_json tbl] nest-key)    )) ;FIXME
 
-  (spy (sql/select sqlmap  [
-                                [
 
-                                 ;(types/call :row_to_json tbl)
-                                 [[:row_to_json tbl]]
+  ;>o> nested1 {:from (:users), :select ([#sql/call [:row_to_json :users] :user])}
 
-                                 nest-key]
-                                ])))
+  (sql/select sqlmap [[[:row_to_json tbl]] nest-key])       ;works
+  )
 
 
+
+(comment
+
+  (require '[clojure.data.json :as json])
+
+  (let [
+        tx (db/get-ds)
+
+        i (require '[clojure.data.json :as json])
+
+        sql (-> (from :users))
+        query (select-nest sql :users :user)                ;works
+        query (select-nest sql :users "user")               ;works
+        ;; FYI: creates following format
+        ;"user": {
+        ;             "system_admin_protected": true,
+        ;             "..
+        ;             }
+
+
+        ;; ============
+
+        ;key-name "user"
+        ;table-name :users
+        ;
+        ;;query (-> (sql/select [[[:row_to_json :users.*]] :abc])        ;works
+        ;;query (-> (sql/select [[[:row_to_json :users]] :abc])          ;works
+        ;query (-> (sql/select [[[:row_to_json table-name]] key-name])   ;works
+        ;        (sql/from :users)
+        ;        )
+
+        ;; ============
+
+        p (println "\n>o> nested" (pr-str query))
+        result (jdbc/execute-one! tx (sql-format query))
+
+        p (println "\nresult" (json/write-str result))      ;clojure-map to json
+        ]
+
+    )
+
+  )
 
 (defn join-and-nest
   ([sqlmap tbl join-cond nest-key]
