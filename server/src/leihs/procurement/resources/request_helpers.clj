@@ -1,23 +1,23 @@
 (ns leihs.procurement.resources.request-helpers
-  (:require 
-            [clojure.tools.logging :as log]
-    
+  (:require
+    [clojure.tools.logging :as log]
+
     ;[clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sqlp]
+    [leihs.procurement.utils.sql :as sqlp]
 
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
+
     ))
 
 (defn join-and-nest-suppliers
   [sqlmap]
   (sqlp/join-and-nest sqlmap
-                     :suppliers
-                     [:= :suppliers.id :procurement_requests.supplier_id]
-                     :supplier))
+                      :suppliers
+                      [:= :suppliers.id :procurement_requests.supplier_id]
+                      :supplier))
 
 (defn join-and-nest-categories
   [sqlmap]
@@ -29,13 +29,13 @@
         (str
           "row_to_json(procurement_categories)::jsonb" " || "
           "jsonb_build_object('main_category', row_to_json(procurement_main_categories))"
-            " AS category")))
+          " AS category")))
     (sql/join :procurement_categories
-                    [:= :procurement_categories.id
-                     :procurement_requests.category_id])
+              [:= :procurement_categories.id
+               :procurement_requests.category_id])
     (sql/join :procurement_main_categories
-                    [:= :procurement_main_categories.id
-                     :procurement_categories.main_category_id])))
+              [:= :procurement_main_categories.id
+               :procurement_categories.main_category_id])))
 
 (defn join-and-nest-models [sqlmap] (sqlp/select-nest sqlmap :models :model))
 
@@ -48,13 +48,13 @@
         (str
           "row_to_json(procurement_organizations)::jsonb" " || "
           "jsonb_build_object('department', row_to_json(procurement_departments))"
-            " AS organization")))
+          " AS organization")))
     (sql/join :procurement_organizations
-                    [:= :procurement_organizations.id
-                     :procurement_requests.organization_id])
+              [:= :procurement_organizations.id
+               :procurement_requests.organization_id])
     (sql/join [:procurement_organizations :procurement_departments]
-                    [:= :procurement_departments.id
-                     :procurement_organizations.parent_id])))
+              [:= :procurement_departments.id
+               :procurement_organizations.parent_id])))
 
 (defn join-and-nest-budget-periods
   [sqlmap]
@@ -62,7 +62,7 @@
   (-> sqlmap
       (sqlp/select-nest :procurement_budget_periods_2 :budget_period)
       (sql/join
-        [(-> (sql/select :* [( :> :current_date :end_date) :is_past])
+        [(-> (sql/select :* [(:> :current_date :end_date) :is_past])
              (sql/from :procurement_budget_periods))
          :procurement_budget_periods_2]
         [:= :procurement_budget_periods_2.id
@@ -72,18 +72,18 @@
   [sqlmap]
   (println ">o>" "join-and-nest-templates")
   (sqlp/join-and-nest sqlmap
-                     :procurement_templates
-                     [:= :procurement_templates.id
-                      :procurement_requests.template_id]
-                     :template))
+                      :procurement_templates
+                      [:= :procurement_templates.id
+                       :procurement_requests.template_id]
+                      :template))
 
 (defn join-and-nest-rooms
   [sqlmap]
   (-> sqlmap
       (sql/select
         (:raw (str "row_to_json(rooms)::jsonb" " || "
-                      "jsonb_build_object('building', row_to_json(buildings))"
-                        " AS room")))
+                   "jsonb_build_object('building', row_to_json(buildings))"
+                   " AS room")))
       (sql/join :rooms [:= :rooms.id :procurement_requests.room_id])
       (sql/join :buildings [:= :buildings.id :rooms.building_id])))
 
@@ -92,9 +92,9 @@
   [sqlmap]
   (println ">o>" "join-and-nest-users")
   (sqlp/join-and-nest sqlmap
-                     :users
-                     [:= :users.id :procurement_requests.user_id]
-                     :user))
+                      :users
+                      [:= :users.id :procurement_requests.user_id]
+                      :user))
 
 (defn join-and-nest-associated-resources
   [sqlmap]

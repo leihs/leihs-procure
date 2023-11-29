@@ -1,23 +1,21 @@
 (ns leihs.procurement.resources.requests
-  (:require [clojure set string]
+  (:require (clojure [set] [string])
 
     ;[clojure.java.jdbc :as jdbc]
-            [leihs.procurement.utils.sql :as sqlp]
-
-            [taoensso.timbre :refer [debug info warn error spy]]
-
-
             [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
+
+
             [honey.sql.helpers :as sql]
-
-
-            [clojure.tools.logging :as log]
-            [leihs.procurement.permissions [request-helpers :as request-perms]
-             [requests :as requests-perms] [user :as user-perms]]
+            [leihs.core.db :as db]
+            (leihs.procurement.permissions [request-helpers :as request-perms]
+                                           [requests :as requests-perms] [user :as user-perms])
             [leihs.procurement.resources.request :as request]
+
+
             [leihs.procurement.resources.request-helpers :as request-helpers]
+            [leihs.procurement.utils.sql :as sqlp]
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]]
             ))
 
 (defn create-order-status-enum-entries [order-stati]
@@ -234,9 +232,9 @@
                                 (requests-perms/apply-scope tx <> auth-entity))
                             (do (println ">o> 3-After sql-format:" <>)
                                 (spy (sql-format <>))))] query
-                                                   ;; Execute the query with `query`, for example using a PostgreSQL function.
-                                                   ;; Example: (execute-postgres-query tx query)
-                                                   )
+                                                         ;; Execute the query with `query`, for example using a PostgreSQL function.
+                                                         ;; Example: (execute-postgres-query tx query)
+                                                         )
 
         p (spy query)
 
