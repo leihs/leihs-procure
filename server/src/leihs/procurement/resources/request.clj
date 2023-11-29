@@ -188,26 +188,43 @@
 
   (let [
 
-        conc [[:concat
-               [:lower [:coalesce :procurement_requests/article_name ""]]
-               [:lower [:coalesce :models/product ""]]
-               [:lower [:coalesce :models/version ""]]
-               ]]
-        conc (sql-format conc)
-        conc (first conc)
+
+        conc sql-order-by-expr
+
+        ;; FYI: this wont work because of ? <-> "", will break query
+        ;conc [[:concat
+        ;       [:lower [:coalesce :procurement_requests/article_name ""]]
+        ;       [:lower [:coalesce :models/product ""]]
+        ;       [:lower [:coalesce :models/version ""]]
+        ;       ]]
+        ;conc (sql-format conc)
+
         p (println ">o> conc" conc)
         ]
 
     ;(-> (sql/select-distinct-on [:procurement_requests.id conc :procurement_requests.*]) ;; FIXME / broken
-    (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
-                                conc
-                                ") procurement_requests.*")]])
+    (-> (sql/select
+          [[:raw (str "DISTINCT ON (procurement_requests.id, "
+                      conc
+
+                      ") procurement_requests.*")]]
+
+          )
 
 
 
         (sql/from :procurement_requests)
         (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-        (sql/order-by :procurement_requests.id conc :procurement_requests.*)
+
+
+
+        (sql/order-by [[:raw conc]]) ;; master-version
+        
+        ;(sql/order-by :procurement_requests.id conc :procurement_requests.*) ;; TODO: FIXME!!!
+        ;(sql/order-by [[:raw (str " (procurement_requests.id, "
+        ;                          conc
+        ;
+        ;                          ") procurement_requests.*")]])
         )
     )
   )
@@ -234,13 +251,14 @@
 
 
         conc [:concat
-               [:lower [:coalesce :procurement_requests/article_name ""]]
-               [:lower [:coalesce :models/product ""]]
-               [:lower [:coalesce :models/version ""]]]
+              [:lower [:coalesce :procurement_requests/article_name ""]]
+              [:lower [:coalesce :models/product ""]]
+              [:lower [:coalesce :models/version ""]]]
 
         conc (sql-format conc)
 
-        p (println ">o> conc" (first conc))
+        p (println ">o> conc" conc)
+        ;p (println ">o> conc" (first conc))
 
         ]
     )

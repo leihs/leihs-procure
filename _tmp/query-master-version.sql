@@ -60,7 +60,6 @@ WHERE (procurement_requests.category_id in ('7d5ba731-edd9-41ba-8773-7337d24c232
                OR (procurement_requests.approved_quantity < procurement_requests.requested_quantity
                AND procurement_requests.approved_quantity > 0)
                OR procurement_requests.approved_quantity = 0)
-
     AND procurement_requests.order_status in (
                                               CAST('not_processed' AS order_status_enum),
                                               CAST('in_progress' AS order_status_enum),
