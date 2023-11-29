@@ -16,6 +16,9 @@
     (try (resolver context args value)
          (catch Throwable e*
            (let [e (get-cause e*)
+
+                 p (println ">e>" e)                        ;; TODO: used to print full exception
+
                  m (.getMessage e)
                  n (-> e*
                        .getClass

@@ -26,6 +26,7 @@
           (logging/debug e)
 
              (println "error" e)
+             (println "error2" _e)
 
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)
