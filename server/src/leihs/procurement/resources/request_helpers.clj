@@ -100,9 +100,12 @@
   [sqlmap]
   (-> sqlmap
       join-and-nest-budget-periods
-      join-and-nest-categories
-      join-and-nest-models
-      join-and-nest-organizations
+
+      ;; TODO: fix me _> NULL values
+      ;join-and-nest-categories
+      ;join-and-nest-models
+      ;join-and-nest-organizations
+
       join-and-nest-templates
       join-and-nest-rooms
       join-and-nest-suppliers
