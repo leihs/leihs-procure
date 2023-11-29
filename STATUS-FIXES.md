@@ -14,6 +14,12 @@ Causes
 --
 1. Abandoned helper functions
 
+ToClarify
+--
+1. `procurement_departments` still needed? dead code
+   - FYI: had to create :procurement_departments manually baseed on :procurement_organizations
+
+
 TODO Procure
 --
 1. Null-Value: join-and-nest-categories  join-and-nest-organizations  join-and-nest-rooms       

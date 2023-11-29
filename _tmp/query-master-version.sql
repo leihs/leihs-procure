@@ -49,27 +49,24 @@ FROM procurement_requests
          LEFT JOIN suppliers ON suppliers.id = procurement_requests.supplier_id
          LEFT JOIN users ON users.id = procurement_requests.user_id
 
-WHERE (
-                  procurement_requests.category_id in ('7d5ba731-edd9-41ba-8773-7337d24c2327')
-              AND procurement_requests.budget_period_id in ('8b8fe440-cae5-4bf9-8048-d0ec2399faa1')
-              AND procurement_requests.organization_id in ('fb664326-a8ef-4556-af02-07d3127cd9ec')
-              AND procurement_requests.priority in ('normal')
-              AND procurement_requests.inspector_priority in ('high')
-              AND (
-                          procurement_requests.approved_quantity IS NULL
-                          OR procurement_requests.approved_quantity >= procurement_requests.requested_quantity
-                          OR (procurement_requests.approved_quantity < procurement_requests.requested_quantity AND
-                              procurement_requests.approved_quantity > 0)
-                          OR procurement_requests.approved_quantity = 0
-                      )
-              AND procurement_requests.order_status in (
-                                                        CAST('not_processed' AS order_status_enum),
-                                                        CAST('in_progress' AS order_status_enum),
-                                                        CAST('procured' AS order_status_enum),
-                                                        CAST('alternative_procured' AS order_status_enum),
-                                                        CAST('not_procured' AS order_status_enum)
-              )
-          )
+WHERE (procurement_requests.category_id in ('7d5ba731-edd9-41ba-8773-7337d24c2327')
+    AND procurement_requests.budget_period_id in ('8b8fe440-cae5-4bf9-8048-d0ec2399faa1')
+    AND procurement_requests.organization_id in ('fb664326-a8ef-4556-af02-07d3127cd9ec')
+    AND procurement_requests.priority in ('normal')
+    AND procurement_requests.inspector_priority in ('high')
+    AND (
+               procurement_requests.approved_quantity IS NULL
+               OR procurement_requests.approved_quantity >= procurement_requests.requested_quantity
+               OR (procurement_requests.approved_quantity < procurement_requests.requested_quantity
+               AND procurement_requests.approved_quantity > 0)
+               OR procurement_requests.approved_quantity = 0)
+
+    AND procurement_requests.order_status in (
+                                              CAST('not_processed' AS order_status_enum),
+                                              CAST('in_progress' AS order_status_enum),
+                                              CAST('procured' AS order_status_enum),
+                                              CAST('alternative_procured' AS order_status_enum),
+                                              CAST('not_procured' AS order_status_enum)))
 
 ORDER BY concat(
                  lower(coalesce(procurement_requests.article_name, '')),
