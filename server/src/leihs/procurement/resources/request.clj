@@ -187,7 +187,10 @@
                [:lower [:coalesce :models/version ""]]
                ]]]
 
-    (-> (sql/select-distinct :procurement_requests.id conc)
+    ;(-> (sql/select-distinct-on [:procurement_requests.id conc :procurement_requests.*]) ;; FIXME
+    (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
+                                conc
+                                ") procurement_requests.*")]])
         (sql/from :procurement_requests)
         (sql/left-join :models [:= :models.id :procurement_requests.model_id])
         (sql/order-by :procurement_requests.id conc :procurement_requests.*)
