@@ -144,26 +144,31 @@
     ;{:NEW [:= :procurement_requests.approved_quantity nil], :APPROVED [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity], :PARTIALLY_APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]], :DENIED [:= :procurement_requests.approved_quantity 0]}
 
     (let [
+
           map (->> s-map
                    keys
                    (map name)
+                   (map debug-print)                        ; Added print function for each key
                    (interleave (vals s-map))
-                   (cons :case)
-                   (cons :call)                             ;; should be replaced by [[?]]
-                   )
+                   (map debug-print)                        ; Added print function for each value
+                   (cons :case))
+
           p (println ">o>map-4" map)                        ;;TODO: whats this, FIXME NOW
+
+          result [[map]]
+          p (println ">o>map-5" map)                        ;;TODO: whats this, FIXME NOW
 
           ;>o>map-4 (:call :case [:= :procurement_requests.approved_quantity nil] NEW [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] PARTIALLY_APPROVED [:= :procurement_requests.approved_quantity 0] DENIED)
 
-          ])
+          ] (spy result))
 
-    (spy (->> s-map
-              keys
-              (map name)
-              (map debug-print)                             ; Added print function for each key
-              (interleave (vals s-map))
-              (map debug-print)                             ; Added print function for each value
-              (cons :case)))
+    ;(spy (->> s-map
+    ;          keys
+    ;          (map name)
+    ;          (map debug-print)                             ; Added print function for each key
+    ;          (interleave (vals s-map))
+    ;          (map debug-print)                             ; Added print function for each value
+    ;          (cons :case)))
 
     ))
 
@@ -181,16 +186,25 @@
   ;    (sql/left-join :models [:= :models.id :procurement_requests.model_id])
   ;    (sql/order-by (:raw sql-order-by-expr)))
 
-  (let [conc [[:concat
+  (let [
+
+        conc [[:concat
                [:lower [:coalesce :procurement_requests/article_name ""]]
                [:lower [:coalesce :models/product ""]]
                [:lower [:coalesce :models/version ""]]
-               ]]]
+               ]]
+        conc (sql-format conc)
+        conc (first conc)
+        p (println ">o> conc" conc)
+        ]
 
-    ;(-> (sql/select-distinct-on [:procurement_requests.id conc :procurement_requests.*]) ;; FIXME
+    ;(-> (sql/select-distinct-on [:procurement_requests.id conc :procurement_requests.*]) ;; FIXME / broken
     (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
                                 conc
                                 ") procurement_requests.*")]])
+
+
+
         (sql/from :procurement_requests)
         (sql/left-join :models [:= :models.id :procurement_requests.model_id])
         (sql/order-by :procurement_requests.id conc :procurement_requests.*)
@@ -198,6 +212,40 @@
     )
   )
 
+
+(comment
+
+  ;[honey.sql :refer [format] :rename {format sql-format}]
+  ;[leihs.core.db :as db]
+  ;[next.jdbc :as jdbc]
+  ;[honey.sql.helpers :as sql]
+
+  (let [
+        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 [{:has_entry true}]
+        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3b2" ;; >>3 []
+        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 []
+        ;user-id nil ;; >>3 []
+        ;auth-entity {:user_id user-id}
+        ;
+        ;c-id nil
+        ;c-id #uuid "1efc2279-bc42-490c-b004-dca03813a6ef"
+        ;
+        ;tx (db/get-ds-next)
+
+
+        conc [:concat
+               [:lower [:coalesce :procurement_requests/article_name ""]]
+               [:lower [:coalesce :models/product ""]]
+               [:lower [:coalesce :models/version ""]]]
+
+        conc (sql-format conc)
+
+        p (println ">o> conc" (first conc))
+
+        ]
+    )
+
+  )
 
 
 (comment
@@ -458,7 +506,9 @@
         advanced-user? false
 
 
-        query2 (-> (sql/select [[(state-sql advanced-user?)] :state]) ;;works
+        ;query2 (-> (sql/select [[(state-sql advanced-user?)] :state]) ;;works (old solution)
+        ;query2 (-> (sql/select (state-sql advanced-user?) :state) ;;fails
+        query2 (-> (sql/select [(state-sql advanced-user?) :state]) ;;works (new)
                    ;query2 (-> (sql/select [[[(state-sql advanced-user?)]] :state]) ;;works
                    (sql/from :procurement_requests :procurement_budget_periods)
                    sql-format
@@ -482,8 +532,11 @@
         requests-base-query-with-state
         ; NOTE: reselect because of:
         ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-        (sql/select :procurement_requests.* [[(state-sql advanced-user?)] :state]) ;maybe fixed??
-        ;(sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
+
+        (sql/select :procurement_requests.* [(state-sql advanced-user?) :state]) ;maybe fixed?? (new, like master)
+
+        ;(sql/select :procurement_requests.* [state-sql advanced-user?) :state]) ; original
+
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
         sql-format
