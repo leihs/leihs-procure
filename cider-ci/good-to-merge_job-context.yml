@@ -1,5 +1,4 @@
 depends_on: &GOOD_TO_MERGE_DEPENDENTS
-
   specs have passed:
     type: job
     job_key: specs
@@ -8,6 +7,11 @@ depends_on: &GOOD_TO_MERGE_DEPENDENTS
   ui-checks were successful:
     type: job
     job_key: ui-checks
+    states: [passed]
+
+  lints were successful:
+    type: job
+    job_key: lint
     states: [passed]
 
   good to merge of the database:

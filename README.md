@@ -1,17 +1,18 @@
-Leihs Admin
-===========
+# Leihs Admin
 
-Development
------------
+## Development
 
 See and run
 
     ./bin/dev-run-backend
     ./bin/dev-run-frontend
 
+### Formatting Code
 
-Production build
-----------------
+Use `./bin/cljfmt check` and `./bin/cljfmt fix`.
+
+From vim you can use `:! ./bin/cljfmt fix %` to format the current file.
+
+## Production build
 
 See `./bin/build`
-
