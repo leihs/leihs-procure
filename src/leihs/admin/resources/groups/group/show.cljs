@@ -1,25 +1,24 @@
 (ns leihs.admin.resources.groups.group.show
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.group.breadcrumbs :as breadcrums]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
-    [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools] [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.group.breadcrumbs :as breadcrums]
+   [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]] [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools]
+   [leihs.admin.state :as state]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn li-dl-component [dt dd]
   ^{:key dt}
@@ -62,4 +61,4 @@
      [:div
       [:h2 "Inventory-Pools"]
       [inventory-pools/table-component]]
-     [debug-component] ]]])
+     [debug-component]]]])

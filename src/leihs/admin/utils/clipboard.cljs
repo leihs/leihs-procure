@@ -1,7 +1,7 @@
 (ns leihs.admin.utils.clipboard
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]))
+   [leihs.core.core :refer [keyword str presence]]))
 
 ; copy-text taken from
 ; https://github.com/metosin/komponentit/blob/master/src/cljs/komponentit/clipboard.cljs
@@ -40,7 +40,6 @@
   [:button.btn.btn-outline-secondary.btn-sm.py-0.px-1
    {:on-click #(copy-text text)}
    [:span [:i.fas.fa-clipboard]]])
-
 
 (defn button [text]
   [:button.btn.btn-outline-secondary.btn-sm.py-0.px-1

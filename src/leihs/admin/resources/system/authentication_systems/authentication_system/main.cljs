@@ -1,31 +1,30 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.core.url.shared]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.system.authentication-systems.breadcrumbs :as parent-breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.common.icons :as icons]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.system.authentication-systems.breadcrumbs :as parent-breadcrumbs]
+   [leihs.admin.state :as state]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.url.shared]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :authentication-system-id)
@@ -34,19 +33,18 @@
 
 (defonce edit-mode?*
   (reaction
-    (and (map? @authentication-system-data*)
-         (boolean ((set '(:authentication-system-edit :authentication-system-create))
-                   (:handler-key @routing/state*))))))
+   (and (map? @authentication-system-data*)
+        (boolean ((set '(:authentication-system-edit :authentication-system-create))
+                  (:handler-key @routing/state*))))))
 
 (defn fetch [& args]
   (go (reset! authentication-system-data*
               (some->
-                {:chan (async/chan)
-                 :url (path :authentication-system
-                            (-> @routing/state* :route-params))}
-                http-client/request :chan <!
-                http-client/filter-success! :body))))
-
+               {:chan (async/chan)
+                :url (path :authentication-system
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success! :body))))
 
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -66,7 +64,6 @@
      [:div.authentication-system-data
       [:h3 "@authentication-system-data*"]
       [:pre (with-out-str (pprint @authentication-system-data*))]]]))
-
 
 ;; authentication-system components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -155,15 +152,13 @@
       [:div
        [:pre.code
         "openssl ecparam -name prime256v1 -genkey -noout -out tmp/key.pem\n"
-        "openssl ec -in tmp/key.pem -pubout -out tmp/public.pem" ]]])
+        "openssl ec -in tmp/key.pem -pubout -out tmp/public.pem"]]])
 
    [form-components/input-component authentication-system-data* [:external_public_key]
     :disabled (not @edit-mode?*)
     :element :textarea
     :rows 2
-    :label "External public key"]
-
-   ])
+    :label "External public key"]])
 
 (defn count-component [kw noun data]
   (let [count (kw data)]
@@ -191,7 +186,6 @@
 (defn authentication-system-id-component []
   [:p "id: " [:span {:style {:font-family "monospace"}} (:id @authentication-system-data*)]])
 
-
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn show-breadcrumbs []
@@ -216,18 +210,17 @@
    [authentication-system-component]
    [debug-component]])
 
-
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch [& args]
   (let [route (path :authentication-system {:authentication-system-id @id*})]
     (go (when (some->
-                {:url route
-                 :method :patch
-                 :json-params  (dissoc @authentication-system-data* :users_count)
-                 :chan (async/chan)}
-                http-client/request :chan <!
-                http-client/filter-success!)
+               {:url route
+                :method :patch
+                :json-params  (dissoc @authentication-system-data* :users_count)
+                :chan (async/chan)}
+               http-client/request :chan <!
+               http-client/filter-success!)
           (accountant/navigate! route)))))
 
 (defn edit-form []
@@ -254,20 +247,19 @@
    [edit-form]
    [debug-component]])
 
-
 ;;; create  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create [& args]
   (go (when-let [id (some->
-                      {:chan(async/chan)
-                       :url (path :authentication-systems)
-                       :method :post
-                       :json-params  @authentication-system-data*}
-                      http-client/request :chan <!
-                      http-client/filter-success! :body :id)]
+                     {:chan (async/chan)
+                      :url (path :authentication-systems)
+                      :method :post
+                      :json-params  @authentication-system-data*}
+                     http-client/request :chan <!
+                     http-client/filter-success! :body :id)]
         (accountant/navigate!
-          (path :authentication-system
-                {:authentication-system-id id})))))
+         (path :authentication-system
+               {:authentication-system-id id})))))
 
 (defn create-form []
   [:form
@@ -282,7 +274,7 @@
    [routing/hidden-state-component
     {:did-mount #(reset! authentication-system-data* {})}]
    [breadcrumbs/nav-component
-    (conj @parent-breadcrumbs/left* [parent-breadcrumbs/create-li])[]]
+    (conj @parent-breadcrumbs/left* [parent-breadcrumbs/create-li]) []]
    [:div.row
     [:div.col-lg
      [:h1
@@ -290,19 +282,18 @@
    [create-form]
    [debug-component]])
 
-
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-authentication-system [& args]
   (go (when
-        (some->
-          {:url (path :authentication-system (-> @routing/state* :route-params))
-           :method :delete
-           :chan (async/chan)}
-          http-client/request :chan <!
-          http-client/filter-success!)
+       (some->
+        {:url (path :authentication-system (-> @routing/state* :route-params))
+         :method :delete
+         :chan (async/chan)}
+        http-client/request :chan <!
+        http-client/filter-success!)
         (accountant/navigate!
-          (path :authentication-systems)))))
+         (path :authentication-systems)))))
 
 (defn delete-form []
   [:form.form

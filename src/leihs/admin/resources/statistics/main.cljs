@@ -1,21 +1,20 @@
 (ns leihs.admin.resources.statistics.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go go-loop]])
+   [cljs.core.async.macros :refer [go go-loop]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (def data* (reagent/atom {}))
 
@@ -25,14 +24,14 @@
                 :statistics-models
                 :statistics-pools
                 :statistics-users]]
-           (when-let [k (first ks)]
-             (some->
-               {:url (path k)
-                :chan (async/chan)}
-               http-client/request :chan <!
-               http-client/filter-success! :body
-               (->> (swap! data* merge)))
-             (recur (rest ks)))))
+    (when-let [k (first ks)]
+      (some->
+       {:url (path k)
+        :chan (async/chan)}
+       http-client/request :chan <!
+       http-client/filter-success! :body
+       (->> (swap! data* merge)))
+      (recur (rest ks)))))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -51,7 +50,7 @@
   [& {:keys [k header description items]
       :or {header "Foo"
            description nil
-           items {} }}]
+           items {}}}]
   [:div.mt-3
    [:h3 header]
    (when description [:small description])
@@ -62,7 +61,6 @@
        [:dt.col-sm-4 v]
        [:dd.col-sm-2.text-right [val-component k]]
        [:div.col-sm-6]])]])
-
 
 (defn contracts-component []
   [:<>

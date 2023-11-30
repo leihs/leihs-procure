@@ -1,24 +1,22 @@
 (ns leihs.admin.resources.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    )
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.user.front :as current-user]
+   [leihs.admin.paths :as paths]
+   [leihs.admin.resources.audits.breadcrumbs :as breadcrumbs-audits]
+   [leihs.admin.resources.breadcrumbs :as breadcrumbs]
 
-    [leihs.admin.paths :as paths]
-    [leihs.admin.resources.audits.breadcrumbs :as breadcrumbs-audits]
-    [leihs.admin.resources.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-inventory-pools]
-    [leihs.admin.resources.inventory.breadcrumbs :as breadcrumbs-inventory]
-    [leihs.admin.resources.settings.breadcrumbs :as settings-breadcrumbs]
-    [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs-statistics]
-    [leihs.admin.resources.system.breadcrumbs :as breadcrumbs-system]
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs-users]
-    [leihs.admin.state :as state]
-    ))
+   [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-inventory-pools]
+   [leihs.admin.resources.inventory.breadcrumbs :as breadcrumbs-inventory]
+   [leihs.admin.resources.settings.breadcrumbs :as settings-breadcrumbs]
+   [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs-statistics]
+   [leihs.admin.resources.system.breadcrumbs :as breadcrumbs-system]
+   [leihs.admin.resources.users.breadcrumbs :as breadcrumbs-users]
+   [leihs.admin.state :as state]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.user.front :as current-user]))
 
 (defn page []
   [:div.admin
@@ -42,4 +40,4 @@
    [:div
     [:h1 "Admin"]
     [:p "The application to administrate this instance of "
-     [:em " leihs"]"."]]])
+     [:em " leihs"] "."]]])

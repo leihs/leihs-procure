@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.constants :as defaults]))
+   [leihs.admin.constants :as defaults]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def default-query-params
   {:page 1

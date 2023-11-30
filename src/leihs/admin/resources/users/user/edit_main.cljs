@@ -1,36 +1,34 @@
 (ns leihs.admin.resources.users.user.edit-main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
-    [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data* form-is-invalid*]]
-    [leihs.admin.resources.users.user.edit-image :as edit-image]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
+   [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data* form-is-invalid*]]
+   [leihs.admin.resources.users.user.edit-image :as edit-image]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (defn patch [& args]
   (let [route (path :user {:user-id @user-id*})]
     (go (when (some->
-                {:chan (async/chan)
-                 :url route
-                 :method :patch
-                 :json-params  (-> @data*
-                                   (update-in [:extended_info]
-                                              (fn [s] (.parse js/JSON s))))}
-                http-client/request :chan <!
-                http-client/filter-success!)
+               {:chan (async/chan)
+                :url route
+                :method :patch
+                :json-params  (-> @data*
+                                  (update-in [:extended_info]
+                                             (fn [s] (.parse js/JSON s))))}
+               http-client/request :chan <!
+               http-client/filter-success!)
           (accountant/navigate! route)))))
 
 (defn patch-submit-component []
@@ -41,7 +39,6 @@
      [icons/save] " Save "]]
    [:div.clearfix]])
 
-
 (defn inner-form-component []
   [:div
    [edit-core/essentials-form-component]
@@ -50,7 +47,6 @@
     [edit-image/image-component]]
    [edit-core/personal-and-contact-form-component]
    [edit-core/account-settings-form-component]])
-
 
 (defn edit-form-component
   [& {:keys [patch]

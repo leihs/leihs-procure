@@ -1,27 +1,26 @@
 (ns leihs.admin.resources.settings.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.settings.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.settings.languages.breadcrumbs :as languages-breadcrumbs]
-    [leihs.admin.resources.settings.misc.breadcrumbs :as misc-breadcrumbs]
-    [leihs.admin.resources.settings.smtp.breadcrumbs :as smtp-breadcrumbs]
-    [leihs.admin.resources.settings.syssec.breadcrumbs :as syssec-breadcrumbs]
-    [leihs.admin.resources.settings.icons :as icons]
-    [leihs.admin.state :as state]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.settings.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.settings.icons :as icons]
+   [leihs.admin.resources.settings.languages.breadcrumbs :as languages-breadcrumbs]
+   [leihs.admin.resources.settings.misc.breadcrumbs :as misc-breadcrumbs]
+   [leihs.admin.resources.settings.smtp.breadcrumbs :as smtp-breadcrumbs]
+   [leihs.admin.resources.settings.syssec.breadcrumbs :as syssec-breadcrumbs]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
-
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn page []
   [:div.settings-page

@@ -1,20 +1,19 @@
 (ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.set]
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.suppliers.shared :as shared]
-    [leihs.admin.resources.suppliers.supplier.main :as supplier]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.uuid :refer [uuid]]
-    [logbug.debug :as debug]
-    [next.jdbc.sql :as jdbc]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [clojure.set]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.suppliers.shared :as shared]
+   [leihs.admin.resources.suppliers.supplier.main :as supplier]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.debug :as debug]
+   [next.jdbc.sql :as jdbc]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def suppliers-base-query
   (-> (sql/select-distinct :suppliers.id
@@ -96,8 +95,8 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET suppliers-path [] #'suppliers)
-    (cpj/POST suppliers-path [] #'create-supplier)))
+   (cpj/GET suppliers-path [] #'suppliers)
+   (cpj/POST suppliers-path [] #'create-supplier)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

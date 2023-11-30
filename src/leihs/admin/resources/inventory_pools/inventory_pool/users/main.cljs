@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [<! go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.resources.users.user.core :as user2]
-    [leihs.admin.resources.users.user.shared :as user]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]))
-
+   ["date-fns" :as date-fns]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [<! go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.resources.users.user.core :as user2]
+   [leihs.admin.resources.users.user.shared :as user]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]))
 
 (def inventory-pool-users-count*
   (reaction (-> @users/data*
@@ -33,7 +32,6 @@
 (def current-query-params*
   (reaction (merge default-query-params
                    @users/current-query-params*)))
-
 
 ;### user #####################################################################
 
@@ -49,8 +47,7 @@
       ^{key idx} [:li {:key idx} item])]])
 
 (defn user-td-component [user]
-  [:td.user [user-inner-component user] ])
-
+  [:td.user [user-inner-component user]])
 
 ;### roles ####################################################################
 
@@ -65,7 +62,6 @@
                            (into {}))
                       :compact true]])
 
-
 ;### direct roles #############################################################
 
 (defn direct-roles-th-component []
@@ -75,10 +71,10 @@
   (go (swap! users/data* assoc-in
              [(:route @routing/state*) :users (:page-index user) :direct_roles]
              (<! (put-roles<
-                   (path :inventory-pool-user-direct-roles
-                         {:inventory-pool-id @inventory-pool/id*
-                          :user-id (:id user)})
-                   roles)))))
+                  (path :inventory-pool-user-direct-roles
+                        {:inventory-pool-id @inventory-pool/id*
+                         :user-id (:id user)})
+                  roles)))))
 
 (defn direct-roles-td-component [user]
   [:td.direct-roles {:key :direct-roles}
@@ -86,7 +82,6 @@
     (get user :direct_roles)
     :compact true
     :update-handler #(direct-roles-update-handler % user)]])
-
 
 ;### groups roles #############################################################
 
@@ -102,10 +97,9 @@
       (:groups_roles user)
       :compact true]
      [:a.btn.btn-outline-primary.btn-sm.py-0
-          {:href (path {:including-user (or (-> user :email presence) (:id user))
-                        :role ""})}
-          [:span [icons/view] " " [icons/edit] " Manage " ]]]))
-
+      {:href (path {:including-user (or (-> user :email presence) (:id user))
+                    :role ""})}
+      [:span [icons/view] " " [icons/edit] " Manage "]]]))
 
 ;### suspended ################################################################
 
@@ -115,17 +109,17 @@
 (defn suspension-td-component [user]
   [:td.suspension
    (suspension/suspension-component
-     (:suspension user)
-     :compact true
-     :update-handler (fn [updated]
-                       (go (let [data (<! (suspension/put-suspension<
-                                            (path :inventory-pool-user-suspension
-                                                  {:inventory-pool-id @inventory-pool/id*
-                                                   :user-id (:id user)})
-                                            updated))]
-                             (swap! users/data* assoc-in
-                                    [(:route @routing/state*) :users
-                                     (:page-index user) :suspension] data)))))])
+    (:suspension user)
+    :compact true
+    :update-handler (fn [updated]
+                      (go (let [data (<! (suspension/put-suspension<
+                                          (path :inventory-pool-user-suspension
+                                                {:inventory-pool-id @inventory-pool/id*
+                                                 :user-id (:id user)})
+                                          updated))]
+                            (swap! users/data* assoc-in
+                                   [(:route @routing/state*) :users
+                                    (:page-index user) :suspension] data)))))])
 
 ;### filter ###################################################################
 
@@ -159,7 +153,6 @@
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
-
 ;### main #####################################################################
 
 (defn debug-component []
@@ -168,8 +161,7 @@
      [:div "@inventory-pool-users-count*"
       [:pre (with-out-str (pprint @inventory-pool-users-count*))]]
      [:div "@current-query-params*"
-      [:pre (with-out-str (pprint @current-query-params*))]]
-     ]))
+      [:pre (with-out-str (pprint @current-query-params*))]]]))
 
 (defn table-component []
   [users/table-component
@@ -199,8 +191,8 @@
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch users/fetch-users))}]
    (breadcrumbs/nav-component
-     @breadcrumbs/left*
-     [[breadcrumbs/create-li]])
+    @breadcrumbs/left*
+    [[breadcrumbs/create-li]])
    [:div
     [:h1
      [:span "Users "

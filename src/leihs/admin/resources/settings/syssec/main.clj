@@ -1,19 +1,18 @@
 (ns leihs.admin.resources.settings.syssec.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.string :as string]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.utils.jdbc :as utils-jdbc]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.string :as string]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
+   [leihs.admin.utils.jdbc :as utils-jdbc]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (defn get-syssec-settings [{tx :tx}]
   {:body (-> (sql/select :*)
@@ -31,12 +30,10 @@
 
 (def routes
   (-> (cpj/routes
-        (cpj/GET syssec-settings-path [] #'get-syssec-settings)
-        (cpj/PATCH syssec-settings-path [] #'upsert)
-        (cpj/PUT syssec-settings-path [] #'upsert))))
-
+       (cpj/GET syssec-settings-path [] #'get-syssec-settings)
+       (cpj/PATCH syssec-settings-path [] #'upsert)
+       (cpj/PUT syssec-settings-path [] #'upsert))))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

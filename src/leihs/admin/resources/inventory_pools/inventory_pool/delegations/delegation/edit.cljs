@@ -1,24 +1,24 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [<! go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.set :refer [rename-keys]]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre]))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [<! go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.set :refer [rename-keys]]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre]))
 
 (defonce data* (reagent/atom {}))
 
@@ -59,7 +59,7 @@
     [form-components/checkbox-component data* [:pool_protected]
      :label "Protected"
      :hint [:span
-            "An " [:strong " unprotected " ]
+            "An " [:strong " unprotected "]
             " delegation can be " [:strong "added"] " to any other pool and then be used and "
             [:strong  " modified "] " from those pools in every way."
             " You can unprotect a delegation temporarily to share it with a limited number of pools."]]]
@@ -72,12 +72,12 @@
                     {:inventory-pool-id @inventory-pool/id*
                      :delegation-id @delegation/id*})]
     (go (when (some->
-                {:chan (async/chan)
-                 :url route
-                 :method :patch
-                 :json-params  @data*}
-                http-client/request :chan <!
-                http-client/filter-success!)
+               {:chan (async/chan)
+                :url route
+                :method :patch
+                :json-params  @data*}
+               http-client/request :chan <!
+               http-client/filter-success!)
           (accountant/navigate! route)))))
 
 (defn edit-delegation-form-component []
@@ -89,7 +89,7 @@
     {:did-mount set-data-by-query-params}]
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left*
-          [breadcrumbs/edit-li])[]]
+          [breadcrumbs/edit-li]) []]
    [:div.row
     [:div.col-lg
      [:h1
@@ -98,21 +98,20 @@
    [edit-delegation-form-component]
    [delegation/debug-component]])
 
-
 ;;; new / post ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create [& _]
   (go (when-let [id (some->
-                      {:chan (async/chan)
-                       :url (path :inventory-pool-delegations
-                                  {:inventory-pool-id @inventory-pool/id*})
-                       :method :post
-                       :json-params @data*}
-                      http-client/request :chan <!
-                      http-client/filter-success! :body :id)]
+                     {:chan (async/chan)
+                      :url (path :inventory-pool-delegations
+                                 {:inventory-pool-id @inventory-pool/id*})
+                      :method :post
+                      :json-params @data*}
+                     http-client/request :chan <!
+                     http-client/filter-success! :body :id)]
         (accountant/navigate!
-          (path :inventory-pool-delegation {:inventory-pool-id @inventory-pool/id*
-                                            :delegation-id id})))))
+         (path :inventory-pool-delegation {:inventory-pool-id @inventory-pool/id*
+                                           :delegation-id id})))))
 
 (defn new-delegation-form-component []
   [form-component create form-components/create-submit-component])
@@ -123,7 +122,7 @@
     {:did-mount set-data-by-query-params}]
    [breadcrumbs/nav-component
     (conj @breadcrumbs/left*
-          [breadcrumbs/create-li])[]]
+          [breadcrumbs/create-li]) []]
    [:div.row
     [:div.col-lg
      [:h1

@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.suppliers.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.suppliers.shared :as shared]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.auth.core :as auth :refer []]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.suppliers.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.suppliers.shared :as shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.auth.core :as auth :refer []]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -44,13 +43,13 @@
 (defn fetch-inventory-pools []
   (go (reset! inventory-pools-data*
               (some->
-                {:chan (async/chan)
-                 :url (path :inventory-pools {} {:with_items_from_suppliers "yes"
-                                                 :active "yes"
-                                                 :per-page 1000})}
-                http/request :chan <!
-                http/filter-success!
-                :body))))
+               {:chan (async/chan)
+                :url (path :inventory-pools {} {:with_items_from_suppliers "yes"
+                                                :active "yes"
+                                                :per-page 1000})}
+               http/request :chan <!
+               http/filter-success!
+               :body))))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -86,13 +85,12 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn name-th-component []
   [:th {:key :name} "Name"])
 
 (defn name-td-component [supplier]
   [:td {:key :name}
-   [link-to-supplier supplier [:span (:name supplier) ]
+   [link-to-supplier supplier [:span (:name supplier)]
     :authorizers [auth/admin-scopes?]]])
 
 (defn items-count-th-component []
@@ -100,7 +98,6 @@
 
 (defn items-count-td-component [supplier]
   [:td.text-left {:key :items_count} (:count_items supplier)])
-
 
 ;;;;;
 

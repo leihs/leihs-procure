@@ -1,10 +1,10 @@
 (ns leihs.admin.utils.pagination
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (defn set-per-page-and-offset
   ([query {per-page :per-page page :page}]

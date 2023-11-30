@@ -1,8 +1,8 @@
 (ns leihs.admin.scratch
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [clojure.string :as string]))
+   [clojure.string :as string]
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def pools [{:id "8a4fa6e3-2b36-46b9-9508-212d4f5125c6", :name "AV-Services", :index 1}
             {:id "82a48074-8a4d-5d3b-b1dd-8e35954137e8", :name "AVS-Ausstattung", :index 2}
@@ -33,7 +33,7 @@
             {:id "77e88ec8-9ff6-5435-818e-dc902fc631a6", :name "Werkstatt Ausleihe", :index 27}
             {:id "91affef6-57fd-5cd9-8646-b29ac905f4b7", :name "ZHdK-Inventar", :index 28}])
 
-(comment 
+(comment
   (let [tmp (->> pools
                  (map #(do [(:id %) (:name %)]))
                  (into {}))]

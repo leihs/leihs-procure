@@ -1,19 +1,19 @@
 (ns leihs.admin.resources.suppliers.supplier.items
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.uuid :refer [uuid]]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-    [taoensso.timbre :refer [error warn info debug spy]]))
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 ;;; items ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -48,7 +48,7 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET supplier-items-path [] #'get-supplier-items)))
+   (cpj/GET supplier-items-path [] #'get-supplier-items)))
 
 ;#### debug ###################################################################
 

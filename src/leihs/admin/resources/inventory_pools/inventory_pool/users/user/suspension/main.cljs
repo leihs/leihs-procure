@@ -1,25 +1,25 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [<! go]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]))
+   ["date-fns" :as date-fns]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [<! go]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defn suspended? [suspended-until ref-date]
   (if-not suspended-until
@@ -58,7 +58,6 @@
                          :chan <! http-client/filter-success! :body)))
     chan))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn supension-inner-form-component [disabled data*]
@@ -81,11 +80,11 @@
         [:button.btn.btn-outline-warning
          {:type :button
           :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Cancel" ]
+         [icons/delete] " Cancel"]
         [:button.btn.btn-outline-secondary
          {:type :button
           :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Close" ])]
+         [icons/delete] " Close"])]
      [:div.col
       [form-components/save-submit-component
        :disabled (not @changed*)]]]))
@@ -119,8 +118,7 @@
                 :on-click #(reset! edit-data* {})}
                [:span [icons/delete] " Reset suspension"]]]]]
            [supension-inner-form-component false edit-data*]
-           [suspension-submit-component edit-data* edit-mode?*]
-           ]]]]]
+           [suspension-submit-component edit-data* edit-mode?*]]]]]]
       [:div.modal-backdrop {:style {:opacity "0.5"}}]]]))
 
 (defn suspension-edit-header []
@@ -149,8 +147,8 @@
 
 (defn suspension-component
   [data & {:keys [compact update-handler]
-                              :or {compact false
-                                   update-handler nil}}]
+           :or {compact false
+                update-handler nil}}]
   (reagent/with-let [edit-mode?* (reagent/atom false)]
     [:div.suspension
      (if (nil? data)
@@ -158,17 +156,17 @@
        [:div
         (when @edit-mode?*
           [suspension-edit-component data edit-mode?* update-handler])
+        [:div
+         [:div [humanized-suspended-until-component
+                (some-> data :suspended_until presence js/Date.)]]
+         (when-not compact [supension-inner-form-component
+                            true (reagent/atom data)])]
+        [:div
          [:div
-          [:div [humanized-suspended-until-component
-                 (some-> data :suspended_until presence js/Date.)]]
-          (when-not compact [supension-inner-form-component
-                             true (reagent/atom data)])]
-         [:div
-          [:div
-           [:button.btn.btn-outline-primary
-            {:class (when compact "btn-sm py-0")
-             :on-click #(reset! edit-mode?* true)}
-            [:span [icons/edit] " Edit"]]]] ])]))
+          [:button.btn.btn-outline-primary
+           {:class (when compact "btn-sm py-0")
+            :on-click #(reset! edit-mode?* true)}
+           [:span [icons/edit] " Edit"]]]]])]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -204,7 +202,7 @@
 (defn page []
   [:div.inventory-pool-user-suspension
    [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/suspension-li])[]]
+    (conj @breadcrumbs/left* [breadcrumbs/suspension-li]) []]
    [header-component]
    [user-page-suspension-component]
    [debug-component]])

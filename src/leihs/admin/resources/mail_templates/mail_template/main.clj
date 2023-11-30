@@ -1,20 +1,20 @@
 (ns leihs.admin.resources.mail-templates.mail-template.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.mail-templates.shared :as shared]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.uuid :refer [uuid]]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :refer [query update!] :rename {query jdbc-query update! jdbc-update!}]
-    [taoensso.timbre :refer [error warn info debug spy]]))
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.mail-templates.shared :as shared]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [query update!] :rename {query jdbc-query update! jdbc-update!}]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -67,8 +67,8 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET mail-template-path [] #'get-mail-template)
-    (cpj/PATCH mail-template-path [] #'patch-mail-template)))
+   (cpj/GET mail-template-path [] #'get-mail-template)
+   (cpj/PATCH mail-template-path [] #'patch-mail-template)))
 
 ;#### debug ###################################################################
 

@@ -1,8 +1,7 @@
 (ns leihs.admin.resources.settings.icons
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]))
-
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def languages [:i.fas.fa-globe])
 (def misc [:i.fas.fa-box-open])

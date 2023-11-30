@@ -4,4 +4,4 @@
 
 (def default-query-params
   {:role "customer"
-   :suspension "any" })
+   :suspension "any"})

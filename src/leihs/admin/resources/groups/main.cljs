@@ -1,31 +1,30 @@
 (ns leihs.admin.resources.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.groups.shared :as shared]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.auth.core :as auth :refer []]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.groups.shared :as shared]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.auth.core :as auth :refer []]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -40,7 +39,6 @@
 
 (defn fetch-groups []
   (http/route-cached-fetch data*))
-
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -58,7 +56,6 @@
     inner))
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn form-term-filter []
   [routing/form-term-filter-component
@@ -89,24 +86,23 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn name-th-component []
   [:th {:key :name} "Name"])
 
 (defn name-td-component [group]
   [:td {:key :name}
-   [link-to-group group [:span (:name group) ]
+   [link-to-group group [:span (:name group)]
     :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]]])
 
 (defn org-th-component []
- [:th {:key :organization} "Organization"])
+  [:th {:key :organization} "Organization"])
 
 (defn org-td-component [group]
   [:td {:key :organization}
    (:organization group)])
 
 (defn org-id-th-component []
- [:th {:key :org-id} "Org ID"])
+  [:th {:key :org-id} "Org ID"])
 
 (defn org-id-td-component [group]
   [:td {:key :org-id}
@@ -126,7 +122,6 @@
 
 (defn users-count-td-component [group]
   [:td.text-right {:key :users_count} (:count_users group)])
-
 
 ;;;;;
 

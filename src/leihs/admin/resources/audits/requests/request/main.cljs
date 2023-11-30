@@ -1,28 +1,27 @@
 (ns leihs.admin.resources.audits.requests.request.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.audits.changes.change.main :as change]
-    [leihs.admin.resources.audits.core :as audits]
-    [leihs.admin.resources.audits.requests.request.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.user.core :as user]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.clipboard :as clipboard]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre :refer []]))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.audits.changes.change.main :as change]
+   [leihs.admin.resources.audits.core :as audits]
+   [leihs.admin.resources.audits.requests.request.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
+   [leihs.admin.resources.users.user.core :as user]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.clipboard :as clipboard]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre :refer []]))
 
 (def request-id* (reaction (or (-> @routing/state* :route-params :request-id) ":request-id")))
 
@@ -39,7 +38,6 @@
           (when (< (:status resp) 300)
             (reset! changes-index* (-> resp :body :changes)))))))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn inner-value-component [text]
@@ -50,7 +48,7 @@
 
 (defn generic-value-component [v]
   [:<>
-   (let [text (if (string? v ) v (with-out-str (pprint v)))]
+   (let [text (if (string? v) v (with-out-str (pprint v)))]
      [inner-value-component text])])
 
 (defn path-value-component [path]
@@ -91,8 +89,6 @@
     {:url (path :audited-request {:request-id @request-id*})}
     request-component]])
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn requester-inner-component [user]
@@ -131,7 +127,6 @@
      [:div.data*
       [:h3 "@changes-index*"]
       [:pre (with-out-str (pprint @changes-index*))]]]))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

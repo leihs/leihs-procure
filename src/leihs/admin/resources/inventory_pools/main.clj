@@ -1,18 +1,18 @@
 (ns leihs.admin.resources.inventory-pools.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [taoensso.timbre :refer [error warn info debug spy]]))
+   [clojure.java.jdbc :as jdbc]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def users-count-sub
   (-> (sql/select :%count.*)
@@ -38,10 +38,10 @@
   (let [order (some-> query-params :order seq vec
                       (->> (map (fn [[f o]] [(keyword f) (keyword o)]))))]
     (case order
-      ([[:name :asc][:id :asc]]
+      ([[:name :asc] [:id :asc]]
        [[:users_count :desc] [:id :asc]]
-       [[:delegations_count :desc][:id :asc]]) (apply sql/order-by query order)
-      (apply sql/order-by query [[:name :asc][:id :asc]]))))
+       [[:delegations_count :desc] [:id :asc]]) (apply sql/order-by query order)
+      (apply sql/order-by query [[:name :asc] [:id :asc]]))))
 
 (defn term-filter [query request]
   (if-let [term (-> request :query-params-raw :term presence)]
@@ -85,11 +85,10 @@
 
 (def routes
   (-> (cpj/routes
-        (cpj/GET (path :inventory-pools) [] #'inventory-pools)
-        (cpj/POST (path :inventory-pools) [] inventory-pool/routes)
-        (cpj/ANY inventory-pool-path [] inventory-pool/routes))
+       (cpj/GET (path :inventory-pools) [] #'inventory-pools)
+       (cpj/POST (path :inventory-pools) [] inventory-pool/routes)
+       (cpj/ANY inventory-pool-path [] inventory-pool/routes))
       (wrap-mixin-default-query-params shared/default-query-params)))
-
 
 ;#### debug ###################################################################
 

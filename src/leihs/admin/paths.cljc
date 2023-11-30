@@ -1,24 +1,24 @@
 (ns leihs.admin.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [bidi.bidi :refer [path-for match-route]]
-    [bidi.verbose :refer [branch param leaf]]
-    [leihs.admin.resources.audits.paths :as audits]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
-    [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
-    [leihs.admin.resources.inventory.paths :as inventory]
-    [leihs.admin.resources.settings.paths :as settings]
-    [leihs.admin.resources.system.paths :as system]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.paths]
-    [leihs.core.url.query-params :as query-params]
-    [taoensso.timbre :refer [debug info warn error spy]]
-    #?@(:clj
-         [[logbug.catcher :as catcher]
-          [logbug.debug :as debug]
-          [logbug.thrown :as thrown]])
-    #?@(:cljs
-         [])))
+   #?@(:clj
+       [[logbug.catcher :as catcher]
+        [logbug.debug :as debug]
+        [logbug.thrown :as thrown]])
+   #?@(:cljs
+       [])
+   [bidi.bidi :refer [path-for match-route]]
+   [bidi.verbose :refer [branch param leaf]]
+   [leihs.admin.resources.audits.paths :as audits]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
+   [leihs.admin.resources.inventory-pools.paths :as inventory-pools]
+   [leihs.admin.resources.inventory.paths :as inventory]
+   [leihs.admin.resources.settings.paths :as settings]
+   [leihs.admin.resources.system.paths :as system]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.paths]
+   [leihs.core.url.query-params :as query-params]
+   [taoensso.timbre :refer [debug info warn error spy]]))
 
 (def external-handlers
   #{:admin-audits-legacy
@@ -31,8 +31,7 @@
     :lending
     :my-user
     :procurement
-    :status
-    })
+    :status})
 
 (def users-paths
   (branch "/users"
@@ -157,9 +156,7 @@
                   users-paths
                   statistics-paths
                   suppliers-paths
-                  (leaf "/audits" :admin-audits-legacy)
-                  )))
-
+                  (leaf "/audits" :admin-audits-legacy))))
 
 (reset! leihs.core.paths/paths* paths)
 

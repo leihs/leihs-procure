@@ -1,28 +1,27 @@
 (ns leihs.admin.resources.settings.syssec.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.breadcrumbs :as core-breadcrumbs]
-    [leihs.admin.common.icons :as admin.common.icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
 
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.settings.icons :as icons]
-    [leihs.admin.resources.settings.syssec.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as admin.common.icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.settings.icons :as icons]
+   [leihs.admin.resources.settings.syssec.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
-
+   [leihs.core.breadcrumbs :as core-breadcrumbs]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
@@ -36,14 +35,14 @@
 
 (defn put [& _]
   (go (when-let [data (some->
-                         {:chan (async/chan)
-                          :json-params @data*
-                          :method :put}
-                         http-client/request
-                         :chan <!
-                         http-client/filter-success :body)]
-         (reset! data* data)
-         (reset! edit?* false))))
+                       {:chan (async/chan)
+                        :json-params @data*
+                        :method :put}
+                       http-client/request
+                       :chan <!
+                       http-client/filter-success :body)]
+        (reset! data* data)
+        (reset! edit?* false))))
 
 (defn form-component []
   [:form.form
@@ -79,7 +78,7 @@
                       "It does not expose the images to crawlers since the listing of the images is not public! ")]
              [:p (str "We recommend leave this setting enabled as it generally improves user experience and lifts load from the application server. ")]]
       :disabled (not @edit?*)]]]
-   
+
    (when @edit?*
      [form-components/save-submit-component])])
 

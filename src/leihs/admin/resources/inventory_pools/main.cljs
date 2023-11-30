@@ -1,31 +1,30 @@
 (ns leihs.admin.resources.inventory-pools.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.constants :as defaults]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.shared :as shared]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq :refer [with-index]]
-    [leihs.core.auth.core :as auth-core]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.json :as json]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.constants :as defaults]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.shared :as shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq :refer [with-index]]
+   [leihs.core.auth.core :as auth-core]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.json :as json]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -38,9 +37,7 @@
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-
 (def data* (reagent/atom {}))
-
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -50,21 +47,19 @@
         (merge @current-query-paramerters-normalized*
                query-params)))
 
-
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-row
-    [routing/form-term-filter-component]
-    [routing/select-component
-     :label "Active"
-     :query-params-key :active
-     :options {"" "any value" "yes" "yes" "no" "no"}]
-    [routing/form-per-page-component]
-    [routing/form-reset-component]]]])
-
+    [:div.form-row
+     [routing/form-term-filter-component]
+     [routing/select-component
+      :label "Active"
+      :query-params-key :active
+      :options {"" "any value" "yes" "yes" "no" "no"}]
+     [routing/form-per-page-component]
+     [routing/form-reset-component]]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -76,22 +71,22 @@
     [:th "Active"]
     [:th "Short name"]
     [:th "Name " [:a {:href (page-path-for-query-params
-                              {:order (-> [[:name :asc] [:id :asc]]
-                                          clj->js json/to-json)})} "↓"]]
+                             {:order (-> [[:name :asc] [:id :asc]]
+                                         clj->js json/to-json)})} "↓"]]
     [:th "# Users " [:a {:href (page-path-for-query-params
-                                 {:order (-> [[:users_count :desc] [:id :asc]]
-                                             clj->js json/to-json)})} "↓"]]
+                                {:order (-> [[:users_count :desc] [:id :asc]]
+                                            clj->js json/to-json)})} "↓"]]
     [:th "# Delegations " [:a {:href (page-path-for-query-params
-                                       {:order (-> [[:delegations_count :desc] [:id :asc]]
-                                                   clj->js json/to-json)})} "↓"]]
+                                      {:order (-> [[:delegations_count :desc] [:id :asc]]
+                                                  clj->js json/to-json)})} "↓"]]
     (for [col more-cols]
       col)]])
 
 (defn link-to-inventory-pool [inventory-pool inner]
   (let [id (:id inventory-pool)]
     (if (or
-          (auth-core/current-user-admin-scopes?)
-          (pool-auth/current-user-is-some-manager-of-pool? id))
+         (auth-core/current-user-admin-scopes?)
+         (pool-auth/current-user-is-some-manager-of-pool? id))
       [:a {:href (path :inventory-pool {:inventory-pool-id id})}
        inner]
       [:span.text-info inner])))
@@ -123,7 +118,6 @@
        [tbody-component inventory-pools tds]]
       [:div.alert.alert-warning.text-center "No (more) inventory-pools found."])))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn debug-component []
@@ -154,7 +148,7 @@
 (defn page []
   [:div.inventory-pools
    (breadcrumbs/nav-component
-     @breadcrumbs/left*
-     [[breadcrumbs/create-li]])
+    @breadcrumbs/left*
+    [[breadcrumbs/create-li]])
    [:h1 [icons/inventory-pools] " Inventory-Pools"]
    [main-page-content-component]])

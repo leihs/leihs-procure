@@ -1,24 +1,23 @@
 (ns leihs.admin.resources.users.user.breadcrumbs
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :refer [split trim]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.user.core :refer [user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :refer [split trim]]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.user.core :refer [user-data*]]
+   [leihs.admin.state :as state]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (defonce user-id*
   (reaction (or (-> @routing/state* :route-params :user-id)
@@ -35,12 +34,12 @@
 (defn modifieable? [current-user-state _]
   (cond
     (auth/system-admin-scopes?
-      current-user-state _) true
+     current-user-state _) true
     (auth/admin-scopes?
-      current-user-state
-      _)  (cond (or (nil? @user-data*) (:is_system_admin @user-data*)) false
-                (or (nil? @user-data*) (:system_admin_protected @user-data*)) false
-                :else true )
+     current-user-state
+     _)  (cond (or (nil? @user-data*) (:is_system_admin @user-data*)) false
+               (or (nil? @user-data*) (:system_admin_protected @user-data*)) false
+               :else true)
     :else (cond (or (nil? @user-data*) (:is_admin @user-data*)) false
                 (or (nil? user-data*) (:admin_protected @user-data*)) false
                 :else true)))
@@ -80,4 +79,4 @@
 
 (defonce left*
   (reaction
-    (conj @breadcrumbs/left* [user-li])))
+   (conj @breadcrumbs/left* [user-li])))

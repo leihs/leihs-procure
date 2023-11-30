@@ -1,37 +1,37 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.core.user.front]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
 
-    [leihs.admin.common.components :as components :refer [link]]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation ]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as suspension]
-    [leihs.admin.utils.regex :as regex]
+   [leihs.admin.common.components :as components :refer [link]]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as suspension]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as delegations]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+   [leihs.admin.utils.regex :as regex]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 ;;; suspension ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn suspension-component []
   [:div#suspension
-   [:h2 " Suspension " ]
+   [:h2 " Suspension "]
    [suspension/delegation-page-suspension-component]])
 
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -46,7 +46,7 @@
          [:th "Property"]
          [:th "Value"]]]
        [:tbody
-        [:tr.name [ :td "Name"] [:td.name (:name delegation)]]
+        [:tr.name [:td "Name"] [:td.name (:name delegation)]]
         [:tr.responsible-user
          [:td "Responsible user"]
          [:td.responsible-user
@@ -101,11 +101,11 @@
 
 (defn breadcrumbs []
   (breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/users-li]
-     [breadcrumbs/groups-li]
-     [breadcrumbs/edit-li]
-     [breadcrumbs/suspension-li]]))
+   @breadcrumbs/left*
+   [[breadcrumbs/users-li]
+    [breadcrumbs/groups-li]
+    [breadcrumbs/edit-li]
+    [breadcrumbs/suspension-li]]))
 
 (defn show-page []
   [:div.delegation

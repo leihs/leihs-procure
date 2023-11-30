@@ -1,26 +1,24 @@
 (ns leihs.admin.resources.users.user.core
   (:refer-clojure :exclude [str keyword])
   (:require
-    [cljs.core.async :as async :refer [go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :refer [split trim]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.shared :as user-shared]
-    [leihs.admin.state :as state]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre :refer [error warn info debug spy]]))
-
+   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :refer [split trim]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.shared :as user-shared]
+   [leihs.admin.state :as state]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (defonce user-id*
   (reaction (or (some-> @routing/state* :route-params :user-id)
                 "00000000-0000-0000-0000-000000000000")))
-
 
 ;;; data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -43,8 +41,6 @@
                         http-client/request
                         :chan <! http-client/filter-success! :body
                         (update-in [:extended_info] stringify-json))))))))
-
-
 
 ;;; some display helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -140,7 +136,7 @@
 
 (defn email-component [email-addr]
   [:a {:href (str "mailto:" email-addr)}
-   [icons/email] "\u00A0" [:span  email-addr ]])
+   [icons/email] "\u00A0" [:span  email-addr]])
 
 (defn personal-properties-component [user]
   [:ul.list-unstyled
@@ -172,15 +168,14 @@
            ^{:key idx} [:li itm])]]))
    (when-let [url (:url user)]
      [user-data-li-dl-component "URL"
-       [:a {:href url}
-        [:p
-         {:style
-          {:white-space :nowrap
-           :overflow :hidden
-           :text-overflow :ellipsis
-           :max-width :15em}}
-         url ]]])])
-
+      [:a {:href url}
+       [:p
+        {:style
+         {:white-space :nowrap
+          :overflow :hidden
+          :text-overflow :ellipsis
+          :max-width :15em}}
+        url]]])])
 
 (defn debug-component []
   (when (:debug @state/global-state*)

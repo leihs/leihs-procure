@@ -1,29 +1,26 @@
 (ns leihs.admin.auth.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys subset?]]
-    [clojure.walk]
-    [compojure.core :as cpj]
-    [leihs.admin.auth.authorize :as authorize]
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
-    [leihs.core.core :refer [keyword str presence deep-merge]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [pandect.core]
-    [ring.util.response :refer [redirect]]
-    )
-  )
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys subset?]]
+   [clojure.walk]
+   [compojure.core :as cpj]
+   [leihs.admin.auth.authorize :as authorize]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
+   [leihs.core.core :refer [keyword str presence deep-merge]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [pandect.core]
+   [ring.util.response :refer [redirect]]))
 
 (defn redirect-target [{{query-target :target} :query-params}]
   (or (presence query-target)
       (path :home)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (def HTTP-SAFE-VERBS #{:get :head :options :trace})
 
@@ -35,14 +32,12 @@
 (defn http-unsafe?  [request]
   (boolean (some-> request :request-method HTTP-UNSAFE-VERBS)))
 
-
 (defn filter-required-scopes-wrt-safe-or-unsafe [request required-scopes]
   (if (http-safe? request)
     (filter (fn [[k v]]
               (#{:scope_read :scope_system_admin_read :scope_admin_read} k))
             required-scopes)
     required-scopes))
-
 
 (defn authorize-scope [request handler required-scopes]
   (let [required-scope-keys (->> required-scopes
@@ -64,14 +59,13 @@
                      :scope_system_admin_read false
                      :scope_system_admin_write false}})
 
-
 (defn authorize [request handler auth-opts]
   (let [normalized-auth-opts (deep-merge default-auth-opts auth-opts)
         skip-authorization-handler-keys (:skip-authorization-handler-keys normalized-auth-opts)
         required-scopes (:required-scopes normalized-auth-opts)]
     (cond
       (authorize/handler-is-ignored?
-        skip-authorization-handler-keys request) (handler request)
+       skip-authorization-handler-keys request) (handler request)
       (-> request :authenticated-entity not) {:status 401 :body "Authentication required!"}
       :else (authorize-scope request handler required-scopes))))
 
@@ -84,6 +78,5 @@
      (authorize request handler auth-opts))))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

@@ -2,17 +2,15 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    ))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (def admin-restricted-attributes
   [:admin_protected
@@ -62,7 +60,6 @@
 (def group-write-keymap
   {})
 
-
 ;;; group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn group-query [group-id]
@@ -71,8 +68,7 @@
       (sql/merge-where [:= :id group-id])))
 
 (defn get-group [{tx :tx {group-id :group-id} :route-params}]
-  {:body (->> group-id group-query sql/format (jdbc/query tx) first) })
-
+  {:body (->> group-id group-query sql/format (jdbc/query tx) first)})
 
 ;;; delete group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -87,9 +83,7 @@
           (throw (ex-info "Deleted failed" {:status 500}))))
     (throw (ex-info "To be deleted group not found." {:status 404}))))
 
-
 ;;; update group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn prepare-write-data [data tx]
   (catcher/with-logging
@@ -100,12 +94,12 @@
 
 (defn protect-admin! [data group]
   (users-and-groups/assert-attributes-do-not-change!
-    data group admin-restricted-attributes)
+   data group admin-restricted-attributes)
   (users-and-groups/assert-not-admin-proteced! group))
 
 (defn protect-system-admin! [data group]
   (users-and-groups/assert-attributes-do-not-change!
-    data group system-admin-restricted-attributes)
+   data group system-admin-restricted-attributes)
   (users-and-groups/assert-not-system-admin-proteced! group))
 
 (defn patch-group
@@ -120,10 +114,9 @@
          (when-not (requester-is-system-admin? request)
            (protect-system-admin! data group))
          (or (= [1] (jdbc/update! tx :groups data ["id = ?" group-id]))
-             (throw (ex-info "Number of updated rows does not equal one." {} )))
+             (throw (ex-info "Number of updated rows does not equal one." {})))
          (get-group request))
      {:status 404})))
-
 
 ;;; create group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -134,14 +127,13 @@
    (users-and-groups/protect-leihs-core! data)
    (when-not (requester-is-admin? request)
      (users-and-groups/assert-attributes-are-not-set!
-       data admin-restricted-attributes))
+      data admin-restricted-attributes))
    (when-not (requester-is-system-admin? request)
      (users-and-groups/assert-attributes-are-not-set!
-       data system-admin-restricted-attributes))
+      data system-admin-restricted-attributes))
    (if-let [group (first (jdbc/insert! tx :groups data))]
      {:body group}
      (throw (ex-info "Group has not been created" {:status 534})))))
-
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -161,9 +153,7 @@
   [{tx :tx data :body {group-id :group-id} :route-params}]
   {:body
    {:inventory_pools_roles
-    (inventory-pools-roles group-id tx)
-    }})
-
+    (inventory-pools-roles group-id tx)}})
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -171,16 +161,15 @@
 
 (def group-transfer-path
   (path :group-transfer-data {:group-id ":group-id"
-                             :target-group-id ":target-group-id"}))
+                              :target-group-id ":target-group-id"}))
 
 (def routes
   (cpj/routes
-    (cpj/GET group-path [] #'get-group)
-    (cpj/GET (path :group-inventory-pools-roles {:group-id ":group-id"}) [] #'group-inventory-pools-roles)
-    (cpj/PATCH group-path [] #'patch-group)
-    (cpj/DELETE group-path [] #'delete-group)
-    (cpj/POST (path :groups) [] #'create-group)))
-
+   (cpj/GET group-path [] #'get-group)
+   (cpj/GET (path :group-inventory-pools-roles {:group-id ":group-id"}) [] #'group-inventory-pools-roles)
+   (cpj/PATCH group-path [] #'patch-group)
+   (cpj/DELETE group-path [] #'delete-group)
+   (cpj/POST (path :groups) [] #'create-group)))
 
 ;#### debug ###################################################################
 

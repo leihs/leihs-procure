@@ -1,16 +1,15 @@
 (ns leihs.admin.resources.users.user.inventory-pools
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (def contracts-count
   (-> (sql/select :%count.*)
@@ -25,7 +24,6 @@
       (sql/merge-where [:= :contracts.inventory_pool_id :inventory-pools.id])
       (sql/merge-where [:= :contracts.state "open"])))
 
-
 (defn reservations-count [& {:keys [stati]
                              :or {stati ["unsubmitted"
                                          "submitted"
@@ -38,7 +36,6 @@
       (sql/merge-where [:= :reservations.inventory_pool_id :inventory-pools.id])
       (sql/merge-where [:= :reservations.user_id :users.id])
       (sql/merge-where [:in :reservations.status stati])))
-
 
 (defn user-inventory-pools-query [uid]
   (-> (sql/select :access_rights.role
@@ -53,8 +50,7 @@
       (sql/merge-select [(reservations-count :stati ["submitted"]) :submitted_reservations_count])
       (sql/merge-select [(reservations-count :stati ["approved"]) :approved_reservations_count])
       (sql/merge-select [(reservations-count) :reservations_count])
-      sql/format
-      ))
+      sql/format))
 
 (defn inventory-pools [uid tx]
   (->> uid
@@ -67,13 +63,11 @@
    {:user-inventory-pools
     (inventory-pools uid tx)}})
 
-
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def routes
   (cpj/routes
-    (cpj/GET (path :user-inventory-pools {:user-id ":user-id"}) [] #'user-inventory-pools)))
-
+   (cpj/GET (path :user-inventory-pools {:user-id ":user-id"}) [] #'user-inventory-pools)))
 
 ;#### debug ###################################################################
 

@@ -1,106 +1,104 @@
 (ns leihs.admin.routes
   (:refer-clojure :exclude [str keyword])
   (:require
-    [bidi.bidi :as bidi]
-    [bidi.ring :refer [make-handler]]
-    [compojure.core :as cpj]
-    [leihs.admin.html :as html]
-    [leihs.admin.paths :refer [path paths]]
-    [leihs.admin.resources.audits.changes.change.main :as audited-change]
-    [leihs.admin.resources.audits.changes.main :as audited-changes]
-    [leihs.admin.resources.audits.requests.main :as audited-requests]
-    [leihs.admin.resources.audits.requests.request.main :as audited-request]
-    [leihs.admin.resources.buildings.building.main :as building]
-    [leihs.admin.resources.buildings.main :as buildings]
-    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
-    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
-    [leihs.admin.resources.groups.group.main :as group]
-    [leihs.admin.resources.groups.group.users.main :as group-users]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as pool-delegation-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as pool-delegation]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as inventory-pool-delegation-suspension]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as pool-delegation-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as pool-delegations]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main :as entitlement-group]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main :as entitlement-group-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.main :as inventory-pool-user]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
-    [leihs.admin.resources.inventory-pools.main :as inventory-pools]
-    [leihs.admin.resources.mail-templates.mail-template.main :as mail-template]
-    [leihs.admin.resources.mail-templates.main :as mail-templates]
-    [leihs.admin.resources.rooms.room.main :as room]
-    [leihs.admin.resources.rooms.main :as rooms]
-    [leihs.admin.resources.settings.languages.main :as languages-settings]
-    [leihs.admin.resources.settings.misc.main :as misc-settings]
-    [leihs.admin.resources.settings.smtp.main :as smtp-settings]
-    [leihs.admin.resources.settings.syssec.main :as syssec-settings]
-    [leihs.admin.resources.statistics.contracts :as statistics-contracts]
-    [leihs.admin.resources.statistics.items :as statistics-items]
-    [leihs.admin.resources.statistics.models :as statistics-models]
-    [leihs.admin.resources.statistics.pools :as statistics-pools]
-    [leihs.admin.resources.statistics.users :as statistics-users]
-    [leihs.admin.resources.suppliers.supplier.main :as supplier]
-    [leihs.admin.resources.suppliers.supplier.items :as supplier-items]
-    [leihs.admin.resources.suppliers.main :as suppliers]
-    [leihs.core.status :as status]
-    [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
-    [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
-    [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
-    [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
-    [leihs.admin.resources.users.user.main :as user]
-    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
-    [leihs.core.anti-csrf.back :as anti-csrf]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.constants :as constants]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.db :as db]
-    [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
-    [leihs.core.json :as json]
-    [leihs.core.json-protocol]
-    [leihs.core.ring-audits :as ring-audits]
-    [leihs.core.ring-exception :as ring-exception]
-    [leihs.core.routes :as core-routes :refer [all-granted]]
-    [leihs.core.routing.back :as routing]
-    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
-    [leihs.core.settings :as settings]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug :refer [I>]]
-    [logbug.ring :refer [wrap-handler-with-logging]]
-    [logbug.thrown :as thrown]
-    [ring.middleware.accept]
-    [ring.middleware.content-type :refer [wrap-content-type]]
-    [ring.middleware.cookies]
-    [ring.middleware.json]
-    [ring.middleware.params]
-    [ring.util.response :refer [redirect]]
-    [taoensso.timbre :refer [debug info warn error spy]]
-    ))
+   [bidi.bidi :as bidi]
+   [bidi.ring :refer [make-handler]]
+   [compojure.core :as cpj]
+   [leihs.admin.html :as html]
+   [leihs.admin.paths :refer [path paths]]
+   [leihs.admin.resources.audits.changes.change.main :as audited-change]
+   [leihs.admin.resources.audits.changes.main :as audited-changes]
+   [leihs.admin.resources.audits.requests.main :as audited-requests]
+   [leihs.admin.resources.audits.requests.request.main :as audited-request]
+   [leihs.admin.resources.buildings.building.main :as building]
+   [leihs.admin.resources.buildings.main :as buildings]
+   [leihs.admin.resources.groups.group.main :as group]
+   [leihs.admin.resources.groups.group.users.main :as group-users]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
+   [leihs.admin.resources.inventory-fields.main :as inventory-fields]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as pool-delegation-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as pool-delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main :as inventory-pool-delegation-suspension]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main :as pool-delegation-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.main :as pool-delegations]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main :as entitlement-group]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main :as entitlement-group-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.main :as inventory-pool-user]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
+   [leihs.admin.resources.inventory-pools.main :as inventory-pools]
+   [leihs.admin.resources.mail-templates.mail-template.main :as mail-template]
+   [leihs.admin.resources.mail-templates.main :as mail-templates]
+   [leihs.admin.resources.rooms.main :as rooms]
+   [leihs.admin.resources.rooms.room.main :as room]
+   [leihs.admin.resources.settings.languages.main :as languages-settings]
+   [leihs.admin.resources.settings.misc.main :as misc-settings]
+   [leihs.admin.resources.settings.smtp.main :as smtp-settings]
+   [leihs.admin.resources.settings.syssec.main :as syssec-settings]
+   [leihs.admin.resources.statistics.contracts :as statistics-contracts]
+   [leihs.admin.resources.statistics.items :as statistics-items]
+   [leihs.admin.resources.statistics.models :as statistics-models]
+   [leihs.admin.resources.statistics.pools :as statistics-pools]
+   [leihs.admin.resources.statistics.users :as statistics-users]
+   [leihs.admin.resources.suppliers.main :as suppliers]
+   [leihs.admin.resources.suppliers.supplier.items :as supplier-items]
+   [leihs.admin.resources.suppliers.supplier.main :as supplier]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.groups.main :as authentication-system-groups]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
+   [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
+   [leihs.admin.resources.users.user.main :as user]
+   [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
+   [leihs.core.anti-csrf.back :as anti-csrf]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.constants :as constants]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.db :as db]
+   [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
+   [leihs.core.json :as json]
+   [leihs.core.json-protocol]
+   [leihs.core.ring-audits :as ring-audits]
+   [leihs.core.ring-exception :as ring-exception]
+   [leihs.core.routes :as core-routes :refer [all-granted]]
+   [leihs.core.routing.back :as routing]
+   [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
+   [leihs.core.settings :as settings]
+   [leihs.core.status :as status]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug :refer [I>]]
+   [logbug.ring :refer [wrap-handler-with-logging]]
+   [logbug.thrown :as thrown]
+   [ring.middleware.accept]
+   [ring.middleware.content-type :refer [wrap-content-type]]
+   [ring.middleware.cookies]
+   [ring.middleware.json]
+   [ring.middleware.params]
+   [ring.util.response :refer [redirect]]
+   [taoensso.timbre :refer [debug info warn error spy]]))
 
 (declare redirect-to-root-handler)
 
 (def skip-authorization-handler-keys
   (clojure.set/union
-    core-routes/skip-authorization-handler-keys
-    #{:home}))
+   core-routes/skip-authorization-handler-keys
+   #{:home}))
 
 (def no-spa-handler-keys
   (clojure.set/union
-    core-routes/no-spa-handler-keys
-    #{:redirect-to-root
-      :not-found}))
-
+   core-routes/no-spa-handler-keys
+   #{:redirect-to-root
+     :not-found}))
 
 (def resolve-table
   (merge core-routes/resolve-table
@@ -167,20 +165,19 @@
                                                      pool-auth/pool-lending-manager?]}
 
           :inventory-pool-entitlement-group {:handler entitlement-group/routes
-                                           :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+                                             :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-group-direct-user {:handler entitlement-group-users/routes
-                                                       :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+                                                         :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-group-group {:handler entitlement-group-groups/routes
-                                                 :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+                                                   :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-group-groups {:handler entitlement-group-groups/routes
-                                                  :authorizers [auth/admin-scopes?  pool-auth/pool-lending-manager?]}
+                                                    :authorizers [auth/admin-scopes?  pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-group-users {:handler entitlement-group-users/routes
-                                                 :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+                                                   :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-groups {:handler entitlement-groups/routes
-                                            :authorizers [auth/admin-scopes?  pool-auth/pool-lending-manager?]}
+                                              :authorizers [auth/admin-scopes?  pool-auth/pool-lending-manager?]}
           :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes
-                                                  :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
-
+                                                    :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
 
           :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
@@ -211,14 +208,13 @@
           :suppliers {:handler suppliers/routes :authorizers [auth/admin-scopes?]}
 
           :languages-settings {:handler languages-settings/routes
-                          :authorizers [auth/admin-scopes?]}
+                               :authorizers [auth/admin-scopes?]}
           :misc-settings {:handler misc-settings/routes
                           :authorizers [auth/admin-scopes?]}
           :smtp-settings {:handler smtp-settings/routes
                           :authorizers [auth/system-admin-scopes?]}
           :syssec-settings {:handler syssec-settings/routes
-                          :authorizers [auth/system-admin-scopes?]}
-
+                            :authorizers [auth/system-admin-scopes?]}
 
           :user {:handler user/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :user-password-reset {:handler user-password-reset/routes
@@ -227,9 +223,7 @@
           :user-transfer-data {:handler user/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :users {:handler users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
 
-          :users-choose {:handler users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
-          }))
-
+          :users-choose {:handler users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -259,8 +253,7 @@
      (and (= (-> request :accept :mime) :html)
           (#{:get :head} (:request-method request))
           (not (no-spa-handler-keys (:handler-key request)))
-          (not (browser-request-matches-javascript? request))
-          ) (html/html-handler request)
+          (not (browser-request-matches-javascript? request))) (html/html-handler request)
      ; other request might need to go the backend and return frontend nevertheless
      :else (let [response (handler request)]
              (if (and (nil? response)
@@ -292,36 +285,35 @@
 (defn init []
   (routing/init paths resolve-table)
   (-> ; I> wrap-handler-with-logging
-      routing/dispatch-to-handler
-      (auth/wrap resolve-table)
-      wrap-dispatch-content-type
-      ring-audits/wrap
-      anti-csrf/wrap
-      auth/wrap-authenticate
-      ring.middleware.cookies/wrap-cookies
-      wrap-empty
-      settings/wrap
-      db/wrap-tx
-      (status/wrap (path :status))
-      ring.middleware.json/wrap-json-response
-      (ring.middleware.json/wrap-json-body {:keywords? true})
-      dispatch-content-type/wrap-accept
-      routing/wrap-add-vary-header
-      routing/wrap-resolve-handler
-      routing/wrap-canonicalize-params-maps
-      ring.middleware.params/wrap-params
-      wrap-content-type
-      (wrap-resource
-        "public" {:allow-symlinks? true
-                  :cache-bust-paths ["/admin/ui/admin-ui.css"
-                                     "/admin/ui/admin-ui.min.css"
-                                     "/admin/js/main.js"]
-                  :never-expire-paths [#".*fontawesome-[^\/]*\d+\.\d+\.\d+\/.*"
-                                       #".+_[0-9a-f]{40}\..+"]
-                  :enabled? true})
-      ring-exception/wrap))
+   routing/dispatch-to-handler
+   (auth/wrap resolve-table)
+   wrap-dispatch-content-type
+   ring-audits/wrap
+   anti-csrf/wrap
+   auth/wrap-authenticate
+   ring.middleware.cookies/wrap-cookies
+   wrap-empty
+   settings/wrap
+   db/wrap-tx
+   (status/wrap (path :status))
+   ring.middleware.json/wrap-json-response
+   (ring.middleware.json/wrap-json-body {:keywords? true})
+   dispatch-content-type/wrap-accept
+   routing/wrap-add-vary-header
+   routing/wrap-resolve-handler
+   routing/wrap-canonicalize-params-maps
+   ring.middleware.params/wrap-params
+   wrap-content-type
+   (wrap-resource
+    "public" {:allow-symlinks? true
+              :cache-bust-paths ["/admin/ui/admin-ui.css"
+                                 "/admin/ui/admin-ui.min.css"
+                                 "/admin/js/main.js"]
+              :never-expire-paths [#".*fontawesome-[^\/]*\d+\.\d+\.\d+\/.*"
+                                   #".+_[0-9a-f]{40}\..+"]
+              :enabled? true})
+   ring-exception/wrap))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

@@ -1,25 +1,24 @@
 (ns leihs.admin.resources.audits.changes.change.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout go]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.audits.changes.change.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
-    [leihs.admin.resources.audits.core :as audits]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.clipboard :as clipboard]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout go]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.audits.changes.change.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
+   [leihs.admin.resources.audits.core :as audits]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.clipboard :as clipboard]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]))
 
 ;;; changes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -29,14 +28,12 @@
   (reaction (or (-> @routing/state* :route-params :audited-change-id)
                 ":audited-change-id")))
 
-
-
 (defn dt-change-content-component [data]
   [:dt.col-sm-5
    (let [text (if (string? data) data (with-out-str (pprint data)))]
      [:<>
       [:div {:style {:position :absolute :right "1em" :bottom 0}}
-           [clipboard/button-tiny text]]
+       [clipboard/button-tiny text]]
       [:pre text]])])
 
 (defn head-change-component [data]
@@ -66,11 +63,11 @@
 (defn main-component [id]
   [http/request-response-component
    {:url (path :audited-change {:audited-change-id id})}
-   change-component ])
+   change-component])
 
 (defn page []
   [:div.audited-change
    [breadcrumbs/nav-component
     @breadcrumbs/left* []]
-   [:h1 audits/icon-change " Audited-Change " ]
+   [:h1 audits/icon-change " Audited-Change "]
    [main-component @audited-change-id*]])

@@ -1,26 +1,26 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
 
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
-    [leihs.admin.resources.users.main :as users]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
+   [leihs.admin.resources.users.main :as users]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defn groups-count-component []
   [:span.entitlement-group-groups-count
@@ -80,9 +80,7 @@
   [:h1 "Entitlement-Group "
    [entitlement-group/name-link-component]
    " in the Inventory-Pool "
-   [inventory-pool/name-link-component]
-
-   ])
+   [inventory-pool/name-link-component]])
 
 (defn main-component []
   [:div
@@ -106,6 +104,5 @@
    (when (and @inventory-pool/id* @entitlement-group/id*)
      [:div
       [breadcrumbs-component]
-      [main-component]
-      ])
+      [main-component]])
    [debug-component]])

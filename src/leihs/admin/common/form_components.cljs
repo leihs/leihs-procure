@@ -1,22 +1,21 @@
 (ns leihs.admin.common.form-components
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.core.match :refer [match]]
-    [clojure.string :as string]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.constants :as constants]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.core.match :refer [match]]
+   [clojure.string :as string]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.constants :as constants]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def TAB-INDEX constants/TAB-INDEX)
 
@@ -35,7 +34,7 @@
                     label (last ks)
                     key (last ks)
                     pre-change identity
-                    post-change identity }}]
+                    post-change identity}}]
   [:div.form-check.form-check.mb-2
    [:input.form-check-input
     {:id key
@@ -64,7 +63,7 @@
 (defn input-component
   [data* ks & {:keys [label hint type element placeholder disabled rows required
                       on-change post-change
-                      prepend append ]
+                      prepend append]
                :or {label (last ks)
                     hint nil
                     disabled false
@@ -118,8 +117,8 @@
                   (sequential? options) (->> options
                                              (map (fn [x]
                                                     (match x
-                                                           [k v] [(str k) (str v)]
-                                                           :else [(str x) (str x)]))))
+                                                      [k v] [(str k) (str v)]
+                                                      :else [(str x) (str x)]))))
                   :else {"" ""})
         default-option (or default-option
                            (-> options first first))]
@@ -189,10 +188,10 @@
 (defn small-save-submit-component [& args]
   [apply submit-component
    (concat
-     [:btn-classes [:btn-warning :btn-sm]
-      :icon [icons/save]
-      :inner "Save"]
-     args)])
+    [:btn-classes [:btn-warning :btn-sm]
+     :icon [icons/save]
+     :inner "Save"]
+    args)])
 
 (defn small-add-submit-component []
   [:button.btn.btn-primary.btn-sm
@@ -204,10 +203,7 @@
    {:type :submit}
    [:span [icons/delete] " Remove "]])
 
-
-
 ;;;
-
 
 (defn edit-modal-component [data header form-elements
                             & {:keys [abort-handler submit-handler]
@@ -220,7 +216,7 @@
         [:div.modal {:style {:display "block" :z-index 10000}}
          [:div.modal-dialog
           [:div.modal-content
-           [:div.modal-header [header] ]
+           [:div.modal-header [header]]
            [:div.modal-body
             [:form.form
              {:on-submit (fn [e]
@@ -234,12 +230,11 @@
                  [:button.btn.btn-outline-warning
                   {:type :button
                    :on-click abort-handler}
-                  [icons/delete] " Cancel" ]
+                  [icons/delete] " Cancel"]
                  [:button.btn.btn-outline-secondary
                   {:type :button
                    :on-click abort-handler}
-                  [icons/delete] " Close" ])]
+                  [icons/delete] " Close"])]
               [:div.col
-               [save-submit-component :disabled (not changed?)]
-               ]]]]]]]
+               [save-submit-component :disabled (not changed?)]]]]]]]]
         [:div.modal-backdrop {:style {:opacity "0.5"}}]])]))

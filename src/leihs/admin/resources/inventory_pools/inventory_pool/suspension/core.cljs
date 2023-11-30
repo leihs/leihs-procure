@@ -1,26 +1,26 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.suspension.core
   (:refer-clojure :exclude [str keyword])
   (:require
-    ["/admin-ui" :as UI]
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [go]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre]))
+   ["/admin-ui" :as UI]
+   ["date-fns" :as date-fns]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [go]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre]))
 
 (defn suspended? [suspended-until ref-date]
   (if-not suspended-until
@@ -59,7 +59,6 @@
                          :chan <! http-client/filter-success! :body)))
     chan))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn supension-inner-form-component [disabled data*]
@@ -67,7 +66,7 @@
    [form-components/input-component data* [:suspended_until]
     :element (reagent/adapt-react-class UI/Components.DatePicker)
     :disabled disabled
-    :extra-props { :minDate "tomorrow" }
+    :extra-props {:minDate "tomorrow"}
     :placeholder (when disabled "")
     :label "Suspended until"]
 
@@ -85,11 +84,11 @@
         [:button.btn.btn-outline-warning
          {:type :button
           :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Cancel" ]
+         [icons/delete] " Cancel"]
         [:button.btn.btn-outline-secondary
          {:type :button
           :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Close" ])]
+         [icons/delete] " Close"])]
      [:div.col
       [form-components/save-submit-component
        :disabled (not @changed*)]]]))

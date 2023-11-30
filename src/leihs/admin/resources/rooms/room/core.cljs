@@ -1,25 +1,24 @@
 (ns leihs.admin.resources.rooms.room.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as core-user]
-    [leihs.core.user.shared :refer [short-id]]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.rooms.room.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.rooms.room.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as core-user]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :room-id presence)
@@ -31,10 +30,9 @@
 
 (defonce edit-mode?*
   (reaction
-    (and (map? @data*)
-         (boolean ((set '(:room-edit :room-create))
-                   (:handler-key @routing/state*))))))
-
+   (and (map? @data*)
+        (boolean ((set '(:room-edit :room-create))
+                  (:handler-key @routing/state*))))))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -51,11 +49,11 @@
         (reset! data* {:building_id nil #_(-> @buildings-data* first :id)})
         (reset! data*
                 (some->
-                  {:chan (async/chan)
-                   :url (path :room
-                              (-> @routing/state* :route-params))}
-                  http-client/request :chan <!
-                  http-client/filter-success! :body)))))
+                 {:chan (async/chan)
+                  :url (path :room
+                             (-> @routing/state* :route-params))}
+                 http-client/request :chan <!
+                 http-client/filter-success! :body)))))
 
 ;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -71,8 +69,7 @@
       [:hr]
       [:div.room-data
        [:h3 "@buildings-data*"]
-       [:pre (with-out-str (pprint @buildings-data*))]]] ]))
-
+       [:pre (with-out-str (pprint @buildings-data*))]]]]))
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

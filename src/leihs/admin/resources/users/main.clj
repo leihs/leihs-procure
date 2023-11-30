@@ -1,21 +1,19 @@
 (ns leihs.admin.resources.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.queries :as queries]
-    [leihs.admin.resources.users.shared :as shared]
-    [leihs.admin.resources.users.user.main :as user]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.back :as routing :refer []]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.queries :as queries]
+   [leihs.admin.resources.users.shared :as shared]
+   [leihs.admin.resources.users.user.main :as user]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.back :as routing :refer []]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (def users-base-query
   (-> (apply sql/select (map #(keyword (str "users." %)) shared/default-fields))
@@ -25,10 +23,10 @@
 
 (defn match-term-with-emails [query term]
   (sql/merge-where
-    query
-    [:or
-     [:= (sql/call :lower term) (sql/call :lower :users.email)]
-     [:= (sql/call :lower term) (sql/call :lower :users.secondary_email)]]))
+   query
+   [:or
+    [:= (sql/call :lower term) (sql/call :lower :users.email)]
+    [:= (sql/call :lower term) (sql/call :lower :users.secondary_email)]]))
 
 (defn match-term-fuzzy [query term]
   (sql/merge-where query [:or
@@ -37,7 +35,7 @@
 
 (defn term-filter [query request]
   (if-let [term (-> request :query-params-raw :term presence)]
-    (if (clojure.string/includes? term "@" )
+    (if (clojure.string/includes? term "@")
       (match-term-with-emails query term)
       (match-term-fuzzy query term))
     query))
@@ -70,7 +68,7 @@
 
 (defn users-query [request]
   (let [request (routing/mixin-default-query-params
-                  request shared/default-query-params)]
+                 request shared/default-query-params)]
     (-> users-base-query
         (routing/set-per-page-and-offset request)
         (term-filter request)
@@ -104,12 +102,11 @@
                (seq/with-index offset)
                seq/with-page-index))}}))
 
-
 (def routes
   (cpj/routes
-    (cpj/GET (path :users) [] #'users)
-    (cpj/GET (path :users-choose) [] #'users)
-    (cpj/POST (path :users) [] #'user/routes)))
+   (cpj/GET (path :users) [] #'users)
+   (cpj/GET (path :users-choose) [] #'users)
+   (cpj/POST (path :users) [] #'user/routes)))
 
 ;#### debug ###################################################################
 

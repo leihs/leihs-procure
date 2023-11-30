@@ -1,27 +1,27 @@
 (ns leihs.admin.resources.audits.requests.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout go]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.set :refer [rename-keys]]
-    [clojure.string :as string]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.audits.core :as audits]
-    [leihs.admin.resources.audits.requests.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.user.core :as user]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.clipboard :as clipboard]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre :refer [error warn info debug spy]]))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout go]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.set :refer [rename-keys]]
+   [clojure.string :as string]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.audits.core :as audits]
+   [leihs.admin.resources.audits.requests.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
+   [leihs.admin.resources.users.user.core :as user]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.clipboard :as clipboard]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def requests* (reagent/atom {}))
 
@@ -52,7 +52,6 @@
     [:i.fas.fa-rotate-90.fa-hand-pointer.px-2]
     " Choose "]])
 
-
 (defn method-filter-component []
   [:div.form-group.m-2
    [:label {:for :method}
@@ -63,11 +62,11 @@
      :on-change (fn [e]
                   (let [val (or (-> e .-target .-value presence) "")]
                     (accountant/navigate! (page-path-for-query-params
-                                            {:page 1
-                                             :method val}))))}
+                                           {:page 1
+                                            :method val}))))}
     (for [[n v] (->> ["" "DELETE" "GET" "PATCH" "POST" "PUT"]
                      (map (fn [op] [op op])))]
-      ^{:key n} [:option {:value v} n]) ]])
+      ^{:key n} [:option {:value v} n])]])
 
 (defn filter-component []
   [:div.card.bg-light
@@ -80,9 +79,7 @@
        :prepend responsible-user-choose-component]]
      [:div.col-md-2 [method-filter-component]]
      [:div.col-md-2 [routing/form-per-page-component]]
-     [:div.col-md-2 [routing/form-reset-component :default-query-params default-query-params]]
-     ]]])
-
+     [:div.col-md-2 [routing/form-reset-component :default-query-params default-query-params]]]]])
 
 ;;; table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -168,7 +165,7 @@
 
 (defn page []
   [:div.audited-requests-page
-   [breadcrumbs/nav-component @breadcrumbs/left*[]]
+   [breadcrumbs/nav-component @breadcrumbs/left* []]
    [:h1 audits/icon-requests " Audited Requests"]
    [filter-component]
    [main-component]

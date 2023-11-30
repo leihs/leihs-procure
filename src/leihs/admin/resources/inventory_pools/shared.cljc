@@ -1,9 +1,9 @@
 (ns leihs.admin.resources.inventory-pools.shared
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.constants :as defaults]))
+   [leihs.admin.constants :as defaults]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def default-fields
   #{:is_active
@@ -12,8 +12,7 @@
     :shortname})
 
 (def available-fields
-  #{
-    :address_id
+  #{:address_id
     :automatic_suspension
     :automatic_suspension_reason
     :color
@@ -30,9 +29,7 @@
     :opening_hours
     :print_contracts
     :required_purpose
-    :shortname
-    })
-
+    :shortname})
 
 (def default-query-params
   {:page 1

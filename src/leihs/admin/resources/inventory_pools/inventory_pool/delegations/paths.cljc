@@ -1,9 +1,8 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [bidi.verbose :refer [branch param leaf]]))
-
+   [bidi.verbose :refer [branch param leaf]]
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def paths
   (branch "/delegations"

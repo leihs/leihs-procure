@@ -1,12 +1,11 @@
 (ns leihs.admin.state
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clj-yaml.core :as yaml]
-    [clojure.java.io :as io]
-    [leihs.core.core :refer [keyword str presence]]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    [tick.core :as tick]
-    ))
+   [clj-yaml.core :as yaml]
+   [clojure.java.io :as io]
+   [leihs.core.core :refer [keyword str presence]]
+   [taoensso.timbre :refer [error warn info debug spy]]
+   [tick.core :as tick]))
 
 (defonce state* (atom {}))
 
@@ -18,8 +17,7 @@
                        {})]
     (swap! state* assoc :built-info built-info)
     (swap! state* update-in [:built-info :timestamp]
-           #(or % (str(tick/now))))))
-
+           #(or % (str (tick/now))))))
 
 (defn init []
   (info "initializing global state ...")

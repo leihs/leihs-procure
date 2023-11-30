@@ -2,17 +2,16 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
-    [leihs.core.db :as db]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
+   [leihs.core.db :as db]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -56,14 +55,13 @@
       (sql/from :inventory_pools)
       (sql/merge-where [:<> :inventory_pools.id inventory-pool-id])
       (sql/merge-where
-        [:exists (-> (sql/select 1)
-                     (sql/from :access_rights)
-                     (sql/merge-where
-                       [:= :access_rights.inventory_pool_id
-                        :inventory_pools.id])
-                     (sql/merge-where
-                       [:= :access_rights.user_id (:id delegation)])
-                     )])))
+       [:exists (-> (sql/select 1)
+                    (sql/from :access_rights)
+                    (sql/merge-where
+                     [:= :access_rights.inventory_pool_id
+                      :inventory_pools.id])
+                    (sql/merge-where
+                     [:= :access_rights.user_id (:id delegation)]))])))
 
 (defn assoc-other-pools [inventory-pool-id delegation tx]
   (assoc delegation :other_pools
@@ -78,8 +76,7 @@
   (-> (sql/select 1)
       (sql/from :access_rights)
       (sql/merge-where [:= :access_rights.inventory_pool_id inventory-pool-id])
-      (sql/merge-where [:= :access_rights.user_id delegation-id])
-      ))
+      (sql/merge-where [:= :access_rights.user_id delegation-id])))
 
 (defn delegation-query [inventory-pool-id delegation-id]
   (-> (apply sql/select (delegation-selects inventory-pool-id))
@@ -95,21 +92,20 @@
      inventory-pool-id :inventory-pool-id} :route-params}]
   (if-let [delegation (->> delegation-id
                            (delegation-query inventory-pool-id)
-                           (jdbc/query tx ) first)]
+                           (jdbc/query tx) first)]
     {:status 200 :body (assoc-other-pools inventory-pool-id delegation tx)}
     {:status 404}))
-
 
 ;;; delete delegation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delegation! [tx delegation-id]
   (or (->> (-> (sql/select :*)
-             (sql/from :users)
-             (sql/merge-where [:= :id delegation-id])
-             (sql/merge-where [:<> nil :delegator_user_id])
-             sql/format)
-         (jdbc/query tx) first)
-    (throw (ex-info "Delegation not found" {:status 404}))))
+               (sql/from :users)
+               (sql/merge-where [:= :id delegation-id])
+               (sql/merge-where [:<> nil :delegator_user_id])
+               sql/format)
+           (jdbc/query tx) first)
+      (throw (ex-info "Delegation not found" {:status 404}))))
 
 (defn can-delete? [delegation-id]
   (jdbc/with-db-transaction [tx (db/get-ds) {:read-only? true}]
@@ -131,15 +127,14 @@
                        (jdbc/query tx) first)
           (when (can-delete? delegation-id)
             (jdbc/delete! tx :users ["id = ?" delegation-id])))
-      {:status 204})
+        {:status 204})
     {:status 404 :body "Removing delegation failed without error."}))
-
 
 ;;; update delegation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-delegation
   ([{tx :tx {delegation-id :delegation-id} :route-params
-     {protected :pool_protected name :name uid :responsible_user_id} :body }]
+     {protected :pool_protected name :name uid :responsible_user_id} :body}]
    (if-let [ruid (-> uid  (responsible-user/find-by-unique-property tx) :id)]
      (let [update-count (first (jdbc/update! tx :users
                                              {:delegator_user_id ruid
@@ -150,7 +145,6 @@
          {:status 204}
          {:status 422 :body "Nothing updated."}))
      (throw responsible-user/not-found-ex))))
-
 
 ;;; add delegation to pool ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -167,7 +161,6 @@
          (throw (ex-info "Error adding delegation to pool" {:status 511}))
          {:status 204})))))
 
-
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def delegation-path
@@ -177,10 +170,10 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET delegation-path [] #'delegation-for-pool)
-    (cpj/PUT delegation-path [] #'add-delegation)
-    (cpj/PATCH delegation-path [] #'patch-delegation)
-    (cpj/DELETE delegation-path [] #'delete-delegation)))
+   (cpj/GET delegation-path [] #'delegation-for-pool)
+   (cpj/PUT delegation-path [] #'add-delegation)
+   (cpj/PATCH delegation-path [] #'patch-delegation)
+   (cpj/DELETE delegation-path [] #'delete-delegation)))
 
 ;(path :inventory-pool-delegations {:inventory-pool-id ":inventory-pool-id"})
 

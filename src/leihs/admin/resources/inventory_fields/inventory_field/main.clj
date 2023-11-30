@@ -2,22 +2,21 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [dissoc-in raise keyword str presence deep-merge]])
   (:require
-    [clojure.set :refer [rename-keys intersection]]
-    [clojure.spec.alpha :as spec]
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.db :as db]
-    [leihs.core.uuid :refer [uuid]]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :refer [query update! delete! insert!] :rename {query jdbc-query update! jdbc-update! delete! jdbc-delete! insert! jdbc-insert!}]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [clojure.set :refer [rename-keys intersection]]
+   [clojure.spec.alpha :as spec]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.db :as db]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [query update! delete! insert!] :rename {query jdbc-query update! jdbc-update! delete! jdbc-delete! insert! jdbc-insert!}]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 ;;; inventory-field ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -84,7 +83,7 @@
 
     (when (and (#{::field-specs/dynamic-required-field
                   ::field-specs/dynamic-not-required-field}
-                 spec)
+                spec)
                (> field-usage 0))
 
       (when (not= (-> old-f :data :type) (-> new-f :data :type))
@@ -95,7 +94,7 @@
 
     (let [new-f* (deep-merge old-f new-f)]
       (cond-> new-f* (-> new-f* :data :target_type (= "any"))
-        (dissoc-in [:data :target_type])))))
+              (dissoc-in [:data :target_type])))))
 
 (defn patch-inventory-field
   [{{inventory-field-id :inventory-field-id} :route-params
@@ -113,9 +112,9 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-field-path [] #'get-inventory-field)
-    (cpj/PATCH inventory-field-path [] #'patch-inventory-field)
-    (cpj/DELETE inventory-field-path [] #'delete-inventory-field)))
+   (cpj/GET inventory-field-path [] #'get-inventory-field)
+   (cpj/PATCH inventory-field-path [] #'patch-inventory-field)
+   (cpj/DELETE inventory-field-path [] #'delete-inventory-field)))
 
 ;#### debug ###################################################################
 

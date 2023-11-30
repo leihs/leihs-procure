@@ -2,24 +2,24 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.choose-core :as choose-core]
-    [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [slingshot.slingshot :refer [try+]]
-    [taoensso.timbre :refer [error warn info debug spy]])
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.choose-core :as choose-core]
+   [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [slingshot.slingshot :refer [try+]]
+   [taoensso.timbre :refer [error warn info debug spy]])
   (:import
-    [java.awt.image BufferedImage]
-    [java.io ByteArrayInputStream ByteArrayOutputStream]
-    [java.util Base64]
-    [javax.imageio ImageIO]))
+   [java.awt.image BufferedImage]
+   [java.io ByteArrayInputStream ByteArrayOutputStream]
+   [java.util Base64]
+   [javax.imageio ImageIO]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -62,7 +62,6 @@
         (sql/merge-where [:= :access_rights.user_id :users.id]))
     :inventory_pool_roles_count]])
 
-
 (def user-write-keys
   [:address
    :account_enabled
@@ -92,7 +91,6 @@
 (def user-write-keymap
   {})
 
-
 (def admin-restricted-attributes
   [:admin_protected
    :is_admin
@@ -102,8 +100,6 @@
 (def system-admin-restricted-attributes
   [:is_system_admin
    :system_admin_protected])
-
-
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -135,26 +131,25 @@
 (defn protect-admin-and-system-admin! [user request]
   (cond
     (requester-is-system-admin?
-      request)  "OK"
+     request)  "OK"
     (requester-is-admin?
-      request) (cond (:system_admin_protected
-                       user) (throw-forbidden!)
-                     (:is_system_admin
-                       user) (throw-forbidden!)
-                     :else "OK")
+     request) (cond (:system_admin_protected
+                     user) (throw-forbidden!)
+                    (:is_system_admin
+                     user) (throw-forbidden!)
+                    :else "OK")
     :else (cond (:admin_protected
-                  user) (throw-forbidden!)
+                 user) (throw-forbidden!)
                 (:is_admin
-                  user) (throw-forbidden!)
+                 user) (throw-forbidden!)
                 :else "OK")))
-
 
 (defn assert-deletion-permitted! [request user]
   (cond (requester-is-system-admin? request) :OK
         (requester-is-admin?
-          request) (cond (:is_system_admin user) (throw-forbidden!)
-                         (:system_admin_protected user) (throw-forbidden!)
-                         :else :OK)
+         request) (cond (:is_system_admin user) (throw-forbidden!)
+                        (:system_admin_protected user) (throw-forbidden!)
+                        :else :OK)
         :else (cond (:is_admin user) (throw-forbidden!)
                     (:admin_protected user) (throw-forbidden!)
                     :else :OK)))
@@ -163,18 +158,17 @@
   (if-let [user (-> request get-user :body)]
     (do (assert-deletion-permitted! request user)
         (try+
-          (if (= [1] (jdbc/delete! tx :users ["id = ?" (:id user)]))
-            {:status 204}
-            (throw (ex-info "User deleted failed" {:status 500})))
-          (catch #(clojure.string/includes?
-                    (ex-message %)
-                    "violates foreign key constraint")  e
-            (throw
-              (ex-info
-                (str "User delete failed because it violates foreign key constraint: "
-                     (ex-message e)) {:status 422} e)))))
+         (if (= [1] (jdbc/delete! tx :users ["id = ?" (:id user)]))
+           {:status 204}
+           (throw (ex-info "User deleted failed" {:status 500})))
+         (catch #(clojure.string/includes?
+                  (ex-message %)
+                  "violates foreign key constraint")  e
+           (throw
+            (ex-info
+             (str "User delete failed because it violates foreign key constraint: "
+                  (ex-message e)) {:status 422} e)))))
     (throw (ex-info "To be deleted user not found." {:status 404}))))
-
 
 ;;; transfer data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -203,7 +197,6 @@
     (transfer-data (:id del-user)
                    (:id target-user) tx)
     (delete-user request)))
-
 
 ;;; image handling ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -258,7 +251,6 @@
       (remove-images data)
       data)))
 
-
 ;;; password ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn password-hash
@@ -272,7 +264,6 @@
     (assoc data :pw_hash (password-hash password tx))
     data))
 
-
 ;;; update user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn prepare-write-data [data]
@@ -284,12 +275,12 @@
 
 (defn protect-admin! [data user]
   (users-and-groups/assert-attributes-do-not-change!
-    data user admin-restricted-attributes)
+   data user admin-restricted-attributes)
   (users-and-groups/assert-not-admin-proteced! user))
 
 (defn protect-system-admin! [data user]
   (users-and-groups/assert-attributes-do-not-change!
-    data user system-admin-restricted-attributes)
+   data user system-admin-restricted-attributes)
   (users-and-groups/assert-not-system-admin-proteced! user))
 
 (defn protect-attribute-de-escalation!
@@ -297,12 +288,12 @@
   (cond
     (requester-is-system-admin? request) "OK"
     (requester-is-admin?
-      request) (users-and-groups/assert-attributes-do-not-change!
-                 data user [:is_system_admin :system_admin_protected])
+     request) (users-and-groups/assert-attributes-do-not-change!
+               data user [:is_system_admin :system_admin_protected])
     :else (users-and-groups/assert-attributes-do-not-change!
-            data user [:is_system_admin :system_admin_protected
-                       :is_admin :admin_protected
-                       :organization :org_id])))
+           data user [:is_system_admin :system_admin_protected
+                      :is_admin :admin_protected
+                      :organization :org_id])))
 
 (defn patch-user
   ([{tx :tx data :body :as request}]
@@ -314,10 +305,9 @@
          (protect-admin-and-system-admin! user request)
          (protect-attribute-de-escalation! user request)
          (or (= [1] (jdbc/update! tx :users data ["id = ?" (:id user)]))
-             (throw (ex-info "Number of updated rows does not equal one." {} )))
+             (throw (ex-info "Number of updated rows does not equal one." {})))
          (get-user request))
      {:status 404})))
-
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -328,16 +318,15 @@
    (users-and-groups/protect-leihs-core! data)
    (when-not (requester-is-admin? request)
      (users-and-groups/assert-attributes-are-not-set!
-       data admin-restricted-attributes))
+      data admin-restricted-attributes))
    (when-not (requester-is-system-admin? request)
-            (users-and-groups/assert-attributes-are-not-set!
-              data system-admin-restricted-attributes))
+     (users-and-groups/assert-attributes-are-not-set!
+      data system-admin-restricted-attributes))
    (warn data)
    (if-let [user (first (jdbc/insert! tx :users data))]
      {:body user}
      {:status 422
       :body "No user has been created."})))
-
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -349,12 +338,11 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET user-path [] #'get-user)
-    (cpj/PATCH user-path [] #'patch-user)
-    (cpj/DELETE user-path [] #'delete-user)
-    (cpj/DELETE user-transfer-path [] #'transfer-data-and-delete-user)
-    (cpj/POST (path :users) [] #'create-user)))
-
+   (cpj/GET user-path [] #'get-user)
+   (cpj/PATCH user-path [] #'patch-user)
+   (cpj/DELETE user-path [] #'delete-user)
+   (cpj/DELETE user-transfer-path [] #'transfer-data-and-delete-user)
+   (cpj/POST (path :users) [] #'create-user)))
 
 ;#### debug ###################################################################
 

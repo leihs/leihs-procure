@@ -1,36 +1,35 @@
 (ns leihs.admin.resources.suppliers.supplier.items
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [clojure.string :as string]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as string]
+   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
 (defn fetch-items []
   (go (reset! data*
               (some->
-                {:chan (async/chan)
-                 :url (path :supplier-items
-                            (-> @routing/state* :route-params))}
-                http-client/request :chan <!
-                http-client/filter-success!
-                :body :items))))
+               {:chan (async/chan)
+                :url (path :supplier-items
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success!
+               :body :items))))
 
 (defn clean-and-fetch [& args]
   (reset! data* nil)

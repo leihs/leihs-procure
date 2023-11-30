@@ -1,23 +1,22 @@
 (ns leihs.admin.common.roles.components
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :refer [go]]
-    [cljs-uuid-utils.core :as uuid]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.state :as state]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre :refer []]))
-
+   [accountant.core :as accountant]
+   [cljs-uuid-utils.core :as uuid]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [go]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre :refer []]))
 
 (defn fetch-roles< [path]
   (let [chan (async/chan)]
@@ -53,8 +52,7 @@
                                   :type :checkbox
                                   :checked enabled
                                   :on-change #(reset! roles* (roles/set-roles role (not enabled)))
-                                  :disabled (not edit-mode?)
-                                  }]
+                                  :disabled (not edit-mode?)}]
                                 [:label.form-check-label
                                  {:for (str role-id-prefix "_" role)}
                                  [:span " " role]]]))))]))

@@ -2,21 +2,20 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.users-and-groups.core :as  users-and-groups]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.groups.group.main :as group]
-    [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.users-and-groups.core :as  users-and-groups]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.groups.group.main :as group]
+   [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn protected-checked-group! [request]
   (let [group (-> request group/get-group :body)]
@@ -48,9 +47,7 @@
             "exactly one group must match the given group-id either by id or org_id")
     (first ids)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn base-users-query [group-id request]
   (-> request users/users-query
@@ -67,9 +64,7 @@
       "any" query
       ("yes" "member")  (-> query
                             (sql/merge-where
-                              [:= :groups_users.group_id group-id])))))
-
-
+                             [:= :groups_users.group_id group-id])))))
 
 (defn users [{{group-id :group-id} :route-params
               tx :tx :as request}]
@@ -82,10 +77,7 @@
                        (seq/with-index offset)
                        seq/with-page-index))}}))
 
-
 ;;; update-users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 (defn- existing-ids [group-id tx]
   "returns the current ids of users of a group,
@@ -126,7 +118,6 @@
      :body {:removed-user-ids to-be-removed-ids
             :added-user-ids to-be-added-ids}}))
 
-
 ;;; put-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn put-user [{tx :tx :as request
@@ -135,10 +126,9 @@
   (let [group (protected-checked-group! request)
         group-id (:id group)]
     (utils.jdbc/insert-or-update!
-      tx :groups_users ["group_id = ? AND user_id = ?" group-id user-id]
-      {:group_id group-id :user_id user-id})
+     tx :groups_users ["group_id = ? AND user_id = ?" group-id user-id]
+     {:group_id group-id :user_id user-id})
     {:status 204}))
-
 
 ;;; remove-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -146,7 +136,7 @@
                     {group-id :group-id
                      user-id :user-id} :route-params}]
   (let [group (protected-checked-group! request)
-        group-id (:id group) ]
+        group-id (:id group)]
     (if (= 1 (->> ["group_id = ? AND user_id = ?" group-id user-id]
                   (jdbc/delete! tx :groups_users)
                   first))
@@ -154,7 +144,6 @@
       (throw (ex-info (str "Remove group-user failed. "
                            "It seems the user is not a member of the group.")
                       {:status 404})))))
-
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -166,13 +155,11 @@
 
 (def routes
   (cpj/routes
-    (cpj/PUT group-user-path [] #'put-user)
-    (cpj/DELETE group-user-path [] #'remove-user)
-    (cpj/GET group-users-path [] #'users)
-    (cpj/PUT group-users-path [] #'batch-update-users)))
-
+   (cpj/PUT group-user-path [] #'put-user)
+   (cpj/DELETE group-user-path [] #'remove-user)
+   (cpj/GET group-users-path [] #'users)
+   (cpj/PUT group-users-path [] #'batch-update-users)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

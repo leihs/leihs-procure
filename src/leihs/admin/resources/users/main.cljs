@@ -1,50 +1,45 @@
 (ns leihs.admin.resources.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.common.membership.users.shared :as users-membership]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.shared :as shared]
-    [leihs.admin.resources.users.user.core :as user]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.membership.users.shared :as users-membership]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.shared :as shared]
+   [leihs.admin.resources.users.user.core :as user]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (def current-query-params*
   (reaction (merge shared/default-query-params
-                   (:query-params-raw @routing/state*)
-                   )))
+                   (:query-params-raw @routing/state*))))
 
 (def current-route* (reaction (:route @routing/state*)))
-
 
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
   (http/route-cached-fetch data*))
 
-
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def on-first-page?*
-  (reaction (= 1 (get-in @routing/state* [:query-params :page] 1)) ))
-
+  (reaction (= 1 (get-in @routing/state* [:query-params :page] 1))))
 
 (defn page-path-for-query-params [query-params]
   (path (:handler-key @routing/state*)
@@ -52,12 +47,11 @@
         (merge @current-query-params*
                query-params)))
 
-
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn form-term-filter []
   [routing/form-term-filter-component
-   :placeholder "part of the name, exact email-address" ])
+   :placeholder "part of the name, exact email-address"])
 
 (defn form-enabled-filter []
   [routing/select-component
@@ -111,7 +105,6 @@
          [:span.text-success "yes"]
          [:span.text-warning "no"])])
 
-
 ;;; protected
 
 (defn protected-th-component []
@@ -123,24 +116,22 @@
      "yes"
      "no")])
 
-
 ;;; org_id
 
 (defn org-id-th-component []
   [:th "Org_id"])
 
 (defn org-id-td-component [user]
-  [:td (:org_id user) ])
+  [:td (:org_id user)])
 
 ;;; org
 
 (defn org-th-component []
- [:th {:key :organization} "Organization"])
+  [:th {:key :organization} "Organization"])
 
 (defn org-td-component [group]
   [:td {:key :organization}
    (:organization group)])
-
 
 ;;; counts
 
@@ -163,7 +154,6 @@
 (defn groups-count-td-component [user]
   [:td.text-right (:groups_count user)])
 
-
 ;; table stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn thead-component [hds]
@@ -175,7 +165,6 @@
     (for [[idx hd] (map-indexed vector hds)]
       ^{:key idx} [hd])]])
 
-
 (defn row-component [user more-cols]
   [:tr.user {:key (:id user)}
    [:td (:index user)]
@@ -183,7 +172,6 @@
    [:td [components/img-small-component user]]
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col user])])
-
 
 (defn table-component
   [hds tds &
@@ -203,12 +191,10 @@
                   (row-component user tds)))]]
        (if @on-first-page?*
          (cond
-           (and membership-filter? @users-membership/filtered-by-member?*
-                ) (users-membership/empty-members-alert)
+           (and membership-filter? @users-membership/filtered-by-member?*) (users-membership/empty-members-alert)
            (and role-filter? @roles/filtered-by-role?*) (roles/empty-alert)
            :else [:div.alert.alert-warning.text-center "No users found."])
          [:div.alert.alert-warning.text-center "No more users found."])))])
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

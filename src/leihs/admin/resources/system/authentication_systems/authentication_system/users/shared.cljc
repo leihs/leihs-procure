@@ -1,7 +1,6 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.shared
   (:require
-    [leihs.core.json :as json]
-    ))
+   [leihs.core.json :as json]))
 
 (defn authentication-system-users-filter-value [query-params]
   (if-not (contains? query-params :authentication-system-users-only)

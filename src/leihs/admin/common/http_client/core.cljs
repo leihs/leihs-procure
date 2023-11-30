@@ -1,24 +1,22 @@
 (ns leihs.admin.common.http-client.core
   (:refer-clojure :exclude [str keyword send-off])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go go-loop]])
+   [cljs.core.async.macros :refer [go go-loop]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [cljs-http.client :as http-client]
-    [cljs-uuid-utils.core :as uuid]
-    [cljs.core.async :as async :refer [timeout]]
-    [clojure.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [goog.string :as gstring]
-    [goog.string.format]
-    [leihs.core.anti-csrf.front :as anti-csrf]
-    [leihs.core.constants :as constants]
-    [leihs.core.core :refer [str keyword deep-merge presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [error]]
-    ))
-
+   [cljs-http.client :as http-client]
+   [cljs-uuid-utils.core :as uuid]
+   [cljs.core.async :as async :refer [timeout]]
+   [clojure.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [goog.string :as gstring]
+   [goog.string.format]
+   [leihs.core.anti-csrf.front :as anti-csrf]
+   [leihs.core.constants :as constants]
+   [leihs.core.core :refer [str keyword deep-merge presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [error]]))
 
 (def base-delay* (reagent/atom 0))
 
@@ -40,13 +38,13 @@
                  #(or % (anti-csrf/anti-csrf-token)))
       (update :modal-on-response-error #(if-not (nil? %) % true))
       (as-> data
-        (update data :modal-on-request
-                #(if-not (nil? %) %
-                   (if (constants/HTTP_SAVE_METHODS (:method data))
-                     false true)))
+            (update data :modal-on-request
+                    #(if-not (nil? %) %
+                             (if (constants/HTTP_SAVE_METHODS (:method data))
+                               false true)))
         (update data :modal-on-response-success
                 #(if-not (nil? %) %
-                   (:modal-on-request data))))))
+                         (:modal-on-request data))))))
 
 (defn request
   ([] (request {}))
@@ -56,7 +54,7 @@
      (swap! requests* assoc id req)
      (go (<! (timeout (:delay req)))
          (let [resp (<! (http-client/request
-                          (select-keys req [:url :method :headers :json-params :body])))]
+                         (select-keys req [:url :method :headers :json-params :body])))]
            (when (:success resp)
              (if (:modal-on-response-success req)
                (go (<! (timeout 1000))
@@ -66,7 +64,6 @@
              (swap! requests* assoc-in [id :response] resp))
            (when-let [chan (:chan req)] (>! chan resp))))
      req)))
-
 
 (defn filter-success [response]
   (when (:success response) response))
@@ -80,7 +77,7 @@
 
 (defn wait-component [req]
   [:div.wait-component
-   {:style { :opacity 0.4}}
+   {:style {:opacity 0.4}}
    [:div.text-center
     [:i.fas.fa-spinner.fa-spin.fa-5x]]
    [:div.text-center
@@ -138,13 +135,13 @@
   (let [route (or route (-> @routing/state* :route))
         chan (async/chan)]
     (go-loop [do-fetch true]
-             (when do-fetch
-               (let [req (request {:chan chan
-                                   :url route})
-                     resp (<! chan)]
-                 (when (< (:status resp) 300)
-                   (swap! data* assoc route (-> resp :body)))))
-             (<! (timeout (* 3 60 1000)))
-             (if (str/starts-with? (:route @routing/state*) route)
-               (recur reload)
-               (swap! data* dissoc route)))))
+      (when do-fetch
+        (let [req (request {:chan chan
+                            :url route})
+              resp (<! chan)]
+          (when (< (:status resp) 300)
+            (swap! data* assoc route (-> resp :body)))))
+      (<! (timeout (* 3 60 1000)))
+      (if (str/starts-with? (:route @routing/state*) route)
+        (recur reload)
+        (swap! data* dissoc route)))))

@@ -2,14 +2,14 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn normalized-inventory-pool-id! [inventory-pool-id tx]
   "Get the id, i.e. the pkey, given either the id or the org_id and

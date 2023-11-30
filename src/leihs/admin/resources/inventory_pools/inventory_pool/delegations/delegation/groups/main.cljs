@@ -1,26 +1,26 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.membership.groups.main :as groups-membership]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.membership.groups.main :as groups-membership]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn member-path
   ([group]
@@ -31,7 +31,6 @@
           :delegation-id @delegation/id*
           :group-id (:id group)} query-params)))
 
-
 ;### header ###################################################################
 
 (defn header-component []
@@ -41,12 +40,11 @@
    " in the Inventory-Pool "
    [inventory-pool/name-link-component]])
 
-
 ;### main #####################################################################
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div ]))
+    [:div]))
 
 (defn table-component []
   [:div
@@ -70,7 +68,7 @@
 (defn breadcrumbs []
   [breadcrumbs/nav-component
    (conj  @breadcrumbs/left*
-         [breadcrumbs/groups-li])[]])
+          [breadcrumbs/groups-li]) []])
 
 (defn page []
   [:div.inventory-pool-groups

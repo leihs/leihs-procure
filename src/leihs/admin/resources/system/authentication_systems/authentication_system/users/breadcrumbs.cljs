@@ -1,16 +1,16 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.breadcrumbs
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]])
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.auth.core :as auth]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as core-user]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
 
-    [leihs.admin.resources.system.authentication-systems.authentication-system.breadcrumbs :as breadcrumbs]
-    [leihs.admin.paths :as paths :refer [path]]))
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as core-user]))
 
 (def li breadcrumbs/li)
 (def nav-component breadcrumbs/nav-component)
@@ -23,7 +23,7 @@
   [li :authentication-system-users-edit
    [:span [icons/edit] " Edit user-data "]
    {:authentication-system-id @authentication-system-id*
-    :user-id @user-id*}{}
+    :user-id @user-id*} {}
    :authorizers [auth/system-admin-scopes?]])
 
 (defn user-li []
@@ -35,7 +35,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defonce left*
   (reaction
-    (conj @breadcrumbs/left* [breadcrumbs/users-li])))
+   (conj @breadcrumbs/left* [breadcrumbs/users-li])))

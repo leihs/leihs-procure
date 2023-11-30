@@ -1,24 +1,21 @@
 (ns leihs.admin.common.components
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as string]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.utils.clipboard :as clipboard]
-    [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    ))
-
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as string]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.utils.clipboard :as clipboard]
+   [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]))
 
 (defn link [inner path]
   (if (not= (:path @routing/state*) path)
     [:a {:href path} inner]
     [:span.text-info inner]))
-
 
 (defn img-large-component [user]
   [:img.bg-light.user-image-256
@@ -34,7 +31,7 @@
              (gravatar-url (or (-> user :email presence)
                                (-> user :secondary_email presence)
                                (-> user :id)) 32))
-    :style {:max-width 32 :max-height 32 }}])
+    :style {:max-width 32 :max-height 32}}])
 
 (defn pre-component [data]
   [:pre (with-out-str (pprint data))])

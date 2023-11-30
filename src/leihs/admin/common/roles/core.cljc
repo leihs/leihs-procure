@@ -1,11 +1,11 @@
 (ns leihs.admin.common.roles.core
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.core.core :refer [keyword str presence]]
-    #?@(:cljs
-        [[reagent.ratom :as ratom :refer [reaction]]
-         [leihs.core.routing.front :as routing]])))
+   #?@(:cljs
+       [[reagent.ratom :as ratom :refer [reaction]]
+        [leihs.core.routing.front :as routing]])
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.core.core :refer [keyword str presence]]))
 
 (def hierarchy
   [:customer
@@ -73,13 +73,12 @@
 (def role-query-param*
   #?(:cljs
      (reaction
-       (get-in @routing/state* [:query-params-raw :role] "customer"))))
+      (get-in @routing/state* [:query-params-raw :role] "customer"))))
 
 (def filtered-by-role?*
   #?(:cljs
      (reaction
-       (= "customer" @role-query-param*))))
-
+      (= "customer" @role-query-param*))))
 
 (defn empty-alert []
   #?(:cljs

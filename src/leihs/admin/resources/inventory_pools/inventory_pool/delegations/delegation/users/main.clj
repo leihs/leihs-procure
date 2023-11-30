@@ -2,16 +2,15 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [compojure.core :as cpj]
+   [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn member-expr [delegation-id]
   [:exists
@@ -19,7 +18,6 @@
        (sql/from :delegations_users)
        (sql/merge-where [:= :users.id :delegations_users.user_id])
        (sql/merge-where [:= :delegations_users.delegation_id delegation-id]))])
-
 
 (defn direct-member-expr [delegation-id]
   [:exists
@@ -41,10 +39,10 @@
                     :as request}]
   (-> (users/users-query request)
       (extend-with-membership
-        (member-expr delegation-id)
-        (direct-member-expr delegation-id)
-        (group-member-expr delegation-id)
-        request)))
+       (member-expr delegation-id)
+       (direct-member-expr delegation-id)
+       (group-member-expr delegation-id)
+       request)))
 
 (defn users-formated-query [request]
   (-> request
@@ -66,10 +64,9 @@
                  {delegation-id :delegation-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
-    tx :delegations_direct_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
-    {:delegation_id delegation-id :user_id user-id})
+   tx :delegations_direct_users ["delegation_id = ? AND user_id = ?" delegation-id user-id]
+   {:delegation_id delegation-id :user_id user-id})
   {:status 204})
-
 
 ;;; remove ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -81,7 +78,6 @@
                 first))
     {:status 204}
     (throw (ex-info "Remove delegation-user failed" {:request request}))))
-
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -98,12 +94,10 @@
 
 (def routes
   (cpj/routes
-    (cpj/PUT delegation-user-path [] #'put-user)
-    (cpj/DELETE delegation-user-path [] #'remove-user)
-    (cpj/GET delegation-users-path [] #'users)))
-
+   (cpj/PUT delegation-user-path [] #'put-user)
+   (cpj/DELETE delegation-user-path [] #'remove-user)
+   (cpj/GET delegation-users-path [] #'users)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

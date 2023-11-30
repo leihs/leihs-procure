@@ -1,6 +1,6 @@
 (ns leihs.admin.common.membership.groups.shared
   (:require
-    [leihs.admin.resources.groups.shared :as groups-shared]))
+   [leihs.admin.resources.groups.shared :as groups-shared]))
 
 (def default-query-params
   (merge groups-shared/default-query-params

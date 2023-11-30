@@ -1,8 +1,8 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.mail-templates
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]]
-            [leihs.core.sql :as sql]
-            [clojure.java.jdbc :as jdbc]))
+  (:require [clojure.java.jdbc :as jdbc]
+            [leihs.core.core :refer [keyword str presence]]
+            [leihs.core.sql :as sql]))
 
 (defn meta-templates [tx]
   (-> (sql/select :*)

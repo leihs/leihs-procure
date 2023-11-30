@@ -1,20 +1,19 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug])
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug])
   (:import
-    [java.awt.image BufferedImage]
-    [java.io ByteArrayInputStream ByteArrayOutputStream]
-    [java.util Base64]
-    [javax.imageio ImageIO]
-    ))
+   [java.awt.image BufferedImage]
+   [java.io ByteArrayInputStream ByteArrayOutputStream]
+   [java.util Base64]
+   [javax.imageio ImageIO]))
 
 ;;; data keys ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -28,7 +27,6 @@
         (sql/from :authentication_systems_groups)
         (sql/merge-where [:= :authentication-systems_groups.authentication-system_id :authentication-systems.id]))
     :groups_count]])
-
 
 ;;; authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -52,18 +50,16 @@
 
 ;;; update authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn patch-authentication-system
   ([{tx :tx data :body {authentication-system-id :authentication-system-id} :route-params}]
    (patch-authentication-system authentication-system-id data tx))
   ([authentication-system-id data tx]
    (when (->> ["SELECT true AS exists FROM authentication_systems WHERE id = ?" authentication-system-id]
-              (jdbc/query tx )
+              (jdbc/query tx)
               first :exists)
      (jdbc/update! tx :authentication_systems
                    (dissoc data :id :groups_count) ["id = ?" authentication-system-id])
      {:status 204})))
-
 
 ;;; create authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -82,16 +78,15 @@
 
 (def authentication-system-transfer-path
   (path :authentication-system-transfer-data {:authentication-system-id ":authentication-system-id"
-                             :target-authentication-system-id ":target-authentication-system-id"}))
+                                              :target-authentication-system-id ":target-authentication-system-id"}))
 
 (def routes
   (->
-    (cpj/routes
-        (cpj/GET authentication-system-path [] #'authentication-system)
-        (cpj/PATCH authentication-system-path [] #'patch-authentication-system)
-        (cpj/DELETE authentication-system-path [] #'delete-authentication-system)
-        (cpj/POST (path :authentication-systems) [] #'create-authentication-system))))
-
+   (cpj/routes
+    (cpj/GET authentication-system-path [] #'authentication-system)
+    (cpj/PATCH authentication-system-path [] #'patch-authentication-system)
+    (cpj/DELETE authentication-system-path [] #'delete-authentication-system)
+    (cpj/POST (path :authentication-systems) [] #'create-authentication-system))))
 
 ;#### debug ###################################################################
 

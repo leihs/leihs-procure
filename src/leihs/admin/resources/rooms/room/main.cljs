@@ -1,26 +1,25 @@
 (ns leihs.admin.resources.rooms.room.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence detect]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.rooms.breadcrumbs :as breadcrumbs-parent]
-    [leihs.admin.resources.rooms.room.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.rooms.room.core :as room :refer [clean-and-fetch id* data*] ]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.rooms.breadcrumbs :as breadcrumbs-parent]
+   [leihs.admin.resources.rooms.room.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.rooms.room.core :as room :refer [clean-and-fetch id* data*]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence detect]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -52,22 +51,22 @@
 
 (defn patch [& args]
   (let [route (path :room {:room-id @room/id*})]
-  (go (when (some->
-              {:url route
-               :method :patch
-               :json-params  @room/data*
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
-        (accountant/navigate! route)))))
+    (go (when (some->
+               {:url route
+                :method :patch
+                :json-params  @room/data*
+                :chan (async/chan)}
+               http-client/request :chan <!
+               http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn edit-page []
   [:div.edit-room
    [routing/hidden-state-component
     {:did-mount clean-and-fetch}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
-           [breadcrumbs/edit-li])[])
+    (conj @breadcrumbs/left*
+          [breadcrumbs/edit-li]) [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -79,20 +78,19 @@
     [form-components/save-submit-component]]
    [room/debug-component]])
 
-
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create []
   (go (when-let [id (some->
-                      {:url (path :rooms)
-                       :method :post
-                       :json-params  @room/data*
-                       :chan (async/chan)}
-                      http-client/request :chan <!
-                      http-client/filter-success!
-                      :body :id)]
+                     {:url (path :rooms)
+                      :method :post
+                      :json-params  @room/data*
+                      :chan (async/chan)}
+                     http-client/request :chan <!
+                     http-client/filter-success!
+                     :body :id)]
         (accountant/navigate!
-          (path :room {:room-id id})))))
+         (path :room {:room-id id})))))
 
 (defn create-submit-component []
   (if @room/edit-mode?*
@@ -107,9 +105,9 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs-parent/left*
-           [breadcrumbs-parent/create-li])
-     [])
+    (conj @breadcrumbs-parent/left*
+          [breadcrumbs-parent/create-li])
+    [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -124,11 +122,11 @@
 
 (defn delete-room [& args]
   (go (when (some->
-              {:url (path :room (-> @routing/state* :route-params))
-               :method :delete
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
+             {:url (path :room (-> @routing/state* :route-params))
+              :method :delete
+              :chan (async/chan)}
+             http-client/request :chan <!
+             http-client/filter-success!)
         (accountant/navigate! (path :rooms)))))
 
 (defn delete-form-component []
@@ -153,10 +151,10 @@
   [:div.room
    [routing/hidden-state-component {:did-mount clean-and-fetch}]
    [breadcrumbs/nav-component
-     @breadcrumbs/left*
-     [[breadcrumbs/rooms-li]
-      [breadcrumbs/delete-li]
-      [breadcrumbs/edit-li]]]
+    @breadcrumbs/left*
+    [[breadcrumbs/rooms-li]
+     [breadcrumbs/delete-li]
+     [breadcrumbs/edit-li]]]
    [:div.row
     [:div.col-lg
      [:h1

@@ -1,27 +1,27 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -29,13 +29,12 @@
 
 (def current-query-paramerters-normalized*
   (reaction (merge default-query-params
-           @current-query-paramerters*)))
+                   @current-query-paramerters*)))
 
 (def data* (reagent/atom {}))
 
 (defn fetch-delegations []
- (http-client/route-cached-fetch data*))
-
+  (http-client/route-cached-fetch data*))
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -57,7 +56,6 @@
      [users/form-suspension-filter]
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
-
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -106,13 +104,13 @@
 
 (defn add-or-remove-delegation [method delegation]
   (go (when (some->
-              {:chan (async/chan)
-               :url (path :inventory-pool-delegation
-                          {:inventory-pool-id @inventory-pool/id*
-                           :delegation-id (:id delegation)})
-               :method method}
-              http-client/request :chan <!
-              http-client/filter-success!)
+             {:chan (async/chan)
+              :url (path :inventory-pool-delegation
+                         {:inventory-pool-id @inventory-pool/id*
+                          :delegation-id (:id delegation)})
+              :method method}
+             http-client/request :chan <!
+             http-client/filter-success!)
         (fetch-delegations))))
 
 (defn action-td-component
@@ -139,17 +137,17 @@
 (defn suspension-td-component [delegation]
   [:td.suspension.text-center
    (suspension/suspension-component
-     (:suspension delegation)
-     :compact true
-     :update-handler (fn [updated]
-                       (go (let [data (<! (suspension/put-suspension<
-                                            (path :inventory-pool-delegation-suspension
-                                                  {:inventory-pool-id @inventory-pool/id*
-                                                   :delegation-id (:id delegation)})
-                                            updated))]
-                             (swap! data* assoc-in
-                                    [(:route @routing/state*) :delegations
-                                     (:page-index delegation) :suspension] data)))))])
+    (:suspension delegation)
+    :compact true
+    :update-handler (fn [updated]
+                      (go (let [data (<! (suspension/put-suspension<
+                                          (path :inventory-pool-delegation-suspension
+                                                {:inventory-pool-id @inventory-pool/id*
+                                                 :delegation-id (:id delegation)})
+                                          updated))]
+                            (swap! data* assoc-in
+                                   [(:route @routing/state*) :delegations
+                                    (:page-index delegation) :suspension] data)))))])
 
 (defn delegation-row-component [{id :id :as delegation}]
   [:tr.delegation {:key (:id delegation)}
@@ -189,7 +187,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn debug-component []
   (when (:debug @state/global-state*)
     [:section.debug
@@ -201,8 +198,8 @@
 
 (defn breadcrumbs []
   [breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]])
+   @breadcrumbs/left*
+   [[breadcrumbs/create-li]]])
 
 (defn page []
   [:div.delegations

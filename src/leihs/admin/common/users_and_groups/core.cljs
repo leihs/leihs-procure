@@ -1,26 +1,24 @@
 (ns leihs.admin.common.users-and-groups.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :refer [checkbox-component input-component]]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent]
-    ))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :refer [checkbox-component input-component]]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (defn organizations [data*]
   (merge {"" "(any)"}
@@ -54,7 +52,6 @@
              :none "(none)"
              :admin :admin
              :system-admin :system-admin}])
-
 
 (defn protect-form-fiels-row-component [data*]
   [:div.form-row

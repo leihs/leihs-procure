@@ -2,15 +2,15 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
-    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
+   [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (def fields
   #{:description
@@ -27,12 +27,12 @@
                   (sql/merge-where [:= :id inventory-pool-id])
                   sql/format)
               (jdbc/query tx)
-              first )})
+              first)})
 
 (defn create-inventory-pool [{tx :tx data :body :as request}]
   (if-let [inventory-pool (first (jdbc/insert!
-                                   tx :inventory_pools
-                                   (select-keys data fields)))]
+                                  tx :inventory_pools
+                                  (select-keys data fields)))]
     (do
       (jdbc/insert! tx :workdays
                     {:inventory_pool_id (:id inventory-pool)})
@@ -45,7 +45,7 @@
   [{{inventory-pool-id :inventory-pool-id} :route-params
     tx :tx data :body :as request}]
   (when (->> ["SELECT true AS exists FROM inventory_pools WHERE id = ?" inventory-pool-id]
-             (jdbc/query tx )
+             (jdbc/query tx)
              first :exists)
     (jdbc/update! tx :inventory_pools
                   (select-keys data fields)
@@ -60,7 +60,7 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-path [] #'inventory-pool)
-    (cpj/DELETE inventory-pool-path [] #'delete-inventory-pool)
-    (cpj/PATCH inventory-pool-path [] #'patch-inventory-pool)
-    (cpj/POST (path :inventory-pools) [] #'create-inventory-pool)))
+   (cpj/GET inventory-pool-path [] #'inventory-pool)
+   (cpj/DELETE inventory-pool-path [] #'delete-inventory-pool)
+   (cpj/PATCH inventory-pool-path [] #'patch-inventory-pool)
+   (cpj/POST (path :inventory-pools) [] #'create-inventory-pool)))

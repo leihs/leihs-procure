@@ -2,17 +2,17 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy roles-to-map]]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -38,7 +38,6 @@
                           seq/with-page-index)]
     {:body {:groups-roles groups-roles}}))
 
-
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def inventory-pool-user-groups-roles-path
@@ -46,11 +45,9 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-user-groups-roles-path [] #'groups-roles)))
-
+   (cpj/GET inventory-pool-user-groups-roles-path [] #'groups-roles)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/wrap-with-log-debug #'filter-by-access-right)
 ;(debug/wrap-with-log-debug #'users-formated-query)

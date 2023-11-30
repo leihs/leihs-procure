@@ -1,12 +1,10 @@
 (ns leihs.admin.common.membership.users.shared
   (:require
-    [leihs.admin.paths :as paths :refer [path]]
-    #?@(:cljs
-        [[reagent.ratom :as ratom :refer [reaction]]
-         [leihs.core.routing.front :as routing]])
-    [leihs.admin.resources.users.shared :as users-shared])
-  )
-
+   #?@(:cljs
+       [[reagent.ratom :as ratom :refer [reaction]]
+        [leihs.core.routing.front :as routing]])
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.shared :as users-shared]))
 
 (def DEFAULT-MEMBERSHIP-QUERY-PARAM "member")
 
@@ -23,16 +21,12 @@
   (merge users-shared/default-query-params
          {:membership "member"}))
 
-
-
-
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (def filtered-by-member?*
   #?(:cljs
      (reaction
-       (= "member" (get-in @routing/state* [:query-params-raw :membership] DEFAULT-MEMBERSHIP-QUERY-PARAM)))))
+      (= "member" (get-in @routing/state* [:query-params-raw :membership] DEFAULT-MEMBERSHIP-QUERY-PARAM)))))
 
 (defn empty-members-alert []
   #?(:cljs

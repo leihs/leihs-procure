@@ -1,23 +1,19 @@
 (ns leihs.admin.common.membership.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.common.membership.users.shared :refer [DEFAULT-QUERY-PARAMS QUERY-OPTIONS DEFAULT-MEMBERSHIP-QUERY-PARAM MEMBERSHIP-QUERY-PARAM-KEY]]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]))
-
-
-
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.membership.users.shared :refer [DEFAULT-QUERY-PARAMS QUERY-OPTIONS DEFAULT-MEMBERSHIP-QUERY-PARAM MEMBERSHIP-QUERY-PARAM-KEY]]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -35,7 +31,6 @@
      [routing/form-per-page-component]
      [routing/form-reset-component]]]])
 
-
 ;;; member td ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn member-user-th-component []
@@ -48,11 +43,9 @@
      :type :checkbox
      :checked (:member user)
      :disabled true
-     :readOnly true }]])
-
+     :readOnly true}]])
 
 ;;; direct member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn update-aggregated-membership [user]
   (swap! users/data* update-in [(:route @routing/state*)
@@ -76,11 +69,11 @@
                     :put true
                     :delete false)]
     (go (when (some->
-                {:chan (async/chan)
-                 :url path
-                 :method method}
-                http-client/request :chan <!
-                http-client/filter-success!)
+               {:chan (async/chan)
+                :url path
+                :method method}
+               http-client/request :chan <!
+               http-client/filter-success!)
           (update-membership-in-table new-state user)))))
 
 (defn remove-direct-memebership [path user]
@@ -129,7 +122,6 @@
                  {:disabled true}
                  [:span [icons/waiting]]])]]]])))
 
-
 ;;; group member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn group-member-user-th-component []
@@ -143,12 +135,12 @@
        :type :checkbox
        :checked (:group_member user)
        :disabled true
-       :readOnly true }]
+       :readOnly true}]
      [:span.ml-2
       (if (:group_member user)
         [:a.btn.btn-outline-primary.btn-sm
          {:href (path-fn user {} {:membership "any"})}
-         [:span [icons/edit] " Edit " ]]
+         [:span [icons/edit] " Edit "]]
         [:a.btn.btn-outline-primary.btn-sm
          {:href (path-fn user {} {:membership "any"})}
          [:span [icons/add] " Add "]])]]))

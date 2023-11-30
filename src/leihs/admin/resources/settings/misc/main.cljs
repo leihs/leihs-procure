@@ -1,28 +1,27 @@
 (ns leihs.admin.resources.settings.misc.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]]
-   [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [leihs.core.breadcrumbs :as core-breadcrumbs]
-   [leihs.admin.common.icons :as admin.common.icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
 
    [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as admin.common.icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.settings.icons :as icons]
    [leihs.admin.resources.settings.misc.breadcrumbs :as breadcrumbs]
    [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
 
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
+   [leihs.core.breadcrumbs :as core-breadcrumbs]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
    [reagent.core :as reagent]))
-
 
 (defonce data* (reagent/atom nil))
 
@@ -94,7 +93,6 @@
              [:a {:href "https://de.wikipedia.org/wiki/ISO_4217"} "ISO 4217 standard"]
              "."]]]]
 
-
    [:div.row
     [:div.col-sm
      [form-components/input-component data* [:maximum_reservation_time]
@@ -131,18 +129,18 @@
              [:code "lending_terms_acceptance_required_for_order"]
              " is checked."]]]]
 
-    [:div.row
-     [:div.col-sm-4.mb-2
-      [form-components/checkbox-component data* [:show_contact_details_on_customer_order]
-       :disabled (not @edit?*)
-       :hint [:span "If enabled, the contact details field will be shown on the customer order before submitting."]]]]
+   [:div.row
+    [:div.col-sm-4.mb-2
+     [form-components/checkbox-component data* [:show_contact_details_on_customer_order]
+      :disabled (not @edit?*)
+      :hint [:span "If enabled, the contact details field will be shown on the customer order before submitting."]]]]
 
-    [:div.row
-     [:div.col-sm
-      [form-components/input-component data* [:home_page_image_url]
-       :label "Homepage Image"
-       :hint [:span "Absolute URL of the image to display on the home page (max 2000 characters). If left empty then the default image is used."]
-       :disabled (not @edit?*)]]]
+   [:div.row
+    [:div.col-sm
+     [form-components/input-component data* [:home_page_image_url]
+      :label "Homepage Image"
+      :hint [:span "Absolute URL of the image to display on the home page (max 2000 characters). If left empty then the default image is used."]
+      :disabled (not @edit?*)]]]
 
    (when @edit?*
      [form-components/save-submit-component])])

@@ -1,24 +1,23 @@
 (ns leihs.admin.resources.system.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
 
-    [leihs.admin.resources.system.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.utils.seq :refer [with-index]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.breadcrumbs :as breadcrumbs]
 
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.seq :refer [with-index]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn breadcrumbs []
   [breadcrumbs/nav-component
@@ -29,4 +28,4 @@
   [:div.system
    [breadcrumbs]
    [:div
-    [:h1 " System " ]]])
+    [:h1 " System "]]])

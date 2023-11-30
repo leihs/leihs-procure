@@ -2,18 +2,17 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.users.user.main :as root-user]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
+   [leihs.admin.resources.users.user.main :as root-user]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn contracts-count [inventory-pool-id state]
   (-> (sql/select :%count.*)
@@ -37,17 +36,15 @@
       (sql/merge-select [(reservations-count inventory-pool-id "approved") :reservations_approved_count])
       identity))
 
-
 ;;; user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn user [{{inventory-pool-id :inventory-pool-id
-              user-id :user-id } :route-params
+              user-id :user-id} :route-params
              tx :tx :as request}]
   {:body
    (or (->> (-> (user-query inventory-pool-id user-id) sql/format)
             (jdbc/query tx) first)
        (throw (ex-info "User not found" {:status 404})))})
-
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -59,11 +56,9 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-user-path [] #'user)))
-
+   (cpj/GET inventory-pool-user-path [] #'user)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/wrap-with-log-debug #'filter-suspended)
 ;(debug/wrap-with-log-debug #'users-formated-query)

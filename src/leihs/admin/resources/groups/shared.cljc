@@ -2,24 +2,20 @@
   (:require [leihs.admin.constants :as defaults]))
 
 (def default-fields
-  #{
-    :name
+  #{:name
     :id
     :organization
-    :org_id
-    })
+    :org_id})
 
 (def available-fields
-  #{
-    :admin_protected
+  #{:admin_protected
     :created_at
     :description
     :id
     :name
     :org_id
     :organization
-    :system_admin_protected
-    })
+    :system_admin_protected})
 
 (def default-query-params
   {:page 1

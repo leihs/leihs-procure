@@ -1,25 +1,24 @@
 (ns leihs.admin.resources.system.authentication-systems.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.system.authentication-systems.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.system.authentication-systems.shared :as shared]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :refer [with-index]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.system.authentication-systems.shared :as shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :refer [with-index]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -30,24 +29,19 @@
 (def current-query-paramerters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
 
-
 (def data* (reagent/atom {}))
 
 (defn fetch-authentication-systems []
   (http-client/route-cached-fetch data*))
-
-
-
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-inline
-    [routing/form-per-page-component]
-    [routing/form-reset-component]]]])
-
+    [:div.form-inline
+     [routing/form-per-page-component]
+     [routing/form-reset-component]]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -109,7 +103,7 @@
 (defn main-page-content-component []
   [:div
    [routing/hidden-state-component
-    {:did-change fetch-authentication-systems }]
+    {:did-change fetch-authentication-systems}]
    [filter-component]
    [routing/pagination-component]
    [authentication-systems-table-component]
@@ -118,8 +112,8 @@
 
 (defn breadcrumbs []
   (breadcrumbs/nav-component
-    @breadcrumbs/left*
-    [[breadcrumbs/create-li]]))
+   @breadcrumbs/left*
+   [[breadcrumbs/create-li]]))
 
 (defn page []
   [:div.authentication-systems

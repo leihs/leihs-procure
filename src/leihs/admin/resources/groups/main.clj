@@ -2,29 +2,27 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.groups.group.main :as group]
-    [leihs.admin.resources.groups.shared :as shared]
-    [leihs.admin.resources.users.choose-core :as choose-user]
-    [leihs.admin.utils.regex :refer [uuid-pattern]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.groups.group.main :as group]
+   [leihs.admin.resources.groups.shared :as shared]
+   [leihs.admin.resources.users.choose-core :as choose-user]
+   [leihs.admin.utils.regex :refer [uuid-pattern]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (def groups-base-query
   (-> (apply sql/select (map #(keyword (str "groups." %)) shared/default-fields))
       (sql/merge-select
-        [(-> (sql/select :%count.*)
-             (sql/from :groups_users)
-             (sql/merge-where
-               [:= :groups_users.group_id :groups.id]))
-         :count_users])
+       [(-> (sql/select :%count.*)
+            (sql/from :groups_users)
+            (sql/merge-where
+             [:= :groups_users.group_id :groups.id]))
+        :count_users])
       (sql/from :groups)
       (sql/order-by :name :id)))
 
@@ -59,12 +57,12 @@
   [query {{user-uid :including-user} :query-params-raw :as request}]
   (if-let [user-uid (presence user-uid)]
     (sql/merge-where
-      query
-      [:exists
-       (-> (choose-user/find-by-some-uid-query user-uid)
-           (sql/select :true)
-           (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
-           (sql/merge-where [:= :groups_users.user_id :users.id]))])
+     query
+     [:exists
+      (-> (choose-user/find-by-some-uid-query user-uid)
+          (sql/select :true)
+          (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
+          (sql/merge-where [:= :groups_users.user_id :users.id]))])
     query))
 
 (defn select-fields [query request]
@@ -86,7 +84,6 @@
         (users-and-groups/protected-filter request)
         (select-fields request))))
 
-
 (def organizations-query
   (-> (sql/select :organization)
       (sql/modifiers :distinct)
@@ -107,8 +104,8 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET (path :groups) [] #'groups)
-    (cpj/POST (path :groups ) [] #'group/routes)))
+   (cpj/GET (path :groups) [] #'groups)
+   (cpj/POST (path :groups) [] #'group/routes)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

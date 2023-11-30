@@ -1,23 +1,22 @@
 (ns leihs.admin.resources.inventory-fields.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.spec.alpha :as spec]
-    [clojure.string :as string]
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
-    [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
-    [leihs.admin.resources.inventory-fields.shared :as shared]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.db :as db]
-    [leihs.core.uuid :refer [uuid]]
-    [logbug.debug :as debug]
-    [next.jdbc.sql :as jdbc]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [clojure.spec.alpha :as spec]
+   [clojure.string :as string]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
+   [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
+   [leihs.admin.resources.inventory-fields.shared :as shared]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.db :as db]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.debug :as debug]
+   [next.jdbc.sql :as jdbc]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def inventory-fields-base-query
   (-> (sql/select :fields.id :fields.dynamic :fields.active :fields.data)
@@ -149,8 +148,8 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-fields-path [] #'inventory-fields)
-    (cpj/POST inventory-fields-path [] #'create-inventory-field)))
+   (cpj/GET inventory-fields-path [] #'inventory-fields)
+   (cpj/POST inventory-fields-path [] #'create-inventory-field)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

@@ -1,49 +1,46 @@
 (ns leihs.admin.resources.users.user.password-reset.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    )
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    ["date-fns" :as date-fns]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [go <! timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.form-components :as forms]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.url.core :as url]
-    [qrcode.react :as qrcode-recat]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
-
+   ["date-fns" :as date-fns]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [go <! timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.form-components :as forms]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.url.core :as url]
+   [qrcode.react :as qrcode-recat]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def user-password-resetable?*
   (reaction
-    (and (-> @user-data* :account_enabled)
-         (-> @user-data* :password_sign_in_enabled)
-         (or (-> @user-data* :email presence)
-             (-> @user-data* :login presence)))))
+   (and (-> @user-data* :account_enabled)
+        (-> @user-data* :password_sign_in_enabled)
+        (or (-> @user-data* :email presence)
+            (-> @user-data* :login presence)))))
 
 (def data-defaults {:valid_for_hours 24
                     :mode :create})
 
 (defn submit [data*]
   (go (let [res (some->
-                  {:chan (async/chan)
-                   :url (-> @routing/state* :route)
-                   :method :post
-                   :json-params (-> @data*
-                                    (update-in [:valid_for_hours] int))}
-                  http-client/request :chan <!
-                  http-client/filter-success! :body)]
+                 {:chan (async/chan)
+                  :url (-> @routing/state* :route)
+                  :method :post
+                  :json-params (-> @data*
+                                   (update-in [:valid_for_hours] int))}
+                 http-client/request :chan <!
+                 http-client/filter-success! :body)]
         (reset! data* res))))
 
 (defn create-form-component [data*]
@@ -58,7 +55,7 @@
      data* [:valid_for_hours] {(* 1 1) "1 hour"
                                (* 1 24) "24 hours"
                                (* 3 24) "3 days"
-                               (* 7 24) "7 days" }
+                               (* 7 24) "7 days"}
      24
      :label [:span "Link valid for  "]
      :inline-label true]
@@ -71,16 +68,12 @@
        [icons/delete] " Reset"]]]
     [forms/submit-component
      :btn-classes [:btn-primary]
-     :inner [:span [icons/add] " Create"]]
-    ]])
-
+     :inner [:span [icons/add] " Create"]]]])
 
 (defn reset-path-url []
   (str (-> @state/global-state*
            :server-state :settings :external_base_url)
-       (path :reset-password {}))
-
-  )
+       (path :reset-password {})))
 
 (defn reset-full-url [token]
   (str (-> @state/global-state* :server-state :settings :external_base_url)
@@ -95,17 +88,16 @@
         {:href (str "mailto:" email-address
                     "?subject=" (url/encode "Password Reset for Leihs")
                     "&body=" (url/encode (clojure.string/join
-                                           "\n"
-                                           [ (str "Click on " (reset-full-url (:token @data*)))
-                                            "" "" "or visit "  " " (str "  " (reset-path-url))
-                                            "" "and enter " " " (str "  " (:token @data*))
-                                            "" "to reset you password for leihs. "
-                                            ""
-                                            "This token is valid until: "
-                                            (str "  " (-> @data* :valid_until date-fns/parseISO str))])))}
+                                          "\n"
+                                          [(str "Click on " (reset-full-url (:token @data*)))
+                                           "" "" "or visit "  " " (str "  " (reset-path-url))
+                                           "" "and enter " " " (str "  " (:token @data*))
+                                           "" "to reset you password for leihs. "
+                                           ""
+                                           "This token is valid until: "
+                                           (str "  " (-> @data* :valid_until date-fns/parseISO str))])))}
         [icons/email] " Send the password reset link via e-mail"]]
-      [:div.clearfix.mb-3]]
-     )])
+      [:div.clearfix.mb-3]])])
 
 (defn show-component [data*]
   [:div
@@ -114,7 +106,7 @@
     (let [url (reset-full-url (:token @data*))]
       [:div
        [:div
-        [:p [:span "visit " ]]
+        [:p [:span "visit "]]
         [:p.text-center
          {:style {:font-size "125%"}} [:span.code (reset-path-url)]]]
        [:div
@@ -134,8 +126,7 @@
     [:button.btn.btn-primary
      {:on-click #(reset! data* data-defaults)}
      [:span [icons/delete] " Close "]]]
-   [:div.clearfix.mb-2]
-   ])
+   [:div.clearfix.mb-2]])
 
 ;for debugging
 ;(defonce data* (reagent/atom data-defaults))
@@ -167,7 +158,7 @@
    [routing/hidden-state-component
     {:did-change #(core/clean-and-fetch)}]
    [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/password-reset-li])[]]
+    (conj @breadcrumbs/left* [breadcrumbs/password-reset-li]) []]
    [:h1 "Password Reset Link for "
     [core/name-link-component]]
    [main-component]])

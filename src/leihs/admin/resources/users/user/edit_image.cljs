@@ -1,23 +1,22 @@
 (ns leihs.admin.resources.users.user.edit-image
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.form-components :refer [input-component]]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
-    [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
-    [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.form-components :refer [input-component]]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
+   [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
+   [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;;; image ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -61,12 +60,12 @@
   (doseq [res [256 32]]
     (-> data
         (image-resize/resize-to-b64
-          res
-          :error-handler (fn [err]
-                           (swap! img-processing* assoc :error err)                          )
-          :success-handler (fn [b64]
-                             (swap! data* assoc (keyword (str "img" res "_url")) b64)
-                             (update-img-digest))))))
+         res
+         :error-handler (fn [err]
+                          (swap! img-processing* assoc :error err))
+         :success-handler (fn [b64]
+                            (swap! data* assoc (keyword (str "img" res "_url")) b64)
+                            (update-img-digest))))))
 
 (defn handle-img-drop [evt]
   (reset! img-processing* {})
@@ -114,8 +113,7 @@
           [:i.fas.fa-times] " Remove image "]])]]]
    [:div
     {:style
-     {
-      :position :absolute
+     {:position :absolute
       :left 0
       :top 0
       :width 256
@@ -123,8 +121,7 @@
       :z-index -1}}
     (if-let [img-data (:img256_url @data*)]
       [:img {:src img-data
-             :style {
-                     :display :block
+             :style {:display :block
                      :margin :auto
                      :max-width "256px"
                      :max-height "256px"
@@ -136,7 +133,7 @@
                 :top 0
                 :width "256px"
                 :height "256px"
-                :z-index -1 }}])]])
+                :z-index -1}}])]])
 
 (defn image-component []
   [:div

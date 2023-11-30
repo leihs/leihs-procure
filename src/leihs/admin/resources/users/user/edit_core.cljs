@@ -1,38 +1,36 @@
 (ns leihs.admin.resources.users.user.edit-core
   (:refer-clojure :exclude [str keyword])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [go timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [leihs.admin.common.form-components :refer [checkbox-component input-component]]
-    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent :refer [reaction]]
-    [taoensso.timbre :refer [error warn info debug spy]]))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [go timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.form-components :refer [checkbox-component input-component]]
+   [leihs.admin.common.users-and-groups.core :as users-and-groups]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.core :as core :refer [user-id* user-data*]]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent :refer [reaction]]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def data* user-data*)
 
 (def admin-protected-is-invalid* (reaction (and (:is_admin @data*)  (not (:admin_protected @data*)))))
 
-(def system-admin-protected-is-invalid* (reaction (and (:is_system_admin @data*)  (not (:system_admin_protected @data*)))) )
+(def system-admin-protected-is-invalid* (reaction (and (:is_system_admin @data*)  (not (:system_admin_protected @data*)))))
 
 (def extended-info-is-valid*
   (reaction (try (.parse js/JSON (get @data* :extended_info))
                  true
                  (catch :default _ false))))
 
-
 (def form-is-invalid*
   (reaction (or @admin-protected-is-invalid*
                 @system-admin-protected-is-invalid*
                 (not @extended-info-is-valid*))))
-
 
 (defn json-component
   [kw & {:keys [label hint classes]
@@ -57,24 +55,23 @@
 
 (defn essentials-form-component []
   [:div.essential-fields
-    [:h3 "Essential Fields"]
-    [:div.form-row
-     [:div.col-md-5 [input-component data* [:email]
-                     :type :email
-                     :label "Email-address"
-                     :validator (fn [value]
-                                  (or false))
-                     :hint [:span "A real email-address is essential for many processes inside leihs. "
-                            "Each value must be " [:strong " unique accross all users "] " and  "
-                            [:strong " must contain a " [:span.text-monospace "@"]] " sign."
-                            " This field is not mandatory: "
-                            [:strong "do not fill in made up email-addresses! "]
-                            "Consider to use the " [:strong.text-monospace "login"] " field instead."
-                            ]]]
-     [:div.col-md-3 [input-component data* [:firstname]
-                     :label "First name"]]
-     [:div.col-md-4 [input-component data* [:lastname]
-                     :label "Last name"]]]])
+   [:h3 "Essential Fields"]
+   [:div.form-row
+    [:div.col-md-5 [input-component data* [:email]
+                    :type :email
+                    :label "Email-address"
+                    :validator (fn [value]
+                                 (or false))
+                    :hint [:span "A real email-address is essential for many processes inside leihs. "
+                           "Each value must be " [:strong " unique accross all users "] " and  "
+                           [:strong " must contain a " [:span.text-monospace "@"]] " sign."
+                           " This field is not mandatory: "
+                           [:strong "do not fill in made up email-addresses! "]
+                           "Consider to use the " [:strong.text-monospace "login"] " field instead."]]]
+    [:div.col-md-3 [input-component data* [:firstname]
+                    :label "First name"]]
+    [:div.col-md-4 [input-component data* [:lastname]
+                    :label "Last name"]]]])
 
 (defn personal-and-contact-form-component []
   [:div
@@ -143,7 +140,7 @@
       :disabled (not @current-user/system-admin?*)
       :label "System admin protected"
       :hint [:span "This entity can only be modifed by system-admins. "]
-      :invalid-feedback [:span "A system_admin must be system_admin_protected."] ]]]
+      :invalid-feedback [:span "A system_admin must be system_admin_protected."]]]]
 
    [:div
     [:h3  "Other Fields "]
@@ -152,7 +149,7 @@
       [input-component data* [:badge_id]
        :label "Badge ID"
        :hint [:span "This value is meant to be used during the hand out or take back in conjunction "
-              "with external machinery such as barcode or RFID scanners." ]]]
+              "with external machinery such as barcode or RFID scanners."]]]
      [:div.col-md
       [input-component data* [:login]
        :label "Login"
@@ -169,10 +166,9 @@
 (defn debug-component []
   (when (:debug @state/global-state*)
     [:div
-    [:div.data
-     [:h3 "data*"]
-     [:pre (with-out-str (pprint @data*))]]
-    [:div
-     [:h3 "@current-user/admin?*"]
-     [:pre (with-out-str (pprint @current-user/admin?*))]]
-    ]))
+     [:div.data
+      [:h3 "data*"]
+      [:pre (with-out-str (pprint @data*))]]
+     [:div
+      [:h3 "@current-user/admin?*"]
+      [:pre (with-out-str (pprint @current-user/admin?*))]]]))

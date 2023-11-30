@@ -1,26 +1,25 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as core-user]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as core-user]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :inventory-pool-id presence)
@@ -29,34 +28,32 @@
 (defonce data* (reagent/atom nil))
 
 (defonce role-for-inventory-pool* (reaction
-                                    (some->> @core-user/state* :access-rights
-                                             (filter #(=(:inventory_pool_id %) @id*))
-                                             first
-                                             :role
-                                             keyword)))
+                                   (some->> @core-user/state* :access-rights
+                                            (filter #(= (:inventory_pool_id %) @id*))
+                                            first
+                                            :role
+                                            keyword)))
 
 (defonce edit-mode?*
   (reaction
-    (and (map? @data*)
-         (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
-                   (:handler-key @routing/state*))))))
-
+   (and (map? @data*)
+        (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
+                  (:handler-key @routing/state*))))))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn fetch []
   (go (reset! data*
               (some->
-                {:chan (async/chan)
-                 :url (path :inventory-pool
-                            (-> @routing/state* :route-params))}
-                http-client/request :chan <!
-                http-client/filter-success! :body))))
+               {:chan (async/chan)
+                :url (path :inventory-pool
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success! :body))))
 
 (defn clean-and-fetch [& args]
   (reset! data* nil)
   (fetch))
-
 
 ;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -67,7 +64,6 @@
      [:div.inventory-pool-data
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
-
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -80,7 +76,6 @@
                  [:em (str (:name @data*))]
                  [:span {:style {:font-family "monospace"}} (short-id @id*)])]
      [components/link inner p])])
-
 
 (defn link-to-legacy-component []
   [:div

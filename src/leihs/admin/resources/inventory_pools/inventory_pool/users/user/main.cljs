@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.main
   (:refer-clojure :exclude [str keyword])
   (:require
-     [accountant.core :as accountant]
-     [cljs.core.async :as async :refer [<! go]]
-     [cljs.pprint :refer [pprint]]
-     [leihs.admin.common.components :as components]
-     [leihs.admin.common.icons :as icons]
-     [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
-     [leihs.admin.common.roles.core :refer []]
-     [leihs.admin.paths :as paths :refer [path]]
-     [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-     [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
-     [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
-     [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
-     [leihs.admin.resources.users.user.shared :as user-shared]
-     [leihs.admin.state :as state]
-     [leihs.admin.utils.regex :as regex]
-     [leihs.core.core :refer [keyword str presence]]
-     [leihs.core.routing.front :as routing]
-     [reagent.core :as reagent]
-     ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [<! go]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
+   [leihs.admin.common.roles.core :refer []]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
+   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
+   [leihs.admin.resources.users.user.shared :as user-shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defonce inventory-pool-user-data* (reagent/atom nil))
 
@@ -45,14 +44,12 @@
          name-or-id (user/fullname-or-some-uid @user-data*)]
      [components/link [:em name-or-id] p])])
 
-
 ;;; suspension ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn suspension-component []
   [:div#suspension
-   [:h2 " Suspension " ]
+   [:h2 " Suspension "]
    [suspension/user-page-suspension-component]])
-
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -70,7 +67,7 @@
   [:div.direct-roles
    [routing/hidden-state-component
     {:did-change direct-roles/fetch}]
-   [:h3 [:span " Direct roles "] ]
+   [:h3 [:span " Direct roles "]]
    [roles-ui/roles-component @direct-roles/roles-data*
     :compact true
     :update-handler #(go (<! (direct-roles/update-handler %))
@@ -90,7 +87,6 @@
    [direct-roles-component]
    [:div.mt-3]
    [roles-via-groups-component @user-data*]])
-
 
 ;;; overview ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -115,15 +111,15 @@
    [:ul.list-unstyled
     [pool-data-li-dl-component "Suspended"
      (if (suspension-core/suspended?
-           (-> @suspension/data* :suspended_until presence js/Date.)
-           (:timestamp @state/global-state*))
+          (-> @suspension/data* :suspended_until presence js/Date.)
+          (:timestamp @state/global-state*))
        [:span.text-danger "yes"]
        [:span.text-success "no"])]
     [pool-data-li-dl-component "Roles"
      [roles-ui/roles-component @user-roles/roles-data*
       :compact true]]
     [not-zero-count-pool-data-li-dl-component user
-     "Submitted reservations" :reservations_submitted_count ]
+     "Submitted reservations" :reservations_submitted_count]
     [not-zero-count-pool-data-li-dl-component user
      "Approved reservations" :reservations_approved_count]
     [not-zero-count-pool-data-li-dl-component user
@@ -149,9 +145,7 @@
     [:div.col-lg-3
      [:hr]
      [:h3 "Account Properties"]
-     [user/account-properties-component @user-data*] ]
-    ]])
-
+     [user/account-properties-component @user-data*]]]])
 
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

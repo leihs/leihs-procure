@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.rooms.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.rooms.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.rooms.shared :as shared]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.auth.core :as auth :refer []]
-    [leihs.core.core :refer [keyword str presence detect]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.rooms.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.rooms.shared :as shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.auth.core :as auth :refer []]
+   [leihs.core.core :refer [keyword str presence detect]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -41,11 +40,11 @@
 (defn clean-and-fetch []
   (go (reset! buildings-data*
               (some->
-                {:chan (async/chan)
-                 :url (path :buildings)}
-                http/request :chan <!
-                http/filter-success!
-                :body :buildings))
+               {:chan (async/chan)
+                :url (path :buildings)}
+               http/request :chan <!
+               http/filter-success!
+               :body :buildings))
       (http/route-cached-fetch data*)))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,7 +57,7 @@
 
 (defn link-to-room
   [room inner & {:keys [authorizers]
-                     :or {authorizers []}}]
+                 :or {authorizers []}}]
   (if (auth/allowed? authorizers)
     [:a {:href (path :room {:room-id (:id room)})} inner]
     inner))
@@ -87,13 +86,12 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn name-th-component []
   [:th {:key :name} "Name"])
 
 (defn name-td-component [room]
   (let [room-name (cond-> (:name room)
-                        (:is_general room) (str " (general)"))
+                    (:is_general room) (str " (general)"))
         inner-comp [:td {:key :code}
                     [link-to-room room [:span room-name]
                      :authorizers [auth/admin-scopes?]]]]

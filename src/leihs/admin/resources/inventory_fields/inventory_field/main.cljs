@@ -1,35 +1,34 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [dissoc-in keyword str presence flip drop-at]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-fields.breadcrumbs :as breadcrumbs-parent]
-    [leihs.admin.resources.inventory-fields.inventory-field.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-fields.inventory-field.core :as inventory-field
-     :refer [clean-and-fetch clean-and-fetch-for-new
-             id* data* edit-mode?*
-             inventory-field-data*
-             inventory-field-usage-data*
-             inventory-fields-groups-data*
-             advanced-types
-             new-dynamic-field-defaults]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [clojure.string :as string]
-    [com.rpl.specter :as specter]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [clojure.string :as string]
+   [com.rpl.specter :as specter]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-fields.breadcrumbs :as breadcrumbs-parent]
+   [leihs.admin.resources.inventory-fields.inventory-field.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-fields.inventory-field.core :as inventory-field
+    :refer [clean-and-fetch clean-and-fetch-for-new
+            id* data* edit-mode?*
+            inventory-field-data*
+            inventory-field-usage-data*
+            inventory-fields-groups-data*
+            advanced-types
+            new-dynamic-field-defaults]]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [dissoc-in keyword str presence flip drop-at]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -52,8 +51,8 @@
 (defn strip-of-uuids [data]
   (-> data
       (dissoc-in [:data :default-uuid])
-      (cond->> 
-        (contains? (:data data) :values)
+      (cond->>
+       (contains? (:data data) :values)
         (specter/transform [:data :values specter/ALL]
                            #(dissoc % :uuid)))))
 
@@ -111,7 +110,7 @@
                            (set-value val data* ks)
                            (reset! old-values nil)
                            (if (and (advanced-types val) (-> data* :data :values empty?))
-                             (let [uuid (random-uuid)] 
+                             (let [uuid (random-uuid)]
                                (do (swap! data*
                                           update-in [:data :values]
                                           (constantly [(sorted-map :value nil :label nil :uuid uuid)]))
@@ -219,18 +218,18 @@
                                           :disabled (not @edit-mode?*)}]
            [:label.form-check-label {:for field-group} [:i (str "<" field-group ">")]]])
         (doall
-          (for [field-group @inventory-fields-groups-data*]
-            [:div.form-check.mb-2 {:key field-group}
-             [:input.form-check-input {:type :radio
-                                       :name field-group
-                                       :id field-group
-                                       :on-change (fn [e]
-                                                    (let [val (-> e .-target .-name presence)]
-                                                      (reset! custom-group-checked? false)
-                                                      (set-value val data* ks)))
-                                       :checked (= (get-in @data* ks) field-group)
-                                       :disabled (not @edit-mode?*)}]
-             [:label.form-check-label {:for field-group} field-group]]))
+         (for [field-group @inventory-fields-groups-data*]
+           [:div.form-check.mb-2 {:key field-group}
+            [:input.form-check-input {:type :radio
+                                      :name field-group
+                                      :id field-group
+                                      :on-change (fn [e]
+                                                   (let [val (-> e .-target .-name presence)]
+                                                     (reset! custom-group-checked? false)
+                                                     (set-value val data* ks)))
+                                      :checked (= (get-in @data* ks) field-group)
+                                      :disabled (not @edit-mode?*)}]
+            [:label.form-check-label {:for field-group} field-group]]))
         (let [field-group "Custom"]
           [:div.form-check
            [:input.form-check-input.mt-2 {:type :radio
@@ -286,7 +285,7 @@
                               (set-value val data* ks)))
                :required true
                :disabled (not @edit-mode?*)}]]
-     [:div [:small "The label to be shown in the edit item/license form."] ]]))
+     [:div [:small "The label to be shown in the edit item/license form."]]]))
 
 (defn checkbox-component [& {:keys [ks label]}]
   (let [id (get-id-from-ks ks)]
@@ -396,21 +395,21 @@
 
 (defn patch [& args]
   (let [route (path :inventory-field {:inventory-field-id @id*})]
-  (go (when (some->
-              {:url route
-               :method :patch
-               :json-params (strip-of-uuids @data*)
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
-        (accountant/navigate! route)))))
+    (go (when (some->
+               {:url route
+                :method :patch
+                :json-params (strip-of-uuids @data*)
+                :chan (async/chan)}
+               http-client/request :chan <!
+               http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn edit-page []
   [:div.edit-inventory-field
    [routing/hidden-state-component {:did-mount clean-and-fetch}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
-           [breadcrumbs/edit-li])[])
+    (conj @breadcrumbs/left*
+          [breadcrumbs/edit-li]) [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -422,20 +421,19 @@
     [form-components/save-submit-component]]
    [inventory-field/debug-component]])
 
-
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create []
   (go (when-let [id (some->
-                      {:url (path :inventory-fields)
-                       :method :post
-                       :json-params (strip-of-uuids @data*)
-                       :chan (async/chan)}
-                      http-client/request :chan <!
-                      http-client/filter-success!
-                      :body :id)]
+                     {:url (path :inventory-fields)
+                      :method :post
+                      :json-params (strip-of-uuids @data*)
+                      :chan (async/chan)}
+                     http-client/request :chan <!
+                     http-client/filter-success!
+                     :body :id)]
         (accountant/navigate!
-          (path :inventory-field {:inventory-field-id id})))))
+         (path :inventory-field {:inventory-field-id id})))))
 
 (defn create-submit-component []
   (if @edit-mode?*
@@ -455,9 +453,9 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch-for-new}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs-parent/left*
-           [breadcrumbs-parent/create-li])
-     [])
+    (conj @breadcrumbs-parent/left*
+          [breadcrumbs-parent/create-li])
+    [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -473,11 +471,11 @@
 
 (defn delete-inventory-field [& args]
   (go (when (some->
-              {:url (path :inventory-field (-> @routing/state* :route-params))
-               :method :delete
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
+             {:url (path :inventory-field (-> @routing/state* :route-params))
+              :method :delete
+              :chan (async/chan)}
+             http-client/request :chan <!
+             http-client/filter-success!)
         (accountant/navigate! (path :inventory-fields)))))
 
 (defn delete-form-component []
@@ -503,13 +501,13 @@
   [:div.inventory-field.mb-5
    [routing/hidden-state-component {:did-mount clean-and-fetch}]
    [breadcrumbs/nav-component
-     @breadcrumbs/left*
-     [[breadcrumbs/inventory-fields-li]
-      (when (and (:dynamic @inventory-field-data*)
-                 (-> @inventory-field-data* :data :required not)
-                 (= @inventory-field-usage-data* 0))
-        [breadcrumbs/delete-li])
-      [breadcrumbs/edit-li]]]
+    @breadcrumbs/left*
+    [[breadcrumbs/inventory-fields-li]
+     (when (and (:dynamic @inventory-field-data*)
+                (-> @inventory-field-data* :data :required not)
+                (= @inventory-field-usage-data* 0))
+       [breadcrumbs/delete-li])
+     [breadcrumbs/edit-li]]]
    [:div.row
     [:div.col-lg
      [:h1

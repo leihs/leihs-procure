@@ -1,37 +1,36 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as core-user]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
 
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-parent]
-    [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.breadcrumbs :as breadcrumbs-parent]
+   [leihs.admin.resources.inventory-pools.inventory-pool.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.state :as state]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as core-user]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce edit-mode?*
   (reaction
-    (and (map? @inventory-pool/data*)
-         (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
-                   (:handler-key @routing/state*))))))
+   (and (map? @inventory-pool/data*)
+        (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
+                  (:handler-key @routing/state*))))))
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -65,28 +64,27 @@
       :rows 20
       :disabled (not @edit-mode?*)]]))
 
-
 ;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch [& args]
   (let [route (path :inventory-pool
                     {:inventory-pool-id @inventory-pool/id*})]
-  (go (when (some->
-              {:url route
-               :method :patch
-               :json-params  @inventory-pool/data*
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
-        (accountant/navigate! route)))))
+    (go (when (some->
+               {:url route
+                :method :patch
+                :json-params  @inventory-pool/data*
+                :chan (async/chan)}
+               http-client/request :chan <!
+               http-client/filter-success!)
+          (accountant/navigate! route)))))
 
 (defn edit-page []
   [:div.edit-inventory-pool
    [routing/hidden-state-component
     {:did-mount inventory-pool/clean-and-fetch}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
-           [breadcrumbs/edit-li])[])
+    (conj @breadcrumbs/left*
+          [breadcrumbs/edit-li]) [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -98,20 +96,19 @@
     [form-components/save-submit-component]]
    [inventory-pool/debug-component]])
 
-
 ;;; add  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create []
   (go (when-let [id (some->
-                      {:url (path :inventory-pools)
-                       :method :post
-                       :json-params  @inventory-pool/data*
-                       :chan (async/chan)}
-                      http-client/request :chan <!
-                      http-client/filter-success!
-                      :body :id)]
+                     {:url (path :inventory-pools)
+                      :method :post
+                      :json-params  @inventory-pool/data*
+                      :chan (async/chan)}
+                     http-client/request :chan <!
+                     http-client/filter-success!
+                     :body :id)]
         (accountant/navigate!
-          (path :inventory-pool {:inventory-pool-id id})))))
+         (path :inventory-pool {:inventory-pool-id id})))))
 
 (defn create-submit-component []
   (if @edit-mode?*
@@ -126,9 +123,9 @@
    [routing/hidden-state-component
     {:did-mount #(reset! inventory-pool/data* {})}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs-parent/left*
-           [breadcrumbs/create-li])
-     [])
+    (conj @breadcrumbs-parent/left*
+          [breadcrumbs/create-li])
+    [])
    [:div.row
     [:div.col-lg
      [:h1
@@ -139,17 +136,15 @@
     [create-submit-component]]
    [inventory-pool/debug-component]])
 
-
 ;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn delete-inventory-pool [& args]
   (go (when (some->
-              {:url (path :inventory-pool (-> @routing/state* :route-params))
-               :method :delete
-               :chan (async/chan)}
-              http-client/request :chan <!
-              http-client/filter-success!)
+             {:url (path :inventory-pool (-> @routing/state* :route-params))
+              :method :delete
+              :chan (async/chan)}
+             http-client/request :chan <!
+             http-client/filter-success!)
         (accountant/navigate! (path :inventory-pools)))))
 
 (defn delete-submit-component []
@@ -167,14 +162,13 @@
     {:did-mount inventory-pool/clean-and-fetch}]
    [:div.row
     (breadcrumbs/nav-component
-      (conj @breadcrumbs/left*
-            [breadcrumbs/delete-li])
-      [])
+     (conj @breadcrumbs/left*
+           [breadcrumbs/delete-li])
+     [])
     [:nav.col-lg {:role :navigation}]]
    [:h1 "Delete Inventory-Pool "
     [inventory-pool/name-link-component]]
    [delete-submit-component]])
-
 
 ;;; show ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -183,13 +177,13 @@
    [routing/hidden-state-component
     {:did-mount inventory-pool/clean-and-fetch}]
    [breadcrumbs/nav-component
-     @breadcrumbs/left*
-     [[breadcrumbs/users-li]
-      [breadcrumbs/groups-li]
-      [breadcrumbs/delegations-li]
-      [breadcrumbs/entitlement-groups-li]
-      [breadcrumbs/delete-li]
-      [breadcrumbs/edit-li]]]
+    @breadcrumbs/left*
+    [[breadcrumbs/users-li]
+     [breadcrumbs/groups-li]
+     [breadcrumbs/delegations-li]
+     [breadcrumbs/entitlement-groups-li]
+     [breadcrumbs/delete-li]
+     [breadcrumbs/edit-li]]]
    [:div.row
     [:div.col-lg
      [:h1

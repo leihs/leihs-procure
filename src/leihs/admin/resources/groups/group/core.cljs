@@ -1,26 +1,25 @@
 (ns leihs.admin.resources.groups.group.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.admin.common.http-client.core :as http-client]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
+   [clojure.string]
+   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
 
@@ -34,7 +33,6 @@
                        :url @route*}
                       http-client/request
                       :chan <! http-client/filter-success! :body))))
-
 
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

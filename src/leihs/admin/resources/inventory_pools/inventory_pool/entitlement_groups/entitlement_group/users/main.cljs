@@ -1,38 +1,34 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.membership.users.main :as membership-users :refer []]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
-    [leihs.admin.resources.users.main :as users]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.membership.users.main :as membership-users :refer []]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
-
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;;; direct member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 (defn direct-member-path-fn [user]
   (path :inventory-pool-entitlement-group-direct-user
         {:inventory-pool-id @inventory-pool/id*
          :entitlement-group-id @entitlement-group/id*
          :user-id (:id user)}))
-
 
 ;;; group member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -60,9 +56,9 @@
     [pool-users/user-td-component
      membership-users/member-user-td-component
      (membership-users/create-direct-member-user-td-component
-       direct-member-path-fn)
+      direct-member-path-fn)
      (membership-users/create-group-member-user-td-component
-       groups-path-fn)]
+      groups-path-fn)]
     :membership-filter? true]
    [routing/pagination-component]])
 

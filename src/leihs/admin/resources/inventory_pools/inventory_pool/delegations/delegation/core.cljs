@@ -1,28 +1,28 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
-    [leihs.core.user.front]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
 
-    [leihs.admin.common.components :as components :refer [link]]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
-    [leihs.admin.utils.regex :as regex]
+   [leihs.admin.common.components :as components :refer [link]]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as delegation-users]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.regex :as regex]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 (defonce id* (reaction (or (-> @routing/state* :route-params :delegation-id)
                            ":delegation-id")))
@@ -39,31 +39,26 @@
                      http-client/request :chan <!
                      http-client/filter-success! :body))))
 
-
 ;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn fetch [_]
   (fetch-delegation))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (defn debug-component []
-	(when (:debug @state/global-state*)
-		[:div.delegation-debug
-		 [:hr]
+  (when (:debug @state/global-state*)
+    [:div.delegation-debug
+     [:hr]
      [:div.delegation-id
       [:h3 "@id*"]
       [:pre (with-out-str (pprint @id*))]]
      [:div.delegation
       [:h3 "@delegation*"]
       [:pre (with-out-str (pprint @delegation*))]]
-		 [:div.delegation-data
-			[:h3 "@data*"]
-			[:pre (with-out-str (pprint @data*))]]
-		 ]))
-
+     [:div.delegation-data
+      [:h3 "@data*"]
+      [:pre (with-out-str (pprint @data*))]]]))
 
 ;; delegation components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

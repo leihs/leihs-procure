@@ -1,37 +1,36 @@
 (ns leihs.admin.resources.groups.group.edit
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
 
-    [leihs.admin.common.form-components :refer [checkbox-component input-component save-submit-component]]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
-    [leihs.admin.resources.groups.group.edit-core :as edit-core]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.form-components :refer [checkbox-component input-component save-submit-component]]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.group.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.groups.group.core :refer [group-id* data* debug-component clean-and-fetch fetch-group group-name-component group-id-component]]
+   [leihs.admin.resources.groups.group.edit-core :as edit-core]
+   [leihs.admin.state :as state]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn patch [& args]
   (go (when (some->
-              {:chan (async/chan)
-               :url (path :group {:group-id @group-id*})
-               :method :patch
-               :json-params @data*}
-              http-client/request
-              :chan <! http-client/filter-success!)
+             {:chan (async/chan)
+              :url (path :group {:group-id @group-id*})
+              :method :patch
+              :json-params @data*}
+             http-client/request
+             :chan <! http-client/filter-success!)
         (accountant/navigate!
-          (path :group {:group-id @group-id*})))))
+         (path :group {:group-id @group-id*})))))
 
 (defn edit-form-component []
   [:form.form

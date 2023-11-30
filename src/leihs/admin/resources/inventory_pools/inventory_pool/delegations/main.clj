@@ -2,20 +2,19 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [filter-suspended add-suspended-until-to-query]]
-    [leihs.admin.resources.users.choose-core :as choose-user]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset mixin-default-query-params]]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.queries :as queries]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.responsible-user :as responsible-user]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :refer [filter-suspended add-suspended-until-to-query]]
+   [leihs.admin.resources.users.choose-core :as choose-user]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset mixin-default-query-params]]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (def delegations-base-query
   (-> (sql/select :delegations.id
@@ -24,7 +23,6 @@
       (sql/from [:users :delegations])
       (sql/order-by :delegations.firstname)
       (sql/merge-where [:<> nil :delegations.delegator_user_id])))
-
 
 (defn merge-select-counts [query inventory-pool-id]
   (-> query
@@ -52,12 +50,12 @@
   [query {{user-uid :including-user} :query-params-raw :as request}]
   (if-let [user-uid (presence user-uid)]
     (sql/merge-where
-      query
-      [:exists
-       (-> (choose-user/find-by-some-uid-query user-uid)
-           (sql/select :true)
-           (sql/merge-join :delegations_users [:= :delegations_users.delegation_id :delegations.id])
-           (sql/merge-where [:= :delegations_users.user_id :users.id]))])
+     query
+     [:exists
+      (-> (choose-user/find-by-some-uid-query user-uid)
+          (sql/select :true)
+          (sql/merge-join :delegations_users [:= :delegations_users.delegation_id :delegations.id])
+          (sql/merge-where [:= :delegations_users.user_id :users.id]))])
     query))
 
 (defn inventory-pool-filter
@@ -66,10 +64,10 @@
           :as request}]
   (case (-> (merge default-query-params query-params) :membership)
     "any" (sql/merge-where
-            query
-            [:or
-             (queries/member-expr inventory-pool-id)
-             [:= :delegations.pool_protected :false]])
+           query
+           [:or
+            (queries/member-expr inventory-pool-id)
+            [:= :delegations.pool_protected :false]])
     "non" (-> query
               (sql/merge-where [:and [:not (queries/member-expr inventory-pool-id)]
                                 [:= :delegations.pool_protected :false]]))
@@ -103,7 +101,6 @@
                             (seq/with-index offset)
                             seq/with-page-index))}}))
 
-
 ;;; create delegation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-delegation
@@ -118,13 +115,12 @@
       (if (first (jdbc/insert! tx :direct_access_rights
                                {:user_id (:id delegation)
                                 :inventory_pool_id inventory-pool-id
-                                :role "customer" }))
+                                :role "customer"}))
         {:status 200 :body delegation}
         (throw (ex-info
-                 "failed to add delegation as customer to pool" {:status 422})))
+                "failed to add delegation as customer to pool" {:status 422})))
       (throw (ex-info  "The delegation could not be created!" {:status 422})))
     (throw responsible-user/not-found-ex)))
-
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -132,19 +128,16 @@
   (path :inventory-pool-delegations
         {:inventory-pool-id ":inventory-pool-id"} {}))
 
-
 (defn routes [{request-method :request-method
                handler-key :handler-key
                :as request}]
   (case handler-key
     :inventory-pool-delegations (case request-method
-                                 :get  (-> request
-                                           (mixin-default-query-params default-query-params)
-                                           delegations)
-                                 :post (create-delegation request))))
-
+                                  :get  (-> request
+                                            (mixin-default-query-params default-query-params)
+                                            delegations)
+                                  :post (create-delegation request))))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

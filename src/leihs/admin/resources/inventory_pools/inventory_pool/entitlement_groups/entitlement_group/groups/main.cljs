@@ -1,31 +1,30 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.state :as state]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
-    [leihs.admin.common.membership.groups.main :as groups-membership]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.admin.common.icons :as icons]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.membership.groups.main :as groups-membership]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
 
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
-
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defn member-path [group]
   (path :inventory-pool-entitlement-group-group
@@ -38,13 +37,12 @@
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-row
-    [groups/form-term-filter]
-    [groups/form-including-user-filter]
-    [groups-membership/form-membership-filter]
-    [routing/form-per-page-component]
-    [routing/form-reset-component]]]])
-
+    [:div.form-row
+     [groups/form-term-filter]
+     [groups/form-including-user-filter]
+     [groups-membership/form-membership-filter]
+     [routing/form-per-page-component]
+     [routing/form-reset-component]]]])
 
 ;### header ###################################################################
 
@@ -55,12 +53,11 @@
    " in the Inventory-Pool "
    [inventory-pool/name-link-component]])
 
-
 ;### main #####################################################################
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div ]))
+    [:div]))
 
 (defn main-page-component []
   [:div
@@ -82,8 +79,8 @@
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
    (breadcrumbs/nav-component
-     (conj @breadcrumbs/left*
-           [breadcrumbs/groups-li])[])
+    (conj @breadcrumbs/left*
+          [breadcrumbs/groups-li]) [])
    [:div
     [header-component]
     [main-page-component]]])

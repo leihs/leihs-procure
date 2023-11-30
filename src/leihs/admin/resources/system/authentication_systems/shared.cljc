@@ -1,26 +1,22 @@
 (ns leihs.admin.resources.system.authentication-systems.shared
   (:require
-    [leihs.admin.constants :as defaults]))
+   [leihs.admin.constants :as defaults]))
 
 (def default-fields
-  #{
-    :enabled
+  #{:enabled
     :id
     :name
     :priority
-    :type
-    })
+    :type})
 
 (def available-fields
-  #{
-    :created_at
+  #{:created_at
     :description
     :enabled
     :id
     :name
     :priority
-    :type
-    })
+    :type})
 
 (def default-query-params {:page 1 :per-page defaults/PER-PAGE :type :any :term nil})
 

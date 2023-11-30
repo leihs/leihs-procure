@@ -1,28 +1,27 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.admin.common.icons :as icons]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.common.roles.components :refer [roles-component put-roles<]]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.shared :refer [default-query-params]]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.common.roles.components :refer [roles-component put-roles<]]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.shared :refer [default-query-params]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]))
-
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 ;### roles ####################################################################
 
@@ -30,11 +29,10 @@
   (go (swap! groups/data* assoc-in
              [(:route @routing/state*) :groups (:page-index group) :roles]
              (<! (put-roles<
-                   (path :inventory-pool-group-roles
-                         {:inventory-pool-id @inventory-pool/id*
-                          :group-id (:id group)})
-                   roles)))))
-
+                  (path :inventory-pool-group-roles
+                        {:inventory-pool-id @inventory-pool/id*
+                         :group-id (:id group)})
+                  roles)))))
 
 (defn roles-th-component  []
   [:th.pl-5 {:key :roles} " Roles "])
@@ -62,19 +60,18 @@
 (defn filter-component []
   [:div.card.bg-light
    [:div.card-body
-   [:div.form-row
-    [groups/form-term-filter]
-    [groups/form-including-user-filter]
-    [form-role-filter]
-    [routing/form-per-page-component]
-    [routing/form-reset-component]]]])
-
+    [:div.form-row
+     [groups/form-term-filter]
+     [groups/form-including-user-filter]
+     [form-role-filter]
+     [routing/form-per-page-component]
+     [routing/form-reset-component]]]])
 
 ;### main #####################################################################
 
 (defn debug-component []
   (when (:debug @state/global-state*)
-    [:div ]))
+    [:div]))
 
 (defn main-page-component []
   [:div
@@ -94,7 +91,7 @@
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
    [breadcrumbs/nav-component
-    @breadcrumbs/left* [] ]
+    @breadcrumbs/left* []]
    [:div
     [:h1
      "Groups with their Roles "

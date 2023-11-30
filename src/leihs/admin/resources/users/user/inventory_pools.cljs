@@ -1,43 +1,41 @@
 (ns leihs.admin.resources.users.user.inventory-pools
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.user.front :as current-user]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]
-    ))
-
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
 (defn fetch-inventory-pools []
   (go (reset!
-        data*
-        (some->
-          {:chan (async/chan)
-           :url (path :user-inventory-pools
-                      (-> @routing/state* :route-params))}
-          http-client/request :chan <!
-          http-client/filter-success!
-          :body :user-inventory-pools))))
+       data*
+       (some->
+        {:chan (async/chan)
+         :url (path :user-inventory-pools
+                    (-> @routing/state* :route-params))}
+        http-client/request :chan <!
+        http-client/filter-success!
+        :body :user-inventory-pools))))
 
 (defn clean-and-fetch-inventory-pools [& args]
   (reset! data* nil)
@@ -61,7 +59,7 @@
                                 {:inventory-pool-id (:inventory_pool_id row)
                                  :user-id @user-id*})
         user-in-pool-inner [:em (user-core/fullname-or-some-uid @user-data*)]
-        pool-inner [:em (:inventory_pool_name row )]]
+        pool-inner [:em (:inventory_pool_name row)]]
     [:td
      [:span
       (if has-access?
@@ -70,7 +68,7 @@
       " in "
       (if has-access?
         [:a {:href pool-path} pool-inner]
-        pool-inner )]]))
+        pool-inner)]]))
 
 (defn roles-td-component [row]
   [:td

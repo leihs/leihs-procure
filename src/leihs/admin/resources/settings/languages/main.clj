@@ -1,19 +1,19 @@
 (ns leihs.admin.resources.settings.languages.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.string :as string]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
-    [leihs.admin.utils.jdbc :as utils-jdbc]
-    [leihs.core.auth.core :as auth]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.json :refer [to-json]]
-    [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-    [leihs.core.sql :as sql]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.string :as string]
+   [compojure.core :as cpj]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
+   [leihs.admin.utils.jdbc :as utils-jdbc]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.json :refer [to-json]]
+   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
+   [leihs.core.sql :as sql]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (defn get-languages-settings [{tx :tx}]
   {:body
@@ -41,11 +41,9 @@
 
 (def routes
   (-> (cpj/routes
-        (cpj/GET languages-settings-path [] #'get-languages-settings)
-        (cpj/PUT languages-settings-path [] #'put))))
-
+       (cpj/GET languages-settings-path [] #'get-languages-settings)
+       (cpj/PUT languages-settings-path [] #'put))))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

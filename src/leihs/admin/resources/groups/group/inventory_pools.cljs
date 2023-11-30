@@ -1,25 +1,23 @@
 (ns leihs.admin.resources.groups.group.inventory-pools
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
 
-    [leihs.admin.common.breadcrumbs :as breadcrumbs]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
-    [leihs.admin.state :as state]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.breadcrumbs :as breadcrumbs]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.group.core :as group.shared :refer [group-id*]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [reagent.core :as reagent]
-    ))
-
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
@@ -42,12 +40,12 @@
 (defn fetch-inventory-pools-roles []
   (go (reset! data*
               (some->
-                {:chan (async/chan)
-                 :url (path :group-inventory-pools-roles
-                            (-> @routing/state* :route-params))}
-                http-client/request :chan <!
-                http-client/filter-success!
-                :body :inventory_pools_roles))))
+               {:chan (async/chan)
+                :url (path :group-inventory-pools-roles
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success!
+               :body :inventory_pools_roles))))
 
 (defn clean-and-fetch [& args]
   (reset! data* nil)
@@ -72,12 +70,12 @@
      [:tr [:th "Pool"] [:th "Roles"]]]
     [:tbody
      (for [row (->>  @data*
-                    (sort-by :inventory_pool_name))]
+                     (sort-by :inventory_pool_name))]
        [:tr.pool {:key (:inventory_pool_id row)}
         [:td
          [:a {:href (path :inventory-pool
                           {:inventory-pool-id (:inventory_pool_id row)})}
-          [:em (:inventory_pool_name row )]] ""]
+          [:em (:inventory_pool_name row)]] ""]
         [:td
          [:a {:href (path :inventory-pool-group-roles
                           {:inventory-pool-id (:inventory_pool_id row)

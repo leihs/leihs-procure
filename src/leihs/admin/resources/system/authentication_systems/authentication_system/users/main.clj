@@ -1,20 +1,19 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.system.authentication-systems.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.users.shared :refer [authentication-system-users-filter-value]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn direct-member-expr [authentication-system-id]
   [:exists
@@ -39,18 +38,15 @@
    (direct-member-expr authentication-system-id)
    (group-member-expr authentication-system-id)])
 
-
 (defn users-query
   [{{authentication-system-id :authentication-system-id} :route-params
     :as request}]
   (-> (users/users-query request)
       (extend-with-membership
-        (member-expr authentication-system-id)
-        (direct-member-expr authentication-system-id)
-        (group-member-expr authentication-system-id)
-        request)))
-
-
+       (member-expr authentication-system-id)
+       (direct-member-expr authentication-system-id)
+       (group-member-expr authentication-system-id)
+       request)))
 
 (defn users [{tx :tx :as request}]
   (let [query (users-query request)
@@ -60,10 +56,7 @@
                   sql/format
                   (jdbc/query tx)
                   (seq/with-index offset)
-                  seq/with-page-index )}}))
-
-
-
+                  seq/with-page-index)}}))
 
 ;;; update-users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -113,8 +106,6 @@
        (map str)
        set))
 
-
-
 (defn batch-update-users [{tx :tx body :body
                            {authentication-system-id :authentication-system-id} :route-params
                            :as request}]
@@ -137,7 +128,6 @@
      :body {:removed-user-ids to-be-removed-ids
             :added-user-ids to-be-added-ids}}))
 
-
 ;;; put-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn put-user [{tx :tx :as request
@@ -145,16 +135,15 @@
                  {authentication-system-id :authentication-system-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
-    tx :authentication_systems_users
-    ["authentication_system_id = ? AND user_id = ?"
-     authentication-system-id user-id]
-    (-> body
-        (select-keys [:data])
-        (merge
-          {:authentication_system_id authentication-system-id
-           :user_id user-id})))
+   tx :authentication_systems_users
+   ["authentication_system_id = ? AND user_id = ?"
+    authentication-system-id user-id]
+   (-> body
+       (select-keys [:data])
+       (merge
+        {:authentication_system_id authentication-system-id
+         :user_id user-id})))
   {:status 204})
-
 
 ;;; remove-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -166,7 +155,6 @@
                 first))
     {:status 204}
     (throw (ex-info "Remove authentication-system-user failed" {:request request}))))
-
 
 ;;; user-data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -181,8 +169,6 @@
                       (jdbc/query tx) first)]
     {:body row}))
 
-
-
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def authentication-system-user-path
@@ -193,13 +179,12 @@
 
 (def routes
   (-> (cpj/routes
-        (cpj/GET authentication-system-user-path [] #'user-data)
-        (cpj/PUT authentication-system-user-path [] #'put-user)
-        (cpj/DELETE authentication-system-user-path [] #'remove-user)
-        (cpj/GET authentication-system-users-path [] #'users)
-        (cpj/PUT authentication-system-users-path [] #'batch-update-users))))
+       (cpj/GET authentication-system-user-path [] #'user-data)
+       (cpj/PUT authentication-system-user-path [] #'put-user)
+       (cpj/DELETE authentication-system-user-path [] #'remove-user)
+       (cpj/GET authentication-system-users-path [] #'users)
+       (cpj/PUT authentication-system-users-path [] #'batch-update-users))))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

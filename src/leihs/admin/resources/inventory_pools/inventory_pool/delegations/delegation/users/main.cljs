@@ -1,28 +1,27 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.shared :refer [short-id]]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.icons :as icons]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.membership.users.main :as users-membership ]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.state :as state]
+   [leihs.admin.common.membership.users.main :as users-membership]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.state :as state]
+   [leihs.core.core :refer [keyword str presence]]
 
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [reagent.core :as reagent]))
-
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.shared :refer [short-id]]
+   [reagent.core :as reagent]))
 
 ;;; path helpers  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -36,13 +35,13 @@
   ([user more-route-params more-query-params]
    (path :inventory-pool-delegation-groups
          (merge
-           {:inventory-pool-id @inventory-pool/id*
-            :delegation-id @delegation/id*
-            :user-id (:id user)}
-           more-route-params)
+          {:inventory-pool-id @inventory-pool/id*
+           :delegation-id @delegation/id*
+           :user-id (:id user)}
+          more-route-params)
          (merge
-           {:including-user (or (-> user :email presence) (:id user))}
-           more-query-params))))
+          {:including-user (or (-> user :email presence) (:id user))}
+          more-query-params))))
 
 ;### main #####################################################################
 
@@ -59,9 +58,9 @@
    [pool-users/user-td-component
     users-membership/member-user-td-component
     (users-membership/create-direct-member-user-td-component
-      direct-member-path)
+     direct-member-path)
     (users-membership/create-group-member-user-td-component
-      groups-path-fn)]])
+     groups-path-fn)]])
 
 (defn main-page-component []
   [:div
@@ -75,7 +74,7 @@
 (defn breadcrumbs []
   [breadcrumbs/nav-component
    (conj  @breadcrumbs/left*
-         [breadcrumbs/users-li])[]])
+          [breadcrumbs/users-li]) []])
 
 (defn index-page []
   [:div.delegation-users

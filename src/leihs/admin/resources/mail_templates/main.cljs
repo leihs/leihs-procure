@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.mail-templates.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.core.async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.mail-templates.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.mail-templates.shared :as shared]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.auth.core :as auth :refer []]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as current-user]
-    [reagent.core :as reagent]
-    ))
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.core.async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.mail-templates.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.mail-templates.shared :as shared]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.auth.core :as auth :refer []]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as current-user]
+   [reagent.core :as reagent]))
 
 (def current-query-paramerters*
   (reaction (-> @routing/state* :query-params
@@ -44,17 +43,17 @@
 (defn fetch-languages []
   (go (reset! languages-data*
               (some->
-                {:chan (async/chan)
-                 :url (path :languages-settings)}
-                http/request :chan <!
-                http/filter-success!
-                :body))))
+               {:chan (async/chan)
+                :url (path :languages-settings)}
+               http/request :chan <!
+               http/filter-success!
+               :body))))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn link-to-mail-template
   [mail-template inner & {:keys [authorizers]
-                     :or {authorizers []}}]
+                          :or {authorizers []}}]
   (if (auth/allowed? authorizers)
     [:a {:href (path :mail-template {:mail-template-id (:id mail-template)})} inner]
     inner))

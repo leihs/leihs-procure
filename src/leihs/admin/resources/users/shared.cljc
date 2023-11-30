@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.users.shared
   (:require
-    [leihs.admin.constants :as defaults]))
+   [leihs.admin.constants :as defaults]))
 
 (def default-fields
   #{:account_enabled
@@ -51,7 +51,7 @@
    :org_id nil
    :page 1
    :per-page defaults/PER-PAGE
-   :term "" })
+   :term ""})
 
 (defn normalized-query-parameters [query-params]
   (merge default-query-params query-params))

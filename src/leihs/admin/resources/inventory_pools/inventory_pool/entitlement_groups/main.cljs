@@ -1,29 +1,28 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
+   [accountant.core :as accountant]
+   [cljs.core.async :as async]
+   [cljs.pprint :refer [pprint]]
 
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.breadcrumbs :as breadcrumbs]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.misc :refer [wait-component]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [clojure.contrib.inflect :refer [pluralize-noun]]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
 
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [accountant.core :as accountant]
-    [cljs.core.async :as async]
-    [cljs.pprint :refer [pprint]]
-    [clojure.contrib.inflect :refer [pluralize-noun]]
-    [reagent.core :as reagent]))
-
+   [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.breadcrumbs :as breadcrumbs]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom {}))
 (defonce current-route* (reaction (:route @routing/state*)))
@@ -39,27 +38,26 @@
     [:th.text-right "# Users"]
     [:th.text-right "# Direct Users"]
     [:th.text-right "# Groups"]
-    [:th.text-center]
-    ]])
+    [:th.text-center]]])
 
 (defn entitlement-group-row-component [{id :id :as entitlement-group}]
   ^{:key id}
   [:tr.entitlement-group.text-left
    [:td
-    [:a {:href (path :inventory-pool-entitlement-group {:inventory-pool-id @inventory-pool/id* :entitlement-group-id id })}
+    [:a {:href (path :inventory-pool-entitlement-group {:inventory-pool-id @inventory-pool/id* :entitlement-group-id id})}
      (:name entitlement-group)]]
    [:td.entitlements-count.text-right (-> entitlement-group :entitlements_count)]
    [:td.users-count.text-right
     [:a {:href (path :inventory-pool-entitlement-group-users
                      {:inventory-pool-id @inventory-pool/id*
-                      :entitlement-group-id id }
+                      :entitlement-group-id id}
                      {:membership :member})}
      (-> entitlement-group :users_count)
      " " [icons/edit] " "]]
    [:td.direct-users-count.text-right
     [:a {:href (path :inventory-pool-entitlement-group-users
                      {:inventory-pool-id @inventory-pool/id*
-                      :entitlement-group-id id }
+                      :entitlement-group-id id}
                      {:membership :direct})}
      (-> entitlement-group :direct_users_count)
      " " [icons/edit] " "]]
@@ -68,9 +66,9 @@
                      {:inventory-pool-id @inventory-pool/id*
                       :entitlement-group-id id})}
      (-> entitlement-group :groups_count)
-     " " [icons/edit] " " ]]
+     " " [icons/edit] " "]]
    [:td.text-center [:a {:href  (str "/manage/" @inventory-pool/id* "/groups/" id "/edit")}
-         [icons/edit] " Edit " ]]])
+                     [icons/edit] " Edit "]]])
 
 (defn main-page-component []
   [:div.entitlement-entitlement-groups

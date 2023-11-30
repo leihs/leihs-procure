@@ -1,15 +1,15 @@
 (ns leihs.admin.common.breadcrumbs
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.breadcrumbs :as core-breadcrumbs]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.admin.common.icons :as icons]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.user.front :as core-user]
-    [leihs.core.auth.core :as auth]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.breadcrumbs :as core-breadcrumbs]
+   [leihs.core.core :refer [keyword str presence]]
 
-    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-    [leihs.admin.paths :as paths :refer [path]]))
+   [leihs.core.routing.front :as routing]
+   [leihs.core.user.front :as core-user]))
 
 (def li core-breadcrumbs/li)
 
@@ -26,7 +26,6 @@
     (when (seq rights)
       [:ol.breadcrumb.leihs-nav-right
        (doall (map-indexed (fn [idx item] [:<> {:key idx} item]) rights))])]])
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -2,19 +2,18 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [group-roles]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :as lmr]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]
-    ))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.roles.core :as roles :refer [expand-to-hierarchy]]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [group-roles]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions :as lmr]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 ;;; roles ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -28,7 +27,6 @@
   [{{inventory-pool-id :inventory-pool-id group-id :group-id} :route-params
     tx :tx :as request}]
   {:body (group-roles tx inventory-pool-id group-id)})
-
 
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id group-id :group-id} :route-params
@@ -55,12 +53,10 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-group-roles-path [] #'get-roles)
-    (cpj/PUT inventory-pool-group-roles-path [] #'set-roles)))
-
+   (cpj/GET inventory-pool-group-roles-path [] #'get-roles)
+   (cpj/PUT inventory-pool-group-roles-path [] #'set-roles)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/wrap-with-log-debug #'filter-by-access-right)
 ;(debug/wrap-with-log-debug #'groups-formated-query)

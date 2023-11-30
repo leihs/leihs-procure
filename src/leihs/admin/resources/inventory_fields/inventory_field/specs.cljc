@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.specs
-  (:require [clojure.spec.alpha :as s]
-            [clojure.set :refer [union difference]]
+  (:require [clojure.set :refer [union difference]]
+            [clojure.spec.alpha :as s]
             [clojure.string :refer [blank? lower-case]]
             [leihs.core.core :refer [presence?]]))
 
@@ -94,7 +94,6 @@
                                     (if (simple-types ftype)
                                       (not (contains? data :values))
                                       (s/valid? ::values (:values data)))))
-
 
 ; ===================== CORE/DYNAMIC FIELDS ====================
 

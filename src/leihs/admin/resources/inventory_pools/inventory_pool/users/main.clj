@@ -1,22 +1,21 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.core.core :refer [keyword str presence]]
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [clojure.set :refer [rename-keys]]
-    [compojure.core :as cpj]
-    [leihs.admin.common.roles.core :as roles]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
-    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.regex :as regex]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [clojure.set :refer [rename-keys]]
+   [compojure.core :as cpj]
+   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.regex :as regex]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 ;;; users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -32,10 +31,10 @@
 (defn filter-for-none-role [query inventory-pool-id]
   (-> query
       (sql/merge-where
-        [:not [:exists (-> (sql/select :true)
-                           (sql/from [:access_rights :far])
-                           (sql/merge-where [:= :far.inventory_pool_id inventory-pool-id])
-                           (sql/merge-where [:= :far.user_id :users.id]))]])))
+       [:not [:exists (-> (sql/select :true)
+                          (sql/from [:access_rights :far])
+                          (sql/merge-where [:= :far.inventory_pool_id inventory-pool-id])
+                          (sql/merge-where [:= :far.user_id :users.id]))]])))
 
 (defn filter-by-role
   [query inventory-pool-id
@@ -46,10 +45,10 @@
       "any" query
       "none" (filter-for-none-role query inventory-pool-id)
       ("customer"
-        "group_manager"
-        "lending_manager"
-        "inventory_manager") (filter-effective-role
-                               query inventory-pool-id role))))
+       "group_manager"
+       "lending_manager"
+       "inventory_manager") (filter-effective-role
+                             query inventory-pool-id role))))
 
 (defn suspension-join [query inventory-pool-id]
   (sql/merge-join query :suspensions
@@ -73,8 +72,6 @@
                             [:= :direct_access_rights.inventory_pool_id inventory-pool-id]])
       (sql/merge-select [:direct_access_rights.role :direct_role])))
 
-
-
 ;;; group access_rights ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn groups-role-query [inventory-pool-id]
@@ -86,10 +83,8 @@
       (sql/merge-where [:= :groups_users.user_id :users.id])
       (sql/group :groups_users.user_id)))
 
-
 (defn role-to-roles-map [ks data]
   (update-in data ks #(-> % roles/expand-to-hierarchy roles/roles-to-map)))
-
 
 ;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -98,11 +93,10 @@
    (add-suspended-until-to-query query inventory-pool-id :users))
   ([query inventory-pool-id table]
    (-> query
-       (sql/merge-select [(-> (sql/select (sql/raw " json_agg(to_json(suspensions.*))" ))
+       (sql/merge-select [(-> (sql/select (sql/raw " json_agg(to_json(suspensions.*))"))
                               (sql/from :suspensions)
                               (sql/merge-where [:= :suspensions.user_id (sql/qualify table :id)])
-                              (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
-                              ) :suspension]))))
+                              (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])) :suspension]))))
 
 ;;; suspension filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -115,22 +109,20 @@
        (sql/merge-where [:= :suspensions.inventory_pool_id inventory-pool-id])
        (sql/merge-where (sql/raw  "CURRENT_DATE <= suspensions.suspended_until")))))
 
-
 (defn filter-suspended
   ([query inventory-pool-id request]
    (filter-suspended query inventory-pool-id request :users))
   ([query inventory-pool-id request table]
    (case (-> request :query-params :suspension)
      "suspended" (sql/merge-where
-                   query
-                   [:exists (suspension-subquery inventory-pool-id table) ])
+                  query
+                  [:exists (suspension-subquery inventory-pool-id table)])
      "unsuspended" (sql/merge-where
-                     query
-                     [:not [:exists (suspension-subquery inventory-pool-id table)]])
+                    query
+                    [:not [:exists (suspension-subquery inventory-pool-id table)]])
      query)))
 
 ;;; users query ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (defn users-query [inventory-pool-id request]
   (-> request
@@ -141,14 +133,11 @@
       (merge-aggreaged-role-to-query inventory-pool-id)
       (merge-direct-role-to-query inventory-pool-id)
       (sql/merge-select [(groups-role-query inventory-pool-id) :groups_role])
-      (add-suspended-until-to-query inventory-pool-id)
-      ))
+      (add-suspended-until-to-query inventory-pool-id)))
 
 (defn users-formated-query [inventory-pool-id request]
   (-> (users-query inventory-pool-id request)
       sql/format))
-
-
 
 ;;; suspsensions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -200,11 +189,9 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET inventory-pool-users-path [] #'users)))
-
+   (cpj/GET inventory-pool-users-path [] #'users)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/wrap-with-log-debug #'filter-suspended)
 ;(debug/wrap-with-log-debug #'users-formated-query)

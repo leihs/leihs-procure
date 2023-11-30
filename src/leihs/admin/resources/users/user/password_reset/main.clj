@@ -1,32 +1,31 @@
 (ns leihs.admin.resources.users.user.password-reset.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.users.main :as users]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.random :refer [base32-crockford-rand-str]]
-    [logbug.debug :as debug]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    [tick.core :as tick])
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.users.main :as users]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.random :refer [base32-crockford-rand-str]]
+   [logbug.debug :as debug]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+   [taoensso.timbre :refer [error warn info debug spy]]
+   [tick.core :as tick])
   (:import [java.sql Timestamp]
            [java.util UUID]))
-
 
 (defn token
   ([] (token 6))
   ([n] (base32-crockford-rand-str n)))
 
 (defn timestamp [hrs]
-  (assert (int? hrs ))
+  (assert (int? hrs))
   (assert (<= hrs (* 7 24)))
   (-> (tick/>>
-        (tick/now)
-        (tick/new-duration hrs :hours))
+       (tick/now)
+       (tick/new-duration hrs :hours))
       Timestamp/from))
 
 (defn user-by-id [tx-next user-id]
@@ -61,8 +60,6 @@
 
 (def routes
   (cpj/routes
-    (cpj/POST (path :user-password-reset {:user-id ":user-id"}) [] #'create)
-    ))
-
+   (cpj/POST (path :user-password-reset {:user-id ":user-id"}) [] #'create)))
 
 ;(debug/debug-ns *ns*)

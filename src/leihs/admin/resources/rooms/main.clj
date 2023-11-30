@@ -1,20 +1,19 @@
 (ns leihs.admin.resources.rooms.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [next.jdbc.sql :as jdbc]
-    [clojure.set]
-    [compojure.core :as cpj]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.rooms.shared :as shared]
-    [leihs.admin.resources.rooms.room.main :as room]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.uuid :refer [uuid]]
-    [leihs.core.core :refer [keyword str presence]]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [logbug.debug :as debug]
-    [taoensso.timbre :refer [error warn info debug spy]]
-    ))
+   [clojure.set]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.rooms.room.main :as room]
+   [leihs.admin.resources.rooms.shared :as shared]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.uuid :refer [uuid]]
+   [logbug.debug :as debug]
+   [next.jdbc.sql :as jdbc]
+   [taoensso.timbre :refer [error warn info debug spy]]))
 
 (def count-items-select-query
   (-> (sql/select :%count.*)
@@ -111,8 +110,8 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET rooms-path [] #'rooms)
-    (cpj/POST rooms-path [] #'create-room)))
+   (cpj/GET rooms-path [] #'rooms)
+   (cpj/POST rooms-path [] #'create-room)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

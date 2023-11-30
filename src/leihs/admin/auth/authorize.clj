@@ -2,8 +2,8 @@
   (:refer-clojure :exclude [str keyword])
   (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-    [logbug.debug :as debug]
-    [logbug.catcher :as catcher]))
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]))
 
 (def HTTP-SAFE-VERBS #{:get :head :options :trace})
 (def HTTP-UNSAFE-VERBS #{:post :put :delete :patch})
@@ -20,20 +20,20 @@
 
 (defn violates-admin-write-scope? [request]
   (boolean
-    (and ((:request-method request)
-          #{:post :put :delete :patch})
-         (-> request :authenticated-entity
-             :scope_admin_write not))))
+   (and ((:request-method request)
+         #{:post :put :delete :patch})
+        (-> request :authenticated-entity
+            :scope_admin_write not))))
 
 (defn admin-and-safe? [request]
   (boolean
-    (and ((:request-method request) HTTP-SAFE-VERBS)
-         (-> request :authenticated-entity :is_admin))))
+   (and ((:request-method request) HTTP-SAFE-VERBS)
+        (-> request :authenticated-entity :is_admin))))
 
 (defn admin-write-scope-and-unsafe? [request]
   (boolean
-    (and ((:request-method request) HTTP-UNSAFE-VERBS)
-         (-> request :authenticated-entity :is_admin))))
+   (and ((:request-method request) HTTP-UNSAFE-VERBS)
+        (-> request :authenticated-entity :is_admin))))
 
 
 

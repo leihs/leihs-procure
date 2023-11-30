@@ -1,30 +1,28 @@
 (ns leihs.admin.resources.audits.changes.main
   (:refer-clojure :exclude [str keyword])
   (:require-macros
-    [reagent.ratom :as ratom :refer [reaction]]
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]]
+   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-    [accountant.core :as accountant]
-    [cljs.core.async :as async :refer [timeout]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.string :as str]
-    [leihs.admin.common.components :as components]
-    [leihs.admin.common.form-components :as form-components]
-    [leihs.admin.common.http-client.core :as http-client]
-    [leihs.admin.common.icons :as icons]
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.audits.changes.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
-    [leihs.admin.resources.audits.core :as audits]
-    [leihs.admin.state :as state]
-    [leihs.admin.utils.clipboard :as clipboard]
-    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [reagent.core :as reagent]
-    [taoensso.timbre :refer [debug info warn error spy]]
-    ))
-
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [timeout]]
+   [cljs.pprint :refer [pprint]]
+   [clojure.string :as str]
+   [leihs.admin.common.components :as components]
+   [leihs.admin.common.form-components :as form-components]
+   [leihs.admin.common.http-client.core :as http-client]
+   [leihs.admin.common.icons :as icons]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.audits.changes.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
+   [leihs.admin.resources.audits.core :as audits]
+   [leihs.admin.state :as state]
+   [leihs.admin.utils.clipboard :as clipboard]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [reagent.core :as reagent]
+   [taoensso.timbre :refer [debug info warn error spy]]))
 
 ;;; data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -42,16 +40,15 @@
 
 (def tables*
   (reaction
-    (let [query-param-table (some-> @routing/state* :query-params-raw :table presence)
-          meta-tables (some-> @data*
-                              (get-in [(:route @routing/state*) :meta :tables])
-                              seq)
-          tables (->> (concat [] meta-tables [query-param-table])
-                      (map presence) (filter identity) distinct sort
-                      (map (fn [t] [t t])))]
-      (concat [["(any)" ""]]
-              tables))))
-
+   (let [query-param-table (some-> @routing/state* :query-params-raw :table presence)
+         meta-tables (some-> @data*
+                             (get-in [(:route @routing/state*) :meta :tables])
+                             seq)
+         tables (->> (concat [] meta-tables [query-param-table])
+                     (map presence) (filter identity) distinct sort
+                     (map (fn [t] [t t])))]
+     (concat [["(any)" ""]]
+             tables))))
 
 ;;; filters ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -68,8 +65,8 @@
          :on-change (fn [e]
                       (let [val (or (-> e .-target .-value presence) "")]
                         (accountant/navigate! (page-path-for-query-params
-                                                {:page 1
-                                                 :table val}))))}
+                                               {:page 1
+                                                :table val}))))}
         (for [[n v] @tables*]
           ^{:key n} [:option {:value v} n])]])))
 
@@ -83,11 +80,11 @@
      :on-change (fn [e]
                   (let [val (or (-> e .-target .-value presence) "")]
                     (accountant/navigate! (page-path-for-query-params
-                                            {:page 1
-                                             :tg-op val}))))}
+                                           {:page 1
+                                            :tg-op val}))))}
     (for [[n v] (->> ["" "DELETE" "INSERT" "UPDATE"]
                      (map (fn [op] [op op])))]
-      ^{:key n} [:option {:value v} n]) ]])
+      ^{:key n} [:option {:value v} n])]])
 
 (defn filter-component []
   [:div.card.bg-light
@@ -107,9 +104,7 @@
      [table-filter-component]
      [tg-op-filter-component]
      [routing/form-per-page-component]
-     [routing/form-reset-component :default-query-params default-query-params]
-     ]]])
-
+     [routing/form-reset-component :default-query-params default-query-params]]]])
 
 ;;; table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -119,7 +114,7 @@
     [:th {:key :timestamp} "Timestamp"]
     [:th {:key :txid} "TX ID"]
     [:th {:key :pkey} "Pkey"]
-    [:th {:key :table } "Table"]
+    [:th {:key :table} "Table"]
     [:th {:key :tg-op} "Operation"]
     [:th {:key :changed-attributes} "Changed attributes"]
     [:th {:key :request}]
@@ -167,7 +162,6 @@
        [:div.alert.alert-warning.text-center "No (more) audited-changes found."]))
    [routing/pagination-component]])
 
-
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn debug-component []
@@ -183,9 +177,8 @@
 
 (defn page []
   [:div.audited-changes-page
-   [breadcrumbs/nav-component @breadcrumbs/left*[]]
+   [breadcrumbs/nav-component @breadcrumbs/left* []]
    [:h1 audits/icon-changes " Audited Changes "]
    [filter-component]
    [main-component]
-   [debug-component]
-   ])
+   [debug-component]])

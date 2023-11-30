@@ -1,14 +1,13 @@
 (ns leihs.admin.resources.statistics.pools
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.statistics.shared :as shared]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
-
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.statistics.shared :as shared]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 ;;; pools ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -25,23 +24,18 @@
                              (sql/from :inventory_pools)) :pools_count])
       (sql/merge-select [(-> (sql/select :%count.*)
                              (sql/from :inventory_pools)
-                             (sql/merge-where (active_pool_cond shared/active_reservations_0m_12m_cond))
-                             ) :active_pools_0m_12m_count])
+                             (sql/merge-where (active_pool_cond shared/active_reservations_0m_12m_cond))) :active_pools_0m_12m_count])
       (sql/merge-select [(-> (sql/select :%count.*)
                              (sql/from :inventory_pools)
-                             (sql/merge-where (active_pool_cond shared/active_reservations_12m_24m_cond))
-                             ) :active_pools_12m_24m_count])))
+                             (sql/merge-where (active_pool_cond shared/active_reservations_12m_24m_cond))) :active_pools_12m_24m_count])))
 
 (defn get-pools [tx]
   {:body (-> pools-query sql/format
              (->> (jdbc/query tx) first))})
 
-
-
 (defn routes [{tx :tx :as request}]
   (get-pools tx))
 
 ;#### debug ###################################################################
-
 
 ;(debug/debug-ns *ns*)

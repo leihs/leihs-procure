@@ -1,11 +1,9 @@
 (ns leihs.admin.common.icons
   (:refer-clojure :exclude [next])
   (:require
-    ["@fortawesome/react-fontawesome" :as fa-react-fontawesome :refer [FontAwesomeIcon]]
-    ["@fortawesome/free-solid-svg-icons" :as solids]
-    ["@fortawesome/free-brands-svg-icons" :as brands]
-    ))
-
+   ["@fortawesome/free-brands-svg-icons" :as brands]
+   ["@fortawesome/free-solid-svg-icons" :as solids]
+   ["@fortawesome/react-fontawesome" :as fa-react-fontawesome :refer [FontAwesomeIcon]]))
 
 (defn add [] (FontAwesomeIcon #js{:icon solids/faPlusCircle :className ""}))
 (defn admin [] (FontAwesomeIcon #js{:icon solids/faWrench :className ""}))

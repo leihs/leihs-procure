@@ -1,17 +1,17 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [clojure.set :as set]
-    [compojure.core :as cpj]
-    [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
-    [leihs.admin.paths :refer [path]]
-    [leihs.admin.resources.groups.main :as groups]
-    [leihs.admin.utils.jdbc :as utils.jdbc]
-    [leihs.admin.utils.seq :as seq]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.sql :as sql]
-    [logbug.debug :as debug]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.set :as set]
+   [compojure.core :as cpj]
+   [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
+   [leihs.admin.paths :refer [path]]
+   [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.utils.jdbc :as utils.jdbc]
+   [leihs.admin.utils.seq :as seq]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.sql :as sql]
+   [logbug.debug :as debug]))
 
 (defn member-expr [delegation-id]
   [:exists
@@ -27,13 +27,13 @@
 
 (defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
-        offset (:offset query) ]
+        offset (:offset query)]
     {:body
      {:groups (-> query sql/format
                   (->>
-                    (jdbc/query tx)
-                    (seq/with-index offset)
-                    seq/with-page-index))}}))
+                   (jdbc/query tx)
+                   (seq/with-index offset)
+                   seq/with-page-index))}}))
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -42,23 +42,21 @@
      group-id :group-id} :route-params
     tx :tx :as request}]
   (utils.jdbc/insert-or-update!
-    tx :delegations_groups
-    ["delegation_id = ? AND group_id = ?  " delegation-id group-id]
-    {:delegation_id delegation-id :group_id group-id}))
-
+   tx :delegations_groups
+   ["delegation_id = ? AND group_id = ?  " delegation-id group-id]
+   {:delegation_id delegation-id :group_id group-id}))
 
 ;;; remove ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn remove-group
   [{{delegation-id :delegation-id
      group-id :group-id} :route-params
-    tx :tx :as request }]
+    tx :tx :as request}]
   (if (= [1] (jdbc/delete! tx :delegations_groups
                            ["delegation_id= ? AND group_id = ?
                             " delegation-id group-id]))
     {:status 204}
     {:status 404 :body "Remove group failed without error."}))
-
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -75,13 +73,11 @@
 
 (def routes
   (cpj/routes
-    (cpj/GET groups-path _ #'groups)
-    (cpj/DELETE group-path _ #'remove-group)
-    (cpj/PUT group-path _ #'add-group)))
-
+   (cpj/GET groups-path _ #'groups)
+   (cpj/DELETE group-path _ #'remove-group)
+   (cpj/PUT group-path _ #'add-group)))
 
 ;#### debug ###################################################################
-
 
 ;(debug/wrap-with-log-debug #'groups-formated-query)
 ;(debug/debug-ns *ns*)

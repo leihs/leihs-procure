@@ -1,13 +1,13 @@
 (ns leihs.admin.resources.users.choose-main
   (:refer-clojure :exclude [str keyword])
   (:require
-    [leihs.admin.paths :as paths :refer [path]]
-    [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
-    [leihs.admin.resources.users.main :as users-main]
-    [leihs.admin.resources.users.shared :as users-shared]
-    [leihs.core.core :refer [keyword str presence]]
-    [leihs.core.routing.front :as routing]
-    [leihs.core.url.query-params :as query-params]))
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.breadcrumbs :as breadcrumbs]
+   [leihs.admin.resources.users.main :as users-main]
+   [leihs.admin.resources.users.shared :as users-shared]
+   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.routing.front :as routing]
+   [leihs.core.url.query-params :as query-params]))
 
 (defn choose-user-th-component []
   [:th {:key :choose} "Choose"])
