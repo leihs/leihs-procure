@@ -7,6 +7,9 @@
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]
 
+            [clojure.data.json :as json]
+
+
             [taoensso.timbre :refer [debug info warn error spy]]
 
 
@@ -29,6 +32,14 @@
   (->> args
        (map :id)
        (string/join "_")))
+
+(defn printer [res]
+  (println "\n>o> final-result" res "\n")
+  (println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+  res
+  )
+
 
 (defn get-dashboard
   [ctx args value]
@@ -161,4 +172,11 @@
                  (assoc :main_categories main-cats*)
                  (assoc :cacheKey (cache-key dashboard-cache-key bp))
                  (assoc :total_price_cents (sum-total-price
-                                             main-cats*)))))))}))
+                                             main-cats*))))))
+
+       printer
+
+       )
+
+
+     }))
