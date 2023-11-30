@@ -65,13 +65,31 @@
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p   (println "\n>>>pure-handler" result)
-        ;p   (println "\n>>>pure-handler::query" query)
-        ;p   (println "\n>>>pure-handler" result)
+        p (println "\n>oo>1pure-handler _> request" request)
+        p (println "\n>o>2pure-handler _> query" query)
+        p (println "\n>o>3pure-handler, result=>" result)
         resp {:body result}]
+
+
     (if (:errors (spy result))
-      (do (debug result) (assoc resp :graphql-error true))
-      resp)))
+      (do (debug result)
+          (assoc resp :graphql-error true))
+      resp)
+
+    ;(check-string-contains query "RequestsIndexFiltered")
+    ;(check-string-contains query "RequestFilters")
+
+
+    (cond
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
+      (.contains query "RequestsIndexFiltered") {:body result :status 202}
+      (.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
+      :else resp
+      )
+
+    ))
 
 (defn parse-query-with-exception-handling
   [schema query]
