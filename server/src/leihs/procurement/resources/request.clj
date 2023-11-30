@@ -219,7 +219,7 @@
 
 
         (sql/order-by [[:raw conc]]) ;; master-version
-        
+
         ;(sql/order-by :procurement_requests.id conc :procurement_requests.*) ;; TODO: FIXME!!!
         ;(sql/order-by [[:raw (str " (procurement_requests.id, "
         ;                          conc

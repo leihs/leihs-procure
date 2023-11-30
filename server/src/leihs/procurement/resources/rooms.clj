@@ -21,7 +21,7 @@
   [tx]
   (-> rooms-base-query
       (sql/where [:= :rooms.general true])
-      (sql/where [:= :rooms.building_id buildings/general-id])
+      (sql/where [:= :rooms.building_id [:cast buildings/general-id :uuid]])
       sql-format
       (->> (jdbc/execute-one! tx))
       (assoc :building (building/get-general tx))))
@@ -30,7 +30,7 @@
   [args value]
   (let [building_id (or (:building_id args) (:id value))]
     (cond-> rooms-base-query
-      building_id (sql/where [:= :rooms.building_id building_id]))))
+      building_id (sql/where [:= :rooms.building_id [:cast building_id :uuid]]))))
 
 (defn get-rooms
   [context args value]

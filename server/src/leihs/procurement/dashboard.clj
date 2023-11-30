@@ -1,6 +1,6 @@
 (ns leihs.procurement.dashboard
   (:require [clojure.string :as string]
-
+            [clojure.data.json :as json]
 
             [taoensso.timbre :refer [debug info warn error spy]]
 
@@ -31,6 +31,111 @@
   (->> args
        (map :id)
        (string/join "_")))
+
+
+(defn filter-and-assoc-cats [mc bp requests dashboard-cache-key tx]
+
+  (println ">o> 1requests" requests)
+
+  (->> mc
+       :id
+       (categories/get-for-main-category-id tx)
+       (map (fn [c]
+              (println ">o> c" c)
+              (let [requests* (filter #(and (= (-> %
+                                                   :category
+                                                   :value
+                                                   :id)
+                                               (str (:id c)))
+                                            (= (-> %
+                                                   :budget_period
+                                                   :value
+                                                   :id)
+                                               (str (:id bp))))
+                                      requests)
+                    p (println ">o> c" c)
+                    p (println ">o> 2 requests*" requests*)
+
+                    result (-> c
+                               (assoc :requests requests*)
+                               (assoc :total_price_cents
+                                      (sum-total-price
+                                        requests*))
+                               (assoc :cacheKey
+                                      (cache-key
+                                        dashboard-cache-key
+                                        bp
+                                        mc
+                                        c)))
+                    p (println "\n>o> result 1a" result "\n")
+                    ]
+
+                ;[clojure.data.json :as json]
+                p (println "\n>o> filter-and-assoc-cats (json)" (json/write-str result) "\n")
+                p (println "\n>o> filter-and-assoc-cats -> :budget_period" (-> result :requests first :budget_period) "\n")
+                p (println "\n>o> filter-and-assoc-cats -> :budget_period (json)" (json/write-str (-> result :requests first :budget_period)) "\n")
+                result
+
+                )))))
+
+(defn printer [res]
+  (println "\n>o> final-result" res "\n")
+  (println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+  res
+  )
+
+(defn determine-budget-periods [requests tx dashboard-cache-key main-cats bps]
+  (->> bps
+       (map (fn [bp]
+              (println ">o> bp" bp)
+              (let [main-cats* (->>
+                                 main-cats
+                                 (map
+                                   (fn [mc]
+                                     (println ">o> mc" mc)
+                                     (let [cats* (filter-and-assoc-cats mc bp requests dashboard-cache-key tx)
+                                           p (println "\n>o> result 2a" cats* "\n")
+
+                                           result (-> mc
+                                                      (assoc :categories cats*)
+                                                      (assoc :total_price_cents (sum-total-price
+                                                                                  cats*))
+                                                      (assoc :cacheKey
+                                                             (cache-key dashboard-cache-key bp mc))
+                                                      (->> (main-categories/merge-image-path
+                                                             tx)))
+
+                                           p (println "\n>o> result 3a" result "\n")
+
+                                           ]
+                                       result
+                                       )
+                                     )))
+                    assoc-data (-> bp
+                                   (assoc :main_categories main-cats*)
+                                   (assoc :cacheKey (cache-key dashboard-cache-key bp))
+                                   (assoc :total_price_cents (sum-total-price
+                                                               main-cats*)))
+                    ]
+
+                ;[clojure.data.json :as json]
+                (println "\n>o> :assoc-data" assoc-data "\n")
+                (println "\n>o> :assoc-data (json)" (json/write-str assoc-data) "\n")
+
+                assoc-data
+                )
+              )
+            )
+       printer
+
+       )
+  )
+
+
+( defn cast-ids-to-uuid [ids]
+(map #(java.util.UUID/fromString %) ids))
+
 
 (defn get-dashboard
   [ctx args value]
@@ -66,7 +171,7 @@
               (let [
                     query (-> budget-periods/budget-periods-base-query
                               (cond-> bp-ids (sql/where
-                                               [:in :procurement_budget_periods.id bp-ids]))
+                                               [:in :procurement_budget_periods.id (cast-ids-to-uuid bp-ids)]))
                               sql-format)
                     p (println ">>queryA1" query)
                     result (jdbc/execute! tx query)
@@ -85,66 +190,14 @@
 
         requests (requests/get-requests ctx args value)     ;; FIXME: this causes issues, value=nil
 
-        p (println ">>requestsB2" requests)
+        p (println ">o>requestsB2" requests)
 
         dashboard-cache-key {:id (hash args)}
 
-        p (println ">>dashboard-cache-keyB2" dashboard-cache-key)
+        p (println ">o>dashboard-cache-keyB2" dashboard-cache-key)
 
         ]
-    (spy {:total_count (count requests),
-     :cacheKey (cache-key dashboard-cache-key),
-     :budget_periods
-       (->>
-         bps
-         (map
-           (fn [bp]
-             (let [main-cats*
-                     (->>
-                       main-cats
-                       (map
-                         (fn [mc]
-                           (let [cats*
-                                   (->>
-                                     mc
-                                     :id
-                                     (categories/get-for-main-category-id tx)
-                                     (map
-                                       (fn [c]
-                                         (let [requests*
-                                                 (filter
-                                                   #(and (= (-> %
-                                                                :category
-                                                                :value
-                                                                :id)
-                                                            (str (:id c)))
-                                                         (= (-> %
-                                                                :budget_period
-                                                                :value
-                                                                :id)
-                                                            (str (:id bp))))
-                                                   requests)]
-                                           (-> c
-                                               (assoc :requests requests*)
-                                               (assoc :total_price_cents
-                                                        (sum-total-price
-                                                          requests*))
-                                               (assoc :cacheKey
-                                                        (cache-key
-                                                          dashboard-cache-key
-                                                          bp
-                                                          mc
-                                                          c)))))))]
-                             (-> mc
-                                 (assoc :categories cats*)
-                                 (assoc :total_price_cents (sum-total-price
-                                                             cats*))
-                                 (assoc :cacheKey
-                                          (cache-key dashboard-cache-key bp mc))
-                                 (->> (main-categories/merge-image-path
-                                        tx)))))))]
-               (-> bp
-                   (assoc :main_categories main-cats*)
-                   (assoc :cacheKey (cache-key dashboard-cache-key bp))
-                   (assoc :total_price_cents (sum-total-price
-                                               main-cats*)))))))})))
+    {:total_count (spy (count requests)),
+     :cacheKey (spy (cache-key dashboard-cache-key)),
+     :budget_periods (spy (determine-budget-periods requests tx dashboard-cache-key main-cats bps))
+     }))

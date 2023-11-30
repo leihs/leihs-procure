@@ -15,7 +15,7 @@
   [id]
   (-> (sql/select :buildings.*)
       (sql/from :buildings)
-      (sql/where [:= :buildings.id id])
+      (sql/where [:= :buildings.id [:cast id :uuid]])
       sql-format))
 
 (defn get-building-by-id
@@ -25,14 +25,14 @@
       (->> (jdbc/execute-one! tx))
       ))
 
-(defn get-general [tx] (get-building-by-id tx buildings/general-id))
+(defn get-general [tx] (get-building-by-id tx [:cast buildings/general-id :uuid]))
 
 (defn get-building
   [context args value]
   (first (jdbc/execute! (-> context
                          :request
                          :tx)
-                     (building-query (:building_id value)))))
+                     (building-query [:cast (:building_id value) :uuid]))))
 
 ;#### debug ###################################################################
 

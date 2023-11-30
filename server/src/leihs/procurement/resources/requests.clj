@@ -53,9 +53,25 @@
 
 
 
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 
+(comment
 
+  (let [
+
+        ids ["123e4567-e89b-12d3-a456-426614174000", "123e4567-e89b-12d3-a456-426614174001"]
+
+        p (println "a" cast-uuids)
+
+        casted (cast-uuids ids)
+
+        p (println "b" casted)
+
+        ])
+
+  )
 
 
 
@@ -103,23 +119,20 @@
     (cond-> start-sqlmap
             id (sql/where [:in :procurement_requests.id id])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
-            category-id (-> (sql/where [:in :procurement_requests.category_id
-                                        category-id])
+            category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
+                            ;category-id (-> (sql/where [:in :procurement_requests.category_id [:cast category-id :uuid]])
                             (sqlp/merge-where-false-if-empty category-id))
             budget-period-id (-> (sql/where
-                                   [:in :procurement_requests.budget_period_id
-                                    budget-period-id])
+                                   [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
                                  (sqlp/merge-where-false-if-empty budget-period-id))
             organization-id (-> (sql/where
-                                  [:in :procurement_requests.organization_id
-                                   organization-id])
+                                  ;[:in :procurement_requests.organization_id organization-id])
+                                  [:in :procurement_requests.organization_id (cast-uuids organization-id)])
                                 (sqlp/merge-where-false-if-empty organization-id))
-            priority (-> (sql/where [:in :procurement_requests.priority
-                                     priority])
+            priority (-> (sql/where [:in :procurement_requests.priority priority])
                          (sqlp/merge-where-false-if-empty priority))
             inspector-priority
-            (-> (sql/where [:in :procurement_requests.inspector_priority
-                            inspector-priority])
+            (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
                 (sqlp/merge-where-false-if-empty inspector-priority))
             state (-> (sql/where
                         (request/get-where-conds-for-states state advanced-user?))

@@ -71,96 +71,26 @@
           keys-to-cast))
 
 
-
 (defn exec-query
   [query-string request]
-
-  ;(throw "my-error")
-
-  ;(debug "graphql query" query-string
-  ;       "with variables" (-> request
-  ;                            :body
-  ;                            :variables))
-
-
-  ;(println "\n>>>exec-query::variables" (-> request
-  ;                               :body
-  ;                               :variables))
-
-
-  ;(println "\n>>> requerst " request)
-  (println "\n>>> queryStr " query-string)
-  ;(println "\n>>> var-a" (-> request
-  ;                           :body
-  ;                           :variables))
-  ;
-  ;(println "\n>>> var-b" (-> request
-  ;                           :body
-  ;                           :variables))
-  ;
-  ;(println "\n>>> var-b1" (-> request
-  ;                           :body
-  ;                           :variables
-  ;                           :budgetPeriods
-  ;                           ))
-  ;
-  ;(println "\n>>> var-b2" (-> request
-  ;                           :body
-  ;                           :variables
-  ;                           :categories
-  ;                           ))
-  ;(spy {:request request})
-
-
-  (let [
-        vars (-> request
-                 :body
-                 :variables)
-
-        p (println "\n>>vars1" vars)
-
-        vars (cast-keys-to-uuids vars keys-to-cast)
-
-        ;vars (convert-uuids vars)
-        ;vars (update-uuid-keys vars [:organizations :categories :budgetPeriods])
-
-
-        p (println "\n>>vars2" vars "\n")
-
-        result (lacinia/execute (core-graphql/schema)
-                                (spy query-string)
-
-                                ;(-> request
-                                ;    :body
-                                ;    :variables)
-
-                                vars
-
-                                {:request request})
-
-        ]
-    result
-    )
-
-  ;(println "\n>>>exec-query::graphql-query" query-string)
-
-  ;;; TODO FIXME
-  ;(lacinia/execute (core-graphql/schema)
-  ;                 query-string
-  ;                 (-> request
-  ;                     :body
-  ;                     :variables)
-  ;
-  ;                 {:request request})
-  )
+  (debug "graphql query" query-string
+         "with variables" (-> request
+                              :body
+                              :variables))
+  (lacinia/execute (core-graphql/schema)
+                   query-string
+                   (-> request
+                       :body
+                       :variables)
+                   {:request request}))
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p (println "\n>>>pure-handler" result)
-        ;p   (println "\n>>>pure-handler::query" query)
-        ;p   (println "\n>>>pure-handler" result)
+        p (println "\n>o>pure-handler" result)
+        p   (println "\n>o>pure-handler::query" query)
+        p   (println "\n>o>pure-handler" result)
         resp {:body result}]
     (if (:errors (spy result))
       (do (debug result) (assoc resp :graphql-error true))

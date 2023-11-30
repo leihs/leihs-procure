@@ -22,9 +22,9 @@
   [tx auth-entity]
 
   (spy (-> (sql/select [true :has_entry])
-      (sql/from :procurement_admins)
-      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
-      sql-format))
+           (sql/from :procurement_admins)
+           (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+           sql-format))
 
   (-> (sql/select [true :has_entry])
       (sql/from :procurement_admins)
@@ -45,12 +45,11 @@
    (let [
          has-entry (-> (sql/select [true :has_entry])
                        (sql/from :procurement_category_inspectors)
-                       (sql/where
-                         [:= :user_id
-                          (:user_id auth-entity)]))
+                       (sql/where [:= :user_id (:user_id [:cast auth-entity :uuid])]))
 
          res (cond-> has-entry
-                     c-id (sql/where [:= :category_id c-id]))
+                     c-id
+                     (sql/where [:= :category_id [:cast c-id :uuid]]))
 
          query (sql-format res)
 
@@ -67,12 +66,9 @@
    (let [
          has-entry (-> (sql/select [true :has_entry])
                        (sql/from :procurement_category_viewers)
-                       (sql/where
-                         [:= :user_id
-                          (:user_id auth-entity)]))
+                       (sql/where [:= :user_id (:user_id [:cast auth-entity :uuid])]))
 
-         res (cond-> has-entry
-                     c-id (sql/where [:= :category_id c-id]))
+         res (cond-> has-entry c-id (sql/where [:= :category_id [:cast c-id :uuid]]))
 
          query (sql-format res)
 
@@ -84,10 +80,10 @@
 (defn requester?
   [tx auth-entity]
 
-  (spy(-> (sql/select [true :has_entry])
-      (sql/from :procurement_requesters_organizations)
-      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
-      sql-format))
+  (spy (-> (sql/select [true :has_entry])
+           (sql/from :procurement_requesters_organizations)
+           (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+           sql-format))
 
   (-> (sql/select [true :has_entry])
       (sql/from :procurement_requesters_organizations)

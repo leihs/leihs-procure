@@ -44,7 +44,11 @@
 
 (defn get-categories-for-ids
   [tx ids]
+
+  (println ">o> ids" ids)
+
   (-> categories-base-query
+      ;(sql/where [:in :procurement_categories.id ids])
       (sql/where [:in :procurement_categories.id ids])
       sql-format
       (->> (jdbc/execute! tx))))

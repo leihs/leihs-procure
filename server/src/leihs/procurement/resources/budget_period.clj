@@ -23,7 +23,8 @@
   [tx id]
   (first (jdbc/execute! tx
                      (-> budget-period-base-query
-                         (sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
+                         ;(sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
+                         (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
                          sql-format))))
 
 (defn get-budget-period
@@ -52,7 +53,7 @@
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:inspection_start_date <>)
                                  (sql-format-date <>)
-                                 (:cast <> :date)
+                                 [:cast <> :date]
                                  (:< :current_date <>)) :result])
                   sql-format)]
     (->> query
@@ -64,11 +65,12 @@
   (let [inspection-start-date (as-> budget-period <>
                                 (:inspection_start_date <>)
                                 (sql-format-date <>)
-                                (:cast <> :date))
+                                [:cast <> :date])
         end-date (as-> budget-period <>
                    (:end_date <>)
                    (sql-format-date <>)
-                   ( :cast <> :date))
+                   ;( :cast <> :date))
+                   [:cast <> :date])
         query (->
                 (sql/select
                   [( :and
@@ -85,7 +87,7 @@
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:end_date <>)
                                  (sql-format-date <>)
-                                 ( :cast <> :date)
+                                 [:cast <> :date]
                                  ( :> :current_date <>)) :result])
                   sql-format)]
     (->> query
