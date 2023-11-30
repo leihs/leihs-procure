@@ -122,6 +122,7 @@
 
 (defn to-name-and-lower-case
   [x]
+  (println ">oo> >>1" x)
   (-> x
       name
       lower-case))
@@ -188,7 +189,6 @@
 
   (let [
 
-
         conc sql-order-by-expr
 
         ;; FYI: this wont work because of ? <-> "", will break query
@@ -218,7 +218,7 @@
 
 
 
-        (sql/order-by [[:raw conc]]) ;; master-version
+        (sql/order-by [[:raw conc]])                        ;; master-version
 
         ;(sql/order-by :procurement_requests.id conc :procurement_requests.*) ;; TODO: FIXME!!!
         ;(sql/order-by [[:raw (str " (procurement_requests.id, "
@@ -371,11 +371,13 @@
 
 (defn to-name-and-lower-case-enums
   [m]
+
+  (println ">oo> >here> to-name-and-lower-case-enums" m)
+
   (cond-> m
           (:order_status m) (update :order_status to-name-and-lower-case)
           (:priority m) (update :priority to-name-and-lower-case)
-          (:inspector_priority m) (update :inspector_priority
-                                          to-name-and-lower-case)))
+          (:inspector_priority m) (update :inspector_priority to-name-and-lower-case)))
 
 (defn upper-case-keyword-value
   [row attr]
@@ -399,6 +401,8 @@
 
 (defn add-total-price
   [row advanced-user?]
+  (println ">oo> add-total-price")
+
   (let [transparent-quantity (or (:order_quantity row)
                                  (:approved_quantity row)
                                  (:requested_quantity row))
@@ -492,7 +496,7 @@
 (defn get-new
   [context args value]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
@@ -606,7 +610,7 @@
 (defn change-budget-period!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -640,7 +644,7 @@
 (defn change-category!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -669,7 +673,7 @@
 (defn create-request!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         attachments (:attachments input-data)
@@ -708,10 +712,15 @@
                                          #(assoc %
                                             :request-id @req-id))))))
 
+
+;(defn create-order-status-enum-entries [order-stati]
+;  (println ">oo> enum" order-stati)
+;  (map (fn [status] [[:cast status :order_status_enum]]) order-stati)) ;;TODO
+
 (defn update-request!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx ring-req)
+        tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -720,19 +729,23 @@
                           :user
                           (requesters/get-organization-of-requester tx)
                           :id)
-        update-data
-        (as-> input-data <>
-          (dissoc <> :id)
-          (dissoc <> :attachments)
-          (cond-> <> (:order_status <>)
-                  (update :order_status
-                          #(:call :cast (to-name-and-lower-case %) :order_status_enum)))
-          (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
-          (cond-> <>
-                  (:inspector_priority <>) (update :inspector_priority
-                                                   to-name-and-lower-case))
-          (cond-> <>
-                  organization-id (assoc :organization_id organization-id)))
+
+        p (println ">oo> input-data >here> " input-data)
+        p (println ">oo> input-data >here> " (:order_status input-data))
+
+        update-data (as-> input-data <>
+                      (dissoc <> :id)
+                      (dissoc <> :attachments)
+                      (cond-> <> (:order_status <>)
+                              (update :order_status
+                                      ;#(:call :cast (to-name-and-lower-case %) :order_status_enum))) ;;TODO FIXME
+                      #([[:cast (to-name-and-lower-case %) :order_status_enum]]))) ;;TODO FIXME
+
+
+                      (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
+                      (cond-> <> (:inspector_priority <>) (update :inspector_priority to-name-and-lower-case))
+                      (cond-> <> organization-id (assoc :organization_id organization-id)))
+
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
       #(do (update! tx req-id (exchange-attrs update-data))
@@ -753,10 +766,37 @@
                                        <>
                                        #(assoc % :request-id req-id)))))
 
+
+
+;(comment
+;  (let [
+;        input-data {:order_status {:read true, :write true, :default "NOT_PROCURED",
+;                                   :required true, :value "not_processed", :id #uuid "40284a6b-cf5e-41c1-af6c-dc423894ee11"}
+;                    :attachment [{:name "example1"} {:name "example2"}]
+;                    }
+;
+;
+;        result (as-> input-data <>
+;                 (dissoc <> :id)
+;                 (dissoc <> :attachments)
+;                 (cond-> <> (:order_status <>)
+;                         (update :order_status
+;                                 #(:call :cast (to-name-and-lower-case %) :order_status_enum))) ;;TODO FIXME
+;                 )
+;
+;        p (println ">o> result" result)
+;
+;        ])
+;
+;  )
+
+
+
 (defn delete-request!
   [context args _]
   (let [ring-request (:request context)
-        tx (:tx ring-request)
+        tx (:tx-next
+             ring-request)
         auth-entity (:authenticated-entity ring-request)
         req-id (-> args
                    :input_data

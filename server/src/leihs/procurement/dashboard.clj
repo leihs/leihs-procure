@@ -20,14 +20,44 @@
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]))
 
-(defn sum-total-price
-  [coll]
-  (->> coll
-       (map :total_price_cents)
-       (reduce +)))
+(defn sum-total-price [coll]
+
+  (println ">oo>" "1sum-total-price :total_price_cents" coll)
+  (println ">oo>" "2sum-total-price :total_price_cents" (:total_price_cents coll))
+
+  (let [
+        sum (->> coll
+                 (map :total_price_cents)
+                 (reduce +))
+
+        ]
+    (if (nil? sum)
+      0
+      sum
+      )
+    )
+  )
+
+
+(comment
+
+  (let [
+        ss [{:total_price_cents 1000}
+            {:total_price_cents 2000}
+            {:total_price_cents 1500}]
+
+        ;ss [{}]
+
+        p (println ">oo>" (sum-total-price ss))
+
+        ])
+  )
+
 
 (defn cache-key
   [& args]
+  (println ">o> cache-key" args)
+
   (->> args
        (map :id)
        (string/join "_")))
@@ -35,7 +65,7 @@
 
 (defn filter-and-assoc-cats [mc bp requests dashboard-cache-key tx]
 
-  (println ">o> 1requests" requests)
+  (println ">o> filter-and-assoc-cats" requests)
 
   (->> mc
        :id
@@ -58,9 +88,7 @@
 
                     result (-> c
                                (assoc :requests requests*)
-                               (assoc :total_price_cents
-                                      (sum-total-price
-                                        requests*))
+                               (assoc :total_price_cents (sum-total-price requests*))
                                (assoc :cacheKey
                                       (cache-key
                                         dashboard-cache-key
@@ -99,10 +127,8 @@
 
                                            result (-> mc
                                                       (assoc :categories cats*)
-                                                      (assoc :total_price_cents (sum-total-price
-                                                                                  cats*))
-                                                      (assoc :cacheKey
-                                                             (cache-key dashboard-cache-key bp mc))
+                                                      (assoc :total_price_cents (sum-total-price cats*))
+                                                      (assoc :cacheKey (cache-key dashboard-cache-key bp mc))
                                                       (->> (main-categories/merge-image-path
                                                              tx)))
 
@@ -115,8 +141,7 @@
                     assoc-data (-> bp
                                    (assoc :main_categories main-cats*)
                                    (assoc :cacheKey (cache-key dashboard-cache-key bp))
-                                   (assoc :total_price_cents (sum-total-price
-                                                               main-cats*)))
+                                   (assoc :total_price_cents (sum-total-price main-cats*)))
                     ]
 
                 ;[clojure.data.json :as json]
@@ -133,8 +158,8 @@
   )
 
 
-( defn cast-ids-to-uuid [ids]
-(map #(java.util.UUID/fromString %) ids))
+(defn cast-ids-to-uuid [ids]
+  (map #(java.util.UUID/fromString %) ids))
 
 
 (defn get-dashboard
@@ -200,4 +225,9 @@
     {:total_count (spy (count requests)),
      :cacheKey (spy (cache-key dashboard-cache-key)),
      :budget_periods (spy (determine-budget-periods requests tx dashboard-cache-key main-cats bps))
+
+     ;:cacheKey "fdjksl-fjdksal",
+     ;:budget_periods [{:test "me", :foo "bar", :total_price_cents 33 :main_categories [:total_price_cents 44]}]
+
+     :test "foo-bar"
      }))

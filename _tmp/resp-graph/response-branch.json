@@ -1,0 +1,160 @@
+{
+  "data": {
+    "dashboard": {
+      "cacheKey": "1608672852",
+      "total_count": 1,
+      "budget_periods": [
+        {
+          "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+          "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+          "name": "Budget-Period-Past",
+          "inspection_start_date": "2023-08-24 00:00:00.0",
+          "end_date": "2023-11-23 00:00:00.0",
+          "total_price_cents": "0",
+          "main_categories": [
+            {
+              "id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+              "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+              "name": "Main Category MC1",
+              "image_url": null,
+              "total_price_cents": "0",
+              "categories": [
+                {
+                  "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                  "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb_7d5ba731-edd9-41ba-8773-7337d24c2327",
+                  "name": "Category C1",
+                  "total_price_cents": "0",
+                  "requests": [
+                    null
+                  ],
+                  "__typename": "Category"
+                }
+              ],
+              "__typename": "MainCategory"
+            }
+          ],
+          "__typename": "BudgetPeriod"
+        }
+      ],
+      "__typename": "Dashboard"
+    }
+  },
+  "errors": [
+    {
+      "message": "Field resolver returned an undefined enum value.",
+      "locations": [
+        {
+          "line": 140,
+          "column": 5
+        }
+      ],
+      "path": [
+        "dashboard",
+        "budget_periods",
+        0,
+        "main_categories",
+        0,
+        "categories",
+        0,
+        "requests",
+        0,
+        "priority",
+        "value"
+      ],
+      "extensions": {
+        "resolved-value": "normal",
+        "serialized-value": "normal",
+        "enum-values": [
+          "HIGH",
+          "NORMAL"
+        ]
+      }
+    },
+    {
+      "message": "Field resolver returned an undefined enum value.",
+      "locations": [
+        {
+          "line": 185,
+          "column": 5
+        }
+      ],
+      "path": [
+        "dashboard",
+        "budget_periods",
+        0,
+        "main_categories",
+        0,
+        "categories",
+        0,
+        "requests",
+        0,
+        "inspector_priority",
+        "value"
+      ],
+      "extensions": {
+        "resolved-value": "medium",
+        "serialized-value": "medium",
+        "enum-values": [
+          "MEDIUM",
+          "MANDATORY",
+          "HIGH",
+          "LOW"
+        ]
+      }
+    },
+    {
+      "message": "Field resolver returned an undefined enum value.",
+      "locations": [
+        {
+          "line": 209,
+          "column": 5
+        }
+      ],
+      "path": [
+        "dashboard",
+        "budget_periods",
+        0,
+        "main_categories",
+        0,
+        "categories",
+        0,
+        "requests",
+        0,
+        "order_status",
+        "value"
+      ],
+      "extensions": {
+        "resolved-value": "not_processed",
+        "serialized-value": "not_processed",
+        "enum-values": [
+          "NOT_PROCURED",
+          "PROCURED",
+          "ALTERNATIVE_PROCURED",
+          "NOT_PROCESSED",
+          "IN_PROGRESS"
+        ]
+      }
+    },
+    {
+      "message": "Non-nullable field was null.",
+      "locations": [
+        {
+          "line": 25,
+          "column": 13
+        }
+      ],
+      "path": [
+        "dashboard",
+        "budget_periods",
+        0,
+        "main_categories",
+        0,
+        "categories",
+        0,
+        "requests",
+        0,
+        "total_price_cents"
+      ]
+    }
+  ]
+}

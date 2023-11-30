@@ -61,7 +61,7 @@
 (defn update-templates!
   [context args _]
   (let [rrequest (:request context)
-        tx (:tx rrequest)
+        tx (:tx-next rrequest)
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
         cat-ids (map :category_id input-data)]

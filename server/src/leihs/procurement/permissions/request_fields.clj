@@ -55,7 +55,11 @@
                                           (or admin category-inspector))
         can-read-order-status-fields (and existing-request 
                                           (or can-edit-order-status-fields category-viewer 
-                                              (and requester own-request)))]
+                                              (and requester own-request)))
+
+
+
+        ]
     {:accounting_type
        {:read (or (and requester own-request (or inspection-phase past-phase))
                   category-viewer
