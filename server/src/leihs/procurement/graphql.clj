@@ -2,24 +2,17 @@
   (:require
     [clojure.edn :as edn]
 
-    [clojure.java [io :as io] [jdbc :as jdbco]]
-    [clojure.java [io :as io]]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-
-
-    [leihs.procurement.authorization :refer [myp]]
+    (clojure.java [io :as io] [jdbc :as jdbco])
+    (clojure.java [io :as io])
 
     [com.walmartlabs.lacinia :as lacinia]
-    [com.walmartlabs.lacinia [parser :as graphql-parser]
-     [schema :as graphql-schema] [util :as graphql-util]]
+    (com.walmartlabs.lacinia [parser :as graphql-parser]
+                             [schema :as graphql-schema] [util :as graphql-util])
     [leihs.core.graphql :as core-graphql]
-    [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.graphql.helpers :as helpers]
+    [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
-    [taoensso.timbre :refer [debug info warn error spy]]
+    [taoensso.timbre :refer [debug error info spy warn]]
     ))
 
 (def CUSTOM_SCALARS
@@ -84,17 +77,45 @@
                        :variables)
                    {:request request}))
 
+
+;(defn check-string-contains [main-str sub-str]
+;  (if (and [.contains main-str sub-str] [= sub-str RequestsIndexFiltered])
+;    (throw (Exception. (str "String contains: " sub-str)))
+;    main-str
+;    )
+;
+;  )
+
+
 (defn pure-handler
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p (println "\n>o>pure-handler" result)
-        p   (println "\n>o>pure-handler::query" query)
-        p   (println "\n>o>pure-handler" result)
+        p (println "\n>oo>1pure-handler _> request" request)
+        p (println "\n>o>2pure-handler _> query" query)
+        p (println "\n>o>3pure-handler, result=>" result)
         resp {:body result}]
+
+
     (if (:errors (spy result))
-      (do (debug result) (assoc resp :graphql-error true))
-      resp)))
+      (do (debug result)
+          (assoc resp :graphql-error true))
+      resp)
+
+    ;(check-string-contains query "RequestsIndexFiltered")
+    ;(check-string-contains query "RequestFilters")
+
+
+    (cond
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
+      (.contains query "RequestsIndexFiltered") {:body result}
+      (.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
+      :else resp
+      )
+
+    ))
 
 (defn parse-query-with-exception-handling
   [schema query]
