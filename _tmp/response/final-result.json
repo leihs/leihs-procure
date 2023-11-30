@@ -1,0 +1,412 @@
+
+
+
+[
+  {
+    "main_categories": [
+      {
+        "id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+        "name": "Main Category MC1",
+        "categories": [
+          {
+            "main_category_id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+            "name": "Category C1",
+            "requests": [
+              {
+                "category": {
+                  "read": true,
+                  "write": false,
+                  "default": {
+                    "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                    "name": "Category C1",
+                    "main_category_id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+                    "general_ledger_account": null,
+                    "cost_center": null,
+                    "procurement_account": null
+                  },
+                  "required": true,
+                  "value": {
+                    "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                    "name": "Category C1",
+                    "cost_center": null,
+                    "main_category": {
+                      "id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+                      "name": "Main Category MC1"
+                    },
+                    "main_category_id": "d2907cbd-98d0-48b7-ab9a-f06803e5cabb",
+                    "procurement_account": null,
+                    "general_ledger_account": null
+                  },
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "supplier": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "motivation": {
+                  "read": true,
+                  "write": false,
+                  "required": true,
+                  "value": "Corporis commodi provident nam.",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "accounting_type": {
+                  "read": true,
+                  "write": false,
+                  "default": "aquisition",
+                  "required": true,
+                  "value": "aquisition",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "template_id": {
+                  "value": null,
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "actionPermissions": {
+                  "edit": true,
+                  "delete": false,
+                  "moveBudgetPeriod": false,
+                  "moveCategory": false
+                },
+                "article_number": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "inspector_priority": {
+                  "read": true,
+                  "write": false,
+                  "default": "MEDIUM",
+                  "required": true,
+                  "value": "medium",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "price_cents": {
+                  "read": true,
+                  "write": false,
+                  "default": 0,
+                  "required": true,
+                  "value": 0,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "budget_period": {
+                  "read": true,
+                  "write": false,
+                  "default": {
+                    "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+                    "name": "Budget-Period-Past",
+                    "inspection_start_date": "2023-08-23T22:00:00.000Z",
+                    "end_date": "2023-11-22T23:00:00.000Z",
+                    "created_at": "2023-11-24T19:25:51.605Z",
+                    "updated_at": "2023-11-24T19:25:51.605Z"
+                  },
+                  "required": true,
+                  "value": {
+                    "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+                    "name": "Budget-Period-Past",
+                    "inspection_start_date": "2023-08-24T00:00:00+02:00",
+                    "end_date": "2023-11-23T00:00:00+01:00",
+                    "created_at": "2023-11-24T20:25:51.605131",
+                    "updated_at": "2023-11-24T20:25:51.605131",
+                    "is_past": true
+                  },
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "article_name": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": true,
+                  "value": "Mediocre Aluminum Shoes",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "organization_id": {
+                  "value": "fb664326-a8ef-4556-af02-07d3127cd9ec",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "replacement": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": true,
+                  "value": true,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "DELETE": false,
+                "template": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": true,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "state": "NEW",
+                "organization": {
+                  "value": {
+                    "id": "fb664326-a8ef-4556-af02-07d3127cd9ec",
+                    "name": "Beauty & Kids",
+                    "parent_id": "d6f9842f-4a7f-45ed-8ac5-c708cd6f8ca9",
+                    "shortname": null,
+                    "department": {
+                      "id": "d6f9842f-4a7f-45ed-8ac5-c708cd6f8ca9",
+                      "name": "Home, Jewelry & Computers",
+                      "parent_id": null,
+                      "shortname": null
+                    }
+                  },
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "supplier_name": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "order_status": {
+                  "read": true,
+                  "write": true,
+                  "default": "NOT_PROCURED",
+                  "required": true,
+                  "value": "not_processed",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "requested_quantity": {
+                  "read": true,
+                  "write": false,
+                  "required": true,
+                  "value": 1,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "updated_at": {
+                  "value": "2023-11-24T19:25:51.635Z",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "model_id": {
+                  "value": null,
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "priority": {
+                  "read": true,
+                  "write": false,
+                  "default": "NORMAL",
+                  "required": true,
+                  "value": "normal",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "supplier_id": {
+                  "value": null,
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "budget_period_id": {
+                  "value": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "id": "40284a6b-cf5e-41c1-af6c-dc423894ee11",
+                "price_currency": {
+                  "read": true,
+                  "write": false,
+                  "default": "CHF",
+                  "required": true,
+                  "value": "CHF",
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "user_id": {
+                  "value": "2187a76b-557a-4775-9a1e-778142161819",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "room": {
+                  "read": true,
+                  "write": false,
+                  "default": {
+                    "id": "b8927fd2-014c-48c2-b095-fa1d5620debe",
+                    "name": "general room",
+                    "description": null,
+                    "building_id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+                    "general": true,
+                    "building": {
+                      "id": "abae04c5-d767-425e-acc2-7ce04df645d1",
+                      "name": "general building",
+                      "code": null
+                    }
+                  },
+                  "required": true,
+                  "value": {
+                    "id": "64bfb152-ea6c-42da-98c6-325afeb462bc",
+                    "name": "reception room",
+                    "general": false,
+                    "building": {
+                      "id": "3eaa2152-ebd3-4b7c-b370-f107fa7b4d7c",
+                      "code": null,
+                      "name": "9594 Beer Extension"
+                    },
+                    "building_id": "3eaa2152-ebd3-4b7c-b370-f107fa7b4d7c",
+                    "description": null
+                  },
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "inspection_comment": {
+                  "read": true,
+                  "write": false,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "approved_quantity": {
+                  "read": true,
+                  "write": false,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "order_quantity": {
+                  "read": true,
+                  "write": false,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "room_id": {
+                  "value": "64bfb152-ea6c-42da-98c6-325afeb462bc",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "user": {
+                  "read": true,
+                  "write": false,
+                  "required": true,
+                  "default": {
+                    "id": "2187a76b-557a-4775-9a1e-778142161819",
+                    "firstname": "Lynsey",
+                    "lastname": "Kertzmann"
+                  },
+                  "value": {
+                    "system_admin_protected": false,
+                    "address": null,
+                    "email": "chanda@ortiz.net",
+                    "pool_protected": false,
+                    "last_sign_in_at": null,
+                    "img32_url": null,
+                    "account_enabled": true,
+                    "lastname": "Kertzmann",
+                    "phone": null,
+                    "img_digest": null,
+                    "org_id": null,
+                    "extended_info": null,
+                    "secondary_email": null,
+                    "city": null,
+                    "settings": null,
+                    "is_admin": false,
+                    "organization": "local",
+                    "login": null,
+                    "searchable": "Lynsey Kertzmann chanda@ortiz.net    Kertzmann Lynsey",
+                    "updated_at": "2023-11-24T20:25:51.614964+01:00",
+                    "firstname": "Lynsey",
+                    "zip": null,
+                    "id": "2187a76b-557a-4775-9a1e-778142161819",
+                    "url": null,
+                    "password_sign_in_enabled": true,
+                    "account_disabled_at": null,
+                    "is_system_admin": false,
+                    "badge_id": null,
+                    "language_locale": null,
+                    "img256_url": null,
+                    "country": null,
+                    "delegator_user_id": null,
+                    "created_at": "2023-11-24T20:25:51.614964+01:00",
+                    "admin_protected": false
+                  },
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "receiver": {
+                  "read": true,
+                  "write": false,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "internal_order_number": {
+                  "read": true,
+                  "write": false,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "category_id": {
+                  "value": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "created_at": {
+                  "value": "2023-11-24T19:25:51.635Z",
+                  "read": false,
+                  "write": false,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "order_comment": {
+                  "read": true,
+                  "write": true,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                },
+                "short_id": "Budget-Period-Past.001",
+                "model": {
+                  "read": true,
+                  "write": false,
+                  "default": null,
+                  "required": false,
+                  "value": null,
+                  "request-id": "40284a6b-cf5e-41c1-af6c-dc423894ee11"
+                }
+              }
+            ],
+            "general_ledger_account": null,
+            "id": "7d5ba731-edd9-41ba-8773-7337d24c2327",
+            "total_price_cents": null,
+            "procurement_account": null,
+            "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb_7d5ba731-edd9-41ba-8773-7337d24c2327",
+            "cost_center": null
+          }
+        ],
+        "total_price_cents": null,
+        "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1_d2907cbd-98d0-48b7-ab9a-f06803e5cabb"
+      }
+    ],
+    "name": "Budget-Period-Past",
+    "updated_at": "2023-11-24T19:25:51.605Z",
+    "inspection_start_date": "2023-08-23T22:00:00.000Z",
+    "end_date": "2023-11-22T23:00:00.000Z",
+    "id": "8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+    "total_price_cents": null,
+    "cacheKey": "1608672852_8b8fe440-cae5-4bf9-8048-d0ec2399faa1",
+    "created_at": "2023-11-24T19:25:51.605Z"
+  }
+]
