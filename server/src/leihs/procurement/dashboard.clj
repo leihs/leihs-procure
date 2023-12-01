@@ -23,18 +23,20 @@
 (defn sum-total-price [coll]
 
   (println ">oo>" "1sum-total-price :total_price_cents" coll)
-  (println ">oo>" "2sum-total-price :total_price_cents" (:total_price_cents coll))
+  (println ">oo>" "2sum-total-price :total_price_cents" (->> coll
+                                                             (map :total_price_cents)))
 
   (let [
-        sum (->> coll
-                 (map :total_price_cents)
-                 (reduce +))
+
+        result (->> coll
+                    (map :total_price_cents)
+                    (map #(if (nil? %) 0 %))  ;;TODO remove this, SET DEFAULT FOR PRICES
+                    (reduce +))
+
+        p (println ">>1" result)
 
         ]
-    (if (nil? sum)                                          ;;TODO remove this, SET DEFAULT FOR PRICES
-      0
-      sum
-      )
+    result
     )
   )
 
@@ -44,6 +46,7 @@
   (let [
         ss [{:total_price_cents 1000}
             {:total_price_cents 2000}
+            {:total_price_cents nil}
             {:total_price_cents 1500}]
 
         ;ss [{}]
