@@ -21,10 +21,13 @@
 (defn admin? "Returns boolean"
   [tx auth-entity]
 
+  (spy auth-entity)
   (spy (-> (sql/select [true :has_entry])
            (sql/from :procurement_admins)
            (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
-           sql-format))
+           sql-format
+           (->> (jdbc/execute-one! tx))
+           ))
 
   (-> (sql/select [true :has_entry])
       (sql/from :procurement_admins)

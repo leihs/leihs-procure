@@ -31,7 +31,7 @@
                  (reduce +))
 
         ]
-    (if (nil? sum)                                          ;;TODO remove this
+    (if (nil? sum)                                          ;;TODO remove this, SET DEFAULT FOR PRICES
       0
       sum
       )

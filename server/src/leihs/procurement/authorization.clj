@@ -118,19 +118,19 @@
   (println "\n>> authorize::request >" request)
   (println "\n>> authorize::handler-key >>" (:handler-key request))
 
-  ;(let [
-  ;
-  ;      auth-ent (:authenticated-entity request)
-  ;      p (myp "authEnt?" auth-ent)
-  ;      txn (:tx request)
-  ;      p (myp "txn" txn)
-  ;
-  ;      p (myp "admin" (user-perms/admin? txn auth-ent))
-  ;      p (myp "inspector" (user-perms/inspector? txn auth-ent))
-  ;      p (myp "viewer" (user-perms/viewer? txn auth-ent))
-  ;      p (myp "requester" (user-perms/requester? txn auth-ent))
-  ;      ]
-  ;  )
+  (let [
+
+        auth-ent (:authenticated-entity request)
+        p (myp "authEnt?" auth-ent)
+        txn (:tx request)
+        p (myp "txn" txn)
+
+        p (myp "admin" (user-perms/admin? txn auth-ent))
+        p (myp "inspector" (user-perms/inspector? txn auth-ent))
+        p (myp "viewer" (user-perms/viewer? txn auth-ent))
+        p (myp "requester" (user-perms/requester? txn auth-ent))
+        ]
+    )
 
   ;(if (or (spy (skip? (:handler-key request)))
   ;        (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?

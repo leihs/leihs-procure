@@ -118,14 +118,14 @@
     ;(check-string-contains query "RequestFilters")
 
 
-    (cond
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
-      (.contains query "RequestsIndexFiltered") {:body result}
-      (.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
-      :else resp
-      )
+    ;(cond
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
+    ;  (.contains query "RequestsIndexFiltered") {:body result}
+    ;  (.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
+    ;  :else resp
+    ;  )
 
     ))
 
