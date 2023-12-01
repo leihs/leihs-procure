@@ -93,12 +93,14 @@
         p (println ">oo> helper3a priority" (:priority arguments))
         priority (some->> arguments
                    :priority
+                   ;(map request/to-name-and-upper-case))
                    (map request/to-name-and-lower-case))
         p (println ">oo> helper3b priority" priority)
 
         p (println ">oo> helper4a inspector-priority" (:inspector-priority arguments))
         inspector-priority (some->> arguments
                              :inspector_priority
+                             ;(map request/to-name-and-upper-case))
                              (map request/to-name-and-lower-case))
         p (println ">oo> helper4b inspector-priority" inspector-priority)
 
@@ -108,6 +110,7 @@
         p (println ">o> helper5")
 
         p (println ">oo> helper5a :order_status" (:order_status arguments))
+        ;order-status (some->> arguments :order_status (map request/to-name-and-upper-case))
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         p (println ">oo> helper5b :order_status" order-status)
 
@@ -124,6 +127,11 @@
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
                          request-helpers/join-and-nest-associated-resources)
         p (println ">o> helper8")
+        p (println ">oo> helper8" order-status inspector-priority priority)
+
+
+
+
         ]
 
     (cond-> start-sqlmap

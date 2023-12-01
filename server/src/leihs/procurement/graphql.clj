@@ -5,6 +5,8 @@
     (clojure.java [io :as io] [jdbc :as jdbco])
     (clojure.java [io :as io])
 
+    [clojure.data.json :as json]
+
     [com.walmartlabs.lacinia :as lacinia]
     (com.walmartlabs.lacinia [parser :as graphql-parser]
                              [schema :as graphql-schema] [util :as graphql-util])
@@ -70,6 +72,18 @@
          "with variables" (-> request
                               :body
                               :variables))
+  (let [
+        vars (-> request
+                 :body
+                 :variables)
+        order-status (get-in request [:body :variables :order_status])
+        priority (get-in request [:body :variables :priority])
+        inspector_priority (get-in request [:body :variables :inspector_priority])
+
+        p (println ">oo> vars from graphQL-Requst" order-status priority inspector_priority vars)
+        ])
+
+
   (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
@@ -78,29 +92,27 @@
                    {:request request}))
 
 
-;(defn check-string-contains [main-str sub-str]
-;  (if (and [.contains main-str sub-str] [= sub-str RequestsIndexFiltered])
-;    (throw (Exception. (str "String contains: " sub-str)))
-;    main-str
-;    )
-;
-;  )
-
-
 (defn pure-handler
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
+        p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
         p (println "\n>oo>1pure-handler _> request" request)
-        p (println "\n>o>2pure-handler _> query" query)
-        p (println "\n>o>3pure-handler, result=>" result)
+        ;p (println "\n>oo>1pure-handler _> request (json)" (json/write-str request))
+
+        ;p (println "\n>oo>2pure-handler _> query" query)
+        ;p (println "\n>o>3pure-handler, result=>" result)
         resp {:body result}]
 
 
     (if (:errors (spy result))
       (do (debug result)
-          (assoc resp :graphql-error true))
-      resp)
+          (assoc resp :graphql-error true)
+          (println "\n>o> ERROR 4pure-handler, result=>" result)
+          )
+      (do
+        (println "\n>o>3apure-handler, result=>" result)
+        resp))
 
     ;(check-string-contains query "RequestsIndexFiltered")
     ;(check-string-contains query "RequestFilters")
