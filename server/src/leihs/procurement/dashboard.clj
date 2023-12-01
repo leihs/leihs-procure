@@ -31,7 +31,7 @@
                  (reduce +))
 
         ]
-    (if (nil? sum)
+    (if (nil? sum)                                          ;;TODO remove this
       0
       sum
       )
@@ -110,6 +110,47 @@
   (println "\n>o> final-result" res "\n")
   (println "\n>o> final-result (json)" (json/write-str res) "\n")
 
+
+
+
+
+  ;(-> res
+  ;    first
+  ;    :main_categories
+  ;    first
+  ;    :categories
+  ;    first
+  ;    :requests
+  ;    first
+  ;    :inspector_priority
+
+  ;(assoc-in res
+  ;          [:main_categories 0 :categories 0 :requests 0 :inspector_priority :value]
+  ;          (.toUpperCase (-> res
+  ;                            first
+  ;                            :main_categories
+  ;                            first
+  ;                            :categories
+  ;                            first
+  ;                            :requests
+  ;                            first
+  ;                            :inspector_priority
+  ;                            :value
+  ;                            )))
+
+  ;(println "\n>oo> final-result _> :inspector_priority" (-> res
+  ;                                                          first
+  ;                                                          :main_categories
+  ;                                                          first
+  ;                                                          :categories
+  ;                                                          first
+  ;                                                          :requests
+  ;                                                          first
+  ;                                                          :inspector_priority
+  ;                                                          :value
+  ;                                                          ) "\n")
+
+
   res
   )
 
@@ -129,8 +170,7 @@
                                                       (assoc :categories cats*)
                                                       (assoc :total_price_cents (sum-total-price cats*))
                                                       (assoc :cacheKey (cache-key dashboard-cache-key bp mc))
-                                                      (->> (main-categories/merge-image-path
-                                                             tx)))
+                                                      (->> (main-categories/merge-image-path tx)))
 
                                            p (println "\n>o> result 3a" result "\n")
 
