@@ -549,6 +549,31 @@
                                        <>
                                        #(assoc % :request-id req-id)))))
 
+
+
+(comment
+  (let [
+        input-data {
+                    :order_status "NOT_PROCURED"
+                    :attachment [{:name "example1"} {:name "example2"}]
+                    }
+
+        ;>o> order-os-map (#sql/call [:cast not_processed :order_status_enum] #sql/call [:cast in_progress :order_status_enum] #sql/call [:cast procured :order_status_enum]
+        ; #sql/call [:cast alternative_procured :order_status_enum] #sql/call [:cast not_procured :order_status_enum])
+
+        result (as-> input-data <>
+                 (dissoc <> :id)
+                 (dissoc <> :attachments)
+                 (cond-> <> (:order_status <>)
+                         (update :order_status
+                                 #(sql/call :cast (to-name-and-lower-case %) :order_status_enum) ;works
+                                 )))
+
+        p (println ">o> result" result)
+
+        ])
+  )
+
 (defn delete-request!
   [context args _]
   (let [ring-request (:request context)
@@ -570,6 +595,10 @@
          (= result '(1)))
       :if-only
       #(:DELETE field-perms))))
+
+
+
+
 
 (defn requested-by?
   [tx auth-entity request]
