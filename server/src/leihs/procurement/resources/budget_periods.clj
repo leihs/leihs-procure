@@ -33,7 +33,7 @@
 
 (defn get-budget-periods
   ([tx ids]
-   (println ">>> Causes issues")
+   (println ">oo> Causes issues >>" ids)
    (jdbc/execute! tx
                (-> budget-periods-base-query
                    (sql/where [:in :procurement_budget_periods.id ids]) ;;TODO: FIXME
@@ -46,7 +46,7 @@
           sql-format
           (jdbc/execute! (-> context
                           :request
-                          :tx))))))
+                          :tx-next))))))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
@@ -57,9 +57,11 @@
 
 (defn update-budget-periods!
   [context args value]
+
+  (println ">oo> update-budget-periods!")
   (let [tx (-> context
                :request
-               :tx)
+               :tx-next)
         bps (:input_data args)]
     (loop [[bp & rest-bps] bps
            bp-ids []]
@@ -73,11 +75,17 @@
               (budget-period/update-budget-period! tx bp-with-dates)
               (budget-period/insert-budget-period! tx
                                                    (dissoc bp-with-dates :id)))
-            (let [bp-id (or (:id bp-with-dates)
+
+            (let [
+                  p (println ">oo> superorsch args=" args)
+                  p (println ">oo> superorsch value=" value)
+                  bp-id (or (:id bp-with-dates)
                             (-> bp-with-dates
                                 (dissoc :id)
                                 (->> (budget-period/get-budget-period tx))
-                                :id))]
+                                :id))
+
+                  ]
               (recur rest-bps (conj bp-ids bp-id)))))
         (do (delete-budget-periods-not-in! tx bp-ids)
             (get-budget-periods context args value))))))

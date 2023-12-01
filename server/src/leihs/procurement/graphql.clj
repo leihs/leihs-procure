@@ -97,8 +97,12 @@
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
         ;p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
-        ;p (println "\n>oo>1pure-handler _> request" request)
-        ;p (println "\n>oo>1pure-handler _> request (json)" (json/write-str request))
+        ;p (println "\n>o>1pure-handler _> request" request)
+        ;p (println "\n>o>1pure-handler _> request (json)" (json/write-str request))
+
+        p (println "\n>oo>1pure-handler _> request" request)
+        p (println "\n>o>2pure-handler _> query" query)
+        p (println "\n>o>3pure-handler, result=>" result)
 
         ;p (println "\n>oo>2pure-handler _> query" query)
         ;p (println "\n>o>3pure-handler, result=>" result)
@@ -114,19 +118,21 @@
         ;(println "\n>o>3apure-handler, result=>" result)
         resp))
 
+    resp
+
     ;(check-string-contains query "RequestsIndexFiltered")
     ;(check-string-contains query "RequestFilters")
 
 
-    (cond
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
-      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
-      ;(.contains query "RequestsIndexFiltered") {:body result}
-      ;(.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
-      (.contains query "RequestFilters")  (throw "my-error")
-      :else resp
-      )
+    ;(cond
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
+    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
+    ;  ;(.contains query "RequestsIndexFiltered") {:body result}
+    ;  ;(.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
+    ;  (.contains query "RequestFilters")  (throw "my-error")
+    ;  :else resp
+    ;  )
 
     ))
 

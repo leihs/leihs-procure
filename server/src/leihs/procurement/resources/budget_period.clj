@@ -29,9 +29,12 @@
 
 (defn get-budget-period
   ([context _ value]
+
+   (println ">oo> hoi1")
+
    (get-budget-period-by-id (-> context
                                 :request
-                                :tx)
+                                :tx-next)
                             (or (:budget_period_id value)
                                 ; for BudgetLimit
                                 (:value value)
@@ -84,6 +87,8 @@
 
 (defn past?
   [tx budget-period]
+  (println ">oo> hoi3")
+
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:end_date <>)
                                  (sql-format-date <>)
@@ -96,11 +101,13 @@
 
 (defn can-delete?
   [context _ value]
+  (println ">oo> hoi2")
+
   (->
     (jdbc/execute-one!
       (-> context
           :request
-          :tx)
+          :tx-next)
       (-> (
             :and
             ( :not
