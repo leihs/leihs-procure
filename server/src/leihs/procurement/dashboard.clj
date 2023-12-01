@@ -59,7 +59,7 @@
 
 (defn cache-key
   [& args]
-  (println ">o> cache-key" args)
+  ;(println ">o> cache-key" args)
 
   (->> args
        (map :id)
@@ -102,9 +102,9 @@
                     ]
 
                 ;[clojure.data.json :as json]
-                p (println "\n>o> filter-and-assoc-cats (json)" (json/write-str result) "\n")
-                p (println "\n>o> filter-and-assoc-cats -> :budget_period" (-> result :requests first :budget_period) "\n")
-                p (println "\n>o> filter-and-assoc-cats -> :budget_period (json)" (json/write-str (-> result :requests first :budget_period)) "\n")
+                ;p (println "\n>o> filter-and-assoc-cats (json)" (json/write-str result) "\n")
+                ;p (println "\n>o> filter-and-assoc-cats -> :budget_period" (-> result :requests first :budget_period) "\n")
+                ;p (println "\n>o> filter-and-assoc-cats -> :budget_period (json)" (json/write-str (-> result :requests first :budget_period)) "\n")
                 result
 
                 )))))
@@ -112,10 +112,6 @@
 (defn printer [res]
   (println "\n>o> final-result" res "\n")
   (println "\n>o> final-result (json)" (json/write-str res) "\n")
-
-
-
-
 
   ;(-> res
   ;    first
@@ -167,7 +163,7 @@
                                    (fn [mc]
                                      (println ">o> mc" mc)
                                      (let [cats* (filter-and-assoc-cats mc bp requests dashboard-cache-key tx)
-                                           p (println "\n>o> result 2a" cats* "\n")
+                                           ;p (println "\n>o> result 2a" cats* "\n")
 
                                            result (-> mc
                                                       (assoc :categories cats*)
@@ -175,7 +171,7 @@
                                                       (assoc :cacheKey (cache-key dashboard-cache-key bp mc))
                                                       (->> (main-categories/merge-image-path tx)))
 
-                                           p (println "\n>o> result 3a" result "\n")
+                                           ;p (println "\n>o> result 3a" result "\n")
 
                                            ]
                                        result
@@ -188,8 +184,8 @@
                     ]
 
                 ;[clojure.data.json :as json]
-                (println "\n>o> :assoc-data" assoc-data "\n")
-                (println "\n>o> :assoc-data (json)" (json/write-str assoc-data) "\n")
+                ;(println "\n>o> :assoc-data" assoc-data "\n")
+                ;(println "\n>o> :assoc-data (json)" (json/write-str assoc-data) "\n")
 
                 assoc-data
                 )
@@ -272,5 +268,5 @@
      ;:cacheKey "fdjksl-fjdksal",
      ;:budget_periods [{:test "me", :foo "bar", :total_price_cents 33 :main_categories [:total_price_cents 44]}]
 
-     :test "foo-bar"
+     ;:test "foo-bar"
      }))

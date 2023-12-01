@@ -357,13 +357,18 @@
 
 (defn upper-case-keyword-value
   [row attr]
+
+  (println ">o> upper-case-keyword-value: row =>" row)
+  (println ">o> upper-case-keyword-value: attr =>" attr)
+
   (update row
           attr
           #(-> %
                upper-case
                keyword)))
 
-(defn treat-order-status [row] (upper-case-keyword-value row :order_status))
+(defn treat-order-status [row]
+  (upper-case-keyword-value row :order_status))
 
 (defn treat-priority [row] (upper-case-keyword-value row :priority))
 
@@ -395,10 +400,20 @@
 
 (defn enum-state
   [row]
-  (->> row
-       :state
-       keyword
-       (assoc row :state)))
+
+  (let [
+
+        p (println ">o> upper-case-keyword-value: attr / :state =>" row)
+        result (->> row
+                    :state
+                    keyword
+                    (assoc row :state))
+        p (println ">o> upper-case-keyword-value: result =>" result)
+        ]
+
+    result)
+
+  )
 
 (defn add-general-ledger-account
   [row]

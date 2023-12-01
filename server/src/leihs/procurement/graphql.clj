@@ -96,8 +96,8 @@
   [{{query :query} :body, :as request}]
   ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
-        p (println "\n>oo>1pure-handler _> request" request)
+        ;p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
+        ;p (println "\n>oo>1pure-handler _> request" request)
         ;p (println "\n>oo>1pure-handler _> request (json)" (json/write-str request))
 
         ;p (println "\n>oo>2pure-handler _> query" query)
@@ -111,21 +111,22 @@
           (println "\n>o> ERROR 4pure-handler, result=>" result)
           )
       (do
-        (println "\n>o>3apure-handler, result=>" result)
+        ;(println "\n>o>3apure-handler, result=>" result)
         resp))
 
     ;(check-string-contains query "RequestsIndexFiltered")
     ;(check-string-contains query "RequestFilters")
 
 
-    ;(cond
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
-    ;  (.contains query "RequestsIndexFiltered") {:body result}
-    ;  (.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
-    ;  :else resp
-    ;  )
+    (cond
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
+      ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
+      ;(.contains query "RequestsIndexFiltered") {:body result}
+      ;(.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
+      (.contains query "RequestFilters")  (throw "my-error")
+      :else resp
+      )
 
     ))
 
