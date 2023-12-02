@@ -18,7 +18,7 @@
   ([context _ _]
    (get-settings (-> context
                      :request
-                     :tx)))
+                     :tx-next)))
   ([tx]
    (-> settings-base-query
        sql-format
@@ -29,11 +29,11 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx)
+               :tx-next)
         input-data (:input_data args)
         inspection-comments (->> input-data
                                  :inspection_comments
-                                 (map #( :cast % :text))
+                                 (map #( :cast % :text))    ;; TODO FIXME PRIO!!!
                                  (cons :jsonb_build_array)
                                  (apply ))
         settings (-> input-data

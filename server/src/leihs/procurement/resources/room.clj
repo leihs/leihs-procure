@@ -13,7 +13,7 @@
   [id]
   (-> (sql/select :rooms.*)
       (sql/from :rooms)
-      (sql/where [:= :rooms.id id])
+      (sql/where [:= :rooms.id [:cast id :uuid]])
       sql-format))
 
 (defn get-room-by-id [tx id] ( (jdbc/execute-one! tx (room-query id))))
@@ -22,7 +22,7 @@
   [context _ value]
   (get-room-by-id (-> context
                       :request
-                      :tx)
+                      :tx-next)
                   (:value value) ; for RequestFieldRoom
     ))
 

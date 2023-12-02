@@ -25,7 +25,7 @@
       [context _ _]
       (jdbc/execute! (-> context
                          :request
-                         :tx)
+                         :tx-next)
                      (sql-format admins-base-query)))
 
 (defn delete-all [tx]                                       ;; TODO
@@ -41,7 +41,7 @@
       [context args value]
       (let [tx (-> context
                    :request
-                   :tx)]
+                   :tx-next)]
            (delete-all tx)
            (doseq [d (:input_data args)]
                   ;(jdbc/insert! tx :procurement_admins d)         ;; TODO

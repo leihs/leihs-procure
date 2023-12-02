@@ -19,13 +19,13 @@
   [context _ value]
   ((jdbc/execute-one! (-> context
                           :request
-                          :tx)
+                          :tx-next)
                       (-> user-base-query
                           (sql/where [:= :users.id
-                                      (or (:user_id value)  ; for
+                                      [:cast (or (:user_id value)  ; for
                                           ; RequesterOrganization
                                           (:value value)    ; for RequestFieldUser
-                                          )])
+                                          ) :uuid]])
                           sql-format))))
 
 

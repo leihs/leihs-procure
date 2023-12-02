@@ -61,9 +61,7 @@
 
 (defn dispatch-to-handler
   [request]
-  (if-let [handler (:handler request)
-    ;p (println "dispatch-to-handler")
-           ]
+  (if-let [handler (:handler request)]
     (handler request)
     (throw
       (ex-info

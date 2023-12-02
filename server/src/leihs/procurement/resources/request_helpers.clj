@@ -212,24 +212,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 (defn join-and-nest-templates
   [sqlmap]
   (println ">o>" "join-and-nest-templates")
@@ -238,15 +220,6 @@
                       [:= :procurement_templates.id
                        :procurement_requests.template_id]
                       :template))
-
-
-
-
-
-
-
-
-
 
 (defn join-and-nest-rooms
   [sqlmap]
@@ -347,7 +320,6 @@
       join-and-nest-categories
       join-and-nest-models
       join-and-nest-organizations
-
       join-and-nest-templates
       join-and-nest-rooms
       join-and-nest-suppliers

@@ -50,13 +50,13 @@
   [tx id]
   (-> (sql/select :procurement_uploads.*)
       (sql/from :procurement_uploads)
-      (sql/where [:= :procurement_uploads.id id])
+      (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
       sql-format
       (->> (jdbc/execute-one! tx))
       ))
 
 (defn upload
-  [{params :params, tx :tx}]
+  [{params :params, tx :tx-next}]
   (let [files (:files params)
         files-data (if (vector? files) files [files])]
     (doseq [fd files-data]
@@ -77,5 +77,5 @@
   [tx id]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_uploads)
-                     (sql/where [:= :procurement_uploads.id id])
+                     (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
                      sql-format)))

@@ -342,7 +342,6 @@
       (sql/join :procurement_budget_periods
                 [:= :procurement_budget_periods.id
                  :procurement_requests.budget_period_id]))
-
   )
 
 (defn to-name-and-lower-case-enums
@@ -572,7 +571,7 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_requests)
                      (sql/set data)
-                     (sql/where [:= :procurement_requests.id req-id])
+                     (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                      sql-format)))
 
 (defn- filter-attachments [m as] (filter #(submap? m %) as))
@@ -758,7 +757,7 @@
       (request-perms/apply-permissions tx
                                        auth-entity
                                        <>
-                                       #(assoc % :request-id req-id)))))
+                                       #(assoc % :request-id [:cast req-id :uuid])))))
 
 
 
@@ -809,7 +808,7 @@
       #(let [result (jdbc/execute! tx
                                    (-> (sql/delete-from :procurement_requests)
                                        (sql/where [:= :procurement_requests.id
-                                                   req-id])
+                                                   [:cast req-id :uuid]])
                                        sql-format))]
          (= result '(1)))
       :if-only

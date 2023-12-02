@@ -24,7 +24,7 @@
   ([context _ value]
    ((jdbc/execute-one! (-> context
                           :request
-                          :tx)
+                          :tx-next)
                       (category-query (or (:value value)
                                           ; for
                                           ; RequestFieldCategory
@@ -48,7 +48,7 @@
   (-> (jdbc/execute-one!
         (-> context
             :request
-            :tx)
+            :tx-next)
         (-> (
               :and
               ( :not
@@ -56,13 +56,13 @@
                                   (-> (sql/select true)
                                       (sql/from [:procurement_requests :pr])
                                       (sql/where [:= :pr.category_id
-                                                        (:id value)]))))
+                                                        [:cast(:id value):uuid]]))))
               ( :not
                         ( :exists
                                   (-> (sql/select true)
                                       (sql/from [:procurement_templates :pt])
                                       (sql/where [:= :pt.category_id
-                                                        (:id value)])))))
+                                                        [:cast (:id value) :uuid]])))))
             (vector :result)
             sql/select
             sql-format))
@@ -73,7 +73,7 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_categories)
                      (sql/set c)
-                     (sql/where [:= :procurement_categories.id (:id c)])
+                     (sql/where [:= :procurement_categories.id [:cast (:id c) :uuid]])
                      sql-format)))
 
 (defn insert-category!

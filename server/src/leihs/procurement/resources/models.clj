@@ -23,7 +23,7 @@
   (jdbc/execute!
     (-> context
         :request
-        :tx)
+        :tx-next)
     (let [terms (some-> args
                         :search_term
                         (clj-str/split #"\s+")

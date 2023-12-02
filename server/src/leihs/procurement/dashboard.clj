@@ -30,7 +30,7 @@
 
         result (->> coll
                     (map :total_price_cents)
-                    (map #(if (nil? %) 0 %))  ;;TODO remove this, SET DEFAULT FOR PRICES
+                    (map #(if (nil? %) 0 %))                ;;TODO remove this, SET DEFAULT FOR PRICES
                     (reduce +))
 
         p (println ">>1" result)
@@ -59,8 +59,6 @@
 
 (defn cache-key
   [& args]
-  ;(println ">o> cache-key" args)
-
   (->> args
        (map :id)
        (string/join "_")))
@@ -112,43 +110,6 @@
 (defn printer [res]
   (println "\n>o> final-result" res "\n")
   (println "\n>o> final-result (json)" (json/write-str res) "\n")
-
-  ;(-> res
-  ;    first
-  ;    :main_categories
-  ;    first
-  ;    :categories
-  ;    first
-  ;    :requests
-  ;    first
-  ;    :inspector_priority
-
-  ;(assoc-in res
-  ;          [:main_categories 0 :categories 0 :requests 0 :inspector_priority :value]
-  ;          (.toUpperCase (-> res
-  ;                            first
-  ;                            :main_categories
-  ;                            first
-  ;                            :categories
-  ;                            first
-  ;                            :requests
-  ;                            first
-  ;                            :inspector_priority
-  ;                            :value
-  ;                            )))
-
-  ;(println "\n>oo> final-result _> :inspector_priority" (-> res
-  ;                                                          first
-  ;                                                          :main_categories
-  ;                                                          first
-  ;                                                          :categories
-  ;                                                          first
-  ;                                                          :requests
-  ;                                                          first
-  ;                                                          :inspector_priority
-  ;                                                          :value
-  ;                                                          ) "\n")
-
 
   res
   )
@@ -225,13 +186,6 @@
 
         bps (if (or (not bp-ids) (not-empty bp-ids))
 
-              ;(-> budget-periods/budget-periods-base-query
-              ;    (cond-> bp-ids (sql/where
-              ;                     [:in :procurement_budget_periods.id bp-ids]))
-              ;    sql-format
-              ;    (->> (jdbc/execute! tx)))
-
-
               (let [
                     query (-> budget-periods/budget-periods-base-query
                               (cond-> bp-ids (sql/where
@@ -264,9 +218,4 @@
     {:total_count (spy (count requests)),
      :cacheKey (spy (cache-key dashboard-cache-key)),
      :budget_periods (spy (determine-budget-periods requests tx dashboard-cache-key main-cats bps))
-
-     ;:cacheKey "fdjksl-fjdksal",
-     ;:budget_periods [{:test "me", :foo "bar", :total_price_cents 33 :main_categories [:total_price_cents 44]}]
-
-     ;:test "foo-bar"
      }))

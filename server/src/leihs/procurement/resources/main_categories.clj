@@ -50,13 +50,13 @@
   ([context _ _]
    (get-main-categories (-> context
                             :request
-                            :tx))))
+                            :tx-next))))
 
 (defn get-main-categories-by-names
   [tx names]
   (jdbc/execute! tx
               (-> main-categories-base-query
-                  (sql/where [:in :procurement_main_categories.name names])
+                  (sql/where [:in :procurement_main_categories.name names]) ;;TODO FIXME
                   (sql/order-by [:procurement_main_categories.name :asc])
                   sql-format)))
 
@@ -64,7 +64,7 @@
   [context args _]
   (let [tx (-> context
                :request
-               :tx)
+               :tx-next)
         mcs (:input_data args)]
     (loop [[mc & rest-mcs] mcs]
       (when mc

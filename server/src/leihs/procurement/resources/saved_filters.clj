@@ -25,7 +25,7 @@
   [context args value]
   ( (jdbc/execute-one! (-> context
                          :request
-                         :tx)
+                         :tx-next)
                      (saved-filters-query (-> value
                                               :user
                                               :id)))))

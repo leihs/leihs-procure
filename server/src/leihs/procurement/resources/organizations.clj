@@ -24,13 +24,13 @@
       (cond-> organizations-base-query
         root-only (sql/where [:= :procurement_organizations.parent_id
                                     nil])
-        id (sql/where [:= :procurement_organizations.parent_id id])))))
+        id (sql/where [:= :procurement_organizations.parent_id [:cast id :uuid]])))))
 
 (defn get-organizations
   [context args value]
   (jdbc/execute! (-> context
                   :request
-                  :tx)
+                  :tx-next)
               (organizations-query context args value)))
 
 (defn delete-unused

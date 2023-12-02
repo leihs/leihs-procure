@@ -15,7 +15,7 @@
   [id]
   (-> (sql/select :suppliers.*)
       (sql/from :suppliers)
-      (sql/where [:= :suppliers.id id])
+      (sql/where [:= :suppliers.id [:cast id :uuid]])
       sql-format))
 
 (defn get-supplier-by-id [tx id] ( (jdbc/execute-one! tx (supplier-query id))))
@@ -24,6 +24,6 @@
   [context _ value]
   (get-supplier-by-id (-> context
                           :request
-                          :tx)
+                          :tx-next)
                       (or (:value value) ; for RequestFieldSupplier
                           (:supplier_id value))))

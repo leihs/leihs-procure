@@ -24,15 +24,15 @@
 (defn image-query
   [id]
   (-> image-base-query
-      (sql/where [:= :procurement_images.id id])))
+      (sql/where [:= :procurement_images.id [:cast id :uuid]])))
 
 (defn image-query-for-main-category
   [id]
   (-> image-base-query
-      (sql/where [:= :procurement_images.main_category_id id])))
+      (sql/where [:= :procurement_images.main_category_id [:cast id :uuid]])))
 
 (defn image
-  [{tx :tx, {image-id :image-id} :route-params}]
+  [{tx :tx-next, {image-id :image-id} :route-params}]
   (if-let [i (->> image-id
                   image-query
                   sql-format

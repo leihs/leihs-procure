@@ -68,7 +68,7 @@
     (->> (categories-query context arguments value)
          (jdbc/execute! (-> context
                          :request
-                         :tx)))))
+                         :tx-next)))))
 
 (defn delete-categories-for-main-category-id-and-not-in-ids!
   [tx mc-id ids]
@@ -77,7 +77,7 @@
     (-> (sql/delete-from :procurement_categories)
         (sql/where [:= :procurement_categories.main_category_id mc-id])
         (cond-> (not (empty? ids)) (sql/where
-                                     [:not-in :procurement_categories.id ids]))
+                                     [:not-in :procurement_categories.id ids])) ;;FIXME TODO ids
         sql-format)))
 
 (defn update-categories!

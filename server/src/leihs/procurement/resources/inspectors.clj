@@ -15,20 +15,20 @@
   [context _ value]
   (jdbc/execute! (-> context
                   :request
-                  :tx)
+                  :tx-next)
               (-> users-base-query
                   (sql/where
-                    [:in :users.id
+                    [:in :users.id                          ;;TODO FIXME ids
                      (-> (sql/select :pci.user_id)
                          (sql/from [:procurement_category_inspectors :pci])
-                         (sql/where [:= :pci.category_id (:id value)]))])
+                         (sql/where [:= :pci.category_id [:cast (:id value):uuid]]))])
                   sql-format)))
 
 (defn delete-inspectors-for-category-id!
   [tx c-id]
   (jdbc/execute! tx
                  (-> (sql/delete-from [:procurement_category_inspectors :pci])
-                     (sql/where [:= :pci.category_id c-id])
+                     (sql/where [:= :pci.category_id [:cast c-id :uuid]])
                      sql-format)))
 
 (defn insert-inspectors!

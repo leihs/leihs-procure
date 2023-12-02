@@ -32,17 +32,17 @@
   [context _ value]
   (let [query (cond-> templates-base-query
                 value (sql/where [:= :procurement_templates.category_id
-                                        (:id value)]))]
+                                        [:cast (:id value):uuid]]))]
     (->> query
          sql-format
          (jdbc/execute! (-> context
                          :request
-                         :tx)))))
+                         :tx-next)))))
 
 (defn get-templates-for-ids
   [tx ids]
   (-> categories/categories-base-query
-      (sql/where [:in :procurement_categories.id ids])
+      (sql/where [:in :procurement_categories.id ids]) ;; TODO PRIO !!!
       sql-format
       (->> (jdbc/execute! tx))))
 
@@ -50,7 +50,7 @@
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
-                     (sql/where [:not-in :procurement_templates.id ids])
+                     (sql/where [:not-in :procurement_templates.id ids]) ;; TODO PRIO !!!
                      sql-format)))
 
 (defn get-template-id

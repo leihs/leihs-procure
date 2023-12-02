@@ -10,7 +10,7 @@
     
     ))
 
-(def general-id "abae04c5-d767-425e-acc2-7ce04df645d1")
+(def general-id #uuid "abae04c5-d767-425e-acc2-7ce04df645d1")
 
 (def buildings-base-query
   (-> (sql/select :buildings.*)
@@ -26,5 +26,5 @@
   [context args _]
   (jdbc/execute! (-> context
                   :request
-                  :tx)
+                  :tx-next)
               (sql-format (buildings-query args))))

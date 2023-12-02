@@ -16,20 +16,20 @@
   [context _ value]
   (jdbc/execute! (-> context
                   :request
-                  :tx)
+                  :tx-next)
               (-> users-base-query
                   (sql/where
                     [:in :users.id
                      (-> (sql/select :pcv.user_id)
                          (sql/from [:procurement_category_viewers :pcv])
-                         (sql/where [:= :pcv.category_id (:id value)]))])
+                         (sql/where [:= :pcv.category_id [:cast (:id value):uuid]]))])
                   sql-format)))
 
 (defn delete-viewers-for-category-id!
   [tx c-id]
   (jdbc/execute! tx
                  (-> (sql/delete-from [:procurement_category_viewers :pcv])
-                     (sql/where [:= :pcv.category_id c-id])
+                     (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
                      sql-format)))
 
 (defn insert-viewers!

@@ -14,5 +14,5 @@
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_uploads)
-                     (sql/where [:in :procurement_uploads.id ids])
+                     (sql/where [:in :procurement_uploads.id ids]) ;; TODO PRIO!!
                      sql-format)))

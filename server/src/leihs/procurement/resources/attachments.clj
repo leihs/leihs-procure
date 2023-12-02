@@ -33,7 +33,7 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx)]
+               :tx-next)]
     (get-attachments-for-request-id tx (:request-id value))))
 
 (defn create-for-request-id-and-uploads!

@@ -27,7 +27,7 @@
   (jdbc/execute!
     (-> context
         :request
-        :tx)
+        :tx-next)
     (let [search-term (:search_term args)
           term-parts (and search-term
                           (map (fn [part] (str "%" part "%"))
@@ -58,4 +58,4 @@
                   (sql/where [:not-in :users.id exclude-ids]) offset
                   (sql/offset offset) limit
                   (sql/limit limit))
-          sql-format))))
+          sql-format))))                                    ;; TODO: SEARCH CHECK

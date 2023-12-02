@@ -23,7 +23,7 @@
 (defn main-category-query-by-id
   [id]
   (-> main-category-base-query
-      (sql/where [:= :procurement_main_categories.id id])
+      (sql/where [:= :procurement_main_categories.id [:cast id :uuid]])
       sql-format))
 
 (defn main-category-query-by-name
@@ -39,7 +39,7 @@
       main-category-query-by-id
       (->> (jdbc/execute! (-> context
                            :request
-                           :tx)))
+                           :tx-next)))
       first))
 
 (defn get-main-category-by-name
@@ -65,7 +65,7 @@
     (jdbc/execute! tx
                    (-> (sql/delete-from :procurement_images)
                        (sql/where [:= :procurement_images.main_category_id
-                                   mc-id])
+                                   [:cast mc-id :uuid]])
                        sql-format))
     (image/create-for-main-category-id-and-upload! tx mc-id new-image-upload))
   (when-let [uploads-to-delete (-> {:to_delete true, :typename "Upload"}
@@ -78,7 +78,7 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
                      (sql/set mc)
-                     (sql/where [:= :procurement_main_categories.id (:id mc)])
+                     (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 
 (defn can-delete?
@@ -87,7 +87,7 @@
     (jdbc/execute-one!
       (-> context
           :request
-          :tx)
+          :tx-next)
       (->
         (
           :and
@@ -98,7 +98,7 @@
                                   (sql/join [:procurement_categories :pc]
                                                   [:= :pc.id :pr.category_id])
                                   (sql/where [:= :pc.main_category_id
-                                                    (:id value)]))))
+                                                    [:cast (:id value) :uuid]]))))
           ( :not
                     ( :exists
                               (-> (sql/select true)
@@ -106,7 +106,7 @@
                                   (sql/join [:procurement_categories :pc]
                                                   [:= :pc.id :pt.category_id])
                                   (sql/where [:= :pc.main_category_id
-                                                    (:id value)])))))
+                                              [:cast (:id value) :uuid]])))))
         (vector :result)
         sql/select
         sql-format))

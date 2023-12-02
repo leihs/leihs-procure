@@ -39,32 +39,6 @@
 (defn str-to-uuid [s]
   (java.util.UUID/fromString s))
 
-(def keys-to-cast [:budgetPeriods :organizations :categories])
-
-
-
-
-;(defn convert-uuids [m]
-;  (-> m
-;      (update :organizations #(map str-to-uuid %))
-;      (update :categories #(map str-to-uuid %))
-;      (update :budgetPeriods #(map str-to-uuid %))))
-
-;(defn update-uuid-keys [m keys]
-;  (reduce (fn [acc key]
-;            (update acc key #(map str-to-uuid %)))
-;          m
-;          keys))
-
-
-(defn cast-keys-to-uuids [m keys-to-cast]
-  (reduce (fn [acc key]
-            (if (contains? m key)
-              (update acc key (fn [v] (mapv #(java.util.UUID/fromString %) v)))
-              acc))
-          m
-          keys-to-cast))
-
 
 (defn exec-query
   [query-string request]
@@ -94,7 +68,6 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
         ;p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
         ;p (println "\n>o>1pure-handler _> request" request)
@@ -158,10 +131,7 @@
                        (= :mutation))]
     (if mutation?
       (jdbco/with-db-transaction
-        ;[tx (:tx-next (spy request))
         [tx (:tx-next request)
-
-         ;tx-next (:tx-next request)
          ]
         (try (let [
                    p (println "pure-handler >> 1")
@@ -179,7 +149,6 @@
       (let [p (println "pure-handler >> 2")
             ]
         (pure-handler request))
-
       )))
 
 

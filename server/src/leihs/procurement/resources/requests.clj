@@ -185,29 +185,6 @@
             search-term (search-query search-term))))
 
 
-
-
-
-
-;(ns leihs.my.back.html
-;    (:refer-clojure :exclude [keyword str])
-;    (:require
-;      [hiccup.page :refer [html5]]
-;      [honey.sql :refer [format] :rename {format sql-format}]
-;      [honey.sql.helpers :as sql]
-;      [leihs.core.http-cache-buster2 :as cache-buster]
-;      [leihs.core.json :refer [to-json]]
-;      [leihs.core.remote-navbar.shared :refer [navbar-props]]
-;      [leihs.core.shared :refer [head]]
-;      [leihs.core.url.core :as url]
-;      [leihs.my.authorization :as auth]
-;      [leihs.core.db :as db]
-;      [next.jdbc :as jdbc]))
-
-
-
-
-
 (comment
   (let [
         user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
@@ -244,16 +221,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 (defn get-requests
   [context arguments value]
   (let [ring-request (:request context)
@@ -276,66 +243,6 @@
                                                 <>
                                                 #(assoc % :request-id (:id <>)))
                (request-perms/add-action-permissions <>)))))))
-
-
-
-;(defn get-requests-DEV
-;  [context arguments value]
-;
-;  (println ">>>requests::get-requests ======================")
-;  (println ">>>args" arguments)
-;  (println ">>>value" value)
-;
-;  (let [ring-request (:request context)
-;        tx (:tx-next ring-request)
-;        auth-entity (:authenticated-entity ring-request)
-;        p (println ">>>auth-entity")
-;        p (println ">>>get-requests>> before first")
-;
-;        query (let [query (as-> context <>
-;                            (do (println ">o> 1-After requests-query-map:")
-;                                ;(do (println ">o> 1-After requests-query-map:" <>)
-;                                (requests-query-map <> arguments value))
-;
-;                            ;>o> 2-After apply-scope: {:select (nil [(:case [:= :procurement_requests.approved_quantity nil] NEW [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] APPROVED [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] PARTIALLY_APPROVED [:= :procurement_requests.approved_quantity 0] DENIED) :state] [#sql/call [:row_to_json :procurement_budget_periods_2] :budget_period] nil [#sql/call [:row_to_json :models] :model] nil [#sql/call [:row_to_json :procurement_templates] :template] nil [#sql/call [:row_to_json :suppliers] :supplier] [#sql/call [:row_to_json :users] :user]), :from [:procurement_requests], :left-join (:models [:= :models.id :procurement_requests.model_id] :procurement_templates [:= :procurement_templates.id :procurement_requests.template_id] :suppliers [:= :suppliers.id :procurement_requests.supplier_id] :users [:= :users.id :procurement_requests.user_id]), :order-by [nil], :join [:procurement_budget_periods [:= :procurement_budget_periods.id :procurement_requests.budget_period_id] [{:select [:* [:end_date :is_past]], :from [:procurement_budget_periods]} :procurement_budget_periods_2] [:= :procurement_budget_periods_2.id :procurement_requests.budget_period_id] :procurement_categories [:= :procurement_categories.id :procurement_requests.category_id] :procurement_main_categories [:= :procurement_main_categories.id :procurement_categories.main_category_id] :procurement_organizations [:= :procurement_organizations.id :procurement_requests.organization_id] [:procurement_organizations :procurement_departments] [:= :procurement_departments.id :procurement_organizations.parent_id] :rooms [:= :rooms.id :procurement_requests.room_id] :buildings [:= :buildings.id :rooms.building_id]], :where [:and [:in :procurement_requests.category_id [#uuid "7d5ba731-edd9-41ba-8773-7337d24c2327"]] [:in :procurement_requests.budget_period_id [#uuid "8b8fe440-cae5-4bf9-8048-d0ec2399faa1"]] [:in :procurement_requests.organization_id [#uuid "fb664326-a8ef-4556-af02-07d3127cd9ec"]] [:in :procurement_requests.priority (normal high)] [:in :procurement_requests.inspector_priority (low medium high mandatory)] [:or [:= :procurement_requests.approved_quantity nil] [:>= :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:and [:< :procurement_requests.approved_quantity :procurement_requests.requested_quantity] [:> :procurement_requests.approved_quantity 0]] [:= :procurement_requests.approved_quantity 0]]]}
-;                            ;                                   ^  TODO:
-;
-;                            (do (println ">o> 2-After apply-scope:" <>)
-;                                (requests-perms/apply-scope tx <> auth-entity))
-;                            (do (println ">o> 3-After sql-format:" <>)
-;                                (spy (sql-format <>))))] query
-;                                                         ;; Execute the query with `query`, for example using a PostgreSQL function.
-;                                                         ;; Example: (execute-postgres-query tx query)
-;                                                         )
-;
-;        p (spy query)
-;
-;
-;        p (println ">o>ring-request-3" query)
-;
-;        ;p (println ">>broken-query" (spy query))            ;;TODO: log broken query
-;        ;p (throw "my-log-error")
-;
-;        proc-requests (request/query-requests tx auth-entity query)
-;
-;
-;        p (println ">>>ring-request-procRequests" proc-requests)
-;
-;        ]
-;    (->>
-;      proc-requests
-;      (map (fn [proc-req]
-;             (as-> proc-req <>
-;               (request-perms/apply-permissions tx
-;                                                auth-entity
-;                                                <>
-;                                                #(assoc % :request-id (:id <>)))
-;               (request-perms/add-action-permissions <>)))))))
-
-
-
-
-
 
 
 
@@ -475,7 +382,7 @@
         ]
 
 
-    (-> (:call :coalesce                                    ;;FIXME TODO
+    (-> (:call :coalesce                                    ;;FIXME TODO PRIO!!!
           :procurement_requests.order_quantity
           :procurement_requests.approved_quantity)
         (total-price-sqlmap bp-id)

@@ -32,7 +32,7 @@
                       [:= :procurement_requesters_organizations.organization_id
                        :procurement_organizations.id])
       (sql/where [:= :procurement_requesters_organizations.user_id
-                        user-id])
+                        [:cast user-id :uuid]])
       sql-format
       (->> (jdbc/execute-one! tx))
       ))
@@ -65,7 +65,7 @@
 
                          (->> (sql/insert-into :procurement_organizations)
                               (sql/values {:name org-name,
-                                           :parent_id (:id department)})
+                                           :parent_id [:cast (:id department):uuid]})
                               sql-format
                               (jdbc/execute-one! tx))
 
@@ -76,8 +76,8 @@
     ;               :organization_id (:id organization)})
 
        (->> (sql/insert-into :procurement_requesters_organizations)
-            (sql/values {:user_id (:user_id data),
-                         :organization_id (:id organization)})
+            (sql/values {:user_id [:cast (:user_id data) :uuid],
+                         :organization_id [:cast (:id organization):uuid]})
             sql-format
             (jdbc/execute! tx))
 
@@ -95,7 +95,7 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx)]
+               :tx-next)]
     (delete-all tx)
     (doseq [d (:input_data args)] (create-requester-organization tx d))
     (organizations/delete-unused tx)

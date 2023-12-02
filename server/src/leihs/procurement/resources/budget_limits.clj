@@ -23,7 +23,7 @@
     (jdbc/execute!
       (-> context
           :request
-          :tx)
+          :tx-next)
       (-> budget-limits-base-query
           (sql/where [:= :procurement_budget_limits.main_category_id
                             main_category_id])

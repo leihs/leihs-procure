@@ -31,7 +31,7 @@
   [context args value]
   (first (jdbc/execute! (-> context
                          :request
-                         :tx)
+                         :tx-next)
                      (building-query [:cast (:building_id value) :uuid]))))
 
 ;#### debug ###################################################################
