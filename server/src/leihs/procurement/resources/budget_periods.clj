@@ -69,8 +69,12 @@
         (let [bp-with-dates (-> bp
                                 (update :inspection_start_date
                                         time-format/parse)
-                                (update :end_date time-format/parse))]
+                                (update :end_date time-format/parse))
+              p (println ">oo> bp-with-dates=" bp-with-dates)
+              ]
           (do
+
+
             (if (:id bp-with-dates)
               (budget-period/update-budget-period! tx bp-with-dates)
               (budget-period/insert-budget-period! tx

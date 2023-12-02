@@ -456,7 +456,10 @@
 
 (defn query-requests
   [tx auth-entity query]
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
+
+  (println ">o> query-requests, auth-entity" auth-entity)
+  (println ">o> query-requests, query" query)
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)] ;; TODO, search contains a weired WHERE TRUE=FALSE query
     (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})))
 
 (defn get-request-by-id-sqlmap
