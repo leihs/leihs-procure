@@ -2,22 +2,35 @@
 CURRENT STATE
 --
 1. Use cases
-   1. Login with initial view                      **.. broken**
+   1. Login with initial view                      **.. ok**
       1. Setup
          - http://localhost:3230/sign-in?return-to=%2Fprocure
          - Account: `jimmie@goyette.com` 
-      2. 2/4 GraphQL-Requests are broken 
+      2. 2/4 GraphQL-Requests are broken                ??
 2. Procure tests                                   **.. broken**
 3. Integdration-tests **.. broken**
 
 Causes
 --
 1. Abandoned helper functions
+2. Replacement of "~~*" by honey-support by `:ilike`
+3. Buggy refactoring of auth/permission
+
+
+Current focus to fix:
+1. ApolloError: ERROR: non-integer constant in ORDER BY
+   Position: 190
+2. ApolloError: Unable to serialize #inst "2024-01-03T23:00:00.000-00:00" as type 'Boolean'.
+   Field resolver returned an undefined enum value.
+3. ApolloError: Field resolver returned an undefined enum value.
+   Field resolver returned an undefined enum value.
+
+
 
 ToClarify
 --
 1. `procurement_departments` still needed? dead code
-   - FYI: had to create :procurement_departments manually baseed on :procurement_organizations
+   - FYI: had to create :procurement_departments manually based on :procurement_organizations
 
 
 Known bugs
