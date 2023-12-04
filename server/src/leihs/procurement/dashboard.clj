@@ -216,7 +216,7 @@
         ;p (println ">>requestsB2-triggerError" ctx args value)
         p (println ">>requestsB2-triggerError" args value)
 
-        requests (requests/get-requests ctx args value)     ;; FIXME: this causes issues, value=nil
+        requests (requests/get-requests ctx args value)
         ;p (println ">o>requestsB2" requests)
 
         dashboard-cache-key {:id (hash args)}

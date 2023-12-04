@@ -153,7 +153,7 @@
                  )
         p (println ">o> searchTerm::test-query    >" test "<")
 
-        p (println ">o> searchTerm::after" (jdbc/execute! tx test))
+        ;p (println ">o> searchTerm::after" (jdbc/execute! tx test))
 
 
         ]
@@ -217,7 +217,8 @@
 
             ;ApolloError: ERROR: argument of OR must be type boolean, not type record
             ;Position: 3525
-            ;search-term (search-query search-term)          ;; FIXME: BUG-2
+            search-term (search-query search-term)          ;; FIXME: BUG-2
+
 
             )))
 
