@@ -1,6 +1,10 @@
 (ns leihs.procurement.graphql
   (:require
     [clojure.edn :as edn]
+
+    (java.sql.Date)
+    [clojure.data.json :as json]
+
     [clojure.java [io :as io] [jdbc :as jdbc]]
     [com.walmartlabs.lacinia :as lacinia]
     [com.walmartlabs.lacinia [parser :as graphql-parser]
@@ -63,11 +67,13 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-  ;(let [result (spy(exec-query query request))
   (let [result (exec-query query request)
-        p (println "\n>oo>1pure-handler _> request" request)
-        p (println "\n>o>2pure-handler _> query" query)
-        p (println "\n>o>3pure-handler, result=>" result)
+        p (println "\n>request-grapql _> request" request)
+        ; (java.sql.Date)
+        p (println "\n>request-c-grapql _> request (json)" (json/write-str (dissoc request :tx-next :tx :async-channel :options :handler :graphql-schema)))
+        p (println "\n>request-c-grapql _> query" query)
+        p (println "\n>request-grapql _> result =>" result)
+
         resp {:body result}]
 
 

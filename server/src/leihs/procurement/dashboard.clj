@@ -33,13 +33,23 @@
        (map :id)
        (string/join "_")))
 
-(defn printer [res]
-  (println "\n>o> final-result" res "\n")
-  (println "\n>o> final-result (json)" (json/write-str res) "\n")
+(defn printer
 
-  res
+
+
+  ([res]
+   (println "\n>o> final-result" res "\n")
+   (println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+   res)
+
+  ([title res]
+   (println "\n>request-http _> " title res "\n")
+   ;(println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+   res)
+
   )
-
 
 (defn get-dashboard
   [ctx args value]
@@ -67,27 +77,9 @@
                       sql/format
                       (->> (jdbc/query tx)))
 
-        p (println ">>mainCats" main-cats)
-
-        bps-original (if (or (not bp-ids) (not-empty bp-ids))
-              (-> budget-periods/budget-periods-base-query
-                  (cond-> bp-ids (sql/merge-where
-                                   [:in :procurement_budget_periods.id bp-ids]))
-                  sql/format
-                  (->> (jdbc/query tx)))
-              [])
-
-        p (println ">>resultA0-bps-original" bps-original)
-
+        p (println ">>ToCheck mainCats" main-cats)
 
         bps (if (or (not bp-ids) (not-empty bp-ids))
-
-              ;(-> budget-periods/budget-periods-base-query
-              ;    (cond-> bp-ids (sql/merge-where
-              ;                     [:in :procurement_budget_periods.id bp-ids]))
-              ;    sql/format
-              ;    (->> (jdbc/query tx)))
-
 
               (let [
                     query (-> budget-periods/budget-periods-base-query
@@ -96,7 +88,7 @@
                     p (println ">>queryA1" query)
                     result (jdbc/query tx query)
 
-                    p (println ">>resultA1" result)
+                    p (println ">>ToCheck dashboard:::procurement_budget_periods.id" result) ;; ids?
 
                     ] result)
 
@@ -174,7 +166,7 @@
                  (assoc :total_price_cents (sum-total-price
                                              main-cats*))))))
 
-       printer
+       (printer "dashboard::determine-budget-periods/result")
 
        )
 
