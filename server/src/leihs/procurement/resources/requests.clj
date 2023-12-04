@@ -24,7 +24,10 @@
 
 (defn search-query
   [sql-query term]
-  (let [term-percent (str "%" term "%")]
+  (let [term-percent (str "%" term "%")
+        p (println ">o> requests::search-query" term-percent)
+
+        ]
     (-> sql-query
         ; NOTE: everything merged already
         ; (sql/join :rooms [:= :procurement_requests.room_id :rooms.id])
@@ -32,21 +35,22 @@
         ; (sql/join :users [:= :procurement_requests.user_id :users.id])
         ; NOTE: models are joined in the base-query already
         (sql/where
-          [:or ["~~*" :buildings.name term-percent]
-           ;  ["~~*" :procurement_requests.id term-percent]
-           ["~~*" :procurement_requests.short_id term-percent]
-           ["~~*" :procurement_requests.article_name term-percent]
-           ["~~*" :procurement_requests.article_number term-percent]
-           ["~~*" :procurement_requests.inspection_comment term-percent]
-           ["~~*" :procurement_requests.order_comment term-percent]
-           ["~~*" :procurement_requests.motivation term-percent]
-           ["~~*" :procurement_requests.receiver term-percent]
-           ["~~*" :procurement_requests.supplier_name term-percent]
-           ["~~*" :rooms.name term-percent]
-           ["~~*" :models.product term-percent]
-           ["~~*" :models.version term-percent]
-           ["~~*" :users.firstname term-percent]
-           ["~~*" :users.lastname term-percent]]))))
+          [:or [:ilike :buildings.name term-percent]
+           ;  [:ilike :procurement_requests.id term-percent]
+
+           [:ilike :procurement_requests.short_id term-percent]
+           [:ilike :procurement_requests.article_name term-percent]
+           [:ilike :procurement_requests.article_number term-percent]
+           [:ilike :procurement_requests.inspection_comment term-percent]
+           [:ilike :procurement_requests.order_comment term-percent]
+           [:ilike :procurement_requests.motivation term-percent]
+           [:ilike :procurement_requests.receiver term-percent]
+           [:ilike :procurement_requests.supplier_name term-percent]
+           [:ilike :rooms.name term-percent]
+           [:ilike :models.product term-percent]
+           [:ilike :models.version term-percent]
+           [:ilike :users.firstname term-percent]
+           [:ilike :users.lastname term-percent]]))))
 
 
 
@@ -130,22 +134,56 @@
         p (println ">oo> helper8" order-status inspector-priority priority)
 
 
+        ;>o> searchTerm::before    >  <
+        ;>o> searchTerm::before    > java.lang.String <
+        ;>o> searchTerm::before    > 0 <
+        ;>o> requests::search-query %%
+        ;>o> searchTerm::test-query    > [SELECT * FROM buildings, procurement_requests, rooms, models, users WHERE (?, buildings.name, ?) OR (?, users.lastname, ?) ~~* %% ~~* %%] <
+
+
+        p (println ">o> searchTerm::before    >" search-term "<")
+        p (println ">o> searchTerm::before    >" (class search-term) "<")
+        p (println ">o> searchTerm::before    >" (count search-term) "<")
+
+        test (search-query (-> (sql/select :*)
+                               (sql/from :buildings :procurement_requests :rooms :models :users)) search-term)
+        test (-> test
+                 sql-format
+                 ;(sql-format :quoted true)
+                 )
+        p (println ">o> searchTerm::test-query    >" test "<")
+
+        p (println ">o> searchTerm::after" (jdbc/execute! tx test))
 
 
         ]
 
     (cond-> start-sqlmap
-            id (sql/where [:in :procurement_requests.id id])
+            id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
-            category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
+
+
+            ;:cause Der in SQL für eine Instanz von leihs.procurement.resources.requests$cast_uuids zu verwendende Datentyp kann nicht abgeleitet werden. Benutzen Sie 'setObject()' mit einem expliziten Typ, um ihn festzulegen.
+
+
+            category-id (-> (sql/where
+                              [:in :procurement_requests.category_id (cast-uuids category-id)]
+                              ;[:in :procurement_requests.category_id [:cast category-id :uuid]]
+                              )
                             ;category-id (-> (sql/where [:in :procurement_requests.category_id [:cast category-id :uuid]])
                             (sqlp/merge-where-false-if-empty category-id))
+
+
+
+
             budget-period-id (-> (sql/where
                                    [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
+                                   ;[:in :procurement_requests.budget_period_id [:cast budget-period-id :uuid]])
                                  (sqlp/merge-where-false-if-empty budget-period-id))
+
             organization-id (-> (sql/where
-                                  ;[:in :procurement_requests.organization_id organization-id])
                                   [:in :procurement_requests.organization_id (cast-uuids organization-id)])
+                                  ;[:in :procurement_requests.organization_id [:cast organization-id :uuid]])
                                 (sqlp/merge-where-false-if-empty organization-id))
 
 
@@ -153,18 +191,13 @@
             priority (-> (sql/where [:in :procurement_requests.priority priority])
                          (sqlp/merge-where-false-if-empty priority))
 
-            ;true (printer ("helper5b sql/priority" priority))
 
             inspector-priority (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
                                    (sqlp/merge-where-false-if-empty inspector-priority))
-            ;true (printer ("helper5b sql/inspector-priority" inspector-priority))
-
 
             state (-> (sql/where
                         (request/get-where-conds-for-states state advanced-user?))
                       (sqlp/merge-where-false-if-empty state))
-            ;true (printer ("helper5b sql/state" state))
-
 
 
             order-status (-> (sql/where [:in :procurement_requests.order_status
@@ -173,7 +206,6 @@
                                          ])
                              ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
                              (sqlp/merge-where-false-if-empty order-status))
-            ;true (printer ("helper5b sql/order-status" order-status))
 
 
             requested-by-auth-user (sql/where [:= :procurement_requests.user_id
@@ -182,7 +214,12 @@
                                                    :authenticated-entity
                                                    :user_id)])
 
-            search-term (search-query search-term))))
+
+            ;ApolloError: ERROR: argument of OR must be type boolean, not type record
+            ;Position: 3525
+            ;search-term (search-query search-term)          ;; FIXME: BUG-2
+
+            )))
 
 
 (comment
@@ -233,7 +270,7 @@
 
         p (println ">o> abc" query)
 
-        proc-requests (request/query-requests tx auth-entity query)]
+        proc-requests (request/query-requests tx auth-entity query)] ;;ERROR
     (->>
       proc-requests
       (map (fn [proc-req]

@@ -217,15 +217,15 @@
         p (println ">>requestsB2-triggerError" args value)
 
         requests (requests/get-requests ctx args value)     ;; FIXME: this causes issues, value=nil
-
-        p (println ">o>requestsB2" requests)
+        ;p (println ">o>requestsB2" requests)
 
         dashboard-cache-key {:id (hash args)}
 
         p (println ">o>dashboard-cache-keyB2" dashboard-cache-key)
 
         ]
-    {:total_count (spy (count requests)),
+    {
+     :total_count (spy (count requests)),
      :cacheKey (spy (cache-key dashboard-cache-key)),
      :budget_periods (spy (determine-budget-periods requests tx dashboard-cache-key main-cats bps))
      }))

@@ -6,6 +6,8 @@
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
 
+            [clojure.java.jdbc :as jdbco]
+
             [leihs.procurement.authorization :as authorization]
             (leihs.procurement.permissions [request-fields :as request-fields-perms]
                                            [request-helpers :as request-perms] [user :as user-perms])
@@ -367,12 +369,28 @@
                keyword)))
 
 (defn treat-order-status [row]
-  (upper-case-keyword-value row :order_status))
 
-(defn treat-priority [row] (upper-case-keyword-value row :priority))
+  (println ">o> treat-order-status: row =>" row)
+  (println ">o> treat-order-status: upperCase =>" (upper-case-keyword-value row :order_status))
+
+
+  (upper-case-keyword-value row :order_status)
+
+  )
+
+(defn treat-priority [row]
+
+  (println ">o> treat-priority: row =>" row)
+  (println ">o> treat-priority: upperCase =>" (upper-case-keyword-value row :priority))
+
+  (upper-case-keyword-value row :priority))
 
 (defn treat-inspector-priority
   [row]
+
+  (println ">o> treat-inspector-priority: row =>" row)
+  (println ">o> treat-inspector-priority: upperCase =>" (upper-case-keyword-value row :inspector_priority))
+
   (upper-case-keyword-value row :inspector_priority))
 
 (defn initialize-attachments-attribute
@@ -400,6 +418,9 @@
 (defn enum-state
   [row]
 
+
+  (println ">o> treat-inspector-priority: enum-state =>" row)
+
   (let [
 
         p (println ">o> upper-case-keyword-value: attr / :state =>" row)
@@ -407,7 +428,7 @@
                     :state
                     keyword
                     (assoc row :state))
-        p (println ">o> upper-case-keyword-value: result =>" result)
+        p (println ">o> treat-inspector-priority: enum-state =>" result)
         ]
 
     result)
@@ -440,7 +461,7 @@
 
 (defn transform-row
   [row advanced-user?]
-  (println ">oo> helper8" "transform-row" row advanced-user?)
+  (println ">oo> helper8" "transform-row" row advanced-user?) ;; never used
   (-> row
       enum-state
       add-general-ledger-account
@@ -458,8 +479,28 @@
 
   (println ">o> query-requests, auth-entity" auth-entity)
   (println ">o> query-requests, query" query)
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)] ;; TODO, search contains a weired WHERE TRUE=FALSE query
-    (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})))
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)
+
+        p (println ">o> query-requests::advanced-user?" advanced-user?)
+        p (println ">o> query-requests::query" query)
+
+        result (jdbc/execute! tx query)                     ;;ERROR
+        p (println ">o> 1query-requests::result" result)
+
+        ;p (println ">o> 1aquery-requests::fnc-blabla" {:row-fn #(transform-row % advanced-user?)})
+
+        ;result (jdbco/query tx query {:row-fn #(transform-row % advanced-user?)}) TODO: BUG-1 activate this
+        ;p (println ">o> 2query-requests::result" result)
+
+        ]
+
+    result
+
+    ;; TODO, search contains a weired WHERE TRUE=FALSE query
+    ;(jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})
+
+
+    ))
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
