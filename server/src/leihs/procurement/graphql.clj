@@ -2,6 +2,7 @@
   (:require
     [clojure.edn :as edn]
 
+    (java.sql.Date)
     (clojure.java [io :as io] [jdbc :as jdbco])
     (clojure.java [io :as io])
 
@@ -66,19 +67,19 @@
                    {:request request}))
 
 
+
 (defn pure-handler
   [{{query :query} :body, :as request}]
   (let [result (exec-query query request)
         ;p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
         ;p (println "\n>o>1pure-handler _> request" request)
-        ;p (println "\n>o>1pure-handler _> request (json)" (json/write-str request))
 
-        p (println "\n>oo>1pure-handler _> request" request)
-        p (println "\n>o>2pure-handler _> query" query)
-        p (println "\n>o>3pure-handler, result=>" result)
+        p (println "\n>request-grapql _> request" request)
+        ; (java.sql.Date)
+        p (println "\n>request-c-grapql _> request (json)" (json/write-str (dissoc request :tx-next :tx :async-channel :options :handler :graphql-schema)))
+        p (println "\n>request-c-grapql _> query" query)
+        p (println "\n>request-grapql _> result =>" result)
 
-        ;p (println "\n>oo>2pure-handler _> query" query)
-        ;p (println "\n>o>3pure-handler, result=>" result)
         resp {:body result}]
 
 

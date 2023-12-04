@@ -107,11 +107,22 @@
 
                 )))))
 
-(defn printer [res]
-  (println "\n>o> final-result" res "\n")
-  (println "\n>o> final-result (json)" (json/write-str res) "\n")
+(defn printer
 
-  res
+
+
+  ([res]
+   (println "\n>o> final-result" res "\n")
+   (println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+   res)
+
+  ([title res]
+   (println "\n>request-http _> " title res "\n")
+   ;(println "\n>o> final-result (json)" (json/write-str res) "\n")
+
+   res)
+
   )
 
 (defn determine-budget-periods [requests tx dashboard-cache-key main-cats bps]
@@ -132,7 +143,7 @@
                                                       (assoc :cacheKey (cache-key dashboard-cache-key bp mc))
                                                       (->> (main-categories/merge-image-path tx)))
 
-                                           ;p (println "\n>o> result 3a" result "\n")
+                                           p (println "\n>>ToCheck dashboard::determine-budget-periods" result "\n")
 
                                            ]
                                        result
@@ -152,7 +163,7 @@
                 )
               )
             )
-       printer
+       (printer "dashboard::determine-budget-periods/result")
 
        )
   )
@@ -182,19 +193,18 @@
                       sql-format
                       (->> (jdbc/execute! tx)))
 
-        p (println ">>mainCats" main-cats)
+        p (println ">>ToCheck mainCats" main-cats)
 
         bps (if (or (not bp-ids) (not-empty bp-ids))
 
               (let [
                     query (-> budget-periods/budget-periods-base-query
-                              (cond-> bp-ids (sql/where
-                                               [:in :procurement_budget_periods.id (cast-ids-to-uuid bp-ids)]))
+                              (cond-> bp-ids (sql/where [:in :procurement_budget_periods.id (cast-ids-to-uuid bp-ids)]))
                               sql-format)
                     p (println ">>queryA1" query)
                     result (jdbc/execute! tx query)
 
-                    p (println ">>resultA1" result)
+                    p (println ">>ToCheck dashboard:::procurement_budget_periods.id" result) ;; ids?
 
                     ] result)
 
