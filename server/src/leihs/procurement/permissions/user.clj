@@ -13,93 +13,159 @@
     [leihs.procurement.permissions.categories :as categories-perms]
     [taoensso.timbre :refer [debug info warn error spy]]))
 
-
-(defn is-truthy? [b]
-  (= true b)
-  )
-
 (defn admin? "Returns boolean"
   [tx auth-entity]
 
-  (spy auth-entity)
-  (spy (-> (sql/select [true :has_entry])
-           (sql/from :procurement_admins)
-           (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
-           sql-format
-           (->> (jdbc/execute-one! tx))
-           ))
+  (let [
+        query (-> (sql/select [[:exists
 
-  (-> (sql/select [true :has_entry])
-      (sql/from :procurement_admins)
-      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+                                (-> (sql/select [true :exists])
+                                    (sql/from :procurement_admins)
+                                    (sql/where [:= :procurement_admins.user_id [:cast (:user_id auth-entity) :uuid]]))
 
-      sql-format
+                                ]]
+                              )
+                  sql-format)
 
-      (->> (jdbc/execute-one! tx))
-      (:has_entry)
-      (is-truthy?))
+        p (println ">o> admin?" query)
 
+        result (jdbc/execute-one! tx (spy query))
+        p (println ">o> admin?" result)
+        ]
+
+    (:exists result)
+    )
   )
 
 (defn inspector?
   ([tx auth-entity] (inspector? tx auth-entity nil))
   ([tx auth-entity c-id]
 
+
    (let [
-         has-entry (-> (sql/select [true :has_entry])
-                       (sql/from :procurement_category_inspectors)
-                       (sql/where [:= :user_id (:user_id [:cast auth-entity :uuid])]))
+         query (-> (sql/select [[:exists
+                                 (cond-> (-> (sql/select [true :exists])
+                                             (sql/from :procurement_category_inspectors)
+                                             (sql/where [:= :procurement_category_inspectors.user_id [:cast (:user_id auth-entity) :uuid]]))
+                                         c-id (sql/where [:= :procurement_category_inspectors.category_id [:cast c-id :uuid]]))] :result])
+                   sql-format)
 
-         res (cond-> has-entry
-                     c-id
-                     (sql/where [:= :category_id [:cast c-id :uuid]]))
 
-         query (sql-format res)
+         p (println ">o> inspector?" query)
 
-         res (jdbc/execute-one! tx (spy query))
+         result (jdbc/execute-one! tx (spy query))
+         p (println ">o> inspector?" result)
          ]
-     (is-truthy? (:has_entry res))
-     )
-   ))
+
+     (:result result)
+
+     )))
+
 
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
-  ([tx auth-entity c-id]                                    ;;FIXME
+  ([tx auth-entity c-id]                                    ;;FIXME broken??
 
    (let [
-         has-entry (-> (sql/select [true :has_entry])
-                       (sql/from :procurement_category_viewers)
-                       (sql/where [:= :user_id (:user_id [:cast auth-entity :uuid])]))
+         query (-> (sql/select [[:exists
+                                 (cond-> (-> (sql/select [true :exists])
+                                             (sql/from :procurement_category_viewers)
+                                             (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]]))
+                                         c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))] :result])
+                   sql-format)
 
-         res (cond-> has-entry c-id (sql/where [:= :category_id [:cast c-id :uuid]]))
+         p (println ">o> viewer?" query)
 
-         query (sql-format res)
-
-         res (jdbc/execute-one! tx (spy query))
+         result (jdbc/execute-one! tx (spy query))
+         p (println ">o> viewer?" result)
          ]
-     (is-truthy? (:has_entry res))
+
+     (:result result)
      )))
+
+
+(comment
+
+  (let [
+        user_id #uuid "b363936a-fd9c-567a-82a4-f0b523dbb26b"
+        c-id #uuid "80226a51-c17a-5fd8-93db-40aef5b03491"
+
+        auth-entity {:user_id user_id}
+
+        tx (db/get-ds-next)
+
+        ;sql (cond-> (-> (sql/select [true :exists])
+        ;                (sql/from :procurement_category_viewers)
+        ;                (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]]))
+        ;            c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))
+
+
+
+        ;sql  (-> (sql/select [true :exists])
+        ;                (sql/from :procurement_category_viewers)
+        ;                (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]])
+        ;                ;(sql/where [:= :procurement_category_viewers.user_id [:cast user_id :uuid]])
+        ;         sql-format
+        ;         )
+
+        sql (-> (sql/select [[:exists
+                              (cond-> (-> (sql/select [true :exists])
+                                          (sql/from :procurement_category_viewers)
+                                          (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]]))
+                                      c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))] :result])
+                sql-format)
+
+
+        p (println "\nquery" sql)
+
+        result (jdbc/execute-one! tx sql)
+
+        p (println "\result" (:result result))
+
+
+
+        ;sql (-> (sql/select [[:exists
+        ;                      ;(cond-> (-> (sql/select true)
+        ;                      (spy (cond-> (-> (sql/select [true :exists])
+        ;                                       (sql/from :procurement_category_viewers)
+        ;                                       (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]]))
+        ;                                   c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))) :result]])
+        ;        sql-format)
+        ;
+        ;p (println "\nquery" sql)
+        ;
+        ;
+        ;result (jdbc/execute-one! tx sql)
+        ;
+        ;;p (println "\nquery2" query2)
+        ]
+
+    )
+  )
+
+
 
 (defn requester?
   [tx auth-entity]
 
-  (spy (-> (sql/select [true :has_entry])
-           (sql/from :procurement_requesters_organizations)
-           (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
-           sql-format))
+  (let [
+        query (-> (sql/select [[:exists
 
-  (-> (sql/select [true :has_entry])
-      (sql/from :procurement_requesters_organizations)
-      (sql/where [:= :user_id [:cast (:user_id auth-entity) :uuid]])
+                                (-> (sql/select [true :exists])
+                                    (sql/from :procurement_requesters_organizations)
+                                    (sql/where [:= :procurement_requesters_organizations.user_id [:cast (:user_id auth-entity) :uuid]]))
+                                ]]
+                              )
+                  sql-format)
 
-      ;(spy sql-format)
-      sql-format
+        p (println ">o> requester??" query)
 
-      ;(spy)
-      (->> (jdbc/execute-one! tx))
-      (:has_entry)
-      (is-truthy?))
-  )
+        result (jdbc/execute-one! tx (spy query))
+        p (println ">o> requester??" result)
+        ]
+
+    (:exists result)))
+
 
 (defn advanced?
   [tx auth-entity]

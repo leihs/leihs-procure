@@ -122,7 +122,7 @@
 
         auth-ent (:authenticated-entity request)
         p (myp "authEnt?" auth-ent)
-        txn (:tx request)
+        txn (:tx-next request)
         p (myp "txn" txn)
 
         p (myp "admin" (user-perms/admin? txn auth-ent))
