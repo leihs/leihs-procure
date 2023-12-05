@@ -42,29 +42,80 @@
            ["~~*" :users.firstname term-percent]
            ["~~*" :users.lastname term-percent]]))))
 
+(defn printer [name x]
+  (println ">oo>" name x)
+  x)
+
 (defn requests-query-map
   [context arguments value]
   (let [id (:id arguments)
         ; short_id (:short_id arguments)
+        p (println ">o> helper1")
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
+        p (println ">o> helper2" category-id budget-period-id organization-id)
+
+        p (println ">oo> helper3a priority" (:priority arguments))
         priority (some->> arguments
                    :priority
                    (map request/to-name-and-lower-case))
+        p (println ">oo> helper3b priority" priority)
+
+        p (println ">oo> helper4a inspector-priority" (:inspector-priority arguments))
         inspector-priority (some->> arguments
                              :inspector_priority
                              (map request/to-name-and-lower-case))
+        p (println ">oo> helper4b inspector-priority" inspector-priority)
+
         requested-by-auth-user (:requested_by_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
+        p (println ">o> helper5")
+
+        p (println ">oo> helper5a :order_status" (:order_status arguments))
+        ;order-status (some->> arguments :order_status (map request/to-name-and-upper-case))
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
+        p (println ">oo> helper5b :order_status" order-status)
+
+
+        p (println ">oo> order-status" order-status)
+
         rrequest (:request context)
         tx (:tx rrequest)
         advanced-user? (spy (user-perms/advanced? tx
                                                   (:authenticated-entity rrequest)))
+
+        p (println ">o> helper7" advanced-user?)
+
         start-sqlmap (spy (-> (request/requests-base-query-with-state advanced-user?)
-                              request-helpers/join-and-nest-associated-resources))]
+                              request-helpers/join-and-nest-associated-resources))
+
+
+        p (println ">o> helper8")
+        p (println ">oo> helper8" order-status inspector-priority priority)
+
+
+        ;>o> searchTerm::before    >  <
+        ;>o> searchTerm::before    > java.lang.String <
+        ;>o> searchTerm::before    > 0 <
+        ;>o> requests::search-query %%
+        ;>o> searchTerm::test-query    > [SELECT * FROM buildings, procurement_requests, rooms, models, users WHERE (?, buildings.name, ?) OR (?, users.lastname, ?) ~~* %% ~~* %%] <
+
+
+        p (println ">o> searchTerm::before    >" search-term "<")
+        p (println ">o> searchTerm::before    >" (class search-term) "<")
+        p (println ">o> searchTerm::before    >" (count search-term) "<")
+
+        test (search-query (-> (sql/select :*)
+                               (sql/from :buildings :procurement_requests :rooms :models :users)) search-term)
+        test (-> test
+                 sql/format
+                 )
+        p (println ">o> searchTerm::test-query    >" test "<")
+
+        ]
+
     (cond-> start-sqlmap
             id (sql/merge-where [:in :procurement_requests.id id])
             ; short_id (sql/merge-where [:in :procurement_requests.short_id short_id])
