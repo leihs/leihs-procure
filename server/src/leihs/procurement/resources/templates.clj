@@ -1,6 +1,6 @@
 (ns leihs.procurement.resources.templates
-  (:require 
-    
+  (:require
+
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
@@ -9,40 +9,49 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
-    
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources [categories :as categories]
-             [template :as template]]
+
+
+    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.permissions.user :as user-perms]
+    [leihs.procurement.resources [categories :as categories]
+     [template :as template]]
     ))
 
-(def templates-base-query
-  (-> (sql/select :procurement_templates.*)
-      (sql/from :procurement_templates)
-      (sql/left-join :models
-                           [:= :models.id :procurement_templates.model_id])
-      (sql/order-by (->> [:procurement_templates.article_name :models.product
-                          :models.version]
-                         (map #(->> ( :coalesce % "")
-                                    ( :lower)))
-                         ( :concat)))))
+(do
+  (println ">o> templates::templates-base-query ERROR?")
+
+  (def templates-base-query
+    (-> (sql/select :procurement_templates.*)
+        (sql/from :procurement_templates)
+        (sql/left-join :models
+                       [:= :models.id :procurement_templates.model_id])
+        (sql/order-by (->> [:procurement_templates.article_name :models.product
+                            :models.version]
+                           (map #(->> (:coalesce % "")
+                                      (:lower)))
+                           (:concat)))))
+  )
 
 (defn get-templates
   [context _ value]
+
+  (println ">oo> templates::get-templates _> context" context)
+  (println ">oo> templates::get-templates _> value contains :id??)" value)
   (let [query (cond-> templates-base-query
-                value (sql/where [:= :procurement_templates.category_id
-                                        [:cast (:id value):uuid]]))]
+                      value (sql/where [:= :procurement_templates.category_id [:cast (:id value) :uuid]]))
+        p (println ">oo> templates::get-templates" query)
+        p (println ">oo> templates::get-templates" (sql-format query))
+        ]
     (->> query
          sql-format
          (jdbc/execute! (-> context
-                         :request
-                         :tx-next)))))
+                            :request
+                            :tx-next)))))
 
 (defn get-templates-for-ids
   [tx ids]
   (-> categories/categories-base-query
-      (sql/where [:in :procurement_categories.id ids]) ;; TODO PRIO !!!
+      (sql/where [:in :procurement_categories.id ids])      ;; TODO PRIO !!!
       sql-format
       (->> (jdbc/execute! tx))))
 
@@ -70,10 +79,10 @@
       (if tmpl
         (do (authorization/authorize-and-apply
               #(if-let [id (:id tmpl)]
-                (if (:to_delete tmpl)
-                  (template/delete-template! tx id)
-                  (template/update-template! tx tmpl))
-                (template/insert-template! tx (dissoc tmpl :id)))
+                 (if (:to_delete tmpl)
+                   (template/delete-template! tx id)
+                   (template/update-template! tx tmpl))
+                 (template/insert-template! tx (dissoc tmpl :id)))
               :if-only
               #(or (user-perms/admin? tx auth-entity)
                    (user-perms/inspector? tx auth-entity (:category_id tmpl))))

@@ -370,7 +370,7 @@
 
 (defn treat-order-status [row]
 
-  (println ">o> treat-order-status: row =>" row)
+  (println ">o> treat-order-status: HERE row =>" row)
   (println ">o> treat-order-status: upperCase =>" (upper-case-keyword-value row :order_status))
 
 
@@ -461,7 +461,9 @@
 
 (defn transform-row
   [row advanced-user?]
-  (println ">oo> helper8" "transform-row" row advanced-user?) ;; never used
+
+  (println ">oo> treat-order-status HERE: transform-row" row advanced-user?)
+
   (-> row
       enum-state
       add-general-ledger-account
@@ -474,33 +476,45 @@
       initialize-attachments-attribute
       dissoc-foreign-keys))
 
+;(defn query-requests
+;  [tx auth-entity query]
+;
+;  (println ">o> query-requests, auth-entity" auth-entity)
+;  (println ">o> query-requests, query" query)
+;  (let [advanced-user? (user-perms/advanced? tx auth-entity)
+;
+;        p (println ">o> query-requests::advanced-user?" advanced-user?)
+;        p (println ">o> query-requests::query" query)
+;
+;        ;result (jdbc/execute! tx query)                     ;;ERROR
+;        p (println ">o> 1query-requests::result" result)
+;
+;        ;p (println ">o> 1aquery-requests::fnc-blabla" {:row-fn #(transform-row % advanced-user?)})
+;
+;        result (jdbco/query tx query {:row-fn #(transform-row % advanced-user?)}) ;TODO: BUG-1 activate this
+;        ;p (println ">o> 2query-requests::result" result)
+;
+;        ]
+;
+;    result
+;
+;    ;; TODO, search contains a weired WHERE TRUE=FALSE query
+;    ;(jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})
+;    ))
+
 (defn query-requests
   [tx auth-entity query]
 
-  (println ">o> query-requests, auth-entity" auth-entity)
+  (println ">o> HERE query-requests, auth-entity" auth-entity)
   (println ">o> query-requests, query" query)
+
   (let [advanced-user? (user-perms/advanced? tx auth-entity)
 
-        p (println ">o> query-requests::advanced-user?" advanced-user?)
-        p (println ">o> query-requests::query" query)
-
-        result (jdbc/execute! tx query)                     ;;ERROR
-        p (println ">o> 1query-requests::result" result)
-
-        ;p (println ">o> 1aquery-requests::fnc-blabla" {:row-fn #(transform-row % advanced-user?)})
-
-        ;result (jdbco/query tx query {:row-fn #(transform-row % advanced-user?)}) TODO: BUG-1 activate this
-        ;p (println ">o> 2query-requests::result" result)
-
+        result (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})
+        p (println ">o> >o> HERE :row-fn" result)
         ]
+    result))
 
-    result
-
-    ;; TODO, search contains a weired WHERE TRUE=FALSE query
-    ;(jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})
-
-
-    ))
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
