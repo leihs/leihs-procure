@@ -82,6 +82,8 @@
 
 (defn advanced?
   [tx auth-entity]
+  (println ">o> HERE perm::user/advanced?" {:viewer? (viewer? tx auth-entity) :inspector? (inspector? tx auth-entity) :admin? (admin? tx auth-entity)})
+
   (spy (->> [viewer? inspector? admin?]
        (map #(% tx auth-entity))
        (some true?)))

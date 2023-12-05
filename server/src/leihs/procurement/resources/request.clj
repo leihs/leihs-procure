@@ -179,19 +179,51 @@
 
 (defn upper-case-keyword-value
   [row attr]
+
+  (println ">o> upper-case-keyword-value: row =>" row)
+  (println ">o> upper-case-keyword-value: attr =>" attr)
+
   (update row
           attr
           #(-> %
                upper-case
-               keyword)))
+               keyword))
 
-(defn treat-order-status [row] (upper-case-keyword-value row :order_status))
+  )
 
-(defn treat-priority [row] (upper-case-keyword-value row :priority))
+(defn treat-order-status [row]
+
+  (println ">o> treat-order-status: HERE row =>" row)
+  (let [
+        result (upper-case-keyword-value row :order_status)
+        p (println ">o> treat-:order_status: upperCase =>" (:order_status result))
+        p (if (nil? (:order_status row))
+                    (throw (Exception. "treat-order-status _> nill")))
+        ] result)
+  )
+
+(defn treat-priority [row]
+  (println ">o> treat-priority: row =>" row)
+  (let [
+        result (upper-case-keyword-value row :priority)
+        p (println ">o> treat-priority: upperCase =>" (:priority result))
+        p (if (nil? (:priority row))
+                    (throw (Exception. "treat-priority _> nill")))
+        ] result)
+  )
 
 (defn treat-inspector-priority
   [row]
-  (upper-case-keyword-value row :inspector_priority))
+
+  (println ">o> treat-inspector-priority: row =>" row)
+  (let [
+        result (upper-case-keyword-value row :inspector_priority)
+        p (println ">o> treat-priority: upperCase =>" (:inspector_priority result))
+        p (if (nil? (:inspector_priority row))
+                    (throw (Exception. "treat-inspector-priority _> nill")))
+
+        ] result)
+  )
 
 (defn initialize-attachments-attribute
   [row]
@@ -215,10 +247,21 @@
 
 (defn enum-state
   [row]
-  (->> row
-       :state
-       keyword
-       (assoc row :state)))
+
+
+  (println ">o> treat-inspector-priority: enum-state =>" row)
+
+  (let [
+        p (println ">o> upper-case-keyword-value: attr / :state =>" row)
+        result (->> row
+                    :state
+                    keyword
+                    (assoc row :state))
+        p (println ">o> treat-inspector-priority: enum-state _> " (:state result))
+        ]
+
+    result)
+  )
 
 (defn add-general-ledger-account
   [row]
@@ -258,10 +301,26 @@
       initialize-attachments-attribute
       dissoc-foreign-keys))
 
+;(defn query-requests
+;  [tx auth-entity query]
+;  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
+;    (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})))
+
+
 (defn query-requests
   [tx auth-entity query]
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})))
+
+  (println ">o> HERE query-requests, auth-entity" auth-entity)
+  (println ">o> query-requests, query" query)
+
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)
+
+        p (println ">o> >o> HERE : advanced-user?" advanced-user?)
+        result (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})
+        p (println ">o> >o> HERE :row-fn" result)
+        ]
+    result))
+
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
