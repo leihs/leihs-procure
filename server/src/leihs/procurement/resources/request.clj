@@ -371,27 +371,37 @@
 (defn treat-order-status [row]
 
   (println ">o> treat-order-status: HERE row =>" row)
-  (println ">o> treat-order-status: upperCase =>" (upper-case-keyword-value row :order_status))
-
-
-  (upper-case-keyword-value row :order_status)
-
+  (let [
+        result (upper-case-keyword-value row :order_status)
+        p (println ">o> treat-:order_status: upperCase =>" (:order_status result))
+        p (if (nil? (:order_status row))
+                    (throw (Exception. "treat-order-status _> nill")))
+        ] result)
   )
 
 (defn treat-priority [row]
 
   (println ">o> treat-priority: row =>" row)
-  (println ">o> treat-priority: upperCase =>" (upper-case-keyword-value row :priority))
-
-  (upper-case-keyword-value row :priority))
+  (let [
+        result (upper-case-keyword-value row :priority)
+        p (println ">o> treat-priority: upperCase =>" (:priority result))
+        p (if (nil? (:priority row))
+                    (throw (Exception. "treat-priority _> nill")))
+        ] result)
+  )
 
 (defn treat-inspector-priority
   [row]
 
   (println ">o> treat-inspector-priority: row =>" row)
-  (println ">o> treat-inspector-priority: upperCase =>" (upper-case-keyword-value row :inspector_priority))
+  (let [
+        result (upper-case-keyword-value row :inspector_priority)
+        p (println ">o> treat-priority: upperCase =>" (:inspector_priority result))
+        p (if (nil? (:inspector_priority row))
+                    (throw (Exception. "treat-inspector-priority _> nill")))
 
-  (upper-case-keyword-value row :inspector_priority))
+        ] result)
+  )
 
 (defn initialize-attachments-attribute
   [row]
@@ -399,8 +409,6 @@
 
 (defn add-total-price
   [row advanced-user?]
-  (println ">oo> add-total-price")
-
   (let [transparent-quantity (or (:order_quantity row)
                                  (:approved_quantity row)
                                  (:requested_quantity row))
@@ -428,7 +436,7 @@
                     :state
                     keyword
                     (assoc row :state))
-        p (println ">o> treat-inspector-priority: enum-state =>" result)
+        p (println ">o> treat-inspector-priority: enum-state _> " (:state result))
         ]
 
     result)
