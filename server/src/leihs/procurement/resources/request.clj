@@ -35,8 +35,11 @@
    :user :user_id})
 
 (defn exchange-attrs
-  ([req] (exchange-attrs req attrs-mapping))
+  ([req]
+   (println ">debug> 5")
+   (exchange-attrs req attrs-mapping))
   ([req mapping]
+   (println ">debug> 6")
    (reduce (fn [mem [attr1 attr2]]
              (let [value (attr1 mem)]
                (if (contains? mem attr1)
@@ -49,10 +52,12 @@
 
 (defn reverse-exchange-attrs
   [req]
+  (println ">debug> 4")
   (exchange-attrs req (map-invert attrs-mapping)))
 
 (defn submap-with-id-for-associated-resources
   [m]
+  (println ">debug> 3")
   (->> m
        (map (fn [[k v]]
               (if (some #{k} (keys attrs-mapping)) [k {:id v}] [k v])))
@@ -114,6 +119,7 @@
 
 (defn get-where-conds-for-states
   [states advanced-user?]
+  (println ">debug> 2")
   (reduce (fn [or-conds state]
             (let [sc-map (states-conds-map advanced-user?)]
               (->> sc-map
@@ -124,13 +130,14 @@
 
 (defn to-name-and-lower-case
   [x]
+  (println ">debug> 1a")
   (-> x
       name
       lower-case))
 
 (defn to-name-and-upper-case
   [x]
-  (println ">oo> >>1" x)
+  (println ">debug> 7")
   (-> x
       name
       upper-case))
@@ -143,6 +150,7 @@
 (defn state-sql
   [advanced-user?]
 
+  (println ">debug> 8c")
   (println ">o>" "state-sql" advanced-user?)
 
   (let [s-map (states-conds-map advanced-user?)
@@ -337,6 +345,7 @@
 
 (defn requests-base-query-with-state
   [advanced-user?]
+  (println ">debug> 9b")
   (println ">o>" "requests-base-query-with-state")
   (-> requests-base-query
       (sql/select [(state-sql advanced-user?) :state])
@@ -347,7 +356,7 @@
 
 (defn to-name-and-lower-case-enums
   [m]
-
+  (println ">debug> 10")
   (println ">oo> >here> to-name-and-lower-case-enums" m)
 
   (cond-> m
@@ -357,7 +366,7 @@
 
 (defn upper-case-keyword-value
   [row attr]
-
+  (println ">debug> 11")
   (println ">o> upper-case-keyword-value: row =>" row)
   (println ">o> upper-case-keyword-value: attr =>" attr)
 
@@ -368,7 +377,7 @@
                keyword)))
 
 (defn treat-order-status [row]
-
+  (println ">debug> 12")
   (println ">o> treat-order-status: HERE row =>" row)
   (let [
         result (upper-case-keyword-value row :order_status)
@@ -379,7 +388,7 @@
   )
 
 (defn treat-priority [row]
-
+  (println ">debug> 13")
   (println ">o> treat-priority: row =>" row)
   (let [
         result (upper-case-keyword-value row :priority)
@@ -391,7 +400,7 @@
 
 (defn treat-inspector-priority
   [row]
-
+  (println ">debug> 14")
   (println ">o> treat-inspector-priority: row =>" row)
   (let [
         result (upper-case-keyword-value row :inspector_priority)
@@ -404,10 +413,12 @@
 
 (defn initialize-attachments-attribute
   [row]
+  (println ">debug> 15")
   (assoc row :attachments :unqueried))
 
 (defn add-total-price
   [row advanced-user?]
+  (println ">debug> 16")
   (let [transparent-quantity (or (:order_quantity row)
                                  (:approved_quantity row)
                                  (:requested_quantity row))
@@ -424,7 +435,7 @@
 
 (defn enum-state
   [row]
-
+  (println ">debug> 17")
 
   (println ">o> treat-inspector-priority: enum-state =>" row)
 
@@ -444,6 +455,7 @@
 
 (defn add-general-ledger-account
   [row]
+  (println ">debug> 18")
   (->> row
        :category
        :general_ledger_account
@@ -451,6 +463,7 @@
 
 (defn add-cost-center
   [row]
+  (println ">debug> 19")
   (->> row
        :category
        :cost_center
@@ -458,16 +471,19 @@
 
 (defn add-procurement-account
   [row]
+  (println ">debug> 20")
   (->> row
        :category
        :procurement_account
        (assoc row :procurement_account)))
 
 (defn dissoc-foreign-keys [row]
+  (println ">debug> 21")
   (apply dissoc row (vals attrs-mapping)))
 
 (defn transform-row
   [row advanced-user?]
+  (println ">debug> 22")
 
   (println ">oo> treat-order-status HERE: transform-row" row advanced-user?)
 
@@ -512,6 +528,8 @@
 (defn query-requests
   [tx auth-entity query]
 
+  (println ">debug> 23d")
+
   (println ">o> HERE query-requests, auth-entity" auth-entity)
   (println ">o> query-requests, query" query)
 
@@ -525,6 +543,8 @@
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
+  (println ">debug> 24")
+
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
@@ -532,6 +552,8 @@
 
 (defn get-request-by-id
   [tx auth-entity id]
+  (println ">debug> 25")
+
   (->> id
        (get-request-by-id-sqlmap tx auth-entity)
        request-helpers/join-and-nest-associated-resources
@@ -541,6 +563,8 @@
 
 (defn- consider-default
   [attr p-spec]
+  (println ">debug> 26")
+
   (if (:value p-spec)
     {attr p-spec}
     (->> p-spec
@@ -551,6 +575,8 @@
 
 (defn get-new
   [context args value]
+  (println ">debug> 27")
+
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -605,6 +631,8 @@
 
 (defn get-last-created-request
   [tx auth-entity]
+  (println ">debug> 28")
+
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
@@ -623,6 +651,8 @@
 
 (defn insert!
   [tx data]
+  (println ">debug> 29")
+
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_requests)
                      (sql/values [data])
@@ -630,16 +660,24 @@
 
 (defn update!
   [tx req-id data]
+  (println ">debug> 30")
+
   (jdbc/execute! tx
                  (-> (sql/update :procurement_requests)
                      (sql/set data)
                      (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                      sql-format)))
 
-(defn- filter-attachments [m as] (filter #(submap? m %) as))
+(defn- filter-attachments [m as]
+
+  (println ">debug> 31")
+
+  (filter #(submap? m %) as))
 
 (defn deal-with-attachments!
   [tx req-id attachments]
+  (println ">debug> 32")
+
   (let [uploads-to-delete
         (filter-attachments {:to_delete true, :typename "Upload"} attachments)
         uploads-to-attachments (filter-attachments {:to_delete false,
@@ -665,6 +703,8 @@
 
 (defn change-budget-period!
   [context args _]
+
+  (println ">debug> 33")
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -699,6 +739,8 @@
 
 (defn change-category!
   [context args _]
+  (println ">debug> 34")
+
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -728,6 +770,9 @@
 
 (defn create-request!
   [context args _]
+
+  (println ">debug> 35")
+
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -770,6 +815,8 @@
 
 
 (defn cast-to-order-status-enum [a]
+  (println ">debug> 36")
+
   (println ">oo> >here> cast-to-order-status-enum" a)
   [[:cast (to-name-and-lower-case a) :order_status_enum]]
   )
@@ -811,6 +858,9 @@
 
 (defn update-request!
   [context args _]
+
+  (println ">debug> 37")
+
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
@@ -892,6 +942,9 @@
 
 (defn delete-request!
   [context args _]
+
+  (println ">debug> 38")
+
   (let [ring-request (:request context)
         tx (:tx-next
              ring-request)
@@ -915,6 +968,9 @@
 
 (defn requested-by?
   [tx auth-entity request]
+
+  (println ">debug> 39")
+
   (= (:user_id auth-entity)
      (-> requests-base-query
          (sql/where [:= :procurement_requests.id (:id request)])
