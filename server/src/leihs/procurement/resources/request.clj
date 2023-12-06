@@ -575,13 +575,13 @@
         ;; FIXME: THIS DOESNT WORK
         ;result (jdbc/execute! tx query {:builder-fn #(transform-row % advanced-user?)}) ;;broken
 
-        p (println "\nresult-2a" )
+        p (println "\nresult-2a")
         ;result (jdbc/execute! tx query {:builder-fn (custom-row-builder advanced-user?)})
         ;result (jdbc/execute! tx query {:builder-fn (make-custom-row-builder advanced-user?)})
         ;result (jdbc/execute! tx query {:builder-fn (custom-row-builder advanced-user?)})
 
         result (->> (jdbc/execute! tx query)
-             (map #(transform-row % advanced-user?)))
+                    (map #(transform-row % advanced-user?)))
 
 
 
@@ -599,7 +599,7 @@
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (-> advanced-user?
         requests-base-query-with-state
-        (sql/where [:= :procurement_requests.id id]))))
+        (sql/where [:= :procurement_requests.id [:cast id :uuid]]))))
 
 (defn get-request-by-id
   [tx auth-entity id]
@@ -1010,8 +1010,7 @@
     (authorization/authorize-and-apply
       #(let [result (jdbc/execute! tx
                                    (-> (sql/delete-from :procurement_requests)
-                                       (sql/where [:= :procurement_requests.id
-                                                   [:cast req-id :uuid]])
+                                       (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                                        sql-format))]
          (= result '(1)))
       :if-only
@@ -1024,7 +1023,7 @@
 
   (= (:user_id auth-entity)
      (-> requests-base-query
-         (sql/where [:= :procurement_requests.id (:id request)])
+         (sql/where [:= :procurement_requests.id [:cast (:id request) :uuid]])
          sql-format
          (->> (query-requests tx auth-entity))
          first

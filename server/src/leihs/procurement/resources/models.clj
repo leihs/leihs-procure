@@ -7,12 +7,12 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
+
     [clojure.string :as clj-str]
     [logbug.debug :as debug]))
 
 (def sql-name
-  (concat :product ( :cast " " :varchar) :version))
+  (concat :product (:cast " " :varchar) :version))
 
 (def models-base-query
   (-> (sql/select :* [sql-name :name])
@@ -32,11 +32,10 @@
           limit (:limit args)]
       (sql-format
         (cond-> models-base-query
-          (not-empty terms)
-            (sql/where
-              (into [:and]
-                    (map (fn [term] ["~~*" ( :unaccent sql-name)
-                                     ( :unaccent term)])
-                      terms)))
-          offset (sql/offset offset)
-          limit (sql/limit limit))))))
+                (not-empty terms)
+                (sql/where
+                  (into [:and]
+                        (map (fn [term] [:ilike (:unaccent sql-name) (:unaccent term)])
+                             terms)))
+                offset (sql/offset offset)
+                limit (sql/limit limit))))))

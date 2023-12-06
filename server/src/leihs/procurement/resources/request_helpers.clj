@@ -14,8 +14,7 @@
   [sqlmap]
   (sqlp/join-and-nest sqlmap
                       :suppliers
-                      [:= :suppliers.id :procurement_requests.supplier_id]
-                      :supplier))
+                      [:= :suppliers.id :procurement_requests.supplier_id] :supplier))
 
 (defn join-and-nest-categories                              ;OK
   [sqlmap]
@@ -176,19 +175,19 @@
         ;; FYI: had to create :procurement_departments manually baseed on :procurement_organizations
         ;sqlmap (-> (sql/from :procurement_budget_periods :procurement_requests))
         sqlmap (-> (sql/from :procurement_requests))
-        query   (-> sqlmap
-                    (sqlp/select-nest :procurement_budget_periods :budget_period)
-                    (sql/join
-                      ;[(-> (sql/select :* [(:> :current_date :end_date) :is_past]) ;; FIXME
+        query (-> sqlmap
+                  (sqlp/select-nest :procurement_budget_periods :budget_period)
+                  (sql/join
+                    ;[(-> (sql/select :* [(:> :current_date :end_date) :is_past]) ;; FIXME
 
-                      ;[(-> (sql/select :* [[:> :current_date :end_date] :is_past]) ;; FIXME
-                      [(-> (sql/select :*) ;; FIXME
-                           (sql/from :procurement_budget_periods)
-                           (sql/where [[:> :current_date :end_date] :is_past])
-                           )
+                    ;[(-> (sql/select :* [[:> :current_date :end_date] :is_past]) ;; FIXME
+                    [(-> (sql/select :*)                    ;; FIXME
+                         (sql/from :procurement_budget_periods)
+                         (sql/where [[:> :current_date :end_date] :is_past])
+                         )
 
-                       :procurement_budget_periods]
-                      [:= :procurement_budget_periods.id :procurement_requests.budget_period_id]))
+                     :procurement_budget_periods]
+                    [:= :procurement_budget_periods.id :procurement_requests.budget_period_id]))
 
 
         query (sql-format query)
@@ -308,11 +307,13 @@
   (println ">o>" "join-and-nest-users")
   (sqlp/join-and-nest sqlmap
                       :users
-                      [:= :users.id :procurement_requests.user_id]
-                      :user))
+                      [:= :users.id :procurement_requests.user_id] :user))
 
 (defn join-and-nest-associated-resources
   [sqlmap]
+
+  (println ">o> join-and-nest-associated-resources" sqlmap)
+
   (-> sqlmap
       join-and-nest-budget-periods
 

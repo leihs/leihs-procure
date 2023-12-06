@@ -15,6 +15,7 @@ Causes
 1. Abandoned helper functions
 2. Replacement of "~~*" by honey-support by `:ilike`
 3. Buggy refactoring of auth/permission
+4. Not support jdbc-next/:row-fn (no errors or exceptions)
 
 
 Current focus to fix:

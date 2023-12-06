@@ -7,7 +7,7 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
+
     [clojure.string :as clj-str]
     [logbug.debug :as debug]))
 
@@ -29,11 +29,10 @@
           limit (:limit args)]
       (sql-format
         (cond-> suppliers-base-query
-          (not-empty terms)
-            (sql/where
-              (into [:and]
-                    (map (fn [term] ["~~*" ( :unaccent :suppliers.name)
-                                     ( :unaccent term)])
-                      terms)))
-          offset (sql/offset offset)
-          limit (sql/limit limit))))))
+                (not-empty terms)
+                (sql/where
+                  (into [:and]
+                        (map (fn [term] [:ilike (:unaccent :suppliers.name) (:unaccent term)])
+                             terms)))
+                offset (sql/offset offset)
+                limit (sql/limit limit))))))

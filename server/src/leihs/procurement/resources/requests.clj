@@ -92,7 +92,7 @@
   [context arguments value]
   (let [id (:id arguments)
         ; short_id (:short_id arguments)
-        p (println ">o> helper1")
+        p (println ">o> helper1 id=" id)
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)

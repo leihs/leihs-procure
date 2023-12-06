@@ -21,10 +21,10 @@
   [_ field value]
   (str (format/to-sql field) " ~* " (format/to-sql value)))
 
-; ilike
-(defmethod format/fn-handler "~~*"
-  [_ field value]
-  (str (format/to-sql field) " ~~* " (format/to-sql value)))
+;; ilike
+;(defmethod format/fn-handler "~~*"
+;  [_ field value]
+;  (str (format/to-sql field) " ~~* " (format/to-sql value)))
 
 (defn dedup-join
   [honeymap]
