@@ -535,7 +535,8 @@
 
   (let [advanced-user? (user-perms/advanced? tx auth-entity)
 
-        result (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)})
+        ;; TODO: FIXME, :row-fn doesnt work in new jdbc-version
+        result (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)}) ;; :row-fn
         p (println ">o> >o> HERE :row-fn" result)
         ]
     result))
