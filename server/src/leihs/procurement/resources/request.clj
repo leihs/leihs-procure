@@ -536,11 +536,61 @@
   (let [advanced-user? (user-perms/advanced? tx auth-entity)
 
         ;; TODO: FIXME, :row-fn doesnt work in new jdbc-version
-        result (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)}) ;; :row-fn
+        ;result (jdbc/execute! tx query {:row-fn #(transform-row % advanced-user?)}) ;; :row-fn
+
+        result (->> (jdbc/execute! tx query)
+                    (map #(transform-row % advanced-user?)))
+
         p (println ">o> >o> HERE :row-fn" result)
         ]
     result))
 
+
+
+(comment
+
+  ;; order_status should be uppercased:
+  (let [
+        req_id #uuid "fad5c7f6-4943-53b8-9fa6-9a533dc938ff"
+        tx (db/get-ds-next)
+        advanced-user? true
+
+        query (-> (sql/select :*)
+                  (sql/from :procurement_requests)
+                  (sql/where [:= :id [:cast req_id :uuid]])
+                  (sql/limit 1)
+                  sql-format
+                  )
+        ;query (sql/format {:select :*
+        ;                   :from :procurement_requests
+        ;                   :where [:= :id [:cast req_id :uuid]]})
+
+        p (println "\nquery" query)
+
+        result (jdbc/execute! tx query)
+        ;p (println "\nresult-1" result)
+        p (println "\nresult-1" (:order_status (first result)))
+
+
+        ;; FIXME: THIS DOESNT WORK
+        ;result (jdbc/execute! tx query {:builder-fn #(transform-row % advanced-user?)}) ;;broken
+
+        p (println "\nresult-2a" )
+        ;result (jdbc/execute! tx query {:builder-fn (custom-row-builder advanced-user?)})
+        ;result (jdbc/execute! tx query {:builder-fn (make-custom-row-builder advanced-user?)})
+        ;result (jdbc/execute! tx query {:builder-fn (custom-row-builder advanced-user?)})
+
+        result (->> (jdbc/execute! tx query)
+             (map #(transform-row % advanced-user?)))
+
+
+
+        p (println "\nresult-2b" result)
+        ;p (println "\nresult-2" (:order_status (first result)))
+        ]
+
+    )
+  )
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
