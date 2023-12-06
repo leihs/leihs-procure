@@ -24,11 +24,10 @@
     (-> (sql/select :procurement_templates.*)
         (sql/from :procurement_templates)
         (sql/left-join :models [:= :models.id :procurement_templates.model_id])
-        (sql/order-by (->> [:procurement_templates.article_name :models.product
-                            :models.version]
-                           (map #(->> (:coalesce % "")
-                                      (:lower)))
-                           (:concat)))))
+        (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
+                                     (map #(->> [:lower [:coalesce % ""]])))
+                        ]])
+        ))
   )
 
 (defn get-templates
@@ -49,6 +48,40 @@
          (jdbc/execute! (-> context
                             :request
                             :tx-next)))))
+
+
+(comment
+
+  ;>o> result [SELECT procurement_templates.* FROM procurement_templates  ORDER BY concat((lower(coalesce(procurement_templates.article_name, ?)),
+  ;                                                                                             lower(coalesce(procurement_templates.supplier_name, ?))))  ]
+
+  (let [
+
+        tx (db/get-ds-next)
+
+        result (-> (sql/select :procurement_templates.*)
+                   (sql/from :procurement_templates)
+
+                   ;; works
+                   (sql/order-by [[:concat (->> [:procurement_templates.article_name :procurement_templates.supplier_name]
+                                                (map #(->> [:lower [:coalesce % ""]])))
+                                   ]])
+
+                   ;; works
+                   ;(sql/order-by [[:concat
+                   ;                [:lower [:coalesce :procurement_templates.article_name ""]]
+                   ;                [:lower [:coalesce :procurement_templates.supplier_name ""]]
+                   ;                ]]
+                   ;              )
+
+                   sql-format)
+
+        p (println ">o> result" result)
+        p (println "\n>o> result" (jdbc/execute! tx result))
+
+        ]
+    )
+  )
 
 (defn get-templates-for-ids
   [tx ids]
