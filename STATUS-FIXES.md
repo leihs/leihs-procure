@@ -7,15 +7,16 @@ CURRENT STATE
          - http://localhost:3230/sign-in?return-to=%2Fprocure
          - Account: `jimmie@goyette.com` 
       2. 2/4 GraphQL-Requests are broken           **.. fixed**
-2. Procure tests                                   **.. broken**
+2. Procure tests                                   **.. 22/24 broken**
 3. Integration-tests                               **.. broken**
 
 Causes
 --
 1. Abandoned helper functions
-2. Replacement of "~~*" by honey-support by `:ilike`
+   1. `[[]]` instead of `sql/call` 
+2. Replacement of `"~~*"` by honey-support by `:ilike`
 3. Buggy refactoring of auth/permission
-4. Not support jdbc-next/:row-fn (no errors or exceptions)
+4. Not support `jdbc-next/:row-fn` (no errors or exceptions)
 
 
 Current focus to fix:
@@ -37,15 +38,17 @@ ToClarify
 Known bugs
 --
 ```log
-ERROR:  non-integer constant in ORDER BY at character 190
+FIXED ERROR:  non-integer constant in ORDER BY at character 190
 2023-12-04 09:24:11.796 CET [4795] STATEMENT:  SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id WHERE procurement_templates.category_id = CAST($1 AS UUID) ORDER BY NULL ASC
 
-ERROR:  non-integer constant in ORDER BY at character 131
+FIXED ERROR:  non-integer constant in ORDER BY at character 131
 2023-12-04 09:17:48.239 CET [4795] STATEMENT:  SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id ORDER BY NULL ASC
+
+
+
 
 ERROR:  syntax error at or near "uuid" at character 81
 2023-12-01 19:21:41.922 CET [87369] STATEMENT:  SELECT * FROM procurement_budget_periods WHERE procurement_budget_periods.id IN uuid ORDER BY end_date DESC
-
 
  ERROR:  argument of OR must be type boolean, not type record at character 4044
 
