@@ -23,8 +23,7 @@
   (def templates-base-query
     (-> (sql/select :procurement_templates.*)
         (sql/from :procurement_templates)
-        (sql/left-join :models
-                       [:= :models.id :procurement_templates.model_id])
+        (sql/left-join :models [:= :models.id :procurement_templates.model_id])
         (sql/order-by (->> [:procurement_templates.article_name :models.product
                             :models.version]
                            (map #(->> (:coalesce % "")
@@ -35,12 +34,15 @@
 (defn get-templates
   [context _ value]
 
-  (println ">oo> templates::get-templates _> context" context)
-  (println ">oo> templates::get-templates _> value contains :id??)" value)
+  ;./spec/features/templates/add_template_spec.rb:18
+  ;>oo> templates::get-templates1a ?broken-base-query? {:select [:procurement_templates.*], :from [:procurement_templates], :left-join [:models [:= :models.id :procurement_templates.model_id]], :order-by [nil]}
+
+  (println ">oo> templates::get-templates2 _> HERE value contains :id??)" (:id value) value)
   (let [query (cond-> templates-base-query
                       value (sql/where [:= :procurement_templates.category_id [:cast (:id value) :uuid]]))
-        p (println ">oo> templates::get-templates" query)
-        p (println ">oo> templates::get-templates" (sql-format query))
+        p (println ">oo> templates::get-templates1a ?broken-base-query?" templates-base-query)
+        p (println ">oo> templates::get-templates1b ?broken-base-query?" (-> templates-base-query sql-format))
+        p (println ">oo> templates::get-templates1" (sql-format query))
         ]
     (->> query
          sql-format
