@@ -18,9 +18,13 @@
             [taoensso.timbre :refer [debug error info spy warn]]
             ))
 
-(defn create-order-status-enum-entries [order-stati]
-  (println ">oo> enum" order-stati)
-  (map (fn [status] [[:cast status :order_status_enum]]) order-stati)) ;;TODO
+;(defn create-order-status-enum-entries [order-stati]
+;  (println ">oo> enum" order-stati)
+;  (map (fn [status] [[:cast status :order_status_enum]]) order-stati)) ;;TODO
+
+(defn create-order-status-enum-entries [order-stati]        ;;new
+  (println ">oo> >here> to-name-and-lower-case-enums" order-stati)
+  (map (fn [status] [:cast status :order_status_enum]) order-stati))
 
 (defn search-query
   [sql-query term]
@@ -117,6 +121,7 @@
         ;order-status (some->> arguments :order_status (map request/to-name-and-upper-case))
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         p (println ">oo> helper5b :order_status" order-status)
+        p (println ">oo> helper5c :order_status" (class (first order-status)))
 
 
         p (println ">oo> order-status" order-status)
@@ -132,6 +137,7 @@
                          request-helpers/join-and-nest-associated-resources)
         p (println ">o> helper8")
         p (println ">oo> helper8" order-status inspector-priority priority)
+        p (println ">oo> helper9" start-sqlmap)
 
 
         ;>o> searchTerm::before    >  <
@@ -141,20 +147,19 @@
         ;>o> searchTerm::test-query    > [SELECT * FROM buildings, procurement_requests, rooms, models, users WHERE (?, buildings.name, ?) OR (?, users.lastname, ?) ~~* %% ~~* %%] <
 
 
-        p (println ">o> searchTerm::before    >" search-term "<")
-        p (println ">o> searchTerm::before    >" (class search-term) "<")
-        p (println ">o> searchTerm::before    >" (count search-term) "<")
-
-        test (search-query (-> (sql/select :*)
-                               (sql/from :buildings :procurement_requests :rooms :models :users)) search-term)
-        test (-> test
-                 sql-format
-                 ;(sql-format :quoted true)
-                 )
-        p (println ">o> searchTerm::test-query    >" test "<")
+        ;p (println ">o> searchTerm::before    >" search-term "<")
+        ;p (println ">o> searchTerm::before    >" (class search-term) "<")
+        ;p (println ">o> searchTerm::before    >" (count search-term) "<")
+        ;
+        ;test (search-query (-> (sql/select :*)
+        ;                       (sql/from :buildings :procurement_requests :rooms :models :users)) search-term)
+        ;test (-> test
+        ;         sql-format
+        ;         ;(sql-format :quoted true)
+        ;         )
+        ;p (println ">o> searchTerm::test-query    >" test "<")
 
         ;p (println ">o> searchTerm::after" (jdbc/execute! tx test))
-
 
         ]
 
@@ -166,26 +171,18 @@
             ;:cause Der in SQL für eine Instanz von leihs.procurement.resources.requests$cast_uuids zu verwendende Datentyp kann nicht abgeleitet werden. Benutzen Sie 'setObject()' mit einem expliziten Typ, um ihn festzulegen.
 
 
-            category-id (-> (sql/where
-                              [:in :procurement_requests.category_id (cast-uuids category-id)]
-                              ;[:in :procurement_requests.category_id [:cast category-id :uuid]]
-                              )
-                            ;category-id (-> (sql/where [:in :procurement_requests.category_id [:cast category-id :uuid]])
+            ;; OK START
+            category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
                             (sqlp/merge-where-false-if-empty category-id))
-
-
-
 
             budget-period-id (-> (sql/where
                                    [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
-                                   ;[:in :procurement_requests.budget_period_id [:cast budget-period-id :uuid]])
                                  (sqlp/merge-where-false-if-empty budget-period-id))
 
             organization-id (-> (sql/where
                                   [:in :procurement_requests.organization_id (cast-uuids organization-id)])
-                                  ;[:in :procurement_requests.organization_id [:cast organization-id :uuid]])
                                 (sqlp/merge-where-false-if-empty organization-id))
-
+            ;; OK END
 
 
             priority (-> (sql/where [:in :procurement_requests.priority priority])
@@ -195,16 +192,17 @@
             inspector-priority (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
                                    (sqlp/merge-where-false-if-empty inspector-priority))
 
+            ;; FIXED
             state (-> (sql/where
                         (request/get-where-conds-for-states state advanced-user?))
                       (sqlp/merge-where-false-if-empty state))
 
 
-            order-status (-> (sql/where [:in :procurement_requests.order_status
-                                         ;(map [[#(:cast % :order_status_enum)]] order-status)
-                                         (create-order-status-enum-entries order-status) ;; TODO: cast enum
-                                         ])
-                             ;(map #(sql/call :cast % :order_status_enum) order-status)]) ;; TODO: original, FIXME
+
+
+
+            ;order-status (-> order-status
+            order-status (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries order-status)])
                              (sqlp/merge-where-false-if-empty order-status))
 
 
@@ -219,8 +217,8 @@
             ;Position: 3525
             search-term (search-query search-term)          ;; FIXME: BUG-2
 
-
             )))
+
 
 
 (comment
@@ -254,6 +252,120 @@
 
         p (println "\nquery" query)
         p (println "\nresult" (jdbc/execute! tx query))]
+    )
+  )
+
+
+
+(comment
+  (let [
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds-next)
+
+
+        stati '("not_processed" "in_progress" "procured" "alternative_procured" "not_procured") ;;correct
+
+        p (println "\nquery1")
+        order-status (-> (sql/select :order_status)
+                         (sql/from :procurement_requests))
+
+
+
+
+        advanced-user? true
+
+
+
+        start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
+                         request-helpers/join-and-nest-associated-resources)
+
+
+        order-status (cond-> start-sqlmap
+
+
+                             order-status (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries stati)])
+                                              (sqlp/merge-where-false-if-empty stati))
+
+                             )
+
+
+        p (println "\nquery3")
+        query (-> order-status sql-format)
+
+
+        p (println "\nquery4 formatted:" query)
+        ;p (println "\nresult" (jdbc/execute! tx query))
+
+        ]
+    )
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(comment
+  (let [
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+        tx (db/get-ds-next)
+
+
+
+        ;>oo> helper5b :order_status (not_processed in_progress procured alternative_procured not_procured)
+
+
+        ;order-status (not_processed in_progress procured alternative_procured not_procured)
+        stati '("not_processed" "in_progress" "procured" "alternative_procured" "not_procured") ;;correct
+
+        p (println "\nquery1")
+        order-status (-> (sql/select :*)
+                         (sql/from :procurement_requests))
+
+        ;; CORRECT SQL
+        ;SELECT * FROM procurement_requests
+        ;WHERE procurement_requests.order_status IN (CAST('not_processed' AS ORDER_STATUS_ENUM), CAST('in_progress' AS ORDER_STATUS_ENUM));
+
+        ;; 1) works
+        ;order-status (-> order-status
+        ;                 (sql/where [:in :procurement_requests.order_status [[:cast (first stati) :order_status_enum]
+        ;                                                                     [:cast (second stati) :order_status_enum]]]))
+
+
+        p (println "\nquery1a" (create-order-status-enum-entries stati))
+
+        ;; 2) works
+        ;order-status (-> order-status
+        ;                 (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries stati)]))
+
+        ;; 3) works, WITH STATI
+        order-status (-> order-status
+                         (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries stati)])
+                         (sqlp/merge-where-false-if-empty stati))
+
+
+
+        ;; 4) works, EMPTY LIST
+        ;order-status (-> order-status
+        ;                 (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries stati)])
+        ;                 (sqlp/merge-where-false-if-empty ()))
+
+        p (println "\nquery3")
+        query (-> order-status sql-format)
+
+
+        p (println "\nquery4 formatted:" query)
+        p (println "\nresult" (jdbc/execute! tx query))
+
+        ]
     )
   )
 

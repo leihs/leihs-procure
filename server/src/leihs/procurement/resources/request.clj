@@ -124,7 +124,6 @@
 
 (defn to-name-and-lower-case
   [x]
-  (println ">oo> >>1" x)
   (-> x
       name
       lower-case))
@@ -375,7 +374,7 @@
         result (upper-case-keyword-value row :order_status)
         p (println ">o> treat-:order_status: upperCase =>" (:order_status result))
         p (if (nil? (:order_status row))
-                    (throw (Exception. "treat-order-status _> nill")))
+            (throw (Exception. "treat-order-status _> nill")))
         ] result)
   )
 
@@ -386,7 +385,7 @@
         result (upper-case-keyword-value row :priority)
         p (println ">o> treat-priority: upperCase =>" (:priority result))
         p (if (nil? (:priority row))
-                    (throw (Exception. "treat-priority _> nill")))
+            (throw (Exception. "treat-priority _> nill")))
         ] result)
   )
 
@@ -398,7 +397,7 @@
         result (upper-case-keyword-value row :inspector_priority)
         p (println ">o> treat-priority: upperCase =>" (:inspector_priority result))
         p (if (nil? (:inspector_priority row))
-                    (throw (Exception. "treat-inspector-priority _> nill")))
+            (throw (Exception. "treat-inspector-priority _> nill")))
 
         ] result)
   )
@@ -771,8 +770,44 @@
 
 
 (defn cast-to-order-status-enum [a]
+  (println ">oo> >here> cast-to-order-status-enum" a)
   [[:cast (to-name-and-lower-case a) :order_status_enum]]
   )
+
+
+;(comment                                                    ;; do sama
+;  (let [
+;        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+;        tx (db/get-ds)
+;
+;        raw-order-status '[NOT_PROCESSED IN_PROGRESS PROCURED ALTERNATIVE_PROCURED NOT_PROCURED]
+;        p (println ">o> raw-order-status" raw-order-status)
+;
+;        order-status (some->> raw-order-status
+;                       (map request/to-name-and-lower-case))
+;        p (println ">o> order-status" order-status)
+;
+;        os-map (create-order-status-enum-entries order-status)
+;        p (println ">o> order-os-map" os-map)
+;
+;        sql (-> (sql/select :*)
+;                (sql/from :procurement_requests)
+;                (sql/where [:in :procurement_requests.order_status
+;                            os-map
+;
+;                            ;[[ [:cast (first order-status) :order_status_enum]]] ;;works, 1 entry
+;                            ;[[ [:cast (second order-status) :order_status_enum]]] ;;works, no entry
+;
+;                            ])
+;                )
+;
+;        p (println "\nsql" sql)
+;        query (sql-format sql)
+;
+;        p (println "\nquery" query)
+;        p (println "\nresult" (jdbc/execute! tx query))]
+;    )
+;  )
 
 (defn update-request!
   [context args _]
@@ -793,7 +828,8 @@
         update-data (as-> input-data <>
                       (dissoc <> :id)
                       (dissoc <> :attachments)
-                      (cond-> <> (:order_status <>)
+                      (cond-> <>
+                              (:order_status <>)
                               (update :order_status cast-to-order-status-enum)) ;;TODO
                       ;(update :order_status
                       ;        #(:call :cast (to-name-and-lower-case %) :order_status_enum)))
