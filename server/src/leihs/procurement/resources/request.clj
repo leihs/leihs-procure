@@ -353,12 +353,44 @@
 
   (let [advanced-user? (user-perms/advanced? tx auth-entity)
 
-        p (println ">o> >o> HERE : advanced-user?" advanced-user?)
+        p (println ">o> >o> HERE2 : advanced-user?" advanced-user?)
         result (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})
         p (println ">o> >o> HERE :row-fn" result)
         ]
     result))
 
+(comment
+
+  ;; order_status should be uppercased:
+  (let [
+        req_id #uuid "fad5c7f6-4943-53b8-9fa6-9a533dc938ff"
+        tx (db/get-ds)
+        advanced-user? true
+
+        query (-> (sql/select :*)
+                  (sql/from :procurement_requests)
+                  (sql/where [:= :id [:cast req_id :uuid]])
+                  (sql/limit 1)
+                  sql/format
+                  )
+        ;query (sql/format {:select :*
+        ;                   :from :procurement_requests
+        ;                   :where [:= :id [:cast req_id :uuid]]})
+
+        p (println "\nquery" query)
+
+        result (jdbc/query tx query)
+        ;p (println "\nresult-1" result)
+        p (println "\nresult-1" (:order_status(first result)))
+
+
+        result (jdbc/query tx query {:row-fn #(transform-row % advanced-user?)})
+        ;p (println "\nresult-2" result)
+        p (println "\nresult-2" (:order_status(first result)))
+        ]
+
+       )
+  )
 
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
