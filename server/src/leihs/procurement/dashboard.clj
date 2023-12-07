@@ -166,7 +166,7 @@
                  (assoc :total_price_cents (sum-total-price
                                              main-cats*))))))
 
-       (printer "dashboard::determine-budget-periods/result")
+       ;(printer "dashboard::determine-budget-periods/result")
 
        )
 
