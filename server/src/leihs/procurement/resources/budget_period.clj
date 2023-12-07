@@ -4,6 +4,8 @@
     [clojure.tools.logging :as log]
     [leihs.procurement.utils.sql :as sql]
     [logbug.debug :as debug]
+    [leihs.core.db :as db]
+
     [tick.core :as tick]
     ))
 
@@ -27,7 +29,7 @@
                                 ; for BudgetLimit
                                 (:value value)
                                 ; for RequestFieldBudgetPeriod
-                              )))
+                                )))
   ([tx bp-map]
    (let [where-clause (sql/map->where-clause :procurement_budget_periods
                                              bp-map)]
@@ -76,16 +78,54 @@
 
 (defn past?
   [tx budget-period]
+
+  ;>oo> past? budget-period= {:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name BP-in-inspection-phase,
+  ; :inspection_start_date #time/instant "2023-12-05T23:00:00Z", :end_date #time/instant "2024-01-06T23:00:00Z",
+  ; :created_at #time/instant "2023-12-07T10:39:01.374390Z", :updated_at #time/instant "2023-12-07T10:39:01.374390Z"}
+
+  ;>o> past? query= [SELECT current_date > CAST(? AS date) AS result  2024-01-07]
+  ;>o> past? result= false
+
+  (println ">oo> past? budget-period=" budget-period)
+
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:end_date <>)
                                  (sql-format-date <>)
                                  (sql/call :cast <> :date)
                                  (sql/call :> :current_date <>)) :result])
-                  sql/format)]
-    (->> query
-         (jdbc/query tx)
-         first
-         :result)))
+                  sql/format)
+        p (println ">o> past? query=" query)
+
+        result (->> query
+                    (jdbc/query tx)
+                    first
+                    :result)
+
+
+        p (println ">o> past? result=" result)
+
+        ]
+    result
+
+    )
+  )
+
+
+
+
+
+(comment
+  (let [
+        tx (db/get-ds)
+        data {:end_date #time/instant "2024-01-06T23:00:00Z"}
+        data {:end_date #time/instant "2023-01-06T23:00:00Z"}
+
+        ;; [SELECT current_date > CAST(? AS date) AS result
+        x (past? tx data)
+        ]
+    )
+  )
+
 
 (defn can-delete?
   [context _ value]
