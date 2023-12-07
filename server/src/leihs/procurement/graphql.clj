@@ -76,7 +76,7 @@
 
         p (println "\n>request-grapql _> request" request)
         ; (java.sql.Date)
-        p (println "\n>request-c-grapql _> request (json)" (json/write-str (dissoc request :tx-next :tx :async-channel :options :handler :graphql-schema)))
+        ;p (println "\n>request-c-grapql _> request (json)" (json/write-str (dissoc request :tx-next :tx :async-channel :options :handler :graphql-schema)))
         p (println "\n>request-c-grapql _> query" query)
         p (println "\n>request-grapql _> result =>" result)
 

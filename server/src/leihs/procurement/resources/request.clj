@@ -769,7 +769,7 @@
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
                           (sql/set {:budget_period_id new-budget-period-id})
-                          (sql/where [:= :procurement_requests.id req-id])
+                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                           sql-format))
       :if-only
       #(and (not (budget-period/past? tx budget-period-new))
@@ -808,7 +808,7 @@
                        (and (not (user-perms/inspector? tx auth-entity cat-id))
                             (not (user-perms/admin? tx auth-entity)))
                        (merge change-category-reset-attrs)))
-             (sql/where [:= :procurement_requests.id req-id])
+             (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
              sql-format))
       :if-only
       #(request-perms/authorized-to-write-all-fields? tx

@@ -8,6 +8,9 @@
             [leihs.procurement.resources.user :as user]
             ;[clojure.java.jdbc :as jdbc]
 
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
           [honey.sql :refer [format] :rename {format sql-format}]
           [leihs.core.db :as db]
           [next.jdbc :as jdbc]
@@ -71,10 +74,12 @@
         :default "aquisition",
         :required true},
      :approved_quantity
-       {:read (or (and requester own-request past-phase)
-                  inspector
-                  category-viewer
-                  admin),
+     ;{:read true, :write true,
+
+       {:read (spy (or (and (spy requester) (spy own-request) (spy past-phase))
+                  (spy inspector)
+                  (spy category-viewer)
+                  (spy admin))),
         :write (and (not past-phase)
                     (or
                       (and new-request requester (or admin category-inspector))

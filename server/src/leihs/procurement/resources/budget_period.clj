@@ -2,19 +2,15 @@
   (:require
 
     [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
+    [leihs.core.db :as db]
 
-        [taoensso.timbre :refer [debug info warn error spy]]
-
-
-    ;[clojure.java.jdbc :as jdbc]
     [leihs.procurement.utils.sql :as sqlp]
 
 
-    [clojure.tools.logging :as log]
-    [logbug.debug :as debug]
+    ;[clojure.java.jdbc :as jdbc]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]
     [tick.core :as tick]
     ))
 
@@ -60,7 +56,7 @@
                                  (:inspection_start_date <>)
                                  (sql-format-date <>)
                                  [:cast <> :date]
-                                 (:< :current_date <>)) :result])
+                                 [:< :current_date <>]) :result])
                   sql-format)
 
         p (println ">oo> in-requesting-phase?" query)
@@ -87,10 +83,10 @@
         p (println ">oo> start/end" inspection-start-date end-date)
         query (->
                 (sql/select
-                  [(:and
-                     (:>= :current_date inspection-start-date)
-                     (:< :current_date end-date))
-                   :result])
+                  [[:and
+                    [:>= :current_date inspection-start-date]
+                    [:< :current_date end-date]
+                    ]:result] )
                 sql-format)]
     (->> query
          (jdbc/execute-one! tx)
@@ -98,17 +94,57 @@
 
 (defn past?
   [tx budget-period]
-  (println ">oo> hoi3")
+  (println ">oo> past? budget-period=" budget-period)
 
-  (let [query (-> (sql/select [(as-> budget-period <>
+  ;{:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name BP-in-inspection-phase, :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",
+  ; :end_date #inst "2024-01-06T23:00:00.000000000-00:00", :created_at #inst "2023-12-07T10:39:01.374390000-00:00", :updated_at #inst "2023-12-07T10:39:01.374390000-00:00"}
+
+  (let [
+        query (-> (sql/select [(as-> budget-period <>
                                  (:end_date <>)
                                  (sql-format-date <>)
                                  [:cast <> :date]
-                                 (:> :current_date <>)) :result])
-                  sql-format)]
+                                 [:> :current_date <>]) :result])
+
+                  sql-format)
+
+        p (println ">o> past? query=" query)
+        p (println ">o> past? result=" (->> query
+                                            (jdbc/execute-one! tx)))
+
+        result (->> query
+                    (jdbc/execute-one! tx)
+                    :result)
+
+        p (println ">o> past? result=" result)
+
+        ]
     (->> query
          (jdbc/execute-one! tx)
          :result)))
+
+
+(comment
+  (let [
+        tx (db/get-ds)
+        ;data {:end_date #time/instant "2024-01-06T23:00:00Z"} ;;false
+        data {:end_date #time/instant "2023-01-06T23:00:00Z"} ;;true
+
+        data {:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name "BP-in-inspection-phase", :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",
+              :end_date #inst "2024-01-06T23:00:00.000000000-00:00", :created_at #inst "2023-12-07T10:39:01.374390000-00:00", :updated_at #inst "2023-12-07T10:39:01.374390000-00:00"}
+
+        ;query= [SELECT CAST(? AS DATE) AS result 2023-01-07] ;;broken?
+
+        ;; [SELECT current_date > CAST(? AS date) AS result
+        ;x (past? tx data)
+
+        p (println ">> past?" (past? tx data))
+        p (println ">> in-inspection-phase?" (in-inspection-phase? tx data))
+        p (println ">> in-requesting-phase?" (in-requesting-phase? tx data))
+        ]
+    ;(past? tx data)
+    )
+  )
 
 
 (defn can-delete?
@@ -116,22 +152,22 @@
   (println ">oo> hoi2")
 
   (-> (spy (jdbc/execute-one! (-> context
-                             :request
-                             :tx-next) (-> (
-                                             :and
-                                             (:not
-                                               (:exists
-                                                 (-> (sql/select true)
-                                                     (sql/from [:procurement_requests :pr])
-                                                     (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))))
-                                             (:not
-                                               (:exists
-                                                 (-> (sql/select true)
-                                                     (sql/from [:procurement_budget_limits :pbl])
-                                                     (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]])))))
-                                           (vector :result)
-                                           sql/select
-                                           sql-format)))
+                                  :request
+                                  :tx-next) (-> (
+                                                  :and
+                                                  (:not
+                                                    (:exists
+                                                      (-> (sql/select true)
+                                                          (sql/from [:procurement_requests :pr])
+                                                          (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))))
+                                                  (:not
+                                                    (:exists
+                                                      (-> (sql/select true)
+                                                          (sql/from [:procurement_budget_limits :pbl])
+                                                          (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]])))))
+                                                (vector :result)
+                                                sql/select
+                                                sql-format)))
 
       :result))
 
