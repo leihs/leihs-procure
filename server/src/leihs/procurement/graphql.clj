@@ -132,12 +132,12 @@
                        (= :mutation))]
     (if mutation?
       (jdbco/with-db-transaction
-        [tx (:tx-next request)
+        [tx (:tx request)
          ]
         (try (let [
                    p (println "pure-handler >> 1")
                    response (->> tx
-                                 (assoc request :tx-next)
+                                 (assoc request :tx)
                                  pure-handler)]
                (when (:graphql-error response)
                  (warn "Rolling back transaction because of graphql error: " response)

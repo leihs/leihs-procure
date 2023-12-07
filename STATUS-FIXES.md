@@ -7,7 +7,7 @@ CURRENT STATE
          - http://localhost:3230/sign-in?return-to=%2Fprocure
          - Account: `jimmie@goyette.com` 
       2. 2/4 GraphQL-Requests are broken           **.. fixed**
-2. Procure tests                                   **.. 22/24 broken**
+2. Procure tests                                   **.. 21/24 broken**
 3. Integration-tests                               **.. broken**
 
 Causes

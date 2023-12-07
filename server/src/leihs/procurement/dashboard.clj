@@ -163,7 +163,7 @@
                 )
               )
             )
-       (printer "dashboard::determine-budget-periods/result")
+       ;(printer "dashboard::determine-budget-periods/result")
 
        )
   )

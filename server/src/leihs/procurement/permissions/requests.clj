@@ -22,14 +22,14 @@
         ]
     (if (or (user-perms/admin? tx auth-entity)
             (user-perms/inspector? tx auth-entity))
-      (spy sqlmap)                                          ;; TODO: do sama
-      (spy (-> sqlmap
+      sqlmap                                          ;; TODO: do sama
+      (-> sqlmap
           (sql/left-join :procurement_category_viewers
                                [:= :procurement_category_viewers.category_id
                                 :procurement_requests.category_id])
           (sql/where [:or
-                            [:= :procurement_category_viewers.user_id user-id]
-                            [:= :procurement_requests.user_id user-id]])))
+                            [:= :procurement_category_viewers.user_id [:cast user-id :uuid]]
+                            [:= :procurement_requests.user_id [:cast user-id :uuid]]]))
 
 
       )))

@@ -169,9 +169,9 @@
 
 (defn advanced?
   [tx auth-entity]
-  (spy (->> [viewer? inspector? admin?]
+  (->> [viewer? inspector? admin?]
             (map #(% tx auth-entity))
-            (some true?))))
+            (some true?)))
 
 (defn get-permissions
   [{{:keys [tx-next authenticated-entity]} :request} args value]
