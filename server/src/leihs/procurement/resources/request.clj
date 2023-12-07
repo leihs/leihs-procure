@@ -1020,6 +1020,8 @@
   [tx auth-entity request]
 
   (println ">debug> 39")
+  (println ">debug> 39 request=" request)
+  (println ">debug> 39 reques.idt=" (:id request))
 
   (= (:user_id auth-entity)
      (-> requests-base-query

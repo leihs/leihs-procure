@@ -161,10 +161,11 @@
 
         ;p (println ">o> searchTerm::after" (jdbc/execute! tx test))
 
+        p (println ">o>> where [:in :procurement_requests.id [:cast id :uuid]])" id)
         ]
 
     (cond-> start-sqlmap
-            id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
+            id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
 
 
