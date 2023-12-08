@@ -3,6 +3,9 @@
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia.resolve :as resolve]
             [leihs.procurement.paths :refer [path]]
+
+            [taoensso.timbre :refer [debug info warn error spy]]
+
             [leihs.procurement.resources [budget-limits :as budget-limits]
              [categories :as categories] [image :as image]
              [main-category :as main-category]]
@@ -15,17 +18,28 @@
 
 (defn merge-image-path
   [tx mc]
+
+  (println ">debug 5" mc)
+  (println ">debug 5a id" (:id mc))
+
   (let [image (->> (:id mc)
                    image/image-query-for-main-category
                    sql/format
+                   spy
                    (jdbc/query tx)
-                   first)]
+                   first)
+        p (println ">debug 5b" image)
+        ]
     (if-let [image-id (:id image)]
       (merge mc {:image_url (path :image {:image-id image-id})})
       mc)))
 
 (defn transform-row
   [tx row]
+
+  (println ">debug 4")
+
+
   (as-> row <>
     (merge-image-path tx <>)
     (assoc <>
@@ -35,21 +49,31 @@
 
 (defn get-main-categories
   ([tx]
+   (println ">debug 3")
    (->> main-categories-base-query
         sql/format
+        spy
         (jdbc/query tx)
         (map #(transform-row tx %))))
+
   ([context _ _]
+   (println ">debug 2")
+
    (get-main-categories (-> context
                             :request
                             :tx))))
 
 (defn get-main-categories-by-names
   [tx names]
+
+  (println ">debug 1")
+  (println ">o> get-main-categories-by-names" names)
+
   (jdbc/query tx
               (-> main-categories-base-query
                   (sql/where [:in :procurement_main_categories.name names])
                   (sql/order-by [:procurement_main_categories.name :asc])
+                  spy
                   sql/format)))
 
 (defn update-main-categories!
@@ -74,9 +98,9 @@
                                  :id))))
               (let [image (:new_image_url mc)
                     budget-limits
-                      (->> mc
-                           :budget_limits
-                           (map #(merge % {:main_category_id @mc-id})))
+                    (->> mc
+                         :budget_limits
+                         (map #(merge % {:main_category_id @mc-id})))
                     categories (->> mc
                                     :categories
                                     (map #(merge %

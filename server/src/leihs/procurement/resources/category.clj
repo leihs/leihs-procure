@@ -1,5 +1,9 @@
 (ns leihs.procurement.resources.category
   (:require [clojure.java.jdbc :as jdbc]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.utils.sql :as sql]))
 
 (def category-base-query
@@ -61,17 +65,23 @@
       first
       :result))
 
+
+;;; short for sql set, to avoid name collision with clojure.core/set
+;(defn sset
+;  ([vs] (sset nil vs))
+;  ([m vs] (build-clause :set m vs)))
+
 (defn update-category!
   [tx c]
-  (jdbc/execute! tx
+  (spy (jdbc/execute! tx
                  (-> (sql/update :procurement_categories)
                      (sql/sset c)
                      (sql/where [:= :procurement_categories.id (:id c)])
-                     sql/format)))
+                     sql/format))))
 
 (defn insert-category!
   [tx c]
-  (jdbc/execute! tx
+  (spy (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_categories)
                      (sql/values [c])
-                     sql/format)))
+                     sql/format))))

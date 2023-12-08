@@ -41,9 +41,10 @@
         ]
     (->> (spy query)
          sql/format
-         (jdbc/query (spy (-> context
+         spy
+         (jdbc/query (-> context
                               :request
-                              :tx))))))
+                              :tx)))))
 
 
 (comment
@@ -120,7 +121,7 @@
            tmpl-ids []]
       (println ">o> templates " tmpl)
       (if (spy tmpl)
-        (do (authorization/authorize-and-apply
+         (do (authorization/authorize-and-apply
               #(if-let [id (:id tmpl)]
                  (if (spy (:to_delete tmpl))
                    (spy (template/delete-template! tx id))
@@ -135,5 +136,8 @@
             (->> tmpl
                  (get-template-id tx)
                  (conj tmpl-ids)
+                 spy
                  (recur rest-tmpls)))
-        (categories/get-categories-for-ids tx cat-ids)))))
+        (spy (categories/get-categories-for-ids tx cat-ids))
+
+        ))))

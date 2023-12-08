@@ -2,6 +2,9 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
             [leihs.procurement.authorization :as authorization]
+
+            [taoensso.timbre :refer [debug info warn error spy]]
+
             [leihs.procurement.permissions.user :as user-perms]
             [leihs.procurement.resources [category :as category]
              [inspectors :as inspectors] [viewers :as viewers]]
@@ -18,7 +21,7 @@
   (println ">oo> tocheck value" value)
 
   (let [id (:id arguments)
-        p (println ">o> tocheck (not nil)" id)
+        p (println ">o> tocheck (not nil, multiple??)" id)
         inspected-by-auth-user (:inspected_by_auth_user arguments)
         main-category-id (:id value)]
     (sql/format
@@ -50,6 +53,7 @@
       (sql/merge-where [:= :procurement_categories.main_category_id
                         main-cat-id])
       sql/format
+      spy
       (->> (jdbc/query tx))))
 
 (defn get-categories
@@ -57,6 +61,7 @@
   (if (= (:id arguments) [])
     []
     (->> (categories-query context arguments value)
+         spy
          (jdbc/query (-> context
                          :request
                          :tx)))))
@@ -69,6 +74,7 @@
         (sql/merge-where [:= :procurement_categories.main_category_id mc-id])
         (cond-> (not (empty? ids)) (sql/merge-where
                                      [:not-in :procurement_categories.id ids]))
+        spy
         sql/format)))
 
 (defn update-categories!

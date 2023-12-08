@@ -12,18 +12,24 @@
 
 (defn main-category-query-by-id
   [id]
+  (println ">debug 24")
+
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.id id])
       sql/format))
 
 (defn main-category-query-by-name
   [mc-name]
+  (println ">debug 23")
+
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.name mc-name])
       sql/format))
 
 (defn get-main-category
   [context _ value]
+  (println ">debug 22")
+
   (-> value
       :main_category_id
       main-category-query-by-id
@@ -34,6 +40,10 @@
 
 (defn get-main-category-by-name
   [tx mc-name]
+
+  (println ">debug 21")
+
+
   (first (jdbc/query tx (main-category-query-by-name mc-name))))
 
 (defn insert!
@@ -55,7 +65,7 @@
     (jdbc/execute! tx
                    (-> (sql/delete-from :procurement_images)
                        (sql/where [:= :procurement_images.main_category_id
-                                   mc-id])
+                                   [:cast mc-id :uuid]])
                        sql/format))
     (image/create-for-main-category-id-and-upload! tx mc-id new-image-upload))
   (when-let [uploads-to-delete (-> {:to_delete true, :typename "Upload"}
@@ -67,7 +77,7 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sql/sset mc)
+                     (sql/sset mc)                          ;; TODO sql/sset
                      (sql/where [:= :procurement_main_categories.id (:id mc)])
                      sql/format)))
 

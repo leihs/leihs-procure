@@ -7,6 +7,9 @@
             [leihs.procurement.resources.template :as template]
             [leihs.procurement.resources.user :as user]
             [clojure.java.jdbc :as jdbc]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
             [clojure.tools.logging :as log]
             [leihs.procurement.resources.budget-period :as budget-period]))
 
@@ -362,8 +365,9 @@
         :default (rooms/general-from-general tx),
         :required true},
      :supplier
-       {:read (or (and requester own-request) category-viewer inspector admin),
-        :write (and
+       {
+        :read (spy (or (and requester own-request) category-viewer inspector admin)),
+        :write (spy (and
                  (not template)
                  (not past-phase)
                  (or (and new-request
@@ -374,7 +378,7 @@
                      (and existing-request
                           (or admin
                               category-inspector
-                              (and requesting-phase requester own-request))))),
+                              (and requesting-phase requester own-request)))))),
         :default (:supplier_id template),
         :required false},
      :supplier_name
