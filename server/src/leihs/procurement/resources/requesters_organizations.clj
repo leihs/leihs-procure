@@ -21,7 +21,7 @@
   [context _ _]
   (jdbc/execute! (-> context
                   :request
-                  :tx)
+                  :tx-next)
               (sql-format requesters-organizations-base-query)))
 
 (defn get-organization-of-requester

@@ -28,7 +28,7 @@
                       (category-query (or (:value value)
                                           ; for
                                           ; RequestFieldCategory
-                                          (:category_id value))))))
+                                          [:cast (:category_id value) :uuid])))))
   ([tx catmap]
    (let [where-clause (sqlp/map->where-clause :procurement_categories catmap)]
      ((jdbc/execute-one! tx

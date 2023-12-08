@@ -57,6 +57,20 @@ LECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_req
 (($22, buildings.name, $23) OR ($24, procurement_requests.short_id, $25) OR ($26, procurement_requests.article_name, $27) OR ($28, procurement_requests.article_number, $29) OR 
 
 ($30, procurement_requests.inspection_comment, $31) OR ($32, procurement_requests.order_comment, $33) OR ($34, procurement_requests.motivation, $35) OR ($36, procurement_requests.receiver, $37) OR ($38, procurement_requests.supplier_name, $39) OR ($40, rooms.name, $41) OR ($42, models.product, $43) OR ($44, models.version, $45) OR ($46, users.firstname, $47) OR ($48, users.lastname, $49)) AND ((procurement_category_viewers.user_id = $50) OR (procurement_requests.user_id = $51)) ORDER BY concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, ''))) ASC
+
+
+[46953] ERROR:  column "room_id" is of type uuid but expression is of type character varying at character 246
+[46953] HINT:  You will need to rewrite or cast the expression.
+[46953] STATEMENT:  UPDATE procurement_requests SET motivation = $1, article_number = $2, price_cents = $3, article_name = $4, replacement = TRUE, supplier_name = $5, order_status = (CAST($6 AS ORDER_STATUS_ENUM)), requested_quantity = $7, priority = $8, room_id = $9, receiver = $10 WHERE procurement_requests.id = CAST($11 AS UUID)
+ 
+[46953] ERROR:  syntax error at or near ")" at character 97
+[46953] STATEMENT:  SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.id IN () ORDER BY procurement_categories.name ASC
+
+[46953] ERROR:  column "category_id" is of type uuid but expression is of type character varying at character 90
+[46953] HINT:  You will need to rewrite or cast the expression.
+[46953] STATEMENT:  INSERT INTO procurement_templates (article_name, category_id, supplier_name) VALUES ($1, $2, NULL)
+
+
 ```
 
 
