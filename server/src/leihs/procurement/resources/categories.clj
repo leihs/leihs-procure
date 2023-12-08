@@ -1,6 +1,10 @@
 (ns leihs.procurement.resources.categories
   (:require
 
+
+
+        [taoensso.timbre :refer [debug info warn error spy]]
+
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
     
@@ -66,6 +70,7 @@
       (sql/where [:= :procurement_categories.main_category_id
                         main-cat-id])
       sql-format
+      spy
       (->> (jdbc/execute! tx))))
 
 (defn get-categories
@@ -73,6 +78,7 @@
   (if (= (:id arguments) [])
     []
     (->> (categories-query context arguments value)
+         spy
          (jdbc/execute! (-> context
                          :request
                          :tx-next)))))

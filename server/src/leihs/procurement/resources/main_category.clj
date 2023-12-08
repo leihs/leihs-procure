@@ -5,6 +5,10 @@
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
+
+    [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [honey.sql.helpers :as sql]
     
             [clojure.tools.logging :as log]
@@ -22,18 +26,24 @@
 
 (defn main-category-query-by-id
   [id]
+  (println ">debug 24")
+
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.id [:cast id :uuid]])
       sql-format))
 
 (defn main-category-query-by-name
   [mc-name]
+  (println ">debug 23")
+
   (-> main-category-base-query
       (sql/where [:= :procurement_main_categories.name mc-name])
       sql-format))
 
 (defn get-main-category
   [context _ value]
+  (println ">debug 22")
+
   (-> value
       :main_category_id
       main-category-query-by-id
@@ -44,6 +54,9 @@
 
 (defn get-main-category-by-name
   [tx mc-name]
+
+  (println ">debug 21")
+
   (first (jdbc/execute! tx (main-category-query-by-name mc-name))))
 
 (defn insert!

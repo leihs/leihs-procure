@@ -8,6 +8,9 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
     
             [com.walmartlabs.lacinia.resolve :as resolve]
             [leihs.procurement.paths :refer [path]]
@@ -23,17 +26,28 @@
 
 (defn merge-image-path
   [tx mc]
+
+  (println ">debug 5" mc)
+  (println ">debug 5a id" (:id mc))
+
   (let [image (->> (:id mc)
                    image/image-query-for-main-category
                    sql-format
+                   spy
                    (jdbc/execute-one! tx)
-                   )]
+                   )
+        p (println ">debug 5b" image)
+        ]
     (if-let [image-id (:id image)]
       (merge mc {:image_url (path :image {:image-id image-id})})
       mc)))
 
 (defn transform-row
   [tx row]
+
+  (println ">debug 4")
+
+
   (as-> row <>
     (merge-image-path tx <>)
     (assoc <>
@@ -43,17 +57,26 @@
 
 (defn get-main-categories
   ([tx]
+   (println ">debug 3")
    (->> main-categories-base-query
         sql-format
         (jdbc/execute! tx)
         (map #(transform-row tx %))))
+
   ([context _ _]
+   (println ">debug 2")
+
    (get-main-categories (-> context
                             :request
                             :tx-next))))
 
 (defn get-main-categories-by-names
   [tx names]
+
+  (println ">debug 1")
+
+
+  (println ">o> get-main-categories-by-names" names)
   (jdbc/execute! tx
               (-> main-categories-base-query
                   (sql/where [:in :procurement_main_categories.name names]) ;;TODO FIXME
@@ -62,6 +85,8 @@
 
 (defn update-main-categories!
   [context args _]
+  (println ">debug ")
+
   (let [tx (-> context
                :request
                :tx-next)
