@@ -5,14 +5,30 @@
 
             [leihs.procurement.utils.sql :as sql]))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 (defn supplier-query
   [id]
   (println ">o> tocheck suppliers.id=" id)
-  (spy (-> (sql/select :suppliers.*)
+  (-> (sql/select :suppliers.*)
       (sql/from :suppliers)
       (sql/where [:= :suppliers.id [:cast (spy id) :uuid]])
       ;(sql/where [:= :suppliers.id (spy id) ])
-      sql/format)))
+      sql/format
+           spy
+           ))
 
 (defn get-supplier-by-id [tx id] (first (jdbc/query tx (supplier-query id))))
 
