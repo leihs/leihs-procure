@@ -26,11 +26,15 @@ feature 'Unarchive Template(s)' do
     end
 
     scenario 'unarchive single template' do
+      binding.pry
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
+      # binding.pry
       show_archived_buttons.first.click
+      # binding.pry
       archive_buttons = all('label[id^="btn_archive"]')
       archive_buttons.first.click
+      # binding.pry
       find('button[type="submit"]').click
     end
 
