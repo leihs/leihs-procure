@@ -6,12 +6,14 @@ Feature: Request CRUD as a requester
 
   Scenario: Create a request as a requester
     Given there is a budget period "Budget-Period-BP" in requesting phase
+    And I pry
     And there is category
     And there is a requester
     And there is a supplier "Supplier S"
     And there is a building "Building B"
     And there is a room "Room R" for building "Building B"
     When I log in as the requester
+    And I pry
     And within the line of the budget period I click on +
     And within the line of the category I click on +
     When I enter the following data into the request form:
