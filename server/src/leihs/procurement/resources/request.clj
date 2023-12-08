@@ -29,15 +29,18 @@
    :category :category_id,
    :model :model_id,
    :organization :organization_id,
-   :room :room_id,
+   :room :room_id,                                          ;; should be uuid
    :supplier :supplier_id,
    :template :template_id,
    :user :user_id})
 
+
+
 (defn exchange-attrs
   ([req]
    (println ">debug> 5")
-   (exchange-attrs req attrs-mapping))
+   (spy (exchange-attrs req attrs-mapping)))
+
   ([req mapping]
    (println ">debug> 6")
    (reduce (fn [mem [attr1 attr2]]
@@ -48,7 +51,8 @@
                      (dissoc attr1))
                  mem)))
            req
-           mapping)))
+           mapping)
+   ))
 
 (defn reverse-exchange-attrs
   [req]
@@ -709,14 +713,38 @@
                      (sql/values [data])
                      sql-format)))
 
+
+
+(defn my-cast [data]
+  (println ">o> no / my-cast /debug " data)
+  (if (contains? data :room_id)
+    (let [
+          p (println ">o> no before _> room_id=" (:room_id data))
+          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
+          ;(assoc data :room_id [:cast (:room_id data) :uuid])
+          data (assoc data :room_id [[:cast (:room_id data) :uuid]])
+          p (println ">o> no after _> room_id=" data)
+          ] data)
+    data
+    )
+  )
+
+
 (defn update!
   [tx req-id data]
   (println ">debug> 30")
+  (println ">debug> update!=" data)
+
+
+  (println ">o> no before quest _> room_id=" (my-cast data))
+
 
   (jdbc/execute! tx
-                 (-> (sql/update :procurement_requests)
-                     (sql/set data)
+                 (-> (sql/update :procurement_requests)     ;;fixme
+                     (sql/set (my-cast data))
                      (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                     ;(sql/where :raw "/* da sama 123 */" )
+                     ;(sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                      sql-format)))
 
 (defn- filter-attachments [m as]
@@ -804,7 +832,7 @@
          tx
          (-> (sql/update :procurement_requests)
              (sql/set
-               (cond-> {:category_id cat-id}
+               (cond-> {:category_id [:cast cat-id :uuid]}
                        (and (not (user-perms/inspector? tx auth-entity cat-id))
                             (not (user-perms/admin? tx auth-entity)))
                        (merge change-category-reset-attrs)))
@@ -941,7 +969,8 @@
 
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(do (update! tx req-id (exchange-attrs update-data))
+      ;[leihs.procurement.resources.request:972] - (update! tx req-id (exchange-attrs update-data)) => [{:next.jdbc/update-count 1}]
+      #(do (spy (update! tx req-id (exchange-attrs update-data)))
            (if-not (empty? attachments)
              (deal-with-attachments! tx req-id attachments)))
       :if-only

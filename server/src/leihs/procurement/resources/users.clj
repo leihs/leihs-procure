@@ -18,7 +18,7 @@
     (concat :users.firstname :users.lastname :users.login :users.id)))
 
 (def users-base-query
-  (-> (sql/select :users.id :users.firstname :users.lastname)
+  (-> (sql/select :users.id :users.firstname :users.lastname) ;; FIXME TODO
       (sql/from :users)
       sql-order-users))
 
@@ -31,30 +31,29 @@
     (let [search-term (:search_term args)
           term-parts (and search-term
                           (map (fn [part] (str "%" part "%"))
-                            (clj-str/split search-term #"\s+")))
+                               (clj-str/split search-term #"\s+")))
           is-requester (:isRequester args)
           exclude-ids (:exclude_ids args)
           offset (:offset args)
           limit (:limit args)]
       (-> (cond-> users-base-query is-requester
                   (sql/join :procurement_requesters_organizations
-                                  [:=
-                                   :procurement_requesters_organizations.user_id
-                                   :users.id])
-                    term-parts
+                            [:=
+                             :procurement_requesters_organizations.user_id
+                             :users.id])
+                  term-parts
                   (sql/where
                     (into [:and]
                           (map
                             (fn [term-percent]
-                              ["~~*"
-                               (->> (concat
-                                              :users.firstname
-                                              ( :cast " " :varchar)
-                                              :users.lastname)
-                                    ( :unaccent))
-                               ( :unaccent term-percent)])
+                              [:ilike (->> (concat
+                                             :users.firstname
+                                             [:cast " " :varchar]
+                                             :users.lastname)
+                                           [:unaccent])
+                               [:unaccent term-percent]])
                             term-parts)))
-                    exclude-ids
+                  exclude-ids
                   (sql/where [:not-in :users.id exclude-ids]) offset
                   (sql/offset offset) limit
                   (sql/limit limit))
