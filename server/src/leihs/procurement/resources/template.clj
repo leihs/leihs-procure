@@ -4,6 +4,9 @@
     ;[clojure.java.jdbc :as jdbc]
             [leihs.procurement.utils.sql :as sqlp]
 
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
           [honey.sql :refer [format] :rename {format sql-format}]
           [leihs.core.db :as db]
           [next.jdbc :as jdbc]
@@ -48,10 +51,16 @@
 
 (defn insert-template!
   [tx tmpl]
-  (jdbc/execute! tx
+  (spy (-> (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_templates)
                      (sql/values [(my-cast tmpl)])
-                     sql-format)))
+                     sql-format)
+
+                 )
+      :update-count
+      ))
+
+  )
 
 (defn validate-update-attributes [tx tmpl]
   (let [req-exist? (-> (sql/select :%count.*)
@@ -81,6 +90,8 @@
 
 (defn get-template
   ([context _ value]
+
+   (println ">o> tocheck ??? get-template" value)
 
    (get-template-by-id (-> context
                            :request

@@ -115,12 +115,13 @@
         cat-ids (map :category_id input-data)]
     (loop [[tmpl & rest-tmpls] (spy input-data)
            tmpl-ids []]
+      (println ">o> templates " tmpl)
       (if (spy tmpl)
         (do (authorization/authorize-and-apply
               #(if-let [id (:id tmpl)]
                  (if (spy (:to_delete tmpl))
-                   (template/delete-template! tx id)
-                   (template/update-template! tx tmpl))
+                   (spy (template/delete-template! tx id))
+                   (spy (template/update-template! tx tmpl)))
 
                  (spy (template/insert-template! tx (dissoc tmpl :id)))
                  )
