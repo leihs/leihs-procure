@@ -16,7 +16,7 @@
              [categories :as categories] [image :as image] [images :as images]
              [uploads :as uploads]]
             [leihs.procurement.utils [helpers :refer [submap?]] 
-             ;[sql :as sql]
+             [sql :as sqlo]
              ]
     ))
 
@@ -90,7 +90,7 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sql/set mc)
+                     (sqlo/sset mc)
                      (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 

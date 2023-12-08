@@ -91,6 +91,7 @@
         (sql/where [:= :procurement_categories.main_category_id mc-id])
         (cond-> (not (empty? ids)) (sql/where
                                      [:not-in :procurement_categories.id ids])) ;;FIXME TODO ids
+        spy
         sql-format)))
 
 (defn update-categories!

@@ -44,10 +44,11 @@
                       value (sql/where [:= :procurement_templates.category_id [:cast (:id value) :uuid]]))
         p (println ">oo> templates::get-templates1a ?broken-base-query?" templates-base-query)
         p (println ">oo> templates::get-templates1b ?broken-base-query?" (-> templates-base-query sql-format))
-        p (println ">oo> templates::get-templates1" (sql-format query))
+        p (println ">oo> templates::get-templates1c" (sql-format query))
         ]
     (->> query
          sql-format
+         spy
          (jdbc/execute! (-> context
                             :request
                             :tx-next)))))
@@ -115,7 +116,7 @@
         cat-ids (map :category_id input-data)]
     (loop [[tmpl & rest-tmpls] (spy input-data)
            tmpl-ids []]
-      (println ">o> templates " tmpl)
+      ;(println ">o> templates " tmpl)
       (if (spy tmpl)
         (do (authorization/authorize-and-apply
               #(if-let [id (:id tmpl)]

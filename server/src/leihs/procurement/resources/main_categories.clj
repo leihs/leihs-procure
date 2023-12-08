@@ -60,6 +60,7 @@
    (println ">debug 3")
    (->> main-categories-base-query
         sql-format
+        spy
         (jdbc/execute! tx)
         (map #(transform-row tx %))))
 
@@ -81,6 +82,7 @@
               (-> main-categories-base-query
                   (sql/where [:in :procurement_main_categories.name names]) ;;TODO FIXME
                   (sql/order-by [:procurement_main_categories.name :asc])
+                  spy
                   sql-format)))
 
 (defn update-main-categories!

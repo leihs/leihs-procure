@@ -5,37 +5,37 @@
 Warning: environ value /Users/mradl/.asdf/installs/java/zulu-11.60.19 for key :java-home has been overwritten with /Users/mradl/.asdf/installs/java/zulu-11.60.19/zulu-11.jdk/Contents/Home
 >o> conc concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))
 >o> templates::templates-base-query ERROR?
-2023-12-08T12:32:50.441Z NX-41294 WARN [leihs.core.release:13] - Failed to read releases.yml, returning bogus value 
-2023-12-08T12:32:51.002Z NX-41294 INFO [leihs.core.logging:37] - initializing logging  {:min-level [[#{"leihs.procurement" "leihs.procurement.resources.*" "leihs.procurement.permissions.*" "leihs.procurement.authorization" "leihs.procurement.*"} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :log-level nil}
-2023-12-08T12:32:51.009Z NX-41294 INFO [leihs.core.logging:39] - initialized logging  {:min-level [[#{"leihs.procurement" "leihs.procurement.resources.*" "leihs.procurement.permissions.*" "leihs.procurement.authorization" "leihs.procurement.*"} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :ns-filter #{"*"}, :middleware [], :timestamp-opts {:pattern :iso8601, :locale :jvm-default, :timezone :utc}, :output-fn #object[taoensso.timbre$default_output_fn 0x304134e1 "taoensso.timbre$default_output_fn@304134e1"], :appenders {:println {:enabled? true, :fn #object[taoensso.timbre.appenders.core$println_appender$fn__3459 0xba2fda0 "taoensso.timbre.appenders.core$println_appender$fn__3459@ba2fda0"]}}, :_init-config {:loaded-from-source :default, :compile-time-config {:min-level nil, :ns-pattern "*"}}, :log-level nil}
-2023-12-08T12:32:51.011Z NX-41294 INFO [leihs.procurement.main:50] - main ("--dev-mode" "true" "--repl" "true" "run")
-2023-12-08T12:32:51.024Z NX-41294 INFO [leihs.core.repl:62] - init {:dev-mode true, :repl true, :repl-bind "localhost", :repl-port 38267, :repl-port-file ".nrepl-port"}
-2023-12-08T12:32:51.026Z NX-41294 INFO [leihs.core.repl:70] - starting nREPL server  38267 localhost
-2023-12-08T12:32:51.044Z NX-41294 INFO [leihs.core.repl:75] - started nREPL server 
-2023-12-08T12:32:51.061Z NX-41294 INFO [leihs.procurement.run:326] - Invoking run with options:  {:db-host localhost, :db-max-pool-size 16, :db-min-pool-size 2, :db-name leihs_test, :db-password leihs, :db-port 5415, :db-user leihs, :dev-mode true, :http-host localhost, :http-max-threads 8, :http-min-threads 1, :http-port 3230, :http-queue-capacity 640, :http-thread-keep-alive-seconds 10, :http-worker-prefix leihs-service-http-worker-, :pid-file nil, :repl true, :repl-bind localhost, :repl-port 38267, :repl-port-file .nrepl-port}
-2023-12-08T12:32:51.061Z NX-41294 INFO [leihs.core.shutdown:20] - PID 20808
-2023-12-08T12:32:51.073Z NX-41294 INFO [leihs.core.shutdown:29] - Registering SIGTERM handler for shutdown.
-2023-12-08T12:32:51.132Z NX-41294 INFO [leihs.core.graphql:17] - Initialized graphQL schema.
-2023-12-08T12:32:51.133Z NX-41294 INFO [leihs.core.db:220] - Initializing db  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
-2023-12-08T12:32:51.139Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:80] - db-pool - Starting...
-2023-12-08T12:32:51.217Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - db-pool - Added connection org.postgresql.jdbc.PgConnection@3040c008
-2023-12-08T12:32:51.223Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:82] - db-pool - Start completed.
-2023-12-08T12:32:51.223Z NX-41294 INFO [leihs.core.db:222] - Initialized db  {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27bad404 "HikariDataSource (db-pool)"]}
-2023-12-08T12:32:51.224Z NX-41294 INFO [leihs.core.db:223] - Initializing ds-next  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
-2023-12-08T12:32:51.239Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:110] - HikariPool-1 - Starting...
-2023-12-08T12:32:51.250Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1630c443
-2023-12-08T12:32:51.251Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:123] - HikariPool-1 - Start completed.
-2023-12-08T12:32:51.257Z NX-41294 INFO [leihs.core.db:225] - Initialized ds-next  #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x4aecce51 "HikariDataSource (HikariPool-1)"], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x208dd07c "next.jdbc.result_set$as_unqualified_lower_maps@208dd07c"]}}
-2023-12-08T12:32:51.264Z NX-41294 INFO [leihs.core.http-server:101] - starting http-server  {:port 3230, :ip "localhost", :pool {:queue #object[java.util.concurrent.ArrayBlockingQueue 0x46a1953d "[]"], :pool #object[java.util.concurrent.ThreadPoolExecutor 0x4e2dae78 "java.util.concurrent.ThreadPoolExecutor@4e2dae78[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"]}}
-2023-12-08T12:32:51.276Z NX-41294 INFO [leihs.core.http-server:104] - started http-server 
+2023-12-08T14:47:39.343Z NX-41294 WARN [leihs.core.release:13] - Failed to read releases.yml, returning bogus value 
+2023-12-08T14:47:39.881Z NX-41294 INFO [leihs.core.logging:37] - initializing logging  {:min-level [[#{"leihs.procurement" "leihs.procurement.resources.*" "leihs.procurement.permissions.*" "leihs.procurement.authorization" "leihs.procurement.*"} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :log-level nil}
+2023-12-08T14:47:39.888Z NX-41294 INFO [leihs.core.logging:39] - initialized logging  {:min-level [[#{"leihs.procurement" "leihs.procurement.resources.*" "leihs.procurement.permissions.*" "leihs.procurement.authorization" "leihs.procurement.*"} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :ns-filter #{"*"}, :middleware [], :timestamp-opts {:pattern :iso8601, :locale :jvm-default, :timezone :utc}, :output-fn #object[taoensso.timbre$default_output_fn 0xa9da0bb "taoensso.timbre$default_output_fn@a9da0bb"], :appenders {:println {:enabled? true, :fn #object[taoensso.timbre.appenders.core$println_appender$fn__3459 0x30ed81ff "taoensso.timbre.appenders.core$println_appender$fn__3459@30ed81ff"]}}, :_init-config {:loaded-from-source :default, :compile-time-config {:min-level nil, :ns-pattern "*"}}, :log-level nil}
+2023-12-08T14:47:39.890Z NX-41294 INFO [leihs.procurement.main:50] - main ("--dev-mode" "true" "--repl" "true" "run")
+2023-12-08T14:47:39.903Z NX-41294 INFO [leihs.core.repl:62] - init {:dev-mode true, :repl true, :repl-bind "localhost", :repl-port 29343, :repl-port-file ".nrepl-port"}
+2023-12-08T14:47:39.905Z NX-41294 INFO [leihs.core.repl:70] - starting nREPL server  29343 localhost
+2023-12-08T14:47:39.923Z NX-41294 INFO [leihs.core.repl:75] - started nREPL server 
+2023-12-08T14:47:39.926Z NX-41294 INFO [leihs.procurement.run:326] - Invoking run with options:  {:db-host localhost, :db-max-pool-size 16, :db-min-pool-size 2, :db-name leihs_test, :db-password leihs, :db-port 5415, :db-user leihs, :dev-mode true, :http-host localhost, :http-max-threads 8, :http-min-threads 1, :http-port 3230, :http-queue-capacity 640, :http-thread-keep-alive-seconds 10, :http-worker-prefix leihs-service-http-worker-, :pid-file nil, :repl true, :repl-bind localhost, :repl-port 29343, :repl-port-file .nrepl-port}
+2023-12-08T14:47:39.927Z NX-41294 INFO [leihs.core.shutdown:20] - PID 32353
+2023-12-08T14:47:39.954Z NX-41294 INFO [leihs.core.shutdown:29] - Registering SIGTERM handler for shutdown.
+2023-12-08T14:47:40.008Z NX-41294 INFO [leihs.core.graphql:17] - Initialized graphQL schema.
+2023-12-08T14:47:40.009Z NX-41294 INFO [leihs.core.db:220] - Initializing db  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
+2023-12-08T14:47:40.015Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:80] - db-pool - Starting...
+2023-12-08T14:47:40.087Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - db-pool - Added connection org.postgresql.jdbc.PgConnection@a3a17d
+2023-12-08T14:47:40.093Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:82] - db-pool - Start completed.
+2023-12-08T14:47:40.094Z NX-41294 INFO [leihs.core.db:222] - Initialized db  {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x61fdac61 "HikariDataSource (db-pool)"]}
+2023-12-08T14:47:40.095Z NX-41294 INFO [leihs.core.db:223] - Initializing ds-next  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
+2023-12-08T14:47:40.109Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:110] - HikariPool-1 - Starting...
+2023-12-08T14:47:40.121Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@64b12601
+2023-12-08T14:47:40.121Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:123] - HikariPool-1 - Start completed.
+2023-12-08T14:47:40.127Z NX-41294 INFO [leihs.core.db:225] - Initialized ds-next  #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x498f1705 "HikariDataSource (HikariPool-1)"], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x321d7d87 "next.jdbc.result_set$as_unqualified_lower_maps@321d7d87"]}}
+2023-12-08T14:47:40.133Z NX-41294 INFO [leihs.core.http-server:101] - starting http-server  {:port 3230, :ip "localhost", :pool {:queue #object[java.util.concurrent.ArrayBlockingQueue 0x2fb34447 "[]"], :pool #object[java.util.concurrent.ThreadPoolExecutor 0x265d9ae7 "java.util.concurrent.ThreadPoolExecutor@265d9ae7[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"]}}
+2023-12-08T14:47:40.144Z NX-41294 INFO [leihs.core.http-server:104] - started http-server 
 >>> authenticate::skip= nil  handler-key= :graphql
 >>> authenticate::authenticated-entity {:email amelia@rosenbaum.name, :contracts_count 0, :lastname Kemmer, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Dawna, :scope_admin_write false, :user_session_created_at #time/instant "2023-12-08T11:45:34.313878Z", :id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :user_session_id #uuid "b9f84747-f458-427c-abb9-170a3febef96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
 
 >> authorize >
 
->> authorize::handler > #object[leihs.core.locale$wrap$fn__44475 0x56199dd8 leihs.core.locale$wrap$fn__44475@56199dd8]
+>> authorize::handler > #object[leihs.core.locale$wrap$fn__44536 0x52510545 leihs.core.locale$wrap$fn__44536@52510545]
 
->> authorize::request > {:authenticated-entity {:email amelia@rosenbaum.name, :contracts_count 0, :lastname Kemmer, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Dawna, :scope_admin_write false, :user_session_created_at #time/instant "2023-12-08T11:45:34.313878Z", :id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :user_session_id #uuid "b9f84747-f458-427c-abb9-170a3febef96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 83f8530a-692a-47bb-995b-a81201490d7b}, leihs-user-session {:value 408912e4-58ae-4d10-96f7-830c2f44e596}}, :remote-addr 127.0.0.1, :start-time 170729947001750, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x4aecce51 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x208dd07c next.jdbc.result_set$as_unqualified_lower_maps@208dd07c]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=83f8530a-692a-47bb-995b-a81201490d7b; leihs-user-session=408912e4-58ae-4d10-96f7-830c2f44e596, content-length 600, referer http://localhost:3230/procure/templates/edit, connection keep-alive, x-csrf-token 83f8530a-692a-47bb-995b-a81201490d7b, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors, postman-token 8d58e32f-4410-45ae-8fe4-2f5e5a76d5cf}, :async-channel #object[org.httpkit.server.AsyncChannel 0x166cd294 /127.0.0.1:3230<->/127.0.0.1:53719], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27bad404 HikariDataSource (db-pool)]}, :content-length 600, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:query query adminTemplates {
+>> authorize::request > {:authenticated-entity {:email amelia@rosenbaum.name, :contracts_count 0, :lastname Kemmer, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Dawna, :scope_admin_write false, :user_session_created_at #time/instant "2023-12-08T11:45:34.313878Z", :id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :user_session_id #uuid "b9f84747-f458-427c-abb9-170a3febef96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}, :cookies {leihs-anti-csrf-token {:value 83f8530a-692a-47bb-995b-a81201490d7b}, leihs-user-session {:value 408912e4-58ae-4d10-96f7-830c2f44e596}}, :remote-addr 127.0.0.1, :start-time 178247774638375, :params {}, :settings {:email_sending_enabled false, :sessions_max_lifetime_secs 432000, :smtp_default_from_address your.lending.desk@example.com, :public_image_caching_enabled true, :sessions_force_secure false, :deliver_received_order_notifications false, :external_base_url nil, :sessions_force_uniqueness false, :email_signature Cheers,}, :tx-next #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x498f1705 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x321d7d87 next.jdbc.result_set$as_unqualified_lower_maps@321d7d87]}}, :query-params-raw {}, :route-params nil, :headers {origin http://localhost:3230, sec-fetch-site same-origin, host localhost:3230, user-agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, content-type application/json, cookie leihs-anti-csrf-token=83f8530a-692a-47bb-995b-a81201490d7b; leihs-user-session=408912e4-58ae-4d10-96f7-830c2f44e596, content-length 600, referer http://localhost:3230/procure/templates/edit, connection keep-alive, x-csrf-token 83f8530a-692a-47bb-995b-a81201490d7b, accept application/json, accept-language de,en-US;q=0.7,en;q=0.3, sec-fetch-dest empty, accept-encoding gzip, deflate, br, sec-fetch-mode cors, postman-token 444852ad-5c36-457f-9b73-6941dfef9421}, :async-channel #object[org.httpkit.server.AsyncChannel 0x72798ee9 /127.0.0.1:3230<->/127.0.0.1:52300], :server-port 3230, :params-raw {}, :tx {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x61fdac61 HikariDataSource (db-pool)]}, :content-length 600, :form-params {}, :websocket? false, :query-params {}, :content-type application/json, :form-params-raw {}, :character-encoding utf8, :uri /procure/graphql, :server-name localhost, :handler-key :graphql, :query-string nil, :body {:query query adminTemplates {
   main_categories {
     id
     name
@@ -69,38 +69,38 @@ Warning: environ value /Users/mradl/.asdf/installs/java/zulu-11.60.19 for key :j
     __typename
   }
 }
-, :operationName adminTemplates}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x3402aef2 leihs.procurement.graphql$handler@3402aef2], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
+, :operationName adminTemplates}, :graphql-schema #CompiledSchema<>, :handler #object[leihs.procurement.graphql$handler 0x6ba3c02f leihs.procurement.graphql$handler@6ba3c02f], :multipart-params {}, :scheme :http, :request-method :post, :accept {:mime :json, :charset nil, :encoding nil, :language nil}}
 
 >> authorize::handler-key >> :graphql
 >myprint>  authEnt? {:email amelia@rosenbaum.name, :contracts_count 0, :lastname Kemmer, :org_id nil, :scope_read true, :is_admin false, :authentication-method :session, :login nil, :scope_system_admin_write false, :scope_write true, :firstname Dawna, :scope_admin_write false, :user_session_created_at #time/instant "2023-12-08T11:45:34.313878Z", :id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :user_session_id #uuid "b9f84747-f458-427c-abb9-170a3febef96", :scope_system_admin_read false, :access-rights (), :user_id #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663", :is_system_admin false, :external_sign_out_url nil, :language_locale nil, :inventory_pool_roles_count 0, :scope_admin_read false}
->myprint>  txn #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x4aecce51 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x208dd07c next.jdbc.result_set$as_unqualified_lower_maps@208dd07c]}}
+>myprint>  txn #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x498f1705 HikariDataSource (HikariPool-1)], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x321d7d87 next.jdbc.result_set$as_unqualified_lower_maps@321d7d87]}}
 >o> admin? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID)) #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.251Z NX-41294 DEBUG [leihs.procurement.permissions.user:33] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.635Z NX-41294 DEBUG [leihs.procurement.permissions.user:33] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> admin? {:exists false}
 >myprint>  admin false
 >o> inspector? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.257Z NX-41294 DEBUG [leihs.procurement.permissions.user:57] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.639Z NX-41294 DEBUG [leihs.procurement.permissions.user:57] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> inspector? {:result true}
 >myprint>  inspector true
 >o> viewer? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.260Z NX-41294 DEBUG [leihs.procurement.permissions.user:80] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.643Z NX-41294 DEBUG [leihs.procurement.permissions.user:80] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> viewer? {:result false}
 >myprint>  viewer false
 >o> requester?? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID)) #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.262Z NX-41294 DEBUG [leihs.procurement.permissions.user:164] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.645Z NX-41294 DEBUG [leihs.procurement.permissions.user:164] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> requester?? {:exists true}
 >myprint>  requester true
 >o> admin? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID)) #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.263Z NX-41294 DEBUG [leihs.procurement.permissions.user:33] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.646Z NX-41294 DEBUG [leihs.procurement.permissions.user:33] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_admins WHERE procurement_admins.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> admin? {:exists false}
 >o> inspector? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.265Z NX-41294 DEBUG [leihs.procurement.permissions.user:57] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.647Z NX-41294 DEBUG [leihs.procurement.permissions.user:57] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_inspectors WHERE procurement_category_inspectors.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> inspector? {:result true}
 >o> viewer? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.266Z NX-41294 DEBUG [leihs.procurement.permissions.user:80] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.648Z NX-41294 DEBUG [leihs.procurement.permissions.user:80] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_category_viewers WHERE procurement_category_viewers.user_id = CAST(? AS UUID)) AS result" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> viewer? {:result false}
 >o> requester?? [SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID)) #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
-2023-12-08T12:32:57.267Z NX-41294 DEBUG [leihs.procurement.permissions.user:164] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
+2023-12-08T14:47:45.648Z NX-41294 DEBUG [leihs.procurement.permissions.user:164] - query => ["SELECT EXISTS (SELECT TRUE AS exists FROM procurement_requesters_organizations WHERE procurement_requesters_organizations.user_id = CAST(? AS UUID))" #uuid "3c5fe2fd-6a6a-4619-90e3-3eb6336ab663"]
 >o> requester?? {:exists true}
 
 > 1 anti-csrf-token >  83f8530a-692a-47bb-995b-a81201490d7b
@@ -109,7 +109,7 @@ Warning: environ value /Users/mradl/.asdf/installs/java/zulu-11.60.19 for key :j
 
 > 2 anti-csrf-token-new >  nil
 pure-handler >> 2
-2023-12-08T12:32:57.275Z NX-41294 DEBUG [leihs.procurement.graphql:46] - graphql query query adminTemplates {
+2023-12-08T14:47:45.657Z NX-41294 DEBUG [leihs.procurement.graphql:46] - graphql query query adminTemplates {
   main_categories {
     id
     name
@@ -147,35 +147,42 @@ pure-handler >> 2
 >oo> vars from graphQL-Requst nil nil nil nil
 >debug 2
 >debug 3
+2023-12-08T14:47:45.669Z NX-41294 DEBUG [leihs.procurement.resources.main-categories:?] - (sql-format main-categories-base-query) => ["SELECT procurement_main_categories.* FROM procurement_main_categories ORDER BY procurement_main_categories.name ASC"]
 >debug 4
 >debug 5 {:id #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22", :name Geisha}
 >debug 5a id #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"
-2023-12-08T12:32:57.290Z NX-41294 DEBUG [leihs.procurement.resources.main-categories:?] - (sql-format (image/image-query-for-main-category (:id mc))) => ["SELECT procurement_images.* FROM procurement_images WHERE procurement_images.main_category_id = CAST(? AS UUID)" #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"]
+2023-12-08T14:47:45.674Z NX-41294 DEBUG [leihs.procurement.resources.main-categories:?] - (sql-format (image/image-query-for-main-category (:id mc))) => ["SELECT procurement_images.* FROM procurement_images WHERE procurement_images.main_category_id = CAST(? AS UUID)" #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"]
 >debug 5b nil
-2023-12-08T12:32:57.293Z NX-41294 DEBUG [leihs.procurement.resources.categories:?] - (sql-format (sql/where categories-base-query [:= :procurement_categories.main_category_id main-cat-id])) => ["SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.main_category_id = ? ORDER BY procurement_categories.name ASC" #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"]
+2023-12-08T14:47:45.676Z NX-41294 DEBUG [leihs.procurement.resources.categories:?] - (sql-format (sql/where categories-base-query [:= :procurement_categories.main_category_id main-cat-id])) => ["SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.main_category_id = ? ORDER BY procurement_categories.name ASC" #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"]
 >oo> templates::get-templates2 _> HERE value contains :id??) #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d" {:id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d", :name Ennarea, :main_category_id #uuid "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22", :general_ledger_account nil, :cost_center nil, :procurement_account nil}
 >oo> templates::get-templates1a ?broken-base-query? {:select [:procurement_templates.*], :from [:procurement_templates], :left-join [:models [:= :models.id :procurement_templates.model_id]], :order-by [[[:concat ([:lower [:coalesce :procurement_templates.article_name ]] [:lower [:coalesce :models.product ]] [:lower [:coalesce :models.version ]])]]]}
 >oo> templates::get-templates1b ?broken-base-query? [SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id ORDER BY CONCAT((LOWER(COALESCE(procurement_templates.article_name, ?)), LOWER(COALESCE(models.product, ?)), LOWER(COALESCE(models.version, ?)))) ASC   ]
->oo> templates::get-templates1 [SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id WHERE procurement_templates.category_id = CAST(? AS UUID) ORDER BY CONCAT((LOWER(COALESCE(procurement_templates.article_name, ?)), LOWER(COALESCE(models.product, ?)), LOWER(COALESCE(models.version, ?)))) ASC #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"   ]
+>oo> templates::get-templates1c [SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id WHERE procurement_templates.category_id = CAST(? AS UUID) ORDER BY CONCAT((LOWER(COALESCE(procurement_templates.article_name, ?)), LOWER(COALESCE(models.product, ?)), LOWER(COALESCE(models.version, ?)))) ASC #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"   ]
+2023-12-08T14:47:45.680Z NX-41294 DEBUG [leihs.procurement.resources.templates:?] - (sql-format query) => ["SELECT procurement_templates.* FROM procurement_templates LEFT JOIN models ON models.id = procurement_templates.model_id WHERE procurement_templates.category_id = CAST(? AS UUID) ORDER BY CONCAT((LOWER(COALESCE(procurement_templates.article_name, ?)), LOWER(COALESCE(models.product, ?)), LOWER(COALESCE(models.version, ?)))) ASC" #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d" "" "" ""]
+2023-12-08T14:47:45.685Z NX-41294 DEBUG [leihs.procurement.resources.model:33] - (:value value) => nil
+2023-12-08T14:47:45.686Z NX-41294 DEBUG [leihs.procurement.resources.model:34] - (:model_id value) => nil
 
 >o> NPE?? model::get-model-by-id id nil
-2023-12-08T12:32:57.307Z NX-41294 DEBUG [leihs.procurement.resources.supplier:34] - value => {:article_number "Mate 9", :price_cents 8, :article_name "Galaxy S1", :is_archived true, :supplier_name "Sony", :model_id nil, :supplier_id nil, :id #uuid "85fc2e2b-4a46-4be4-8089-d0e2aa68e254", :price_currency "USD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
-2023-12-08T12:32:57.307Z NX-41294 DEBUG [leihs.procurement.resources.supplier:35] - value => {:article_number "Mate 9", :price_cents 8, :article_name "Galaxy S1", :is_archived true, :supplier_name "Sony", :model_id nil, :supplier_id nil, :id #uuid "85fc2e2b-4a46-4be4-8089-d0e2aa68e254", :price_currency "USD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.687Z NX-41294 DEBUG [leihs.procurement.resources.model:21] - id => nil
+2023-12-08T14:47:45.687Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (model-query id) => ["SELECT models.* FROM models WHERE models.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.688Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (jdbc/execute-one! tx (spy (model-query id))) => nil
+2023-12-08T14:47:45.694Z NX-41294 DEBUG [leihs.procurement.resources.supplier:36] - value => {:article_number "Mate 9", :price_cents 8, :article_name "Galaxy S1", :is_archived true, :supplier_name "Sony", :model_id nil, :supplier_id nil, :id #uuid "85fc2e2b-4a46-4be4-8089-d0e2aa68e254", :price_currency "USD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.694Z NX-41294 DEBUG [leihs.procurement.resources.supplier:37] - value => {:article_number "Mate 9", :price_cents 8, :article_name "Galaxy S1", :is_archived true, :supplier_name "Sony", :model_id nil, :supplier_id nil, :id #uuid "85fc2e2b-4a46-4be4-8089-d0e2aa68e254", :price_currency "USD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
 >o> tocheck suppliers.id= nil
-2023-12-08T12:32:57.308Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
-2023-12-08T12:32:57.308Z NX-41294 DEBUG [leihs.procurement.resources.supplier:21] - (-> (sql/select :suppliers.*) (sql/from :suppliers) (sql/where [:= :suppliers.id [:cast (spy id) :uuid]]) sql-format) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.695Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
+2023-12-08T14:47:45.695Z NX-41294 DEBUG [leihs.procurement.resources.supplier:?] - (sql-format (sql/where (sql/from (sql/select :suppliers.*) :suppliers) [:= :suppliers.id [:cast (spy id) :uuid]])) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
 >e> #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -344,19 +351,19 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.312Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
-2023-12-08T12:32:57.314Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
+2023-12-08T14:47:45.754Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
+2023-12-08T14:47:45.756Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -525,25 +532,30 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
+2023-12-08T14:47:45.759Z NX-41294 DEBUG [leihs.procurement.resources.model:33] - (:value value) => nil
+2023-12-08T14:47:45.759Z NX-41294 DEBUG [leihs.procurement.resources.model:34] - (:model_id value) => nil
 
 >o> NPE?? model::get-model-by-id id nil
-2023-12-08T12:32:57.319Z NX-41294 DEBUG [leihs.procurement.resources.supplier:34] - value => {:article_number "OnePlus 5T", :price_cents 83, :article_name "Galaxy S9", :is_archived true, :supplier_name "Panasonic", :model_id nil, :supplier_id nil, :id #uuid "a2859f66-be3c-46cd-85df-5cf294eefab8", :price_currency "PLN", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
-2023-12-08T12:32:57.319Z NX-41294 DEBUG [leihs.procurement.resources.supplier:35] - value => {:article_number "OnePlus 5T", :price_cents 83, :article_name "Galaxy S9", :is_archived true, :supplier_name "Panasonic", :model_id nil, :supplier_id nil, :id #uuid "a2859f66-be3c-46cd-85df-5cf294eefab8", :price_currency "PLN", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.760Z NX-41294 DEBUG [leihs.procurement.resources.model:21] - id => nil
+2023-12-08T14:47:45.760Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (model-query id) => ["SELECT models.* FROM models WHERE models.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.761Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (jdbc/execute-one! tx (spy (model-query id))) => nil
+2023-12-08T14:47:45.762Z NX-41294 DEBUG [leihs.procurement.resources.supplier:36] - value => {:article_number "OnePlus 5T", :price_cents 83, :article_name "Galaxy S9", :is_archived true, :supplier_name "Panasonic", :model_id nil, :supplier_id nil, :id #uuid "a2859f66-be3c-46cd-85df-5cf294eefab8", :price_currency "PLN", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.762Z NX-41294 DEBUG [leihs.procurement.resources.supplier:37] - value => {:article_number "OnePlus 5T", :price_cents 83, :article_name "Galaxy S9", :is_archived true, :supplier_name "Panasonic", :model_id nil, :supplier_id nil, :id #uuid "a2859f66-be3c-46cd-85df-5cf294eefab8", :price_currency "PLN", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
 >o> tocheck suppliers.id= nil
-2023-12-08T12:32:57.320Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
-2023-12-08T12:32:57.320Z NX-41294 DEBUG [leihs.procurement.resources.supplier:21] - (-> (sql/select :suppliers.*) (sql/from :suppliers) (sql/where [:= :suppliers.id [:cast (spy id) :uuid]]) sql-format) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.762Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
+2023-12-08T14:47:45.762Z NX-41294 DEBUG [leihs.procurement.resources.supplier:?] - (sql-format (sql/where (sql/from (sql/select :suppliers.*) :suppliers) [:= :suppliers.id [:cast (spy id) :uuid]])) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
 >e> #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -712,19 +724,19 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.322Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
-2023-12-08T12:32:57.322Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
+2023-12-08T14:47:45.799Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
+2023-12-08T14:47:45.800Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -893,25 +905,30 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
+2023-12-08T14:47:45.800Z NX-41294 DEBUG [leihs.procurement.resources.model:33] - (:value value) => nil
+2023-12-08T14:47:45.800Z NX-41294 DEBUG [leihs.procurement.resources.model:34] - (:model_id value) => nil
 
 >o> NPE?? model::get-model-by-id id nil
-2023-12-08T12:32:57.324Z NX-41294 DEBUG [leihs.procurement.resources.supplier:34] - value => {:article_number "iPhone 5S", :price_cents 53, :article_name "Mi 8", :is_archived true, :supplier_name "Polaroid", :model_id nil, :supplier_id nil, :id #uuid "ae10df63-7f80-4f08-8255-b1d9eb371f33", :price_currency "CAD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
-2023-12-08T12:32:57.325Z NX-41294 DEBUG [leihs.procurement.resources.supplier:35] - value => {:article_number "iPhone 5S", :price_cents 53, :article_name "Mi 8", :is_archived true, :supplier_name "Polaroid", :model_id nil, :supplier_id nil, :id #uuid "ae10df63-7f80-4f08-8255-b1d9eb371f33", :price_currency "CAD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.800Z NX-41294 DEBUG [leihs.procurement.resources.model:21] - id => nil
+2023-12-08T14:47:45.801Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (model-query id) => ["SELECT models.* FROM models WHERE models.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.801Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (jdbc/execute-one! tx (spy (model-query id))) => nil
+2023-12-08T14:47:45.803Z NX-41294 DEBUG [leihs.procurement.resources.supplier:36] - value => {:article_number "iPhone 5S", :price_cents 53, :article_name "Mi 8", :is_archived true, :supplier_name "Polaroid", :model_id nil, :supplier_id nil, :id #uuid "ae10df63-7f80-4f08-8255-b1d9eb371f33", :price_currency "CAD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.803Z NX-41294 DEBUG [leihs.procurement.resources.supplier:37] - value => {:article_number "iPhone 5S", :price_cents 53, :article_name "Mi 8", :is_archived true, :supplier_name "Polaroid", :model_id nil, :supplier_id nil, :id #uuid "ae10df63-7f80-4f08-8255-b1d9eb371f33", :price_currency "CAD", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
 >o> tocheck suppliers.id= nil
-2023-12-08T12:32:57.325Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
-2023-12-08T12:32:57.325Z NX-41294 DEBUG [leihs.procurement.resources.supplier:21] - (-> (sql/select :suppliers.*) (sql/from :suppliers) (sql/where [:= :suppliers.id [:cast (spy id) :uuid]]) sql-format) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.803Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
+2023-12-08T14:47:45.803Z NX-41294 DEBUG [leihs.procurement.resources.supplier:?] - (sql-format (sql/where (sql/from (sql/select :suppliers.*) :suppliers) [:= :suppliers.id [:cast (spy id) :uuid]])) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
 >e> #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1080,19 +1097,19 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.326Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
-2023-12-08T12:32:57.327Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
+2023-12-08T14:47:45.838Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
+2023-12-08T14:47:45.839Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1261,25 +1278,30 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
+2023-12-08T14:47:45.840Z NX-41294 DEBUG [leihs.procurement.resources.model:33] - (:value value) => nil
+2023-12-08T14:47:45.840Z NX-41294 DEBUG [leihs.procurement.resources.model:34] - (:model_id value) => nil
 
 >o> NPE?? model::get-model-by-id id nil
-2023-12-08T12:32:57.329Z NX-41294 DEBUG [leihs.procurement.resources.supplier:34] - value => {:article_number "Galaxy S7", :price_cents 80, :article_name "Pocophone F1", :is_archived true, :supplier_name "Benq", :model_id nil, :supplier_id nil, :id #uuid "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243", :price_currency "INR", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
-2023-12-08T12:32:57.329Z NX-41294 DEBUG [leihs.procurement.resources.supplier:35] - value => {:article_number "Galaxy S7", :price_cents 80, :article_name "Pocophone F1", :is_archived true, :supplier_name "Benq", :model_id nil, :supplier_id nil, :id #uuid "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243", :price_currency "INR", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.841Z NX-41294 DEBUG [leihs.procurement.resources.model:21] - id => nil
+2023-12-08T14:47:45.842Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (model-query id) => ["SELECT models.* FROM models WHERE models.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.843Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (jdbc/execute-one! tx (spy (model-query id))) => nil
+2023-12-08T14:47:45.844Z NX-41294 DEBUG [leihs.procurement.resources.supplier:36] - value => {:article_number "Galaxy S7", :price_cents 80, :article_name "Pocophone F1", :is_archived true, :supplier_name "Benq", :model_id nil, :supplier_id nil, :id #uuid "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243", :price_currency "INR", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.845Z NX-41294 DEBUG [leihs.procurement.resources.supplier:37] - value => {:article_number "Galaxy S7", :price_cents 80, :article_name "Pocophone F1", :is_archived true, :supplier_name "Benq", :model_id nil, :supplier_id nil, :id #uuid "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243", :price_currency "INR", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
 >o> tocheck suppliers.id= nil
-2023-12-08T12:32:57.329Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
-2023-12-08T12:32:57.329Z NX-41294 DEBUG [leihs.procurement.resources.supplier:21] - (-> (sql/select :suppliers.*) (sql/from :suppliers) (sql/where [:= :suppliers.id [:cast (spy id) :uuid]]) sql-format) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.845Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
+2023-12-08T14:47:45.845Z NX-41294 DEBUG [leihs.procurement.resources.supplier:?] - (sql-format (sql/where (sql/from (sql/select :suppliers.*) :suppliers) [:= :suppliers.id [:cast (spy id) :uuid]])) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
 >e> #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1448,19 +1470,19 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.334Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
-2023-12-08T12:32:57.334Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
+2023-12-08T14:47:45.880Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
+2023-12-08T14:47:45.880Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1629,25 +1651,30 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
+2023-12-08T14:47:45.880Z NX-41294 DEBUG [leihs.procurement.resources.model:33] - (:value value) => nil
+2023-12-08T14:47:45.881Z NX-41294 DEBUG [leihs.procurement.resources.model:34] - (:model_id value) => nil
 
 >o> NPE?? model::get-model-by-id id nil
-2023-12-08T12:32:57.336Z NX-41294 DEBUG [leihs.procurement.resources.supplier:34] - value => {:article_number "Galaxy S7 Edge", :price_cents 9, :article_name "Redmi Note 6 Pro", :is_archived true, :supplier_name "Leica", :model_id nil, :supplier_id nil, :id #uuid "18d8dd22-d224-4323-aa50-302f76df8732", :price_currency "TJS", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
-2023-12-08T12:32:57.337Z NX-41294 DEBUG [leihs.procurement.resources.supplier:35] - value => {:article_number "Galaxy S7 Edge", :price_cents 9, :article_name "Redmi Note 6 Pro", :is_archived true, :supplier_name "Leica", :model_id nil, :supplier_id nil, :id #uuid "18d8dd22-d224-4323-aa50-302f76df8732", :price_currency "TJS", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.881Z NX-41294 DEBUG [leihs.procurement.resources.model:21] - id => nil
+2023-12-08T14:47:45.881Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (model-query id) => ["SELECT models.* FROM models WHERE models.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.882Z NX-41294 DEBUG [leihs.procurement.resources.model:26] - (jdbc/execute-one! tx (spy (model-query id))) => nil
+2023-12-08T14:47:45.884Z NX-41294 DEBUG [leihs.procurement.resources.supplier:36] - value => {:article_number "Galaxy S7 Edge", :price_cents 9, :article_name "Redmi Note 6 Pro", :is_archived true, :supplier_name "Leica", :model_id nil, :supplier_id nil, :id #uuid "18d8dd22-d224-4323-aa50-302f76df8732", :price_currency "TJS", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
+2023-12-08T14:47:45.884Z NX-41294 DEBUG [leihs.procurement.resources.supplier:37] - value => {:article_number "Galaxy S7 Edge", :price_cents 9, :article_name "Redmi Note 6 Pro", :is_archived true, :supplier_name "Leica", :model_id nil, :supplier_id nil, :id #uuid "18d8dd22-d224-4323-aa50-302f76df8732", :price_currency "TJS", :category_id #uuid "8598b76e-31f0-4924-9174-f8ae7b8e003d"}
 >o> tocheck suppliers.id= nil
-2023-12-08T12:32:57.337Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
-2023-12-08T12:32:57.337Z NX-41294 DEBUG [leihs.procurement.resources.supplier:21] - (-> (sql/select :suppliers.*) (sql/from :suppliers) (sql/where [:= :suppliers.id [:cast (spy id) :uuid]]) sql-format) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
+2023-12-08T14:47:45.884Z NX-41294 DEBUG [leihs.procurement.resources.supplier:23] - id => nil
+2023-12-08T14:47:45.884Z NX-41294 DEBUG [leihs.procurement.resources.supplier:?] - (sql-format (sql/where (sql/from (sql/select :suppliers.*) :suppliers) [:= :suppliers.id [:cast (spy id) :uuid]])) => ["SELECT suppliers.* FROM suppliers WHERE suppliers.id = CAST(NULL AS UUID)"]
 >e> #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1816,19 +1843,19 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.338Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
-2023-12-08T12:32:57.339Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
+2023-12-08T14:47:45.921Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - NullPointerException
+2023-12-08T14:47:45.921Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:326] - #error {
  :cause nil
  :via
  [{:type java.lang.NullPointerException
    :message nil
-   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]}]
+   :at [leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]}]
  :trace
- [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 27]
-  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 31]
-  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 29]
-  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44621 invoke resolver.clj 16]
+ [[leihs.procurement.resources.supplier$get_supplier_by_id invokeStatic supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier_by_id invoke supplier.clj 29]
+  [leihs.procurement.resources.supplier$get_supplier invokeStatic supplier.clj 33]
+  [leihs.procurement.resources.supplier$get_supplier invoke supplier.clj 31]
+  [leihs.procurement.graphql.resolver$wrap_resolver_with_error$fn__44687 invoke resolver.clj 16]
   [com.walmartlabs.lacinia.schema$wrap_resolver_to_ensure_resolver_result$fn__14023 invoke schema.clj 986]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invokeStatic executor.clj 86]
   [com.walmartlabs.lacinia.executor$invoke_resolver_for_field invoke executor.clj 68]
@@ -1997,7 +2024,7 @@ pure-handler >> 2
   [java.util.concurrent.ThreadPoolExecutor runWorker ThreadPoolExecutor.java 1128]
   [java.util.concurrent.ThreadPoolExecutor$Worker run ThreadPoolExecutor.java 628]
   [java.lang.Thread run Thread.java 829]]}
-2023-12-08T12:32:57.343Z NX-41294 DEBUG [leihs.procurement.graphql:86] - result => {:data #ordered/map ([:main_categories [#ordered/map ([:id "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"] [:name "Geisha"] [:image_url nil] [:categories [#ordered/map ([:id "8598b76e-31f0-4924-9174-f8ae7b8e003d"] [:name "Ennarea"] [:templates [#ordered/map ([:id "85fc2e2b-4a46-4be4-8089-d0e2aa68e254"] [:article_name "Galaxy S1"] [:article_number "Mate 9"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 8] [:price_currency "USD"] [:supplier_name "Sony"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "a2859f66-be3c-46cd-85df-5cf294eefab8"] [:article_name "Galaxy S9"] [:article_number "OnePlus 5T"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 83] [:price_currency "PLN"] [:supplier_name "Panasonic"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "ae10df63-7f80-4f08-8255-b1d9eb371f33"] [:article_name "Mi 8"] [:article_number "iPhone 5S"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 53] [:price_currency "CAD"] [:supplier_name "Polaroid"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243"] [:article_name "Pocophone F1"] [:article_number "Galaxy S7"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 80] [:price_currency "INR"] [:supplier_name "Benq"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "18d8dd22-d224-4323-aa50-302f76df8732"] [:article_name "Redmi Note 6 Pro"] [:article_number "Galaxy S7 Edge"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 9] [:price_currency "TJS"] [:supplier_name "Leica"] [:supplier nil] [:__typename :Template])]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception "NullPointerException"}})}
-2023-12-08T12:32:57.346Z NX-41294 DEBUG [leihs.procurement.graphql:87] - {:data #ordered/map ([:main_categories [#ordered/map ([:id "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"] [:name "Geisha"] [:image_url nil] [:categories [#ordered/map ([:id "8598b76e-31f0-4924-9174-f8ae7b8e003d"] [:name "Ennarea"] [:templates [#ordered/map ([:id "85fc2e2b-4a46-4be4-8089-d0e2aa68e254"] [:article_name "Galaxy S1"] [:article_number "Mate 9"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 8] [:price_currency "USD"] [:supplier_name "Sony"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "a2859f66-be3c-46cd-85df-5cf294eefab8"] [:article_name "Galaxy S9"] [:article_number "OnePlus 5T"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 83] [:price_currency "PLN"] [:supplier_name "Panasonic"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "ae10df63-7f80-4f08-8255-b1d9eb371f33"] [:article_name "Mi 8"] [:article_number "iPhone 5S"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 53] [:price_currency "CAD"] [:supplier_name "Polaroid"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243"] [:article_name "Pocophone F1"] [:article_number "Galaxy S7"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 80] [:price_currency "INR"] [:supplier_name "Benq"] [:supplier nil] [:__typename :Template]) #ordered/map ([:id "18d8dd22-d224-4323-aa50-302f76df8732"] [:article_name "Redmi Note 6 Pro"] [:article_number "Galaxy S7 Edge"] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 9] [:price_currency "TJS"] [:supplier_name "Leica"] [:supplier nil] [:__typename :Template])]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception "NullPointerException"}} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception "NullPointerException"}})}
+2023-12-08T14:47:45.923Z NX-41294 DEBUG [leihs.procurement.graphql:86] - result => {:data #ordered/map ([:main_categories [#ordered/map ([:id "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"] [:name "Geisha"] [:image_url nil] [:categories [#ordered/map ([:id "8598b76e-31f0-4924-9174-f8ae7b8e003d"] [:name "Ennarea"] [:templates [nil nil nil nil nil]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception "NullPointerException"}})}
+2023-12-08T14:47:45.925Z NX-41294 DEBUG [leihs.procurement.graphql:87] - {:data #ordered/map ([:main_categories [#ordered/map ([:id "ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22"] [:name "Geisha"] [:image_url nil] [:categories [#ordered/map ([:id "8598b76e-31f0-4924-9174-f8ae7b8e003d"] [:name "Ennarea"] [:templates [nil nil nil nil nil]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception "NullPointerException"}} {:message "Non-nullable field was null.", :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :requests_count]} {:message "", :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception "NullPointerException"}})}
 
->o> ERROR 4pure-handler, result=> {:data #ordered/map ([:main_categories [#ordered/map ([:id ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22] [:name Geisha] [:image_url nil] [:categories [#ordered/map ([:id 8598b76e-31f0-4924-9174-f8ae7b8e003d] [:name Ennarea] [:templates [#ordered/map ([:id 85fc2e2b-4a46-4be4-8089-d0e2aa68e254] [:article_name Galaxy S1] [:article_number Mate 9] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 8] [:price_currency USD] [:supplier_name Sony] [:supplier nil] [:__typename :Template]) #ordered/map ([:id a2859f66-be3c-46cd-85df-5cf294eefab8] [:article_name Galaxy S9] [:article_number OnePlus 5T] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 83] [:price_currency PLN] [:supplier_name Panasonic] [:supplier nil] [:__typename :Template]) #ordered/map ([:id ae10df63-7f80-4f08-8255-b1d9eb371f33] [:article_name Mi 8] [:article_number iPhone 5S] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 53] [:price_currency CAD] [:supplier_name Polaroid] [:supplier nil] [:__typename :Template]) #ordered/map ([:id dcb9f1c5-3ccb-416f-be1d-a0ada6f5e243] [:article_name Pocophone F1] [:article_number Galaxy S7] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 80] [:price_currency INR] [:supplier_name Benq] [:supplier nil] [:__typename :Template]) #ordered/map ([:id 18d8dd22-d224-4323-aa50-302f76df8732] [:article_name Redmi Note 6 Pro] [:article_number Galaxy S7 Edge] [:model nil] [:requests_count nil] [:is_archived true] [:price_cents 9] [:price_currency TJS] [:supplier_name Leica] [:supplier nil] [:__typename :Template])]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception NullPointerException}} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception NullPointerException}} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception NullPointerException}} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception NullPointerException}} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception NullPointerException}})}
+>o> ERROR 4pure-handler, result=> {:data #ordered/map ([:main_categories [#ordered/map ([:id ec9d0619-6f98-4cd5-81dc-0a76fe4f8d22] [:name Geisha] [:image_url nil] [:categories [#ordered/map ([:id 8598b76e-31f0-4924-9174-f8ae7b8e003d] [:name Ennarea] [:templates [nil nil nil nil nil]] [:__typename :Category])]] [:__typename :MainCategory])]]), :errors ({:message Non-nullable field was null., :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :requests_count]} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 0 :supplier], :extensions {:exception NullPointerException}} {:message Non-nullable field was null., :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :requests_count]} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 1 :supplier], :extensions {:exception NullPointerException}} {:message Non-nullable field was null., :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :requests_count]} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 2 :supplier], :extensions {:exception NullPointerException}} {:message Non-nullable field was null., :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :requests_count]} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 3 :supplier], :extensions {:exception NullPointerException}} {:message Non-nullable field was null., :locations [{:line 19, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :requests_count]} {:message , :locations [{:line 24, :column 9}], :path [:main_categories 0 :categories 0 :templates 4 :supplier], :extensions {:exception NullPointerException}})}
