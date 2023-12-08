@@ -14,7 +14,11 @@
 
 (defn categories-query
   [context arguments value]
+
+  (println ">oo> tocheck value" value)
+
   (let [id (:id arguments)
+        p (println ">o> tocheck (not nil)" id)
         inspected-by-auth-user (:inspected_by_auth_user arguments)
         main-category-id (:id value)]
     (sql/format

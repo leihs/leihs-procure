@@ -13,6 +13,8 @@
 
 (defn get-template-by-id
   [tx id]
+  (println ">o> tocheck ??? get-template-by-id" id)
+
   (-> templates-base-query
       (sql/merge-where [:= :procurement_templates.id id])
       sql/format
@@ -54,6 +56,8 @@
 
 (defn get-template
   ([context _ value]
+   (println ">o> tocheck ??? get-template" value)
+
    (get-template-by-id (-> context
                            :request
                            :tx)
