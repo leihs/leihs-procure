@@ -29,11 +29,11 @@
 
 
 
-  (-> templates-base-query
+  (spy (-> templates-base-query
       (sql/where [:= :procurement_templates.id [:cast id :uuid]])
       sql-format
       (->> (jdbc/execute! tx))
-      ))
+      )))
 
 (defn my-cast [data]
   (println ">o> no / my-cast /debug " data)
@@ -63,35 +63,48 @@
   )
 
 (defn validate-update-attributes [tx tmpl]
-  (let [req-exist? (-> (sql/select :%count.*)
+  (let [
+        res (-> (sql/select :%count.*)
                        (sql/from :procurement_requests)
                        (sql/where [:= :template_id [:cast(:id tmpl):uuid]])
                        sql-format
                        (->> (jdbc/execute-one! tx))
-                       :count (> 0) )]
+                       )
+        p (println ">o> res - :count needed!!!!!!!!" res)
+
+        req-exist? (-> (sql/select :%count.*)
+                       (sql/from :procurement_requests)
+                       (sql/where [:= :template_id [:cast(:id tmpl):uuid]])
+                       sql-format
+                       (->> (jdbc/execute-one! tx))
+                       :count (> 0) )
+
+
+
+        ]
     (if req-exist?
       (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE))
       tmpl))
 
 (defn update-template!
   [tx tmpl]
-  (jdbc/execute! tx
+  (spy (jdbc/execute! tx
                  (-> (sql/update :procurement_templates)
                      (sql/set (validate-update-attributes tx tmpl))
                      (sql/where [:= :procurement_templates.id [:cast (:id tmpl) :uuid]])
-                     sql-format)))
+                     sql-format))))
 
 (defn delete-template!
   [tx id]
-  (jdbc/execute! tx
+   (spy (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
                      (sql/where [:= :procurement_templates.id [:cast id :uuid]])
-                     sql-format)))
+                     sql-format))))
 
 (defn get-template
   ([context _ value]
 
-   (println ">o> tocheck ??? get-template" value)
+   (println ">o> 0 tocheck ??? get-template" value)
 
    (get-template-by-id (-> context
                            :request
@@ -99,17 +112,30 @@
                        (or (:value value) ; for RequestFieldTemplate
                            (:template_id value))))
   ([tx tmpl]
+   (println ">o> 1 tocheck ??? get-template")
+
+
    (let [where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
-     (-> templates-base-query
+     (spy (-> templates-base-query
          (sql/where where-clause)
          sql-format
+         spy
          (->> (jdbc/execute! tx))
-         ))))
+         ))
+
+     )))
 
 (defn requests-count [{{:keys [tx]} :request} _ {:keys [id]}]
-  (-> (sql/select :%count.*)
+
+  (println ">o> requests-count tocheck count!!!!! _> id=" id)
+
+
+
+(spy  (-> (sql/select :%count.*)
       (sql/from :procurement_requests)
       (sql/where [:= :template_id [:cast id :uuid]])
       sql-format
-      (->> (jdbc/execute! tx))
+      (->> (jdbc/execute-one! tx))
       :count))
+
+  )

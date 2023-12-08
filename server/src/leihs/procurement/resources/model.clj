@@ -9,6 +9,11 @@
         [taoensso.timbre :refer [debug info warn error spy]]
 
 
+
+
+
+
+
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
@@ -21,9 +26,7 @@
       (sql/where [:= :models.id [:cast (spy id) :uuid]])
       sql-format))
 
-(defn get-model-by-id [tx id]
-  (println "\n>o> NPE?? model::get-model-by-id id" id)
-  (spy (jdbc/execute-one! tx (spy (model-query id)))))
+(defn get-model-by-id [tx id]  (println "\n>o> NPE?? model::get-model-by-id id" id)   (spy (jdbc/execute-one! tx (spy (model-query id)))))
 
 (defn get-model
   [context _ value]

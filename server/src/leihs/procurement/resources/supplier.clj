@@ -26,13 +26,21 @@
       spy
       ))
 
-(defn get-supplier-by-id [tx id] ((jdbc/execute-one! tx (supplier-query id))))
+(defn get-supplier-by-id [tx id]
+  (jdbc/execute-one! tx (supplier-query id)))
 
 (defn get-supplier
   [context _ value]
-  (spy (get-supplier-by-id (-> context
-                          :request
-                          :tx-next)
-                      (or (:value (spy value))              ; for RequestFieldSupplier
-                          (:supplier_id (spy value)))))
+
+
+  (spy (-> context
+           :request
+           :tx))
+
+  (spy (get-supplier-by-id (spy (-> context
+                                    :request
+                                    :tx-next))
+                           (or (spy (:value (spy value)))         ; for RequestFieldSupplier
+                               (spy (:supplier_id (spy value))))
+                           ))
   )

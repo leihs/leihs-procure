@@ -26,7 +26,7 @@ feature 'Unarchive Template(s)' do
     end
 
     scenario 'unarchive single template' do
-      binding.pry
+      # binding.pry
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       # binding.pry

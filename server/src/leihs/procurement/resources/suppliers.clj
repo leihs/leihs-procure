@@ -8,6 +8,9 @@
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [clojure.string :as clj-str]
     [logbug.debug :as debug]))
 
@@ -21,7 +24,7 @@
     (-> context
         :request
         :tx-next)
-    (let [terms (some-> args
+    (spy (let [terms (some-> args
                         :search_term
                         (clj-str/split #"\s+")
                         (->> (map #(str "%" % "%"))))
@@ -35,4 +38,4 @@
                         (map (fn [term] [:ilike (:unaccent :suppliers.name) (:unaccent term)])
                              terms)))
                 offset (sql/offset offset)
-                limit (sql/limit limit))))))
+                limit (sql/limit limit)))))))
