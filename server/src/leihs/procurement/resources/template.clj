@@ -21,17 +21,36 @@
 
 (defn get-template-by-id
   [tx id]
+
+  (println ">o> tocheck ??? get-template-by-id" id)
+
+
+
   (-> templates-base-query
       (sql/where [:= :procurement_templates.id [:cast id :uuid]])
       sql-format
       (->> (jdbc/execute! tx))
       ))
 
+(defn my-cast [data]
+  (println ">o> no / my-cast /debug " data)
+  (if (contains? data :category_id)
+    (let [
+          p (println ">o> no before _> room_id=" (:category_id data))
+          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
+          ;(assoc data :room_id [:cast (:room_id data) :uuid])
+          data (assoc data :category_id [[:cast (:category_id data) :uuid]])
+          p (println ">o> no after _> room_id=" data)
+          ] data)
+    data
+    )
+  )
+
 (defn insert-template!
   [tx tmpl]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_templates)
-                     (sql/values [tmpl])
+                     (sql/values [(my-cast tmpl)])
                      sql-format)))
 
 (defn validate-update-attributes [tx tmpl]
@@ -62,11 +81,12 @@
 
 (defn get-template
   ([context _ value]
+
    (get-template-by-id (-> context
                            :request
                            :tx-next)
                        (or (:value value) ; for RequestFieldTemplate
-                           (:template_id value))))          ;; TODO BUG?
+                           (:template_id value))))
   ([tx tmpl]
    (let [where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
      (-> templates-base-query

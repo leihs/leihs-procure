@@ -23,12 +23,19 @@
 
 (defn categories-query
   [context arguments value]
+
+  (println ">oo> tocheck value" value)
+  (println ">oo> tocheck value" value)
   (let [id (:id arguments)
+        p (println ">o> tocheck (not nil)" id)
         inspected-by-auth-user (:inspected_by_auth_user arguments)
         main-category-id (:id value)]
+
+    ;(assert (and arguments (seq arguments))
+
     (sql-format
       (cond-> categories-base-query
-        id (sql/where [:in :procurement_categories.id id])
+        id (sql/where [:in :procurement_categories.id id])  ;;TODO: BROKEN
         main-category-id (sql/where
                            [:= :procurement_categories.main_category_id
                             main-category-id])

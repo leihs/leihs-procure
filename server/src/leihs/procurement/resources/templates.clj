@@ -5,6 +5,9 @@
     ;        [leihs.procurement.utils.sql :as sql]
 
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -102,6 +105,7 @@
   (or (:id tmpl)
       (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>))))
 
+
 (defn update-templates!
   [context args _]
   (let [rrequest (:request context)
@@ -109,15 +113,17 @@
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
         cat-ids (map :category_id input-data)]
-    (loop [[tmpl & rest-tmpls] input-data
+    (loop [[tmpl & rest-tmpls] (spy input-data)
            tmpl-ids []]
-      (if tmpl
+      (if (spy tmpl)
         (do (authorization/authorize-and-apply
               #(if-let [id (:id tmpl)]
-                 (if (:to_delete tmpl)
+                 (if (spy (:to_delete tmpl))
                    (template/delete-template! tx id)
                    (template/update-template! tx tmpl))
-                 (template/insert-template! tx (dissoc tmpl :id)))
+
+                 (spy (template/insert-template! tx (dissoc tmpl :id)))
+                 )
               :if-only
               #(or (user-perms/admin? tx auth-entity)
                    (user-perms/inspector? tx auth-entity (:category_id tmpl))))

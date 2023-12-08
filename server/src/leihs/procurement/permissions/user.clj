@@ -16,6 +16,7 @@
 (defn admin? "Returns boolean"
   [tx auth-entity]
 
+
   (let [
         query (-> (sql/select [[:exists
 
