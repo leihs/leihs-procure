@@ -14,6 +14,40 @@
     [tick.core :as tick]
     ))
 
+
+
+
+(defn my-cast [data]
+  (println ">o> no / 22 / my-cast /debug " data)
+
+
+  (let [
+        data (if (contains? data :id)
+               (assoc data :id [[:cast (:id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :category_id)
+               (assoc data :category_id [[:cast (:category_id data) :uuid]])
+               data
+               )
+        data (if (contains? data :inspection_start_date)
+               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
+               data
+               )
+
+        data (if (contains? data :end_date)
+               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
+               data
+               )
+
+        ]
+    (spy data)
+    )
+  )
+
+
+
 (def budget-period-base-query
   (-> (sql/select :procurement_budget_periods.*)
       (sql/from :procurement_budget_periods)))
@@ -41,11 +75,21 @@
                                 )))
   ([tx bp-map]
    (let [where-clause (sqlp/map->where-clause :procurement_budget_periods
-                                              bp-map)]
-     (first (jdbc/execute! tx
-                           (-> budget-period-base-query
-                               (sql/where where-clause)
-                               sql-format))))))
+                                              (spy (my-cast bp-map)))
+         result (spy (jdbc/execute! tx
+                                    (-> budget-period-base-query
+                                        (sql/where where-clause)
+                                        sql-format
+                                        spy
+                                        )))
+         p (println ">o> query=" result)
+         result (first result)
+         p (println ">o> result=" result)
+         ]
+     result))
+
+  )
+
 
 (defn sql-format-date [inst]
   (-> inst tick/date str))
@@ -152,60 +196,58 @@
   (println ">> can-delete2")
   (println ">oo> hoi2")
 
-  (spy (-> (spy (jdbc/execute-one! (-> context
-                                       :request
-                                       :tx-next) (-> [:and
-                                                      [:not
-                                                       [:exists
-                                                        (-> (sql/select true)
-                                                            (sql/from [:procurement_requests :pr])
-                                                            (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
-                                                      [:not
-                                                       [:exists
-                                                        (-> (sql/select true)
-                                                            (sql/from [:procurement_budget_limits :pbl])
-                                                            (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
-                                   (vector :result)
-                                   sql/select
-                                   sql-format
-                                   spy
-                                   )
-                                   ))
-
-       :result)))
-
-
-
-
-(defn my-cast [data]
-  (println ">o> no / 22 / my-cast /debug " data)
-
-
   (let [
-        data (if (contains? data :id)
-               (assoc data :id [[:cast (:id data) :uuid]])
-               data
-               )
+        result (-> (spy (jdbc/execute-one! (-> context
+                                               :request
+                                               :tx-next) (-> [:and
+                                                              [:not
+                                                               [:exists
+                                                                (-> (sql/select true)
+                                                                    (sql/from [:procurement_requests :pr])
+                                                                    (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
+                                                              [:not
+                                                               [:exists
+                                                                (-> (sql/select true)
+                                                                    (sql/from [:procurement_budget_limits :pbl])
+                                                                    (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
+                                                             (vector :result)
+                                                             sql/select
+                                                             sql-format
+                                                             spy
+                                                             )
+                                           )
+                        ))
+        result (:result result)
+        ] result)
 
-        data (if (contains? data :category_id)
-               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-               data
-               )
-        data (if (contains? data :inspection_start_date)
-               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
-               data
-               )
-
-        data (if (contains? data :end_date)
-               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
-               data
-               )
-
-        ]
-    (spy data)
-    )
+  ;(spy (-> (spy (jdbc/execute-one! (-> context
+  ;                                     :request
+  ;                                     :tx-next) (-> [:and
+  ;                                                    [:not
+  ;                                                     [:exists
+  ;                                                      (-> (sql/select true)
+  ;                                                          (sql/from [:procurement_requests :pr])
+  ;                                                          (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
+  ;                                                    [:not
+  ;                                                     [:exists
+  ;                                                      (-> (sql/select true)
+  ;                                                          (sql/from [:procurement_budget_limits :pbl])
+  ;                                                          (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
+  ;                                                   (vector :result)
+  ;                                                   sql/select
+  ;                                                   sql-format
+  ;                                                   spy
+  ;                                                   )
+  ;                                 )
+  ;              ))
+  ;
+  ;         :result)
 
   )
+
+
+
+
 
 (defn update-budget-period!
   [tx bp]
@@ -213,17 +255,16 @@
   (let [
         bp (my-cast bp)
 
-        result  (jdbc/execute! tx
-                               (-> (sql/update :procurement_budget_periods)
-                                   (sql/set bp)
-                                   (sql/where [:= :procurement_budget_periods.id (:id bp)])
-                                   sql-format
-                                   spy))
+        result (jdbc/execute! tx
+                              (-> (sql/update :procurement_budget_periods)
+                                  (sql/set bp)
+                                  (sql/where [:= :procurement_budget_periods.id (:id bp)])
+                                  sql-format
+                                  spy))
 
-        ]result )
+        ] result)
 
-
- )
+  )
 
 
 
@@ -231,12 +272,20 @@
 
 (defn insert-budget-period!
   [tx bp]
-  (jdbc/execute! tx
-                 (-> (sql/insert-into :procurement_budget_periods)
-                     (sql/values [bp])
-                     sql-format
-                     spy
-                     )))
+
+  (let [
+        bp (my-cast bp)
+
+        result (jdbc/execute! tx
+                              (-> (sql/insert-into :procurement_budget_periods)
+                                  (sql/values [bp])
+                                  sql-format
+                                  spy
+                                  ))
+
+        ] result)
+
+  )
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)
