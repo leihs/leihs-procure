@@ -96,6 +96,7 @@
 
 (defn can-delete?
   [context _ value]
+  (println ">> can-delete3")
   (->
     (jdbc/execute-one!
       (-> context
@@ -130,4 +131,6 @@
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)
                      (sql/where [:= :procurement_main_categories.id id])
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))

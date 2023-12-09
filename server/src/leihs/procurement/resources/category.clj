@@ -47,6 +47,7 @@
 
 (defn can-delete?
   [context _ value]
+  (println ">> can-delete1")
   (-> (jdbc/execute-one!
         (-> context
             :request

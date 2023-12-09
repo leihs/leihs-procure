@@ -86,7 +86,7 @@
                   [[:and
                     [:>= :current_date inspection-start-date]
                     [:< :current_date end-date]
-                    ]:result] )
+                    ] :result])
                 sql-format)]
     (->> query
          (jdbc/execute-one! tx)
@@ -149,27 +149,30 @@
 
 (defn can-delete?
   [context _ value]
+  (println ">> can-delete2")
   (println ">oo> hoi2")
 
-  (-> (spy (jdbc/execute-one! (-> context
-                                  :request
-                                  :tx-next) (-> (
-                                                  :and
-                                                  (:not
-                                                    (:exists
-                                                      (-> (sql/select true)
-                                                          (sql/from [:procurement_requests :pr])
-                                                          (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))))
-                                                  (:not
-                                                    (:exists
-                                                      (-> (sql/select true)
-                                                          (sql/from [:procurement_budget_limits :pbl])
-                                                          (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]])))))
-                                                (vector :result)
-                                                sql/select
-                                                sql-format)))
+  (spy (-> (spy (jdbc/execute-one! (-> context
+                                       :request
+                                       :tx-next) (-> [:and
+                                                      [:not
+                                                       [:exists
+                                                        (-> (sql/select true)
+                                                            (sql/from [:procurement_requests :pr])
+                                                            (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
+                                                      [:not
+                                                       [:exists
+                                                        (-> (sql/select true)
+                                                            (sql/from [:procurement_budget_limits :pbl])
+                                                            (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
+                                   (vector :result)
+                                   sql/select
+                                   sql-format
+                                   spy
+                                   )
+                                   ))
 
-      :result))
+       :result)))
 
 (defn update-budget-period!
   [tx bp]
@@ -177,14 +180,17 @@
                  (-> (sql/update :procurement_budget_periods)
                      (sql/set bp)
                      (sql/where [:= :procurement_budget_periods.id [:cast (:id bp) :uuid]])
-                     sql-format)))
+                     sql-format
+                     spy)))
 
 (defn insert-budget-period!
   [tx bp]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_budget_periods)
                      (sql/values [bp])
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

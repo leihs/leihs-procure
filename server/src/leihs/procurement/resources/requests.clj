@@ -417,10 +417,10 @@
   (println ">oo> get-total-price-cents" sqlmap)
 
 
-  (or (some->> sqlmap
+  (or (spy(some->> sqlmap
         sql-format
         (jdbc/execute-one! tx)
-        :result)
+        :result))
       0))
 
 (defn- sql-sum
@@ -430,10 +430,10 @@
 
 
   (spy (as-> qty-type <>
-         (:call :* :procurement_requests.price_cents <>)
-         (:call :cast <> :bigint)
-         (:call :sum <>)))
-  )
+         [:* :procurement_requests.price_cents <>]
+         [:cast <> :bigint]
+         [:sum <>])
+  ))
 
 
 (comment
@@ -547,9 +547,9 @@
         ]
 
 
-    (-> (:call :coalesce                                    ;;FIXME TODO PRIO!!!
+    (-> [[:coalesce                                    ;;FIXME TODO PRIO!!!
           :procurement_requests.order_quantity
-          :procurement_requests.approved_quantity)
+          :procurement_requests.approved_quantity]]
         (total-price-sqlmap bp-id)
         ;(total-price-sqlmap [:cast bp-id :uuid])
         (sql/where [:!= :procurement_requests.approved_quantity nil])
