@@ -174,14 +174,60 @@
 
        :result)))
 
+
+
+
+(defn my-cast [data]
+  (println ">o> no / 22 / my-cast /debug " data)
+
+
+  (let [
+        data (if (contains? data :id)
+               (assoc data :id [[:cast (:id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :category_id)
+               (assoc data :category_id [[:cast (:category_id data) :uuid]])
+               data
+               )
+        data (if (contains? data :inspection_start_date)
+               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
+               data
+               )
+
+        data (if (contains? data :end_date)
+               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
+               data
+               )
+
+        ]
+    (spy data)
+    )
+
+  )
+
 (defn update-budget-period!
   [tx bp]
-  (jdbc/execute! tx
-                 (-> (sql/update :procurement_budget_periods)
-                     (sql/set bp)
-                     (sql/where [:= :procurement_budget_periods.id [:cast (:id bp) :uuid]])
-                     sql-format
-                     spy)))
+
+  (let [
+        bp (my-cast bp)
+
+        result  (jdbc/execute! tx
+                               (-> (sql/update :procurement_budget_periods)
+                                   (sql/set bp)
+                                   (sql/where [:= :procurement_budget_periods.id (:id bp)])
+                                   sql-format
+                                   spy))
+
+        ]result )
+
+
+ )
+
+
+
+
 
 (defn insert-budget-period!
   [tx bp]
