@@ -104,6 +104,36 @@ SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_r
 ```
 
 
+```
+files=3179, longest=0.022 s, average=0.001 s; distance=2574 kB, estimate=3789 kB
+2023-12-08 18:16:57.757 CET [43260] ERROR:  syntax error at or near ")" at character 97
+2023-12-08 18:16:57.757 CET [43260] STATEMENT:  SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.id IN () ORDER BY procurement_categories.name ASC
+2023-12-08 18:17:04.241 CET [43262] ERROR:  new row for relation "procurement_templates" violates check constraint "check_either_model_id_or_article_name"
+2023-12-08 18:17:04.241 CET [43262] DETAIL:  Failing row contains (a7b7eb30-39b4-4122-8a00-de0b2a9d2d76, null, null, null, null, 0, CHF, null, c0e853e2-3420-4dc7-8428-a2f75cd2e9ed, f).
+2023-12-08 18:17:04.241 CET [43262] STATEMENT:  INSERT INTO procurement_templates (category_id, supplier_name) VALUES ((CAST($1 AS UUID)), NULL)
+2023-12-08 18:17:11.893 CET [43262] ERROR:  column "id" is of type uuid but expression is of type character varying at character 39
+2023-12-08 18:17:11.893 CET [43262] HINT:  You will need to rewrite or cast the expression.
+2023-12-08 18:17:11.893 CET [43262] STATEMENT:  UPDATE procurement_templates SET id = $1, article_name = $2, article_number = $3, price_cents = $4, is_archived = TRUE, category_id = $5, supplier_name = $6 WHERE procurement_templates.id = CAST($7 AS UUID)
+2023-12-08 18:17:19.082 CET [43262] ERROR:  column "id" is of type uuid but expression is of type character varying at character 39
+2023-12-08 18:17:19.082 CET [43262] HINT:  You will need to rewrite or cast the expression.
+2023-12-08 18:17:19.082 CET [43262] STATEMENT:  UPDATE procurement_templates SET id = $1, article_name = $2, article_number = $3, price_cents = $4, is_archived = TRUE, category_id = $5, supplier_name = $6 WHERE procurement_templates.id = CAST($7 AS UUID)
+2023-12-08 18:17:25.442 CET [59156] ERROR:  column "id" is of type uuid but expression is of type character varying at character 39
+2023-12-08 18:17:25.442 CET [59156] HINT:  You will need to rewrite or cast the expression.
+2023-12-08 18:17:25.442 CET [59156] STATEMENT:  UPDATE procurement_templates SET id = $1, article_name = $2, article_number = $3, price_cents = $4, is_archived = FALSE, category_id = $5, supplier_name = $6 WHERE procurement_templates.id = CAST($7 AS UUID)
+2023-12-08 18:17:32.426 CET [59156] ERROR:  operator does not exist: uuid = character varying at character 93
+2023-12-08 18:17:32.426 CET [59156] HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+2023-12-08 18:17:32.426 CET [59156] STATEMENT:  SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.id IN ($1, $2, $3, $4, $5) ORDER BY procurement_categories.name ASC
+2023-12-08 18:17:39.018 CET [59156] ERROR:  column "id" is of type uuid but expression is of type character varying at character 39
+2023-12-08 18:17:39.018 CET [59156] HINT:  You will need to rewrite or cast the expression.
+2023-12-08 18:17:39.018 CET [59156] STATEMENT:  UPDATE procurement_templates SET id = $1, article_name = $2, article_number = $3, price_cents = $4, is_archived = FALSE, category_id = $5, supplier_name = $6 WHERE procurement_templates.id = CAST($7 AS UUID)
+2023-12-08 18:17:40.304 CET [958] LOG:  checkpoint starting: time
+2023-12-08 18:17:45.658 CET [59156] ERROR:  column "id" is of type uuid but expression is of type character varying at character 39
+2023-12-08 18:17:45.658 CET [59156] HINT:  You will need to rewrite or cast the expression.
+2023-12-08 18:17:45.658 CET [59156] STATEMENT:  UPDATE procurement_templates SET id = $1, article_name = $2, article_number = $3, price_cents = $4, is_archived = FALSE, category_id = $5, supplier_name = $6 WHERE procurement_templates.id = CAST($7 AS UUID)
+```
+
+
+
 TODO Procure
 --
 1. Null-Value: join-and-nest-categories  join-and-nest-organizations  join-and-nest-rooms       

@@ -87,18 +87,23 @@
     )
   )
 
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+
 (defn get-templates-for-ids
   [tx ids]
   (-> categories/categories-base-query
-      (sql/where [:in :procurement_categories.id ids])      ;; TODO PRIO !!!
+      (sql/where [:in :procurement_categories.id (cast-uuids ids)]) ;; TODO PRIO !!!
       sql-format
       (->> (jdbc/execute! tx))))
+
+
 
 (defn delete-templates-not-in-ids!
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
-                     (sql/where [:not-in :procurement_templates.id ids]) ;; TODO PRIO !!!
+                     (sql/where [:not-in :procurement_templates.id (cast-uuids ids)]) ;; TODO PRIO !!!
                      sql-format)))
 
 (defn get-template-id

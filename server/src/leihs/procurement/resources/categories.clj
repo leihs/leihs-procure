@@ -25,6 +25,10 @@
       (sql/from :procurement_categories)
       (sql/order-by [:procurement_categories.name :asc])))
 
+
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+
 (defn categories-query
   [context arguments value]
 
@@ -39,7 +43,7 @@
 
     (sql-format
       (cond-> categories-base-query
-        id (sql/where [:in :procurement_categories.id id])  ;;TODO: BROKEN
+        id (sql/where [:in :procurement_categories.id (cast-uuids id)])  ;;TODO: BROKEN
         main-category-id (sql/where
                            [:= :procurement_categories.main_category_id
                             main-category-id])
