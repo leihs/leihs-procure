@@ -3,6 +3,7 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -17,6 +18,8 @@
 
 (defn get-user
   [context _ value]
+  (println ">o> >tocheck>")
+
   ((jdbc/execute-one! (-> context
                           :request
                           :tx-next)
@@ -26,7 +29,9 @@
                                           ; RequesterOrganization
                                           (:value value)    ; for RequestFieldUser
                                           ) :uuid]])
-                          sql-format))))
+                          sql-format
+                          spy
+                          ))))
 
 
 
@@ -73,8 +78,12 @@
 (defn get-user-by-id
   [tx id]
   (spy id)
+  (println ">o> >tocheck>")
+
   (jdbc/execute-one! tx
                      (-> user-base-query
                          ;(sql/where [:= :users.id (:cast id :uuid)])
                          (sql/where [:= :id [:cast id :uuid]])
-                         sql-format)))
+                         sql-format
+                         spy
+                         )))

@@ -3,6 +3,9 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -23,21 +26,27 @@
                      (-> (sql/select :pcv.user_id)
                          (sql/from [:procurement_category_viewers :pcv])
                          (sql/where [:= :pcv.category_id [:cast (:id value):uuid]]))])
-                  sql-format)))
+                  sql-format
+                  spy )))
 
 (defn delete-viewers-for-category-id!
   [tx c-id]
   (jdbc/execute! tx
                  (-> (sql/delete-from [:procurement_category_viewers :pcv])
                      (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))
 
 (defn insert-viewers!
   [tx row-maps]
+  (println ">o> >tocheck>")
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_category_viewers)
                      (sql/values row-maps)
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))
 
 (defn update-viewers!
   [tx c-id u-ids]

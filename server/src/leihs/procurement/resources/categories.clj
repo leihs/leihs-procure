@@ -53,6 +53,9 @@
                                     :authenticated-entity
                                     :user_id)]))))))
 
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+
 (defn get-categories-for-ids
   [tx ids]
 
@@ -60,8 +63,9 @@
 
   (-> categories-base-query
       ;(sql/where [:in :procurement_categories.id ids])
-      (sql/where [:in :procurement_categories.id ids])
+      (sql/where [:in :procurement_categories.id (cast-uuids ids)])
       sql-format
+      spy
       (->> (jdbc/execute! tx))))
 
 (defn get-for-main-category-id

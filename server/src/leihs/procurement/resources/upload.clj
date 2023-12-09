@@ -2,7 +2,8 @@
   (:require [clojure.string :as string]
             [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            
+            [taoensso.timbre :refer [debug info warn error spy]]
+
     ;[clojure.java.jdbc :as jdbc]
 
     [honey.sql :refer [format] :rename {format sql-format}]
@@ -23,7 +24,9 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_uploads)
                      (sql/values [m])
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))
 
 (defn prepare-upload-row-map
   [file-data]
@@ -48,12 +51,13 @@
 
 (defn get-by-id
   [tx id]
-  (-> (sql/select :procurement_uploads.*)
+  (spy (-> (sql/select :procurement_uploads.*)
       (sql/from :procurement_uploads)
       (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
       sql-format
+      spy
       (->> (jdbc/execute-one! tx))
-      ))
+      )))
 
 (defn upload
   [{params :params, tx :tx-next}]
@@ -68,8 +72,9 @@
                           (sql/order-by [:created_at :desc])
                           (sql/limit (count files-data))
                           sql-format
+                          spy
                           (->> (jdbc/execute! tx)))]
-      {:body upload-rows})))
+      {:body (spy upload-rows)})))
 
 (def routes (cpj/routes (cpj/POST (path :upload) [] #'upload)))
 

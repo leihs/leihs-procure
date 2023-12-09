@@ -3,6 +3,9 @@
     ;[ clojure.java.jdbc :as jdbc]
             ;[leihs.procurement.utils.sql :as sql]
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -36,6 +39,9 @@
           exclude-ids (:exclude_ids args)
           offset (:offset args)
           limit (:limit args)]
+
+      (println ">o> >tocheck>")
+
       (-> (cond-> users-base-query is-requester
                   (sql/join :procurement_requesters_organizations
                             [:=
@@ -57,4 +63,5 @@
                   (sql/where [:not-in :users.id exclude-ids]) offset
                   (sql/offset offset) limit
                   (sql/limit limit))
-          sql-format))))                                    ;; TODO: SEARCH CHECK
+          sql-format
+          spy ))))                                    ;; TODO: SEARCH CHECK
