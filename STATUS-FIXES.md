@@ -90,6 +90,17 @@ SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_r
 [46953] STATEMENT:  INSERT INTO procurement_templates (article_name, category_id, supplier_name) VALUES ($1, $2, NULL)
 
 
+
+
+
+
+
+
+
+ ERROR:  SELECT DISTINCT ON expressions must match initial ORDER BY expressions at character 21
+2023-12-09 06:33:53.529 CET [71438] STATEMENT:  SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.*, ((CASE WHEN procurement_requests.approved_quantity IS NULL THEN $1 WHEN procurement_requests.approved_quantity >= procurement_requests.requested_quantity THEN $2 WHEN (procurement_requests.approved_quantity < procurement_requests.requested_quantity) AND (procurement_requests.approved_quantity > $3) THEN $4 WHEN procurement_requests.approved_quantity = $5 THEN $6 END)) AS state, procurement_requests.*, ((CASE WHEN procurement_requests.approved_quantity IS NULL THEN $7 WHEN procurement_requests.approved_quantity >= procurement_requests.requested_quantity THEN $8 WHEN (procurement_requests.approved_quantity < procurement_requests.requested_quantity) AND (procurement_requests.approved_quantity > $9) THEN $10 WHEN procurement_requests.approved_quantity = $11 THEN $12 END)) AS state FROM procurement_requests INNER JOIN procurement_budget_periods ON procurement_budget_periods.id = procurement_requests.budget_period_id LEFT JOIN models ON models.id = procurement_requests.model_id ORDER BY concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, ''))) ASC, created_at DESC LIMIT $13
+
+
 ```
 
 

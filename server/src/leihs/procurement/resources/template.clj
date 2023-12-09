@@ -55,7 +55,7 @@
   (spy (-> templates-base-query
            (sql/where [:= :procurement_templates.id [:cast id :uuid]])
            sql-format
-           (->> (jdbc/execute! tx))
+           (->> (jdbc/execute-one! tx))
            )))
 
 ;(defn my-cast [data]

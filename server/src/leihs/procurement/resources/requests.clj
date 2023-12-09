@@ -28,6 +28,10 @@
 
 (defn search-query
   [sql-query term]
+
+  (println ">oo> search-query" term)
+
+
   (let [term-percent (str "%" term "%")
         p (println ">o> requests::search-query" term-percent)
 
@@ -90,6 +94,10 @@
 
 (defn requests-query-map                                    ;; TODO: FIXME
   [context arguments value]
+
+  (println ">oo> requests-query-map" value)
+
+
   (let [id (:id arguments)
         ; short_id (:short_id arguments)
         p (println ">o> helper1 id=" id)
@@ -374,6 +382,10 @@
 
 (defn get-requests
   [context arguments value]
+
+  (println ">oo> get-requests" value)
+
+
   (let [ring-request (:request context)
         tx (:tx-next ring-request)
         auth-entity (:authenticated-entity ring-request)

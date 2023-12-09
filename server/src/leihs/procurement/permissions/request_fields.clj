@@ -24,6 +24,9 @@
   Write permissions apply either to a new or an existing request."
   [tx auth-entity proc-request]
   (let [new-request (nil? (:id proc-request))
+
+        p (println ">o> request-fields::get-for-user-and-request, new-request?=" new-request)
+
         existing-request (not new-request)
         budget-period (budget-period/get-budget-period-by-id tx
                                                              (-> proc-request

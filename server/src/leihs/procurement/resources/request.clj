@@ -630,7 +630,7 @@
 
 (defn get-new
   [context args value]
-  (println ">debug> 27")
+  (println ">debug> 27 get-new")
 
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
@@ -689,7 +689,7 @@
   (println ">debug> 28")
 
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
+   (spy (-> advanced-user?
         requests-base-query-with-state
         ; NOTE: reselect because of:
         ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
@@ -701,33 +701,102 @@
         (sql/order-by [:created_at :desc])
         (sql/limit 1)
         sql-format
+        spy
         (->> (query-requests tx auth-entity))
-        first)))
+        first))))
+
+
+
+
+(defn my-cast [data]
+  (println ">o> no / 22 / my-cast /debug " data)
+
+
+  (let [
+        data (if (contains? data :id)
+               (assoc data :id [[:cast (:id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :category_id)
+               (assoc data :category_id [[:cast (:category_id data) :uuid]])
+               data
+               )
+        data (if (contains? data :template_id)
+               (assoc data :template_id [[:cast (:template_id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :room_id)
+               (assoc data :room_id [[:cast (:room_id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :order_status)
+               (assoc data :order_status [[:cast (:order_status data) :order_status_enum]])
+               data
+               )
+
+        data (if (contains? data :budget_period_id)
+               (assoc data :budget_period_id [[:cast (:budget_period_id data) :uuid]])
+               data
+               )
+
+        data (if (contains? data :user_id)
+               (assoc data :user_id [[:cast (:user_id data) :uuid]])
+               data
+               )
+
+        ;[[:cast (to-name-and-lower-case a) :order_status_enum]]
+
+        ]
+    (spy data)
+    )
+
+  )
+
 
 (defn insert!
   [tx data]
   (println ">debug> 29")
 
-  (jdbc/execute! tx
-                 (-> (sql/insert-into :procurement_requests)
-                     (sql/values [data])
-                     sql-format)))
 
+  (let [
 
+        data (spy (my-cast data))
 
-(defn my-cast [data]
-  (println ">o> no / my-cast /debug " data)
-  (if (contains? data :room_id)
-    (let [
-          p (println ">o> no before _> room_id=" (:room_id data))
-          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
-          ;(assoc data :room_id [:cast (:room_id data) :uuid])
-          data (assoc data :room_id [[:cast (:room_id data) :uuid]])
-          p (println ">o> no after _> room_id=" data)
-          ] data)
-    data
+        result   (jdbc/execute! tx
+                                (-> (sql/insert-into :procurement_requests)
+                                    (sql/values [data])
+                                    sql-format
+                                    spy
+                                    ))
+        ]
+
+    (spy result)
     )
+
+
+
+
+
   )
+
+
+;
+;(defn my-cast [data]
+;  (println ">o> no / my-cast /debug " data)
+;  (if (contains? data :room_id)
+;    (let [
+;          p (println ">o> no before _> room_id=" (:room_id data))
+;          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
+;          ;(assoc data :room_id [:cast (:room_id data) :uuid])
+;          data (assoc data :room_id [[:cast (:room_id data) :uuid]])
+;          p (println ">o> no after _> room_id=" data)
+;          ] data)
+;    data
+;    )
+;  )
 
 
 (defn update!
@@ -745,7 +814,9 @@
                      (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                      ;(sql/where :raw "/* da sama 123 */" )
                      ;(sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                     sql-format)))
+                     sql-format
+                     spy
+                     )))
 
 (defn- filter-attachments [m as]
 

@@ -22,13 +22,15 @@
 
 (defn get-category
   ([context _ value]
-   ((jdbc/execute-one! (-> context
+   (jdbc/execute-one! (-> context
                           :request
                           :tx-next)
                       (category-query (or (:value value)
                                           ; for
                                           ; RequestFieldCategory
-                                          [:cast (:category_id value) :uuid])))))
+                                          [:cast (:category_id value) :uuid]))))
+
+
   ([tx catmap]
    (let [where-clause (sqlp/map->where-clause :procurement_categories catmap)]
      ((jdbc/execute-one! tx
