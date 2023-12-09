@@ -24,13 +24,13 @@
   (println ">o> templates::templates-base-query ERROR?")
 
   (def templates-base-query
-    (-> (sql/select :procurement_templates.*)
+    (spy (-> (sql/select :procurement_templates.*)
         (sql/from :procurement_templates)
         (sql/left-join :models [:= :models.id :procurement_templates.model_id])
         (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
                                      (map #(->> [:lower [:coalesce % ""]])))
                         ]])
-        ))
+        )))
   )
 
 (defn get-templates
