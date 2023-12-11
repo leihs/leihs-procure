@@ -102,10 +102,10 @@
   [tx row-maps]
 
   (println ">o> tocheck3 true/false")
+  (println ">o> tocheck3 true/false" row-maps)
 
   (spy (jdbc/execute! tx (-> (sql/insert-into :procurement_category_inspectors)
-                             ;(sql/values (my-cast row-maps))
-                             (sql/values ( spy (row-maps)))
+                             (sql/values (map #(my-cast %) row-maps))
                              sql-format))))
 
 (defn update-inspectors!
