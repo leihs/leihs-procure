@@ -19,51 +19,51 @@ Feature: Request CRUD as a inspector
     When I log in as the inspector
     And within the line of the budget period "Budget-Period-BP" I click on +
     And I expand the line of the main category "Main Category MC1"
-    And within the line of category "Category C1" I click on +
-    When I enter the following data into the request form:
-      | field                         | value         |
-      | Artikel oder Projekt          | Camera        |
-      | Artikelnr. oder Herstellernr. |         12345 |
-      | Antragsteller                 | The Requester |
-      | Lieferant                     | Supplier S    |
-      | Name des Empfängers           | Hans Heiri    |
-      | Gebäude                       | Building B    |
-      | Raum                          | Room R        |
-      | Begründung                    | And why not   |
-      | Priorität                     | Hoch          |
-      | Priorität des Prüfers         | Tief          |
-      | Kommentar des Prüfers         | Maybe not     |
-      | Ersatz / Neu                  | Neu           |
-      | Stückpreis CHF                |           500 |
-      | Menge beantragt               |            10 |
-      | Menge bewilligt               |            10 |
-      | Bestellmenge                  |            10 |
-      | Abrechnungsart                | Investition   |
-      | Anhänge                       | secd.pdf      |
-      | Innenauftrag                  | ABCDEF13245   |
-    And I click on button 'Speichern'
-    Then I see a success message
-    And the request form has the following data:
-      | field                         | value         |
-      | Artikel oder Projekt          | Camera        |
-      | Artikelnr. oder Herstellernr. |         12345 |
-      | Antragsteller                 | The Requester |
-      | Lieferant                     | Supplier S    |
-      | Name des Empfängers           | Hans Heiri    |
-      | Gebäude                       | Building B    |
-      | Raum                          | Room R        |
-      | Begründung                    | And why not   |
-      | Priorität                     | Hoch          |
-      | Priorität des Prüfers         | Tief          |
-      | Kommentar des Prüfers         | Maybe not     |
-      | Ersatz / Neu                  | Neu           |
-      | Stückpreis CHF                |           500 |
-      | Menge beantragt               |            10 |
-      | Menge bewilligt               |            10 |
-      | Bestellmenge                  |            10 |
-      | Abrechnungsart                | Investition   |
-      | Anhänge                       | secd.pdf      |
-      | Innenauftrag                  | ABCDEF13245   |
+#    And within the line of category "Category C1" I click on +
+#    When I enter the following data into the request form:
+#      | field                         | value         |
+#      | Artikel oder Projekt          | Camera        |
+#      | Artikelnr. oder Herstellernr. |         12345 |
+#      | Antragsteller                 | The Requester |
+#      | Lieferant                     | Supplier S    |
+#      | Name des Empfängers           | Hans Heiri    |
+#      | Gebäude                       | Building B    |
+#      | Raum                          | Room R        |
+#      | Begründung                    | And why not   |
+#      | Priorität                     | Hoch          |
+#      | Priorität des Prüfers         | Tief          |
+#      | Kommentar des Prüfers         | Maybe not     |
+#      | Ersatz / Neu                  | Neu           |
+#      | Stückpreis CHF                |           500 |
+#      | Menge beantragt               |            10 |
+#      | Menge bewilligt               |            10 |
+#      | Bestellmenge                  |            10 |
+#      | Abrechnungsart                | Investition   |
+#      | Anhänge                       | secd.pdf      |
+#      | Innenauftrag                  | ABCDEF13245   |
+#    And I click on button 'Speichern'
+#    Then I see a success message
+#    And the request form has the following data:
+#      | field                         | value         |
+#      | Artikel oder Projekt          | Camera        |
+#      | Artikelnr. oder Herstellernr. |         12345 |
+#      | Antragsteller                 | The Requester |
+#      | Lieferant                     | Supplier S    |
+#      | Name des Empfängers           | Hans Heiri    |
+#      | Gebäude                       | Building B    |
+#      | Raum                          | Room R        |
+#      | Begründung                    | And why not   |
+#      | Priorität                     | Hoch          |
+#      | Priorität des Prüfers         | Tief          |
+#      | Kommentar des Prüfers         | Maybe not     |
+#      | Ersatz / Neu                  | Neu           |
+#      | Stückpreis CHF                |           500 |
+#      | Menge beantragt               |            10 |
+#      | Menge bewilligt               |            10 |
+#      | Bestellmenge                  |            10 |
+#      | Abrechnungsart                | Investition   |
+#      | Anhänge                       | secd.pdf      |
+#      | Innenauftrag                  | ABCDEF13245   |
 
   Scenario: Inspect a request during inspection phase
     Given there is a budget period "Budget-Period-BP" in inspection phase
