@@ -3,16 +3,16 @@
 
 
 
-        [taoensso.timbre :refer [debug info warn error spy]]
+    [taoensso.timbre :refer [debug info warn error spy]]
 
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
-    
-            [clojure.tools.logging :as log]
-            [leihs.procurement.authorization :as authorization]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources [category :as category]
-             [inspectors :as inspectors] [viewers :as viewers]]
+
+    [clojure.tools.logging :as log]
+    [leihs.procurement.authorization :as authorization]
+    [leihs.procurement.permissions.user :as user-perms]
+    [leihs.procurement.resources [category :as category]
+     [inspectors :as inspectors] [viewers :as viewers]]
 
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
@@ -43,22 +43,22 @@
 
     (sql-format
       (cond-> categories-base-query
-        id (sql/where [:in :procurement_categories.id (cast-uuids id)])  ;;TODO: BROKEN
-        main-category-id (sql/where
-                           [:= :procurement_categories.main_category_id
-                            main-category-id])
-        inspected-by-auth-user
-          (-> (sql/join :procurement_category_inspectors
-                              [:= :procurement_category_inspectors.category_id
-                               :procurement_categories.id])
-              (sql/where [:= :procurement_category_inspectors.user_id
-                                (-> context
-                                    :request
-                                    :authenticated-entity
-                                    :user_id)]))))))
+              id (sql/where [:in :procurement_categories.id (cast-uuids id)]) ;;TODO: BROKEN
+              main-category-id (sql/where
+                                 [:= :procurement_categories.main_category_id
+                                  main-category-id])
+              inspected-by-auth-user
+              (-> (sql/join :procurement_category_inspectors
+                            [:= :procurement_category_inspectors.category_id
+                             :procurement_categories.id])
+                  (sql/where [:= :procurement_category_inspectors.user_id
+                              (-> context
+                                  :request
+                                  :authenticated-entity
+                                  :user_id)]))))))
 
 (defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+  (spy (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)))
 
 (defn get-categories-for-ids
   [tx ids]
@@ -76,7 +76,7 @@
   [tx main-cat-id]
   (-> categories-base-query
       (sql/where [:= :procurement_categories.main_category_id
-                        main-cat-id])
+                  main-cat-id])
       sql-format
       spy
       (->> (jdbc/execute! tx))))
@@ -88,19 +88,19 @@
     (->> (categories-query context arguments value)
          spy
          (jdbc/execute! (-> context
-                         :request
-                         :tx-next)))))
+                            :request
+                            :tx-next)))))
 
 (defn delete-categories-for-main-category-id-and-not-in-ids!
   [tx mc-id ids]
   (jdbc/execute!
     tx
     (-> (sql/delete-from :procurement_categories)
-        (sql/where [:= :procurement_categories.main_category_id mc-id])
-        (cond-> (not (empty? ids)) (sql/where
-                                     [:not-in :procurement_categories.id ids])) ;;FIXME TODO ids
+        (sql/where [:= :procurement_categories.main_category_id [:cast mc-id :uuid]])
+        (cond-> (not (empty? ids)) (sql/where [:not-in :procurement_categories.id (cast-uuids ids)])) ;;FIXME TODO ids
+        sql-format
         spy
-        sql-format)))
+        )))
 
 (defn update-categories!
   [tx mc-id cs]
@@ -135,8 +135,8 @@
                #(user-perms/inspector? tx auth-user c-id)])
             (recur rest-cs))
         (jdbc/execute! tx
-                    (-> categories-base-query
-                        (sql/where [:in :procurement_categories.id
-                                          (map :id categories)])
-                        sql-format))))))
+                       (-> categories-base-query
+                           (sql/where [:in :procurement_categories.id
+                                       (map :id categories)])
+                           sql-format))))))
 

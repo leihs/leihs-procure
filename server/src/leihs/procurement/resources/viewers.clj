@@ -29,12 +29,11 @@
 
 (defn delete-viewers-for-category-id!
   [tx c-id]
-  (jdbc/execute! tx
-                 (-> (sql/delete-from [:procurement_category_viewers :pcv])
-                     (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
-                     sql-format
-                     spy
-                     )))
+  (jdbc/execute! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
+                        (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
+                        sql-format
+                        spy
+                        )))
 
 (defn insert-viewers!
   [tx row-maps]
