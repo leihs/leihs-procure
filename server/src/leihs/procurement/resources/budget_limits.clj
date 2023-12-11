@@ -40,7 +40,8 @@
   [tx bl]
   (jdbc/execute!
     tx
-    (-> (sql/delete-from [:procurement_budget_limits :pbl])
+    ;(-> (sql/delete-from [:procurement_budget_limits :pbl])
+    (-> (sql/delete-from :procurement_budget_limits :pbl)
         (sql/where [:and [:= :pbl.main_category_id (:main_category_id bl)]
                     [:= :pbl.budget_period_id (:budget_period_id bl)]])
         sql-format)))

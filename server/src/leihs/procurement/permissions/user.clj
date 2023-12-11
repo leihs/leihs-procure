@@ -29,7 +29,9 @@
 
                                 ]]
                               )
-                  sql-format)
+                  sql-format
+                  spy
+                  )
 
         p (println ">o> admin?" query)
 
@@ -168,7 +170,7 @@
         p (println ">o> requester??" result)
         ]
 
-    (:exists result)))
+    (spy (:exists result))))
 
 
 (defn advanced?

@@ -21,18 +21,17 @@
   (println ">oo >tocheck user1")
   (println ">o> >tocheck>")
 
-  ((jdbc/execute-one! (-> context
+  (jdbc/execute-one! (-> context
                           :request
                           :tx-next)
                       (-> user-base-query
-                          (sql/where [:= :users.id
-                                      [:cast (or (:user_id value)  ; for
-                                          ; RequesterOrganization
-                                          (:value value)    ; for RequestFieldUser
-                                          ) :uuid]])
+                          (sql/where [:= :users.id [:cast (or (:user_id value) ; for
+                                                              ; RequesterOrganization
+                                                              (:value value) ; for RequestFieldUser
+                                                              ) :uuid]])
                           sql-format
                           spy
-                          ))))
+                          )))
 
 
 

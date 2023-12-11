@@ -6,6 +6,9 @@
       [next.jdbc :as jdbc]
       [honey.sql.helpers :as sql]
 
+          [taoensso.timbre :refer [debug info warn error spy]]
+
+
       ;        [leihs.procurement.utils.sql :as sql]
       ;[clojure.java.jdbc :as jdbc]
 
@@ -31,10 +34,11 @@
 (defn delete-all [tx]                                       ;; TODO
       ;(jdbc/delete! tx :procurement_admins [])
 
-      (->>
-        (sql/delete :procurement_admins)
+      (spy (->>
+        (sql/delete-from :procurement_admins)
         sql-format
-        (jdbc/execute! tx))
+        spy
+        (jdbc/execute! tx)))
       )
 
 (defn update-admins!
@@ -45,11 +49,11 @@
            (delete-all tx)
            (doseq [d (:input_data args)]
                   ;(jdbc/insert! tx :procurement_admins d)         ;; TODO
-                  (->> (sql/insert-into :procurement_admins)
-                      (sql/set d)
+                  (spy (->> (sql/insert-into :procurement_admins)
+                      (sql/set (spy d))
                        sql-format
                       (jdbc/execute! tx)
-                      )
+                      ))
 
 
                   )
