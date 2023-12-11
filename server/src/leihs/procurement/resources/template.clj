@@ -58,19 +58,6 @@
            (->> (jdbc/execute-one! tx))
            )))
 
-;(defn my-cast [data]
-;  (println ">o> no / my-cast /debug " data)
-;  (if (contains? data :category_id)
-;    (let [
-;          p (println ">o> no before _> room_id=" (:category_id data))
-;          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
-;          ;(assoc data :room_id [:cast (:room_id data) :uuid])
-;          data (assoc data :category_id [[:cast (:category_id data) :uuid]])
-;          p (println ">o> no after _> room_id=" data)
-;          ] data)
-;    data
-;    )
-;  )
 
 (defn insert-template!
   [tx tmpl]

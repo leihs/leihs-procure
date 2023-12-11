@@ -3,31 +3,29 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
-        [taoensso.timbre :refer [debug info warn error spy]]
+    [taoensso.timbre :refer [debug info warn error spy]]
 
 
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-     
-            [clojure.tools.logging :as log]
-            [leihs.procurement.resources.users :refer [users-base-query]]
+
+    [clojure.tools.logging :as log]
+    [leihs.procurement.resources.users :refer [users-base-query]]
     ))
 
 (defn get-viewers
   [context _ value]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (-> users-base-query
-                  (sql/where
-                    [:in :users.id
-                     (-> (sql/select :pcv.user_id)
-                         (sql/from [:procurement_category_viewers :pcv])
-                         (sql/where [:= :pcv.category_id [:cast (:id value):uuid]]))])
-                  sql-format
-                  spy )))
+                     :request
+                     :tx-next)
+                 (-> users-base-query (sql/where [:in :users.id
+                                                  (-> (sql/select :pcv.user_id)
+                                                      (sql/from [:procurement_category_viewers :pcv])
+                                                      (sql/where [:= :pcv.category_id [:cast (:id value) :uuid]]))])
+                     sql-format
+                     spy)))
 
 (defn delete-viewers-for-category-id!
   [tx c-id]

@@ -16,10 +16,42 @@
 
 (defn sql-order-users
   [sqlmap]
-  (println ">oo >tocheck users3")
-  (sql/order-by
-    sqlmap
-    (concat :users.firstname :users.lastname :users.login :users.id)))
+  (println ">oo >tocheck users3 sql-order-users, sqlmap=" sqlmap)
+  (sql/order-by sqlmap [[:concat :users.firstname :users.lastname :users.login :users.id]])
+  )
+
+
+
+(comment
+  (let [
+        tx (db/get-ds-next)
+        request {:route-params {:user-id #uuid "c0777d74-668b-5e01-abb5-f8277baa0ea8"}
+                 :tx-next tx}
+
+        ;query (-> (sql/select :*)
+        query (-> (sql/select :users.firstname :users.lastname :users.login :users.id)
+                  (sql/from :users)
+                  )
+
+        query (sql-order-users query)
+
+        result (jdbc/execute! tx (-> query
+                                     sql-format
+                                     ))
+
+        p (println "\nquery" result)
+
+        ]
+
+    )
+  )
+
+
+
+
+
+
+
 
 (def users-base-query
   (-> (sql/select :users.id :users.firstname :users.lastname) ;; FIXME TODO
@@ -59,7 +91,8 @@
 
 
 
-
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 
 
@@ -75,7 +108,10 @@
                           (map (fn [part] (str "%" part "%"))
                                (clj-str/split search-term #"\s+")))
           is-requester (:isRequester args)
+
           exclude-ids (:exclude_ids args)
+          ;exclude-ids (cast-uuids (:exclude_ids args))
+
           offset (:offset args)
           limit (:limit args)
 
@@ -120,7 +156,7 @@
                   ;                     term-parts))
                   ;
                   ;             )
-                  exclude-ids (sql/where [:not-in :users.id exclude-ids])
+                  exclude-ids (sql/where [:not-in :users.id (cast-uuids (spy exclude-ids))])
                   offset (sql/offset offset)
                   limit (sql/limit limit))
           sql-format

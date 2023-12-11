@@ -1,5 +1,5 @@
 (ns leihs.procurement.resources.inspectors
-  (:require 
+  (:require
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
@@ -7,22 +7,21 @@
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
-            [leihs.procurement.resources.users :refer [users-base-query]]
+
+    [leihs.procurement.resources.users :refer [users-base-query]]
     ))
 
 (defn get-inspectors
   [context _ value]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (-> users-base-query
-                  (sql/where
-                    [:in :users.id                          ;;TODO FIXME ids
-                     (-> (sql/select :pci.user_id)
-                         (sql/from [:procurement_category_inspectors :pci])
-                         (sql/where [:= :pci.category_id [:cast (:id value):uuid]]))])
-                  sql-format)))
+                     :request
+                     :tx-next)
+                 (-> users-base-query
+                     (sql/where
+                       [:in :users.id (-> (sql/select :pci.user_id)
+                                          (sql/from [:procurement_category_inspectors :pci])
+                                          (sql/where [:= :pci.category_id [:cast (:id value) :uuid]]))])
+                     sql-format)))
 
 (defn delete-inspectors-for-category-id!
   [tx c-id]

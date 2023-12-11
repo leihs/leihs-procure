@@ -8,6 +8,9 @@
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
 
+
+
+
     [clojure.tools.logging :as log]
     [leihs.core.core :refer [raise]]
     [leihs.procurement.permissions.categories :as categories-perms]
@@ -34,7 +37,7 @@
         p (println ">o> admin?" result)
         ]
 
-    (:exists result)
+    (spy (:exists result))
     )
   )
 
