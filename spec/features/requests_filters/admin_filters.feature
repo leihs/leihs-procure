@@ -115,9 +115,8 @@ Feature: Requests' filter for inspector, viewer and procurement admin
 
     When I log in as the procurement admin
 
-
     Then the "nur Kategorien mit Anträgen" filter is checked
-#    And "Budgetperioden" filter name is "Alle 3 ausgewählt"
+    And "Budgetperioden" filter name is "Alle 3 ausgewählt"
     And "Kategorien" filter name is "Alle 4 ausgewählt"
 
     And "Organisationen" filter name is "Alle 4 ausgewählt"
@@ -142,46 +141,46 @@ Feature: Requests' filter for inspector, viewer and procurement admin
 
     When I expand all categories
     Then I see following budget periods:
-#      | BP-requesting-phase |
+      | BP-requesting-phase |
       | BP-inspection-phase |
       | BP-past             |
-#    And I see "9 Anträge"
-#    Then I see requests for the following articles:
-#      | article   | state      |
-#      | Product A | Neu        |
-#      | Product I | Neu        |
-#      | Product C | Neu        |
-#      | Product D | Teilweise bewilligt |
-#      | Product E | Genehmigt |
-#      | Product F | Abgelehnt |
-#      | Product K | Neu       |
-#
-#    When I uncheck "Department 1" for "Organisationen" filter
-#    Then "Organisationen" filter name is "Organization 3, Organization 4"
-#    And I see "3 Anträge"
-#    And I see requests for the following articles:
-#      | article   | state      |
-#      | Product I | Neu        |
-#      | Product J | Neu        |
-#      | Product K | Neu        |
-#    When I uncheck "Zwingend" for "Priorität des Prüfers" filter
-#    Then "Priorität des Prüfers" filter name is "Tief, Mittel, Hoch"
-#    And I see "2 Anträge"
-#    And I see requests for the following articles:
-#      | article   | state      |
-#      | Product I | Neu        |
-#      | Product J | Neu        |
-#
-#    And I click on "Filter zurücksetzen"
-#
-#    When I uncheck "nur Kategorien mit Anträgen" filter
-#    And I expand all categories
-#    And I see "9 Anträge"
-#    Then within all budget periods I see the following main categories:
-#      | Main Category 1 |
-#      | Main Category 2 |
-#    Then within all budget periods I see the following categories:
-#      | Category 1 |
-#      | Category 2 |
-#      | Category 3 |
-#      | Category 4 |
+    And I see "9 Anträge"
+    Then I see requests for the following articles:
+      | article   | state      |
+      | Product A | Neu        |
+      | Product I | Neu        |
+      | Product C | Neu        |
+      | Product D | Teilweise bewilligt |
+      | Product E | Genehmigt |
+      | Product F | Abgelehnt |
+      | Product K | Neu       |
+
+    When I uncheck "Department 1" for "Organisationen" filter
+    Then "Organisationen" filter name is "Organization 3, Organization 4"
+    And I see "3 Anträge"
+    And I see requests for the following articles:
+      | article   | state      |
+      | Product I | Neu        |
+      | Product J | Neu        |
+      | Product K | Neu        |
+    When I uncheck "Zwingend" for "Priorität des Prüfers" filter
+    Then "Priorität des Prüfers" filter name is "Tief, Mittel, Hoch"
+    And I see "2 Anträge"
+    And I see requests for the following articles:
+      | article   | state      |
+      | Product I | Neu        |
+      | Product J | Neu        |
+
+    And I click on "Filter zurücksetzen"
+
+    When I uncheck "nur Kategorien mit Anträgen" filter
+    And I expand all categories
+    And I see "9 Anträge"
+    Then within all budget periods I see the following main categories:
+      | Main Category 1 |
+      | Main Category 2 |
+    Then within all budget periods I see the following categories:
+      | Category 1 |
+      | Category 2 |
+      | Category 3 |
+      | Category 4 |
