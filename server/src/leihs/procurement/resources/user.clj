@@ -18,6 +18,7 @@
 
 (defn get-user
   [context _ value]
+  (println ">oo >tocheck user1")
   (println ">o> >tocheck>")
 
   ((jdbc/execute-one! (-> context
@@ -57,6 +58,10 @@
 
         tx (db/get-ds-next)
 
+        ;SELECT * FROM users
+        ;WHERE UNACCENT(CONCAT(users.firstname, ' ', users.lastname)) LIKE UNACCENT('%Procurement% %Admin%')
+        ;AND UNACCENT(CONCAT(users.firstname, ' ', users.lastname)) LIKE UNACCENT('%Procurement% %Admin%')
+
 
         sql (-> user-base-query
                 (sql/where [:= :users.id id])
@@ -77,6 +82,7 @@
 
 (defn get-user-by-id
   [tx id]
+  (println ">oo >tocheck user2")
   (spy id)
   (println ">o> >tocheck>")
 

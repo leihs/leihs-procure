@@ -88,38 +88,41 @@
       (println ">o> >tocheck> offset=" offset)
       (println ">o> >tocheck> limit=" limit)
 
+
       ;>o> >tocheck> search-term= Procurement Admin
       ;>o> >tocheck> term-parts= (%Procurement% %Admin%)
       ;>o> >tocheck> is-requester= true
       ;>o> >tocheck> exclude-ids= nil
       ;>o> >tocheck> offset= 0
       ;>o> >tocheck> limit= 25
+      ;>o> >tocheck> merge-where1= nil 0
+      ;>o> >tocheck> merge-where2= (%Procurement% %Admin%)
 
-      (-> (cond-> users-base-query is-requester
-                  (sql/join :procurement_requesters_organizations
-                            [:= :procurement_requesters_organizations.user_id :users.id])
-                  (spy term-parts)
 
-                  (sql/where (into [:and]
+      (-> (cond-> users-base-query
+                  is-requester (sql/join :procurement_requesters_organizations
+                                         [:=
+                                          :procurement_requesters_organizations.user_id
+                                          :users.id])
+                  term-parts (sql/where (into [:and] (map (fn [x] [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]] [:unaccent [:cast x :varchar]]]) term-parts)))
 
-                                   (search-query search-term term-parts)
-
-                                   ;(map
-                                   ;  (fn [term-percent]
-                                   ;    [:ilike (->> (concat
-                                   ;                   :users.firstname
-                                   ;                   [:cast " " :varchar]
-                                   ;                   :users.lastname)
-                                   ;                 [:unaccent])
-                                   ;     [:unaccent term-percent]])
-                                   ;  term-parts)
-
-                                   ))
-
-                  exclude-ids
-                  (sql/where [:not-in :users.id exclude-ids]) offset
-                  (sql/offset offset) limit
-                  (sql/limit limit))
+                  ;term-parts (sql/merge-where
+                  ;             (into [:and]
+                  ;                   (map
+                  ;                     (fn [term-percent]
+                  ;                       ["~~*"
+                  ;                        (->> (sql/call :concat
+                  ;                                       :users.firstname
+                  ;                                       (sql/call :cast " " :varchar)
+                  ;                                       :users.lastname)
+                  ;                             (sql/call :unaccent))
+                  ;                        (sql/call :unaccent term-percent)])
+                  ;                     term-parts))
+                  ;
+                  ;             )
+                  exclude-ids (sql/where [:not-in :users.id exclude-ids])
+                  offset (sql/offset offset)
+                  limit (sql/limit limit))
           sql-format
           spy))))                                           ;; TODO: SEARCH
 
@@ -134,6 +137,7 @@
 
 
 
+(def list-if-nil (fn [x] (if (nil? x) '[] x)))
 
 
 
@@ -144,72 +148,107 @@
   (let [
         p (println "\nquery")
 
-
         search-term "Procurement Admin"
-        term-parts "%Procurement% %Admin%"
+        term-parts "%Procurement% %Admin%"                  ;; iteration
         is-requester true
-        exclude-ids nil
+        exclude-ids (list-if-nil nil)
         offset 0
         limit 25
-
-        ;test (fn [term-percent]
-        ;  ["~~*"
-        ;   (->> (sqlo/call :concat
-        ;                  :users.firstname
-        ;                  (sqlo/call :cast " " :varchar)
-        ;                  :users.lastname)
-        ;        (sqlo/call :unaccent))
-        ;   (sqlo/call :unaccent term-percent)])
-
-        ;formatted-name (sqlo/call :concat
-        ;                       :users.firstname
-        ;                       (sqlo/call :cast " " :varchar)
-        ;                       :users.lastname)
-        ;p (println "\n 1:" (sqlo/format formatted-name))
-        ;
-        ;unaccented-name (sqlo/call :unaccent formatted-name)
-        ;p (println "\n 2:" (sqlo/format unaccented-name))
-        ;
-        ;
-        ;unaccented-term (sqlo/call :unaccent term-parts)
-        ;p (println "\n 3:" (sqlo/format unaccented-term))
-        ;
-        ;result ["~~*" unaccented-name unaccented-term]
-        ;
-        ;p (println "\nquery" (sqlo/format result))
-
-
-
-
-
 
         tx (db/get-ds-next)
 
 
+        ;; MASTER
+        ;SELECT users.id, users.firstname, users.lastname
+        ;FROM users
+        ;INNER JOIN procurement_requesters_organizations
+        ;ON procurement_requesters_organizations.user_id = users.id
+        ;WHERE (unaccent(concat(users.firstname, CAST(' ' AS varchar), users.lastname)) ~~* unaccent('%Procurement%')
+        ;               AND unaccent(concat(users.firstname, CAST(' ' AS varchar), users.lastname)) ~~* unaccent('%Admin%'))
+
+        ;ORDER BY concat(users.firstname, users.lastname, users.login, users.id)
+        ;LIMIT 25 OFFSET 0
 
 
-        formatted-name [:concat
-                        :users.firstname
-                        [[:cast " " :varchar]]
-                        :users.lastname]
-        p (println "\n 1:" (sql-format formatted-name))
+        ;(sql/format (cond-> users-base-query is-requester
+        ;                    (sql/merge-join :procurement_requesters_organizations [:= :procurement_requesters_organizations.user_id :users.id]) term-parts
+        ;                    (sql/merge-where (into [:and] (map (spy (fn [term-percent]
+        ;                                                              ["~~*" (->> (sql/call :concat :users.firstname (sql/call :cast " " :varchar) :users.lastname) (sql/call :unaccent)) (sql/call :unaccent term-percent)])) term-parts))) exclude-ids
+        ;                    (sql/merge-where [:not-in :users.id exclude-ids]) offset
+        ;                    (sql/offset offset) limit
+        ;                    (sql/limit limit)))
+
+        ;=> ["SELECT users.id, users.firstname, users.lastname FROM users INNER JOIN procurement_requesters_organizations ON procurement_requesters_organizations.user_id = users.id
+        ; WHERE (unaccent(concat(users.firstname, CAST(? AS varchar), users.lastname)) ~~* unaccent(?) AND unaccent(concat(users.firstname, CAST(? AS varchar), users.lastname)) ~~* unaccent(?))
+        ; ORDER BY concat(users.firstname, users.lastname, users.login, users.id) LIMIT ? OFFSET ?" " " "%Procurement%" " " "%Admin%" 25 0]
 
 
-        unaccented-name [:unaccent formatted-name]
-        p (println "\n 2:" (sql-format unaccented-name))
 
 
-        unaccented-term [:unaccent term-parts]
-        p (println "\n 3:" (sql-format unaccented-term))
-
-        result [:or [:ilike [unaccented-name] [:ilike [unaccented-term]]]]
-        p (println ">o> ???" result)
 
 
-        query (-> (sql/select :*)
+
+
+        term-parts "%Procurement% %Admin%"                  ;; iteration
+
+        term-parts (and search-term
+                        (map (fn [part] (str "%" part "%"))
+                             (clj-str/split search-term #"\s+")))
+
+        p (println ">o> ?term-parts?" term-parts)
+
+
+
+
+        ;; Works
+        ;term-parts-query (map (fn [x] [[[:unaccent [:concat :users.firstname [[:cast " " :varchar]] :users.lastname] x]]]) term-parts)
+        term-parts-query (map (fn [x] [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]] [:unaccent [:cast x :varchar]]]) term-parts)
+        p (println ">o> ???1a" (first term-parts-query))
+        p (println ">o> ???1b" (second term-parts-query))
+        where-clause (into [:and] term-parts-query)
+
+
+        where-clause (into [:and] (map (fn [x] [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]] [:unaccent [:cast x :varchar]]]) term-parts))
+
+
+        ;where-clause [:and [:ilike [[:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]]] ;; works
+        ;                    [[:unaccent [:cast "%abcd%" :varchar]]]]]
+        ;
+        ;
+        ;;; works
+        ;where-clause [:and [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]] [:unaccent [:cast "%abcd%" :varchar]]]    ]
+
+
+
+
+
+        ;exclude-ids (list-if-nil (#uuid  "39b75ad5-44d6-4ced-838c-a205a078baa5" #uuid "4c407438-36f9-4f2d-a737-2413356af468"))
+        exclude-ids [#uuid "39b75ad5-44d6-4ced-838c-a205a078baa5" #uuid "4c407438-36f9-4f2d-a737-2413356af468"] ;;works
+        exclude-ids (list-if-nil [])                        ;;ERROR: syntax error at or near ")"
+        ;exclude-ids (list-if-nil nil)                      ;;ERROR: syntax error at or near ")"
+
+        p (println ">o> ?exclude-ids?" exclude-ids)
+
+
+        ;;where-clause [:unaccent term-parts]
+        ;p (println "\n 3:" (sql-format where-clause))
+        ;
+        ;where-cond [:and [:ilike [unaccented-name] [:ilike [where-clause]]]]
+        p (println ">o> ???2" where-clause)
+
+
+        query (-> (sql/select :users.id :users.firstname :users.lastname)
                   (sql/from :users)
-                  (sql/where result)
-                  )
+                  (sql/join :procurement_requesters_organizations [:= :procurement_requesters_organizations.user_id :users.id]) ;;? term-parts
+                  (sql/where where-clause)                  ;;exclude-ids
+
+
+                  ;(sql/where [:not-in :users.id (into [] exclude-ids)]) ;;offset
+                  (sql/where [:not-in :users.id exclude-ids]) ;;offset
+                  (sql/offset offset)                       ;;limit
+                  (sql/limit limit))
+
+
 
 
         p (println "\nquery" (sql-format query))
@@ -242,6 +281,28 @@
 ;      [next.jdbc :as jdbc]))
 
 (comment
+
+  ; "SELECT users.id, users.firstname, users.lastname FROM users INNER JOIN procurement_requesters_organizations ON procurement_requesters_organizations.user_id = users.id
+
+
+  ; WHERE (unaccent(concat(users.firstname, CAST(? AS varchar), users.lastname)) ~~* unaccent(?)
+  ; AND unaccent(concat(users.firstname, CAST(? AS varchar), users.lastname)) ~~* unaccent(?))
+
+  ; ORDER BY concat(users.firstname, users.lastname, users.login, users.id) LIMIT ? OFFSET ?" " " "%Procurement%" " " "%Admin%" 25 0]
+
+
+  ;(sql/format (cond-> users-base-query is-requester
+  ;                    (sql/merge-join :procurement_requesters_organizations [:= :procurement_requesters_organizations.user_id :users.id]) term-parts
+  ;(sql/merge-where (into [:and] (map (spy (fn [term-percent]
+  ;                                                              ["~~*" (->> (sql/call :concat :users.firstname
+  ;                                                                                    (sql/call :cast " " :varchar) :users.lastname)
+  ;                                                                          (sql/call :unaccent))
+  ;                                                               (sql/call :unaccent term-percent)]))
+  ;                                                       term-parts))) exclude-ids
+
+  ;                    (sql/merge-where [:not-in :users.id exclude-ids]) offset
+  ;                    (sql/offset offset) limit
+  ;                    (sql/limit limit)))
 
   (let [
         tx (db/get-ds-next)
