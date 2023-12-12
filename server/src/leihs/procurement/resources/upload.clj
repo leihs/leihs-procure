@@ -1,21 +1,23 @@
 (ns leihs.procurement.resources.upload
-  (:require [clojure.string :as string]
-            [cheshire.core :refer [generate-string] :rename
+  (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-            [taoensso.timbre :refer [debug info warn error spy]]
+            [cheshire.core :as json]
+            [clojure.string :as string]
+
+            [compojure.core :as cpj]
 
     ;[clojure.java.jdbc :as jdbc]
 
             [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
             [honey.sql.helpers :as sql]
-
-            [compojure.core :as cpj]
+            [leihs.core.db :as db]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils [exif :as exif]
-             ;[sql :as sql]
-             ])
+
+            (leihs.procurement.utils [exif :as exif]
+                                     ;[sql :as sql]
+                                     )
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))
 
@@ -64,7 +66,12 @@
                )
 
         data (if (contains? data :metadata)
-               (assoc data :metadata [[:cast (:metadata data) :json]])
+               (do
+                 (println ">o> upload::metadata")
+                 (assoc data :metadata [[:cast (:metadata data) :jsonb]]) ;; works as local-test
+                 ;(assoc data :metadata [[:cast (:metadata data) :json]])
+                 ;(assoc data :metadata [[:cast (:metadata data) :text]]))
+                 )
                data
                )
 
@@ -86,19 +93,52 @@
 
 
   (let [
-        ;m (my-cast m)
+        m (my-cast m)
 
         p (println ">o> m" m)
         p (println ">o> :metadata" (:metadata m) "\n")
 
-        result (jdbc/execute! tx
+        result (jdbc/execute-one! tx
                               (spy (-> (sql/insert-into :procurement_uploads)
-                                  (sql/values [(spy m)])
-                                  sql-format
-                                  spy
-                                  )))
-        ] (spy result))
+                                       (sql/values [(spy m)])
+                                       sql-format
+                                       spy
+                                       )))
+        ] (spy (:update-count result)))
 
+  )
+
+
+(comment
+
+  (let [
+        tx (db/get-ds-next)
+        request {:route-params {:user-id #uuid "c0777d74-668b-5e01-abb5-f8277baa0ea8"}
+                 :tx tx}
+        user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
+
+        json_data (json/generate-string {:ab "test" :cd "efg"})
+
+        ;; procure-logic
+        json_data (to-json json_data)
+
+
+
+        data (my-cast {:size 12 :filename "test.me" :metadata json_data :content "abcdef"})
+
+        result (jdbc/execute-one! tx (spy (-> (sql/insert-into :procurement_uploads)
+                                              (sql/values [data])
+                                              sql-format
+                                              spy
+                                              )))
+
+        p (println "\nresult1" result)
+        p (println "\nresult2" (:update-count result))      ;; nil
+        p (println "\nresult3" (:next.jdbc/update-count result)) ;; 1
+
+        ]
+
+    )
   )
 
 (defn prepare-upload-row-map
@@ -110,7 +150,8 @@
         metadata (-> tempfile
                      exif/extract-metadata
                      to-json
-                     (#(:cast % :json)))
+                     ;(#(:cast % :json))
+                     )
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")
                          "application/octet-stream")]
