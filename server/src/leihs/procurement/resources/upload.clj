@@ -37,6 +37,24 @@
         (assoc :exiftool_version (exif/exiftool-version))
         (assoc :exiftool_options (string/join " " exif/exiftool-options)))))
 
+
+(comment
+
+  (let [
+        ;>o>  [CAST(? AS json) {"meins":"abc","deins":"uvw"}]
+        abc (-> {:meins "abc" :deins "uvw"}
+                to-json
+                (#(sql/call :cast % :json))
+                (sql/format)
+                )
+
+        p (println ">o> " abc)
+
+        ]
+    )
+  )
+
+
 (defn get-by-id
   [tx id]
   (-> (sql/select :procurement_uploads.*)
