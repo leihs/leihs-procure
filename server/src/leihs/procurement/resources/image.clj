@@ -5,6 +5,9 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
 
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
@@ -46,6 +49,8 @@
                            "Content-Transfer-Encoding" "binary"}}))
     {:status 404}))
 
+(defn cast-to-json [comment] [:cast comment :json])
+
 (defn insert!
   [tx data]
   (jdbc/execute! tx
@@ -56,11 +61,18 @@
 (defn create-for-main-category-id-and-upload!
   [tx mc-id upload]
   (let [{u-id :id} upload
-        u-row (upload/get-by-id tx u-id)
+        p (println ">o> u-id" u-id)
+
+        u-row (upload/get-by-id tx (spy u-id))
+        p (println ">o> u-row" u-row)
+
         md (-> u-row
                :metadata
                to-json
-               (#( :cast % :json)))]
+               cast-to-json
+
+               ;(#( :cast % :json))
+               )]
     (insert! tx
              (-> u-row
                  (dissoc :id)

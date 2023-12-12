@@ -22,7 +22,7 @@
            org.apache.commons.io.FileUtils))
 
 
-
+(defn cast-to-json [comment] [:cast comment :json])
 
 
 
@@ -99,11 +99,11 @@
         p (println ">o> :metadata" (:metadata m) "\n")
 
         result (jdbc/execute-one! tx
-                              (spy (-> (sql/insert-into :procurement_uploads)
-                                       (sql/values [(spy m)])
-                                       sql-format
-                                       spy
-                                       )))
+                                  (spy (-> (sql/insert-into :procurement_uploads)
+                                           (sql/values [(spy m)])
+                                           sql-format
+                                           spy
+                                           )))
         ] (spy (:update-count result)))
 
   )
@@ -141,6 +141,27 @@
     )
   )
 
+
+
+
+(comment
+
+  (let [
+        ;>o>  [CAST(? AS json) {"meins":"abc","deins":"uvw"}]
+        abc (-> {:meins "abc" :deins "uvw"}
+                to-json
+                ;(#([:cast % :json])) ;; old
+                cast-to-json                                ;;new
+                (sql-format)
+                )
+
+        p (println ">o> " abc)
+
+        ]
+    )
+  )
+
+
 (defn prepare-upload-row-map
   [file-data]
   (let [tempfile (:tempfile file-data)
@@ -151,6 +172,7 @@
                      exif/extract-metadata
                      to-json
                      ;(#(:cast % :json))
+                     cast-to-json
                      )
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")
@@ -172,6 +194,47 @@
            spy
            (->> (jdbc/execute-one! tx))
            )))
+
+
+
+(defn parse-jsonstr [jsonstr]
+  (json/parse-string jsonstr true))
+
+(comment
+
+  (let [
+        tx (db/get-ds-next)
+        ;id #uuid "ae59f50a-c7fc-4984-8e08-d96a5a0ddbd5"
+        ;id #uuid "db77926b-442e-4533-8ce2-bbd3b2c161d1"
+        id #uuid "ae59f50a-c7fc-4984-8e08-d96a5a0ddbd5"
+
+        result (spy (-> (sql/select :id :metadata)                        ;; works
+                        ;result (spy (-> (sql/select :metadata)           ;; fails
+                        ;result (spy (-> (sql/select :id)                 ;; works
+
+                        (sql/from :procurement_uploads)
+                        (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
+                        sql-format))
+
+        result (jdbc/execute-one! tx result)
+
+        json-data (:metadata result)
+
+        p (println "\nquery1" result)
+        p (println "\nquery2a" json-data)
+        p (println "\nquery2b" (class json-data))
+
+        parsed-jsonstr-to-map (parse-jsonstr json-data)
+
+        p (println "\nquery3a" parsed-jsonstr-to-map)
+        p (println "\nquery3b" (:File:FileTypeExtension (first parsed-jsonstr-to-map)))
+        p (println "\nquery3c" (:Composite:ImageSize (first parsed-jsonstr-to-map)))
+
+        ]
+
+    )
+  )
+
 
 (defn upload
   [{params :params, tx :tx-next}]
