@@ -40,7 +40,7 @@
         org-name (:organization data)
         p (println ">o> tocheck 1null-values, dep-name=" dep-name ) ;; dep-name= Rektorat
         p (println ">o> tocheck 1null-values, org-name="  org-name) ;; org-name= Rektorat
-
+        ;; one entry
         department (or (spy (organization/get-department-by-name tx dep-name)) ;; {:id #uuid "a80d7883-9e83-5d93-b7b7-11af0eee9142", :name "DDK", :shortname nil, :parent_id nil}
                        (spy (first (jdbc/insert! tx
                                             :procurement_organizations
@@ -55,12 +55,12 @@
                                                :parent_id (:id department)}))))]
     (spy (jdbc/insert! tx                                   ;;  => ({:id #uuid "5f73cbf5-61a2-41e9-806f-02f424d7291e", :user_id #uuid "fefcc6b2-4fb6-5e0c-8795-b4988c557c01", :organization_id #uuid "9161d8e2-9431-4bf7-8fea-279a6148c941"})
                   :procurement_requesters_organizations
-                  {:user_id (:user_id data),
-                   :organization_id (:id organization)}))))
+                  {:user_id (spy (:user_id data)),          ;;(:user_id data) => c15c65c8-003b-485d-90c4-c48445c1fba1
+                   :organization_id (spy (:id organization))})))) ;;(:id organization) => #uuid "0cfcd799-2f5a-4eb9-9f4b-9b65ee66cbdc"
 
 (defn delete-all
   [tx]
-  (spy (jdbc/delete! tx :procurement_requesters_organizations [])))
+  (spy (jdbc/delete! tx :procurement_requesters_organizations []))) ;; [98]
 
 (defn update-requesters-organizations!
   [context args value]
@@ -68,11 +68,11 @@
                :request
                :tx)]
     (delete-all tx)
-    (doseq [d (:input_data args)] (create-requester-organization tx d))
+    (doseq [d (spy (:input_data args))] (spy (create-requester-organization tx d))) ;;  => ({:id #uuid "de33330d-191f-
     (organizations/delete-unused tx)
     (saved-filters/delete-unused tx)
     (let [req-orgs
-            (spy (jdbc/query tx (sql/format requesters-organizations-base-query)))]
+            (spy (jdbc/query tx (sql/format requesters-organizations-base-query)))] ;;  => ({:id #uuid "4d6224de-05a5-4
       (->>
         req-orgs
         (map #(conj %
