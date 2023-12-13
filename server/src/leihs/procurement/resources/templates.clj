@@ -5,19 +5,19 @@
     ;        [leihs.procurement.utils.sql :as sql]
 
 
-        [taoensso.timbre :refer [debug info warn error spy]]
-
-
     [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
+
+
     [honey.sql.helpers :as sql]
-
-
+    [leihs.core.db :as db]
     [leihs.procurement.authorization :as authorization]
     [leihs.procurement.permissions.user :as user-perms]
-    [leihs.procurement.resources [categories :as categories]
-     [template :as template]]
+
+
+    (leihs.procurement.resources [categories :as categories]
+                                 [template :as template])
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]
     ))
 
 (do
@@ -25,12 +25,12 @@
 
   (def templates-base-query
     (spy (-> (sql/select :procurement_templates.*)
-        (sql/from :procurement_templates)
-        (sql/left-join :models [:= :models.id :procurement_templates.model_id])
-        (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
-                                     (map #(->> [:lower [:coalesce % ""]])))
-                        ]])
-        )))
+             (sql/from :procurement_templates)
+             (sql/left-join :models [:= :models.id :procurement_templates.model_id])
+             (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
+                                          (map #(->> [:lower [:coalesce % ""]])))
+                             ]])
+             )))
   )
 
 (defn get-templates
@@ -92,10 +92,13 @@
 
 (defn get-templates-for-ids
   [tx ids]
-  (-> categories/categories-base-query
-      (sql/where [:in :procurement_categories.id (cast-uuids ids)]) ;; TODO PRIO !!!
-      sql-format
-      (->> (jdbc/execute! tx))))
+
+  (println ">>> tocheck / templates::get-templates-for-ids >> ids >1 => " ids)
+
+  (jdbc/execute! tx (str "/* test123 */" (-> categories/categories-base-query
+                                             (sql/where [:in :procurement_categories.id (cast-uuids ids)])
+                                             sql-format)))
+  )
 
 
 

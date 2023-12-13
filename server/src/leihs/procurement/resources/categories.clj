@@ -1,8 +1,5 @@
 (ns leihs.procurement.resources.categories
   (:require
-
-
-
     [taoensso.timbre :refer [debug info warn error spy]]
 
     ;[clojure.java.jdbc :as jdbc]
@@ -41,21 +38,21 @@
 
     ;(assert (and arguments (seq arguments))
 
-    (sql-format
-      (cond-> categories-base-query
-              id (sql/where [:in :procurement_categories.id (cast-uuids id)]) ;;TODO: BROKEN
-              main-category-id (sql/where
-                                 [:= :procurement_categories.main_category_id
-                                  main-category-id])
-              inspected-by-auth-user
-              (-> (sql/join :procurement_category_inspectors
-                            [:= :procurement_category_inspectors.category_id
-                             :procurement_categories.id])
-                  (sql/where [:= :procurement_category_inspectors.user_id
-                              (-> context
-                                  :request
-                                  :authenticated-entity
-                                  :user_id)]))))))
+    (sql-format (cond-> categories-base-query
+                        id (sql/where [:in :procurement_categories.id (cast-uuids id)]) ;;TODO: BROKEN
+                        main-category-id (sql/where
+                                           [:= :procurement_categories.main_category_id
+                                            main-category-id])
+                        inspected-by-auth-user
+                        (-> (sql/join :procurement_category_inspectors
+                                      [:= :procurement_category_inspectors.category_id
+                                       :procurement_categories.id])
+                            (sql/where [:= :procurement_category_inspectors.user_id
+                                        (-> context
+                                            :request
+                                            :authenticated-entity
+                                            :user_id)])))
+                )))
 
 (defn cast-uuids [uuids]
   (spy (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)))
@@ -74,12 +71,62 @@
 
 (defn get-for-main-category-id
   [tx main-cat-id]
-  (-> categories-base-query
-      (sql/where [:= :procurement_categories.main_category_id
-                  main-cat-id])
-      sql-format
-      spy
-      (->> (jdbc/execute! tx))))
+
+
+  (jdbc/execute! tx (spy (-> categories-base-query
+                             (sql/where [:= :procurement_categories.main_category_id main-cat-id])
+                             ;(sql/with [:raw "/* test789*/"])
+                             sql-format
+                             spy))
+                 ))
+
+
+(defn add-comment-to-sql-format "helper for debugging sql"
+  ([sql-formatted]
+   (let [
+         first-element (str (first sql-formatted) (str " /* comment */"))
+         ]
+     (cons first-element (rest sql-formatted))))
+
+  ([sql-format comment]
+   (let [
+         first-element (str (first sql-format) (str " /*" comment "*/"))
+         ]
+     (cons first-element (rest sql-format))))
+  )
+
+(comment
+  (let [
+        tx (db/get-ds-next)
+
+        ;; examples to trigger errors
+        user-id "e7ac5011-fd0e-4838-9a0f-b7da5783eede"
+        ;user-id nil
+        user-id ""
+
+        x (-> (sql/select :* [true :debug-comment1])
+              (sql/from :users)
+              ;(sql/where [:= :id [:cast user-id :uuid]] [:= :firstname "Procurement"])
+              (sql/where [:= :id [:cast user-id :uuid]])
+              sql-format
+              )
+
+        p (println ">o> abc>>>>aa" x)
+        ;p (println ">o> abc>>>>" (jdbc/execute-one! tx x))
+
+        ;x (conj x "/*now-comment*/")
+
+        p (println "\n")
+
+        ;x (add-comment-to-sql-format x)
+        x (add-comment-to-sql-format x "servus du")
+
+        p (println ">o> abc>>>>a" x)
+        p (println ">o> abc>>>>b" (jdbc/execute-one! tx (spy x)))
+
+        ]
+    )
+  )
 
 (defn get-categories
   [context arguments value]
@@ -134,9 +181,8 @@
               [#(user-perms/admin? tx auth-user)
                #(user-perms/inspector? tx auth-user c-id)])
             (recur rest-cs))
-        (jdbc/execute! tx
-                       (-> categories-base-query
-                           (sql/where [:in :procurement_categories.id
-                                       (map :id categories)])
-                           sql-format))))))
+        (jdbc/execute! tx (-> categories-base-query
+                              (sql/where [:in :procurement_categories.id (map :id categories)])
+                              sql-format))
+        ))))
 

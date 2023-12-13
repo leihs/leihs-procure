@@ -7,6 +7,9 @@
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
             ;[clojure.java.jdbc :as jdbc]
             ;[leihs.procurement.utils.sql :as sql]
 
@@ -36,6 +39,10 @@
                :tx-next)]
     (get-attachments-for-request-id tx (:request-id value))))
 
+
+;cast-to-json
+(defn cast-to-json [comment] [:cast comment :json])
+
 (defn create-for-request-id-and-uploads!
   [tx req-id uploads]
   (doseq [{u-id :id} uploads]
@@ -43,7 +50,12 @@
           md (-> u-row
                  :metadata
                  to-json
-                 (#(:cast % :json)))]
+
+                 cast-to-json
+                 ;(#(:cast % :json))
+
+
+                 )]
       (attachment/create! tx
                           (-> u-row
                               (dissoc :id)
@@ -52,9 +64,12 @@
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
+(defn cast-uuids [uuids]
+  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+
 (defn delete!
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_attachments)
-                     (sql/where [:in :procurement_attachments.id ids])
+                     (sql/where [:in :procurement_attachments.id (cast-uuids (spy ids))])
                      sql-format)))
