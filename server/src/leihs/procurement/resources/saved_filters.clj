@@ -1,6 +1,6 @@
 (ns leihs.procurement.resources.saved-filters
-  (:require 
-    
+  (:require
+
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
@@ -17,18 +17,18 @@
 (defn saved-filters-query
   [user-id]
   (spy (-> (sql/select :*)
-      (sql/from :procurement_users_filters)
-      (sql/where [:= :user_id [:cast user-id :uuid]])
-      sql-format)))
+           (sql/from :procurement_users_filters)
+           (sql/where [:= :user_id [:cast user-id :uuid]])
+           sql-format)))
 
 (defn get-saved-filters
   [context args value]
-  ( (jdbc/execute-one! (-> context
-                         :request
-                         :tx-next)
-                     (saved-filters-query (-> value
-                                              :user
-                                              :id)))))
+  ((jdbc/execute-one! (-> context
+                          :request
+                          :tx-next)
+                      (saved-filters-query (-> value
+                                               :user
+                                               :id)))))
 
 (defn get-saved-filters-by-user-id
   [tx user-id]
@@ -39,12 +39,9 @@
   [tx]
   (jdbc/execute!
     tx
-    (-> (sql/delete-from [:procurement_users_filters :puf])
-        (sql/where
-          [:not
-           (:exists
-                     (-> (sql/select true)
-                         (sql/from [:procurement_requesters_organizations :pro])
-                         (sql/where [:= :pro.user_id :puf.user_id])))])
+    (-> (sql/delete-from :procurement_users_filters :puf)
+        (sql/where [:not [:exists (-> (sql/select true)
+                                      (sql/from [:procurement_requesters_organizations :pro])
+                                      (sql/where [:= :pro.user_id :puf.user_id]))]])
         sql-format)))
 

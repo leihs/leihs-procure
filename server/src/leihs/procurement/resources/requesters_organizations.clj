@@ -43,38 +43,40 @@
   [tx data]
   (let [dep-name (:department data)
         org-name (:organization data)
-        p (println ">o> tocheck 1null-values, dep-name=" dep-name )
-        p (println ">o> tocheck 1null-values, org-name="  org-name)
+        p (println ">o> tocheck 1null-values, dep-name=" dep-name)
+        p (println ">o> tocheck 1null-values, org-name=" org-name)
 
 
-        department (or (spy (organization/get-department-by-name tx dep-name))                      ;; nil
-                       (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)  ;; {:next.jdbc/update-count 1}
+        department (or (spy (organization/get-department-by-name tx dep-name)) ;; nil
+                       (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations) ;; {:next.jdbc/update-count 1}
                                                       (sql/values [{:name (spy dep-name)}])
                                                       sql-format
                                                       spy)))
                        )
         p (println ">o> tocheck 2null-values" department)
 
+        ;; one entry
+        organization (or (spy (organization/get-organization-by-name-and-dep-id ;;
+                                tx
+                                org-name
+                                (:id department)))
 
-        organization (or (spy (organization/get-organization-by-name-and-dep-id
-                           tx
-                           org-name
-                           (:id department)))
-
-                         (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
-                                                   (sql/values [{:name org-name,
-                                                                 :parent_id [:cast (:id department) :uuid]}])
-                                                   sql-format)))
+                         (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations) ;;FIXME insert&fetch
+                                                        (sql/values [{:name org-name,
+                                                                      :parent_id [:cast (:id department) :uuid]}])
+                                                        (sql/returning :*)
+                                                        sql-format)))
                          )
         p (println ">o> tocheck 3null-values" organization)
 
         ]
-
-    (jdbc/execute! tx (-> (sql/insert-into :procurement_requesters_organizations)
-                          (sql/values [{:user_id [:cast (spy (:user_id data)) :uuid],
-                                        :organization_id [:cast (spy (:id organization)) :uuid]}]) ;;FIXME is null
-                          sql-format
-                          spy))
+    ;; one entry OR nil
+    (spy (jdbc/execute! tx (-> (sql/insert-into :procurement_requesters_organizations)
+                               (sql/values [{:user_id [:cast (spy (:user_id data)) :uuid],
+                                             :organization_id [:cast (spy (:id organization)) :uuid]}]) ;;FIXME is null
+                               (sql/returning :*)
+                               sql-format
+                               spy)))
     ))
 
 (defn delete-all
@@ -91,24 +93,35 @@
                :request
                :tx-next)]
     (delete-all tx)
-    (doseq [d (:input_data args)] (create-requester-organization tx d))
-    (organizations/delete-unused tx)
+    (doseq [d (:input_data args)] (create-requester-organization tx (spy d)))
+
+    (println ">o> after doseq")
+
+    (organizations/delete-unused tx)                        ;; issue
+
+    (println ">o> after org/delete-unused")
+
     (saved-filters/delete-unused tx)
-    (let [req-orgs
-          (jdbc/execute! tx (sql-format requesters-organizations-base-query))]
-      (->>
-        req-orgs
-        (map #(conj %
-                    {:organization (->> %
-                                        :organization_id
-                                        (organization/get-organization-by-id
-                                          tx))}))
-        (map #(conj %
-                    {:department (->> %
-                                      :organization
-                                      :parent_id
-                                      (organization/get-department-by-id tx))}))
-        (map #(conj %
-                    {:user (->> %
-                                :user_id
-                                (user/get-user-by-id tx))}))))))
+
+    (println ">o> after filters/delete-unused")
+
+    (let [req-orgs (jdbc/execute! tx (sql-format requesters-organizations-base-query))
+
+          p (println ">o> req-orgs" req-orgs)
+          ]
+
+      (->> req-orgs
+           (map #(conj %
+                       {:organization (->> %
+                                           :organization_id
+                                           (organization/get-organization-by-id
+                                             tx))}))
+           (map #(conj %
+                       {:department (->> %
+                                         :organization
+                                         :parent_id
+                                         (organization/get-department-by-id tx))}))
+           (map #(conj %
+                       {:user (->> %
+                                   :user_id
+                                   (user/get-user-by-id tx))}))))))
