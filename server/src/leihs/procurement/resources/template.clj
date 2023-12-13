@@ -4,6 +4,8 @@
     ;[clojure.java.jdbc :as jdbc]
     [leihs.procurement.utils.sql :as sqlp]
 
+    [leihs.procurement.utils.helpers :refer [my-cast]]
+
     [taoensso.timbre :refer [debug info warn error spy]]
 
 
@@ -24,26 +26,25 @@
 
 
 
-(defn my-cast [data]
-  (println ">o> no / 22 / my-cast /debug " data)
-
-
-  (let [
-        data (if (contains? data :id)
-               (assoc data :id [[:cast (:id data) :uuid]])
-               data
-               )
-
-        data (if (contains? data :category_id)
-               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-               data
-               )
-
-        ]
-    (spy data)
-    )
-
-  )
+;(defn my-cast [data]
+;  (println ">o> no / 22 / my-cast /debug " data)
+;
+;
+;  (let [
+;        data (if (contains? data :id)
+;               (assoc data :id [[:cast (:id data) :uuid]])
+;               data
+;               )
+;
+;        data (if (contains? data :category_id)
+;               (assoc data :category_id [[:cast (:category_id data) :uuid]])
+;               data
+;               )
+;
+;        ]
+;    (spy data)
+;    )
+;  )
 
 (defn get-template-by-id
   [tx id]

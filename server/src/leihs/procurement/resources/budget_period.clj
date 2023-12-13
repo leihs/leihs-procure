@@ -7,6 +7,8 @@
 
     [leihs.procurement.utils.sql :as sqlp]
 
+    [leihs.procurement.utils.helpers :refer [my-cast]]
+
 
     ;[clojure.java.jdbc :as jdbc]
     [next.jdbc :as jdbc]
@@ -17,34 +19,34 @@
 
 
 
-(defn my-cast [data]
-  (println ">o> no / 22 / my-cast /debug " data)
-
-
-  (let [
-        data (if (contains? data :id)
-               (assoc data :id [[:cast (:id data) :uuid]])
-               data
-               )
-
-        data (if (contains? data :category_id)
-               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-               data
-               )
-        data (if (contains? data :inspection_start_date)
-               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
-               data
-               )
-
-        data (if (contains? data :end_date)
-               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
-               data
-               )
-
-        ]
-    (spy data)
-    )
-  )
+;(defn my-cast [data]
+;  (println ">o> no / 22 / my-cast /debug " data)
+;
+;
+;  (let [
+;        data (if (contains? data :id)
+;               (assoc data :id [[:cast (:id data) :uuid]])
+;               data
+;               )
+;
+;        data (if (contains? data :category_id)
+;               (assoc data :category_id [[:cast (:category_id data) :uuid]])
+;               data
+;               )
+;        data (if (contains? data :inspection_start_date)
+;               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
+;               data
+;               )
+;
+;        data (if (contains? data :end_date)
+;               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
+;               data
+;               )
+;
+;        ]
+;    (spy data)
+;    )
+;  )
 
 
 
