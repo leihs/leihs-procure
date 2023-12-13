@@ -50,6 +50,17 @@ Known bugs thrown during tests
 
 2023-12-12 11:56:31.495 CET [2580] ERROR:  syntax error at or near ")" at character 97
 2023-12-12 11:56:31.495 CET [2580] STATEMENT:  SELECT procurement_categories.* FROM procurement_categories WHERE procurement_categories.id IN () ORDER BY procurement_categories.name ASC
+
+
+
+
+2023-12-13 19:05:29.018 CET [66552] ERROR:  update or delete on table "procurement_organizations" violates foreign key constraint "fk_rails_c116e35025" on table "procurement_requesters_organizations"
+2023-12-13 19:05:29.018 CET [66552] DETAIL:  Key (id)=(303c776f-f8e6-4e39-b45f-faac49eb4ab4) is still referenced from table "procurement_requesters_organizations".
+2023-12-13 19:05:29.018 CET [66552] STATEMENT:  DELETE FROM procurement_organizations AS po1 WHERE (po1.parent_id IS NULL) AND NOT EXISTS (SELECT TRUE FROM procurement_organizations AS po2 WHERE po2.parent_id = po1.id)
+2023-12-13 19:06:59.712 CET [1359] LOG:  checkpoint starting: time
+
+
+
 ```
 
 

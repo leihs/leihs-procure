@@ -41,7 +41,7 @@
 (defn delete-unused
   [tx]
   "first delete organizations (parent_id IS NOT NULL) without requesters
-  and requests, then delete departments (parent_id IS NULL) without children"
+  and requests, then delete departments (parent_id IS NULL) without children       ?? procurement_requesters_organizations cascade delete"
 
   (println "------ start DELETE-1 -----------------")
   (spy (jdbc/execute!                                       ;; [0]
@@ -106,6 +106,23 @@
 
                            ;(sql/select :*)
                            (sql/select :%count.*)
+                           (sql/from [:procurement_organizations :po1] [:procurement_requesters_organizations req]) ;; fixme TODO cause
+
+
+                           (sql/where :and [:= :po1.parent_id nil]
+                                      [:= :req.organization_id :po1.id]
+                                      [:not [:exists (-> (sql/select true)
+                                                         (sql/from [:procurement_organizations :po2])
+                                                         (sql/where [:= :po2.parent_id :po1.id]))]])
+
+                           sql-format
+                           spy
+                           )))
+
+  (spy (jdbc/execute! tx (->
+
+                           (sql/select :*)
+                           ;(sql/select :%count.*)
                            (sql/from [:procurement_organizations :po1]) ;; fixme TODO cause
 
 
@@ -113,14 +130,6 @@
                                       [:not [:exists (-> (sql/select true)
                                                          (sql/from [:procurement_organizations :po2])
                                                          (sql/where [:= :po2.parent_id :po1.id]))]])
-
-
-                           ;(sql/where [:= :po1.parent_id nil])
-                           ;(sql/where [:not [:exists (-> (sql/select true)
-                           ;                              (sql/from [:procurement_organizations :po2])
-                           ;                              (sql/where [:= :po2.parent_id :po1.id]))]])
-
-
 
                            sql-format
                            spy
