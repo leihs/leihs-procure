@@ -43,63 +43,37 @@
   [tx data]
   (let [dep-name (:department data)
         org-name (:organization data)
-        department (or (organization/get-department-by-name tx dep-name)
-                       ;(first (jdbc/insert! tx
-                       ;                     :procurement_organizations
-                       ;                     {:name dep-name}))
+        p (println ">o> tocheck 1null-values" dep-name org-name)
 
+
+        department (or (spy (organization/get-department-by-name tx dep-name))
                        (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
                                                       (sql/values [{:name (spy dep-name)}])
                                                       sql-format
                                                       spy)))
-
-                       ;(spy (->> (sql/insert-into :procurement_organizations)
-                       ;    (sql/values [{:name (spy dep-name)}])
-                       ;    sql-format
-                       ;     spy
-                       ;    (jdbc/execute-one! tx)))
-
                        )
-        organization (or (organization/get-organization-by-name-and-dep-id
+        p (println ">o> tocheck 2null-values" department)
+
+
+        organization (or (spy (organization/get-organization-by-name-and-dep-id
                            tx
                            org-name
-                           (:id department))
+                           (:id department)))
 
-
-                         ;(first (jdbc/insert! tx
-                         ;                     :procurement_organizations
-                         ;                     {:name org-name,
-                         ;                      :parent_id (:id department)}))
-
-                         (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
+                         (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
                                                    (sql/values [{:name org-name,
                                                                  :parent_id [:cast (:id department) :uuid]}])
-                                                   sql-format))
+                                                   sql-format)))
+                         )
+        p (println ">o> tocheck 3null-values" organization)
 
-                         ;(->> (sql/insert-into :procurement_organizations)
-                         ;     (sql/values [{:name org-name,
-                         ;                  :parent_id [:cast (:id department):uuid]}])
-                         ;     sql-format
-                         ;     (jdbc/execute-one! tx))
-
-                         )]
-    ;(jdbc/insert! tx
-    ;              :procurement_requesters_organizations
-    ;              {:user_id (:user_id data),
-    ;               :organization_id (:id organization)})
+        ]
 
     (jdbc/execute! tx (-> (sql/insert-into :procurement_requesters_organizations)
                           (sql/values [{:user_id [:cast (spy (:user_id data)) :uuid],
-                                        :organization_id [:cast (spy (:id organization)) :uuid]}])
+                                        :organization_id [:cast (spy (:id organization)) :uuid]}]) ;;FIXME is null
                           sql-format
                           spy))
-
-    ;(->> (sql/insert-into :procurement_requesters_organizations)
-    ;     (sql/values [{:user_id [:cast (:user_id data) :uuid],
-    ;                  :organization_id [:cast (:id organization):uuid]}])
-    ;     sql-format
-    ;     (jdbc/execute! tx))
-
     ))
 
 (defn delete-all
