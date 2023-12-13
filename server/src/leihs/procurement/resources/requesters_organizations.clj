@@ -43,11 +43,12 @@
   [tx data]
   (let [dep-name (:department data)
         org-name (:organization data)
-        p (println ">o> tocheck 1null-values" dep-name org-name)
+        p (println ">o> tocheck 1null-values, dep-name=" dep-name )
+        p (println ">o> tocheck 1null-values, org-name="  org-name)
 
 
-        department (or (spy (organization/get-department-by-name tx dep-name))
-                       (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
+        department (or (spy (organization/get-department-by-name tx dep-name))                      ;; nil
+                       (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)  ;; {:next.jdbc/update-count 1}
                                                       (sql/values [{:name (spy dep-name)}])
                                                       sql-format
                                                       spy)))

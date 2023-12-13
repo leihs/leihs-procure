@@ -3,6 +3,9 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+        [taoensso.timbre :refer [debug info warn error spy]]
+
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -43,10 +46,10 @@
 
 (defn get-department-by-name
   [tx dep-name]
-  (->> dep-name
+  (spy (->> dep-name
        department-by-name-query
        (jdbc/execute-one! tx)
-       ))
+       )))
 
 (defn get-department-by-id
   [tx id]
@@ -76,7 +79,9 @@
                                          ; for
                                          ; RequestFieldOrganization
                                          )])
-                         sql-format)))
+                         sql-format
+                         spy
+                         )))
 
 (defn get-organization-by-name-and-dep-id
   [tx org-name dep-id]
