@@ -36,29 +36,115 @@
                      :tx-next)
                  (organizations-query context args value)))
 
+
+
 (defn delete-unused
   [tx]
   "first delete organizations (parent_id IS NOT NULL) without requesters
   and requests, then delete departments (parent_id IS NULL) without children"
-  (spy (jdbc/execute! tx (-> (sql/delete-from :procurement_organizations :po)
-                             (sql/where [:<> :po.parent_id nil])
-                             (sql/where [:not [:exists (-> (sql/select true)
-                                                           (sql/from [:procurement_requesters_organizations :pro])
-                                                           (sql/where [:= :pro.organization_id :po.id]))]])
 
-                             (sql/where [:not [:exists (-> (sql/select true)
-                                                           (sql/from [:procurement_requests :pr])
-                                                           (sql/where [:= :pr.organization_id :po.id]))]])
-                             sql-format
-                             spy
-                             )))
+  (println "------ start DELETE-1 -----------------")
+  (spy (jdbc/execute!                                       ;; [0]
+
+         ;               ["DELETE FROM procurement_organizations AS po WHERE (po.parent_id IS NOT NULL) AND NOT EXISTS (SELECT TRUE FROM procurement_requesters_organizations AS pro WHERE pro.organization_id = po.id) AND NOT EXISTS (SELECT TRUE FROM procurement_requests AS pr WHERE pr.organization_id = po.id)"]
+         ;; master       ["DELETE FROM procurement_organizations po  WHERE (po.parent_id IS NOT NULL AND NOT exists((SELECT TRUE FROM procurement_requesters_organizations pro WHERE pro.organization_id = po.id)) AND NOT exists((SELECT TRUE FROM procurement_requests pr WHERE pr.organization_id = po.id)))"]
+         tx (->
+              ;(sql/select :*)
+              (sql/select :%count.*)
+
+              (sql/from [:procurement_organizations :po])
 
 
+              (sql/where :and [:<> :po.parent_id nil]
+                         [:not [:exists (-> (sql/select true)
+                                            (sql/from [:procurement_requesters_organizations :pro])
+                                            (sql/where [:= :pro.organization_id :po.id]))]]
+                         [:not [:exists (-> (sql/select true)
+                                            (sql/from [:procurement_requests :pr])
+                                            (sql/where [:= :pr.organization_id :po.id]))]])
+              sql-format
+              spy
+              )))
+  (println "------ end DELETE-1 -----------------")
+
+  (spy (jdbc/execute!                                       ;; [0]
+
+         ;               ["DELETE FROM procurement_organizations AS po WHERE (po.parent_id IS NOT NULL) AND NOT EXISTS (SELECT TRUE FROM procurement_requesters_organizations AS pro WHERE pro.organization_id = po.id) AND NOT EXISTS (SELECT TRUE FROM procurement_requests AS pr WHERE pr.organization_id = po.id)"]
+         ;; master       ["DELETE FROM procurement_organizations po  WHERE (po.parent_id IS NOT NULL AND NOT exists((SELECT TRUE FROM procurement_requesters_organizations pro WHERE pro.organization_id = po.id)) AND NOT exists((SELECT TRUE FROM procurement_requests pr WHERE pr.organization_id = po.id)))"]
+         tx (-> (sql/delete-from :procurement_organizations :po)
+
+
+                (sql/where :and [:<> :po.parent_id nil]
+                           [:not [:exists (-> (sql/select true)
+                                              (sql/from [:procurement_requesters_organizations :pro])
+                                              (sql/where [:= :pro.organization_id :po.id]))]]
+                           [:not [:exists (-> (sql/select true)
+                                              (sql/from [:procurement_requests :pr])
+                                              (sql/where [:= :pr.organization_id :po.id]))]])
+
+
+                ;(sql/where [:<> :po.parent_id nil])
+                ;(sql/where [:not [:exists (-> (sql/select true)
+                ;                              (sql/from [:procurement_requesters_organizations :pro])
+                ;                              (sql/where [:= :pro.organization_id :po.id]))]])
+                ;
+                ;(sql/where [:not [:exists (-> (sql/select true)
+                ;                              (sql/from [:procurement_requests :pr])
+                ;                              (sql/where [:= :pr.organization_id :po.id]))]])
+
+
+                sql-format
+                spy
+                )))
+
+
+  ;(Thread/sleep 1000)                                       ; sleep for 1 second
+
+
+  (println "------ start DELETE-2 -----------------")
+  (spy (jdbc/execute! tx (->
+
+                           ;(sql/select :*)
+                           (sql/select :%count.*)
+                           (sql/from [:procurement_organizations :po1]) ;; fixme TODO cause
+
+
+                           (sql/where :and [:= :po1.parent_id nil]
+                                      [:not [:exists (-> (sql/select true)
+                                                         (sql/from [:procurement_organizations :po2])
+                                                         (sql/where [:= :po2.parent_id :po1.id]))]])
+
+
+                           ;(sql/where [:= :po1.parent_id nil])
+                           ;(sql/where [:not [:exists (-> (sql/select true)
+                           ;                              (sql/from [:procurement_organizations :po2])
+                           ;                              (sql/where [:= :po2.parent_id :po1.id]))]])
+
+
+
+                           sql-format
+                           spy
+                           )))
+  (println "------ end DELETE-2 -----------------")
+
+
+  ;["DELETE FROM procurement_organizations AS po1 WHERE (po1.parent_id IS NULL) AND NOT EXISTS (SELECT TRUE FROM procurement_organizations AS po2 WHERE po2.parent_id = po1.id)"]
+  ; master => ["DELETE FROM procurement_organizations po1  WHERE (po1.parent_id IS NULL AND NOT exists((SELECT TRUE FROM procurement_organizations po2 WHERE po2.parent_id = po1.id)))"]
   (spy (jdbc/execute! tx (-> (sql/delete-from :procurement_organizations :po1) ;; fixme TODO cause
-                             (sql/where [:= :po1.parent_id nil])
-                             (sql/where [:not [:exists (-> (sql/select true)
+
+                             (sql/where :and [:= :po1.parent_id nil]
+                                        [:not [:exists (-> (sql/select true)
                                                            (sql/from [:procurement_organizations :po2])
                                                            (sql/where [:= :po2.parent_id :po1.id]))]])
+
+
+                             ;(sql/where [:= :po1.parent_id nil])
+                             ;(sql/where [:not [:exists (-> (sql/select true)
+                             ;                              (sql/from [:procurement_organizations :po2])
+                             ;                              (sql/where [:= :po2.parent_id :po1.id]))]])
+
+
+
                              sql-format
                              spy
                              ))))
