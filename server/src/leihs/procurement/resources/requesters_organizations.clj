@@ -1,5 +1,9 @@
 (ns leihs.procurement.resources.requesters-organizations
   (:require [clojure.java.jdbc :as jdbc]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.resources [organization :as organization]
              [organizations :as organizations] [saved-filters :as saved-filters]
              [user :as user]]
@@ -11,14 +15,14 @@
 
 (defn get-requesters-organizations
   [context _ _]
-  (jdbc/query (-> context
+  (spy (jdbc/query (-> context
                   :request
                   :tx)
-              (sql/format requesters-organizations-base-query)))
+              (sql/format requesters-organizations-base-query))))
 
 (defn get-organization-of-requester
   [tx user-id]
-  (-> (sql/select :procurement_organizations.*)
+  (spy (-> (sql/select :procurement_organizations.*)
       (sql/from :procurement_requesters_organizations)
       (sql/merge-join :procurement_organizations
                       [:= :procurement_requesters_organizations.organization_id
@@ -26,33 +30,37 @@
       (sql/merge-where [:= :procurement_requesters_organizations.user_id
                         user-id])
       sql/format
+      spy
       (->> (jdbc/query tx))
-      first))
+      first)))
 
 (defn create-requester-organization
   [tx data]
   (let [dep-name (:department data)
         org-name (:organization data)
-        department (or (organization/get-department-by-name tx dep-name)
-                       (first (jdbc/insert! tx
+        p (println ">o> tocheck 1null-values, dep-name=" dep-name ) ;; dep-name= Rektorat
+        p (println ">o> tocheck 1null-values, org-name="  org-name) ;; org-name= Rektorat
+
+        department (or (spy (organization/get-department-by-name tx dep-name)) ;; {:id #uuid "a80d7883-9e83-5d93-b7b7-11af0eee9142", :name "DDK", :shortname nil, :parent_id nil}
+                       (spy (first (jdbc/insert! tx
                                             :procurement_organizations
-                                            {:name dep-name})))
-        organization (or (organization/get-organization-by-name-and-dep-id
+                                            {:name dep-name}))))
+        organization (or (spy (organization/get-organization-by-name-and-dep-id ;; {:id #uuid "9161d8e2-9431-4bf7-8fea-279a6148c941", :name "Forschung Cultural Critique", :shortname nil, :parent_id #uuid "53266f06-6625-5967-9c39-d8e1941d8ae2"}
                            tx
                            org-name
-                           (:id department))
-                         (first (jdbc/insert! tx
+                           (:id department)))
+                         (spy (first (jdbc/insert! tx
                                               :procurement_organizations
                                               {:name org-name,
-                                               :parent_id (:id department)})))]
-    (jdbc/insert! tx
+                                               :parent_id (:id department)}))))]
+    (spy (jdbc/insert! tx                                   ;;  => ({:id #uuid "5f73cbf5-61a2-41e9-806f-02f424d7291e", :user_id #uuid "fefcc6b2-4fb6-5e0c-8795-b4988c557c01", :organization_id #uuid "9161d8e2-9431-4bf7-8fea-279a6148c941"})
                   :procurement_requesters_organizations
                   {:user_id (:user_id data),
-                   :organization_id (:id organization)})))
+                   :organization_id (:id organization)}))))
 
 (defn delete-all
   [tx]
-  (jdbc/delete! tx :procurement_requesters_organizations []))
+  (spy (jdbc/delete! tx :procurement_requesters_organizations [])))
 
 (defn update-requesters-organizations!
   [context args value]
@@ -64,7 +72,7 @@
     (organizations/delete-unused tx)
     (saved-filters/delete-unused tx)
     (let [req-orgs
-            (jdbc/query tx (sql/format requesters-organizations-base-query))]
+            (spy (jdbc/query tx (sql/format requesters-organizations-base-query)))]
       (->>
         req-orgs
         (map #(conj %
