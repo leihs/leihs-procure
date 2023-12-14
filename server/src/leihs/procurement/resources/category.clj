@@ -3,7 +3,7 @@
     ;[clojure.java.jdbc :as jdbc]
     [leihs.procurement.utils.sql :as sqlp]
 
-        [taoensso.timbre :refer [debug info warn error spy]]
+    [taoensso.timbre :refer [debug info warn error spy]]
 
     [leihs.procurement.utils.helpers :refer [my-cast]]
 
@@ -93,18 +93,20 @@
 
 
   ([tx catmap]
-   (let [where-clause (sqlp/map->where-clause :procurement_categories catmap)]
-     ((jdbc/execute-one! tx
-                         (-> category-base-query
-                             (sql/where where-clause)
-                             sql-format))))))
+   (let [where-clause (sqlp/map->where-clause :procurement_categories (spy (my-cast catmap)))]
+     (spy (jdbc/execute-one! tx (spy (-> category-base-query
+                               (sql/where (spy where-clause))
+                               sql-format))
+                        ))
+
+     )))
 
 (defn get-category-by-id
   [tx id]
   (spy (->> id
-       category-query
-       (jdbc/execute-one! tx)
-       ))
+            category-query
+            (jdbc/execute-one! tx)
+            ))
 
   )
 
@@ -112,23 +114,23 @@
   [context _ value]
   (println ">> can-delete1")
   (spy (-> (spy (jdbc/execute-one!
-        (-> context
-            :request
-            :tx-next) (-> [:and
-                           [:not
-                            [:exists
-                             (-> (sql/select true)
-                                 (sql/from [:procurement_requests :pr])
-                                 (sql/where [:= :pr.category_id [:cast (:id value) :uuid]]))]]
-                           [:not
-                            [:exists
-                             (-> (sql/select true)
-                                 (sql/from [:procurement_templates :pt])
-                                 (sql/where [:= :pt.category_id [:cast (:id value) :uuid]]))]]]
-                          (vector :result)
-                          sql/select
-                          sql-format)))
-      :result)))
+                  (-> context
+                      :request
+                      :tx-next) (-> [:and
+                                     [:not
+                                      [:exists
+                                       (-> (sql/select true)
+                                           (sql/from [:procurement_requests :pr])
+                                           (sql/where [:= :pr.category_id [:cast (:id value) :uuid]]))]]
+                                     [:not
+                                      [:exists
+                                       (-> (sql/select true)
+                                           (sql/from [:procurement_templates :pt])
+                                           (sql/where [:= :pt.category_id [:cast (:id value) :uuid]]))]]]
+                                    (vector :result)
+                                    sql/select
+                                    sql-format)))
+           :result)))
 
 (defn update-category!
   [tx c]

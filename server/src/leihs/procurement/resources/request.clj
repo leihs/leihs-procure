@@ -8,7 +8,7 @@
 
             [leihs.procurement.utils.helpers :refer [my-cast]]
 
-            [clojure.java.jdbc :as jdbco]
+            ;[clojure.java.jdbc :as jdbco]
 
             [leihs.procurement.authorization :as authorization]
             (leihs.procurement.permissions [request-fields :as request-fields-perms]
@@ -18,7 +18,6 @@
                                          [requesters-organizations :as requesters] [template :as template]
                                          [uploads :as uploads])
             (leihs.procurement.utils [helpers :refer [reject-keys submap?]])
-
 
 
             [next.jdbc :as jdbc]
@@ -208,16 +207,16 @@
         p (println ">o> conc" conc)
         ]
 
-(spy    (-> (sql/select
-          [[:raw (str "DISTINCT ON (procurement_requests.id, "
-                      conc
-                      ") procurement_requests.*")]]
-          )
+    (spy (-> (sql/select
+               [[:raw (str "DISTINCT ON (procurement_requests.id, "
+                           conc
+                           ") procurement_requests.*")]]
+               )
 
-        (sql/from :procurement_requests)
-        (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-        (sql/order-by :procurement_requests.id [[:raw conc]])                        ;; master-version
-        ))
+             (sql/from :procurement_requests)
+             (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+             (sql/order-by :procurement_requests.id [[:raw conc]]) ;; master-version
+             ))
     ))
 
 
@@ -328,17 +327,17 @@
         ;;res (-> (sql/select-distinct :procurement_requests.*)
         ;res (-> (sql/select-distinct :procurement_requests.id conc :procurement_requests.*)
         res (spy (-> (sql/select-distinct :procurement_requests.id conc)
-                (sql/from :procurement_requests)
-                (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-                ;(sql/order-by :procurement_requests.id conc :procurement_requests.*)
-                (sql/order-by :procurement_requests.id conc)
-                ))
+                     (sql/from :procurement_requests)
+                     (sql/left-join :models [:= :models.id :procurement_requests.model_id])
+                     ;(sql/order-by :procurement_requests.id conc :procurement_requests.*)
+                     (sql/order-by :procurement_requests.id conc)
+                     ))
 
         ;>o> query [SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.* FROM procurement_requests LEFT JOIN models ON models.id = procurement_requests.model_id]
 
 
 
-        p (println "\n>o>3 query"(spy (sql-format res)))
+        p (println "\n>o>3 query" (spy (sql-format res)))
         ;p (Execution error (PSQLException) at org.postgresql.core.v3.QueryExecutorImpl/receiveErrorResponse (QueryExecutorImpl.java:2533).
         ;             ERROR: for SELECT DISTINCT, ORDER BY expressions must appear in select list
         ;             Position: 305
@@ -692,21 +691,21 @@
   (println ">debug> 28")
 
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-   (spy (-> advanced-user?
-        requests-base-query-with-state
-        ; NOTE: reselect because of:
-        ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
+    (spy (-> advanced-user?
+             requests-base-query-with-state
+             ; NOTE: reselect because of:
+             ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
 
-        (sql/select :procurement_requests.* [(state-sql advanced-user?) :state]) ;maybe fixed?? (new, like master)
+             (sql/select :procurement_requests.* [(state-sql advanced-user?) :state]) ;maybe fixed?? (new, like master)
 
-        ;(sql/select :procurement_requests.* [state-sql advanced-user?) :state]) ; original
+             ;(sql/select :procurement_requests.* [state-sql advanced-user?) :state]) ; original
 
-        (sql/order-by [:created_at :desc])
-        (sql/limit 1)
-        sql-format
-        spy
-        (->> (query-requests tx auth-entity))
-        first))))
+             (sql/order-by [:created_at :desc])
+             (sql/limit 1)
+             sql-format
+             spy
+             (->> (query-requests tx auth-entity))
+             first))))
 
 
 
@@ -768,12 +767,12 @@
 
         data (spy (my-cast data))
 
-        result   (jdbc/execute! tx
-                                (-> (sql/insert-into :procurement_requests)
-                                    (sql/values [data])
-                                    sql-format
-                                    spy
-                                    ))
+        result (jdbc/execute! tx
+                              (-> (sql/insert-into :procurement_requests)
+                                  (sql/values [data])
+                                  sql-format
+                                  spy
+                                  ))
         ]
 
     (spy result)
@@ -865,7 +864,7 @@
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/set {:budget_period_id new-budget-period-id})
+                          (sql/set (my-cast {:budget_period_id new-budget-period-id}))
                           (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                           sql-format))
       :if-only
@@ -1095,8 +1094,7 @@
   (println ">debug> 38")
 
   (let [ring-request (:request context)
-        tx (:tx-next
-             ring-request)
+        tx (:tx-next ring-request)
         auth-entity (:authenticated-entity ring-request)
         req-id (-> args
                    :input_data
@@ -1106,11 +1104,17 @@
                                                                    auth-entity
                                                                    request)]
     (authorization/authorize-and-apply
-      #(let [result (jdbc/execute! tx
-                                   (-> (sql/delete-from :procurement_requests)
-                                       (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                                       sql-format))]
-         (= result '(1)))
+      #(let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_requests)
+                                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                                          sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
+
+             ;; TODO: FIXME, namespace shouldn't be needed here
+             result-count (spy (:update-count (spy result)))                ;; fails
+             result-count (spy (:next.jdbc/update-count (spy result)))      ;; works
+             ]
+
+         (spy (= (spy result-count) 1))
+         )
       :if-only
       #(:DELETE field-perms))))
 

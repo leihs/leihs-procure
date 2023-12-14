@@ -185,7 +185,7 @@
   [tx id]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)
-                     (sql/where [:= :procurement_main_categories.id id])
+                     (sql/where [:= :procurement_main_categories.id [:cast id :uuid]])
                      sql-format
                      spy
                      )))
