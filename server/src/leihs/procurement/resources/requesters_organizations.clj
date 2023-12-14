@@ -50,10 +50,11 @@
         department (or (spy (organization/get-department-by-name tx dep-name)) ;; nil
                        (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations) ;; {:next.jdbc/update-count 1}
                                                       (sql/values [{:name (spy dep-name)}])
+                                                      (sql/returning :*)
                                                       sql-format
                                                       spy)))
                        )
-        p (println ">o> tocheck 2null-values" department)
+        p (println ">o> tocheck 2null-values, obj:" department)
 
         ;; one entry
         organization (or (spy (organization/get-organization-by-name-and-dep-id ;;
