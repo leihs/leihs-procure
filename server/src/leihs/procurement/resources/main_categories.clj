@@ -57,12 +57,12 @@
 
 (defn get-main-categories
   ([tx]
-   (println ">debug 3")
-   (->> main-categories-base-query
+   (println ">debug 3   tocheck >>>>")
+   (spy (->> main-categories-base-query
         sql-format
         spy
         (jdbc/execute! tx)
-        (map #(transform-row tx %))))
+        (map #(transform-row tx %)))))
 
   ([context _ _]
    (println ">debug 2")
@@ -87,7 +87,7 @@
 
 (defn update-main-categories!
   [context args _]
-  (println ">debug ")
+  (println ">debug 0")
 
   (let [tx (-> context
                :request

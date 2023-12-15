@@ -63,6 +63,7 @@
 
 (defn insert!
   [tx mc]
+  (println ">debug 25")
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_main_categories)
                      (sql/values [mc])
@@ -73,6 +74,9 @@
 
 (defn deal-with-image!
   [tx mc-id images]
+
+  (println ">debug 26")
+
   (log/info images)
   (when-let [new-image-upload (-> {:to_delete false, :typename "Upload"}
                                   (filter-images images)
@@ -141,6 +145,8 @@
 (defn update!
   [tx mc]
 
+  (println ">debug 27")
+
   (println ">o> abc tocheck >>" mc)
   (spy (jdbc/execute! tx
                       (-> (sql/update :procurement_main_categories)
@@ -152,6 +158,9 @@
 
 (defn can-delete?
   [context _ value]
+
+  (println ">debug 28")
+
   (println ">> can-delete3")
   (spy (->
          (jdbc/execute-one!
@@ -183,6 +192,10 @@
 
 (defn delete!
   [tx id]
+
+
+  (println ">debug 29")
+
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)
                      (sql/where [:= :procurement_main_categories.id [:cast id :uuid]])

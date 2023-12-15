@@ -396,18 +396,20 @@
                 (requests-perms/apply-scope tx <> auth-entity)
                 (sql-format <>))
 
-        p (println ">o> abc" query)
 
         proc-requests (request/query-requests tx auth-entity query)] ;;ERROR
-    (->>
-      proc-requests
+       (println ">o> >>> tocheck proc-requests" query)
+    (spy (->>
+      (spy proc-requests)
       (map (fn [proc-req]
              (as-> proc-req <>
                (request-perms/apply-permissions tx
                                                 auth-entity
                                                 <>
                                                 #(assoc % :request-id (:id <>)))
-               (request-perms/add-action-permissions <>)))))))
+               (request-perms/add-action-permissions <>)))))
+
+         )))
 
 
 

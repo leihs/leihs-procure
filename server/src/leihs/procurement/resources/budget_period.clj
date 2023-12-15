@@ -56,6 +56,9 @@
 
 (defn get-budget-period-by-id
   [tx id]
+
+  (println ">o> budget-periond 0")
+
   (first (jdbc/execute! tx
                         (-> budget-period-base-query
                             ;(sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
@@ -65,7 +68,7 @@
 (defn get-budget-period
   ([context _ value]
 
-   (println ">oo> hoi1")
+   (println ">o> budget-periond 2")
 
    (get-budget-period-by-id (-> context
                                 :request
@@ -76,6 +79,9 @@
                                 ; for RequestFieldBudgetPeriod
                                 )))
   ([tx bp-map]
+   (println ">o> budget-periond 1")
+
+
    (let [where-clause (sqlp/map->where-clause :procurement_budget_periods
                                               (spy (my-cast bp-map)))
          result (spy (jdbc/execute! tx
@@ -98,6 +104,9 @@
 
 (defn in-requesting-phase?
   [tx budget-period]
+
+  (println ">o> budget-periond 3")
+
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:inspection_start_date <>)
                                  (sql-format-date <>)
@@ -114,6 +123,9 @@
 
 (defn in-inspection-phase?
   [tx budget-period]
+
+  (println ">o> budget-periond 4")
+
   (let [inspection-start-date (as-> budget-period <>
                                 (:inspection_start_date <>)
                                 (sql-format-date <>)
@@ -140,6 +152,9 @@
 
 (defn past?
   [tx budget-period]
+
+  (println ">o> budget-periond 5")
+
   (println ">oo> past? budget-period=" budget-period)
 
   ;{:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name BP-in-inspection-phase, :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",

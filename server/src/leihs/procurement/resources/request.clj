@@ -549,6 +549,9 @@
 
         p (println ">o> >o> HERE :row-fn" result)
         ]
+
+    ;(throw (Exception. "fake error"))
+
     (spy result)))
 
 
@@ -688,7 +691,7 @@
 
 (defn get-last-created-request
   [tx auth-entity]
-  (println ">debug> 28")
+  (println ">debug> 28 >>> here tocheck ???")
 
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
     (spy (-> advanced-user?

@@ -5,7 +5,7 @@
             [taoensso.timbre :refer [debug info warn error spy]]
 
 
-
+            [clojure.data.json :as json]
     ;[clojure.java.jdbc :as jdbc]
     ;[leihs.procurement.utils.sql :as sql]
 
@@ -72,7 +72,6 @@
        :id
        (categories/get-for-main-category-id tx)
        (map (fn [c]
-              (println ">o> c" c)
               (let [requests* (filter #(and (= (-> %
                                                    :category
                                                    :value
@@ -84,11 +83,11 @@
                                                    :id)
                                                (str (:id bp))))
                                       requests)
-                    p (println ">o> c" c)
-                    p (println ">o> 2 requests*" requests*)
+                    ;p (println ">o> c" c)
+                    ;p (println ">o> 2 here tocheck !!!!!!! requests*" requests*)
 
                     result (-> c
-                               (assoc :requests requests*)
+                               (assoc :requests (spy requests*))
                                (assoc :total_price_cents (sum-total-price requests*))
                                (assoc :cacheKey
                                       (cache-key
@@ -96,7 +95,7 @@
                                         bp
                                         mc
                                         c)))
-                    p (println "\n>o> result 1a" result "\n")
+                    p (println "\n>o> result request tocheck !!!! " requests* "\n")
                     ]
 
                 ;[clojure.data.json :as json]
@@ -149,6 +148,9 @@
                                        result
                                        )
                                      )))
+
+                    p (println ">o> main-cats* >>>>>" main-cats*)
+
                     assoc-data (-> bp
                                    (assoc :main_categories main-cats*)
                                    (assoc :cacheKey (cache-key dashboard-cache-key bp))
@@ -157,7 +159,7 @@
 
                 ;[clojure.data.json :as json]
                 ;(println "\n>o> :assoc-data" assoc-data "\n")
-                ;(println "\n>o> :assoc-data (json)" (json/write-str assoc-data) "\n")
+                (println "\n>o> :assoc-data (json)" (json/write-str assoc-data) "\n")
 
                 assoc-data
                 )
@@ -171,6 +173,13 @@
 
 (defn cast-ids-to-uuid [ids]
   (map #(java.util.UUID/fromString %) ids))
+
+
+(defn filter-category [category]
+  (select-keys category ["request-id" "main_category_id"]))
+
+(defn filter-data [data]
+  (map #(update % "category" filter-category) data))
 
 
 (defn get-dashboard
@@ -217,11 +226,17 @@
         p (println ">>requestsB2-triggerError" args value)
 
         requests (requests/get-requests ctx args value)
-        ;p (println ">o>requestsB2" requests)
+        p (println ">oo>requestsB2" (json/write-str requests) "\n")
+
+        p (println ">oo>requestsB2a" (json/write-str (filter-data requests)))
+
+
+        ;[clojure.data.json :as json]
+        ;p (println "\n>o> :budget_period 2a" (json/write-str requests) "\n")
 
         dashboard-cache-key {:id (hash args)}
 
-        p (println ">o>dashboard-cache-keyB2" dashboard-cache-key)
+        ;p (println ">o>dashboard-cache-keyB2" dashboard-cache-key)
 
         ]
     {
