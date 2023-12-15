@@ -195,6 +195,7 @@
 
 
   (println ">debug 29")
+  (println ">debug 29  delete! id=" id)
 
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_main_categories)

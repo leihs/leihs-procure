@@ -42,8 +42,8 @@
     tx
     ;(-> (sql/delete-from [:procurement_budget_limits :pbl])
     (-> (sql/delete-from :procurement_budget_limits :pbl)
-        (sql/where [:and [:= :pbl.main_category_id (:main_category_id bl)]
-                    [:= :pbl.budget_period_id (:budget_period_id bl)]])
+        (sql/where [:and [:= :pbl.main_category_id [:cast (:main_category_id bl) :uuid]]
+                    [:= :pbl.budget_period_id [:cast (:budget_period_id bl) :uuid]]])
         sql-format)))
 
 (defn update-budget-limits!

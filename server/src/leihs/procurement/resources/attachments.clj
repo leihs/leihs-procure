@@ -7,6 +7,8 @@
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
 
+            [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
         [taoensso.timbre :refer [debug info warn error spy]]
 
 
@@ -64,8 +66,8 @@
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn delete!
   [tx ids]

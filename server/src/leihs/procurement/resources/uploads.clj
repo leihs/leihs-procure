@@ -5,6 +5,8 @@
 
     [taoensso.timbre :refer [debug info warn error spy]]
 
+    [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -13,8 +15,8 @@
     ))
 
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn delete!
   [tx ids]

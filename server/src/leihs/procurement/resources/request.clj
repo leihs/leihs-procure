@@ -2,6 +2,9 @@
   (:require (clojure [set :refer [map-invert]]
                      [string :refer [lower-case upper-case]])
 
+
+            [clojure.data.json :as json]
+
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
@@ -551,6 +554,9 @@
         ]
 
     ;(throw (Exception. "fake error"))
+
+    ;[clojure.data.json :as json]
+    p (println "\n>o> :budget_period 2a (json)" (json/write-str result) "\n")
 
     (spy result)))
 

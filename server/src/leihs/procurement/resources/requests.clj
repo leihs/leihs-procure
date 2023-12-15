@@ -4,6 +4,7 @@
     ;[clojure.java.jdbc :as jdbc]
             [honey.sql :refer [format] :rename {format sql-format}]
 
+            [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
 
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
@@ -66,8 +67,8 @@
 
 
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 
 (comment

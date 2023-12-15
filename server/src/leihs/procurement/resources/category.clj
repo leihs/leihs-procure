@@ -81,6 +81,9 @@
 
 (defn get-category
   ([context _ value]
+
+   (println ">>>id 1 ???????" )
+
    (jdbc/execute-one! (-> context
                           :request
                           :tx-next)
@@ -103,6 +106,9 @@
 
 (defn get-category-by-id
   [tx id]
+
+  (println ">>>id 2 ???????" )
+
   (spy (->> id
             category-query
             (jdbc/execute-one! tx)

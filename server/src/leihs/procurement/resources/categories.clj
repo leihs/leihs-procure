@@ -5,6 +5,9 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+
+    [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
     [clojure.tools.logging :as log]
     [leihs.procurement.authorization :as authorization]
     [leihs.procurement.permissions.user :as user-perms]
@@ -17,14 +20,14 @@
     [honey.sql.helpers :as sql]
     ))
 
-(def categories-base-query
+(def categories-base-query                                  ;; broken query
   (-> (sql/select :procurement_categories.*)
       (sql/from :procurement_categories)
       (sql/order-by [:procurement_categories.name :asc])))
 
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn categories-query
   [context arguments value]
@@ -54,79 +57,117 @@
                                             :user_id)])))
                 )))
 
-(defn cast-uuids [uuids]
-  (spy (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)))
+;(defn cast-uuids "DEPRS: can't handle duplicates" [uuids]
+;  (spy (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)))
+
+;(defn cast-uuids [uuids]
+;  (let [
+;        p (println ">o> uuids-sql" (class uuids))
+;        uuids-sql (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids))
+;        p (println ">o> uuids-sql" uuids-sql)
+;        ]
+;    (spy uuids-sql)
+;    )
+;  ;(spy (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
+;  )
+
 
 (defn get-categories-for-ids
   [tx ids]
 
-  (println ">o> ids" ids)
+  (println ">o> ids1" ids)
+  (println ">o> ids2" (class ids))
+  (println ">o> ids3" (cast-uuids ids))
+  (println ">>>id 4 ???????")
 
-  (-> categories-base-query
-      ;(sql/where [:in :procurement_categories.id ids])
-      (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-      sql-format
-      spy
-      (->> (jdbc/execute! tx))))
-
-(defn get-for-main-category-id
-  [tx main-cat-id]
-
-
-  (jdbc/execute! tx (spy (-> categories-base-query
-                             (sql/where [:= :procurement_categories.main_category_id main-cat-id])
-                             ;(sql/with [:raw "/* test789*/"])
-                             sql-format
-                             spy))
-                 ))
-
-
-(defn add-comment-to-sql-format "helper for debugging sql"
-  ([sql-formatted]
-   (let [
-         first-element (str (first sql-formatted) (str " /* comment */"))
-         ]
-     (cons first-element (rest sql-formatted))))
-
-  ([sql-format comment]
-   (let [
-         first-element (str (first sql-format) (str " /*" comment "*/"))
-         ]
-     (cons first-element (rest sql-format))))
+  (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
+                                                   ;(sql/where [:in :procurement_categories.id ids])
+                                                   (sql/where [:in :procurement_categories.id (cast-uuids ids)])
+                                                   sql-format
+                                                   spy) "categories/get-categories-for-ids"))
   )
+
+
 
 (comment
   (let [
         tx (db/get-ds-next)
 
-        ;; examples to trigger errors
-        user-id "e7ac5011-fd0e-4838-9a0f-b7da5783eede"
-        ;user-id nil
-        user-id ""
+        ids [#uuid "6e02fbcc-c575-43dc-acac-5923fc070b0e" #uuid "6e02fbcc-c575-43dc-acac-5923fc070b2e" #uuid "6e02fbcc-c575-43dc-acac-5923fc070b0e"]
+        ids ["6e02fbcc-c575-43dc-acac-5923fc070b0e" "6e02fbcc-c575-43dc-acac-5923fc070b2e" "6e02fbcc-c575-43dc-acac-5923fc070b0e"]
 
-        x (-> (sql/select :* [true :debug-comment1])
-              (sql/from :users)
-              ;(sql/where [:= :id [:cast user-id :uuid]] [:= :firstname "Procurement"])
-              (sql/where [:= :id [:cast user-id :uuid]])
-              sql-format
-              )
+        test (add-comment-to-sql-format (-> categories-base-query
+                                            (sql/where [:in :procurement_categories.id (cast-uuids ids)])
+                                            sql-format
+                                            spy) "categories/get-categories-for-ids")
 
-        p (println ">o> abc>>>>aa" x)
-        ;p (println ">o> abc>>>>" (jdbc/execute-one! tx x))
-
-        ;x (conj x "/*now-comment*/")
-
-        p (println "\n")
-
-        ;x (add-comment-to-sql-format x)
-        x (add-comment-to-sql-format x "servus du")
-
-        p (println ">o> abc>>>>a" x)
-        p (println ">o> abc>>>>b" (jdbc/execute-one! tx (spy x)))
-
+        p (println ">o> " test)
         ]
+    (jdbc/execute! tx test)
     )
   )
+
+
+
+(defn get-for-main-category-id
+  [tx main-cat-id]
+
+  (println ">>>id 3 ???????")
+  (println ">>>id 3 ???????  tocheck main-cat-id=" main-cat-id)
+
+  (jdbc/execute! tx (spy (add-comment-to-sql-format (-> categories-base-query
+                                                        (sql/where [:= :procurement_categories.main_category_id [:cast main-cat-id :uuid]])
+                                                        sql-format
+                                                        spy) "categories/get-categories-for-id"))
+                 ))
+
+
+;(defn add-comment-to-sql-format "helper for debugging sql"
+;  ([sql-formatted]
+;   (let [
+;         first-element (str (first sql-formatted) (str " /* comment */"))
+;         ]
+;     (cons first-element (rest sql-formatted))))
+;
+;  ([sql-format comment]
+;   (let [
+;         first-element (str (first sql-format) (str " /*" comment "*/"))
+;         ]
+;     (cons first-element (rest sql-format))))
+;  )
+;
+;(comment
+;  (let [
+;        tx (db/get-ds-next)
+;
+;        ;; examples to trigger errors
+;        user-id "e7ac5011-fd0e-4838-9a0f-b7da5783eede"
+;        ;user-id nil
+;        user-id ""
+;
+;        x (-> (sql/select :* [true :debug-comment1])
+;              (sql/from :users)
+;              ;(sql/where [:= :id [:cast user-id :uuid]] [:= :firstname "Procurement"])
+;              (sql/where [:= :id [:cast user-id :uuid]])
+;              sql-format
+;              )
+;
+;        p (println ">o> abc>>>>aa" x)
+;        ;p (println ">o> abc>>>>" (jdbc/execute-one! tx x))
+;
+;        ;x (conj x "/*now-comment*/")
+;
+;        p (println "\n")
+;
+;        ;x (add-comment-to-sql-format x)
+;        x (add-comment-to-sql-format x "servus du")
+;
+;        p (println ">o> abc>>>>a" x)
+;        p (println ">o> abc>>>>b" (jdbc/execute-one! tx (spy x)))
+;
+;        ]
+;    )
+;  )
 
 (defn get-categories
   [context arguments value]
@@ -181,8 +222,8 @@
               [#(user-perms/admin? tx auth-user)
                #(user-perms/inspector? tx auth-user c-id)])
             (recur rest-cs))
-        (jdbc/execute! tx (-> categories-base-query
-                              (sql/where [:in :procurement_categories.id (map :id categories)])
-                              sql-format))
+        (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
+                                                         (sql/where [:in :procurement_categories.id (cast-uuids (map :id categories))])
+                                                         sql-format) "categories/update-categories-viewers!"))
         ))))
 

@@ -5,6 +5,8 @@
     ;        [leihs.procurement.utils.sql :as sql]
 
 
+    [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
     [honey.sql :refer [format] :rename {format sql-format}]
 
 
@@ -87,17 +89,17 @@
     )
   )
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn get-templates-for-ids
   [tx ids]
 
   (println ">>> tocheck / templates::get-templates-for-ids >> ids >1 => " ids)
 
-  (jdbc/execute! tx (str "/* test123 */" (-> categories/categories-base-query
+  (jdbc/execute! tx (add-comment-to-sql-format (-> categories/categories-base-query
                                              (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-                                             sql-format)))
+                                             sql-format)) "templates/get-templates-for-ids")
   )
 
 
@@ -121,7 +123,16 @@
         tx (:tx-next rrequest)
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
-        cat-ids (map :category_id input-data)]
+        cat-ids (map :category_id input-data)
+
+
+        ; TODO: FIXME
+        ; Requests' filter for inspector, viewer and procurement admin
+        ; Filters for procurement admin
+        ; Given there is an initial admin -> And
+
+        p (println ">o> templates/update-templates! (empty list-issue!!!!!) cat-ids=" cat-ids)
+        ]
     (loop [[tmpl & rest-tmpls] (spy input-data)
            tmpl-ids []]
       ;(println ">o> templates " tmpl)

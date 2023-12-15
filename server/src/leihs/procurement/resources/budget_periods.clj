@@ -7,6 +7,8 @@
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
 
+            [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
             [leihs.procurement.resources.budget-period :as budget-period]
 
             [java-time :as jt]
@@ -33,7 +35,7 @@
   [args]
   (cond-> budget-periods-base-query
           (:id args) (sql/where [:in :procurement_budget_periods.id
-                                 (:cast (:id args) :uuid)])
+                                 [:cast (:id args) :uuid]])
           (-> args
               :whereRequestsCanBeMovedTo
               empty?
@@ -47,7 +49,7 @@
    (println ">oo> Causes issues >>" ids)
    (jdbc/execute! tx
                   (-> budget-periods-base-query
-                      (sql/where [:in :procurement_budget_periods.id ids]) ;;TODO: FIXME
+                      (sql/where [:in :procurement_budget_periods.id (ids)]) ;;TODO: FIXME
                       sql-format)))
 
   ([context args _]
@@ -60,8 +62,8 @@
                              :request
                              :tx-next))))))
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
+;(defn cast-uuids [uuids]
+;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
