@@ -10,7 +10,11 @@
 (defn reject-keys [m ks] (reduce #(dissoc %1 %2) m ks))
 
 
-; [leihs.procurement.utils.helpers :refer my-cast]
+; [leihs.procurement.utils.helpers :refer [cast-ids-to-uuid]]
+(defn cast-ids-to-uuid [ids]
+  (map #(java.util.UUID/fromString %) ids))
+
+; [leihs.procurement.utils.helpers :refer [my-cast]]
 (defn my-cast [data]
   (println ">o> utils.helpers / my-cast " data)
   (let [
