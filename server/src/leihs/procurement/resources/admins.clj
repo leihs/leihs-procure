@@ -1,20 +1,22 @@
 (ns leihs.procurement.resources.admins
-    (:require
+  (:require
 
-      [honey.sql :refer [format] :rename {format sql-format}]
-      [leihs.core.db :as db]
-      [next.jdbc :as jdbc]
-      [honey.sql.helpers :as sql]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
 
-          [taoensso.timbre :refer [debug info warn error spy]]
+    [leihs.procurement.utils.helpers :refer [my-cast]]
+
+    [taoensso.timbre :refer [debug info warn error spy]]
 
 
-      ;        [leihs.procurement.utils.sql :as sql]
-      ;[clojure.java.jdbc :as jdbc]
+    ;        [leihs.procurement.utils.sql :as sql]
+    ;[clojure.java.jdbc :as jdbc]
 
-      [leihs.procurement.resources.user :as user]
-      [leihs.procurement.resources.users :refer [sql-order-users]]
-      ))
+    [leihs.procurement.resources.user :as user]
+    [leihs.procurement.resources.users :refer [sql-order-users]]
+    ))
 
 (def admins-base-query
   (-> (sql/select :users.*)
@@ -25,44 +27,42 @@
       sql-order-users))
 
 (defn get-admins
-      [context _ _]
-      (jdbc/execute! (-> context
-                         :request
-                         :tx-next)
-                     (sql-format admins-base-query)))
+  [context _ _]
+  (spy (jdbc/execute! (-> context
+                          :request
+                          :tx-next)
+                      (spy (sql-format admins-base-query)))))
 
 (defn delete-all [tx]                                       ;; TODO
-      ;(jdbc/delete! tx :procurement_admins [])
+  ;(jdbc/delete! tx :procurement_admins [])
 
-      (spy (->>
-        (sql/delete-from :procurement_admins)
-        sql-format
-        spy
-        (jdbc/execute! tx)))
-      )
+  (spy (->>
+         (sql/delete-from :procurement_admins)
+         sql-format
+         spy
+         (jdbc/execute! tx)))
+  )
 
 (defn update-admins!
-      [context args value]
-      (let [tx (-> context
-                   :request
-                   :tx-next)]
-           (delete-all tx)
-           (doseq [d (:input_data args)]
-                  ;(jdbc/insert! tx :procurement_admins d)         ;; TODO
-                  (spy (->> (sql/insert-into :procurement_admins)
-                      (sql/set (spy d))
-                       sql-format
-                      (jdbc/execute! tx)
-                      ))
+  [context args value]
+  (let [tx (-> context
+               :request
+               :tx-next)
 
+        users (:input_data args)
 
-                  )
-           (let [admins (get-admins context args value)]
-                (map #(conj %
-                            {:user (->> %
-                                        :user_id
-                                        (user/get-user-by-id tx))})
-                     admins))))
+        ]
+    (delete-all tx)
+    (doseq [d users]
+      (spy (jdbc/execute! tx (-> (sql/insert-into :procurement_admins)
+                                 (sql/values [(spy (my-cast d))])
+                                 sql-format
+                                 spy
+                                 ))))
+    (let [admins (get-admins context args value)
+          p (println ">o> update-admins! ???? list<users> ??? admins=" admins)
+          ]
+      (map #(conj % {:user (->> % :user_id (user/get-user-by-id tx))}) admins))))
 
 ;#### debug ###################################################################
 
