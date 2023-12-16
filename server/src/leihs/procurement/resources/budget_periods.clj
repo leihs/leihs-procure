@@ -3,6 +3,9 @@
             [clj-time.format :as time-format]
             [clojure.java.jdbc :as jdbc]
 
+
+            [logbug.debug :as debug]
+
                 [taoensso.timbre :refer [debug info warn error spy]]
 
             [com.walmartlabs.lacinia [resolve :as resolve]]
@@ -128,3 +131,7 @@
             ;;({:id #uuid "bc517cb6-8efb-44a7-be05-032a309e4504", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-16T08:50:52.351065Z", :updated_at #time/instant "2023-12-16T08:50:52.351065Z"} {:id #uuid "a50ba927-bc61-4403-a5e3-03fd9e38d16f", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-16T08:50:50.322549Z", :updated_at #time/instant "2023-12-16T08:50:50.322549Z"})
 
             )))))
+
+
+;#### debug ###################################################################
+(debug/debug-ns *ns*)
