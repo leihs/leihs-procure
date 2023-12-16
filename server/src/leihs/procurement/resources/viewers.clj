@@ -1,6 +1,10 @@
 (ns leihs.procurement.resources.viewers
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]
+
+                [taoensso.timbre :refer [debug info warn error spy]]
+
+
             [leihs.procurement.resources.users :refer [users-base-query]]
             [leihs.procurement.utils.sql :as sql]))
 
@@ -26,13 +30,13 @@
 
 (defn insert-viewers!
   [tx row-maps]
-  (jdbc/execute! tx
+  (spy (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_category_viewers)
                      (sql/values row-maps)
-                     sql/format)))
+                     sql/format))))
 
 (defn update-viewers!
   [tx c-id u-ids]
-  (delete-viewers-for-category-id! tx c-id)
-  (if (not (empty? u-ids))
-    (insert-viewers! tx (map #(hash-map :user_id % :category_id c-id) u-ids))))
+  (spy (delete-viewers-for-category-id! tx c-id))
+  (if (spy (not (empty? u-ids)))
+    (spy (insert-viewers! tx (map #(hash-map :user_id % :category_id c-id) u-ids)))))
