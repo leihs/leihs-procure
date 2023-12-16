@@ -3,6 +3,8 @@
     ;[clojure.java.jdbc :as jdbc]
     ;        [leihs.procurement.utils.sql :as sql]
 
+     [leihs.procurement.utils.helpers :refer [my-cast]]
+
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]
     [next.jdbc :as jdbc]
@@ -33,7 +35,7 @@
   [tx bl]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_budget_limits)
-                     (sql/values [bl])
+                     (sql/values [(my-cast bl)])
                      sql-format)))
 
 (defn delete-budget-limit!
