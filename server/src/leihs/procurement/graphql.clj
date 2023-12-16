@@ -125,7 +125,7 @@
         (try (let [response (->> tx
                                  (assoc request :tx)
                                  pure-handler)]
-               (when (:graphql-error response)
+               (when (spy (:graphql-error response))
                  (warn "Rolling back transaction because of graphql error: " response)
                  (jdbc/db-set-rollback-only! tx))
                response)

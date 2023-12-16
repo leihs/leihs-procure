@@ -42,10 +42,15 @@ describe 'templates' do
       GRAPHQL
 
       result = query(q, user.id)
+
+      puts ">> result: " + result.to_s
+
       expect(result['data']['update_templates']).to be_blank
       expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Template.all.count).to be == templates_before.count
       templates_before.each do |data|
+        puts ">>> data=" + data.to_s
+        puts ">>> Template.find(data)=" + Template.find(data).to_s
         expect(Template.find(data)).to be
       end
     end
