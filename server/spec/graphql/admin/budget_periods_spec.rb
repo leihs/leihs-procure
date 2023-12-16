@@ -205,7 +205,6 @@ describe 'budget periods' do
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']
     end
 
-
     it 'updates successfully for an authorized user' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)
@@ -233,10 +232,17 @@ describe 'budget periods' do
 
       puts ">>>" + result.to_json
       # >>>{"data":{"budget_periods":[{"name":"new_bp"},{"name":"bp_1_new_name"}]}}
-
+      # >>1>{"name":"new_bp","inspection_start_date":"2025-06-01T00:00:00.000+00:00","end_date":"2025-12-01T00:00:00.000+00:00"}
+      # >>1>{"name":"bp_1_new_name","inspection_start_date":"2024-06-01T00:00:00.000+00:00","end_date":"2024-12-01T00:00:00.000+00:00"}
+      # >>2>{"budget_period":{"name":"bp_1_new_name"}}
+      # >>3>{"name":"bp_1_new_name"}
+      # >>4>c355012b-be8d-4905-ba4d-d634b3767448
+      # updates successfully for an authorized user
 
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
+        puts ">>1>" + data.to_json
+
         expect(BudgetPeriod.find(data)).to be
       end
 
@@ -244,6 +250,10 @@ describe 'budget periods' do
         { budget_period: { name: 'bp_1_new_name' } }
       ]
       budget_limits_after.each do |data|
+        puts ">>2>" + data.to_json
+        puts ">>3>" + data[:budget_period].to_json
+        puts ">>4>" + BudgetPeriod.find(data[:budget_period]).id
+
         FactoryBot.create(
           :budget_limit,
           budget_period_id: BudgetPeriod.find(data[:budget_period]).id

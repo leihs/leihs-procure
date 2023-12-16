@@ -270,20 +270,23 @@
   [tx bp]
 
   (let [
-        bp (my-cast bp)
+        bp (my-cast (spy bp))
 
-        result (jdbc/execute-one! tx
+        result (spy (jdbc/execute-one! tx
                               (-> (sql/update :procurement_budget_periods)
-                                  (sql/set bp)
+                                  (sql/set (spy bp))
                                   (sql/where [:= :procurement_budget_periods.id (:id bp)])
                                   sql-format
-                                  spy))
+                                  ;spy
+                                  )))
+
+        result (spy (:next.jdbc/update-count (spy result)))
 
         ;] (spy (:update-count (spy result))))
         ;] (spy (list (:next.jdbc/update-count (spy result)))))
-        ] (spy (:next.jdbc/update-count (spy result))))
+        ] (spy (list result))
 
-  )
+  ))
 
 
 
@@ -293,17 +296,19 @@
   [tx bp]
 
   (let [
-        bp (my-cast bp)
+        bp (my-cast (spy bp))
 
-        result (jdbc/execute! tx
+        result (spy (jdbc/execute! tx
                               (-> (sql/insert-into :procurement_budget_periods)
-                                  (sql/values [bp])
+                                  (sql/values [(spy bp)])
                                   sql-format
                                   spy
-                                  ))
+                                  )))
+
+        result (spy (:update-count result))
 
         ;] (list (:update-count result)))
-        ] (spy (:update-count result))
+        ] (spy (list result))
 
   ))
 
