@@ -131,7 +131,10 @@
         ; Filters for procurement admin
         ; Given there is an initial admin -> And
 
-        p (println ">o> templates/update-templates! (empty list-issue!!!!!) cat-ids=" cat-ids)
+        p (println ">oo> templates/update-templates! (empty list-issue!!!!!) cat-ids=" cat-ids)
+        p (println ">oo> templates/update-templates! (empty list-issue!!!!!) input-data=" input-data)
+        p (println ">oo> templates/update-templates! (empty list-issue!!!!!) auth-entity=" auth-entity)
+        p (println ">oo> templates/update-templates! (empty list-issue!!!!!) args=" args)
         ]
     (loop [[tmpl & rest-tmpls] (spy input-data)
            tmpl-ids []]
