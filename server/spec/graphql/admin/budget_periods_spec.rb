@@ -230,6 +230,11 @@ describe 'budget periods' do
           inspection_start_date: @new_inspection_start_date_1,
           end_date: @new_end_date_1 }
       ]
+
+      puts ">>>" + result.to_json
+      # >>>{"data":{"budget_periods":[{"name":"new_bp"},{"name":"bp_1_new_name"}]}}
+
+
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
         expect(BudgetPeriod.find(data)).to be
