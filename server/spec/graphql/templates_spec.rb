@@ -42,20 +42,40 @@ describe 'templates' do
       GRAPHQL
 
       result = query(q, user.id)
+
+      puts result
+
       expect(result['data']['update_templates']).to be_blank
-      # expect(result['errors'].first['message']).to match(/UnauthorizedException/)
-
-      puts "###############################################"
-      puts "Error-Message >>> " + result['errors'].first['message']
-
-      expect(result['errors'].first['message']).to match(/(ERROR|UnauthorizedException)/)  # TODO: fix to return exception
-      # expect(result['errors'].first['message']).to include("ERROR")
+      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Template.all.count).to be == templates_before.count
-      templates_before.each do |data|
-        puts ">>>" + data.to_s
+      templates_before.each do |data|          # FIXME: this causes error
+        puts ">>> data=" + data.to_s
+        puts ">>> Template.find(data)=" + Template.find(data).to_s
         expect(Template.find(data)).to be
       end
     end
+
+
+    # TODO: FIXME
+    # Run options: include {:locations=>{"./spec/graphql/templates_spec.rb"=>[6]}}
+    #
+    # templates
+    # mutation
+    # >> result: {"data"=>{"update_templates"=>nil}, "errors"=>[{"message"=>"UnauthorizedException - Not authorized for this query path and arguments.",
+    # "locations"=>[{"line"=>2, "column"=>11}], "path"=>["update_templates"],
+    # "extensions"=>{"exception"=>"ExceptionInfo",
+    #
+    # "arguments"=>
+    # {"input_data"=>[
+    # {"id"=>"682c749c-7382-40c4-a81b-e8055bf32bc3", "article_name"=>"test", "category_id"=>"18214e1f-9417-42f8-9f39-2d8e7855d034", "price_cents"=>100},
+    # {"id"=>"0d2ec666-7c6c-4ae9-8f20-85ec095200be", "article_name"=>"test", "category_id"=>"36894f94-57b7-4e4e-a4e8-1978c5e32287", "price_cents"=>100}]}}}]}
+
+    # >>> data={:article_name=>"tmpl for category A", :category_id=>"18214e1f-9417-42f8-9f39-2d8e7855d034"}
+    # >>> Template.find(data)=#<Template:0x000000010d20f720>
+    # >>> data={:article_name=>"tmpl for category B", :category_id=>"36894f94-57b7-4e4e-a4e8-1978c5e32287"}
+    # >>> Template.find(data)=#<Template:0x000000010d20df38>
+    #   throws if not inspector of some category
+
 
     context 'throws for used templates' do
       before :each do

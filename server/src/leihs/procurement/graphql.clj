@@ -85,14 +85,8 @@
 
     (if (:errors (spy result))
       (do (debug result)
-          (assoc resp :graphql-error true)
-          (println "\n>o> ERROR 4pure-handler, result=>" result)
-          )
-      (do
-        ;(println "\n>o>3apure-handler, result=>" result)
-        resp))
-
-    resp
+          (assoc resp :graphql-error true))
+      resp)
 
     ;(check-string-contains query "RequestsIndexFiltered")
     ;(check-string-contains query "RequestFilters")
@@ -139,17 +133,23 @@
                    response (->> tx
                                  (assoc request :tx)
                                  pure-handler)]
-               (when (:graphql-error response)
+               (when (spy (:graphql-error response))
+                 (println ">>> ??? graphql2 when")
                  (warn "Rolling back transaction because of graphql error: " response)
                  (jdbco/db-set-rollback-only! tx))
                response)
+
              (catch Throwable th
                (warn "Rolling back transaction because of " th)
+
+               (println ">>> ??? graphql1 catch")
+
                (jdbco/db-set-rollback-only! tx)
                (throw th))))
+
       (let [p (println "pure-handler >> 2")
             ]
-        (pure-handler request))
+        (spy (pure-handler request)))
       )))
 
 

@@ -95,14 +95,13 @@
                    (->> (jdbc/execute-one! tx))
                    )
 
-        p (println ">o> res - true/false needed!!!!!!!!" result)
 
-        req-exist? (-> result
-                       :count
-                       (> 0)
-                       )
+        req-exist? (spy (-> (spy result)
+                            :count
+                            (> 0)
+                            ))
 
-        p (println ">o> res - true/false needed!!!!!!!!" req-exist?)
+        p (println ">o> res - true/false 2needed!!!!!!!!" req-exist?)
 
 
         ;req-exist? (-> (sql/select :%count.*)
@@ -130,23 +129,25 @@
 
     (spy tmpl)
 
-    (spy (jdbc/execute! tx
-                        (-> (sql/update :procurement_templates)
-                            (sql/set (validate-update-attributes tx tmpl))
-                            (sql/where [:= :procurement_templates.id (:id tmpl)])
-                            sql-format
-                            spy
-                            )))
+    (spy (-> (jdbc/execute! tx
+                            (-> (sql/update :procurement_templates)
+                                (sql/set (validate-update-attributes tx tmpl))
+                                (sql/where [:= :procurement_templates.id (:id tmpl)])
+                                sql-format
+                                spy
+                                ))
+             :update-count
+             ))
     )
 
   )
 
 (defn delete-template!
   [tx id]
-  (spy (jdbc/execute! tx
-                      (-> (sql/delete-from :procurement_templates)
-                          (sql/where [:= :procurement_templates.id [:cast id :uuid]])
-                          sql-format))))
+  (spy (jdbc/execute! tx (-> (sql/delete-from :procurement_templates)
+                             (sql/where [:= :procurement_templates.id [:cast id :uuid]])
+                             sql-format
+                             spy))))
 
 (defn get-template
   ([context _ value]
