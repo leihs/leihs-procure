@@ -33,45 +33,65 @@
 
 (defn budget-periods-query
   [args]
-  (cond-> budget-periods-base-query
-          (:id args) (sql/where [:in :procurement_budget_periods.id
-                                 [:cast (:id args) :uuid]])
-          (-> args
-              :whereRequestsCanBeMovedTo
-              empty?
-              not)
-          (sql/where [:< :current_date
-                      :procurement_budget_periods.end_date])))
+
+  (spy (let [
+             ids (spy (:id args))
+             ]
+         (cond-> budget-periods-base-query
+                 ids (sql/where [:in :procurement_budget_periods.id (cast-uuids ids)])
+                 (spy (-> args
+                          :whereRequestsCanBeMovedTo
+                          empty?
+                          not)) (sql/where [:< :current_date :procurement_budget_periods.end_date]))
+         ))
+
+  )
 
 (defn get-budget-periods
   ([tx ids]
-
-   (println ">oo> Causes issues >>" ids)
-   (jdbc/execute! tx
-                  (-> budget-periods-base-query
-                      (sql/where [:in :procurement_budget_periods.id (ids)]) ;;TODO: FIXME
-                      sql-format)))
+   (println ">oo> Causes issues1 >>" ids)
+   (spy (jdbc/execute! tx (-> budget-periods-base-query
+                              (sql/where [:in :procurement_budget_periods.id (ids)]) ;;TODO: FIXME
+                              sql-format
+                              spy
+                              )))
+   )
 
   ([context args _]
-   (if (= (:id args) [])
+   (println ">oo> Causes issues2 >>" args)
+   ;(if (spy (= (:id args) nil))
+   (if (spy (= (:id args) []))
      []
-     (->> args
-          budget-periods-query
-          sql-format
-          (jdbc/execute! (-> context
+     (spy (jdbc/execute! (-> context
                              :request
-                             :tx-next))))))
+                             :tx-next) (-> (spy args)
+                                           budget-periods-query
+                                           sql-format
+                                           spy))))
+
+   ))
+
+;(->> args
+;     budget-periods-query
+;     sql-format
+;     (jdbc/execute! (-> context
+;                        :request
+;                        :tx-next))))))
 
 ;(defn cast-uuids [uuids]
 ;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
-  (jdbc/execute! tx (-> (sql/delete-from :procurement_budget_periods :pbp)
-                        (sql/where [:not-in :pbp.id (cast-uuids ids)])
-                        sql-format
-                        spy
-                        ))
+
+  (println ">o> tocheck delete-budget-periods-not-in! ???" ids)
+  (spy (-> (jdbc/execute! tx (-> (sql/delete-from :procurement_budget_periods :pbp)
+                                 (sql/where [:not-in :pbp.id (cast-uuids ids)])
+                                 ;(sql/returning :*)
+                                 sql-format
+                                 spy
+                                 )
+                          ) :update-count))
   )
 
 
@@ -83,44 +103,58 @@
   [context args value]
 
   (println ">oo> update-budget-periods!")
-  (let [tx (-> context
+(spy   (let [tx (-> context
                :request
                :tx-next)
         bps (:input_data args)]
-    (loop [[bp & rest-bps] bps
+    (spy (loop [[bp & rest-bps] bps
            bp-ids []]
       (if bp
-        (let [
+       (let [
 
               p (println ">oo> before bp-with-dates=" bp)
-              bp-with-dates (-> bp
+              bp-with-dates (spy (-> bp
                                 ;(update :inspection_start_date time-format/parse) ;; TODO: fix parsing of timestamp
                                 ;(update :end_date time-format/parse))
                                 (update :inspection_start_date set-date) ;; TODO: fix parsing of timestamp
-                                (update :end_date set-date))
+                                (update :end_date set-date)))
               p (println ">oo> after bp-with-dates=" bp-with-dates)
               ]
           (do
+            (if (spy (:id bp-with-dates))
+              (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
+              (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
 
-
-            (if (:id bp-with-dates)
-              (budget-period/update-budget-period! tx bp-with-dates)
-              (budget-period/insert-budget-period! tx
-                                                   (dissoc bp-with-dates :id)))
-
-            (let [
+             (let [
                   p (println ">oo> superorsch args=" args)
                   p (println ">oo> superorsch value=" value)
-                  bp-id (or (:id bp-with-dates)
-                            (-> bp-with-dates
-                                (dissoc :id)
-                                (->> (budget-period/get-budget-period tx))
-                                :id))
+                  bp-id (or (spy (:id bp-with-dates))
+                            (spy (-> bp-with-dates
+                                     (dissoc :id)
+                                     (->> (budget-period/get-budget-period tx))
+                                     :id)))
 
                   ]
-              (recur rest-bps (conj bp-ids bp-id)))))
-        (do (delete-budget-periods-not-in! tx bp-ids)
-            (get-budget-periods context args value))))))
+              (recur rest-bps (conj bp-ids bp-id)))
+
+            ))
+        (spy (do (spy (delete-budget-periods-not-in! tx bp-ids))
+            (println ">>> ??? delete _> get-budget-periods" args value)
+            (spy (get-budget-periods context args value))
+
+            ; TODO FIXME
+            ;nil
+            ;
+            ;expected: {"data"=>{"budget_periods"=>[{"name"=>"new_bp"}, {"name"=>"bp_1_new_name"}]}}
+            ;got: {"data"=>{"budget_periods"=>nil}}
+
+            ))
+
+        )))
+
+    ))
+
+  )
 
 
 

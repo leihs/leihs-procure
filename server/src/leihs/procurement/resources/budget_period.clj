@@ -272,14 +272,16 @@
   (let [
         bp (my-cast bp)
 
-        result (jdbc/execute! tx
+        result (jdbc/execute-one! tx
                               (-> (sql/update :procurement_budget_periods)
                                   (sql/set bp)
                                   (sql/where [:= :procurement_budget_periods.id (:id bp)])
                                   sql-format
                                   spy))
 
-        ] result)
+        ;] (spy (:update-count (spy result))))
+        ;] (spy (list (:next.jdbc/update-count (spy result)))))
+        ] (spy (:next.jdbc/update-count (spy result))))
 
   )
 
@@ -300,9 +302,10 @@
                                   spy
                                   ))
 
-        ] result)
+        ;] (list (:update-count result)))
+        ] (spy (:update-count result))
 
-  )
+  ))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)
