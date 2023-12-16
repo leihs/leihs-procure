@@ -210,20 +210,32 @@
 
 (defn update-categories-viewers!
   [context args value]
-  (let [request (:request context)
+  (spy (let [request (:request context)
         tx (:tx-next request)
         auth-user (:authenticated-entity request)
         categories (:input_data args)]
-    (loop [[c & rest-cs] categories]
+    (loop [[c & rest-cs] (spy categories)]
       (if-let [c-id (:id c)]
-        (do (authorization/authorize-and-apply
-              #(viewers/update-viewers! tx c-id (:viewers c))
+        (do (spy (authorization/authorize-and-apply
+              #(spy (viewers/update-viewers! tx c-id (spy (:viewers c))))
               :if-any
-              [#(user-perms/admin? tx auth-user)
-               #(user-perms/inspector? tx auth-user c-id)])
+              [#(spy (user-perms/admin? tx auth-user))
+               #(spy (user-perms/inspector? tx auth-user c-id))
+               ]))
             (recur rest-cs))
-        (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
+        (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
                                                          (sql/where [:in :procurement_categories.id (cast-uuids (map :id categories))])
-                                                         sql-format) "categories/update-categories-viewers!"))
-        ))))
+                                                         sql-format) "categories/update-categories-viewers!")))
+        )))))
 
+
+;master
+;2023-12-16T16:23:13.056Z NX-41294 DEBUG [leihs.procurement.resources.categories:110] - (user-perms/admin? tx auth-user) => false
+;2023-12-16T16:23:13.057Z NX-41294 DEBUG [leihs.procurement.resources.categories:111] - (user-perms/inspector? tx auth-user c-id) => true
+;2023-12-16T16:23:13.061Z NX-41294 DEBUG [leihs.procurement.resources.viewers:40] - (delete-viewers-for-category-id! tx c-id) => (1)
+;2023-12-16T16:23:13.063Z NX-41294 DEBUG [leihs.procurement.resources.viewers:41] - (not (empty? u-ids)) => true
+;2023-12-16T16:23:13.087Z NX-41294 DEBUG [leihs.procurement.resources.viewers:33] - (jdbc/execute! tx (-> (sql/insert-into :procurement_category_viewers) (sql/values row-maps) sql/format)) => (3)
+;2023-12-16T16:23:13.087Z NX-41294 DEBUG [leihs.procurement.resources.viewers:42] - (insert-viewers! tx (map (fn* [p1__43117#] (hash-map :user_id p1__43117# :category_id c-id)) u-ids)) => (3)
+;2023-12-16T16:23:13.088Z NX-41294 DEBUG [leihs.procurement.resources.categories:107] - (viewers/update-viewers! tx c-id (:viewers c)) => (3)
+;2023-12-16T16:23:13.089Z NX-41294 DEBUG [leihs.procurement.resources.categories:110] - (user-perms/admin? tx auth-user) => false
+;2023-12-16T16:23:13.090Z NX-41294 DEBUG [leihs.procurement.resources.categories:111] - (user-perms/inspector? tx auth-user c-id) => false

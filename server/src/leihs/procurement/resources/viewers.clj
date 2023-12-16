@@ -80,24 +80,55 @@
 
 (defn delete-viewers-for-category-id!
   [tx c-id]
-  (jdbc/execute! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
-                        (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
-                        sql-format
-                        spy
-                        )))
+
+  (let [
+        result (spy (jdbc/execute-one! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
+                                         (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
+                                         sql-format
+                                         ;spy
+                                         )))
+
+        res (spy (:update-count result ))
+        result (spy (:next.jdbc/update-count result ))
+
+        ]
+    (spy (list result))
+    )
+
+  ;(spy (-> (spy (jdbc/execute-one! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
+  ;                               (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
+  ;                               sql-format
+  ;                               ;spy
+  ;                               )))
+  ;         ;:next.jdbc/update-count
+  ;         :update-count
+  ;         list
+  ;         ))
+  )
 
 (defn insert-viewers!
   [tx row-maps]
   (println ">o> >tocheck>" row-maps)
-  (jdbc/execute! tx
-                 (-> (sql/insert-into :procurement_category_viewers)
-                     (sql/values (map #(my-cast %) row-maps))
-                     sql-format
-                     spy
-                     )))
+  (spy (-> (spy (jdbc/execute-one! tx (-> (sql/insert-into :procurement_category_viewers)
+                                          (sql/values (map #(my-cast %) row-maps))
+                                          sql-format
+                                          ;spy
+                                          )))
+           ;:update-count
+           :next.jdbc/update-count
+           list
+           )))
 
 (defn update-viewers!
   [tx c-id u-ids]
-  (delete-viewers-for-category-id! tx c-id)
-  (if (not (empty? u-ids))
-    (insert-viewers! tx (map #(hash-map :user_id % :category_id c-id) u-ids))))
+
+  (println ">o> ??? update-viewers! u-ids=" u-ids)
+  (println ">o> ??? update-viewers! c-id=" c-id)
+
+  (spy (-> (delete-viewers-for-category-id! tx c-id)
+           ;:update-count
+           ;list
+           ))
+  (if (spy (not (empty? u-ids)))
+    (spy (insert-viewers! tx (map #(hash-map :user_id % :category_id c-id) u-ids)))
+    ))
