@@ -48,12 +48,14 @@
         p (println ">oo> templates::get-templates1b ?broken-base-query?" (-> templates-base-query sql-format))
         p (println ">oo> templates::get-templates1c" (sql-format query))
         ]
-    (->> query
+    (spy (->> query
          sql-format
          spy
          (jdbc/execute! (-> context
                             :request
-                            :tx-next)))))
+                            :tx-next))))
+
+    ))
 
 
 (comment
@@ -97,29 +99,29 @@
 
   (println ">>> tocheck / templates::get-templates-for-ids >> ids >1 => " ids)
 
-  (jdbc/execute! tx (add-comment-to-sql-format (-> categories/categories-base-query
+  (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories/categories-base-query
                                              (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-                                             sql-format)) "templates/get-templates-for-ids")
+                                             sql-format)) "templates/get-templates-for-ids"))
   )
 
 
 
 (defn delete-templates-not-in-ids!
   [tx ids]
-  (jdbc/execute! tx
+  (spy (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_templates)
                      (sql/where [:not-in :procurement_templates.id (cast-uuids ids)]) ;; TODO PRIO !!!
-                     sql-format)))
+                     sql-format))))
 
 (defn get-template-id
   [tx tmpl]
-  (or (:id tmpl)
-      (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>))))
+  (or (spy (:id tmpl))
+      (spy (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>)))))
 
 
 (defn update-templates!
   [context args _]
-  (let [rrequest (:request context)
+  (spy (let [rrequest (:request context)
         tx (:tx-next rrequest)
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
@@ -155,4 +157,4 @@
                  (get-template-id tx)
                  (conj tmpl-ids)
                  (recur rest-tmpls)))
-        (categories/get-categories-for-ids tx cat-ids)))))
+        (categories/get-categories-for-ids tx cat-ids))))))

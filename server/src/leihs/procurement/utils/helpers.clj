@@ -80,6 +80,7 @@
   ;(spy (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
   )
 
+
 ; [leihs.procurement.utils.helpers :refer [my-cast]]
 (defn my-cast [data]
   (println ">o> utils.helpers / my-cast " data)
@@ -123,11 +124,6 @@
                data
                )
 
-        data (if (contains? data :category_id)
-               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-               data
-               )
-
         data (if (contains? data :main_category_id)
                (assoc data :main_category_id [[:cast (:main_category_id data) :uuid]])
                data
@@ -147,16 +143,12 @@
                (do
                  (println ">o> upload::metadata")
                  (assoc data :metadata [[:cast (:metadata data) :jsonb]]) ;; works as local-test
-                 ;(assoc data :metadata [[:cast (:metadata data) :json]])
-                 ;(assoc data :metadata [[:cast (:metadata data) :text]]))
                  )
                data
                )
-
-        ;[[:cast (to-name-and-lower-case a) :order_status_enum]]
-
         ]
     (spy data)
     )
 
   )
+
