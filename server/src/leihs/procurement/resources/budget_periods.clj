@@ -7,6 +7,8 @@
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
 
+            [logbug.debug :as debug]
+
             [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
 
             [leihs.procurement.resources.budget-period :as budget-period]
@@ -208,3 +210,6 @@
         ])
 
   )
+
+;#### debug ###################################################################
+(debug/debug-ns *ns*)

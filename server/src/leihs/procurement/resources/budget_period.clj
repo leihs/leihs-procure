@@ -9,6 +9,7 @@
 
     [leihs.procurement.utils.helpers :refer [my-cast]]
 
+    [logbug.debug :as debug]
 
     ;[clojure.java.jdbc :as jdbc]
     [next.jdbc :as jdbc]
@@ -313,5 +314,5 @@
   ))
 
 ;#### debug ###################################################################
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)
 
