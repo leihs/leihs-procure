@@ -57,14 +57,14 @@
                    (sql/merge-where [:in :procurement_budget_periods.id ids])
                    sql/format))))
   ([context args _]
-   (if (spy (= (:id args) []))
-     []
+   (spy (if (spy (= (:id args) []))
+     (spy [])
      (spy (->> args
           budget-periods-query
           sql/format
           (jdbc/query (-> context
                           :request
-                          :tx)))))))
+                          :tx))))))))
 
 
 
@@ -103,26 +103,34 @@
 
 (defn update-budget-periods!
   [context args value]
-  (let [tx (-> context
+  (spy (let [tx (-> context
                :request
                :tx)
         bps (:input_data args)]
-    (loop [[bp & rest-bps] bps
+
+
+    (spy (loop [[bp & rest-bps] (spy bps)
            bp-ids []]
-      (if (spy bp)
+
+       (if (spy bp)
         (let [bp-with-dates  (spy (-> bp                    ;;  => {:id nil, :name "new_bp", :inspection_start_date #clj-time/date-time "2025-06-01T00:00:00.000Z", :end_date #clj-time/date-time "2025-12-01T00:00:00.000Z"}
                                 (update :inspection_start_date
                                            time-format/parse)
-                                (update :end_date time-format/parse)))]
+                                (update :end_date time-format/parse)))
+              p (spy bp-with-dates)
+              ]
           (do
             (if (spy (:id bp-with-dates))
               (spy (budget-period/update-budget-period! tx bp-with-dates)) ;; nil
               (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id)))) ;; => (1)
-            (let [bp-id (or (:id bp-with-dates)
-                            (-> bp-with-dates
+            (let [bp-id (or (spy (:id bp-with-dates))
+                            (spy (-> bp-with-dates
                                 (dissoc :id)
-                                (->> (budget-period/get-budget-period tx))
-                                :id))]
+                                     spy
+                                (->> (budget-period/get-budget-period tx)
+                                     spy
+                                     )
+                                :id)))]
              (recur rest-bps (conj bp-ids bp-id))
 
               )))
@@ -130,7 +138,11 @@
             (spy (get-budget-periods context args value))
             ;;({:id #uuid "bc517cb6-8efb-44a7-be05-032a309e4504", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-16T08:50:52.351065Z", :updated_at #time/instant "2023-12-16T08:50:52.351065Z"} {:id #uuid "a50ba927-bc61-4403-a5e3-03fd9e38d16f", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-16T08:50:50.322549Z", :updated_at #time/instant "2023-12-16T08:50:50.322549Z"})
 
-            )))))
+            ))
+
+      ))
+
+    )))
 
 
 ;#### debug ###################################################################

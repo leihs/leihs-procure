@@ -258,7 +258,9 @@ describe 'budget periods' do
           :budget_limit,
           budget_period_id: BudgetPeriod.find(data[:budget_period]).id
         )
+
       end
+
     end
   end
 end
