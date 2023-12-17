@@ -231,7 +231,7 @@
                                                              (vector :result)
                                                              sql/select
                                                              sql-format
-                                                             spy
+                                                             ;spy
                                                              )
                                            )
                         ))
@@ -303,7 +303,7 @@
                               (-> (sql/insert-into :procurement_budget_periods)
                                   (sql/values [(spy bp)])
                                   sql-format
-                                  spy
+                                  ;spy
                                   )))
 
         result (spy (:update-count result))

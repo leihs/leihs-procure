@@ -105,56 +105,56 @@
   [context args value]
 
   (println ">oo> update-budget-periods!")
-(spy   (let [tx (-> context
-               :request
-               :tx-next)
-        bps (:input_data args)]
-    (spy (loop [[bp & rest-bps] bps
-           bp-ids []]
-      (if bp
-       (let [
+  (spy (let [tx (-> context
+                    :request
+                    :tx-next)
+             bps (:input_data args)]
+         (spy (loop [[bp & rest-bps] bps
+                     bp-ids []]
+                (if bp
+                  (let [
 
-              p (println ">oo> before bp-with-dates=" bp)
-              bp-with-dates (spy (-> bp
-                                ;(update :inspection_start_date time-format/parse) ;; TODO: fix parsing of timestamp
-                                ;(update :end_date time-format/parse))
-                                (update :inspection_start_date set-date) ;; TODO: fix parsing of timestamp
-                                (update :end_date set-date)))
-              p (println ">oo> after bp-with-dates=" bp-with-dates)
-              ]
-          (do
-            (if (spy (:id bp-with-dates))
-              (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
-              (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
+                        p (println ">oo> before bp-with-dates=" bp)
+                        bp-with-dates (spy (-> bp
+                                               ;(update :inspection_start_date time-format/parse) ;; TODO: fix parsing of timestamp
+                                               ;(update :end_date time-format/parse)))
+                                               (update :inspection_start_date set-date) ;; TODO: fix parsing of timestamp
+                                               (update :end_date set-date)))
+                        p (println ">oo> after bp-with-dates=" bp-with-dates)
+                        ]
+                    (do
+                      (if (spy (:!= (:id bp-with-dates) nil))
+                        (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
+                        (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
 
-             (let [
-                  p (println ">oo> superorsch args=" args)
-                  p (println ">oo> superorsch value=" value)
-                  bp-id (or (spy (:id bp-with-dates))
-                            (spy (-> bp-with-dates
-                                     (dissoc :id)
-                                     (->> (budget-period/get-budget-period tx))
-                                     :id)))
+                      (let [
+                            p (println ">oo> superorsch args=" args)
+                            p (println ">oo> superorsch value=" value)
+                            bp-id (or (spy (:id bp-with-dates))
+                                      (spy (-> bp-with-dates
+                                               (dissoc :id)
+                                               (->> (budget-period/get-budget-period tx))
+                                               :id)))
 
-                  ]
-              (recur rest-bps (conj bp-ids bp-id)))
+                            ]
+                        (recur rest-bps (conj bp-ids bp-id)))
 
-            ))
-        (spy (do (spy (delete-budget-periods-not-in! tx bp-ids))
-            (println ">>> ??? delete _> get-budget-periods" args value)
-            (spy (get-budget-periods context args value))
+                      ))
+                  (spy (do (spy (delete-budget-periods-not-in! tx bp-ids))
+                           (println ">>> ??? delete _> get-budget-periods" args value)
+                           (spy (get-budget-periods context args value))
 
-            ; TODO FIXME
-            ;nil
-            ;
-            ;expected: {"data"=>{"budget_periods"=>[{"name"=>"new_bp"}, {"name"=>"bp_1_new_name"}]}}
-            ;got: {"data"=>{"budget_periods"=>nil}}
+                           ; TODO FIXME
+                           ;nil
+                           ;
+                           ;expected: {"data"=>{"budget_periods"=>[{"name"=>"new_bp"}, {"name"=>"bp_1_new_name"}]}}
+                           ;got: {"data"=>{"budget_periods"=>nil}}
 
-            ))
+                           ))
 
-        )))
+                  )))
 
-    ))
+         ))
 
   )
 
@@ -213,3 +213,9 @@
 
 ;#### debug ###################################################################
 (debug/debug-ns *ns*)
+
+;2023-12-17T06:48:47.621Z NX-41294 DEBUG [leihs.procurement.resources.budget-period:39] - (first (spy (jdbc/query tx (-> budget-period-base-query (sql/merge-where where-clause) sql/format)))) => {:id #uuid "80f2897a-dc35-4ecf-a997-b744e79a478c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:47.361794Z", :updated_at #time/instant "2023-12-17T06:48:47.361794Z"}
+;2023-12-17T06:48:47.765Z NX-41294 DEBUG [leihs.procurement.resources.budget-periods:39] - (cond-> budget-periods-base-query (:id args) (sql/merge-where [:in :procurement_budget_periods.id (:id args)]) (spy (-> args :whereRequestsCanBeMovedTo empty? not)) (sql/merge-where [:< :current_date :procurement_budget_periods.end_date])) => {:select (:procurement_budget_periods.*), :from (:procurement_budget_periods), :order-by ([:end_date :desc])}
+;2023-12-17T06:48:47.769Z NX-41294 DEBUG [leihs.procurement.resources.budget-periods:60] - (if (spy (= (:id args) [])) (spy []) (spy (->> args budget-periods-query sql/format (jdbc/query (-> context :request :tx))))) => ({:id #uuid "80f2897a-dc35-4ecf-a997-b744e79a478c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:47.361794Z", :updated_at #time/instant "2023-12-17T06:48:47.361794Z"} {:id #uuid "ab45ea8b-c753-465f-9cb0-fd9933248f3e", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:46.235266Z", :updated_at #time/instant "2023-12-17T06:48:46.235266Z"})
+;2023-12-17T06:48:47.770Z NX-41294 DEBUG [leihs.procurement.resources.budget-periods:106] - (let [tx (-> context :request :tx) bps (:input_data args)] (loop [[bp & rest-bps] bps bp-ids []] (if (spy bp) (let [bp-with-dates (spy (-> bp (update :inspection_start_date time-format/parse) (update :end_date time-format/parse)))] (do (if (spy (:id bp-with-dates)) (spy (budget-period/update-budget-period! tx bp-with-dates)) (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id)))) (let [bp-id (or (spy (:id bp-with-dates)) (spy (-> bp-with-dates (dissoc :id) (->> (budget-period/get-budget-period tx)) :id)))] (recur rest-bps (conj bp-ids bp-id))))) (do (spy (delete-budget-periods-not-in! tx bp-ids)) (spy (get-budget-periods context args value)))))) => ({:id #uuid "80f2897a-dc35-4ecf-a997-b744e79a478c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:47.361794Z", :updated_at #time/instant "2023-12-17T06:48:47.361794Z"} {:id #uuid "ab45ea8b-c753-465f-9cb0-fd9933248f3e", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:46.235266Z", :updated_at #time/instant "2023-12-17T06:48:46.235266Z"})
+;2023-12-17T06:48:47.772Z NX-41294 DEBUG [leihs.procurement.graphql.resolver:19] - ((spy resolver) (spy context) (spy args) (spy value)) => ({:id #uuid "80f2897a-dc35-4ecf-a997-b744e79a478c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:47.361794Z", :updated_at #time/instant "2023-12-17T06:48:47.361794Z"} {:id #uuid "ab45ea8b-c753-465f-9cb0-fd9933248f3e", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:46.235266Z", :updated_at #time/instant "2023-12-17T06:48:46.235266Z"})
