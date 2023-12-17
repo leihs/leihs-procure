@@ -87,13 +87,17 @@
   [tx ids]
 
   (println ">o> tocheck delete-budget-periods-not-in! ???" ids)
-  (spy (-> (jdbc/execute! tx (-> (sql/delete-from :procurement_budget_periods :pbp)
+  (spy (-> (spy (jdbc/execute-one! tx (-> (sql/delete-from :procurement_budget_periods :pbp)
                                  (sql/where [:not-in :pbp.id (cast-uuids ids)])
                                  ;(sql/returning :*)
                                  sql-format
                                  spy
                                  )
-                          ) :update-count))
+                          ))
+           ;:update-count
+           :next.jdbc/update-count
+           list
+           ))
   )
 
 
@@ -123,7 +127,7 @@
                         p (println ">oo> after bp-with-dates=" bp-with-dates)
                         ]
                     (do
-                      (if (spy (:!= (:id bp-with-dates) nil))
+                      (if (spy (:id bp-with-dates))
                         (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
                         (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
 

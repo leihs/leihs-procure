@@ -299,14 +299,15 @@
   (let [
         bp (my-cast (spy bp))
 
-        result (spy (jdbc/execute! tx
+        result (spy (jdbc/execute-one! tx
                               (-> (sql/insert-into :procurement_budget_periods)
                                   (sql/values [(spy bp)])
                                   sql-format
                                   ;spy
                                   )))
 
-        result (spy (:update-count result))
+        ;result (spy (:update-count result))
+        result (spy (:next.jdbc/update-count result))
 
         ;] (list (:update-count result)))
         ] (spy (list result))
