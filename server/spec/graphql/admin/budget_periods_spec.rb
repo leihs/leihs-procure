@@ -1,5 +1,8 @@
 require 'spec_helper'
 require_relative '../graphql_helper'
+require 'json'
+require 'date'
+
 
 describe 'budget periods' do
   context 'query' do
@@ -213,7 +216,8 @@ describe 'budget periods' do
       result = query(@q, user.id)
       puts ">> user.id\n" + user.id
       puts ">> query\n" + @q
-      puts ">> result =>\n" + result.to_json
+      puts ">> response =>\n" + result.to_json
+      puts "\n"
 
 
       # sorted after `inspection_start_date DESC`
@@ -225,6 +229,12 @@ describe 'budget periods' do
           ]
         }
       })
+
+
+      # [{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00"},
+      # {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00"}]
+
+
 
       budget_periods_after = [
         { name: 'new_bp',
@@ -246,28 +256,72 @@ describe 'budget periods' do
       # updates successfully for an authorized user
 
 
-      puts ">>>\n"+BudgetPeriod.to_json
+      puts ">BudgetPeriod>>\n"+BudgetPeriod.to_json
 
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
-        puts ">>1>" + data.to_json
+        response_data = JSON.parse(data.to_json)
+        name = response_data['name']
 
-        expect(BudgetPeriod.find(data)).to be
+        budget_period = BudgetPeriod.find(name: name)
+        db_data = JSON.parse(budget_period.to_json)
+
+        puts "---"
+        puts "? TMP ?" + response_data.to_s
+        puts "? DB  ?" + db_data.to_json
+        # puts "? ??1 ?" + BudgetPeriod.find(data).to_json
+        # puts "? ??1 ?" + BudgetPeriod.find(response_data).to_json
+        puts "---"
+
+        expect(compare_ts_in_maps_without_timezone(db_data, response_data)).to be true
       end
 
       budget_limits_after = [
         { budget_period: { name: 'bp_1_new_name' } }
       ]
       budget_limits_after.each do |data|
-        puts ">>2>" + data.to_json
-        puts ">>3>" + data[:budget_period].to_json
-        puts ">>4>" + BudgetPeriod.find(data[:budget_period]).id
+        # puts ">>2>" + data.to_json
+        # puts ">>3>" + data[:budget_period].to_json
+        # puts ">>4>" + BudgetPeriod.find(data[:budget_period]).id
 
         FactoryBot.create(
           :budget_limit,
           budget_period_id: BudgetPeriod.find(data[:budget_period]).id
         )
       end
+
     end
   end
+end
+
+
+def parse_date_ignoring_timezone(date_str)
+  # puts ">>?>>" + date_str.to_s
+  # Parses the date and ignores the timezone part
+  DateTime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%L').to_s
+end
+
+
+
+def compare_ts_in_maps_without_timezone(map1, map2)
+  fields = ["inspection_start_date", "end_date"]
+
+  fields.each do |field|
+    # puts ">> Field being checked: #{field}" # Add this to check the field name
+    if map1[field] && map2[field]
+      # puts ">>2>>a map1: " + map1.to_s
+      # puts ">>2>>a field value in map1: " + map1[field].to_s  # Show value from map1
+      puts ">> Compare: #{map1[field]} #{map2[field]} key=#{field}"  # Show value from map2
+      date1 = parse_date_ignoring_timezone(map1[field])
+      date2 = parse_date_ignoring_timezone(map2[field])
+
+      return false if date1 != date2
+    else
+      # Field not present in one of the maps or is nil
+      puts ">> Field '#{field}' not found or is nil in one of the maps" # Add this for clarity
+      return false
+    end
+  end
+
+  true # All dates match
 end

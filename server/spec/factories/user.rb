@@ -8,8 +8,8 @@ FactoryBot.define do
     email { Faker::Internet.email }
     ############################
     # migrate to column defaults
-    created_at { Date.today }
-    updated_at { Date.today }
+    # created_at { Date.today }
+    # updated_at { Date.today }
     ############################
 
     after(:create) do |user|

@@ -60,25 +60,25 @@
 
   (println ">o> budget-periond 0")
 
-  (first (jdbc/execute! tx
-                        (-> budget-period-base-query
-                            ;(sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
-                            (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
-                            sql-format))))
+  (spy (first (jdbc/execute! tx
+                             (-> budget-period-base-query
+                                 ;(sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
+                                 (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
+                                 sql-format)))))
 
 (defn get-budget-period
   ([context _ value]
 
-   (println ">o> budget-periond 2")
+   (println ">ooo> budget-periond 2")
 
-   (get-budget-period-by-id (-> context
-                                :request
-                                :tx-next)
-                            (or (:budget_period_id value)
-                                ; for BudgetLimit
-                                (:value value)
-                                ; for RequestFieldBudgetPeriod
-                                )))
+   (spy (get-budget-period-by-id (-> context
+                                     :request
+                                     :tx-next)
+                                 (spy (or (spy (:budget_period_id value))
+                                          ; for BudgetLimit
+                                          (spy (:value value))
+                                          ; for RequestFieldBudgetPeriod
+                                          )))))
   ([tx bp-map]
    (println ">o> budget-periond 1")
 
@@ -91,11 +91,13 @@
                                         sql-format
                                         spy
                                         )))
-         p (println ">o> query=" result)
+         p (println ">o> query=" (spy result))
          result (first result)
          p (println ">o> result=" result)
          ]
-     result))
+
+     (spy result)
+     ))
 
   )
 
@@ -106,7 +108,7 @@
 (defn in-requesting-phase?
   [tx budget-period]
 
-  (println ">o> budget-periond 3")
+  (println ">ooo> budget-periond 3")
 
   (let [query (-> (sql/select [(as-> budget-period <>
                                  (:inspection_start_date <>)
@@ -117,15 +119,18 @@
 
         p (println ">oo> in-requesting-phase?" query)
 
+        result (->> query
+                    (jdbc/execute-one! tx))
         ]
-    (->> query
-         (jdbc/execute-one! tx)
-         :result)))
+
+    (spy (:result (spy result)))
+
+    ))
 
 (defn in-inspection-phase?
   [tx budget-period]
 
-  (println ">o> budget-periond 4")
+  (println ">ooo> budget-periond 4")
 
   (let [inspection-start-date (as-> budget-period <>
                                 (:inspection_start_date <>)
@@ -156,7 +161,7 @@
 
   (println ">o> budget-periond 5")
 
-  (println ">oo> past? budget-period=" budget-period)
+  (println ">ooo> past? budget-period=" budget-period)
 
   ;{:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name BP-in-inspection-phase, :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",
   ; :end_date #inst "2024-01-06T23:00:00.000000000-00:00", :created_at #inst "2023-12-07T10:39:01.374390000-00:00", :updated_at #inst "2023-12-07T10:39:01.374390000-00:00"}
@@ -181,9 +186,9 @@
         p (println ">o> past? result=" result)
 
         ]
-    (->> query
-         (jdbc/execute-one! tx)
-         :result)))
+    (spy result)
+
+    ))
 
 
 (comment
@@ -211,8 +216,8 @@
 
 (defn can-delete?
   [context _ value]
-  (println ">> can-delete2")
-  (println ">oo> hoi2")
+  (println ">ooo> can-delete2")
+
 
   (let [
         result (-> (spy (jdbc/execute-one! (-> context
@@ -236,31 +241,7 @@
                                            )
                         ))
         result (:result result)
-        ] result)
-
-  ;(spy (-> (spy (jdbc/execute-one! (-> context
-  ;                                     :request
-  ;                                     :tx-next) (-> [:and
-  ;                                                    [:not
-  ;                                                     [:exists
-  ;                                                      (-> (sql/select true)
-  ;                                                          (sql/from [:procurement_requests :pr])
-  ;                                                          (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
-  ;                                                    [:not
-  ;                                                     [:exists
-  ;                                                      (-> (sql/select true)
-  ;                                                          (sql/from [:procurement_budget_limits :pbl])
-  ;                                                          (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
-  ;                                                   (vector :result)
-  ;                                                   sql/select
-  ;                                                   sql-format
-  ;                                                   spy
-  ;                                                   )
-  ;                                 )
-  ;              ))
-  ;
-  ;         :result)
-
+        ] (spy result))
   )
 
 
@@ -274,12 +255,12 @@
         bp (my-cast (spy bp))
 
         result (spy (jdbc/execute-one! tx
-                              (-> (sql/update :procurement_budget_periods)
-                                  (sql/set (spy bp))
-                                  (sql/where [:= :procurement_budget_periods.id (:id bp)])
-                                  sql-format
-                                  ;spy
-                                  )))
+                                       (-> (sql/update :procurement_budget_periods)
+                                           (sql/set (spy bp))
+                                           (sql/where [:= :procurement_budget_periods.id (:id bp)])
+                                           sql-format
+                                           ;spy
+                                           )))
 
         result (spy (:next.jdbc/update-count (spy result)))
 
@@ -287,7 +268,7 @@
         ;] (spy (list (:next.jdbc/update-count (spy result)))))
         ] (spy (list result))
 
-  ))
+          ))
 
 
 
@@ -300,11 +281,11 @@
         bp (my-cast (spy bp))
 
         result (spy (jdbc/execute-one! tx
-                              (-> (sql/insert-into :procurement_budget_periods)
-                                  (sql/values [(spy bp)])
-                                  sql-format
-                                  ;spy
-                                  )))
+                                       (-> (sql/insert-into :procurement_budget_periods)
+                                           (sql/values [(spy bp)])
+                                           sql-format
+                                           ;spy
+                                           )))
 
         ;result (spy (:update-count result))
         result (spy (:next.jdbc/update-count result))
@@ -312,7 +293,7 @@
         ;] (list (:update-count result)))
         ] (spy (list result))
 
-  ))
+          ))
 
 ;#### debug ###################################################################
 (debug/debug-ns *ns*)

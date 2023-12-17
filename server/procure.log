@@ -1,1 +1,4 @@
-
+# java_leihs-procure-server env check via asdf v0.13.1
+# java_leihs-procure-server env skipped update; touch .tool-versions or remove /var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/asdf_cache_java_leihs-procure-server to force update
+# clojure_leihs-procure-server env check via asdf v0.13.1
+# clojure_leihs-procure-server env skipped update; touch .tool-versions or remove /var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/asdf_cache_clojure_leihs-procure-server to force update
