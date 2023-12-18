@@ -20,16 +20,9 @@
             [taoensso.timbre :refer [debug error info spy warn]]
 
             )
-
   (:import
-
     [java.time OffsetDateTime ZoneOffset ZonedDateTime ZoneId]
     [java.time.format DateTimeFormatter]
-
-
-    ;[java.time.OffsetDateTime]
-
-    ;[java.sql Timestamp]
     [java.time ZonedDateTime ZoneId ZoneOffset]
     [java.time.format DateTimeFormatter])
   )
@@ -51,31 +44,9 @@
         ]
     result))
 
-;(defn change-offset-and-convert [utc-string new-offset]
-;  (let [parsed-date (parse-utc-string utc-string)
-;        offset-date-time (.withZoneSameInstant parsed-date (ZoneId/ofOffset "UTC" (ZoneOffset/of new-offset)))]
-;    (zoned-date-time-to-timestamp offset-date-time)))
-;;
-;;(defn change-offset-to-timestamp [zoned-date-time new-offset]
-;;  (let [offset-dt (.toOffsetDateTime zoned-date-time)
-;;        adjusted-dt (.withOffsetSameInstant offset-dt (ZoneOffset/of new-offset))]
-;;    (Timestamp/from (.toInstant adjusted-dt))))
-
 
 (defn parse-utc-string [utc-string]
   (OffsetDateTime/parse utc-string))
-;
-;(defn change-timezone-offset [offset-date-time new-offset]
-;  (.withOffsetSameInstant offset-date-time (ZoneOffset/of new-offset)))
-
-
-(import [java.time OffsetDateTime ZoneOffset])
-
-(defn parse-and-change-offset [utc-string new-offset]
-  (let [parsed-date (OffsetDateTime/parse utc-string)
-        offset (ZoneOffset/of new-offset)]
-    (.withOffsetSameInstant parsed-date offset)))
-
 
 (defn parse-and-format-offset-date-time [utc-string new-offset]
   (let [parsed-date (OffsetDateTime/parse utc-string)
@@ -86,22 +57,33 @@
 (comment
 
   ;; FIXME: modify & save utc in budget_periods with utc
+  ;; BROKEN: does not consider timezone-offset
   (let [
         tx (db/get-ds-next)
 
         ;; BROKEN: MODIFY & SAVE
-        utc-string "2024-06-01T00:00:00+00:00"
-        new-offset "+02:00" ;; Change this to the desired new offset
-        ;updated-date (parse-and-change-offset utc-string new-offset)
-        updated-date (parse-and-format-offset-date-time utc-string new-offset)
+        start-utc-string "2024-06-01T00:00:00+00:00"        ;; T00:00:00
+        end-utc-string "2024-06-01T00:00:00+01:00"          ;; T01:00:00
+        new-offset1 "+04:00"                                ;; Change this to the desired new offset
+        new-offset2 "+02:00"                                ;; Change this to the desired new offset
+
+
+        start-updated-date (parse-and-format-offset-date-time start-utc-string new-offset1)
+        end-updated-date (parse-and-format-offset-date-time end-utc-string new-offset2)
         ;
-        ;p (println ">o> updated-date >> " updated-date)
+        p (println "\n>???> updated-date >> " start-updated-date end-updated-date "\n")
+        ; str: updated-date >>  2024-06-01 04:00:00+04 2024-06-01 01:00:00+02
+        ; db: parse-and-convert,2024-06-01 00:00:00.000000 +00:00,2024-05-31 23:00:00.000000 +00:00
+
         ;
-        x (insert-test-period-budget tx {:name "ba222221"
-                                         :inspection_start_date [:cast (str parsed-date1) :timestamptz]
-                                         ;:end-date [:cast (str updated-date) :timestamptz]
-                                         :end-date [:cast updated-date :timestamptz]
-                                         ;:end-date (str updated-date)
+        x (insert-test-period-budget tx {:name "parse-and-convert2"
+                                         ;; works
+                                         ;:inspection_start_date [:cast (str start-updated-date) :timestamptz]
+                                         ;:end-date [:cast (str end-updated-date) :timestamptz]
+
+                                         ;; works
+                                         :inspection_start_date [:cast start-updated-date :timestamptz]
+                                         :end-date [:cast end-updated-date :timestamptz]
                                          })
         ]
     )                                                       ;; here
@@ -140,14 +122,11 @@
         ])
   )
 
-
 (import [java.time ZonedDateTime]
         [java.time.format DateTimeFormatter])
 
 (defn parse-utc-string [utc-string]
   (ZonedDateTime/parse utc-string (DateTimeFormatter/ISO_OFFSET_DATE_TIME)))
-
-
 
 (def budget-periods-base-query
   (-> (sql/select :*)
