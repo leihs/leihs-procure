@@ -49,14 +49,21 @@ describe 'templates' do
       expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Template.all.count).to be == templates_before.count
       templates_before.each do |data|          # FIXME: this causes error
-        puts ">>> data=" + data.to_s
-        puts ">>> Template.find(data)=" + Template.find(data).to_s
+        puts ">>> data=" + data.to_json
+        puts ">>> Template.find(data)=" + Template.find(data).to_s+"<"
         expect(Template.find(data)).to be
       end
     end
 
+    # # TODO: FIXME
+    # response:
+    #   "{\"data\":{\"update_templates\":null},\"errors\":[{\"message\":\"UnauthorizedException - Not authorized for this query path and arguments.\",\"locations\":[{\"line\":2,\"column\":11}],\"path\":[\"update_templates\"],\"extensions\":{\"exception\":\"ExceptionInfo\",\"arguments\":{\"input_data\":[{\"id\":\"2d7c573c-b96b-4631-a66b-d49335d36c7c\",\"article_name\":\"test\",\"category_id\":\"49512e30-ef5e-4b93-bdc1-f88555257479\",\"price_cents\":100},{\"id\":\"a8ba6b62-c01e-48eb-8de1-a0b7afa4d548\",\"article_name\":\"test\",\"category_id\":\"f914d1b8-c8e9-4ebc-bf15-83c911a64c77\",\"price_cents\":100}]}}}]}"
+    #
+    # {"data"=>{"update_templates"=>nil}, "errors"=>[{"message"=>"UnauthorizedException - Not authorized for this query path and arguments.", "locations"=>[{"line"=>2, "column"=>11}], "path"=>["update_templates"], "extensions"=>{"exception"=>"ExceptionInfo", "arguments"=>{"input_data"=>[{"id"=>"2d7c573c-b96b-4631-a66b-d49335d36c7c", "article_name"=>"test", "category_id"=>"49512e30-ef5e-4b93-bdc1-f88555257479", "price_cents"=>100}, {"id"=>"a8ba6b62-c01e-48eb-8de1-a0b7afa4d548", "article_name"=>"test", "category_id"=>"f914d1b8-c8e9-4ebc-bf15-83c911a64c77", "price_cents"=>100}]}}}]}
+    # >>> data={"article_name":"tmpl for category A","category_id":"49512e30-ef5e-4b93-bdc1-f88555257479"}
+    # >>> Template.find(data)=<
 
-    # TODO: FIXME
+
     # Run options: include {:locations=>{"./spec/graphql/templates_spec.rb"=>[6]}}
     #
     # templates

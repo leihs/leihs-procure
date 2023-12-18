@@ -36,7 +36,7 @@
         p (println ">o> admin?" query)
 
         result (jdbc/execute-one! tx (spy query))
-        p (println ">o> admin?" result)
+        p (println ">o> admin?" (spy result))
         ]
 
     (spy (:exists result))
@@ -60,10 +60,10 @@
          p (println ">o> inspector?" query)
 
          result (jdbc/execute-one! tx (spy query))
-         p (println ">o> inspector?" result)
+         p (println ">o> inspector?" (spy result))
          ]
 
-     (:result result)
+     (spy (:result result))
 
      )))
 
@@ -83,10 +83,10 @@
          p (println ">o> viewer?" query)
 
          result (jdbc/execute-one! tx (spy query))
-         p (println ">o> viewer?" result)
+         p (println ">o> viewer?" (spy result))
          ]
 
-     (:result result)
+     (spy (:result result))
      )))
 
 
@@ -167,7 +167,7 @@
         p (println ">o> requester??" query)
 
         result (jdbc/execute-one! tx (spy query))
-        p (println ">o> requester??" result)
+        p (println ">o> requester??" (spy result))
         ]
 
     (spy (:exists result))))
@@ -175,13 +175,12 @@
 
 (defn advanced?
   [tx auth-entity]
-  (->> [viewer? inspector? admin?]
+  (spy (->> [viewer? inspector? admin?]
             (map #(% tx auth-entity))
-            (some true?)))
+            (some true?))))
 
 (defn get-permissions
   [{{:keys [tx-next authenticated-entity]} :request} args value]
-  ;[{{:keys [tx-next tx authenticated-entity]} :request} args value]
 
   (when (not= (:user_id authenticated-entity) (:id value))
     (raise "Not allowed to query permissions for a user other then the authenticated one."))

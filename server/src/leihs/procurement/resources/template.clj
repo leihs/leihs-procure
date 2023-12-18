@@ -28,7 +28,7 @@
 (defn get-template-by-id
   [tx id]
 
-  (println ">o> tocheck ??? get-template-by-id" id)
+  (println ">oo> tocheck ??? get-template-by-id" id)
 
   (spy (-> templates-base-query
            (sql/where [:= :procurement_templates.id [:cast id :uuid]])
@@ -53,7 +53,6 @@
                                               sql-format
                                               ;spy
                                               )
-
                                        )
                         ))
 
@@ -66,17 +65,17 @@
   )
 
 (defn validate-update-attributes [tx tmpl]
-  (let [
+  (spy (let [
         p (println ">oo> ??????????1 tmpl=" tmpl)
         p (println ">oo> ??????????2 tmpl=" (:id tmpl))
-        result (-> (sql/select :%count.*)
+        result (spy (-> (sql/select :%count.*)
                    (sql/from :procurement_requests)
                    ;(sql/where [:= :template_id [:cast (:id tmpl) :uuid]])
                    (sql/where [:= :template_id (:id tmpl)])
                    sql-format
-                   spy
+                   ;spy
                    (->> (jdbc/execute-one! tx))
-                   )
+                   ))
 
 
         req-exist? (spy (-> (spy result)
@@ -84,12 +83,13 @@
                             (> 0)
                             ))
 
-        p (println ">o> res - true/false 2needed!!!!!!!!" req-exist?)
+        p (println ">o> res - true/false needed!!!!!!!!" (spy req-exist?))
 
         ]
     (if req-exist?
       (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE))
-    tmpl))
+
+    tmpl)))
 
 
 
@@ -132,15 +132,16 @@
 (defn get-template
   ([context _ value]
 
-   (println ">o> 0 tocheck ??? get-template" value)
+   (println ">oo> 0 tocheck ??? get-template" value)
 
-   (get-template-by-id (-> context
+   (spy (get-template-by-id (-> context
                            :request
                            :tx-next)
                        (or (:value value)                   ; for RequestFieldTemplate
-                           (:template_id value))))
+                           (:template_id value)))))
+
   ([tx tmpl]
-   (println ">o> 1 tocheck ??? get-template")
+   (println ">oo> 1 tocheck ??? get-template")
 
 
    (let [
@@ -157,8 +158,7 @@
 
 (defn requests-count [{{:keys [tx]} :request} _ {:keys [id]}]
 
-  (println ">o> requests-count tocheck count!!!!! _> id=" id)
-
+  (println ">oo> requests-count tocheck count!!!!! _> id=" id)
 
 
   (spy (-> (sql/select :%count.*)

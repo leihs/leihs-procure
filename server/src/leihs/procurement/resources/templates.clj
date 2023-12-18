@@ -23,7 +23,7 @@
     ))
 
 (do
-  (println ">o> templates::templates-base-query ERROR?")
+  (println ">oo> templates::templates-base-query ERROR?")
 
   (def templates-base-query
     (spy (-> (sql/select :procurement_templates.*)
@@ -50,7 +50,7 @@
         ]
     (spy (->> query
          sql-format
-         spy
+         ;spy
          (jdbc/execute! (-> context
                             :request
                             :tx-next))))
@@ -84,8 +84,8 @@
 
                    sql-format)
 
-        p (println ">o> result" result)
-        p (println "\n>o> result" (jdbc/execute! tx result))
+        p (println ">oo> result" result)
+        p (println "\n>oo> result" (jdbc/execute! tx result))
 
         ]
     )
@@ -95,7 +95,7 @@
 (defn get-templates-for-ids
   [tx ids]
 
-  (println ">>> tocheck / templates::get-templates-for-ids >> ids >1 => " ids)
+  (println ">oo> tocheck / templates::get-templates-for-ids >> ids >1 => " ids)
 
   (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories/categories-base-query
                                              (sql/where [:in :procurement_categories.id (cast-uuids ids)])
@@ -113,6 +113,7 @@
 
 (defn get-template-id
   [tx tmpl]
+
   (or (spy (:id tmpl))
       (spy (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>)))))
 
@@ -144,7 +145,7 @@
               #(if-let [id (:id tmpl)]
                  (if (spy (:to_delete tmpl))
                    (spy (template/delete-template! tx id))
-                   (spy (template/update-template! tx tmpl)))
+                   (spy (template/update-template! tx tmpl))) ;; here
 
                  (spy (template/insert-template! tx (dissoc tmpl :id)))
                  )
