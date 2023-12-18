@@ -59,9 +59,9 @@
                                  (->> if-all
                                       (map #(%))
                                       (every? true?))))]
-    (if (auth-func)
-      (func)
-      (throw-unauthorized))))
+    (if (spy (auth-func))
+      (spy (func))
+      (spy (throw-unauthorized)))))
 
 (defn wrap-authorize-resolver
   [resolver check]

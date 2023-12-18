@@ -106,12 +106,12 @@
 
 (defn get-template-id
   [tx tmpl]
-  (or (spy (:id tmpl))
-      (spy (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>)))))
+  (spy (or (spy (:id tmpl))
+      (spy (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>))))))
 
 (defn update-templates!
   [context args _]
-  (let [rrequest (:request context)
+  (spy (let [rrequest (:request context)
         tx (:tx rrequest)
         auth-entity (:authenticated-entity rrequest)
         input-data (:input_data args)
@@ -121,17 +121,17 @@
       (println ">o> templates " tmpl)
       (if (spy tmpl)
         (do (authorization/authorize-and-apply
-              #(if-let [id (:id tmpl)]
+              (spy #(if-let [id (:id tmpl)]
                  (if (spy (:to_delete tmpl))
                    (spy (template/delete-template! tx id))
-                   (spy (template/update-template! tx tmpl))
+                   (spy (template/update-template! tx tmpl)) ;;here
                    )
 
                  (spy (template/insert-template! tx (dissoc tmpl :id)))
-                 )
+                 ))
               :if-only
-              #(or (user-perms/admin? tx auth-entity)
-                   (user-perms/inspector? tx auth-entity (:category_id tmpl))))
+              #(or (spy (user-perms/admin? tx auth-entity))
+                   (spy (user-perms/inspector? tx auth-entity (:category_id tmpl)))))
             (->> tmpl
                  (get-template-id tx)
                  (conj tmpl-ids)
@@ -139,7 +139,7 @@
                  (recur rest-tmpls)))
         (spy (categories/get-categories-for-ids tx cat-ids))
 
-        ))))
+        )))))
 
 
 ;templates

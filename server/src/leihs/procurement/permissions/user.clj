@@ -8,8 +8,8 @@
 
 (defn admin?
   [tx auth-entity]
-  (:result
-    (first
+  (spy (:result
+    (spy (first
       (jdbc/query
         tx
         (-> (sql/select
@@ -18,13 +18,13 @@
                              (sql/from :procurement_admins)
                              (sql/where [:= :procurement_admins.user_id
                                          (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql/format)))))))
 
 (defn inspector?
   ([tx auth-entity] (inspector? tx auth-entity nil))
   ([tx auth-entity c-id]
-   (:result
-     (first
+   (spy (:result
+     (spy (first
        (jdbc/query
          tx
          (-> (sql/select
@@ -38,13 +38,13 @@
                           c-id (sql/merge-where
                                  [:= :procurement_category_inspectors.category_id
                                   c-id]))) :result])
-             sql/format))))))
+             sql/format))))))))
 
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
   ([tx auth-entity c-id]
-   (:result
-     (first (jdbc/query
+   (spy (:result
+     (spy (first (jdbc/query
               tx
               (-> (sql/select
                     [(sql/call
@@ -57,12 +57,12 @@
                                c-id (sql/merge-where
                                       [:= :procurement_category_viewers.category_id
                                        c-id]))) :result])
-                  sql/format))))))
+                  sql/format))))))))
 
 (defn requester?
   [tx auth-entity]
-  (:result
-    (first
+  (spy (:result
+    (spy (first
       (jdbc/query
         tx
         (-> (sql/select
@@ -72,13 +72,13 @@
                              (sql/where
                                [:= :procurement_requesters_organizations.user_id
                                 (:user_id auth-entity)]))) :result])
-            sql/format)))))
+            sql/format)))))))
 
 (defn advanced?
   [tx auth-entity]
-  (->> [viewer? inspector? admin?]
+  (spy (->> [viewer? inspector? admin?]
        (map #(% tx auth-entity))
-       (some true?)))
+       (some true?))))
 
 (defn get-permissions
   [{{:keys [tx authenticated-entity]} :request} args value]
