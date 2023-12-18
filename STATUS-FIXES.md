@@ -7,7 +7,9 @@ CURRENT STATE
          - http://localhost:3230/sign-in?return-to=%2Fprocure
          - Account: `jimmie@goyette.com` 
       2. 2/4 GraphQL-Requests are broken           **.. fixed**
-2. Procure tests                                   **.. 8/24 broken**
+2. Procure tests 
+   1. BE                                           **.. 4/87 broken**
+   1. FE                                           **.. 8/24 broken**
 3. Integration-tests                               **.. broken**
 
 Causes
@@ -19,7 +21,7 @@ Causes
 4. Not support `jdbc-next/:row-fn` (no errors or exceptions)
 
 
-Current focus to fix:
+### Current focus to fix:
 1. ApolloError: ERROR: non-integer constant in ORDER BY
    Position: 190
 2. ApolloError: Unable to serialize #inst "2024-01-03T23:00:00.000-00:00" as type 'Boolean'.
@@ -27,7 +29,8 @@ Current focus to fix:
 3. ApolloError: Field resolver returned an undefined enum value.
    Field resolver returned an undefined enum value.
 
-
+### Final checks
+- budget-periods / UTC-Insert
 
 ToClarify
 --
