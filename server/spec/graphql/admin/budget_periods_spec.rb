@@ -2,6 +2,7 @@ require 'spec_helper'
 require_relative '../graphql_helper'
 require 'json'
 require 'date'
+require 'time'
 
 
 describe 'budget periods' do
@@ -169,8 +170,13 @@ describe 'budget periods' do
       end
 
       now = DateTime.now
-      @new_inspection_start_date_1 = DateTime.new(now.year + 1, 6, 1)
-      @new_end_date_1 = DateTime.new(now.year + 1, 12, 1)
+      # @new_inspection_start_date_1 = DateTime.new(now.year + 1, 6, 1)
+      # @new_end_date_1 = DateTime.new(now.year + 1, 12, 1)
+
+      # test utc with offset
+      @new_inspection_start_date_1 = "2025-06-01T00:00:00+04:00"      # T20:00
+      @new_end_date_1 = "2025-06-01T00:00:00+02:00"                   # T22:00
+
       @new_inspection_start_date_2 = DateTime.new(now.year + 2, 6, 1)
       @new_end_date_2 = DateTime.new(now.year + 2, 12, 1)
 
@@ -213,20 +219,11 @@ describe 'budget periods' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)
 
-      # name = "bp_to_delete"
-      # budget_period = BudgetPeriod.find(name: name)
-      # db_data = JSON.parse(budget_period.to_json)
-      #
-      # puts "---"
-      # puts "? DB  ?" + db_data.to_json
-      # return if true
-
       result = query(@q, user.id)
       puts ">> user.id\n" + user.id
       puts ">> query\n" + @q
       puts ">> response =>\n" + result.to_json
       puts "\n"
-
 
       # sorted after `inspection_start_date DESC`
       expect(result).to eq({
@@ -238,12 +235,6 @@ describe 'budget periods' do
         }
       })
 
-
-      # [{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00"},
-      # {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00"}]
-
-
-
       budget_periods_after = [
         { name: 'new_bp',
           inspection_start_date: @new_inspection_start_date_2,
@@ -254,16 +245,6 @@ describe 'budget periods' do
       ]
 
       puts ">>>" + result.to_json
-      # >>>{"data":{"budget_periods":[{"name":"new_bp"},{"name":"bp_1_new_name"}]}}
-      # >>1>{"name":"new_bp","inspection_start_date":"2025-06-01T00:00:00.000+00:00","end_date":"2025-12-01T00:00:00.000+00:00"}
-      # >>1>{"name":"bp_1_new_name","inspection_start_date":"2024-06-01T00:00:00.000+00:00","end_date":"2024-12-01T00:00:00.000+00:00"}
-      #
-      # >>2>{"budget_period":{"name":"bp_1_new_name"}}
-      # >>3>{"name":"bp_1_new_name"}
-      # >>4>c355012b-be8d-4905-ba4d-d634b3767448
-      # updates successfully for an authorized user
-
-
       puts ">BudgetPeriod>>\n"+BudgetPeriod.to_json
 
       expect(BudgetPeriod.count).to be == budget_periods_after.count
@@ -277,28 +258,21 @@ describe 'budget periods' do
         puts "---"
         puts "? TMP ?" + response_data.to_s
         puts "? DB  ?" + db_data.to_json
-        # puts "? ??1 ?" + BudgetPeriod.find(data).to_json
-        # puts "? ??1 ?" + BudgetPeriod.find(response_data).to_json
         puts "---"
 
-
         # DB-VALUES: new_bp,2025-05-31 22:00:00.000000 +00:00,2025-11-30 23:00:00.000000 +00:00
-        # ? TMP ?{"name"=>"new_bp", "inspection_start_date"=>"2025-06-01T00:00:00.000+00:00", "end_date"=>"2025-12-01T00:00:00.000+00:00"}
-        # ? DB  ?{"id":"d2f4effe-d66c-4e63-b862-a015749b9f42","name":"new_bp","inspection_start_date":"2025-06-01T00:00:00.000+02:00","end_date":"2025-12-01T00:00:00.000+01:00",
+        # ? TMP ?{"name"=>"bp_1_new_name", "inspection_start_date"=>"2025-06-01T00:00:00+04:00", "end_date"=>"2025-06-01T00:00:00+02:00"}
+        # ? DB  ?{"id":"71625cf7-107a-4f90-a55c-ee2f9f001266","name":"bp_1_new_name","inspection_start_date":"2025-05-31T22:00:00.000+02:00","end_date":"2025-06-01T00:00:00.000+02:00",
 
         # TODO: Save ts in a correct way
         expect(compare_ts_as_UTC(db_data, response_data)).to be true
-        # expect(BudgetPeriod.find(data)).to be
+        expect(BudgetPeriod.find(data)).to be
       end
 
       budget_limits_after = [
         { budget_period: { name: 'bp_1_new_name' } }
       ]
       budget_limits_after.each do |data|
-        # puts ">>2>" + data.to_json
-        # puts ">>3>" + data[:budget_period].to_json
-        # puts ">>4>" + BudgetPeriod.find(data[:budget_period]).id
-
         FactoryBot.create(
           :budget_limit,
           budget_period_id: BudgetPeriod.find(data[:budget_period]).id
@@ -310,41 +284,35 @@ describe 'budget periods' do
 end
 
 
+
 def parse_date_ignoring_timezone(date_str)
   # puts "Original date string: " + date_str.to_s
 
-  # Parse the date string with timezone
-  parsed_date = DateTime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%L%z')
-
-  # Convert the parsed date to UTC
-  utc_date = parsed_date.new_offset(0)
-
-  # puts "Converted to UTC: " + utc_date.to_s
-
-  # Return the UTC date as a string
-  utc_date.to_s
+  begin
+    parsed_date = Time.parse(date_str)
+    utc_date = parsed_date.getutc
+    utc_date.strftime('%Y-%m-%dT%H:%M:%S.%L%z')
+  rescue ArgumentError => e
+    puts "Error parsing date: #{e.message}"
+    nil
+  end
 end
 
 def compare_ts_as_UTC(map1, map2)
   fields = ["inspection_start_date", "end_date"]
 
   fields.each do |field|
-    # puts ">> Field being checked: #{field}" # Add this to check the field name
     if map1[field] && map2[field]
-      # puts ">>2>>a map1: " + map1.to_s
-      # puts ">>2>>a field value in map1: " + map1[field].to_s  # Show value from map1
-      # puts ">> Compare: #{map1[field]} #{map2[field]} key=#{field}"  # Show value from map2
       date1 = parse_date_ignoring_timezone(map1[field])
       date2 = parse_date_ignoring_timezone(map2[field])
       puts ">> Compare: #{date1} #{date2} key=#{field}"  # Show value from map2
 
       return false if date1 != date2
     else
-      # Field not present in one of the maps or is nil
       puts ">> Field '#{field}' not found or is nil in one of the maps" # Add this for clarity
       return false
     end
   end
 
-  true # All dates match
+  true
 end
