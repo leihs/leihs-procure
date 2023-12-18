@@ -11,44 +11,10 @@
 
     [logbug.debug :as debug]
 
-    ;[clojure.java.jdbc :as jdbc]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
     [tick.core :as tick]
     ))
-
-
-
-
-;(defn my-cast [data]
-;  (println ">o> no / 22 / my-cast /debug " data)
-;
-;
-;  (let [
-;        data (if (contains? data :id)
-;               (assoc data :id [[:cast (:id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :category_id)
-;               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-;               data
-;               )
-;        data (if (contains? data :inspection_start_date)
-;               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
-;               data
-;               )
-;
-;        data (if (contains? data :end_date)
-;               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
-;               data
-;               )
-;
-;        ]
-;    (spy data)
-;    )
-;  )
-
 
 
 (def budget-period-base-query
@@ -62,7 +28,6 @@
 
   (spy (first (jdbc/execute! tx
                              (-> budget-period-base-query
-                                 ;(sql/where [:= :procurement_budget_periods.id (:cast id :uuid)])
                                  (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
                                  sql-format)))))
 
@@ -81,7 +46,6 @@
                                           )))))
   ([tx bp-map]
    (println ">o> budget-periond 1")
-
 
    (let [where-clause (sqlp/map->where-clause :procurement_budget_periods
                                               (spy (my-cast bp-map)))
@@ -160,11 +124,7 @@
   [tx budget-period]
 
   (println ">o> budget-periond 5")
-
   (println ">ooo> past? budget-period=" budget-period)
-
-  ;{:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name BP-in-inspection-phase, :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",
-  ; :end_date #inst "2024-01-06T23:00:00.000000000-00:00", :created_at #inst "2023-12-07T10:39:01.374390000-00:00", :updated_at #inst "2023-12-07T10:39:01.374390000-00:00"}
 
   (let [
         query (-> (sql/select [(as-> budget-period <>
@@ -172,19 +132,11 @@
                                  (sql-format-date <>)
                                  [:cast <> :date]
                                  [:> :current_date <>]) :result])
-
                   sql-format)
-
-        p (println ">o> past? query=" query)
-        p (println ">o> past? result=" (->> query
-                                            (jdbc/execute-one! tx)))
 
         result (->> query
                     (jdbc/execute-one! tx)
                     :result)
-
-        p (println ">o> past? result=" result)
-
         ]
     (spy result)
 
@@ -199,11 +151,6 @@
 
         data {:id #uuid "71bd50a3-dfac-42b9-bf55-60bd151c2556", :name "BP-in-inspection-phase", :inspection_start_date #inst "2023-12-05T23:00:00.000000000-00:00",
               :end_date #inst "2024-01-06T23:00:00.000000000-00:00", :created_at #inst "2023-12-07T10:39:01.374390000-00:00", :updated_at #inst "2023-12-07T10:39:01.374390000-00:00"}
-
-        ;query= [SELECT CAST(? AS DATE) AS result 2023-01-07] ;;broken?
-
-        ;; [SELECT current_date > CAST(? AS date) AS result
-        ;x (past? tx data)
 
         p (println ">> past?" (past? tx data))
         p (println ">> in-inspection-phase?" (in-inspection-phase? tx data))
@@ -296,5 +243,5 @@
           ))
 
 ;#### debug ###################################################################
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
 

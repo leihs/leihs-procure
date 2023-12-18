@@ -170,12 +170,8 @@ describe 'budget periods' do
       end
 
       now = DateTime.now
-      # @new_inspection_start_date_1 = DateTime.new(now.year + 1, 6, 1)
-      # @new_end_date_1 = DateTime.new(now.year + 1, 12, 1)
-
-      # test utc with offset
-      @new_inspection_start_date_1 = "2025-06-01T00:00:00+04:00"      # T20:00
-      @new_end_date_1 = "2025-06-01T00:00:00+02:00"                   # T22:00
+      @new_inspection_start_date_1 = DateTime.new(now.year + 1, 6, 1)
+      @new_end_date_1 = DateTime.new(now.year + 1, 12, 1)
 
       @new_inspection_start_date_2 = DateTime.new(now.year + 2, 6, 1)
       @new_end_date_2 = DateTime.new(now.year + 2, 12, 1)
@@ -220,10 +216,6 @@ describe 'budget periods' do
       FactoryBot.create(:admin, user_id: user.id)
 
       result = query(@q, user.id)
-      puts ">> user.id\n" + user.id
-      puts ">> query\n" + @q
-      puts ">> response =>\n" + result.to_json
-      puts "\n"
 
       # sorted after `inspection_start_date DESC`
       expect(result).to eq({
@@ -244,9 +236,6 @@ describe 'budget periods' do
           end_date: @new_end_date_1 }
       ]
 
-      puts ">>>" + result.to_json
-      puts ">BudgetPeriod>>\n"+BudgetPeriod.to_json
-
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
         response_data = JSON.parse(data.to_json)
@@ -255,16 +244,6 @@ describe 'budget periods' do
         budget_period = BudgetPeriod.find(name: name)
         db_data = JSON.parse(budget_period.to_json)
 
-        puts "---"
-        puts "? TMP ?" + response_data.to_s
-        puts "? DB  ?" + db_data.to_json
-        puts "---"
-
-        # DB-VALUES: new_bp,2025-05-31 22:00:00.000000 +00:00,2025-11-30 23:00:00.000000 +00:00
-        # ? TMP ?{"name"=>"bp_1_new_name", "inspection_start_date"=>"2025-06-01T00:00:00+04:00", "end_date"=>"2025-06-01T00:00:00+02:00"}
-        # ? DB  ?{"id":"71625cf7-107a-4f90-a55c-ee2f9f001266","name":"bp_1_new_name","inspection_start_date":"2025-05-31T22:00:00.000+02:00","end_date":"2025-06-01T00:00:00.000+02:00",
-
-        # TODO: Save ts in a correct way
         expect(compare_ts_as_UTC(db_data, response_data)).to be true
         expect(BudgetPeriod.find(data)).to be
       end
@@ -278,7 +257,6 @@ describe 'budget periods' do
           budget_period_id: BudgetPeriod.find(data[:budget_period]).id
         )
       end
-
     end
   end
 end
@@ -286,8 +264,6 @@ end
 
 
 def parse_date_ignoring_timezone(date_str)
-  # puts "Original date string: " + date_str.to_s
-
   begin
     parsed_date = Time.parse(date_str)
     utc_date = parsed_date.getutc
@@ -305,11 +281,9 @@ def compare_ts_as_UTC(map1, map2)
     if map1[field] && map2[field]
       date1 = parse_date_ignoring_timezone(map1[field])
       date2 = parse_date_ignoring_timezone(map2[field])
-      puts ">> Compare: #{date1} #{date2} key=#{field}"  # Show value from map2
 
       return false if date1 != date2
     else
-      puts ">> Field '#{field}' not found or is nil in one of the maps" # Add this for clarity
       return false
     end
   end
