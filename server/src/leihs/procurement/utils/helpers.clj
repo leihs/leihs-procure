@@ -64,11 +64,6 @@
   (map #(java.util.UUID/fromString %) ids))
 
 
-; [leihs.procurement.utils.helpers :refer [cast-uuids]]
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
-
-
 (defn cast-uuids [uuids]
   (let [
         p (println ">o> uuids-sql" (class uuids))

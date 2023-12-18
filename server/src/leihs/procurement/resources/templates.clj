@@ -91,8 +91,6 @@
     )
   )
 
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
 
 (defn get-templates-for-ids
   [tx ids]

@@ -26,9 +26,6 @@
       (sql/order-by [:procurement_categories.name :asc])))
 
 
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
-
 (defn categories-query
   [context arguments value]
 
@@ -56,20 +53,6 @@
                                             :authenticated-entity
                                             :user_id)])))
                 )))
-
-;(defn cast-uuids "DEPRS: can't handle duplicates" [uuids]
-;  (spy (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)))
-
-;(defn cast-uuids [uuids]
-;  (let [
-;        p (println ">o> uuids-sql" (class uuids))
-;        uuids-sql (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids))
-;        p (println ">o> uuids-sql" uuids-sql)
-;        ]
-;    (spy uuids-sql)
-;    )
-;  ;(spy (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
-;  )
 
 
 (defn get-categories-for-ids

@@ -4,7 +4,7 @@
 
             [taoensso.timbre :refer [debug info warn error spy]]
 
-            [leihs.procurement.utils.helpers :refer [cast-ids-to-uuid cast-uuids]]
+            [leihs.procurement.utils.helpers :refer [cast-uuids]]
             [clojure.data.json :as json]
     ;[clojure.java.jdbc :as jdbc]
     ;[leihs.procurement.utils.sql :as sql]

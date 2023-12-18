@@ -62,15 +62,6 @@
            [:ilike :users.lastname term-percent]]))))
 
 
-
-
-
-
-
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
-
-
 (comment
 
   (let [

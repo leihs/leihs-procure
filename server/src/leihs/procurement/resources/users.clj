@@ -89,15 +89,6 @@
 
   )
 
-
-
-
-;
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
-
-
-
 (defn get-users
   [context args _]
   (println ">oo >tocheck users1")

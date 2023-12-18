@@ -718,55 +718,6 @@
 
 
 
-
-;(defn my-cast [data]
-;  (println ">o> no / 22 / my-cast /debug " data)
-;
-;
-;  (let [
-;        data (if (contains? data :id)
-;               (assoc data :id [[:cast (:id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :category_id)
-;               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-;               data
-;               )
-;        data (if (contains? data :template_id)
-;               (assoc data :template_id [[:cast (:template_id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :room_id)
-;               (assoc data :room_id [[:cast (:room_id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :order_status)
-;               (assoc data :order_status [[:cast (:order_status data) :order_status_enum]])
-;               data
-;               )
-;
-;        data (if (contains? data :budget_period_id)
-;               (assoc data :budget_period_id [[:cast (:budget_period_id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :user_id)
-;               (assoc data :user_id [[:cast (:user_id data) :uuid]])
-;               data
-;               )
-;
-;        ;[[:cast (to-name-and-lower-case a) :order_status_enum]]
-;
-;        ]
-;    (spy data)
-;    )
-;
-;  )
-
-
 (defn insert!
   [tx data]
   (println ">debug> 29")
@@ -787,22 +738,6 @@
     (spy result)
     )
   )
-
-
-;
-;(defn my-cast [data]
-;  (println ">o> no / my-cast /debug " data)
-;  (if (contains? data :room_id)
-;    (let [
-;          p (println ">o> no before _> room_id=" (:room_id data))
-;          ;(assoc data :room_id (java.util.UUID/fromString (:room_id data)))
-;          ;(assoc data :room_id [:cast (:room_id data) :uuid])
-;          data (assoc data :room_id [[:cast (:room_id data) :uuid]])
-;          p (println ">o> no after _> room_id=" data)
-;          ] data)
-;    data
-;    )
-;  )
 
 
 (defn update!

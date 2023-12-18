@@ -66,9 +66,6 @@
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
-;(defn cast-uuids [uuids]
-;  (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids))
-
 (defn delete!
   [tx ids]
   (jdbc/execute! tx

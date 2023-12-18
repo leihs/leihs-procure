@@ -25,27 +25,6 @@
       (sql/from :procurement_templates)))
 
 
-
-;(defn my-cast [data]
-;  (println ">o> no / 22 / my-cast /debug " data)
-;
-;
-;  (let [
-;        data (if (contains? data :id)
-;               (assoc data :id [[:cast (:id data) :uuid]])
-;               data
-;               )
-;
-;        data (if (contains? data :category_id)
-;               (assoc data :category_id [[:cast (:category_id data) :uuid]])
-;               data
-;               )
-;
-;        ]
-;    (spy data)
-;    )
-;  )
-
 (defn get-template-by-id
   [tx id]
 
