@@ -92,7 +92,7 @@
     (handler request)
     (= handler-key :graphql)
     {:status 401,
-     :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED22"
+     :body (helpers/error-as-graphql-object "NOT_AUTHENTICATED"
                                             "Not authenticated!")}
     :else
     (response/redirect

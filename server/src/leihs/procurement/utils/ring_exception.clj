@@ -25,8 +25,10 @@
           (logging/warn (thrown/to-string e))
           (logging/debug e)
 
-             (println "error" e)
-             (println "error2" _e)
+
+          ;========= remove me
+          ;   (println "error" e)
+          ;   (println "error2" _e)
 
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)

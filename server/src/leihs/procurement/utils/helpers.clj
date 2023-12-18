@@ -141,6 +141,14 @@
                  )
                data
                )
+
+        data (if (contains? data :meta_data)
+               (do
+                 (println ">o> upload::metadata")
+                 (assoc data :meta_data [[:cast (:meta_data data) :jsonb]]) ;; works as local-test
+                 )
+               data
+               )
         ]
     (spy data)
     )

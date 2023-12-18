@@ -2,3 +2,4 @@
 # java_leihs-procure-server env skipped update; touch .tool-versions or remove /var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/asdf_cache_java_leihs-procure-server to force update
 # clojure_leihs-procure-server env check via asdf v0.13.1
 # clojure_leihs-procure-server env skipped update; touch .tool-versions or remove /var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/asdf_cache_clojure_leihs-procure-server to force update
+Warning: environ value /Users/mradl/.asdf/installs/java/zulu-11.60.19 for key :java-home has been overwritten with /Users/mradl/.asdf/installs/java/zulu-11.60.19/zulu-11.jdk/Contents/Home

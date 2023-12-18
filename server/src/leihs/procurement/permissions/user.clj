@@ -151,7 +151,7 @@
 
 
 
-(defn requester?
+(spy (defn requester?
   [tx auth-entity]
 
   (let [
@@ -170,7 +170,7 @@
         p (println ">o> requester??" (spy result))
         ]
 
-    (spy (:exists result))))
+    (spy (:exists result)))))
 
 
 (defn advanced?

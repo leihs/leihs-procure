@@ -3,8 +3,16 @@
     [clojure.edn :as edn]
 
     (java.sql.Date)
-    (clojure.java [io :as io] [jdbc :as jdbco])
+    ;(clojure.java [io :as io] [jdbc :as jdbco])
     (clojure.java [io :as io])
+
+
+
+    ;; all needed imports
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [leihs.core.db :as db]
+    [next.jdbc :as jdbc]
+    [honey.sql.helpers :as sql]
 
     [clojure.data.json :as json]
 
@@ -32,33 +40,12 @@
               graphql-schema/compile)
       (throw (ex-info "Failed to load schema" {}))))
 
-
-
-
-
-
-(defn str-to-uuid [s]
-  (java.util.UUID/fromString s))
-
-
 (defn exec-query
   [query-string request]
   (debug "graphql query" query-string
          "with variables" (-> request
                               :body
                               :variables))
-  (let [
-        vars (-> request
-                 :body
-                 :variables)
-        order-status (get-in request [:body :variables :order_status])
-        priority (get-in request [:body :variables :priority])
-        inspector_priority (get-in request [:body :variables :inspector_priority])
-
-        p (println ">oo> vars from graphQL-Requst" order-status priority inspector_priority vars)
-        ])
-
-
   (lacinia/execute (core-graphql/schema)
                    query-string
                    (-> request
@@ -66,43 +53,13 @@
                        :variables)
                    {:request request}))
 
-
-
 (defn pure-handler
   [{{query :query} :body, :as request}]
   (let [result (exec-query query request)
-        ;p (println "\n>oo>1pure-handler _> request, can contains invalid value in -> priority inspector_priority order_status")
-        ;p (println "\n>o>1pure-handler _> request" request)
-
-        p (println "\n>request-grapql _> request" request)
-        ; (java.sql.Date)
-        p (println "\n>request-c-grapql _> request (json)" (json/write-str (dissoc request :tx-next :tx :async-channel :options :handler :graphql-schema)))
-        ;p (println "\n>request-c-grapql _> query" query)
-        p (println "\n>request-grapql _> result =>" result)
-
         resp {:body result}]
-
-
-    (if (:errors (spy result))
-      (do (debug result)
-          (assoc resp :graphql-error true))
-      resp)
-
-    ;(check-string-contains query "RequestsIndexFiltered")
-    ;(check-string-contains query "RequestFilters")
-
-
-    ;(cond
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 502 :data [{:foo "servus"}]}
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result :status 200 :data [{:foo "servus"}]}
-    ;  ;(and (.contains query "RequestsIndexFiltered") (:errors (result))) {:body result}
-    ;  ;(.contains query "RequestsIndexFiltered") {:body result}
-    ;  ;(.contains query "RequestFilters") {:body result :status 409 :message "should not be handled"}
-    ;  (.contains query "RequestFilters")  (throw "my-error")
-    ;  :else resp
-    ;  )
-
-    ))
+    (if (:errors result)
+      (do (debug result) (assoc resp :graphql-error true))
+      resp)))
 
 (defn parse-query-with-exception-handling
   [schema query]
@@ -125,32 +82,68 @@
                        :type
                        (= :mutation))]
     (if mutation?
-      (jdbco/with-db-transaction
-        [tx (:tx request)
-         ]
-        (try (let [
-                   p (println "pure-handler >> 1")
-                   response (->> tx
-                                 (assoc request :tx)
-                                 pure-handler)]
-               (when (spy (:graphql-error response))
-                 (println ">>> ??? graphql2 when")
-                 (warn "Rolling back transaction because of graphql error: " response)
-                 (jdbco/db-set-rollback-only! tx))
-               response)
+      ;(jdbc/with-transaction
+      (jdbc/with-transaction+options
 
-             (catch Throwable th
-               (warn "Rolling back transaction because of " th)
+        ;[tx-next (get-ds-next)]
+                                          ;[
+                                          ;p (println ">o> abc" (spy request))
+                                          ;tx (:tx-next request)
+                                          ;;tx-next (:tx-next request)
+                                          ;]
+                                          [tx (:tx-next request) (db/get-ds-next)]
 
-               (println ">>> ??? graphql1 catch")
+                                          (try
+                                            (let [p (println "pure-handler >> 1")
+                                                  ;tx tx
+                                                  response (->> (spy tx)
+                                                                (assoc request :tx-next)
+                                                                pure-handler)]
 
-               (jdbco/db-set-rollback-only! tx)
-               (throw th))))
+                                              (when (spy (:graphql-error response))
+                                                (println ">oo> ??? graphql2 when")
+                                                (warn ">oo> Rolling back transaction because of graphql error: " response)
+                                                (.rollback tx))
+                                              response)
 
-      (let [p (println "pure-handler >> 2")
-            ]
-        (spy (pure-handler request)))
-      )))
+                                            (catch Throwable th
+                                              (warn ">oo> Rolling back transaction because of " th)
+                                              (println ">oo> ??? graphql1 catch")
+
+                                              ;(jdbco/db-set-rollback-only! tx)
+                                              (.rollback tx)
+                                              (throw th))
+                                            ))
+      (pure-handler request))
+    ))
+
+
+;(jdbco/with-db-transaction
+;  [tx (:tx request)
+;   ]
+;  (try (let [
+;             p (println "pure-handler >> 1")
+;             response (->> tx
+;                           (assoc request :tx)
+;                           pure-handler)]
+;         (when (spy (:graphql-error response))
+;           (println ">>> ??? graphql2 when")
+;           (warn "Rolling back transaction because of graphql error: " response)
+;           (jdbco/db-set-rollback-only! tx))
+;         response)
+;
+;       (catch Throwable th
+;         (warn "Rolling back transaction because of " th)
+;
+;         (println ">>> ??? graphql1 catch")
+;
+;         (jdbco/db-set-rollback-only! tx)
+;         (throw th))))
+
+
+
+
+
 
 
 (defn init []

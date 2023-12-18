@@ -41,6 +41,8 @@ describe 'templates' do
         }
       GRAPHQL
 
+      # return if true
+
       result = query(q, user.id)
 
       puts result
