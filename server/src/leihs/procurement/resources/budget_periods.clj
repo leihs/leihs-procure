@@ -13,18 +13,139 @@
 
             [leihs.procurement.resources.budget-period :as budget-period]
 
+
+
             [java-time :as jt]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]
 
             )
 
+  (:import
+
+    [java.time OffsetDateTime ZoneOffset ZonedDateTime ZoneId]
+    [java.time.format DateTimeFormatter]
+
+
+    ;[java.time.OffsetDateTime]
+
+    ;[java.sql Timestamp]
+    [java.time ZonedDateTime ZoneId ZoneOffset]
+    [java.time.format DateTimeFormatter])
+  )
+
+
+(defn insert-test-period-budget [tx data]
+
+  (let [
+        ;query (-> (sql/upsert :procurement_budget_periods)
+        query (-> (sql/insert-into :procurement_budget_periods)
+                  (sql/values [data])
+                  sql-format
+                  spy
+                  )
+        p (println ">o> query=" query)
+
+        result (jdbc/execute-one! tx query)
+        p (println ">o> result/update-count=" result)
+        ]
+    result))
+
+;(defn change-offset-and-convert [utc-string new-offset]
+;  (let [parsed-date (parse-utc-string utc-string)
+;        offset-date-time (.withZoneSameInstant parsed-date (ZoneId/ofOffset "UTC" (ZoneOffset/of new-offset)))]
+;    (zoned-date-time-to-timestamp offset-date-time)))
+;;
+;;(defn change-offset-to-timestamp [zoned-date-time new-offset]
+;;  (let [offset-dt (.toOffsetDateTime zoned-date-time)
+;;        adjusted-dt (.withOffsetSameInstant offset-dt (ZoneOffset/of new-offset))]
+;;    (Timestamp/from (.toInstant adjusted-dt))))
+
+
+(defn parse-utc-string [utc-string]
+  (OffsetDateTime/parse utc-string))
+;
+;(defn change-timezone-offset [offset-date-time new-offset]
+;  (.withOffsetSameInstant offset-date-time (ZoneOffset/of new-offset)))
+
+
+(import [java.time OffsetDateTime ZoneOffset])
+
+(defn parse-and-change-offset [utc-string new-offset]
+  (let [parsed-date (OffsetDateTime/parse utc-string)
+        offset (ZoneOffset/of new-offset)]
+    (.withOffsetSameInstant parsed-date offset)))
+
+
+(defn parse-and-format-offset-date-time [utc-string new-offset]
+  (let [parsed-date (OffsetDateTime/parse utc-string)
+        changed-offset (.withOffsetSameInstant parsed-date (ZoneOffset/of new-offset))
+        formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ssX")]
+    (.format changed-offset formatter)))
+
+(comment
+
+  ;; FIXME: modify & save utc in budget_periods with utc
+  (let [
+        tx (db/get-ds-next)
+
+        ;; BROKEN: MODIFY & SAVE
+        utc-string "2024-06-01T00:00:00+00:00"
+        new-offset "+02:00" ;; Change this to the desired new offset
+        ;updated-date (parse-and-change-offset utc-string new-offset)
+        updated-date (parse-and-format-offset-date-time utc-string new-offset)
+        ;
+        ;p (println ">o> updated-date >> " updated-date)
+        ;
+        x (insert-test-period-budget tx {:name "ba222221"
+                                         :inspection_start_date [:cast (str parsed-date1) :timestamptz]
+                                         ;:end-date [:cast (str updated-date) :timestamptz]
+                                         :end-date [:cast updated-date :timestamptz]
+                                         ;:end-date (str updated-date)
+                                         })
+        ]
+    )                                                       ;; here
   )
 
 
 
-;(defn parse-date-string [date-str]
-;  (jt/zoned-date-time date-str "yyyy-MM-dd HH:mm:ss.S"))
+(comment
+
+  ;; save utc in budget_periods with utc
+  (let [
+        utc-string-0 "2024-06-01T00:00:00+00:00"
+        utc-string+1 "2024-06-01T00:00:00+01:00"
+        utc-string+4 "2024-06-01T00:00:00+04:00"
+        utc-string+2 "2024-06-01T00:00:00+02:00"
+
+        parsed-date1 (parse-utc-string utc-string+4)
+        parsed-date2 (parse-utc-string utc-string+1)
+
+        utc-string "2024-06-01T00:00:00+00:00"
+        parsed-date (parse-utc-string utc-string)
+
+        tx (db/get-ds-next)
+
+        ;; works
+        x (insert-test-period-budget tx {:name "as-string"
+                                         :inspection_start_date [:cast utc-string-0 :timestamptz]
+                                         :end-date [:cast utc-string-0 :timestamptz]
+                                         })
+
+        ;; works
+        x (insert-test-period-budget tx {:name "parsed-string"
+                                         :inspection_start_date [:cast (str parsed-date1) :timestamptz]
+                                         :end-date [:cast (str parsed-date2) :timestamptz]
+                                         })
+        ])
+  )
+
+
+(import [java.time ZonedDateTime]
+        [java.time.format DateTimeFormatter])
+
+(defn parse-utc-string [utc-string]
+  (ZonedDateTime/parse utc-string (DateTimeFormatter/ISO_OFFSET_DATE_TIME)))
 
 
 
@@ -105,6 +226,10 @@
   d
   )
 
+
+;(defn parse-utc-string [utc-string]
+;  (jt/zoned-date-time utc-string))
+
 (defn update-budget-periods!
   [context args value]
 
@@ -120,14 +245,24 @@
                    (let [
                          ;p (spy (">ooo> delete & get-budget-period"))
 
-                         ;p (println ">ooo> before bp-with-dates=" bp)
-                         ;bp-with-dates (spy (-> bp
-                         ;                       spy
-                         ;                       ;(update :inspection_start_date time-format/parse) ;; TODO: fix parsing of timestamp
-                         ;                       ;(update :end_date time-format/parse)))
-                         ;                       (update :inspection_start_date set-date) ;; TODO: fix parsing of timestamp
-                         ;                       (update :end_date set-date)))
-                         ;p (println ">ooo> after bp-with-dates=" bp-with-dates)
+
+                         p (println ">ooo> before  ??? 1 bp-with-dates=" bp)
+                         p (println ">ooo> before  ??? 2 bp-with-dates=" (:inspection_start_date bp))
+                         ;p (println ">ooo> before  ??? 3 bp-with-dates=" (time-format/parse (:inspection_start_date bp)))
+                         ;p (println ">ooo> before  ??? 4 bp-with-dates=" (time-format/parse (:end_date bp)))
+                         p (println ">ooo> before  ??? 3 bp-with-dates=" (parse-utc-string (:inspection_start_date bp)))
+                         p (println ">ooo> before  ??? 4 bp-with-dates=" (parse-utc-string (:end_date bp)))
+
+                         bp-with-dates (spy (-> bp
+                                                spy
+                                                ;(update :inspection_start_date time-format/parse) ;; TODO: fix parsing of timestamp
+                                                ;(update :end_date time-format/parse)))
+                                                ;
+                                                (update :inspection_start_date parse-utc-string) ;; TODO: fix parsing of timestamp
+                                                (update :end_date parse-utc-string)))
+                         ;(update :inspection_start_date set-date) ;; TODO: fix parsing of timestamp
+                         ;(update :end_date set-date)))
+                         p (println ">ooo> after bp-with-dates=" bp-with-dates)
                          bp-with-dates bp
 
                          ]
@@ -165,10 +300,10 @@
     ;{:budget_periods [{:name "new_bp"}, {:name "bp_1_new_name"}]}
 
     )
-    ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T08:05:04.551321Z", :updated_at #time/instant "2023-12-17T08:05:04.551321Z"} {:id #uuid "619c02a3-fa61-486a-8c06-69ab9b0c7e73", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T08:05:03.344216Z", :updated_at #time/instant "2023-12-17T08:05:03.344216Z"}]
-    ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00", :created_at "2023-12-17T13:43:05.524+01:00", :updated_at  "2023-12-17T13:43:05.524+01:00"}, {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00", :created_at "2023-12-17T13:43:05.524+01:00", :updated_at  "2023-12-17T13:43:05.524+01:00"}]
-    ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00"},
-    ; {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00"}]
+  ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T08:05:04.551321Z", :updated_at #time/instant "2023-12-17T08:05:04.551321Z"} {:id #uuid "619c02a3-fa61-486a-8c06-69ab9b0c7e73", :name "bp_1_new_name", :inspection_start_date #time/instant "2024-06-01T00:00:00Z", :end_date #time/instant "2024-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T08:05:03.344216Z", :updated_at #time/instant "2023-12-17T08:05:03.344216Z"}]
+  ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00", :created_at "2023-12-17T13:43:05.524+01:00", :updated_at  "2023-12-17T13:43:05.524+01:00"}, {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00", :created_at "2023-12-17T13:43:05.524+01:00", :updated_at  "2023-12-17T13:43:05.524+01:00"}]
+  ;[{:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "new_bp", :inspection_start_date  "2025-06-01T00:00:00.000+00:00", :end_date "2025-12-01T00:00:00.000+00:00"},
+  ; {:id #uuid "9ab7cd6d-2af6-4088-8316-f1264ff4811c", :name "bp_1_new_name", :inspection_start_date  "2024-06-01T00:00:00.000+00:00", :end_date "2024-12-01T00:00:00.000+00:00"}]
 
 
   ;[{"id":"37db1046-1798-4908-a35f-0817b5226f5e","name":"bp_1_new_name","inspection_start_date":"2024-06-01T00:00:00.000+02:00","end_date":"2024-12-01T00:00:00.000+01:00","created_at":"2023-12-17T13:43:04.372+01:00","updated_at":"2023-12-17T13:43:04.372+01:00"},{"id":"cceeb336-9775-4ab6-9cd7-03ced76c2cb5","name":"new_bp","inspection_start_date":"2025-06-01T00:00:00.000+02:00","end_date":"2025-12-01T00:00:00.000+01:00","created_at":"2023-12-17T13:43:05.524+01:00","updated_at":"2023-12-17T13:43:05.524+01:00"}]

@@ -259,7 +259,7 @@
                                            (sql/set (spy bp))
                                            (sql/where [:= :procurement_budget_periods.id (:id bp)])
                                            sql-format
-                                           ;spy
+                                           spy
                                            )))
 
         result (spy (:next.jdbc/update-count (spy result)))
@@ -284,7 +284,7 @@
                                        (-> (sql/insert-into :procurement_budget_periods)
                                            (sql/values [(spy bp)])
                                            sql-format
-                                           ;spy
+                                           spy
                                            )))
 
         ;result (spy (:update-count result))

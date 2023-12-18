@@ -213,6 +213,14 @@ describe 'budget periods' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)
 
+      # name = "bp_to_delete"
+      # budget_period = BudgetPeriod.find(name: name)
+      # db_data = JSON.parse(budget_period.to_json)
+      #
+      # puts "---"
+      # puts "? DB  ?" + db_data.to_json
+      # return if true
+
       result = query(@q, user.id)
       puts ">> user.id\n" + user.id
       puts ">> query\n" + @q
@@ -279,8 +287,8 @@ describe 'budget periods' do
         # ? DB  ?{"id":"d2f4effe-d66c-4e63-b862-a015749b9f42","name":"new_bp","inspection_start_date":"2025-06-01T00:00:00.000+02:00","end_date":"2025-12-01T00:00:00.000+01:00",
 
         # TODO: Save ts in a correct way
-        # expect(compare_ts_as_UTC(db_data, response_data)).to be true
-        expect(BudgetPeriod.find(data)).to be
+        expect(compare_ts_as_UTC(db_data, response_data)).to be true
+        # expect(BudgetPeriod.find(data)).to be
       end
 
       budget_limits_after = [

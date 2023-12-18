@@ -130,12 +130,12 @@
                )
 
         data (if (contains? data :inspection_start_date)
-               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamp]])
+               (assoc data :inspection_start_date [[:cast (:inspection_start_date data) :timestamptz]])
                data
                )
 
         data (if (contains? data :end_date)
-               (assoc data :end_date [[:cast (:end_date data) :timestamp]])
+               (assoc data :end_date [[:cast (:end_date data) :timestamptz]])
                data
                )
 
