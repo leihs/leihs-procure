@@ -55,6 +55,20 @@ describe 'templates' do
       end
     end
 
+    # response:
+    #   "{\"data\":{\"update_templates\":null},\"errors\":[{\"message\":\"UnauthorizedException - Not authorized for this query path and arguments.\",\"locations\":[{\"line\":2,\"column\":11}],\"path\":[\"update_templates\"],\"extensions\":{\"exception\":\"ExceptionInfo\",\"arguments\":{\"input_data\":[{\"id\":\"f6bd4394-3b64-4d82-bd9d-1c76e01e94d1\",\"article_name\":\"test\",\"category_id\":\"2ab3757b-1517-44c6-9ab2-959375f7b551\",\"price_cents\":100},{\"id\":\"abbdd29f-1c81-4ba6-994f-e3e4b4897f74\",\"article_name\":\"test\",\"category_id\":\"87b5758b-5edd-4cab-9f5d-3467087d3495\",\"price_cents\":100}]}}}]}"
+    #
+    # >> result: {"data"=>{"update_templates"=>nil}, "errors"=>[{"message"=>"UnauthorizedException - Not authorized for this query path and arguments.", "locations"=>[{"line"=>2, "column"=>11}], "path"=>["update_templates"], "extensions"=>{"exception"=>"ExceptionInfo", "arguments"=>{"input_data"=>[{"id"=>"f6bd4394-3b64-4d82-bd9d-1c76e01e94d1", "article_name"=>"test", "category_id"=>"2ab3757b-1517-44c6-9ab2-959375f7b551", "price_cents"=>100}, {"id"=>"abbdd29f-1c81-4ba6-994f-e3e4b4897f74", "article_name"=>"test", "category_id"=>"87b5758b-5edd-4cab-9f5d-3467087d3495", "price_cents"=>100}]}}}]}
+    # >>> data={:article_name=>"tmpl for category A", :category_id=>"2ab3757b-1517-44c6-9ab2-959375f7b551"}
+    # >>> Template.find(data)=#<Template:0x000000010e6a78e0>
+    #   >>> data={:article_name=>"tmpl for category B", :category_id=>"87b5758b-5edd-4cab-9f5d-3467087d3495"}
+    # >>> Template.find(data)=#<Template:0x000000010e6a60f8>
+    #   throws if not inspector of some category
+    #
+    # Finished in 2.04 seconds (files took 0.77458 seconds to load)
+    # 1 example, 0 failures
+
+
     context 'throws for used templates' do
       before :each do
         @category_A = FactoryBot.create(:category)
