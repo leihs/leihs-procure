@@ -401,15 +401,24 @@
   [context args _]
   (let [ring-req (:request context)
         tx (:tx ring-req)
+
+        p (println ">o> create-request! 1" context)
+        p (println ">o> create-request! 2" ring-req)
+        p (println ">o> create-request! 3" tx)
+        p (println ">o> create-request! 4" (class tx))
+
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
+        p (println ">o> debug> 35 1")
         attachments (:attachments input-data)
         template (if-let [t-id (:template input-data)]
                    (template/get-template-by-id tx t-id))
         data-from-template (-> template
                                (dissoc :id))
         user-id (or (:user input-data) (:user_id auth-entity))
+        p (println ">o> debug> create-request! before get-organization-of-requester")
         organization (requesters/get-organization-of-requester tx user-id)
+        p (println ">o> debug> create-request! after get-organization-of-requester")
         write-data (-> input-data
                        (dissoc :attachments)
                        (assoc :user user-id)

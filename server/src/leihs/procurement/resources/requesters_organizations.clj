@@ -22,6 +22,10 @@
 
 (defn get-organization-of-requester
   [tx user-id]
+
+  (println ">o> get-organization-of-requester 1" (class tx))
+  (println ">o> get-organization-of-requester 1" tx)
+
   (spy (-> (sql/select :procurement_organizations.*)
       (sql/from :procurement_requesters_organizations)
       (sql/merge-join :procurement_organizations
