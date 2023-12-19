@@ -19,6 +19,8 @@
 (defn admin? "Returns boolean"
   [tx auth-entity]
 
+  (println ">oo> tx" (class tx))
+  (println ">oo> auth-entity" auth-entity)
 
   (let [
         query (-> (sql/select [[:exists
@@ -42,6 +44,25 @@
     (spy (:exists result))
     )
   )
+
+(comment
+
+  (let [
+        tx (db/get-ds-next)
+        user-id #uuid "e9c920bd-f96f-4e78-8ce9-803043149dc8"
+        ;query (sql-format {:select :*
+        ;                   :from [:users]
+        ;                   :where [:= :id [:cast user-id :uuid]]})
+
+        query (admin? tx {:user_id user-id})
+
+        p (println "\nquery" query)
+
+        ]
+
+       )
+  )
+
 
 (defn inspector?
   ([tx auth-entity] (inspector? tx auth-entity nil))
@@ -152,25 +173,25 @@
 
 
 (spy (defn requester?
-  [tx auth-entity]
+       [tx auth-entity]
 
-  (let [
-        query (-> (sql/select [[:exists
+       (let [
+             query (-> (sql/select [[:exists
 
-                                (-> (sql/select [true :exists])
-                                    (sql/from :procurement_requesters_organizations)
-                                    (sql/where [:= :procurement_requesters_organizations.user_id [:cast (:user_id auth-entity) :uuid]]))
-                                ]]
-                              )
-                  sql-format)
+                                     (-> (sql/select [true :exists])
+                                         (sql/from :procurement_requesters_organizations)
+                                         (sql/where [:= :procurement_requesters_organizations.user_id [:cast (:user_id auth-entity) :uuid]]))
+                                     ]]
+                                   )
+                       sql-format)
 
-        p (println ">o> requester??" query)
+             p (println ">o> requester??" query)
 
-        result (jdbc/execute-one! tx (spy query))
-        p (println ">o> requester??" (spy result))
-        ]
+             result (jdbc/execute-one! tx (spy query))
+             p (println ">o> requester??" (spy result))
+             ]
 
-    (spy (:exists result)))))
+         (spy (:exists result)))))
 
 
 (defn advanced?

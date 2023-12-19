@@ -16,7 +16,8 @@
   ;(println ">o> wrap-resolver-with-error ???" resolver)
 
   (fn [context args value]
-    (try (spy ((spy resolver) (spy context) (spy args) (spy value)))
+    ;(try (spy ((spy resolver) (spy context) (spy args) (spy value)))
+    (try (spy (resolver context args value))
          (catch Throwable e*
            (let [e (get-cause e*)
                  p (println ">o> within catch ")

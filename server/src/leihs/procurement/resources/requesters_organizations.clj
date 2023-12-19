@@ -29,15 +29,36 @@
 
 (defn get-organization-of-requester
   [tx user-id]
-  (-> (sql/select :procurement_organizations.*)
-      (sql/from :procurement_requesters_organizations)
-      (sql/join :procurement_organizations
-                [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
-      (sql/where [:= :procurement_requesters_organizations.user_id [:cast (spy user-id) :uuid]])
-      sql-format
-      spy
-      (->> (jdbc/execute-one! tx))
-      ))
+
+        (println ">o> get-organization-of-requester 1" (class tx))
+        (println ">o> get-organization-of-requester 1" tx)
+  (let [
+        sql (spy (-> (sql/select :procurement_organizations.*)
+                     (sql/from :procurement_requesters_organizations)
+                     (sql/join :procurement_organizations
+                               [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
+                     (sql/where [:= :procurement_requesters_organizations.user_id [:cast (spy user-id) :uuid]])
+                     sql-format
+                     ;spy
+                     ;(->> (jdbc/execute-one! tx))
+                     ))
+
+        p (println ">o> get-organization-of-requester 2" (class tx))
+
+        result (jdbc/execute-one! tx sql)
+        ](spy result) )
+
+
+  ;(spy (-> (sql/select :procurement_organizations.*)
+  ;         (sql/from :procurement_requesters_organizations)
+  ;         (sql/join :procurement_organizations
+  ;                   [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
+  ;         (sql/where [:= :procurement_requesters_organizations.user_id [:cast (spy user-id) :uuid]])
+  ;         sql-format
+  ;         ;spy
+  ;         (->> (jdbc/execute-one! tx))
+  ;         )))
+  )
 
 (defn create-requester-organization
   [tx data]

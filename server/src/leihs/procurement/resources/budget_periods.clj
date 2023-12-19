@@ -190,42 +190,42 @@
                :tx-next)
         bps (:input_data args)
 
-        ;result (loop [[bp & rest-bps] bps
-        ;              bp-ids []]
-        ;         (if bp
-        ;           (let [
-        ;                 p (println ">ooo> before  ??? 1 bp-with-dates=" bp)
-        ;                 bp-with-dates (spy (-> bp
-        ;                                        spy
-        ;                                        (update :inspection_start_date parse-utc-string) ;; TODO: fix parsing of timestamp
-        ;                                        (update :end_date parse-utc-string)))
-        ;                 p (println ">ooo> after bp-with-dates=" bp-with-dates)
-        ;                 bp-with-dates bp
-        ;
-        ;                 ]
-        ;             (do
-        ;               (if (spy (:id bp-with-dates))
-        ;                 (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
-        ;                 (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
-        ;
-        ;               (let [
-        ;                     bp-id (or (spy (:id bp-with-dates))
-        ;                               (spy (-> bp-with-dates
-        ;                                        (dissoc :id)
-        ;                                        (->> (budget-period/get-budget-period tx))
-        ;                                        :id)))
-        ;                     ]
-        ;                 (recur rest-bps (conj bp-ids bp-id)))
-        ;
-        ;               ))
-        ;           (do
-        ;             (spy (delete-budget-periods-not-in! tx bp-ids))
-        ;             (spy (get-budget-periods context args value))
-        ;             )
-        ;           ))
+        result (loop [[bp & rest-bps] bps
+                      bp-ids []]
+                 (if bp
+                   (let [
+                         p (println ">ooo> before  ??? 1 bp-with-dates=" bp)
+                         bp-with-dates (spy (-> bp
+                                                spy
+                                                (update :inspection_start_date parse-utc-string) ;; TODO: fix parsing of timestamp
+                                                (update :end_date parse-utc-string)))
+                         p (println ">ooo> after bp-with-dates=" bp-with-dates)
+                         bp-with-dates bp
+
+                         ]
+                     (do
+                       (if (spy (:id bp-with-dates))
+                         (spy (budget-period/update-budget-period! tx (spy bp-with-dates))) ;; is nil, should be 1
+                         (spy (budget-period/insert-budget-period! tx (dissoc bp-with-dates :id))))
+
+                       (let [
+                             bp-id (or (spy (:id bp-with-dates))
+                                       (spy (-> bp-with-dates
+                                                (dissoc :id)
+                                                (->> (budget-period/get-budget-period tx))
+                                                :id)))
+                             ]
+                         (recur rest-bps (conj bp-ids bp-id)))
+
+                       ))
+                   (do
+                     (spy (delete-budget-periods-not-in! tx bp-ids))
+                     (spy (get-budget-periods context args value))
+                     )
+                   ))
 
 
-        result "servus du"
+        ;result "servus du"
 
         ]
 

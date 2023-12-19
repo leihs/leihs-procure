@@ -27,8 +27,9 @@
 
 
           ;========= remove me
-          ;   (println "error" e)
-          ;   (println "error2" _e)
+             (println "error" e)
+             (println "error2" _e)
+          ;=========
 
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)

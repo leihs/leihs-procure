@@ -35,7 +35,7 @@
 
   (spy (-> context
            :request
-           :tx))
+           :tx-next))
 
   (spy (get-supplier-by-id (spy (-> context
                                     :request

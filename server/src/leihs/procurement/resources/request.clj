@@ -868,18 +868,29 @@
         tx (:tx-next ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
+        p (println ">o> debug> 35 1")
         attachments (:attachments input-data)
         template (if-let [t-id (:template input-data)]
                    (template/get-template-by-id tx t-id))
+        p (println ">o> debug> 35 2")
         data-from-template (-> template
                                (dissoc :id))
+        p (println ">o> debug> 35 3")
         user-id (or (:user input-data) (:user_id auth-entity))
+        p (println ">o> debug> 35 4")
         organization (requesters/get-organization-of-requester tx user-id)
+        p (println ">o> debug> 35 5")
         write-data (-> input-data
                        (dissoc :attachments)
                        (assoc :user user-id)
                        (assoc :organization (:id organization))
-                       to-name-and-lower-case-enums)]
+                       to-name-and-lower-case-enums)
+        p (println ">o> debug> 35 6")
+
+        ]
+
+    (println ">debug> 35a")
+
     (let [req-id (atom nil)]
       (authorization/authorize-and-apply
         #(do (insert! tx
