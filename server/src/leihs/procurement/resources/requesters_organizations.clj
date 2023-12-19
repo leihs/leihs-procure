@@ -46,6 +46,7 @@
         p (println ">o> get-organization-of-requester 2" (class tx))
 
         result (jdbc/execute-one! tx sql)
+        p (println ">o> get-organization-of-requester 2" result)
         ](spy result) )
 
 

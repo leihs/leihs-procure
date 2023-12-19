@@ -866,6 +866,12 @@
 
   (let [ring-req (:request context)
         tx (:tx-next ring-req)
+
+        p (println ">o> create-request! 1" context)
+        p (println ">o> create-request! 2" ring-req)
+        p (println ">o> create-request! 3" tx)
+        p (println ">o> create-request! 4" (class tx))
+
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         p (println ">o> debug> 35 1")
