@@ -878,14 +878,14 @@
         attachments (:attachments input-data)
         template (if-let [t-id (:template input-data)]
                    (template/get-template-by-id tx t-id))
-        p (println ">o> debug> 35 2")
+        p (println ">o> debug> ??? 35 2" template)
         data-from-template (-> template
                                (dissoc :id))
-        p (println ">o> debug> 35 3")
+        p (println ">o> debug> ??? 35 3" data-from-template)
         user-id (or (:user input-data) (:user_id auth-entity))
-        p (println ">o> debug> 35 4")
+        p (println ">o> debug> 35 4 user-id=" user-id)
         organization (requesters/get-organization-of-requester tx user-id)
-        p (println ">o> debug> 35 5")
+        p (println ">o> debug> 35 5" organization)
         write-data (-> input-data
                        (dissoc :attachments)
                        (assoc :user user-id)
