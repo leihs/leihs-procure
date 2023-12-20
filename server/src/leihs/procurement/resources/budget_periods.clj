@@ -35,7 +35,7 @@
         result (jdbc/execute-one! tx query)
         p (println ">o> result/update-count=" result)
         ]
-    result))
+    (spy result)))
 
 
 (defn parse-utc-string [utc-string]
