@@ -23,9 +23,10 @@
 
 (defn sum-total-price
   [coll]
-  (->> coll
-       (map :total_price_cents)
-       (reduce +)))
+  (println ">o> sum-total-price ???" coll)
+  (spy (->> (spy coll)
+            (map :total_price_cents)
+            (reduce +))))
 
 
 ;(comment
@@ -50,34 +51,6 @@
        (map :id)
        (string/join "_")))
 
-(defn my-log [req]
-
-  ;[clojure.data.json :as json]
-    (println ">>>id1 (json)" (json/write-str req))
-  ;  ;(println ">>>id2 " req)
-  ;  (println ">>>id2 " (get-in (first req) [:category :read]))
-  ;  ;(println ">>>id2a " (get-in (first req) [:budget_period :request_id]))
-  ;  (println ">>>id2b " (get-in (first req) [:budget_period]))
-  ;  (println ">>>id2c " (get-in (first req) [:budget_period :request-id])) ;; correct
-  ;  (println ">>>id2c " (get-in (first req) [:category :request-id])) ;; correct
-  ;  (println ">>>id3 " (first req))
-  ;  ;(println ">>>id4 " :budget_period req)
-  ;  (println ">>>id5 " :budget_period (first req))
-  ;  (println ">>>id6 " (:request_id (:budget_period (first req))))
-
-  (let [
-        budget (get-in (first req) [:budget_period :request-id]) ;; correct
-        category (get-in (first req) [:category :value :id]) ;; correct
-        main-cat (get-in (first req) [:category :value :main_category_id]) ;; correct
-
-        p (println ">>>id   main-cat=" main-cat " cat=" category " budget=" budget)
-        ])
-
-
-  req
-
-  )
-
 (defn get-dashboard
   [ctx args value]
   (let [ring-request (:request ctx)
@@ -99,55 +72,47 @@
         dashboard-cache-key {:id (hash args)}]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
-     :budget_periods
-     (->>
-       bps
-       (map
-         (fn [bp]
-           (let [main-cats*
-                 (->>
-                   main-cats
-                   (map
-                     (fn [mc]
-                       (let [cats*
-                             (->>
-                               mc
-                               :id
-                               (categories/get-for-main-category-id tx)
-                               (map (fn [c] (let [requests* (filter #(and (= (-> %
-                                                                                 :category
-                                                                                 :value
-                                                                                 :id)
-                                                                             (str (:id c)))
-                                                                          (= (-> %
-                                                                                 :budget_period
-                                                                                 :value
-                                                                                 :id)
-                                                                             (str (:id bp))))
-                                                                    requests)
-                                                  p (println ">>>id requests*" requests*)
-                                                  ]
-                                              (-> c
-                                                  (assoc :requests (my-log requests*))
-                                                  (assoc :total_price_cents
-                                                         (sum-total-price
-                                                           requests*))
-                                                  (assoc :cacheKey
-                                                         (cache-key
-                                                           dashboard-cache-key
-                                                           bp
-                                                           mc
-                                                           c)))))))]
-                         (-> mc
-                             (assoc :categories cats*)
-                             (assoc :total_price_cents (sum-total-price
-                                                         cats*))
-                             (assoc :cacheKey
-                                    (cache-key dashboard-cache-key bp mc))
-                             (->> (main-categories/merge-image-path
-                                    tx)))))))]
-             (-> bp
-                 (assoc :main_categories main-cats*)
-                 (assoc :cacheKey (cache-key dashboard-cache-key bp))
-                 (assoc :total_price_cents (sum-total-price
-                                             main-cats*)))))))}))
+     :budget_periods (->>
+                       bps
+                       (map (fn [bp]
+                              (let [main-cats* (->> main-cats
+                                                    (map (fn [mc]
+                                                           (let [cats* (->> mc
+                                                                            :id
+                                                                            (categories/get-for-main-category-id tx)
+                                                                            (map (fn [c] (let [
+                                                                                               p (println ">o> c ???1 before filter" c)
+                                                                                               p (println ">o> c ???1 before filter" bp)
+                                                                                               requests* (spy (filter #(and (= (-> %
+                                                                                                                              :category
+                                                                                                                              :value
+                                                                                                                              :id)
+                                                                                                                          (str (:id c)))
+                                                                                                                       (= (-> %
+                                                                                                                              :budget_period
+                                                                                                                              :value
+                                                                                                                              :id)
+                                                                                                                          (str (:id bp))))
+                                                                                                                 requests))
+                                                                                               p (println ">>>id here ??? requests*" requests*)
+                                                                                               ]
+                                                                                           (-> c
+                                                                                               (assoc :requests requests*)
+                                                                                               (assoc :total_price_cents (sum-total-price requests*))
+                                                                                               (assoc :cacheKey
+                                                                                                      (cache-key
+                                                                                                        dashboard-cache-key
+                                                                                                        bp
+                                                                                                        mc
+                                                                                                        c)))))))]
+                                                             (-> mc
+                                                                 (assoc :categories cats*)
+                                                                 (assoc :total_price_cents (sum-total-price cats*))
+                                                                 (assoc :cacheKey
+                                                                        (cache-key dashboard-cache-key bp mc))
+                                                                 (->> (main-categories/merge-image-path
+                                                                        tx)))))))]
+                                (-> bp
+                                    (assoc :main_categories main-cats*)
+                                    (assoc :cacheKey (cache-key dashboard-cache-key bp))
+                                    (assoc :total_price_cents (sum-total-price main-cats*)))))))}))

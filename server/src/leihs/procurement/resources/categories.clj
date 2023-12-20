@@ -95,14 +95,14 @@
 (defn get-for-main-category-id
   [tx main-cat-id]
 
-  (println ">>>id 3 ???????")
+  (println ">>>id 3 ??????? get-for-main-category-id")
   (println ">>>id 3 ???????  tocheck main-cat-id=" main-cat-id)
 
-  (jdbc/execute! tx (spy (add-comment-to-sql-format (-> categories-base-query
-                                                        (sql/where [:= :procurement_categories.main_category_id [:cast main-cat-id :uuid]])
-                                                        sql-format
-                                                        spy) "categories/get-categories-for-id"))
-                 ))
+  (spy (jdbc/execute! tx (-> categories-base-query
+                             (sql/where [:= :procurement_categories.main_category_id [:cast main-cat-id :uuid]])
+                             sql-format
+                             spy))
+       ))
 
 
 ;(defn add-comment-to-sql-format "helper for debugging sql"
@@ -194,22 +194,22 @@
 (defn update-categories-viewers!
   [context args value]
   (spy (let [request (:request context)
-        tx (:tx-next request)
-        auth-user (:authenticated-entity request)
-        categories (:input_data args)]
-    (loop [[c & rest-cs] (spy categories)]
-      (if-let [c-id (:id c)]
-        (do (spy (authorization/authorize-and-apply
-              #(spy (viewers/update-viewers! tx c-id (spy (:viewers c))))
-              :if-any
-              [#(spy (user-perms/admin? tx auth-user))
-               #(spy (user-perms/inspector? tx auth-user c-id))
-               ]))
-            (recur rest-cs))
-        (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
-                                                         (sql/where [:in :procurement_categories.id (cast-uuids (map :id categories))])
-                                                         sql-format) "categories/update-categories-viewers!")))
-        )))))
+             tx (:tx-next request)
+             auth-user (:authenticated-entity request)
+             categories (:input_data args)]
+         (loop [[c & rest-cs] (spy categories)]
+           (if-let [c-id (:id c)]
+             (do (spy (authorization/authorize-and-apply
+                        #(spy (viewers/update-viewers! tx c-id (spy (:viewers c))))
+                        :if-any
+                        [#(spy (user-perms/admin? tx auth-user))
+                         #(spy (user-perms/inspector? tx auth-user c-id))
+                         ]))
+                 (recur rest-cs))
+             (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
+                                                                   (sql/where [:in :procurement_categories.id (cast-uuids (map :id categories))])
+                                                                   sql-format) "categories/update-categories-viewers!")))
+             )))))
 
 
 ;master
