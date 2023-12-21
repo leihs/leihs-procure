@@ -9,6 +9,8 @@
     ;[clojure.java.jdbc :as jdbc]
     ;[leihs.procurement.utils.sql :as sql]
 
+            [logbug.debug :as debug]
+
 
             [honey.sql :refer [format] :rename {format sql-format}]
             [leihs.core.db :as db]
@@ -68,7 +70,13 @@
                   sql-format
                   (->> (jdbc/execute! tx)))
               [])
+
+        p (println ">>resultA1-2 xxx bps" bps)
+
+
         requests (requests/get-requests ctx args value)
+        p (println ">>requestsB2 xxx" requests)
+
         dashboard-cache-key {:id (hash args)}]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
@@ -81,8 +89,8 @@
                                                                             :id
                                                                             (categories/get-for-main-category-id tx)
                                                                             (map (fn [c] (let [
-                                                                                               p (println ">o> c ???1 before filter" c)
-                                                                                               p (println ">o> c ???1 before filter" bp)
+                                                                                               p (println ">o> c ???1 xxx before filter" c)
+                                                                                               p (println ">o> c ???1 xxx before filter" bp)
                                                                                                requests* (spy (filter #(and (= (-> %
                                                                                                                               :category
                                                                                                                               :value
@@ -94,7 +102,7 @@
                                                                                                                               :id)
                                                                                                                           (str (:id bp))))
                                                                                                                  requests))
-                                                                                               p (println ">>>id here ??? requests*" requests*)
+                                                                                               p (println ">>>id here ??? xxx requests*" requests*)
                                                                                                ]
                                                                                            (-> c
                                                                                                (assoc :requests requests*)
@@ -116,3 +124,6 @@
                                     (assoc :main_categories main-cats*)
                                     (assoc :cacheKey (cache-key dashboard-cache-key bp))
                                     (assoc :total_price_cents (sum-total-price main-cats*)))))))}))
+
+
+(debug/debug-ns *ns*)

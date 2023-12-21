@@ -11,6 +11,7 @@
             (leihs.procurement.permissions [request-helpers :as request-perms]
                                            [requests :as requests-perms] [user :as user-perms])
             [leihs.procurement.resources.request :as request]
+            [logbug.debug :as debug]
 
 
             [leihs.procurement.resources.request-helpers :as request-helpers]
@@ -165,7 +166,8 @@
         ]
 
     (cond-> start-sqlmap
-            id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
+            ;id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
+            id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
 
 
@@ -390,16 +392,16 @@
 
 
         proc-requests (request/query-requests tx auth-entity query)] ;;ERROR
-       (println ">o> >>> tocheck proc-requests" query)
+    (println ">o> >>> tocheck proc-requests" query)
     (spy (->>
-      (spy proc-requests)
-      (map (fn [proc-req]
-             (as-> proc-req <>
-               (request-perms/apply-permissions tx
-                                                auth-entity
-                                                <>
-                                                #(assoc % :request-id (:id <>)))
-               (request-perms/add-action-permissions <>)))))
+           (spy proc-requests)
+           (map (fn [proc-req]
+                  (as-> proc-req <>
+                    (request-perms/apply-permissions tx
+                                                     auth-entity
+                                                     <>
+                                                     #(assoc % :request-id (:id <>)))
+                    (request-perms/add-action-permissions <>)))))
 
          )))
 
@@ -411,10 +413,10 @@
   (println ">oo> get-total-price-cents" sqlmap)
 
 
-  (or (spy(some->> sqlmap
-        sql-format
-        (jdbc/execute-one! tx)
-        :result))
+  (or (spy (some->> sqlmap
+             sql-format
+             (jdbc/execute-one! tx)
+             :result))
       0))
 
 (defn- sql-sum
@@ -427,7 +429,7 @@
          [:* :procurement_requests.price_cents <>]
          [:cast <> :bigint]
          [:sum <>])
-  ))
+       ))
 
 
 (comment
@@ -541,7 +543,7 @@
         ]
 
 
-    (-> [[:coalesce                                    ;;FIXME TODO PRIO!!!
+    (-> [[:coalesce                                         ;;FIXME TODO PRIO!!!
           :procurement_requests.order_quantity
           :procurement_requests.approved_quantity]]
         (total-price-sqlmap bp-id)
@@ -550,3 +552,6 @@
         (->> (get-total-price-cents tx)))
 
     ))
+
+;[logbug.debug :as debug]
+(debug/debug-ns *ns*)
