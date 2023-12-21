@@ -136,7 +136,7 @@
         ;p (println ">requests-query-map>> ??")
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
                          request-helpers/join-and-nest-associated-resources)
-        p (println ">o> helper8")
+        p (println ">o> helper8" start-sqlmap)
         p (println ">oo> helper8" order-status inspector-priority priority)
         p (println ">oo> helper9" start-sqlmap)
 
@@ -377,10 +377,7 @@
 (defn get-requests
   [context arguments value]
 
-  (println ">debug> 50")
-
-  (println ">oo> get-requests" value)
-
+  (println ">debug> >>> FIRST LINE > get-requests????")
 
   (let [ring-request (:request context)
         tx (:tx-next ring-request)
@@ -392,7 +389,7 @@
 
 
         proc-requests (request/query-requests tx auth-entity query)] ;;ERROR
-    (println ">o> >>> tocheck proc-requests" query)
+    (println ">o> >>> tocheck >query proc-requests" query)
     (spy (->>
            (spy proc-requests)
            (map (fn [proc-req]
@@ -554,4 +551,4 @@
     ))
 
 ;[logbug.debug :as debug]
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)

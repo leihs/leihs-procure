@@ -204,6 +204,7 @@
        "lower(coalesce(models.version, ''))" ")"))
 
 (def requests-base-query                                    ;;ok
+
   (let [
         conc sql-order-by-expr
 
@@ -218,7 +219,8 @@
 
              (sql/from :procurement_requests)
              (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-             (sql/order-by :procurement_requests.id [[:raw conc]]) ;; master-version
+             (sql/order-by [[:raw conc]]) ;; master-version
+             ;(sql/order-by :procurement_requests.id [[:raw conc]]) ;; master-version
              ))
     ))
 
@@ -259,97 +261,6 @@
   )
 
 
-(comment
-
-  ;[honey.sql :refer [format] :rename {format sql-format}]
-  ;[leihs.core.db :as db]
-  ;[next.jdbc :as jdbc]
-  ;[honey.sql.helpers :as sql]
-
-  (let [
-        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 [{:has_entry true}]
-        ;user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3b2" ;; >>3 []
-        user-id #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 []
-        user-id nil                                         ;; >>3 []
-        auth-entity {:user_id user-id}
-
-        c-id nil
-        c-id #uuid "1efc2279-bc42-490c-b004-dca03813a6ef"
-
-        advanced-user? true
-
-        tx (db/get-ds-next)
-
-        ;;; TODO: this works
-        ;res (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
-        ;                                sql-order-by-expr
-        ;                                ") procurement_requests.*")]])
-        ;        (sql/from :procurement_requests)
-        ;        (sql/left-join :models [:= :models.id :procurement_requests.model_id]))
-
-
-        ;(def sql-order-by-expr
-        ;  (str "concat("
-        ;       "lower(coalesce(procurement_requests.article_name, '')), "
-        ;       "lower(coalesce(models.product, '')), "
-        ;       "lower(coalesce(models.version, ''))" ")"))
-
-        ;conc [:concat [:lower [:coalesce :procurement_requests.article_name ""]]]
-
-        ;conc [:concat
-        ;      [:lower [:coalesce :procurement_requests.article_name ""]]
-        ;      [:lower [:coalesce :models.product ""]]
-        ;      [:lower [:coalesce :models.version ""]]
-        ;      ]
-
-        ;; works
-        conc [[:concat
-               [:lower [:coalesce :procurement_requests/article_name ""]]
-               [:lower [:coalesce :models/product ""]]
-               [:lower [:coalesce :models/version ""]]
-               ]]
-
-
-        ;p (println "\n>o>1 conc" conc)
-        ;p (println "\n>o>2 conc" (sql-format conc))
-        ;conc2 (sql-format conc)
-
-
-        res2 (-> (sql/select conc)
-                 (sql/from :procurement_requests :models)
-                 )
-
-        p (println "\n>o>3 query" (sql-format res2))
-        p (println "\n>o>4 result" (jdbc/execute! tx (sql-format res2)))
-
-
-
-
-        ;; TODO: this works
-        ;;res (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
-        ;;res (-> (sql/select-distinct :procurement_requests.*)
-        ;res (-> (sql/select-distinct :procurement_requests.id conc :procurement_requests.*)
-        res (spy (-> (sql/select-distinct :procurement_requests.id conc)
-                     (sql/from :procurement_requests)
-                     (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-                     ;(sql/order-by :procurement_requests.id conc :procurement_requests.*)
-                     (sql/order-by :procurement_requests.id conc)
-                     ))
-
-        ;>o> query [SELECT DISTINCT ON (procurement_requests.id, concat(lower(coalesce(procurement_requests.article_name, '')), lower(coalesce(models.product, '')), lower(coalesce(models.version, '')))) procurement_requests.* FROM procurement_requests LEFT JOIN models ON models.id = procurement_requests.model_id]
-
-
-
-        p (println "\n>o>3 query" (spy (sql-format res)))
-        ;p (Execution error (PSQLException) at org.postgresql.core.v3.QueryExecutorImpl/receiveErrorResponse (QueryExecutorImpl.java:2533).
-        ;             ERROR: for SELECT DISTINCT, ORDER BY expressions must appear in select list
-        ;             Position: 305
-        ;             println "\n>o>4 result" (jdbc/execute! tx (sql-format res)))
-
-        ]
-    )
-
-  )
 
 
 (defn requests-base-query-with-state
