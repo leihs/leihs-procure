@@ -318,6 +318,8 @@ describe 'price sums' do
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
 
+        puts ">>>" + result.to_json
+
         res_sort = sort_requests(result)
         exp_sort = sort_requests(expected_result_transparent)
 

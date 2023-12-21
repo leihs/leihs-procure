@@ -25,10 +25,16 @@
 
 (defn sum-total-price
   [coll]
-  (println ">o> sum-total-price ???" coll)
-  (spy (->> (spy coll)
-            (map :total_price_cents)
-            (reduce +))))
+  (println ">o> sum-total-price ???" (->> coll
+                                          (map :total_price_cents)))
+
+  (println ">o> sum-total-price ???" (->> coll
+                                          (map :name)))
+
+  (spy (->> coll
+       (map :total_price_cents)
+       (reduce +))))
+
 
 
 ;(comment
@@ -109,9 +115,24 @@
      :budget_periods (->>
                        bps
                        (map (fn [bp]
-                              (let [main-cats* (->> main-cats
+                              (let [
+
+
+                                    main-cats* (->> main-cats
                                                     (map (fn [mc]
-                                                           (let [cats* (->> mc
+                                                           (let [
+
+                                                                 ;p (println ">o> xxx debug-cats*=" debug-cats*)
+
+
+                                                                 p (println ">o> xxx debug mc=" (->> mc
+                                                                                                        (map :name)
+                                                                                                        ))
+
+
+
+
+                                                                 cats* (->> mc
                                                                             :id
                                                                             (categories/get-for-main-category-id tx)
                                                                             (map (fn [c] (let [
@@ -139,18 +160,35 @@
                                                                                                         dashboard-cache-key
                                                                                                         bp
                                                                                                         mc
-                                                                                                        c)))))))]
-                                                             (-> mc
-                                                                 (assoc :categories cats*)
-                                                                 (assoc :total_price_cents (sum-total-price cats*))
-                                                                 (assoc :cacheKey
-                                                                        (cache-key dashboard-cache-key bp mc))
-                                                                 (->> (main-categories/merge-image-path
-                                                                        tx)))))))]
+                                                                                                        c)))))))
+
+                                                                 p (println ">o> xxx cats*=" (->> cats*
+                                                                                                        (map :name)
+                                                                                                        ))
+
+
+
+                                                                 merged-path (-> mc
+                                                                     (assoc :categories cats*)
+                                                                     (assoc :total_price_cents (sum-total-price cats*))
+                                                                     (assoc :cacheKey
+                                                                            (cache-key dashboard-cache-key bp mc))
+                                                                     (->> (main-categories/merge-image-path
+                                                                            tx)))
+
+
+                                                                 p (println ">o> xxx merged-path=" (->> merged-path
+                                                                                                  (map :name)
+                                                                                                  ))
+                                                                 ]
+                                                             merged-path
+
+
+                                                             ))))]
                                 (-> bp
                                     (assoc :main_categories main-cats*)
                                     (assoc :cacheKey (cache-key dashboard-cache-key bp))
                                     (assoc :total_price_cents (sum-total-price main-cats*)))))))}))
 
 
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)
