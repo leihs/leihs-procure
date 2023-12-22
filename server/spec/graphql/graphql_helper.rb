@@ -15,10 +15,6 @@ class GraphqlQuery
 
   def perform
     @response = Faraday.post("#{http_base_url}/procure/graphql") do |req|
-
-      # puts ">>>>" + req.to_s
-
-
       req.headers['Accept'] = 'application/json'
       req.headers['Content-Type'] = 'application/json'
       req.headers['X-CSRF-Token'] = @csrf_token
@@ -31,22 +27,12 @@ class GraphqlQuery
       end
 
       req.headers['Cookie'] = cookies.map { |k, v| "#{k}=#{v}" }.join('; ')
-
-      # graphql_helper.rb:31
-      print "\n\nquery:\n" + @query
-      print "\n\nquery-vars:\n" + @variables.to_json
-      print "\n\ncsrf:\n" + @csrf_token
-      print "\n\ncookie:\n" + req.headers['Cookie'] +"\n\n"
-
     end
 
     self
   end
 
   def result
-    # graphql_helper.rb:43
-    print "\n\nresponse:\n" + @response.body.to_json + "\n\n"
-
     JSON.parse @response.body
   end
 
@@ -61,12 +47,7 @@ class GraphqlQuery
                           { user: user.email, password: 'password' }) do |req|
                             req.headers['X-CSRF-Token'] = csrf_token
                             req.headers['Cookie'] = "leihs-anti-csrf-token=#{csrf_token}"
-
-                            # graphql_helper.rb:58 / 61
-                            print "\n\nUser:\n" + user.email.to_s + "\n\n"
-             end
-
-
+                          end
            else
              Faraday.post(http_base_url)
            end
