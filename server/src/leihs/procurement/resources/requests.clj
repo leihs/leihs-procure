@@ -166,8 +166,9 @@
         ]
 
     (cond-> start-sqlmap
-            ;id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
-            id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
+            id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
+            ;; TODO / FYI: :in will cause problems
+            ;id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
             ; short_id (sql/where [:in :procurement_requests.short_id short_id])
 
 

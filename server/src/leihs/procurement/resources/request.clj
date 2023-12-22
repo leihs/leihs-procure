@@ -219,7 +219,8 @@
 
              (sql/from :procurement_requests)
              (sql/left-join :models [:= :models.id :procurement_requests.model_id])
-             (sql/order-by [[:raw conc]]) ;; master-version
+             (sql/order-by :procurement_requests.id [[:raw conc]]) ;; master-version
+             ;; TODO / FYI: MAYBE THIS WILL CAUSE SORTING ISSUE?
              ;(sql/order-by :procurement_requests.id [[:raw conc]]) ;; master-version
              ))
     ))

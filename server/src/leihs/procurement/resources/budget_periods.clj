@@ -277,7 +277,7 @@
     )
 
   ;#### debug ###################################################################
-  (debug/debug-ns *ns*)
+  ;(debug/debug-ns *ns*)
 
   ;2023-12-17T06:48:47.621Z NX-41294 DEBUG [leihs.procurement.resources.budget-period:39] - (first (spy (jdbc/query tx (-> budget-period-base-query (sql/merge-where where-clause) sql/format)))) => {:id #uuid "80f2897a-dc35-4ecf-a997-b744e79a478c", :name "new_bp", :inspection_start_date #time/instant "2025-06-01T00:00:00Z", :end_date #time/instant "2025-12-01T00:00:00Z", :created_at #time/instant "2023-12-17T06:48:47.361794Z", :updated_at #time/instant "2023-12-17T06:48:47.361794Z"}
   ;2023-12-17T06:48:47.765Z NX-41294 DEBUG [leihs.procurement.resources.budget-periods:39] - (cond-> budget-periods-base-query (:id args) (sql/merge-where [:in :procurement_budget_periods.id (:id args)]) (spy (-> args :whereRequestsCanBeMovedTo empty? not)) (sql/merge-where [:< :current_date :procurement_budget_periods.end_date])) => {:select (:procurement_budget_periods.*), :from (:procurement_budget_periods), :order-by ([:end_date :desc])}

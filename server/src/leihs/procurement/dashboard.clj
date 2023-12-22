@@ -183,11 +183,16 @@
         p (println ">>requestsB2 xxx requests.count" (count requests))
 
 
+        p (println ">o> xxx request.count=" (count requests))
+        p (println ">o> xxx bps=" (count bps))
+        p (println ">o> xxx main-cats count=" (count main-cats) (map :name main-cats))
+
         ;p (throw (Exception. "fake error"))
 
         dashboard-cache-key {:id (hash args)}]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
+     ;;
      :budget_periods (create-budget bps tx requests dashboard-cache-key main-cats) ;; correct result with hard-coded-data
      }))
 
@@ -240,6 +245,16 @@
         main-cats (apply (resolve (first log-entry-main-cats)) (second log-entry-main-cats))
 
         result (create-budget bps tx requests dashboard-cache-key main-cats)
+
+
+        ;>o> request.count= 5
+        ;>o> bps= 1
+        ;>o> main-cats= 2
+
+        p (println ">o> request.count=" (count requests))
+        p (println ">o> bps=" (count bps))
+        p (println ">o> main-cats count=" (count main-cats) (map :name main-cats))
+
 
         p (println ">o> result=" result)
         p (println ">o> result::total_price_cents=" (:total_price_cents (first result)))
