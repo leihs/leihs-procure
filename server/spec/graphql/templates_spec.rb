@@ -41,17 +41,15 @@ describe 'templates' do
         }
       GRAPHQL
 
-      # return if true
-
       result = query(q, user.id)
 
-      puts result
+      puts ">>> result:\n"+result.to_json
 
       expect(result['data']['update_templates']).to be_blank
       expect(result['errors'].first['message']).to match(/UnauthorizedException/)
       expect(Template.all.count).to be == templates_before.count
       templates_before.each do |data|          # FIXME: this causes error
-        puts ">>> data=" + data.to_json
+        puts ">>> looking for data=" + data.to_json
         puts ">>> Template.find(data)=" + Template.find(data).to_s+"<"
         expect(Template.find(data)).to be
       end
