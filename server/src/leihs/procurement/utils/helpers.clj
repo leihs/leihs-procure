@@ -67,12 +67,34 @@
 (defn cast-uuids [uuids]
   (let [
         p (println ">o> uuids-sql" (class uuids))
-        uuids-sql (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids))
+        ;uuids-sql (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids))
+
+        ;; TODO: test it, avoid to make unique
+        ;uuids (set uuids)
+
+        uuids-sql (map (fn [uuid-str] [:cast uuid-str :uuid]) uuids)
         p (println ">o> uuids-sql" uuids-sql)
         ]
     (spy uuids-sql)
     )
   ;(spy (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
+  )
+
+
+
+
+
+(comment
+  (let [
+        id1 #uuid "3eaba478-f710-4cb8-bc87-54921a27e3b2" ;; >>3 []
+        id2 #uuid "3eaba478-f710-4cb8-bc87-54921a27e3bb" ;; >>3 []
+
+
+        result (cast-uuids [id1 id2 id1])
+
+        p (println ">o> result=" result)
+        p (println ">o> result.count=" (count result))
+        ]result)
   )
 
 
