@@ -58,7 +58,14 @@ step 'I expand the line of the category :cat' do |cat|
 end
 
 step 'I expand the request line' do
+  puts "open >>>" + @request.article_name.to_s + "<"
   find('li', text: @request.article_name, match: :first).click
+  end
+
+step 'I expand the request line after 2sec' do
+  sleep 2
+  find('li', text: @request.article_name, match: :first).click
+
 end
 
 step 'within the line of the category I click on +' do

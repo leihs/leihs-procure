@@ -98,7 +98,7 @@ Feature: Request CRUD as a requester
       | Stückpreis CHF                |           999 |
       | Menge beantragt               |            99 |
     And I click on 'Speichern'
-    When I expand the request line
+    When I expand the request line after 2sec
     Then the request form has the following data:
       | field                         | value         |
       | Artikel oder Projekt          | Camera X      |
