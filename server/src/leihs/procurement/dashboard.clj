@@ -2,6 +2,9 @@
   (:require [clojure.string :as string]
             [clojure.data.json :as json]
 
+            [clj-time.format :as fmt]
+
+
             [taoensso.timbre :refer [debug info warn error spy]]
 
             [leihs.procurement.utils.helpers :refer [cast-uuids]]
@@ -11,6 +14,7 @@
 
             [logbug.debug :as debug]
 
+            [leihs.procurement.utils.helpers :refer [convert-dates]]
 
             [honey.sql :refer [format] :rename {format sql-format}]
             [leihs.core.db :as db]
@@ -22,6 +26,8 @@
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]))
+
+
 
 (defn sum-total-price
   [coll]
@@ -174,6 +180,10 @@
                   sql-format
                   (->> (jdbc/execute! tx)))
               [])
+
+        bps (map convert-dates bps)
+
+
 
         p (println ">>resultA1-2 xxx bps" bps)
 
