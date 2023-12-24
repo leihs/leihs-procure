@@ -552,4 +552,4 @@
     ))
 
 ;[logbug.debug :as debug]
-;(debug/debug-ns *ns*)
+(debug/debug-ns *ns*)

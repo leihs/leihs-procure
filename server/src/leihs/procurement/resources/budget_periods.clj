@@ -132,13 +132,17 @@
 
   (spy (let [
              ids (spy (:id args))
+
+             p (println ">o> tocheck >>>" ids (:id args))
+
+             result (cond-> budget-periods-base-query
+                            ids (sql/where [:in :procurement_budget_periods.id (cast-uuids ids)])
+                            (spy (-> args
+                                     :whereRequestsCanBeMovedTo
+                                     empty?
+                                     not)) (sql/where [:< :current_date :procurement_budget_periods.end_date]))
              ]
-         (cond-> budget-periods-base-query
-                 ids (sql/where [:in :procurement_budget_periods.id (cast-uuids ids)])
-                 (spy (-> args
-                          :whereRequestsCanBeMovedTo
-                          empty?
-                          not)) (sql/where [:< :current_date :procurement_budget_periods.end_date]))
+         result
          ))
 
   )
