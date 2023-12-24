@@ -150,8 +150,8 @@
                  (spy (template/insert-template! tx (dissoc tmpl :id)))
                  )
               :if-only
-              #(or (user-perms/admin? tx auth-entity)
-                   (user-perms/inspector? tx auth-entity (:category_id tmpl))))
+              #(or (spy (user-perms/admin? tx auth-entity))
+                   (spy (user-perms/inspector? tx auth-entity (:category_id tmpl)))))
             (->> tmpl
                  (get-template-id tx)
                  (conj tmpl-ids)

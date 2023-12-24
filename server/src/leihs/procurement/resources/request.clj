@@ -3,6 +3,8 @@
                      [string :refer [lower-case upper-case]])
 
 
+            [logbug.debug :as debug]
+
             [clojure.data.json :as json]
 
             [honey.sql :refer [format] :rename {format sql-format}]
@@ -305,7 +307,7 @@
         p (println ">o> treat-:order_status: upperCase =>" (:order_status result))
         p (if (nil? (:order_status row))
             (throw (Exception. "treat-order-status _> nill")))
-        ] result)
+        ] (spy result))
   )
 
 (defn treat-priority [row]
@@ -1005,3 +1007,5 @@
          (->> (query-requests tx auth-entity))
          first
          :user_id)))
+
+(debug/debug-ns *ns*)

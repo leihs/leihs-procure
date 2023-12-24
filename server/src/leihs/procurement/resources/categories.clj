@@ -58,16 +58,16 @@
 (defn get-categories-for-ids
   [tx ids]
 
-  (println ">o> ids1" ids)
-  (println ">o> ids2" (class ids))
-  (println ">o> ids3" (cast-uuids ids))
-  (println ">>>id 4 ???????")
+  (println ">o> (empty list-issue!!!!!) ids1" ids)
+  (println ">o> (empty list-issue!!!!!) ids2" (class ids))
+  (println ">o> (empty list-issue!!!!!) ids3" (cast-uuids ids))
+  (println ">>>id (empty list-issue!!!!!) 4 ???????")
 
-  (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
+  (spy (jdbc/execute! tx (add-comment-to-sql-format (-> categories-base-query
                                                    ;(sql/where [:in :procurement_categories.id ids])
                                                    (sql/where [:in :procurement_categories.id (cast-uuids ids)])
                                                    sql-format
-                                                   spy) "categories/get-categories-for-ids"))
+                                                   spy) "categories/get-categories-for-ids")))
   )
 
 
