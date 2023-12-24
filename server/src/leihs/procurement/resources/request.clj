@@ -13,7 +13,7 @@
 
             [leihs.procurement.utils.helpers :refer [my-cast]]
 
-            ;[clojure.java.jdbc :as jdbco]
+    ;[clojure.java.jdbc :as jdbco]
 
             [leihs.procurement.authorization :as authorization]
             (leihs.procurement.permissions [request-fields :as request-fields-perms]
@@ -662,16 +662,24 @@
 
   (println ">o> no before quest _> room_id=" (my-cast data))
 
+  (let [
+        result (jdbc/execute-one! tx
+                                  (-> (sql/update :procurement_requests) ;;fixme
+                                      (sql/set (my-cast data))
+                                      (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                                      ;(sql/where :raw "/* da sama 123 */" )
+                                      ;(sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                                      sql-format
+                                      spy
+                                      ))
+        p (println ">o> result tocheck" result)
 
-  (jdbc/execute! tx
-                 (-> (sql/update :procurement_requests)     ;;fixme
-                     (sql/set (my-cast data))
-                     (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                     ;(sql/where :raw "/* da sama 123 */" )
-                     ;(sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                     sql-format
-                     spy
-                     )))
+        result (:next.jdbc/update-count result)
+        p (println ">o> result tocheck" result)
+
+        ] result)
+
+  )
 
 (defn- filter-attachments [m as]
 
@@ -980,12 +988,12 @@
                                                                    request)]
     (authorization/authorize-and-apply
       #(let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_requests)
-                                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                                          sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
+                                              (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                                              sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
 
              ;; TODO: FIXME, namespace shouldn't be needed here
-             result-count (spy (:update-count (spy result)))                ;; fails
-             result-count (spy (:next.jdbc/update-count (spy result)))      ;; works
+             result-count (spy (:update-count (spy result))) ;; fails
+             result-count (spy (:next.jdbc/update-count (spy result))) ;; works
              ]
 
          (spy (= (spy result-count) 1))
