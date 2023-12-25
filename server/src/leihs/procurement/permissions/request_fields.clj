@@ -263,14 +263,11 @@
      ;                            (or requester inspector admin)),
      ;                :required true},
      :order_status
-     {
-      :read true
-      :write true
-      ;:read can-read-order-status-fields
-      ; :write can-edit-order-status-fields
-      ; keep it upper-case!
-      :default "NOT_PROCURED"
-      :required true}
+      {:read can-read-order-status-fields
+        :write can-edit-order-status-fields
+        ; keep it upper-case!
+        :default "NOT_PROCURED"
+        :required true}
      :order_comment
      {:read can-read-order-status-fields
       :write can-edit-order-status-fields
