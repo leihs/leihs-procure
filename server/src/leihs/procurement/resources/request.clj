@@ -464,13 +464,14 @@
         result (->> (jdbc/execute! tx (spy query))
                     (map #(transform-row % advanced-user?)))
 
-        p (println ">o> >o> HERE :row-fn" result)
+        p (println ">o> query-requests >o> HERE tocheck xxx :row-fn" advanced-user?)
+        p (println ">o> query-requests >o> HERE tocheck xxx :row-fn" result)
         ]
 
     ;(throw (Exception. "fake error"))
 
     ;[clojure.data.json :as json]
-    p (println "\n>o> :budget_period 2a (json)" (json/write-str result) "\n")
+    ;p (println "\n>o> :budget_period 2a (json)" (json/write-str result) "\n")
 
     (spy result)))
 

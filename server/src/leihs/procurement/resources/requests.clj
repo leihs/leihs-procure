@@ -389,8 +389,12 @@
                 (sql-format <>))
 
 
-        proc-requests (request/query-requests tx auth-entity query)] ;;ERROR
-    (println ">o> >>> tocheck >query proc-requests" query)
+        proc-requests (request/query-requests tx auth-entity query)
+        p (println ">o> >>> get-requests tocheck >query xxx proc-requests 1" query)
+        p (println ">o> >>> get-requests tocheck >query xxx proc-requests 2" proc-requests)
+
+        ]                                                   ;;ERROR
+    ;(println ">o> >>> tocheck >query proc-requests" query)
     (spy (->>
            (spy proc-requests)
            (map (fn [proc-req]
