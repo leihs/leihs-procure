@@ -82,57 +82,64 @@ Feature: Order status
       | field                  | value                         |
       | Beschaffungs-Status    | Beschafft                     |
       | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
-    And I pry
     And I click on 'Speichern'
 
     # Make sure filter reflects the new status
+    And Sleep 2sec
+
+#    And Wait for response
     When I uncheck "Beschafft" for "Status Beschaffung" filter
-    And I pry
     Then I see "0 Anträge"
 
+    # Now modify the order status for in item in inspecting phase
+    When I check all items for "Budgetperioden" filter
+    And I uncheck all items for "Budgetperioden" filter
+    And I check "Inspecting" for "Budgetperioden" filter
 
+    And Sleep 2sec
+    And I expand the line of the request for "Zebra"
+    And I enter the following data into the request form:
+      | field                  | value                |
+      | Beschaffungs-Status    | Nicht beschafft      |
+      | Beschaffungs-Kommentar | Leider nicht möglich |
+    And I click on 'Speichern'
 
-#    # Now modify the order status for in item in inspecting phase
-#    When I check all items for "Budgetperioden" filter
-#    And I uncheck all items for "Budgetperioden" filter
-#    And I check "Inspecting" for "Budgetperioden" filter
-#    And I expand the line of the request for "Zebra"
-#    And I enter the following data into the request form:
-#      | field                  | value                |
-#      | Beschaffungs-Status    | Nicht beschafft      |
-#      | Beschaffungs-Kommentar | Leider nicht möglich |
-#    And I click on 'Speichern'
-#    And I expand the line of the request for "Zebra"
-#    Then the request form has the following data:
-#      | field                  | value                |
-#      | Beschaffungs-Status    | Nicht beschafft      |
-#      | Beschaffungs-Kommentar | Leider nicht möglich |
-#    And I click on 'Abbrechen'
-#
-#    # Make sure filter reflects the new status
-#    When I uncheck "Nicht beschafft" for "Status Beschaffung" filter
-#    Then I see "0 Anträge"
-#
-#    # Now modify the order status for in item in requesting phase
-#    When I check all items for "Budgetperioden" filter
-#    And I uncheck all items for "Budgetperioden" filter
-#    And I check "Requesting" for "Budgetperioden" filter
-#    And I expand the line of the request for "Gepard"
-#    And I enter the following data into the request form:
-#      | field                  | value                 |
-#      | Beschaffungs-Status    | Alternative beschafft |
-#      | Beschaffungs-Kommentar | Genausogut            |
-#    And I click on 'Speichern'
-#    And I expand the line of the request for "Gepard"
-#    Then the request form has the following data:
-#      | field                  | value                 |
-#      | Beschaffungs-Status    | Alternative beschafft |
-#      | Beschaffungs-Kommentar | Genausogut            |
-#    And I click on 'Abbrechen'
-#
-#    # Make sure filter reflects the new status
-#    When I uncheck "Alternative beschafft" for "Status Beschaffung" filter
-#    Then I see "0 Anträge"
+    And Sleep 2sec
+    And I expand the line of the request for "Zebra"
+    Then the request form has the following data:
+      | field                  | value                |
+      | Beschaffungs-Status    | Nicht beschafft      |
+      | Beschaffungs-Kommentar | Leider nicht möglich |
+    And I click on 'Abbrechen'
+
+    # Make sure filter reflects the new status
+    When I uncheck "Nicht beschafft" for "Status Beschaffung" filter
+    Then I see "0 Anträge"
+
+    # Now modify the order status for in item in requesting phase
+    When I check all items for "Budgetperioden" filter
+    And I uncheck all items for "Budgetperioden" filter
+    And I check "Requesting" for "Budgetperioden" filter
+
+    And Sleep 2sec
+    And I expand the line of the request for "Gepard"
+    And I enter the following data into the request form:
+      | field                  | value                 |
+      | Beschaffungs-Status    | Alternative beschafft |
+      | Beschaffungs-Kommentar | Genausogut            |
+    And I click on 'Speichern'
+
+    And Sleep 2sec
+    And I expand the line of the request for "Gepard"
+    Then the request form has the following data:
+      | field                  | value                 |
+      | Beschaffungs-Status    | Alternative beschafft |
+      | Beschaffungs-Kommentar | Genausogut            |
+    And I click on 'Abbrechen'
+
+    # Make sure filter reflects the new status
+    When I uncheck "Alternative beschafft" for "Status Beschaffung" filter
+    Then I see "0 Anträge"
 
   Scenario: Viewer can view the order status
     When I log in as the viewer
@@ -148,6 +155,8 @@ Feature: Order status
     Then I see "Artikel oder Projekt" in the request form
     And I see "Beschaffungs-Status" in the request form
     And I see "Nicht bearbeitet" in the request form
+    # And I pry
+      # not editable =================================================================================>>>>
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
@@ -173,6 +182,7 @@ Feature: Order status
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
+
   Scenario: Requester can view the order status
     When I log in as the requester "Elvira Ehring"
 
@@ -187,6 +197,8 @@ Feature: Order status
     Then I see "Artikel oder Projekt" in the request form
     And I see "Beschaffungs-Status" in the request form
     And I see "Nicht bearbeitet" in the request form
+    # And I pry
+      # not editable =================================================================================>>>>
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 

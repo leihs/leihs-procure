@@ -62,6 +62,30 @@ step 'I expand the request line' do
   find('li', text: @request.article_name, match: :first).click
   end
 
+
+def wait_for_ajax
+  Timeout.timeout(Capybara.default_max_wait_time) do
+    loop until finished_all_ajax_requests?
+  end
+end
+
+def finished_all_ajax_requests?
+  page.evaluate_script('jQuery.active').zero?
+end
+
+step 'Sleep 2sec' do
+  sleep 2
+end
+
+
+step 'Wait for response' do
+  wait_for_ajax
+end
+
+step 'Sleep 4sec' do
+  sleep 4
+end
+
 step 'I expand the request line after 2sec' do
   sleep 2
   find('li', text: @request.article_name, match: :first).click
