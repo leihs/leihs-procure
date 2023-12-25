@@ -920,11 +920,15 @@
                       (cond-> <> organization-id (assoc :organization_id organization-id)))
 
         proc-request (get-request-by-id tx auth-entity req-id)]
+
+
     (authorization/authorize-and-apply
       ;[leihs.procurement.resources.request:972] - (update! tx req-id (exchange-attrs update-data)) => [{:next.jdbc/update-count 1}]
       #(do (spy (update! tx req-id (exchange-attrs update-data)))
            (if-not (empty? attachments)
              (deal-with-attachments! tx req-id attachments)))
+
+
       :if-only
       #(request-perms/authorized-to-write-all-fields?
          tx
@@ -933,6 +937,9 @@
          (-> input-data
              (reject-keys request-perms/attrs-to-skip)
              submap-with-id-for-associated-resources)))
+
+
+
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
       (request-perms/apply-permissions tx

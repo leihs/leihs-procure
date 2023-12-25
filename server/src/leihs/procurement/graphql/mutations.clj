@@ -26,7 +26,7 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
-   :update-request request/update-request!,
+   :update-request (spy request/update-request!),
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),

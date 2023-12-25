@@ -87,9 +87,9 @@ Feature: Order status
 
     # Make sure filter reflects the new status
     When I uncheck "Beschafft" for "Status Beschaffung" filter
+    And I pry
     Then I see "0 Anträge"
 
-    And I pry
 
 
 #    # Now modify the order status for in item in inspecting phase

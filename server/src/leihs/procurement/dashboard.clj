@@ -144,6 +144,8 @@
   [ctx args value]
 
   (println ">debug> >>> FIRST LINE > get-dashboard????")
+  (println ">debug> o> helper >>> FIRST LINE > get-dashboard???? args=" args)
+  (println ">debug> o> helper >>> FIRST LINE > get-dashboard???? value=" value)
 
   (let [ring-request (:request ctx)
         tx (:tx-next ring-request)

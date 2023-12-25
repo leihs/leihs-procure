@@ -93,6 +93,7 @@
 
   (let [id (:id arguments)
         ; short_id (:short_id arguments)
+        p (println ">o> helper1 arguments=" arguments)
         p (println ">o> helper1 id=" id)
         category-id (:category_id arguments)
         budget-period-id (:budget_period_id arguments)
@@ -121,7 +122,7 @@
         p (println ">oo> helper5a :order_status" (:order_status arguments))
         ;order-status (some->> arguments :order_status (map request/to-name-and-upper-case))
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
-        p (println ">oo> helper5b :order_status" order-status)
+        p (println ">oo> helper5b  tocheck :order_status" order-status)
         p (println ">oo> helper5c :order_status" (class (first order-status)))
 
 
@@ -137,7 +138,7 @@
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
                          request-helpers/join-and-nest-associated-resources)
         p (println ">o> helper8" start-sqlmap)
-        p (println ">oo> helper8" order-status inspector-priority priority)
+        p (println ">oo> helper8 tocheck order_status" order-status inspector-priority priority) ;; ok?
         p (println ">oo> helper9" start-sqlmap)
 
 
@@ -163,65 +164,72 @@
         ;p (println ">o> searchTerm::after" (jdbc/execute! tx test))
 
         p (println ">o>> where [:in :procurement_requests.id [:cast id :uuid]])" id)
+
+        result (cond-> start-sqlmap
+                       id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
+                       ;; TODO / FYI: :in will cause problems
+                       ;id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
+                       ; short_id (sql/where [:in :procurement_requests.short_id short_id])
+
+
+                       ;:cause Der in SQL für eine Instanz von leihs.procurement.resources.requests$cast_uuids zu verwendende Datentyp kann nicht abgeleitet werden. Benutzen Sie 'setObject()' mit einem expliziten Typ, um ihn festzulegen.
+
+
+                       ;; OK START
+                       category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
+                                       (sqlp/merge-where-false-if-empty category-id))
+
+                       budget-period-id (-> (sql/where
+                                              [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
+                                            (sqlp/merge-where-false-if-empty budget-period-id))
+
+                       organization-id (-> (sql/where
+                                             [:in :procurement_requests.organization_id (cast-uuids organization-id)])
+                                           (sqlp/merge-where-false-if-empty organization-id))
+                       ;; OK END
+
+
+                       priority (-> (sql/where [:in :procurement_requests.priority priority])
+                                    (sqlp/merge-where-false-if-empty priority))
+
+
+                       inspector-priority (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
+                                              (sqlp/merge-where-false-if-empty inspector-priority))
+
+                       ;; FIXED
+                       state (-> (sql/where
+                                   (request/get-where-conds-for-states state advanced-user?))
+                                 (sqlp/merge-where-false-if-empty state))
+
+
+
+
+
+                       ;order-status (-> order-status
+                       order-status (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries order-status)])
+                                        (sqlp/merge-where-false-if-empty order-status))
+
+
+                       requested-by-auth-user (sql/where [:= :procurement_requests.user_id
+                                                          (-> context
+                                                              :request
+                                                              :authenticated-entity
+                                                              :user_id)])
+
+
+                       ;ApolloError: ERROR: argument of OR must be type boolean, not type record
+                       ;Position: 3525
+                       search-term (search-query search-term) ;; FIXME: BUG-2
+
+                       )
+
+        ;p (println ">o> order-status ??? tocheck" (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries order-status)])
+        ;                                              (sqlp/merge-where-false-if-empty order-status)))
+
+        p (println ">o> result" result)
         ]
-
-    (cond-> start-sqlmap
-            id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
-            ;; TODO / FYI: :in will cause problems
-            ;id (sql/where [:in :procurement_requests.id [:cast id :uuid]])
-            ; short_id (sql/where [:in :procurement_requests.short_id short_id])
-
-
-            ;:cause Der in SQL für eine Instanz von leihs.procurement.resources.requests$cast_uuids zu verwendende Datentyp kann nicht abgeleitet werden. Benutzen Sie 'setObject()' mit einem expliziten Typ, um ihn festzulegen.
-
-
-            ;; OK START
-            category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
-                            (sqlp/merge-where-false-if-empty category-id))
-
-            budget-period-id (-> (sql/where
-                                   [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
-                                 (sqlp/merge-where-false-if-empty budget-period-id))
-
-            organization-id (-> (sql/where
-                                  [:in :procurement_requests.organization_id (cast-uuids organization-id)])
-                                (sqlp/merge-where-false-if-empty organization-id))
-            ;; OK END
-
-
-            priority (-> (sql/where [:in :procurement_requests.priority priority])
-                         (sqlp/merge-where-false-if-empty priority))
-
-
-            inspector-priority (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
-                                   (sqlp/merge-where-false-if-empty inspector-priority))
-
-            ;; FIXED
-            state (-> (sql/where
-                        (request/get-where-conds-for-states state advanced-user?))
-                      (sqlp/merge-where-false-if-empty state))
-
-
-
-
-
-            ;order-status (-> order-status
-            order-status (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries order-status)])
-                             (sqlp/merge-where-false-if-empty order-status))
-
-
-            requested-by-auth-user (sql/where [:= :procurement_requests.user_id
-                                               (-> context
-                                                   :request
-                                                   :authenticated-entity
-                                                   :user_id)])
-
-
-            ;ApolloError: ERROR: argument of OR must be type boolean, not type record
-            ;Position: 3525
-            search-term (search-query search-term)          ;; FIXME: BUG-2
-
-            )))
+    (spy result)
+    ))
 
 
 
