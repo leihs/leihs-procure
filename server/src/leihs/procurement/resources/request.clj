@@ -303,8 +303,11 @@
   (println ">debug> 12")
   (println ">o> treat-order-status: HERE row =>" row)
   (let [
+
+        p (println ">o> treat-:order_status: upperCase A =>"  (:order_status row))
+
         result (upper-case-keyword-value row :order_status)
-        p (println ">o> treat-:order_status: upperCase =>" (:order_status result))
+        p (println ">o> treat-:order_status: upperCase B =>" result)
         p (if (nil? (:order_status row))
             (throw (Exception. "treat-order-status _> nill")))
         ] (spy result))
@@ -675,10 +678,10 @@
                                       ))
         p (println ">o> result tocheck" result)
 
-        result (:next.jdbc/update-count result)
+        result (list (:next.jdbc/update-count result))
         p (println ">o> result tocheck" result)
 
-        ] result)
+        ] (spy result))
 
   )
 
@@ -924,6 +927,7 @@
 
     (authorization/authorize-and-apply
       ;[leihs.procurement.resources.request:972] - (update! tx req-id (exchange-attrs update-data)) => [{:next.jdbc/update-count 1}]
+      ; master / procurement.resources.request:490] - (update! tx req-id (exchange-attrs update-data)) => (1)
       #(do (spy (update! tx req-id (exchange-attrs update-data)))
            (if-not (empty? attachments)
              (deal-with-attachments! tx req-id attachments)))
