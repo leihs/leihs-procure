@@ -1,21 +1,12 @@
 (ns leihs.procurement.resources.attachment
   (:require
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-
-    [leihs.core.utils :refer [my-cast]]
-
-    [taoensso.timbre :refer [debug info warn error spy]]
-
-    ;[clojure.java.jdbc :as jdbc]
-    ;        [leihs.procurement.utils.sql :as sql]
-
     [compojure.core :as cpj]
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.paths :refer [path]]
-    )
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
 
 (def attachment-base-query

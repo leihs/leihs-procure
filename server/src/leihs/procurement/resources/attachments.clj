@@ -1,24 +1,14 @@
 (ns leihs.procurement.resources.attachments
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-
-            [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
-
-        [taoensso.timbre :refer [debug info warn error spy]]
-
-
-            ;[clojure.java.jdbc :as jdbc]
-            ;[leihs.procurement.utils.sql :as sql]
-
-    [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.resources [attachment :as attachment]
-             [upload :as upload]]
-    ))
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [honey.sql.helpers :as sql]
+            [leihs.procurement.paths :refer [path]]
+            (leihs.procurement.resources [attachment :as attachment]
+                                         [upload :as upload])
+            [leihs.procurement.utils.helpers :refer [cast-uuids]]
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def attachments-base-query
   (-> (sql/select :procurement_attachments.*)
@@ -28,7 +18,7 @@
   [tx request-id]
   (let [query (-> attachments-base-query
                   (sql/where [:= :procurement_attachments.request_id
-                                    request-id])
+                              request-id])
                   sql-format)]
     (->> query
          (jdbc/execute! tx)
@@ -41,8 +31,6 @@
                :tx-next)]
     (get-attachments-for-request-id tx (:request-id value))))
 
-
-;cast-to-json
 (defn cast-to-json [comment] [:cast comment :json])
 
 (defn create-for-request-id-and-uploads!
@@ -52,12 +40,7 @@
           md (-> u-row
                  :metadata
                  to-json
-
-                 cast-to-json
-                 ;(#(:cast % :json))
-
-
-                 )]
+                 cast-to-json)]
       (attachment/create! tx
                           (-> u-row
                               (dissoc :id)
@@ -70,5 +53,5 @@
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_attachments)
-                     (sql/where [:in :procurement_attachments.id (cast-uuids (spy ids))])
+                     (sql/where [:in :procurement_attachments.id (cast-uuids ids)])
                      sql-format)))
