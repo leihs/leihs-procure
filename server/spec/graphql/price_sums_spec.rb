@@ -310,7 +310,6 @@ describe 'price sums' do
         }
       end
 
-      # TODO / FYI: maybe there is still a sorting-issue in sql-query
       it 'requesting phase' do
         @budget_period_I = FactoryBot.create(:budget_period,
                                              :requesting_phase,
@@ -319,12 +318,12 @@ describe 'price sums' do
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
 
-        puts ">>>" + result.to_json
-
         res_sort = sort_requests(result)
         exp_sort = sort_requests(expected_result)
 
         expect(res_sort).to eq(exp_sort)
+
+        # expect(result).to eq(expected_result)
       end
 
       it 'inspection phase' do
@@ -339,6 +338,8 @@ describe 'price sums' do
         exp_sort = sort_requests(expected_result)
 
         expect(res_sort).to eq(exp_sort)
+
+        # expect(result).to eq(expected_result)
       end
     end
 
@@ -354,6 +355,8 @@ describe 'price sums' do
       exp_sort = sort_requests(expected_result_transparent)
 
       expect(res_sort).to eq(exp_sort)
+
+      # expect(result).to eq(expected_result_transparent)
     end
   end
 
@@ -387,6 +390,8 @@ describe 'price sums' do
       exp_sort = sort_requests(expected_result_transparent)
 
       expect(res_sort).to eq(exp_sort)
+
+      # expect(result).to eq(expected_result_transparent)
     end
   end
 end
@@ -396,16 +401,9 @@ def sort_requests(_data)
     budget_period[:main_categories].each do |main_category|
       main_category[:categories].each do |category|
         next if category[:requests].nil? || category[:requests].empty?
-
-        # puts "before => " + category[:requests].to_s
-
         category[:requests].sort_by! { |request| request[:id] }
-
-        # puts "after => " + category[:requests].to_s
-
       end
     end
   end
   _data
 end
-
