@@ -8,7 +8,7 @@
 
     ;[clojure.java.jdbc :as jdbc]
 
-            [leihs.procurement.utils.helpers :refer [my-cast]]
+            [leihs.core.utils :refer [my-cast]]
 
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]

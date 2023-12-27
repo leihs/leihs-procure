@@ -4,7 +4,7 @@
     ;[clojure.java.jdbc :as jdbc]
     [leihs.procurement.utils.sql :as sqlp]
 
-    [leihs.procurement.utils.helpers :refer [my-cast]]
+    [leihs.core.utils :refer [my-cast]]
 
     [taoensso.timbre :refer [debug info warn error spy]]
 

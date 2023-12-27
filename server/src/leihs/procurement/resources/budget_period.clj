@@ -7,7 +7,7 @@
 
     [leihs.procurement.utils.sql :as sqlp]
 
-    [leihs.procurement.utils.helpers :refer [my-cast]]
+    [leihs.core.utils :refer [my-cast]]
 
     [logbug.debug :as debug]
 

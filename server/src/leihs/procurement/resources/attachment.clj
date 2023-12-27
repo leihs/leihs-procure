@@ -6,7 +6,7 @@
     [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
 
-    [leihs.procurement.utils.helpers :refer [my-cast]]
+    [leihs.core.utils :refer [my-cast]]
 
     [taoensso.timbre :refer [debug info warn error spy]]
 

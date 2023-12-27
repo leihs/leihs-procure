@@ -11,7 +11,7 @@
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]
 
-            [leihs.procurement.utils.helpers :refer [my-cast]]
+            [leihs.core.utils :refer [my-cast]]
 
     ;[clojure.java.jdbc :as jdbco]
 
