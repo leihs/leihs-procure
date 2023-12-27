@@ -19,9 +19,6 @@
 (defn admin? "Returns boolean"
   [tx auth-entity]
 
-  (println ">oo> tx" (class tx))
-  (println ">oo> auth-entity" auth-entity)
-
   (let [
         query (-> (sql/select [[:exists
 
@@ -35,10 +32,8 @@
                   spy
                   )
 
-        p (println ">o> admin?" query)
 
         result (jdbc/execute-one! tx (spy query))
-        p (println ">o> admin?" (spy result))
         ]
 
     (spy (:exists result))
@@ -78,10 +73,8 @@
                    sql-format)
 
 
-         p (println ">o> inspector?" query)
 
          result (jdbc/execute-one! tx (spy query))
-         p (println ">o> inspector?" (spy result))
          ]
 
      (spy (:result result))
@@ -101,10 +94,7 @@
                                          c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))] :result])
                    sql-format)
 
-         p (println ">o> viewer?" query)
-
          result (jdbc/execute-one! tx (spy query))
-         p (println ">o> viewer?" (spy result))
          ]
 
      (spy (:result result))
@@ -185,10 +175,8 @@
                                    )
                        sql-format)
 
-             p (println ">o> requester??" query)
 
              result (jdbc/execute-one! tx (spy query))
-             p (println ">o> requester??" (spy result))
              ]
 
          (spy (:exists result)))))

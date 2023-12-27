@@ -245,7 +245,7 @@
     (spy result)
     ))
 
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
 
 (comment
 

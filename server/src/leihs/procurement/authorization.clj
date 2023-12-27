@@ -13,11 +13,6 @@
     [ring.util.response :as response]))
 
 
-(defn myp [name var]
-  (println ">myprint> " name var)
-  var
-  )
-
 (defn throw-unauthorized []
   (throw (ex-info
            (str "UnauthorizedException"
@@ -83,10 +78,6 @@
   (some #(= handler-key %) skip-authorization-handler-keys))
 
 (defn authenticate [handler {:keys [uri query-string handler-key] :as request}]
-
-  (println ">>> authenticate::skip=" (skip? handler-key) " handler-key=" handler-key)
-  (println ">>> authenticate::authenticated-entity" (:authenticated-entity request))
-
   (cond
     (or (skip? handler-key) (:authenticated-entity request))
     (handler request)
@@ -105,44 +96,22 @@
 (defn wrap-authenticate
   [handler]
   (fn [request]
-    ;(println ">>wrap-authenticate::handler" handler)
-    ;(println ">>wrap-authenticate::request" request)
-
     (authenticate handler request)))
 
 
 
 (defn authorize [handler request]
-  (println "\n>> authorize >")
-  (println "\n>> authorize::handler >" handler)
-  (println "\n>> authorize::request >" request)
-  (println "\n>> authorize::handler-key >>" (:handler-key request))
-
-  (let [
-
-        auth-ent (:authenticated-entity request)
-        p (myp "authEnt?" auth-ent)
-        txn (:tx-next request)
-        p (myp "txn" txn)
-
-        p (myp "admin" (user-perms/admin? txn auth-ent))
-        p (myp "inspector" (user-perms/inspector? txn auth-ent))
-        p (myp "viewer" (user-perms/viewer? txn auth-ent))
-        p (myp "requester" (user-perms/requester? txn auth-ent))
-        ]
-    )
-
   ;(if (or (spy (skip? (:handler-key request)))
   ;        (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
   ;                   user-perms/requester?]
   ;                  (map #(% (:tx-next request) (:authenticated-entity request)))
   ;                  (some true?)))
 
-  (if (or  (skip? (:handler-key request))
+  (if (or (skip? (:handler-key request))
           (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
-                     user-perms/requester?]
-                    (map #(% (:tx-next request) (:authenticated-entity request)))
-                    (some true?))
+                user-perms/requester?]
+               (map #(% (:tx-next request) (:authenticated-entity request)))
+               (some true?))
           )
     (handler request)
     {:status 403,
