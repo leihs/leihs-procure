@@ -11,8 +11,7 @@
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
 
-(defn create-order-status-enum-entries [order-stati]        ;;new
-  (println ">oo> >here> to-name-and-lower-case-enums" order-stati)
+(defn create-order-status-enum-entries [order-stati]
   (map (fn [status] [:cast status :order_status_enum]) order-stati))
 
 (defn search-query
