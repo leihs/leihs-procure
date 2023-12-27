@@ -85,8 +85,6 @@ Feature: Order status
     And I click on 'Speichern'
 
     # Make sure filter reflects the new status
-    And Sleep 2sec
-
     When I uncheck "Beschafft" for "Status Beschaffung" filter
     Then I see "0 Anträge"
 
@@ -94,16 +92,12 @@ Feature: Order status
     When I check all items for "Budgetperioden" filter
     And I uncheck all items for "Budgetperioden" filter
     And I check "Inspecting" for "Budgetperioden" filter
-
-    And Sleep 2sec
     And I expand the line of the request for "Zebra"
     And I enter the following data into the request form:
       | field                  | value                |
       | Beschaffungs-Status    | Nicht beschafft      |
       | Beschaffungs-Kommentar | Leider nicht möglich |
     And I click on 'Speichern'
-
-    And Sleep 2sec
     And I expand the line of the request for "Zebra"
     Then the request form has the following data:
       | field                  | value                |
@@ -119,16 +113,12 @@ Feature: Order status
     When I check all items for "Budgetperioden" filter
     And I uncheck all items for "Budgetperioden" filter
     And I check "Requesting" for "Budgetperioden" filter
-
-    And Sleep 2sec
     And I expand the line of the request for "Gepard"
     And I enter the following data into the request form:
       | field                  | value                 |
       | Beschaffungs-Status    | Alternative beschafft |
       | Beschaffungs-Kommentar | Genausogut            |
     And I click on 'Speichern'
-
-    And Sleep 2sec
     And I expand the line of the request for "Gepard"
     Then the request form has the following data:
       | field                  | value                 |

@@ -28,7 +28,7 @@ Feature: Request CRUD as procurement admin
       | Beschaffungs-Kommentar | Wurde bestellt und geliefert! |
 
     And I click on 'Speichern'
-    And I expand the request line after 2sec
+    And I expand the request line
     And the request form has the following data:
       | field                  | value                         |
       | Beschaffungs-Status    | Beschafft                     |
@@ -81,7 +81,7 @@ Feature: Request CRUD as procurement admin
       | Innenauftrag                  | ABCDEF13245   |
       | Anhänge                       | secd.pdf      |
     And I click on 'Speichern'
-    And I expand the request line after 2sec
+    And I expand the request line
     And the request form has the following data:
       | field                         | value         |
       | Artikel oder Projekt          | Camera X      |

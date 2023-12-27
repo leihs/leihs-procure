@@ -111,7 +111,7 @@ Feature: Request CRUD as a inspector
       | Innenauftrag                  | ABCDEF13245   |
       | Anhänge                       | secd.pdf    |
     And I click on button 'Speichern'
-    And I expand the request line after 2sec
+    And I expand the request line
     And the request form has the following data:
       | field                         | value         |
       | Artikel oder Projekt          | Camera X      |

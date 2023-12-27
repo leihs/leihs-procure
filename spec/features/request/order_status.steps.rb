@@ -10,10 +10,6 @@ step "there is a viewer for category :cat" do |cat|
   @viewer = pv.user
 end
 
-step "Print: :prop" do |prop|
-  puts ">>> Log: " + prop.to_s
-end
-
 step ":prop filter has following checkboxes:" do |prop, table|
   within ".form-compact" do
     within find(".form-group", text: prop) do

@@ -61,23 +61,6 @@ step 'I expand the request line' do
   find('li', text: @request.article_name, match: :first).click
 end
 
-step 'Sleep 2sec' do
-  sleep 2
-end
-
-step 'Wait for response' do
-  wait_for_ajax
-end
-
-step 'Sleep 4sec' do
-  sleep 4
-end
-
-step 'I expand the request line after 2sec' do
-  sleep 2
-  find('li', text: @request.article_name, match: :first).click
-end
-
 step 'within the line of the category I click on +' do
   within find('.card.list-group-item', text: @category.name) do
     find('.fa-plus-circle').click
