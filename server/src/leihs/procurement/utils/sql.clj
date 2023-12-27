@@ -1,30 +1,20 @@
 (ns leihs.procurement.utils.sql
   (:refer-clojure :exclude [format update])
   (:require
-
     ;; all needed imports
     [clojure.data.json :as json]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     (honeysql [format :as format] [helpers :as helpers]
               [types :as types] [util :refer [defalias]])
-
     [leihs.core.db :as db]
-
     [next.jdbc :as jdbc]
-
-
     [taoensso.timbre :refer [debug error info spy warn]]))
 
 ; regex
 (defmethod format/fn-handler "~*"
   [_ field value]
   (str (format/to-sql field) " ~* " (format/to-sql value)))
-
-;; ilike
-;(defmethod format/fn-handler "~~*"
-;  [_ field value]
-;  (str (format/to-sql field) " ~~* " (format/to-sql value)))
 
 (defn dedup-join
   [honeymap]
@@ -38,7 +28,7 @@
   [sql-map & params-or-opts]
   (apply format/format [(dedup-join sql-map) params-or-opts]))
 
-(defn map->where-clause                                     ;;TODO
+(defn map->where-clause
   ([m] (map->where-clause nil m))
   ([table m]
    "transforms {:foo 1, :bar 2} of table :baz into
@@ -62,19 +52,7 @@
 
 (defn select-nest
   [sqlmap tbl nest-key]
-
-  (println ">o> sqlmap" sqlmap)
-  (println ">o> tbl" tbl)
-  (println ">o> nest-key" nest-key)
-
-  ;(helpers/merge-select sqlmap [(types/call :row_to_json tbl) nest-key]))
-  ;(sql/select sqlmap [:call :row_to_json tbl] nest-key)    )) ;FIXME
-
-
-  ;>o> nested1 {:from (:users), :select ([#sql/call [:row_to_json :users] :user])}
-
-  (sql/select sqlmap [[[:row_to_json tbl]] nest-key])       ;works
-  )
+  (sql/select sqlmap [[[:row_to_json tbl]] nest-key]))
 
 
 

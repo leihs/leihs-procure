@@ -1,45 +1,24 @@
 (ns leihs.procurement.dashboard
   (:require [clojure.string :as string]
-            [clojure.data.json :as json]
-
-            [clj-time.format :as fmt]
-
-
-            [taoensso.timbre :refer [debug info warn error spy]]
-
-            [leihs.procurement.utils.helpers :refer [cast-uuids]]
-            [clojure.data.json :as json]
-    ;[clojure.java.jdbc :as jdbc]
-    ;[leihs.procurement.utils.sql :as sql]
-
-            [logbug.debug :as debug]
-
-            [leihs.procurement.utils.helpers :refer [convert-dates]]
-
             [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
             [honey.sql.helpers :as sql]
-
-            [clojure.tools.logging :as log]
+            [leihs.core.db :as db]
             [leihs.procurement.resources.budget-periods :as budget-periods]
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
-            [leihs.procurement.resources.requests :as requests]))
+            [leihs.procurement.resources.requests :as requests]
+            [leihs.procurement.utils.helpers :refer [cast-uuids]]
+            [leihs.procurement.utils.helpers :refer [convert-dates]]
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]]))
 
 
 
 (defn sum-total-price
   [coll]
-  (println ">o> sum-total-price ???" (->> coll
-                                          (map :total_price_cents)))
-
-  (println ">o> sum-total-price ???" (->> coll
-                                          (map :name)))
-
-  (spy (->> coll
-            (map :total_price_cents)
-            (reduce +))))
+  (->> coll
+       (map :total_price_cents)
+       (reduce +)))
 
 
 
@@ -73,18 +52,11 @@
                  main-cats* (->> main-cats
                                  (map (fn [mc]
                                         (let [
-                                              p (println ">o> xxx debug mc=" (->> mc
-                                                                                  (map :name)
-                                                                                  ))
-
                                               cats* (->> mc
                                                          :id
                                                          (categories/get-for-main-category-id tx)
                                                          (map (fn [c] (let [
-                                                                            p (println ">o> c ???1 xxx before filter  c=" c)
-                                                                            p (println ">o> c ???1 xxx before filter bp=" bp)
-
-                                                                            requests* (spy (filter #(and (= (-> %
+                                                                            requests*  (filter #(and (= (-> %
                                                                                                                 :category
                                                                                                                 :value
                                                                                                                 :id)
@@ -94,8 +66,7 @@
                                                                                                                 :value
                                                                                                                 :id)
                                                                                                             (str (:id bp))))
-                                                                                                   requests))
-                                                                            p (println ">>>id here ??? xxx requests*" requests*)
+                                                                                                   requests)
                                                                             ]
                                                                         (-> c
                                                                             (assoc :requests requests*)
@@ -106,13 +77,6 @@
                                                                                      bp
                                                                                      mc
                                                                                      c)))))))
-
-                                              p (println ">o> xxx cats*=" (->> cats*
-                                                                               (map :name)
-                                                                               ))
-
-
-
                                               merged-path (-> mc
                                                               (assoc :categories cats*)
                                                               (assoc :total_price_cents (sum-total-price cats*))
@@ -120,11 +84,6 @@
                                                                      (cache-key dashboard-cache-key bp mc))
                                                               (->> (main-categories/merge-image-path
                                                                      tx)))
-
-
-                                              p (println ">o> xxx merged-path=" (->> merged-path
-                                                                                     (map :name)
-                                                                                     ))
                                               ]
                                           merged-path
 
@@ -143,10 +102,6 @@
 (defn get-dashboard
   [ctx args value]
 
-  (println ">debug> >>> FIRST LINE > get-dashboard????")
-  (println ">debug> o> helper >>> FIRST LINE > get-dashboard???? args=" args)
-  (println ">debug> o> helper >>> FIRST LINE > get-dashboard???? value=" value)
-
   (let [ring-request (:request ctx)
         tx (:tx-next ring-request)
         cat-ids (:category_id args)
@@ -154,26 +109,6 @@
         main-cats (-> main-categories/main-categories-base-query
                       sql-format
                       (->> (jdbc/execute! tx)))
-
-
-        ;; DEBUG
-        main-cats-query (-> main-categories/main-categories-base-query
-                            sql-format)
-        p (println ">>> resultA1-2a xxx >query query-bps " main-cats-query)
-
-
-        ;; DEBUG
-        bps-query (-> budget-periods/budget-periods-base-query
-                      (cond-> bp-ids (sql/where
-                                       ;[:in :procurement_budget_periods.id (cast-ids-to-uuid bp-ids)]))
-                                       [:in :procurement_budget_periods.id (cast-uuids bp-ids)]))
-                      sql-format
-                      )
-
-        p (println ">>> resultA1-2b xxx >query query-bps " bps-query)
-
-
-
         bps (if (or (not bp-ids) (not-empty bp-ids))
               (-> budget-periods/budget-periods-base-query
                   (cond-> bp-ids (sql/where
@@ -184,27 +119,10 @@
               [])
 
         bps (map convert-dates bps)
-
-
-
-        p (println ">>resultA1-2 xxx bps" bps)
-
-
         requests (requests/get-requests ctx args value)
-        p (println ">>requestsB2 xxx" requests)
-        p (println ">>requestsB2 xxx requests.count" (count requests))
-
-
-        p (println ">o> xxx request.count=" (count requests))
-        p (println ">o> xxx bps=" (count bps))
-        p (println ">o> xxx main-cats count=" (count main-cats) (map :name main-cats))
-
-        ;p (throw (Exception. "fake error"))
-
         dashboard-cache-key {:id (hash args)}]
     {:total_count (count requests),
      :cacheKey (cache-key dashboard-cache-key),
-     ;;
      :budget_periods (create-budget bps tx requests dashboard-cache-key main-cats) ;; correct result with hard-coded-data
      }))
 

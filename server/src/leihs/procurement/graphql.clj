@@ -1,28 +1,20 @@
 (ns leihs.procurement.graphql
   (:require
     [clojure.edn :as edn]
-
-    (java.sql.Date)
-    (clojure.java [io :as io] [jdbc :as jdbco])
+    (clojure.java [io :as io])
     (clojure.java [io :as io])
 
-
-
     ;; all needed imports
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-
-    [clojure.data.json :as json]
-
     [com.walmartlabs.lacinia :as lacinia]
     (com.walmartlabs.lacinia [parser :as graphql-parser]
                              [schema :as graphql-schema] [util :as graphql-util])
+    ;[java.sql.Date]
+    [leihs.core.db :as db]
     [leihs.core.graphql :as core-graphql]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
+    [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
     ))
 
@@ -55,13 +47,7 @@
 
 (defn pure-handler
   [{{query :query} :body, :as request}]
-
-  (println ">o> ??????  pure-handler 2a" query)
-  (println ">o> ??????  pure-handler 2b" request)
-  (println ">o> ??????  pure-handler 2c" (class request))
-
   (let [result (exec-query query request)
-        p (println ">o> ??????  pure-handler 2d" result)
         resp {:body result}]
     (if (:errors result)
       (do (debug result) (assoc resp :graphql-error true))
@@ -82,50 +68,26 @@
 
 (defn handler
   [{{query :query} :body, :as request}]
-
-  (println ">o> ???? handler a")
-
-  (let [mutation? (spy (->> query
+  (let [mutation? (->> query
                             (parse-query-with-exception-handling (core-graphql/schema))
                             graphql-parser/operations
                             :type
-                            (= :mutation)))]
-    (if (spy mutation?)
-
-
-
+                            (= :mutation))]
+    (if  mutation?
       (jdbc/with-transaction+options [tx-next (db/get-ds-next)]
                                      (letfn [(rollback-both-tx! []
-                                               ;(jdbc/db-set-rollback-only! tx)
                                                (.rollback (:connectable tx-next)))]
-                                       (try (let [resp (-> request
-                                                           ;(assoc :tx tx)
-                                                           (assoc :tx-next tx-next)
-                                                           pure-handler)
-                                                  resp-body (:body resp)
-                                                  resp-status (:status resp)
-                                                  p (println "pure-handler after request >> 1a")
-                                                  ]
-
-
-                                              (println ">>>>>>>>>>>?????????? response=" resp)
-
-                                              (when (spy (:graphql-error resp))
-                                                (warn ">oo> Rolling back transaction because of graphql error: " resp)
-                                                (println ">oo> ??? graphql2 when")
-
-                                                ;(.rollback (:connectable tx)))
-
+                                       (try (let [response (-> request
+                                                               (assoc :tx-next tx-next)
+                                                               pure-handler)]
+                                              (when (:graphql-error response)
+                                                (warn "Rolling back transaction because of graphql error: " response)
                                                 (rollback-both-tx!))
-
-                                              resp)
+                                              response)
                                             (catch Throwable th
-
-                                              (println ">oo> ??? graphql1 catch")
-                                              (warn "Rolling back transaction because of " (.getMessage th))
+                                              (warn "Rolling back transaction because of " th)
                                               (rollback-both-tx!)
                                               (throw th)))))
-
       (pure-handler request))
     ))
 
