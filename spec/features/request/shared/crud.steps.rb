@@ -58,25 +58,12 @@ step 'I expand the line of the category :cat' do |cat|
 end
 
 step 'I expand the request line' do
-  puts "open >>>" + @request.article_name.to_s + "<"
   find('li', text: @request.article_name, match: :first).click
-  end
-
-
-def wait_for_ajax
-  Timeout.timeout(Capybara.default_max_wait_time) do
-    loop until finished_all_ajax_requests?
-  end
-end
-
-def finished_all_ajax_requests?
-  page.evaluate_script('jQuery.active').zero?
 end
 
 step 'Sleep 2sec' do
   sleep 2
 end
-
 
 step 'Wait for response' do
   wait_for_ajax
@@ -89,7 +76,6 @@ end
 step 'I expand the request line after 2sec' do
   sleep 2
   find('li', text: @request.article_name, match: :first).click
-
 end
 
 step 'within the line of the category I click on +' do
@@ -268,13 +254,13 @@ step 'I set the end date as :date on line :n' do |date, n|
   fill_in("#{n.to_i - 1}.end_date", with: date)
 end
 
-step "I select the first budget period" do 
-  first('select#request_new.budgetPeriod option').select_option  
+step "I select the first budget period" do
+  first('select#request_new.budgetPeriod option').select_option
 end
 
 step "I select budget period :bp" do |bp|
   within(".form-group", text: "Budgetperioden") do
-    find(".dropdown-toggle").click 
+    find(".dropdown-toggle").click
     find(".dropdown-item-subgroup", text: bp).click
   end
 end

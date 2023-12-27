@@ -1,9 +1,6 @@
 (ns leihs.procurement.utils.helpers
   (:require [clojure.set :refer [subset?]]
-
-            [taoensso.timbre :refer [debug error info spy warn]]
-
-            ))
+            [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn submap? [m1 m2] (subset? (set m1) (set m2)))
 
@@ -13,7 +10,6 @@
 (defn cast-uuids [uuids]
   (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
 
-
 (import [java.time ZonedDateTime]
         [java.time.format DateTimeFormatter]
         [java.sql Timestamp]
@@ -22,15 +18,11 @@
 
 (defn timestamp-to-zoneddatetime [timestamp]
   (let [instant (.toInstant timestamp)
-        zone-id (ZoneId/of "Z")]                            ; UTC
+        zone-id (ZoneId/of "Z")]
     (ZonedDateTime/ofInstant instant zone-id)))
 
 (defn format-date [timestamp]
-  (println ">>> xxx" timestamp)
-  (println ">>> xxx class=" (class timestamp))
-
   (.format (timestamp-to-zoneddatetime timestamp) (DateTimeFormatter/ISO_INSTANT)))
-
 
 ; [leihs.procurement.utils.helpers :refer [convert-dates]]
 (defn convert-dates [entry]

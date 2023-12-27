@@ -24,13 +24,6 @@
         (let [e (get-cause _e)]
           (logging/warn (thrown/to-string e))
           (logging/debug e)
-
-
-          ;========= remove me
-             (println "error" e)
-             (println "error2" _e)
-          ;=========
-
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)
                  (contains? (ex-data e) :status))

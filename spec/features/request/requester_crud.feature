@@ -12,10 +12,8 @@ Feature: Request CRUD as a requester
     And there is a building "Building B"
     And there is a room "Room R" for building "Building B"
     When I log in as the requester
-#    And I pry
     And within the line of the budget period I click on +
     And within the line of the category I click on +
-#    And I pry
     When I enter the following data into the request form:
       | field                         | value       |
       | Artikel oder Projekt          | Camera      |

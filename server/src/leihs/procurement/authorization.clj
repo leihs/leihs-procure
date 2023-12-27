@@ -1,17 +1,13 @@
 (ns leihs.procurement.authorization
   (:require
-    [clojure.tools.logging :as log]
     [leihs.core.core :refer [presence]]
     [leihs.core.sign-in.external-authentication.back :as ext-auth]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.paths :refer [path]]
     [leihs.procurement.permissions.user :as user-perms]
-
-    [taoensso.timbre :refer [debug info warn error spy]]
-
-    [logbug.debug :as debug :refer [I>]]
-    [ring.util.response :as response]))
-
+    [logbug.debug :refer [I>]]
+    [ring.util.response :as response]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn throw-unauthorized []
   (throw (ex-info
@@ -24,10 +20,7 @@
   (fn [context args value]
     (let [rrequest (:request context)
           tx (:tx-next rrequest)
-          p (println ">>1x" tx)
-          auth-entity (:authenticated-entity rrequest)
-          p (println ">>2x" auth-entity)
-          ]
+          auth-entity (:authenticated-entity rrequest)]
       (if (->> predicates
                (map #(% tx auth-entity))
                (some true?))
@@ -98,21 +91,12 @@
   (fn [request]
     (authenticate handler request)))
 
-
-
 (defn authorize [handler request]
-  ;(if (or (spy (skip? (:handler-key request)))
-  ;        (spy (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
-  ;                   user-perms/requester?]
-  ;                  (map #(% (:tx-next request) (:authenticated-entity request)))
-  ;                  (some true?)))
-
   (if (or (skip? (:handler-key request))
           (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
                 user-perms/requester?]
                (map #(% (:tx-next request) (:authenticated-entity request)))
-               (some true?))
-          )
+               (some true?)))
     (handler request)
     {:status 403,
      :body (helpers/error-as-graphql-object

@@ -87,7 +87,6 @@ Feature: Order status
     # Make sure filter reflects the new status
     And Sleep 2sec
 
-#    And Wait for response
     When I uncheck "Beschafft" for "Status Beschaffung" filter
     Then I see "0 Anträge"
 
@@ -155,8 +154,6 @@ Feature: Order status
     Then I see "Artikel oder Projekt" in the request form
     And I see "Beschaffungs-Status" in the request form
     And I see "Nicht bearbeitet" in the request form
-    # And I pry
-      # not editable =================================================================================>>>>
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
@@ -182,7 +179,6 @@ Feature: Order status
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 
-
   Scenario: Requester can view the order status
     When I log in as the requester "Elvira Ehring"
 
@@ -197,8 +193,6 @@ Feature: Order status
     Then I see "Artikel oder Projekt" in the request form
     And I see "Beschaffungs-Status" in the request form
     And I see "Nicht bearbeitet" in the request form
-    # And I pry
-      # not editable =================================================================================>>>>
     And I see a readonly "order_status" field in the request form
     And I click on "Schliessen"
 

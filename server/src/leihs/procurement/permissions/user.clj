@@ -29,7 +29,6 @@
                    sql-format)]
      (:result (jdbc/execute-one! tx (spy query))))))
 
-
 (defn viewer?
   ([tx auth-entity] (viewer? tx auth-entity nil))
   ([tx auth-entity c-id]

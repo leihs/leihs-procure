@@ -3,20 +3,17 @@
     [clojure.edn :as edn]
     (clojure.java [io :as io])
     (clojure.java [io :as io])
-
     ;; all needed imports
     [com.walmartlabs.lacinia :as lacinia]
     (com.walmartlabs.lacinia [parser :as graphql-parser]
                              [schema :as graphql-schema] [util :as graphql-util])
-    ;[java.sql.Date]
     [leihs.core.db :as db]
     [leihs.core.graphql :as core-graphql]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
     [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-    ))
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def CUSTOM_SCALARS
   {:ID {:parse identity :serialize str}
@@ -69,11 +66,11 @@
 (defn handler
   [{{query :query} :body, :as request}]
   (let [mutation? (->> query
-                            (parse-query-with-exception-handling (core-graphql/schema))
-                            graphql-parser/operations
-                            :type
-                            (= :mutation))]
-    (if  mutation?
+                       (parse-query-with-exception-handling (core-graphql/schema))
+                       graphql-parser/operations
+                       :type
+                       (= :mutation))]
+    (if mutation?
       (jdbc/with-transaction+options [tx-next (db/get-ds-next)]
                                      (letfn [(rollback-both-tx! []
                                                (.rollback (:connectable tx-next)))]
@@ -88,8 +85,7 @@
                                               (warn "Rolling back transaction because of " th)
                                               (rollback-both-tx!)
                                               (throw th)))))
-      (pure-handler request))
-    ))
+      (pure-handler request))))
 
 
 (defn init []
