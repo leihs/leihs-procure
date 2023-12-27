@@ -5,7 +5,7 @@
 
     [taoensso.timbre :refer [debug info warn error spy]]
 
-    [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+    [leihs.procurement.utils.helpers :refer [cast-uuids]]
 
     [honey.sql :refer [format] :rename {format sql-format}]
     [leihs.core.db :as db]

@@ -8,7 +8,8 @@
     (leihs.procurement.resources [categories :as categories]
                                  [template :as template])
 
-    [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+
+    [leihs.procurement.utils.helpers :refer [cast-uuids]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
     ))
@@ -37,45 +38,13 @@
   )
 
 
-(comment
-
-  ;>o> result [SELECT procurement_templates.* FROM procurement_templates  ORDER BY concat((lower(coalesce(procurement_templates.article_name, ?)),
-  ;                                                                                             lower(coalesce(procurement_templates.supplier_name, ?))))  ]
-
-  (let [
-
-        tx (db/get-ds-next)
-
-        result (-> (sql/select :procurement_templates.*)
-                   (sql/from :procurement_templates)
-
-                   ;; works
-                   (sql/order-by [[:concat (->> [:procurement_templates.article_name :procurement_templates.supplier_name]
-                                                (map #(->> [:lower [:coalesce % ""]])))
-                                   ]])
-
-                   ;; works
-                   ;(sql/order-by [[:concat
-                   ;                [:lower [:coalesce :procurement_templates.article_name ""]]
-                   ;                [:lower [:coalesce :procurement_templates.supplier_name ""]]
-                   ;                ]]
-                   ;              )
-
-                   sql-format)
-
-        p (println ">oo> result" result)
-        p (println "\n>oo> result" (jdbc/execute! tx result))
-
-        ]
-    )
-  )
 
 
 (defn get-templates-for-ids
   [tx ids]
-  (jdbc/execute! tx (add-comment-to-sql-format (-> categories/categories-base-query
+  (jdbc/execute! tx  (-> categories/categories-base-query
                                                    (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-                                                   sql-format)) "templates/get-templates-for-ids"))
+                                                   sql-format)))
 
 
 

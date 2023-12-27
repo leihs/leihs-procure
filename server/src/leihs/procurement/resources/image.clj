@@ -1,23 +1,14 @@
 (ns leihs.procurement.resources.image
   (:require [cheshire.core :refer [generate-string] :rename
              {generate-string to-json}]
-
-    ;[clojure.java.jdbc :as jdbc]
-    ;        [leihs.procurement.utils.sql :as sql]
-
-            [taoensso.timbre :refer [debug info warn error spy]]
-
-            [leihs.core.utils :refer [my-cast]]
-
-            [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
-            [honey.sql.helpers :as sql]
-
             [compojure.core :as cpj]
+            [honey.sql :refer [format] :rename {format sql-format}]
+            [honey.sql.helpers :as sql]
+            [leihs.core.utils :refer [my-cast]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
-            )
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
 
 (def image-base-query
@@ -39,8 +30,7 @@
   (if-let [i (->> image-id
                   image-query
                   sql-format
-                  (jdbc/execute-one! tx)
-                  )]
+                  (jdbc/execute-one! tx))]
     (->> i
          :content
          (.decode (Base64/getMimeDecoder))
@@ -60,11 +50,7 @@
 (defn create-for-main-category-id-and-upload!
   [tx mc-id upload]
   (let [{u-id :id} upload
-        p (println ">o> u-id" u-id)
-
-        u-row (upload/get-by-id tx (spy u-id))
-        p (println ">o> u-row" u-row)
-
+        u-row (upload/get-by-id tx u-id)
         md (-> u-row
                :metadata
                to-json

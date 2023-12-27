@@ -10,15 +10,8 @@
         user-id (-> request
                     :authenticated-entity
                     :user_id)
-
-        p (println ">>>1" user-id)
-
         user (user/get-user-by-id tx user-id)
-        p (println ">>>2" user)
-        saved-filters (saved-filters/get-saved-filters-by-user-id tx user-id)
-        p (println ">>>3" saved-filters)
-
-        ] ;;FIXME
+        saved-filters (saved-filters/get-saved-filters-by-user-id tx user-id)]
     {:user user,
      :saved_filters (:filter saved-filters),
      :navbarProps (-> request

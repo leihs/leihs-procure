@@ -1,14 +1,8 @@
 (ns leihs.procurement.resources.buildings
-  (:require 
-    ;[clojure.java.jdbc :as jdbc]
-    ;        [leihs.procurement.utils.sql :as sql]
-
+  (:require
     [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-    
-    ))
+    [next.jdbc :as jdbc]))
 
 (def general-id #uuid "abae04c5-d767-425e-acc2-7ce04df645d1")
 
@@ -20,11 +14,11 @@
 (defn buildings-query
   [args]
   (let [id (:id args)]
-    (cond-> buildings-base-query id (sql/where [:= :buildings.id id]))))
+    (cond-> buildings-base-query id (sql/where [:= :buildings.id [:cast id :uuid]]))))
 
 (defn get-buildings
   [context args _]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (sql-format (buildings-query args))))
+                     :request
+                     :tx-next)
+                 (sql-format (buildings-query args))))

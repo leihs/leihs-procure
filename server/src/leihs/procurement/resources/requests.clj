@@ -4,7 +4,7 @@
     ;[clojure.java.jdbc :as jdbc]
             [honey.sql :refer [format] :rename {format sql-format}]
 
-            [leihs.procurement.utils.helpers :refer [add-comment-to-sql-format cast-uuids]]
+            [leihs.procurement.utils.helpers :refer [cast-uuids]]
 
             [honey.sql.helpers :as sql]
             [leihs.core.db :as db]

@@ -3,21 +3,10 @@
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
     [leihs.procurement.resources.budget-period :as budget-period]
-
     [leihs.procurement.utils.helpers :refer [convert-dates]]
-
     [leihs.procurement.utils.helpers :refer [cast-uuids]]
-
     [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-
-    )
-  (:import
-    (java.time OffsetDateTime ZoneOffset ZonedDateTime)
-    (java.time.format DateTimeFormatter)
-    (java.time ZoneOffset ZonedDateTime)
-    (java.time.format DateTimeFormatter))
-  )
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 
 (defn insert-test-period-budget [tx data]
@@ -26,7 +15,7 @@
                   sql-format)]
     (jdbc/execute-one! tx query)))
 
-
+;; TODO: remove
 ;(defn parse-utc-string [utc-string]
 ;  (OffsetDateTime/parse utc-string))
 
@@ -70,11 +59,11 @@
   ([context args _]
    (if (= (:id args) [])
      []
-     (let [result (spy (jdbc/execute! (-> context
-                                          :request
-                                          :tx-next) (-> args
-                                                        budget-periods-query
-                                                        sql-format)))]
+     (let [result (jdbc/execute! (-> context
+                                     :request
+                                     :tx-next) (-> args
+                                                   budget-periods-query
+                                                   sql-format))]
        (map convert-dates result)))))
 
 
@@ -107,8 +96,7 @@
                          ;p (println ">o> bp-with-dates" bp-with-dates)
 
 
-                         bp-with-dates bp
-                         ]
+                         bp-with-dates bp]
                      (do
                        (if (:id bp-with-dates)
                          (budget-period/update-budget-period! tx bp-with-dates)
