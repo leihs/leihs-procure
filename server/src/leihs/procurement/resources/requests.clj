@@ -553,7 +553,7 @@
         ]
 
 
-    (-> [[:coalesce                                         ;;FIXME TODO PRIO!!!
+    (-> [[:coalesce
           :procurement_requests.order_quantity
           :procurement_requests.approved_quantity]]
         (total-price-sqlmap bp-id)
@@ -564,4 +564,4 @@
     ))
 
 ;[logbug.debug :as debug]
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)

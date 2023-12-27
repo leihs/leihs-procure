@@ -1016,10 +1016,6 @@
 (defn requested-by?
   [tx auth-entity request]
 
-  (println ">debug> 39")
-  (println ">debug> 39 request=" request)
-  (println ">debug> 39 reques.idt=" (:id request))
-
   (= (:user_id auth-entity)
      (-> requests-base-query
          (sql/where [:= :procurement_requests.id [:cast (:id request) :uuid]])
@@ -1028,4 +1024,4 @@
          first
          :user_id)))
 
-(debug/debug-ns *ns*)
+;(debug/debug-ns *ns*)
