@@ -2,10 +2,6 @@
   (:require
     [leihs.procurement [authorization :as authorization]]
     [leihs.procurement.permissions [user :as user-perms]]
-
-        [taoensso.timbre :refer [debug info warn error spy]]
-
-
     [leihs.procurement.resources [admins :as admins]
      [budget-period :as budget-period] [budget-periods :as budget-periods]
      [category :as category] [categories :as categories]
@@ -30,7 +26,7 @@
    :update-main-categories (-> main-categories/update-main-categories!
                                (authorization/wrap-ensure-one-of
                                  [user-perms/admin?])),
-   :update-request (spy request/update-request!),
+   :update-request request/update-request!,
    :update-requesters-organizations
      (-> requesters-organizations/update-requesters-organizations!
          (authorization/wrap-ensure-one-of [user-perms/admin?])),

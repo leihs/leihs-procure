@@ -1,40 +1,25 @@
 (ns leihs.procurement.permissions.request-fields
-  (:require [leihs.procurement.resources.rooms :as rooms]
-            [leihs.procurement.resources.building :as building]
+  (:require [leihs.procurement.permissions.user :as user-perms]
+            [leihs.procurement.resources.budget-period :as budget-period]
             [leihs.procurement.resources.category :as category]
-            [leihs.procurement.permissions.user :as user-perms]
-            [leihs.procurement.resources.model :as model]
+            [leihs.procurement.resources.rooms :as rooms]
             [leihs.procurement.resources.template :as template]
-            [leihs.procurement.resources.user :as user]
-    ;[clojure.java.jdbc :as jdbc]
-
-
-            [taoensso.timbre :refer [debug info warn error spy]]
-
-            [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.core.db :as db]
-            [next.jdbc :as jdbc]
-            [honey.sql.helpers :as sql]
-
-            [clojure.tools.logging :as log]
-            [leihs.procurement.resources.budget-period :as budget-period]))
+            [leihs.procurement.resources.user :as user]))
 
 (defn get-for-user-and-request
   "Read permissions always apply only to an existing request.
   Write permissions apply either to a new or an existing request."
   [tx auth-entity proc-request]
   (let [new-request (nil? (:id proc-request))
-
-        p (println ">o> request-fields::get-for-user-and-request, new-request?=" new-request)
-
         existing-request (not new-request)
-        budget-period (budget-period/get-budget-period-by-id tx (-> proc-request
-                                                                    :budget_period
-                                                                    :id))
+        budget-period (budget-period/get-budget-period-by-id tx
+                                                             (-> proc-request
+                                                                 :budget_period
+                                                                 :id))
         template (some->> proc-request
-                   :template
-                   :id
-                   (template/get-template-by-id tx))
+                          :template
+                          :id
+                          (template/get-template-by-id tx))
         category-id (or (-> proc-request
                             :category
                             :id)
@@ -62,107 +47,105 @@
                                           (or can-edit-order-status-fields category-viewer
                                               (and requester own-request)))]
     {:accounting_type
-     {:read (or (and requester own-request (or inspection-phase past-phase))
-                category-viewer
-                inspector
-                admin),
-      :write (and (not past-phase)
-                  (or (and new-request
-                           requester
-                           (or (and requesting-phase inspector)
-                               (and inspection-phase category-inspector)
-                               admin))
-                      (and existing-request (or admin category-inspector)))),
-      :default "aquisition",
-      :required true},
+       {:read (or (and requester own-request (or inspection-phase past-phase))
+                  category-viewer
+                  inspector
+                  admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        :default "aquisition",
+        :required true},
      :approved_quantity
-     ;{:read true, :write true,
-
-     {:read (spy (or (and (spy requester) (spy own-request) (spy past-phase))
-                     (spy inspector)
-                     (spy category-viewer)
-                     (spy admin))),
-      :write (and (not past-phase)
-                  (or
-                    (and new-request requester (or admin category-inspector))
-                    (and existing-request (or admin category-inspector)))),
-      :required false},
+       {:read (or (and requester own-request past-phase)
+                  inspector
+                  category-viewer
+                  admin),
+        :write (and (not past-phase)
+                    (or
+                      (and new-request requester (or admin category-inspector))
+                      (and existing-request (or admin category-inspector)))),
+        :required false},
      :article_name
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not template)
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default (:article_name template),
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (:article_name template),
+        :required true},
      :article_number
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not template)
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default (:article_number template),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (:article_number template),
+        :required false},
      :attachments
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :required false},
      :budget_period
-     {:read true,
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default budget-period,
-      :required true},
+       {:read true,
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default budget-period,
+        :required true},
      :category
-     {:read true,
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default category,
-      :required true},
+       {:read true,
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default category,
+        :required true},
      :cost_center {:read (or (and requester own-request (or inspection-phase past-phase))
                              category-viewer
                              inspector
@@ -174,89 +157,89 @@
                   (or admin
                       (and requesting-phase requester own-request)
                       category-inspector)),
-     :general_ledger_account {:read (or (and requester own-request (or inspection-phase past-phase))
-                                        category-viewer
-                                        inspector
-                                        admin),
+     :general_ledger_account {:read  (or (and requester own-request (or inspection-phase past-phase))
+                                         category-viewer
+                                         inspector
+                                         admin),
                               :write false,
                               :required false},
      :inspection_comment
-     {:read (or (and requester own-request past-phase)
-                category-viewer
-                inspector
-                admin),
-      :write (and (not past-phase)
-                  (or (and new-request
-                           requester
-                           (or (and requesting-phase inspector)
-                               (and inspection-phase category-inspector)
-                               admin))
-                      (and existing-request (or admin category-inspector)))),
-      :required false},
+       {:read (or (and requester own-request past-phase)
+                  category-viewer
+                  inspector
+                  admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        :required false},
      :inspector_priority
-     {:read (or category-viewer inspector admin),
-      :write (and (not past-phase)
-                  (or (and new-request
-                           requester
-                           (or (and requesting-phase inspector)
-                               (and inspection-phase category-inspector)
-                               admin))
-                      (and existing-request (or admin category-inspector)))),
-      ; keep it upper-case!
-      :default "MEDIUM",
-      :required true},
+       {:read (or category-viewer inspector admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        ; keep it upper-case!
+        :default "MEDIUM",
+        :required true},
      :internal_order_number
-     {:read (or (and requester own-request (or inspection-phase past-phase))
-                category-viewer
-                inspector
-                admin),
-      :write (and (not past-phase)
-                  (or (and new-request
-                           requester
-                           (or (and requesting-phase inspector)
-                               (and inspection-phase category-inspector)
-                               admin))
-                      (and existing-request (or admin category-inspector)))),
-      :required false},
+       {:read (or (and requester own-request (or inspection-phase past-phase))
+                  category-viewer
+                  inspector
+                  admin),
+        :write (and (not past-phase)
+                    (or (and new-request
+                             requester
+                             (or (and requesting-phase inspector)
+                                 (and inspection-phase category-inspector)
+                                 admin))
+                        (and existing-request (or admin category-inspector)))),
+        :required false},
      :model
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not template)
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default (:model_id template),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (:model_id template),
+        :required false},
      :motivation
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            (and requesting-phase requester own-request)
-                            (and inspection-phase
-                                 own-request
-                                 category-inspector))))),
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              (and requesting-phase requester own-request)
+                              (and inspection-phase
+                                   own-request
+                                   category-inspector))))),
+        :required true},
      :order_quantity
-     {:read (or inspector category-viewer admin),
-      :write (and (not past-phase)
-                  (or
-                    (and new-request requester (or admin category-inspector))
-                    (and existing-request (or admin category-inspector)))),
-      :required false},
+       {:read (or inspector category-viewer admin),
+        :write (and (not past-phase)
+                    (or
+                      (and new-request requester (or admin category-inspector))
+                      (and existing-request (or admin category-inspector)))),
+        :required false},
      ; FIXME: remove from here?
      ; :organization {:read true,
      ;                :write (and new-request
@@ -269,156 +252,152 @@
         :default "NOT_PROCURED"
         :required true}
      :order_comment
-     {:read can-read-order-status-fields
-      :write can-edit-order-status-fields
-      :required false}
+      {:read can-read-order-status-fields
+        :write can-edit-order-status-fields
+        :required false}
      :price_cents
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not template)
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default (or (:price_cents template) 0),
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (or (:price_cents template) 0),
+        :required true},
      :price_currency {:read true,
                       :write false,
                       :default (or (:price_currency template) "CHF"),
                       :required true},
      :priority
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            (and requesting-phase requester own-request)
-                            (and inspection-phase
-                                 own-request
-                                 category-inspector))))),
-      :default "NORMAL",
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              (and requesting-phase requester own-request)
+                              (and inspection-phase
+                                   own-request
+                                   category-inspector))))),
+        :default "NORMAL",
+        :required true},
      :procurement_account {:read (or (and requester own-request (or inspection-phase past-phase))
                                      category-viewer
                                      inspector
                                      admin),
                            :write false},
      :receiver
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :required false},
      :replacement
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default nil,
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default nil,
+        :required true},
      :requested_quantity
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write
-      (and
-        (not past-phase)
-        (or (or (and new-request
-                     requester
-                     (or (and requesting-phase (or own-request inspector))
-                         (and inspection-phase category-inspector)
-                         admin))
-                (and existing-request
-                     (or admin
-                         (and requesting-phase requester own-request)
-                         (and inspection-phase category-inspector)))))),
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write
+          (and
+            (not past-phase)
+            (or (or (and new-request
+                         requester
+                         (or (and requesting-phase (or own-request inspector))
+                             (and inspection-phase category-inspector)
+                             admin))
+                    (and existing-request
+                         (or admin
+                             (and requesting-phase requester own-request)
+                             (and inspection-phase category-inspector)))))),
+        :required true},
      :room
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write
-      (and
-        (not past-phase)
-        (or (or (and new-request
-                     requester
-                     (or (and requesting-phase (or own-request inspector))
-                         (and inspection-phase category-inspector)
-                         admin))
-                (and existing-request
-                     (or admin
-                         category-inspector
-                         (and requesting-phase requester own-request)))))),
-      :default (rooms/general-from-general tx),
-      :required true},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write
+          (and
+            (not past-phase)
+            (or (or (and new-request
+                         requester
+                         (or (and requesting-phase (or own-request inspector))
+                             (and inspection-phase category-inspector)
+                             admin))
+                    (and existing-request
+                         (or admin
+                             category-inspector
+                             (and requesting-phase requester own-request)))))),
+        :default (rooms/general-from-general tx),
+        :required true},
      :supplier
-     {
-      ;:read true, :write false,
-
-      :read (spy (or (and requester own-request) category-viewer inspector admin)),
-      :write (spy (and
-                    (not template)
-                    (not past-phase)
-                    (or (and new-request
-                             requester
-                             (or (and requesting-phase (or own-request inspector))
-                                 (and inspection-phase category-inspector)
-                                 admin))
-                        (and existing-request
-                             (or admin
-                                 category-inspector
-                                 (and requesting-phase requester own-request)))))),
-
-      :default (:supplier_id template),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (:supplier_id template),
+        :required false},
      :supplier_name
-     {:read (or (and requester own-request) category-viewer inspector admin),
-      :write (and
-               (not template)
-               (not past-phase)
-               (or (and new-request
-                        requester
-                        (or (and requesting-phase (or own-request inspector))
-                            (and inspection-phase category-inspector)
-                            admin))
-                   (and existing-request
-                        (or admin
-                            category-inspector
-                            (and requesting-phase requester own-request))))),
-      :default (:supplier_name template),
-      :required false},
+       {:read (or (and requester own-request) category-viewer inspector admin),
+        :write (and
+                 (not template)
+                 (not past-phase)
+                 (or (and new-request
+                          requester
+                          (or (and requesting-phase (or own-request inspector))
+                              (and inspection-phase category-inspector)
+                              admin))
+                     (and existing-request
+                          (or admin
+                              category-inspector
+                              (and requesting-phase requester own-request))))),
+        :default (:supplier_name template),
+        :required false},
      :template {:read true,
                 :write (not existing-request),
                 :default template,
                 :required true},
      :user {:read
-            (or (and requester own-request) category-viewer inspector admin),
+              (or (and requester own-request) category-viewer inspector admin),
             :write
-            (and (not past-phase)
-                 (or (and new-request requester (or admin category-inspector))
-                     (and existing-request (or admin category-inspector)))),
+              (and (not past-phase)
+                   (or (and new-request requester (or admin category-inspector))
+                       (and existing-request (or admin category-inspector)))),
             :required true,
             :default user}}))

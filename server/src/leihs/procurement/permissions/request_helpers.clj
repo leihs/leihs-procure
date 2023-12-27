@@ -65,9 +65,6 @@
 
 (defn can-write-any-field?
   [req]
-  (println ">oo> can-write-any-field?")
-  (println ">oo> can-write-any-field/attr to remove" [attrs-to-skip special-perms non-form-fields])
-
   (->> [attrs-to-skip special-perms non-form-fields]
        (apply concat)
        (apply dissoc req)
