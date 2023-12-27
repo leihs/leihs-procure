@@ -1,18 +1,10 @@
 (ns leihs.procurement.resources.suppliers
   (:require
-    ;[clojure.java.jdbc :as jdbc]
-    ;[leihs.procurement.utils.sql :as sql]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-
-        [taoensso.timbre :refer [debug info warn error spy]]
-
-
     [clojure.string :as clj-str]
-    [logbug.debug :as debug]))
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def suppliers-base-query
   (-> (sql/select :suppliers.*)
@@ -24,7 +16,7 @@
     (-> context
         :request
         :tx-next)
-    (spy (let [terms (some-> args
+    (let [terms (some-> args
                         :search_term
                         (clj-str/split #"\s+")
                         (->> (map #(str "%" % "%"))))
@@ -38,4 +30,4 @@
                         (map (fn [term] [:ilike (:unaccent :suppliers.name) (:unaccent term)])
                              terms)))
                 offset (sql/offset offset)
-                limit (sql/limit limit)))))))
+                limit (sql/limit limit))))))

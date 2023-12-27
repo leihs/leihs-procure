@@ -2,28 +2,21 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.db :as db]
     [leihs.procurement.authorization :as authorization]
     [leihs.procurement.permissions.user :as user-perms]
     (leihs.procurement.resources [categories :as categories]
                                  [template :as template])
-
-
     [leihs.procurement.utils.helpers :refer [cast-uuids]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
     ))
 
-(do
-  (def templates-base-query
-    (-> (sql/select :procurement_templates.*)
-        (sql/from :procurement_templates)
-        (sql/left-join :models [:= :models.id :procurement_templates.model_id])
-        (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
-                                     (map #(->> [:lower [:coalesce % ""]])))
-                        ]])
-        ))
-  )
+(def templates-base-query
+  (-> (sql/select :procurement_templates.*)
+      (sql/from :procurement_templates)
+      (sql/left-join :models [:= :models.id :procurement_templates.model_id])
+      (sql/order-by [[:concat (->> [:procurement_templates.article_name :models.product :models.version]
+                                   (map #(->> [:lower [:coalesce % ""]])))]])))
 
 (defn get-templates
   [context _ value]
@@ -33,20 +26,13 @@
          sql-format
          (jdbc/execute! (-> context
                             :request
-                            :tx-next))))
-
-  )
-
-
-
+                            :tx-next)))))
 
 (defn get-templates-for-ids
   [tx ids]
-  (jdbc/execute! tx  (-> categories/categories-base-query
-                                                   (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-                                                   sql-format)))
-
-
+  (jdbc/execute! tx (-> categories/categories-base-query
+                        (sql/where [:in :procurement_categories.id (cast-uuids ids)])
+                        sql-format)))
 
 (defn delete-templates-not-in-ids!
   [tx ids]
@@ -59,7 +45,6 @@
   [tx tmpl]
   (or (:id tmpl)
       (as-> tmpl <> (dissoc <> :id) (template/get-template tx <>) (:id <>))))
-
 
 (defn update-templates!
   [context args _]
@@ -76,9 +61,7 @@
                  (if (:to_delete tmpl)
                    (template/delete-template! tx id)
                    (template/update-template! tx tmpl))
-
-                 (template/insert-template! tx (dissoc tmpl :id))
-                 )
+                 (template/insert-template! tx (dissoc tmpl :id)))
               :if-only
               #(or (user-perms/admin? tx auth-entity)
                    (user-perms/inspector? tx auth-entity (:category_id tmpl))))

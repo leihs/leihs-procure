@@ -1,16 +1,9 @@
 (ns leihs.procurement.resources.rooms
-  (:require [clojure.tools.logging :as log]
+  (:require [honey.sql :refer [format] :rename {format sql-format}]
+            [honey.sql.helpers :as sql]
             [leihs.procurement.resources.building :as building]
             [leihs.procurement.resources.buildings :as buildings]
-    
-            ;[clojure.java.jdbc :as jdbc]
-            ;[leihs.procurement.utils.sql :as sql]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-    ))
+            [next.jdbc :as jdbc]))
 
 (def rooms-base-query
   (-> (sql/select :rooms.*)
@@ -30,11 +23,11 @@
   [args value]
   (let [building_id (or (:building_id args) (:id value))]
     (cond-> rooms-base-query
-      building_id (sql/where [:= :rooms.building_id [:cast building_id :uuid]]))))
+            building_id (sql/where [:= :rooms.building_id [:cast building_id :uuid]]))))
 
 (defn get-rooms
   [context args value]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (sql-format (rooms-query args value))))
+                     :request
+                     :tx-next)
+                 (sql-format (rooms-query args value))))

@@ -1,15 +1,9 @@
 (ns leihs.procurement.resources.models
   (:require
-    ;[clojure.java.jdbc :as jdbc]
-    ;[leihs.procurement.utils.sql :as sql]
-
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
-    [honey.sql.helpers :as sql]
-
     [clojure.string :as clj-str]
-    [logbug.debug :as debug]))
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [next.jdbc :as jdbc]))
 
 (def sql-name
   (concat :product (:cast " " :varchar) :version))

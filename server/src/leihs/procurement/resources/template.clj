@@ -1,29 +1,18 @@
 (ns leihs.procurement.resources.template
   (:require
-
-    ;[clojure.java.jdbc :as jdbc]
-    [leihs.procurement.utils.sql :as sqlp]
-
-    [leihs.core.utils :refer [my-cast]]
-
-    [taoensso.timbre :refer [debug info warn error spy]]
-
-
     [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-
-    [clojure.data :refer [diff]]
-    [leihs.core.core :refer [raise]]
-    [taoensso.timbre :refer [debug info warn error]]))
+    [leihs.core.utils :refer [my-cast]]
+    [leihs.procurement.utils.sql :as sqlp]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]
+    [taoensso.timbre :refer [debug error info warn]]))
 
 (def ALLOWED-KEYS-FOR-USED-TEMPLATE #{:is_archived})
 
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
       (sql/from :procurement_templates)))
-
 
 (defn get-template-by-id
   [tx id]
@@ -46,26 +35,15 @@
   (let [
         result (-> (sql/select :%count.*)
                    (sql/from :procurement_requests)
-                   ;(sql/where [:= :template_id [:cast (:id tmpl) :uuid]])
                    (sql/where [:= :template_id (:id tmpl)])
                    sql-format
-                   (->> (jdbc/execute-one! tx))
-                   )
-
-
+                   (->> (jdbc/execute-one! tx)))
         req-exist? (-> (spy result)
                        :count
-                       (> 0)
-                       )
-        ]
+                       (> 0))]
     (if req-exist?
       (select-keys tmpl ALLOWED-KEYS-FOR-USED-TEMPLATE))
-
     tmpl))
-
-
-
-
 
 (defn update-template!
   [tx tmpl]
@@ -100,8 +78,7 @@
      (-> templates-base-query
          (sql/where where-clause)
          sql-format
-         (->> (jdbc/execute! tx))
-         ))))
+         (->> (jdbc/execute! tx))))))
 
 (defn requests-count [{{:keys [tx]} :request} _ {:keys [id]}]
   (-> (sql/select :%count.*)

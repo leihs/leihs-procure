@@ -1,18 +1,9 @@
 (ns leihs.procurement.resources.saved-filters
   (:require
-
-    ;[clojure.java.jdbc :as jdbc]
-    ;        [leihs.procurement.utils.sql :as sql]
-
     [honey.sql :refer [format] :rename {format sql-format}]
-    [leihs.core.db :as db]
-    [next.jdbc :as jdbc]
     [honey.sql.helpers :as sql]
-
-
-    [taoensso.timbre :refer [debug info warn error spy]]
-
-    ))
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn saved-filters-query
   [user-id]
@@ -32,7 +23,6 @@
 
 (defn get-saved-filters-by-user-id
   [tx user-id]
-  (println ">>oida>>" user-id)
   (jdbc/execute-one! tx (saved-filters-query user-id)))
 
 (defn delete-unused
