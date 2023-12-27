@@ -4,7 +4,6 @@ require 'json'
 require 'date'
 require 'time'
 
-
 describe 'budget periods' do
   context 'query' do
     example 'returns no error' do
@@ -172,7 +171,6 @@ describe 'budget periods' do
       now = DateTime.now
       @new_inspection_start_date_1 = DateTime.new(now.year + 1, 6, 1)
       @new_end_date_1 = DateTime.new(now.year + 1, 12, 1)
-
       @new_inspection_start_date_2 = DateTime.new(now.year + 2, 6, 1)
       @new_end_date_2 = DateTime.new(now.year + 2, 12, 1)
 
@@ -210,7 +208,6 @@ describe 'budget periods' do
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']
     end
 
-
     it 'updates successfully for an authorized user' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)
@@ -235,7 +232,6 @@ describe 'budget periods' do
           inspection_start_date: @new_inspection_start_date_1,
           end_date: @new_end_date_1 }
       ]
-
       expect(BudgetPeriod.count).to be == budget_periods_after.count
       budget_periods_after.each do |data|
         response_data = JSON.parse(data.to_json)
@@ -260,8 +256,6 @@ describe 'budget periods' do
     end
   end
 end
-
-
 
 def parse_date_ignoring_timezone(date_str)
   begin
