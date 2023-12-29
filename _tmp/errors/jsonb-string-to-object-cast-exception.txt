@@ -1,0 +1,73 @@
+
+>> TEST-CASE:
+procure git:(mr/procure-next) ✗ NOPRY_ON_EXCEPTION=yes TEST_AUTH_SYSTEM_PORT=4567 DB_NAME=leihs_test ./bin/rspec ./spec/features/request/admin_crud.feature:37
+
+
+
+>>1d  json
+>> ===============================================
+>> ===============================================
+>>1a  ["Eum architecto minus magnam."]
+>>1b  java.lang.String
+>>1c  [Eum architecto minus magnam.]
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id":"9728f94a-0e15-4167-beae-2023edf26a5e","name":"Budget-Period-BP","inspection_start_date":"2023-12-28T00:00:00+01:00","end_date":"2024-01-29T00:00:00+01:00","created_at":"2023-12-29T11:01:44.906275","updated_at":"2023-12-29T11:01:44.906275","is_past":false}
+>>1b  java.lang.String
+>>1c  {:id 9728f94a-0e15-4167-beae-2023edf26a5e, :name Budget-Period-BP, :inspection_start_date 2023-12-28T00:00:00+01:00, :end_date 2024-01-29T00:00:00+01:00, :created_at 2023-12-29T11:01:44.906275, :updated_at 2023-12-29T11:01:44.906275, :is_past false}
+>>1d  json
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "6d62815b-fc36-40be-b6e9-d90cf9dfea9c", "name": "Category C1", "cost_center": null, "main_category": {"id": "37ba5570-1a2e-4b79-82fd-ac90fc52cffd", "name": "Main Category MC1"}, "main_category_id": "37ba5570-1a2e-4b79-82fd-ac90fc52cffd", "procurement_account": null, "general_ledger_account": null}
+>>1b  java.lang.String
+>>1c  {:id 6d62815b-fc36-40be-b6e9-d90cf9dfea9c, :name Category C1, :cost_center nil, :main_category {:id 37ba5570-1a2e-4b79-82fd-ac90fc52cffd, :name Main Category MC1}, :main_category_id 37ba5570-1a2e-4b79-82fd-ac90fc52cffd, :procurement_account nil, :general_ledger_account nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "1ae55011-3b23-4fab-9e20-0d52749c0908", "name": "Beauty & Kids", "parent_id": "792e5be2-fc6c-4b47-bbad-eb56876db8ed", "shortname": null, "department": {"id": "792e5be2-fc6c-4b47-bbad-eb56876db8ed", "name": "Home, Jewelry & Computers", "parent_id": null, "shortname": null}}
+>>1b  java.lang.String
+>>1c  {:id 1ae55011-3b23-4fab-9e20-0d52749c0908, :name Beauty & Kids, :parent_id 792e5be2-fc6c-4b47-bbad-eb56876db8ed, :shortname nil, :department {:id 792e5be2-fc6c-4b47-bbad-eb56876db8ed, :name Home, Jewelry & Computers, :parent_id nil, :shortname nil}}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "bfc16494-d727-47b7-9705-e3d548b7fca2", "name": "kitchen", "general": false, "building": {"id": "e578c120-bb65-4c28-b32c-ae92c63d413e", "code": null, "name": "343 Willy Garden"}, "building_id": "e578c120-bb65-4c28-b32c-ae92c63d413e", "description": null}
+>>1b  java.lang.String
+>>1c  {:id bfc16494-d727-47b7-9705-e3d548b7fca2, :name kitchen, :general false, :building {:id e578c120-bb65-4c28-b32c-ae92c63d413e, :code nil, :name 343 Willy Garden}, :building_id e578c120-bb65-4c28-b32c-ae92c63d413e, :description nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id":"b68f8771-981c-45fc-a976-3d0089dba1e2","login":null,"firstname":"The","lastname":"Requester","phone":null,"org_id":null,"email":"joan@ortiz.net","badge_id":null,"address":null,"city":null,"zip":null,"country":null,"settings":null,"delegator_user_id":null,"created_at":"2023-12-29T11:01:44.95494+01:00","updated_at":"2023-12-29T11:01:44.95494+01:00","account_enabled":true,"password_sign_in_enabled":true,"url":null,"img256_url":null,"img32_url":null,"img_digest":null,"is_admin":false,"extended_info":null,"searchable":"The Requester joan@ortiz.net    Requester The","secondary_email":null,"language_locale":null,"admin_protected":false,"is_system_admin":false,"pool_protected":false,"system_admin_protected":false,"organization":"local","account_disabled_at":null,"last_sign_in_at":null}
+>>1b  java.lang.String
+>>1c  {:system_admin_protected false, :address nil, :email joan@ortiz.net, :pool_protected false, :last_sign_in_at nil, :img32_url nil, :account_enabled true, :lastname Requester, :phone nil, :img_digest nil, :org_id nil, :extended_info nil, :secondary_email nil, :city nil, :settings nil, :is_admin false, :organization local, :login nil, :searchable The Requester joan@ortiz.net    Requester The, :updated_at 2023-12-29T11:01:44.95494+01:00, :firstname The, :zip nil, :id b68f8771-981c-45fc-a976-3d0089dba1e2, :url nil, :password_sign_in_enabled true, :account_disabled_at nil, :is_system_admin false, :badge_id nil, :language_locale nil, :img256_url nil, :country nil, :delegator_user_id nil, :created_at 2023-12-29T11:01:44.95494+01:00, :admin_protected false}
+>>1d  json
+>> ===============================================
+>> ===============================================
+>>1a  "[{\n  \"SourceFile\": \"/var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/ring-multipart-3123608979821035576.tmp\",\n  \"ExifTool:ExifToolVersion\": 12.70,\n  \"System:FileName\": \"ring-multipart-3123608979821035576.tmp\",\n  \"System:Directory\": \"/var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T\",\n  \"System:FileSize\": \"57 kB\",\n  \"System:FileModifyDate\": \"2023:12:29 11:01:57+01:00\",\n  \"System:FileAccessDate\": \"2023:12:29 11:01:57+01:00\",\n  \"System:FileInodeChangeDate\": \"2023:12:29 11:01:57+01:00\",\n  \"System:FilePermissions\": \"-rw-r--r--\",\n  \"File:FileType\": \"PDF\",\n  \"File:FileTypeExtension\": \"pdf\",\n  \"File:MIMEType\": \"application/pdf\",\n  \"PDF:PDFVersion\": 1.4,\n  \"PDF:Linearized\": \"No\",\n  \"PDF:PageCount\": 1,\n  \"PDF:Producer\": \"pdfTeX-1.20a\",\n  \"PDF:Creator\": \"TeX\",\n  \"PDF:CreateDate\": \"2005:11:28 23:03:50-06:00\",\n  \"PDF:PTEX_Fullbanner\": \"This is pdfTeX, Version 3.141592-1.20a  (Web2C 7.5.3) kpathsea version 3.5.3\"\n}]\n"
+>>1b  java.lang.String
+>>1c  [{
+  "SourceFile": "/var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/ring-multipart-3123608979821035576.tmp",
+  "ExifTool:ExifToolVersion": 12.70,
+  "System:FileName": "ring-multipart-3123608979821035576.tmp",
+  "System:Directory": "/var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T",
+  "System:FileSize": "57 kB",
+  "System:FileModifyDate": "2023:12:29 11:01:57+01:00",
+  "System:FileAccessDate": "2023:12:29 11:01:57+01:00",
+  "System:FileInodeChangeDate": "2023:12:29 11:01:57+01:00",
+  "System:FilePermissions": "-rw-r--r--",
+  "File:FileType": "PDF",
+  "File:FileTypeExtension": "pdf",
+  "File:MIMEType": "application/pdf",
+  "PDF:PDFVersion": 1.4,
+  "PDF:Linearized": "No",
+  "PDF:PageCount": 1,
+  "PDF:Producer": "pdfTeX-1.20a",
+  "PDF:Creator": "TeX",
+  "PDF:CreateDate": "2005:11:28 23:03:50-06:00",
+  "PDF:PTEX_Fullbanner": "This is pdfTeX, Version 3.141592-1.20a  (Web2C 7.5.3) kpathsea version 3.5.3"
+}]
+
+>>1d  json
+>> ===============================================
+2023-12-29T10:01:57.867Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - class java.lang.String cannot be cast to class clojure.lang.IObj (java.lang.String is in module java.base of loader 'bootstrap'; clojure.lang.IObj is in unnamed module of loader 'app')
+2023-12-29T10:01:57.869Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:request nil]), :errors ({:message "class java.lang.String cannot be cast to class clojure.lang.IObj (java.lang.String is in module java.base of loader 'bootstrap'; clojure.lang.IObj is in unnamed module of loader 'app')", :locations [{:line 2, :column 3}], :path [:request], :extensions {:exception "ClassCastException", :arguments {:input_data $requestData}}})}, :graphql-error true}

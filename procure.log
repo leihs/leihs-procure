@@ -3,110 +3,657 @@
 # clojure_leihs-procure-server env check via asdf v0.13.1
 # clojure_leihs-procure-server env skipped update; touch .tool-versions or remove /var/folders/jl/49spzkdd2v3cdz37fgmp0ddr6cj76v/T/asdf_cache_clojure_leihs-procure-server to force update
 Warning: environ value /Users/mradl/.asdf/installs/java/zulu-11.60.19 for key :java-home has been overwritten with /Users/mradl/.asdf/installs/java/zulu-11.60.19/zulu-11.jdk/Contents/Home
-2023-12-27T17:05:28.023Z NX-41294 WARN [leihs.core.release:13] - Failed to read releases.yml, returning bogus value 
-2023-12-27T17:05:28.624Z NX-41294 INFO [leihs.core.logging:37] - initializing logging  {:min-level [[#{} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :log-level nil}
-2023-12-27T17:05:28.631Z NX-41294 INFO [leihs.core.logging:39] - initialized logging  {:min-level [[#{} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :warn]], :ns-filter #{"*"}, :middleware [], :timestamp-opts {:pattern :iso8601, :locale :jvm-default, :timezone :utc}, :output-fn #object[taoensso.timbre$default_output_fn 0x8891e30 "taoensso.timbre$default_output_fn@8891e30"], :appenders {:println {:enabled? true, :fn #object[taoensso.timbre.appenders.core$println_appender$fn__3459 0x3b3d552f "taoensso.timbre.appenders.core$println_appender$fn__3459@3b3d552f"]}}, :_init-config {:loaded-from-source :default, :compile-time-config {:min-level nil, :ns-pattern "*"}}, :log-level nil}
-2023-12-27T17:05:28.633Z NX-41294 INFO [leihs.procurement.main:50] - main ("--dev-mode" "true" "--repl" "true" "run")
-2023-12-27T17:05:28.644Z NX-41294 INFO [leihs.core.repl:62] - init {:dev-mode true, :repl true, :repl-bind "localhost", :repl-port 13456, :repl-port-file ".nrepl-port"}
-2023-12-27T17:05:28.646Z NX-41294 INFO [leihs.core.repl:70] - starting nREPL server  13456 localhost
-2023-12-27T17:05:28.673Z NX-41294 INFO [leihs.core.repl:75] - started nREPL server 
-2023-12-27T17:05:28.680Z NX-41294 INFO [leihs.procurement.run:326] - Invoking run with options:  {:db-host localhost, :db-max-pool-size 16, :db-min-pool-size 2, :db-name leihs_test, :db-password leihs, :db-port 5415, :db-user leihs, :dev-mode true, :http-host localhost, :http-max-threads 8, :http-min-threads 1, :http-port 3230, :http-queue-capacity 640, :http-thread-keep-alive-seconds 10, :http-worker-prefix leihs-service-http-worker-, :pid-file nil, :repl true, :repl-bind localhost, :repl-port 13456, :repl-port-file .nrepl-port}
-2023-12-27T17:05:28.680Z NX-41294 INFO [leihs.core.shutdown:20] - PID 73122
-2023-12-27T17:05:28.700Z NX-41294 INFO [leihs.core.shutdown:29] - Registering SIGTERM handler for shutdown.
-2023-12-27T17:05:28.756Z NX-41294 INFO [leihs.core.graphql:17] - Initialized graphQL schema.
-2023-12-27T17:05:28.758Z NX-41294 INFO [leihs.core.db:222] - Initializing db  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
-2023-12-27T17:05:28.763Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:80] - db-pool - Starting...
-2023-12-27T17:05:28.837Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - db-pool - Added connection org.postgresql.jdbc.PgConnection@7bdebde7
-2023-12-27T17:05:28.843Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:82] - db-pool - Start completed.
-2023-12-27T17:05:28.843Z NX-41294 INFO [leihs.core.db:224] - Initialized db  {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1d78aed2 "HikariDataSource (db-pool)"]}
-2023-12-27T17:05:28.844Z NX-41294 INFO [leihs.core.db:225] - Initializing ds-next  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
->o> init-ds-next
-2023-12-27T17:05:28.859Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:110] - HikariPool-1 - Starting...
-2023-12-27T17:05:28.873Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@26c3d33d
-2023-12-27T17:05:28.873Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:123] - HikariPool-1 - Start completed.
-2023-12-27T17:05:28.879Z NX-41294 INFO [leihs.core.db:227] - Initialized ds-next  #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x57909c0 "HikariDataSource (HikariPool-1)"], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x16081cb "next.jdbc.result_set$as_unqualified_lower_maps@16081cb"]}}
->o> wrap-tx
-2023-12-27T17:05:28.887Z NX-41294 INFO [leihs.core.http-server:101] - starting http-server  {:port 3230, :ip "localhost", :pool {:queue #object[java.util.concurrent.ArrayBlockingQueue 0x60c0b1cb "[]"], :pool #object[java.util.concurrent.ThreadPoolExecutor 0x56d4aa90 "java.util.concurrent.ThreadPoolExecutor@56d4aa90[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"]}}
-2023-12-27T17:05:28.897Z NX-41294 INFO [leihs.core.http-server:104] - started http-server 
-2023-12-27T17:06:21.406Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:22.227Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:22.228Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:admins nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 15}], :path [:admins], :extensions {:exception "ExceptionInfo", :arguments {:input_data [{:user_id "1a58d26c-8519-4279-8e34-7075e10a452b"}]}}})}, :graphql-error true}
-2023-12-27T17:06:27.028Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:27.070Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:28.801Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:28.806Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:budget_periods nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 11}], :path [:budget_periods], :extensions {:exception "ExceptionInfo", :arguments {:input_data [{:id "be05f654-bfc1-4b2e-9e93-0e5fcb9c7927", :name "bp_1_new_name", :inspection_start_date "2024-06-01T00:00:00+00:00", :end_date "2024-12-01T00:00:00+00:00"} {:id nil, :name "new_bp", :inspection_start_date "2025-06-01T00:00:00+00:00", :end_date "2025-12-01T00:00:00+00:00"}]}}})}, :graphql-error true}
-2023-12-27T17:06:30.479Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:30.480Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:categories_viewers nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 11}], :path [:categories_viewers], :extensions {:exception "ExceptionInfo", :arguments {:input_data [{:id "f62223e3-d737-46a8-92bb-4aec1f619d74", :viewers ["eee1dc79-aac4-4345-a5bf-99b0e89b8931" "6a559f09-f6fa-4b46-8b50-de7b089db207" "a1a76127-96e8-4c45-8f1e-adda6811dfba"]} {:id "dcd74815-9dd2-440b-9f7f-b28291945718", :viewers []}]}}})}, :graphql-error true}
-2023-12-27T17:06:34.834Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:34.835Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:main_categories nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 11}], :path [:main_categories], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:06:36.912Z NX-41294 INFO [leihs.procurement.resources.main-category:326] - [{:id 8b49726f-4b63-4006-ac49-c1d758ada82f, :to_delete true, :typename Upload} {:id f337300f-24f6-4df5-b694-aaee61603ebd, :to_delete false, :typename Upload}]
-2023-12-27T17:06:37.854Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:37.854Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:requesters_organizations nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 11}], :path [:requesters_organizations], :extensions {:exception "ExceptionInfo", :arguments {:input_data [{:user_id "91c72964-f88d-42e4-a6d4-ddc31f01c786", :department "dep_II", :organization "org_B"} {:user_id "af6f3ed5-2867-4073-acc4-b051f928ab01", :department "dep_X", :organization "org_C"} {:user_id "5e76ffc2-c1c0-4bdb-bdd2-b09e8ec36bad", :department "dep_IV", :organization "org_X"} {:user_id "c42c87f6-216e-4eab-8384-04ec6a154a0c", :department "dep_XI", :organization "org_Y"} {:user_id "d4305d33-d2fa-43c5-9e9f-607be89ac61a", :department "dep_V", :organization "org_E"}]}}})}, :graphql-error true}
-2023-12-27T17:06:51.344Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:51.346Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:06:53.135Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:53.135Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:06:55.830Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:06:55.830Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:00.349Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:00.350Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:01.904Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:01.905Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:04.042Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:04.043Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:04.622Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:04.622Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:05.204Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:05.204Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:07.040Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:07.041Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:08.223Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:08.224Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:10.051Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:10.052Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:13.426Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:13.427Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:15.056Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:15.056Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:create_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 9}], :path [:create_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:19.114Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:19.115Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:delete_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 13}], :path [:delete_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:19.166Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:19.166Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:delete_request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 13}], :path [:delete_request], :extensions {:exception "ExceptionInfo", :arguments {:input_data $input}}})}, :graphql-error true}
-2023-12-27T17:07:32.391Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:32.396Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 13}], :path [:request], :extensions {:exception "ExceptionInfo", :arguments {:input_data {:id "1e0dcf07-32b6-401f-913f-e1500b0922a0", :article_name "test"}}}})}, :graphql-error true}
-2023-12-27T17:07:32.462Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:32.462Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:request nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 13}], :path [:request], :extensions {:exception "ExceptionInfo", :arguments {:input_data {:id "1e0dcf07-32b6-401f-913f-e1500b0922a0", :article_name "test"}}}})}, :graphql-error true}
->oo> >here> to-name-and-lower-case-enums (in_progress)
-2023-12-27T17:07:46.266Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - UnauthorizedException - Not authorized for this query path and arguments.
-2023-12-27T17:07:46.267Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:update_templates nil]), :errors ({:message "UnauthorizedException - Not authorized for this query path and arguments.", :locations [{:line 2, :column 11}], :path [:update_templates], :extensions {:exception "ExceptionInfo", :arguments {:input_data [{:id "49349fef-bae2-415d-93ec-7bfbe253bc61", :article_name "test", :category_id "9fdaefdb-66f6-4a89-91be-bbc6f9c17182", :price_cents 100} {:id "5a95c7dd-ee5a-40cd-85be-17eb694deef8", :article_name "test", :category_id "c59e9072-9638-4f37-bc27-b48d4c411c67", :price_cents 100}]}}})}, :graphql-error true}
-2023-12-27T17:07:49.156Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - ERROR: update or delete on table "procurement_templates" violates foreign key constraint "fk_rails_bf7bec026c" on table "procurement_requests"
-  Detail: Key (id)=(e7a4d923-3455-4271-96de-afc284c9d8d5) is still referenced from table "procurement_requests".
-2023-12-27T17:07:49.157Z NX-41294 WARN [leihs.procurement.graphql:81] - Rolling back transaction because of graphql error:  {:body {:data #ordered/map ([:update_templates nil]), :errors ({:message "ERROR: update or delete on table \"procurement_templates\" violates foreign key constraint \"fk_rails_bf7bec026c\" on table \"procurement_requests\"\n  Detail: Key (id)=(e7a4d923-3455-4271-96de-afc284c9d8d5) is still referenced from table \"procurement_requests\".", :locations [{:line 2, :column 11}], :path [:update_templates], :extensions {:exception "PSQLException", :arguments {:input_data [{:id "e7a4d923-3455-4271-96de-afc284c9d8d5", :article_name "test", :category_id "d9af6117-0e9b-4c89-97e5-d47b48c232c8", :price_cents 100, :to_delete true}]}}})}, :graphql-error true}
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
->oo> >here> to-name-and-lower-case-enums (not_processed in_progress procured alternative_procured not_procured)
+2023-12-29T10:19:50.200Z NX-41294 WARN [leihs.core.release:12] - Failed to read releases.yml, returning bogus value 
+2023-12-29T10:19:50.851Z NX-41294 INFO [leihs.core.logging:23] - initializing logging  {:min-level [[#{} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :debug]], :log-level nil}
+2023-12-29T10:19:50.858Z NX-41294 INFO [leihs.core.logging:25] - initialized logging  {:min-level [[#{} :debug] [#{"com.zaxxer.hikari.*" "leihs.*"} :info] [#{"*"} :debug]], :ns-filter #{"*"}, :middleware [], :timestamp-opts {:pattern :iso8601, :locale :jvm-default, :timezone :utc}, :output-fn #object[taoensso.timbre$default_output_fn 0x7ef6a00e "taoensso.timbre$default_output_fn@7ef6a00e"], :appenders {:println {:enabled? true, :fn #object[taoensso.timbre.appenders.core$println_appender$fn__3459 0x259fba09 "taoensso.timbre.appenders.core$println_appender$fn__3459@259fba09"]}}, :_init-config {:loaded-from-source :default, :compile-time-config {:min-level nil, :ns-pattern "*"}}, :log-level nil}
+2023-12-29T10:19:50.860Z NX-41294 INFO [leihs.procurement.main:50] - main ("--dev-mode" "true" "--repl" "true" "run")
+2023-12-29T10:19:50.872Z NX-41294 INFO [leihs.core.repl:59] - init {:dev-mode true, :repl true, :repl-bind "localhost", :repl-port 39405, :repl-port-file ".nrepl-port"}
+2023-12-29T10:19:50.874Z NX-41294 INFO [leihs.core.repl:67] - starting nREPL server  39405 localhost
+2023-12-29T10:19:50.905Z NX-41294 INFO [leihs.core.repl:72] - started nREPL server 
+2023-12-29T10:19:50.908Z NX-41294 INFO [leihs.procurement.run:326] - Invoking run with options:  {:db-host localhost, :db-max-pool-size 16, :db-min-pool-size 2, :db-name leihs_test, :db-password leihs, :db-port 5415, :db-user leihs, :dev-mode true, :http-host localhost, :http-max-threads 8, :http-min-threads 1, :http-port 3230, :http-queue-capacity 640, :http-thread-keep-alive-seconds 10, :http-worker-prefix leihs-service-http-worker-, :pid-file nil, :repl true, :repl-bind localhost, :repl-port 39405, :repl-port-file .nrepl-port}
+2023-12-29T10:19:50.909Z NX-41294 INFO [leihs.core.shutdown:18] - PID 84217
+2023-12-29T10:19:50.938Z NX-41294 INFO [leihs.core.shutdown:27] - Registering SIGTERM handler for shutdown.
+2023-12-29T10:19:51.007Z NX-41294 INFO [leihs.core.graphql:17] - Initialized graphQL schema.
+2023-12-29T10:19:51.009Z NX-41294 INFO [leihs.core.db:219] - Initializing db  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
+2023-12-29T10:19:51.015Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:80] - db-pool - Starting...
+2023-12-29T10:19:51.095Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - db-pool - Added connection org.postgresql.jdbc.PgConnection@5db4fa72
+2023-12-29T10:19:51.102Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:82] - db-pool - Start completed.
+2023-12-29T10:19:51.102Z NX-41294 INFO [leihs.core.db:221] - Initialized db  {:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4df12d5b "HikariDataSource (db-pool)"]}
+2023-12-29T10:19:51.103Z NX-41294 INFO [leihs.core.db:222] - Initializing ds-next  {:db-name "leihs_test", :db-port 5415, :db-host "localhost", :db-user "leihs", :db-password "leihs", :db-min-pool-size 2, :db-max-pool-size 16}
+2023-12-29T10:19:51.116Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:110] - HikariPool-1 - Starting...
+2023-12-29T10:19:51.126Z NX-41294 INFO [com.zaxxer.hikari.pool.HikariPool:565] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@73775793
+2023-12-29T10:19:51.127Z NX-41294 INFO [com.zaxxer.hikari.HikariDataSource:123] - HikariPool-1 - Start completed.
+2023-12-29T10:19:51.132Z NX-41294 INFO [leihs.core.db:224] - Initialized ds-next  #next.jdbc.default_options.DefaultOptions{:connectable #object[com.zaxxer.hikari.HikariDataSource 0x645dfcbd "HikariDataSource (HikariPool-1)"], :options {:builder-fn #object[next.jdbc.result_set$as_unqualified_lower_maps 0x6b495e5a "next.jdbc.result_set$as_unqualified_lower_maps@6b495e5a"]}}
+2023-12-29T10:19:51.140Z NX-41294 INFO [leihs.core.http-server:95] - starting http-server  {:port 3230, :ip "localhost", :pool {:queue #object[java.util.concurrent.ArrayBlockingQueue 0x3556619f "[]"], :pool #object[java.util.concurrent.ThreadPoolExecutor 0x1630c443 "java.util.concurrent.ThreadPoolExecutor@1630c443[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"]}}
+2023-12-29T10:19:51.151Z NX-41294 INFO [leihs.core.http-server:98] - started http-server 
+2023-12-29T10:20:22.091Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text  #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x90a2edd HikariProxyPreparedStatement@151662301 wrapping SELECT * FROM users  WHERE (users.org_id IS NULL OR users.login IS NULL OR lower(users.email) = ?)] 1]  type:  java.lang.String
+2023-12-29T10:20:22.091Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  
+2023-12-29T10:20:22.098Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 1]
+2023-12-29T10:20:22.114Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"]
+2023-12-29T10:20:22.114Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"
+2023-12-29T10:20:22.115Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Dawna #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 3]
+2023-12-29T10:20:22.115Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Dawna]
+2023-12-29T10:20:22.115Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Dawna
+2023-12-29T10:20:22.115Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Kemmer #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 4]
+2023-12-29T10:20:22.116Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Kemmer]
+2023-12-29T10:20:22.116Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Kemmer
+2023-12-29T10:20:22.116Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [amelia@rosenbaum.name #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 7]
+2023-12-29T10:20:22.116Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar amelia@rosenbaum.name]
+2023-12-29T10:20:22.116Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  amelia@rosenbaum.name
+2023-12-29T10:20:22.117Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.800703000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 15]
+2023-12-29T10:20:22.118Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.800703000-00:00"]
+2023-12-29T10:20:22.118Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.800703Z"
+2023-12-29T10:20:22.119Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.800703000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 16]
+2023-12-29T10:20:22.119Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.800703000-00:00"]
+2023-12-29T10:20:22.119Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.800703Z"
+2023-12-29T10:20:22.119Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 25]
+2023-12-29T10:20:22.120Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna]
+2023-12-29T10:20:22.120Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna
+2023-12-29T10:20:22.120Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 32]
+2023-12-29T10:20:22.120Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.120Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.121Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "d19bcca3-d326-49fc-966b-e12f347fe98d" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 1]
+2023-12-29T10:20:22.121Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "d19bcca3-d326-49fc-966b-e12f347fe98d"]
+2023-12-29T10:20:22.121Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "d19bcca3-d326-49fc-966b-e12f347fe98d"
+2023-12-29T10:20:22.121Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Jimmie #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 3]
+2023-12-29T10:20:22.122Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Jimmie]
+2023-12-29T10:20:22.122Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Jimmie
+2023-12-29T10:20:22.122Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Koss #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 4]
+2023-12-29T10:20:22.122Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Koss]
+2023-12-29T10:20:22.123Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Koss
+2023-12-29T10:20:22.123Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [krysta@kihn.io #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 7]
+2023-12-29T10:20:22.123Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar krysta@kihn.io]
+2023-12-29T10:20:22.123Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  krysta@kihn.io
+2023-12-29T10:20:22.124Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.943022000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 15]
+2023-12-29T10:20:22.124Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.943022000-00:00"]
+2023-12-29T10:20:22.124Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.943022Z"
+2023-12-29T10:20:22.124Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.943022000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 16]
+2023-12-29T10:20:22.125Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.943022000-00:00"]
+2023-12-29T10:20:22.125Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.943022Z"
+2023-12-29T10:20:22.126Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Jimmie Koss krysta@kihn.io    Koss Jimmie #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 25]
+2023-12-29T10:20:22.126Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Jimmie Koss krysta@kihn.io    Koss Jimmie]
+2023-12-29T10:20:22.126Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Jimmie Koss krysta@kihn.io    Koss Jimmie
+2023-12-29T10:20:22.127Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 32]
+2023-12-29T10:20:22.127Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.127Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.128Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 1]
+2023-12-29T10:20:22.128Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b"]
+2023-12-29T10:20:22.128Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b"
+2023-12-29T10:20:22.128Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [The #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 3]
+2023-12-29T10:20:22.128Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text The]
+2023-12-29T10:20:22.129Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  The
+2023-12-29T10:20:22.129Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Requester #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 4]
+2023-12-29T10:20:22.129Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Requester]
+2023-12-29T10:20:22.129Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Requester
+2023-12-29T10:20:22.130Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [joan@ortiz.net #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 7]
+2023-12-29T10:20:22.130Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar joan@ortiz.net]
+2023-12-29T10:20:22.130Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  joan@ortiz.net
+2023-12-29T10:20:22.130Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.961107000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 15]
+2023-12-29T10:20:22.131Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.961107000-00:00"]
+2023-12-29T10:20:22.131Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.961107Z"
+2023-12-29T10:20:22.131Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.961107000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 16]
+2023-12-29T10:20:22.131Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.961107000-00:00"]
+2023-12-29T10:20:22.132Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.961107Z"
+2023-12-29T10:20:22.132Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [The Requester joan@ortiz.net    Requester The #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 25]
+2023-12-29T10:20:22.132Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text The Requester joan@ortiz.net    Requester The]
+2023-12-29T10:20:22.132Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  The Requester joan@ortiz.net    Requester The
+2023-12-29T10:20:22.132Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 32]
+2023-12-29T10:20:22.133Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.133Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.133Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 1]
+2023-12-29T10:20:22.133Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"]
+2023-12-29T10:20:22.133Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 3]
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement]
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Admin #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 4]
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Admin]
+2023-12-29T10:20:22.134Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Admin
+2023-12-29T10:20:22.135Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [amos.abernathy@strosin.co #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 7]
+2023-12-29T10:20:22.135Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar amos.abernathy@strosin.co]
+2023-12-29T10:20:22.135Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.136Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 15]
+2023-12-29T10:20:22.136Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.136Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.136Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 16]
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement Admin amos.abernathy@strosin.co    Admin Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 25]
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement Admin amos.abernathy@strosin.co    Admin Procurement]
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement Admin amos.abernathy@strosin.co    Admin Procurement
+2023-12-29T10:20:22.137Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x3432b68e org.postgresql.jdbc.PgResultSetMetaData@3432b68e] 32]
+2023-12-29T10:20:22.138Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.138Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.144Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text password #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x5266dfdf HikariProxyPreparedStatement@1382473695 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> ? OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 1]  type:  java.lang.String
+2023-12-29T10:20:22.144Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  password
+2023-12-29T10:20:22.145Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:uuid #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42" #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x5266dfdf HikariProxyPreparedStatement@1382473695 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> 'password' OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 2]  type:  java.util.UUID
+2023-12-29T10:20:22.145Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"
+2023-12-29T10:20:22.208Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x15f7312c org.postgresql.jdbc.PgResultSetMetaData@15f7312c] 1]
+2023-12-29T10:20:22.211Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.211Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x15f7312c org.postgresql.jdbc.PgResultSetMetaData@15f7312c] 2]
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [leihs password #object[org.postgresql.jdbc.PgResultSetMetaData 0x15f7312c org.postgresql.jdbc.PgResultSetMetaData@15f7312c] 3]
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar leihs password]
+2023-12-29T10:20:22.212Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  leihs password
+2023-12-29T10:20:22.216Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 1]
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 2]
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 1]
+2023-12-29T10:20:22.219Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 2]
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 1]
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.220Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 2]
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 1]
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.221Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.222Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x7f6767cd org.postgresql.jdbc.PgResultSetMetaData@7f6767cd] 2]
+2023-12-29T10:20:22.222Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.222Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 1]
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 2]
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.223Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 1]
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 2]
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.224Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 1]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 2]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 1]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.225Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.226Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x7d13ef4b org.postgresql.jdbc.PgResultSetMetaData@7d13ef4b] 2]
+2023-12-29T10:20:22.226Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.226Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.316Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text  #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x3d0deb96 HikariProxyPreparedStatement@1024322454 wrapping SELECT * FROM users  WHERE (users.org_id IS NULL OR users.login IS NULL OR lower(users.email) = ?)] 1]  type:  java.lang.String
+2023-12-29T10:20:22.317Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  
+2023-12-29T10:20:22.318Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 1]
+2023-12-29T10:20:22.318Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"]
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Dawna #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 3]
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Dawna]
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Dawna
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Kemmer #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 4]
+2023-12-29T10:20:22.319Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Kemmer]
+2023-12-29T10:20:22.320Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Kemmer
+2023-12-29T10:20:22.320Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [amelia@rosenbaum.name #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 7]
+2023-12-29T10:20:22.320Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar amelia@rosenbaum.name]
+2023-12-29T10:20:22.320Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  amelia@rosenbaum.name
+2023-12-29T10:20:22.320Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.800703000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 15]
+2023-12-29T10:20:22.321Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.800703000-00:00"]
+2023-12-29T10:20:22.321Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.800703Z"
+2023-12-29T10:20:22.321Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.800703000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 16]
+2023-12-29T10:20:22.321Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.800703000-00:00"]
+2023-12-29T10:20:22.321Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.800703Z"
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 25]
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna]
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Dawna Kemmer amelia@rosenbaum.name    Kemmer Dawna
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 32]
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.322Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.323Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "d19bcca3-d326-49fc-966b-e12f347fe98d" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 1]
+2023-12-29T10:20:22.323Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "d19bcca3-d326-49fc-966b-e12f347fe98d"]
+2023-12-29T10:20:22.323Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "d19bcca3-d326-49fc-966b-e12f347fe98d"
+2023-12-29T10:20:22.323Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Jimmie #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 3]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Jimmie]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Jimmie
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Koss #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 4]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Koss]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Koss
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [krysta@kihn.io #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 7]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar krysta@kihn.io]
+2023-12-29T10:20:22.324Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  krysta@kihn.io
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.943022000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 15]
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.943022000-00:00"]
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.943022Z"
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.943022000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 16]
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.943022000-00:00"]
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.943022Z"
+2023-12-29T10:20:22.325Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Jimmie Koss krysta@kihn.io    Koss Jimmie #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 25]
+2023-12-29T10:20:22.326Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Jimmie Koss krysta@kihn.io    Koss Jimmie]
+2023-12-29T10:20:22.326Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Jimmie Koss krysta@kihn.io    Koss Jimmie
+2023-12-29T10:20:22.326Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 32]
+2023-12-29T10:20:22.326Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.326Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.327Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 1]
+2023-12-29T10:20:22.327Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b"]
+2023-12-29T10:20:22.327Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "c9381d5c-6a4a-448e-9f85-a497c3e2837b"
+2023-12-29T10:20:22.327Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [The #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 3]
+2023-12-29T10:20:22.327Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text The]
+2023-12-29T10:20:22.328Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  The
+2023-12-29T10:20:22.328Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Requester #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 4]
+2023-12-29T10:20:22.328Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Requester]
+2023-12-29T10:20:22.328Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Requester
+2023-12-29T10:20:22.328Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [joan@ortiz.net #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 7]
+2023-12-29T10:20:22.329Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar joan@ortiz.net]
+2023-12-29T10:20:22.329Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  joan@ortiz.net
+2023-12-29T10:20:22.329Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.961107000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 15]
+2023-12-29T10:20:22.329Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.961107000-00:00"]
+2023-12-29T10:20:22.329Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.961107Z"
+2023-12-29T10:20:22.330Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.961107000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 16]
+2023-12-29T10:20:22.330Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.961107000-00:00"]
+2023-12-29T10:20:22.330Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.961107Z"
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [The Requester joan@ortiz.net    Requester The #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 25]
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text The Requester joan@ortiz.net    Requester The]
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  The Requester joan@ortiz.net    Requester The
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 32]
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.331Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.332Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 1]
+2023-12-29T10:20:22.332Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"]
+2023-12-29T10:20:22.332Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.332Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 3]
+2023-12-29T10:20:22.332Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement]
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Admin #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 4]
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Admin]
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Admin
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [amos.abernathy@strosin.co #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 7]
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar amos.abernathy@strosin.co]
+2023-12-29T10:20:22.333Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.334Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 15]
+2023-12-29T10:20:22.334Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.334Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.334Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 16]
+2023-12-29T10:20:22.334Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement Admin amos.abernathy@strosin.co    Admin Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 25]
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement Admin amos.abernathy@strosin.co    Admin Procurement]
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement Admin amos.abernathy@strosin.co    Admin Procurement
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x56267208 org.postgresql.jdbc.PgResultSetMetaData@56267208] 32]
+2023-12-29T10:20:22.335Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.336Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.337Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text password #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x769581dd HikariProxyPreparedStatement@1989509597 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> ? OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 1]  type:  java.lang.String
+2023-12-29T10:20:22.337Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  password
+2023-12-29T10:20:22.338Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:uuid #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42" #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x769581dd HikariProxyPreparedStatement@1989509597 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> 'password' OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 2]  type:  java.util.UUID
+2023-12-29T10:20:22.338Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  #uuid "9e4689fe-310b-4c90-bbb1-1fd7eba54b42"
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x7548e51f org.postgresql.jdbc.PgResultSetMetaData@7548e51f] 1]
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x7548e51f org.postgresql.jdbc.PgResultSetMetaData@7548e51f] 2]
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.340Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [leihs password #object[org.postgresql.jdbc.PgResultSetMetaData 0x7548e51f org.postgresql.jdbc.PgResultSetMetaData@7548e51f] 3]
+2023-12-29T10:20:22.341Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar leihs password]
+2023-12-29T10:20:22.341Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  leihs password
+2023-12-29T10:20:22.342Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 1]
+2023-12-29T10:20:22.342Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.342Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 2]
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 1]
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.343Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 2]
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 1]
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 2]
+2023-12-29T10:20:22.344Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 1]
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x4c63c263 org.postgresql.jdbc.PgResultSetMetaData@4c63c263] 2]
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.345Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.346Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 1]
+2023-12-29T10:20:22.346Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.346Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 2]
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 1]
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.347Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.348Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 2]
+2023-12-29T10:20:22.348Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.348Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.348Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 1]
+2023-12-29T10:20:22.348Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.349Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.349Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 2]
+2023-12-29T10:20:22.349Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.349Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.349Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 1]
+2023-12-29T10:20:22.350Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.350Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.350Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x296ad602 org.postgresql.jdbc.PgResultSetMetaData@296ad602] 2]
+2023-12-29T10:20:22.350Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.350Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.457Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text amos.abernathy@strosin.co #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x1d15b4f2 HikariProxyPreparedStatement@487961842 wrapping SELECT * FROM users  WHERE (users.org_id = ? OR users.login = ? OR lower(users.email) = ?)] 1]  type:  java.lang.String
+2023-12-29T10:20:22.457Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.458Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text amos.abernathy@strosin.co #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x1d15b4f2 HikariProxyPreparedStatement@487961842 wrapping SELECT * FROM users  WHERE (users.org_id = 'amos.abernathy@strosin.co' OR users.login = ? OR lower(users.email) = ?)] 2]  type:  java.lang.String
+2023-12-29T10:20:22.458Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.458Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text amos.abernathy@strosin.co #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x1d15b4f2 HikariProxyPreparedStatement@487961842 wrapping SELECT * FROM users  WHERE (users.org_id = 'amos.abernathy@strosin.co' OR users.login = 'amos.abernathy@strosin.co' OR lower(users.email) = ?)] 3]  type:  java.lang.String
+2023-12-29T10:20:22.458Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.459Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 1]
+2023-12-29T10:20:22.460Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"]
+2023-12-29T10:20:22.460Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 3]
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement]
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Admin #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 4]
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Admin]
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Admin
+2023-12-29T10:20:22.461Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [amos.abernathy@strosin.co #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 7]
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar amos.abernathy@strosin.co]
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 15]
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:21.974652000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 16]
+2023-12-29T10:20:22.462Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:21.974652000-00:00"]
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:21.974652Z"
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Procurement Admin amos.abernathy@strosin.co    Admin Procurement #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 25]
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text Procurement Admin amos.abernathy@strosin.co    Admin Procurement]
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Procurement Admin amos.abernathy@strosin.co    Admin Procurement
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [local #object[org.postgresql.jdbc.PgResultSetMetaData 0x28fc050f org.postgresql.jdbc.PgResultSetMetaData@28fc050f] 32]
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text local]
+2023-12-29T10:20:22.463Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  local
+2023-12-29T10:20:22.465Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text password #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x7d50861b HikariProxyPreparedStatement@2102429211 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> ? OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 1]  type:  java.lang.String
+2023-12-29T10:20:22.465Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  password
+2023-12-29T10:20:22.465Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x7d50861b HikariProxyPreparedStatement@2102429211 wrapping SELECT authentication_systems.id, authentication_systems.type, authentication_systems.name, authentication_systems.description, authentication_systems.external_sign_in_url FROM authentication_systems, users  WHERE ((EXISTS (SELECT TRUE FROM authentication_systems_users WHERE (authentication_systems_users.user_id = users.id AND authentication_systems.id = authentication_systems_users.authentication_system_id AND (authentication_systems.type <> 'password' OR users.password_sign_in_enabled = TRUE) AND users.account_enabled = TRUE)) OR EXISTS (SELECT TRUE FROM authentication_systems asxs INNER JOIN authentication_systems_groups ON (asxs.id = authentication_systems_groups.authentication_system_id) INNER JOIN groups_users ON (authentication_systems_groups.group_id = groups_users.group_id AND authentication_systems_groups.group_id = groups_users.group_id AND groups_users.user_id = users.id) WHERE (asxs.id = authentication_systems.id AND users.account_enabled = TRUE))) AND authentication_systems.enabled = TRUE AND users.id = ?) ORDER BY authentication_systems.priority DESC, authentication_systems.id] 2]  type:  java.util.UUID
+2023-12-29T10:20:22.465Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x4ecf3c80 org.postgresql.jdbc.PgResultSetMetaData@4ecf3c80] 1]
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x4ecf3c80 org.postgresql.jdbc.PgResultSetMetaData@4ecf3c80] 2]
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.467Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.468Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [leihs password #object[org.postgresql.jdbc.PgResultSetMetaData 0x4ecf3c80 org.postgresql.jdbc.PgResultSetMetaData@4ecf3c80] 3]
+2023-12-29T10:20:22.468Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar leihs password]
+2023-12-29T10:20:22.468Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  leihs password
+2023-12-29T10:20:22.468Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text amos.abernathy@strosin.co #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x485c5097 HikariProxyPreparedStatement@1214009495 wrapping SELECT * FROM authentication_systems  WHERE (authentication_systems.sign_up_email_match IS NOT NULL AND ? ~* authentication_systems.sign_up_email_match)] 1]  type:  java.lang.String
+2023-12-29T10:20:22.469Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  amos.abernathy@strosin.co
+2023-12-29T10:20:22.470Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text password #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x58cfca18 HikariProxyPreparedStatement@1490012696 wrapping SELECT * FROM authentication_systems  WHERE type = ?] 1]  type:  java.lang.String
+2023-12-29T10:20:22.470Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  password
+2023-12-29T10:20:22.471Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 1]
+2023-12-29T10:20:22.474Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.474Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [leihs password #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 2]
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar leihs password]
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  leihs password
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 4]
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar password]
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:22.475Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [0 #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 6]
+2023-12-29T10:20:22.476Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:int4 0]
+2023-12-29T10:20:22.476Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  0
+2023-12-29T10:20:22.476Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2020-11-05T12:50:39.546594000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 15]
+2023-12-29T10:20:22.476Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2020-11-05T12:50:39.546594000-00:00"]
+2023-12-29T10:20:22.476Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2020-11-05T12:50:39.546594Z"
+2023-12-29T10:20:22.477Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2020-11-05T12:50:39.546594000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x506b7b4f org.postgresql.jdbc.PgResultSetMetaData@506b7b4f] 16]
+2023-12-29T10:20:22.477Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2020-11-05T12:50:39.546594000-00:00"]
+2023-12-29T10:20:22.477Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2020-11-05T12:50:39.546594Z"
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 1]
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 2]
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.479Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 1]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 2]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 1]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.480Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 2]
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 1]
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x1300aa45 org.postgresql.jdbc.PgResultSetMetaData@1300aa45] 2]
+2023-12-29T10:20:22.481Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.482Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.482Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 1]
+2023-12-29T10:20:22.482Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:22.482Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 2]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 1]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 2]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:22.483Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 1]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 2]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 1]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:22.484Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:22.485Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x72295834 org.postgresql.jdbc.PgResultSetMetaData@72295834] 2]
+2023-12-29T10:20:22.485Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:22.485Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:22.575Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x2ff002e3 HikariProxyPreparedStatement@804258531 wrapping INSERT INTO user_sessions ( user_id, token_hash, authentication_system_id, meta_data ) VALUES ( ?, ?, ?, ? )
+RETURNING *] 1]  type:  java.util.UUID
+2023-12-29T10:20:22.575Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.576Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542 #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x2ff002e3 HikariProxyPreparedStatement@804258531 wrapping INSERT INTO user_sessions ( user_id, token_hash, authentication_system_id, meta_data ) VALUES ( 'ddfbed89-d624-428c-a7ef-b70fd0d800f3'::uuid, ?, ?, ? )
+RETURNING *] 2]  type:  java.lang.String
+2023-12-29T10:20:22.576Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542
+2023-12-29T10:20:22.577Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:text password #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x2ff002e3 HikariProxyPreparedStatement@804258531 wrapping INSERT INTO user_sessions ( user_id, token_hash, authentication_system_id, meta_data ) VALUES ( 'ddfbed89-d624-428c-a7ef-b70fd0d800f3'::uuid, 'cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542', ?, ? )
+RETURNING *] 3]  type:  java.lang.String
+2023-12-29T10:20:22.577Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  password
+2023-12-29T10:20:22.579Z NX-41294 DEBUG [pg-types.sql-parameter:326] - calling convert-parameter with:  [:jsonb {:user_agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, :remote_addr 127.0.0.1} #object[com.zaxxer.hikari.pool.HikariProxyPreparedStatement 0x2ff002e3 HikariProxyPreparedStatement@804258531 wrapping INSERT INTO user_sessions ( user_id, token_hash, authentication_system_id, meta_data ) VALUES ( 'ddfbed89-d624-428c-a7ef-b70fd0d800f3'::uuid, 'cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542', 'password', ? )
+RETURNING *] 4]  type:  clojure.lang.PersistentArrayMap
+2023-12-29T10:20:22.580Z NX-41294 DEBUG [pg-types.sql-parameter:326] - converted-parameter:  #object[org.postgresql.util.PGobject 0x1ee249fa {"user_agent":"Mozilla\/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko\/20100101 Firefox\/115.0","remote_addr":"127.0.0.1"}]
+2023-12-29T10:20:22.592Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "b62b5377-42ed-430e-83f4-663dc58c9c02" #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 1]
+2023-12-29T10:20:22.594Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "b62b5377-42ed-430e-83f4-663dc58c9c02"]
+2023-12-29T10:20:22.594Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "b62b5377-42ed-430e-83f4-663dc58c9c02"
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542 #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 2]
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542]
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  cca6cb48332b7a409f1f7f9d2f394b3c5735963bd6d8350bacccd42c09e08542
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3" #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 3]
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:uuid #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"]
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #uuid "ddfbed89-d624-428c-a7ef-b70fd0d800f3"
+2023-12-29T10:20:22.595Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#inst "2023-12-29T10:20:22.580569000-00:00" #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 5]
+2023-12-29T10:20:22.596Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:timestamptz #inst "2023-12-29T10:20:22.580569000-00:00"]
+2023-12-29T10:20:22.596Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  #time/instant "2023-12-29T10:20:22.580569Z"
+2023-12-29T10:20:22.597Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [#object[org.postgresql.util.PGobject 0xc0f0edd {"user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0", "remote_addr": "127.0.0.1"}] #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 6]
+2023-12-29T10:20:22.597Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:jsonb #object[org.postgresql.util.PGobject 0xc0f0edd {"user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0", "remote_addr": "127.0.0.1"}]]
+2023-12-29T10:20:22.598Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  {:user_agent Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0, :remote_addr 127.0.0.1}
+2023-12-29T10:20:22.598Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [password #object[org.postgresql.jdbc.PgResultSetMetaData 0x16223bd8 org.postgresql.jdbc.PgResultSetMetaData@16223bd8] 7]
+2023-12-29T10:20:22.598Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:text password]
+2023-12-29T10:20:22.598Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  password
+2023-12-29T10:20:23.162Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 1]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 2]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 1]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:23.163Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 2]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 1]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 2]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 1]
+2023-12-29T10:20:23.164Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:23.165Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:23.165Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x1854a154 org.postgresql.jdbc.PgResultSetMetaData@1854a154] 2]
+2023-12-29T10:20:23.165Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:23.165Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:23.166Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 1]
+2023-12-29T10:20:23.166Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 2]
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 1]
+2023-12-29T10:20:23.167Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 2]
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 1]
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:23.168Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 2]
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 1]
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:23.169Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x703ea9cb org.postgresql.jdbc.PgResultSetMetaData@703ea9cb] 2]
+2023-12-29T10:20:23.170Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:23.170Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+>> ===============================================
+>>1a  ["Eum architecto minus magnam."]
+>>1b  java.lang.String
+>>1c  [Eum architecto minus magnam.]
+>>1d  jsonb
+>> ===============================================
+2023-12-29T10:20:23.363Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 1]
+2023-12-29T10:20:23.363Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 2]
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 1]
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:23.364Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 2]
+2023-12-29T10:20:23.365Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:23.365Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:23.365Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 1]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 2]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 1]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:23.366Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:23.367Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x75900b7b org.postgresql.jdbc.PgResultSetMetaData@75900b7b] 2]
+2023-12-29T10:20:23.367Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:23.367Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+2023-12-29T10:20:23.367Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (UK) #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 1]
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (UK)]
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (UK)
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-GB #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 2]
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-GB]
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-GB
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [English (US) #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 1]
+2023-12-29T10:20:23.368Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar English (US)]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  English (US)
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [en-US #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 2]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar en-US]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  en-US
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Deutsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 1]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Deutsch]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Deutsch
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [de-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 2]
+2023-12-29T10:20:23.369Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar de-CH]
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  de-CH
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [Züritüütsch #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 1]
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar Züritüütsch]
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  Züritüütsch
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - dispatch-to-convert-column [gsw-CH #object[org.postgresql.jdbc.PgResultSetMetaData 0x3a8274d6 org.postgresql.jdbc.PgResultSetMetaData@3a8274d6] 2]
+2023-12-29T10:20:23.370Z NX-41294 DEBUG [pg-types.read-column:326] - calling convert-column with:  [:varchar gsw-CH]
+2023-12-29T10:20:23.371Z NX-41294 DEBUG [pg-types.read-column:326] - converted-column:  gsw-CH
+>> ===============================================
+>>1a  ["Eum architecto minus magnam."]
+>>1b  java.lang.String
+>>1c  [Eum architecto minus magnam.]
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id":"8b9de39e-aae1-4aee-8d00-afed45556a99","name":"Budget-Period-BP","inspection_start_date":"2023-12-28T00:00:00+01:00","end_date":"2024-01-29T00:00:00+01:00","created_at":"2023-12-29T11:20:21.932305","updated_at":"2023-12-29T11:20:21.932305","is_past":false}
+>>1b  java.lang.String
+>>1c  {:id 8b9de39e-aae1-4aee-8d00-afed45556a99, :name Budget-Period-BP, :inspection_start_date 2023-12-28T00:00:00+01:00, :end_date 2024-01-29T00:00:00+01:00, :created_at 2023-12-29T11:20:21.932305, :updated_at 2023-12-29T11:20:21.932305, :is_past false}
+>>1d  json
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "19ad6bef-0972-4bb9-9395-e6f250f0f33b", "name": "Category C1", "cost_center": null, "main_category": {"id": "cfbd2265-fc1e-4443-bb6d-fb97ff2e942d", "name": "Main Category MC1"}, "main_category_id": "cfbd2265-fc1e-4443-bb6d-fb97ff2e942d", "procurement_account": null, "general_ledger_account": null}
+>>1b  java.lang.String
+>>1c  {:id 19ad6bef-0972-4bb9-9395-e6f250f0f33b, :name Category C1, :cost_center nil, :main_category {:id cfbd2265-fc1e-4443-bb6d-fb97ff2e942d, :name Main Category MC1}, :main_category_id cfbd2265-fc1e-4443-bb6d-fb97ff2e942d, :procurement_account nil, :general_ledger_account nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "4aeb9bad-bdaa-4806-b9e6-4a084ff2759b", "name": "Beauty & Kids", "parent_id": "f9b3ba14-673c-40c0-90db-3f87099caea1", "shortname": null, "department": {"id": "f9b3ba14-673c-40c0-90db-3f87099caea1", "name": "Home, Jewelry & Computers", "parent_id": null, "shortname": null}}
+>>1b  java.lang.String
+>>1c  {:id 4aeb9bad-bdaa-4806-b9e6-4a084ff2759b, :name Beauty & Kids, :parent_id f9b3ba14-673c-40c0-90db-3f87099caea1, :shortname nil, :department {:id f9b3ba14-673c-40c0-90db-3f87099caea1, :name Home, Jewelry & Computers, :parent_id nil, :shortname nil}}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "1b685f5a-cca0-40e4-85d8-ce6d80a4b060", "name": "kitchen", "general": false, "building": {"id": "dbd87ced-9ad1-4163-8de6-9f6d0a084b54", "code": null, "name": "343 Willy Garden"}, "building_id": "dbd87ced-9ad1-4163-8de6-9f6d0a084b54", "description": null}
+>>1b  java.lang.String
+>>1c  {:id 1b685f5a-cca0-40e4-85d8-ce6d80a4b060, :name kitchen, :general false, :building {:id dbd87ced-9ad1-4163-8de6-9f6d0a084b54, :code nil, :name 343 Willy Garden}, :building_id dbd87ced-9ad1-4163-8de6-9f6d0a084b54, :description nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id":"c9381d5c-6a4a-448e-9f85-a497c3e2837b","login":null,"firstname":"The","lastname":"Requester","phone":null,"org_id":null,"email":"joan@ortiz.net","badge_id":null,"address":null,"city":null,"zip":null,"country":null,"settings":null,"delegator_user_id":null,"created_at":"2023-12-29T11:20:21.961107+01:00","updated_at":"2023-12-29T11:20:21.961107+01:00","account_enabled":true,"password_sign_in_enabled":true,"url":null,"img256_url":null,"img32_url":null,"img_digest":null,"is_admin":false,"extended_info":null,"searchable":"The Requester joan@ortiz.net    Requester The","secondary_email":null,"language_locale":null,"admin_protected":false,"is_system_admin":false,"pool_protected":false,"system_admin_protected":false,"organization":"local","account_disabled_at":null,"last_sign_in_at":null}
+>>1b  java.lang.String
+>>1c  {:system_admin_protected false, :address nil, :email joan@ortiz.net, :pool_protected false, :last_sign_in_at nil, :img32_url nil, :account_enabled true, :lastname Requester, :phone nil, :img_digest nil, :org_id nil, :extended_info nil, :secondary_email nil, :city nil, :settings nil, :is_admin false, :organization local, :login nil, :searchable The Requester joan@ortiz.net    Requester The, :updated_at 2023-12-29T11:20:21.961107+01:00, :firstname The, :zip nil, :id c9381d5c-6a4a-448e-9f85-a497c3e2837b, :url nil, :password_sign_in_enabled true, :account_disabled_at nil, :is_system_admin false, :badge_id nil, :language_locale nil, :img256_url nil, :country nil, :delegator_user_id nil, :created_at 2023-12-29T11:20:21.961107+01:00, :admin_protected false}
+>>1d  json
+>> ===============================================
+2023-12-29T10:20:23.461Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - No implementation of method: :date of protocol: #'tick.protocols/IExtraction found for class: nil
+>> ===============================================
+>>1a  {"id":"8b9de39e-aae1-4aee-8d00-afed45556a99","name":"Budget-Period-BP","inspection_start_date":"2023-12-28T00:00:00+01:00","end_date":"2024-01-29T00:00:00+01:00","created_at":"2023-12-29T11:20:21.932305","updated_at":"2023-12-29T11:20:21.932305","is_past":false}
+>>1b  java.lang.String
+>>1c  {:id 8b9de39e-aae1-4aee-8d00-afed45556a99, :name Budget-Period-BP, :inspection_start_date 2023-12-28T00:00:00+01:00, :end_date 2024-01-29T00:00:00+01:00, :created_at 2023-12-29T11:20:21.932305, :updated_at 2023-12-29T11:20:21.932305, :is_past false}
+>>1d  json
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "19ad6bef-0972-4bb9-9395-e6f250f0f33b", "name": "Category C1", "cost_center": null, "main_category": {"id": "cfbd2265-fc1e-4443-bb6d-fb97ff2e942d", "name": "Main Category MC1"}, "main_category_id": "cfbd2265-fc1e-4443-bb6d-fb97ff2e942d", "procurement_account": null, "general_ledger_account": null}
+>>1b  java.lang.String
+>>1c  {:id 19ad6bef-0972-4bb9-9395-e6f250f0f33b, :name Category C1, :cost_center nil, :main_category {:id cfbd2265-fc1e-4443-bb6d-fb97ff2e942d, :name Main Category MC1}, :main_category_id cfbd2265-fc1e-4443-bb6d-fb97ff2e942d, :procurement_account nil, :general_ledger_account nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "4aeb9bad-bdaa-4806-b9e6-4a084ff2759b", "name": "Beauty & Kids", "parent_id": "f9b3ba14-673c-40c0-90db-3f87099caea1", "shortname": null, "department": {"id": "f9b3ba14-673c-40c0-90db-3f87099caea1", "name": "Home, Jewelry & Computers", "parent_id": null, "shortname": null}}
+>>1b  java.lang.String
+>>1c  {:id 4aeb9bad-bdaa-4806-b9e6-4a084ff2759b, :name Beauty & Kids, :parent_id f9b3ba14-673c-40c0-90db-3f87099caea1, :shortname nil, :department {:id f9b3ba14-673c-40c0-90db-3f87099caea1, :name Home, Jewelry & Computers, :parent_id nil, :shortname nil}}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id": "1b685f5a-cca0-40e4-85d8-ce6d80a4b060", "name": "kitchen", "general": false, "building": {"id": "dbd87ced-9ad1-4163-8de6-9f6d0a084b54", "code": null, "name": "343 Willy Garden"}, "building_id": "dbd87ced-9ad1-4163-8de6-9f6d0a084b54", "description": null}
+>>1b  java.lang.String
+>>1c  {:id 1b685f5a-cca0-40e4-85d8-ce6d80a4b060, :name kitchen, :general false, :building {:id dbd87ced-9ad1-4163-8de6-9f6d0a084b54, :code nil, :name 343 Willy Garden}, :building_id dbd87ced-9ad1-4163-8de6-9f6d0a084b54, :description nil}
+>>1d  jsonb
+>> ===============================================
+>> ===============================================
+>>1a  {"id":"c9381d5c-6a4a-448e-9f85-a497c3e2837b","login":null,"firstname":"The","lastname":"Requester","phone":null,"org_id":null,"email":"joan@ortiz.net","badge_id":null,"address":null,"city":null,"zip":null,"country":null,"settings":null,"delegator_user_id":null,"created_at":"2023-12-29T11:20:21.961107+01:00","updated_at":"2023-12-29T11:20:21.961107+01:00","account_enabled":true,"password_sign_in_enabled":true,"url":null,"img256_url":null,"img32_url":null,"img_digest":null,"is_admin":false,"extended_info":null,"searchable":"The Requester joan@ortiz.net    Requester The","secondary_email":null,"language_locale":null,"admin_protected":false,"is_system_admin":false,"pool_protected":false,"system_admin_protected":false,"organization":"local","account_disabled_at":null,"last_sign_in_at":null}
+>>1b  java.lang.String
+>>1c  {:system_admin_protected false, :address nil, :email joan@ortiz.net, :pool_protected false, :last_sign_in_at nil, :img32_url nil, :account_enabled true, :lastname Requester, :phone nil, :img_digest nil, :org_id nil, :extended_info nil, :secondary_email nil, :city nil, :settings nil, :is_admin false, :organization local, :login nil, :searchable The Requester joan@ortiz.net    Requester The, :updated_at 2023-12-29T11:20:21.961107+01:00, :firstname The, :zip nil, :id c9381d5c-6a4a-448e-9f85-a497c3e2837b, :url nil, :password_sign_in_enabled true, :account_disabled_at nil, :is_system_admin false, :badge_id nil, :language_locale nil, :img256_url nil, :country nil, :delegator_user_id nil, :created_at 2023-12-29T11:20:21.961107+01:00, :admin_protected false}
+>>1d  json
+>> ===============================================
+2023-12-29T10:20:23.579Z NX-41294 WARN [leihs.procurement.graphql.resolver:326] - No implementation of method: :date of protocol: #'tick.protocols/IExtraction found for class: nil
