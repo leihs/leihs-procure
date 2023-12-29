@@ -2,7 +2,6 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.procurement.utils.sql :as sqlo]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -33,6 +32,6 @@
         settings (-> input-data
                      (assoc :inspection_comments inspection-comments))]
     (jdbc/execute-one! tx (-> (sql/update :procurement_settings)
-                              (sqlo/sset settings)
+                              (sql/set settings)
                               sql-format))
     (get-settings tx)))

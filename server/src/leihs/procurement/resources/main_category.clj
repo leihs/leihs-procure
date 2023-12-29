@@ -5,8 +5,7 @@
     [honey.sql.helpers :as sql]
     [leihs.core.utils :refer [my-cast]]
     (leihs.procurement.resources [image :as image] [uploads :as uploads])
-    (leihs.procurement.utils [helpers :refer [submap?]]
-                             [sql :as sqlo])
+    (leihs.procurement.utils [helpers :refer [submap?]])
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -69,7 +68,7 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sqlo/sset (my-cast mc))
+                     (sql/set (my-cast mc))
                      (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 
