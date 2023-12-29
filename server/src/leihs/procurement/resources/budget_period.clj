@@ -14,10 +14,9 @@
 
 (defn get-budget-period-by-id
   [tx id]
-  (let [query (-> budget-period-base-query
-                  (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
-                  sql-format)]
-    (jdbc/execute-one! tx query)))
+  (jdbc/execute-one! tx (-> budget-period-base-query
+                            (sql/where [:= :procurement_budget_periods.id [:cast id :uuid]])
+                            sql-format)))
 
 (defn get-budget-period
   ([context _ value]
@@ -30,12 +29,10 @@
                                               )))
 
   ([tx bp-map]
-   (let [where-clause (sqlp/map->where-clause :procurement_budget_periods
-                                              (my-cast bp-map))
-         result (jdbc/execute-one! tx (-> budget-period-base-query
-                                          (sql/where where-clause)
-                                          sql-format))]
-     result)))
+   (jdbc/execute-one! tx (-> budget-period-base-query
+                             (sql/where (sqlp/map->where-clause :procurement_budget_periods
+                                                                (my-cast bp-map)))
+                             sql-format))))
 
 (defn sql-format-date [inst]
   (-> inst tick/date str))
@@ -47,10 +44,9 @@
                                  (sql-format-date <>)
                                  [:cast <> :date]
                                  [:< :current_date <>]) :result])
-                  sql-format)
-        result (->> query
-                    (jdbc/execute-one! tx))]
-    (:result result)))
+                  sql-format)]
+    (:result (->> query
+                  (jdbc/execute-one! tx)))))
 
 (defn in-inspection-phase?
   [tx budget-period]
@@ -67,40 +63,36 @@
                       [:>= :current_date inspection-start-date]
                       [:< :current_date end-date]
                       ] :result])
-                  sql-format)
-        result (jdbc/execute-one! tx query)]
-    (:result result)))
+                  sql-format)]
+    (:result (jdbc/execute-one! tx query))))
 
 (defn past?
   [tx budget-period]
-  (let [query (-> (sql/select [(as-> budget-period <>
-                                 (:end_date <>)
-                                 (sql-format-date <>)
-                                 [:cast <> :date]
-                                 [:> :current_date <>]) :result])
-                  sql-format)
-        result (jdbc/execute-one! tx query)]
-    (:result result)))
+  (:result (jdbc/execute-one! tx (-> (sql/select [(as-> budget-period <>
+                                                    (:end_date <>)
+                                                    (sql-format-date <>)
+                                                    [:cast <> :date]
+                                                    [:> :current_date <>]) :result])
+                                     sql-format))))
 
 (defn can-delete?
   [context _ value]
-  (let [result (-> (jdbc/execute-one! (-> context
-                                          :request
-                                          :tx-next) (-> [:and
-                                                         [:not
-                                                          [:exists
-                                                           (-> (sql/select true)
-                                                               (sql/from [:procurement_requests :pr])
-                                                               (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
-                                                         [:not
-                                                          [:exists
-                                                           (-> (sql/select true)
-                                                               (sql/from [:procurement_budget_limits :pbl])
-                                                               (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
-                                                        (vector :result)
-                                                        sql/select
-                                                        sql-format)))]
-    (:result result)))
+  (:result (-> (jdbc/execute-one! (-> context
+                                      :request
+                                      :tx-next) (-> [:and
+                                                     [:not
+                                                      [:exists
+                                                       (-> (sql/select true)
+                                                           (sql/from [:procurement_requests :pr])
+                                                           (sql/where [:= :pr.budget_period_id [:cast (:id value) :uuid]]))]]
+                                                     [:not
+                                                      [:exists
+                                                       (-> (sql/select true)
+                                                           (sql/from [:procurement_budget_limits :pbl])
+                                                           (sql/where [:= :pbl.budget_period_id [:cast (:id value) :uuid]]))]]]
+                                                    (vector :result)
+                                                    sql/select
+                                                    sql-format)))))
 
 (defn update-budget-period!
   [tx bp]

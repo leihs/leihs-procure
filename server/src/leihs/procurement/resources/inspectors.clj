@@ -20,18 +20,22 @@
 
 (defn delete-inspectors-for-category-id!
   [tx c-id]
-  (jdbc/execute! tx (-> (sql/delete-from :procurement_category_inspectors :pci)
-                        (sql/where [:= :pci.category_id [:cast (spy c-id) :uuid]])
-                        sql-format)))
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_category_inspectors :pci)
+                     (sql/where [:= :pci.category_id [:cast c-id :uuid]])
+                     sql-format)))
 
 (defn insert-inspectors!
   [tx row-maps]
-  (jdbc/execute! tx (-> (sql/insert-into :procurement_category_inspectors)
-                        (sql/values (map #(my-cast %) row-maps))
-                        sql-format)))
+  (jdbc/execute! tx
+                 (-> (sql/insert-into :procurement_category_inspectors)
+                     (sql/values (map #(my-cast %) row-maps))
+                     sql-format)))
 
 (defn update-inspectors!
   [tx c-id u-ids]
   (delete-inspectors-for-category-id! tx c-id)
   (if (not (empty? u-ids))
-    (insert-inspectors! tx (map #(hash-map :user_id % :category_id c-id) u-ids))))
+    (insert-inspectors! tx
+                        (map #(hash-map :user_id % :category_id c-id) u-ids))))
+

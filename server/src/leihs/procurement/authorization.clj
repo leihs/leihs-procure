@@ -11,7 +11,7 @@
 
 (defn throw-unauthorized []
   (throw (ex-info
-           (str "UnauthorizedException"
+           (str  "UnauthorizedException"
                 " - " "Not authorized for this query path and arguments.")
            {:status 403})))
 
@@ -83,8 +83,8 @@
       (path :sign-in
             nil
             {:return-to (cond-> uri
-                                (presence query-string)
-                                (str "?" query-string))}))))
+                          (presence query-string)
+                          (str "?" query-string))}))))
 
 (defn wrap-authenticate
   [handler]

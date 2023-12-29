@@ -26,10 +26,10 @@
           limit (:limit args)]
       (sql-format
         (cond-> models-base-query
-                (not-empty terms)
-                (sql/where
-                  (into [:and]
-                        (map (fn [term] [:ilike (:unaccent sql-name) (:unaccent term)])
-                             terms)))
-                offset (sql/offset offset)
-                limit (sql/limit limit))))))
+          (not-empty terms)
+            (sql/where
+              (into [:and]
+                    (map (fn [term] [:ilike (:unaccent sql-name) (:unaccent term)])
+                      terms)))
+          offset (sql/offset offset)
+          limit (sql/limit limit))))))

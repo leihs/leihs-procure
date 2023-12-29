@@ -40,15 +40,13 @@
   [tx dep-name]
   (->> dep-name
        department-by-name-query
-       (jdbc/execute-one! tx)
-       ))
+       (jdbc/execute-one! tx)))
 
 (defn get-department-by-id
   [tx id]
   (->> id
        department-by-id-query
-       (jdbc/execute-one! tx)
-       ))
+       (jdbc/execute-one! tx)))
 
 (defn get-organization-by-id
   [tx id]
@@ -90,8 +88,7 @@
        department-query
        (jdbc/execute-one! (-> context
                               :request
-                              :tx-next))
-       ))
+                              :tx-next))))
 
 (defn get-department-of-organization
   [context _ value]

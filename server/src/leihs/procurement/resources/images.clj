@@ -7,6 +7,7 @@
 
 (defn delete!
   [tx ids]
-  (jdbc/execute! tx (-> (sql/delete-from :procurement_images)
-                        (sql/where [:in :procurement_images.id (cast-uuids ids)])
-                        sql-format)))
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_images)
+                     (sql/where [:in :procurement_images.id (cast-uuids ids)])
+                     sql-format)))

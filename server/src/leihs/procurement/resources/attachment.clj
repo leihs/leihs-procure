@@ -23,8 +23,7 @@
   (if-let [a (->> attachment-id
                   attachment-query
                   sql-format
-                  (jdbc/execute-one! tx)
-                  )]
+                  (jdbc/execute-one! tx))]
     (->> a
          :content
          (.decode (Base64/getMimeDecoder))

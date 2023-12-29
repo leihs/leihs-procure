@@ -17,15 +17,15 @@
 
 (defn get-budget-limits
   [context _ value]
-  (let [main_category_id (spy (:id value))]
-    (spy (jdbc/execute!
-           (-> context
-               :request
-               :tx-next)
-           (-> budget-limits-base-query
-               (sql/where [:= :procurement_budget_limits.main_category_id
-                           main_category_id])
-               sql-format)))))
+  (let [main_category_id (:id value)]
+    (jdbc/execute!
+      (-> context
+          :request
+          :tx-next)
+      (-> budget-limits-base-query
+          (sql/where [:= :procurement_budget_limits.main_category_id
+                      main_category_id])
+          sql-format))))
 
 (defn insert-budget-limit!
   [tx bl]

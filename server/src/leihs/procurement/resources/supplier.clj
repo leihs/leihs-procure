@@ -9,7 +9,7 @@
   [id]
   (-> (sql/select :suppliers.*)
       (sql/from :suppliers)
-      (sql/where [:= :suppliers.id [:cast (spy id) :uuid]])
+      (sql/where [:= :suppliers.id [:cast id :uuid]])
       sql-format))
 
 (defn get-supplier-by-id [tx id] (jdbc/execute-one! tx (supplier-query id)))
@@ -19,5 +19,5 @@
   (get-supplier-by-id (-> context
                           :request
                           :tx-next)
-                      (or (:value value)                     ; for RequestFieldSupplier
+                      (or (:value value)                    ; for RequestFieldSupplier
                           (:supplier_id value))))

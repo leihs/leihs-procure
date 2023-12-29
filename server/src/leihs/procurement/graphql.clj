@@ -71,20 +71,19 @@
                        :type
                        (= :mutation))]
     (if mutation?
-      (jdbc/with-transaction+options [tx-next (db/get-ds-next)]
-                                     (letfn [(rollback-both-tx! []
-                                               (.rollback (:connectable tx-next)))]
-                                       (try (let [response (-> request
-                                                               (assoc :tx-next tx-next)
-                                                               pure-handler)]
-                                              (when (:graphql-error response)
-                                                (warn "Rolling back transaction because of graphql error: " response)
-                                                (rollback-both-tx!))
-                                              response)
-                                            (catch Throwable th
-                                              (warn "Rolling back transaction because of " th)
-                                              (rollback-both-tx!)
-                                              (throw th)))))
+      (jdbc/with-transaction+options
+        [tx-next (db/get-ds-next)]
+        (try (let [response (-> request
+                                (assoc :tx-next tx-next)
+                                pure-handler)]
+               (when (:graphql-error response)
+                 (warn "Rolling back transaction because of graphql error: " response)
+                 (.rollback (:connectable tx-next)))
+               response)
+             (catch Throwable th
+               (warn "Rolling back transaction because of " th)
+               (.rollback (:connectable tx-next))
+               (throw th))))
       (pure-handler request))))
 
 

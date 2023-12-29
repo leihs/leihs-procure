@@ -69,8 +69,8 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sqlo/sset (spy (my-cast mc)))
-                     (sql/where [:= :procurement_main_categories.id [:cast (spy (:id mc)) :uuid]])
+                     (sqlo/sset (my-cast mc))
+                     (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 
 (defn can-delete?
@@ -79,26 +79,27 @@
     (jdbc/execute-one!
       (-> context
           :request
-          :tx-next) (-> [:and
-                         [:not
-                          [:exists
-                           (-> (sql/select true)
-                               (sql/from [:procurement_requests :pr])
-                               (sql/join [:procurement_categories :pc]
-                                         [:= :pc.id :pr.category_id])
-                               (sql/where [:= :pc.main_category_id
-                                           [:cast (:id value) :uuid]]))]]
-                         [:not
-                          [:exists
-                           (-> (sql/select true)
-                               (sql/from [:procurement_templates :pt])
-                               (sql/join [:procurement_categories :pc]
-                                         [:= :pc.id :pt.category_id])
-                               (sql/where [:= :pc.main_category_id
-                                           [:cast (:id value) :uuid]]))]]]
-                        (vector :result)
-                        sql/select
-                        sql-format))
+          :tx-next)
+      (-> [:and
+           [:not
+            [:exists
+             (-> (sql/select true)
+                 (sql/from [:procurement_requests :pr])
+                 (sql/join [:procurement_categories :pc]
+                           [:= :pc.id :pr.category_id])
+                 (sql/where [:= :pc.main_category_id
+                             [:cast (:id value) :uuid]]))]]
+           [:not
+            [:exists
+             (-> (sql/select true)
+                 (sql/from [:procurement_templates :pt])
+                 (sql/join [:procurement_categories :pc]
+                           [:= :pc.id :pt.category_id])
+                 (sql/where [:= :pc.main_category_id
+                             [:cast (:id value) :uuid]]))]]]
+          (vector :result)
+          sql/select
+          sql-format))
     :result))
 
 (defn delete!

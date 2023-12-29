@@ -10,7 +10,7 @@
   :BudgetPeriodInput {:fields {:end_date {:type (non-null String)},
                                :id {:type ID},
                                :inspection_start_date {:type (non-null
-                                                               String)},
+                                                              String)},
                                :name {:type (non-null String)}}},
   :CategoryInput {:fields {:cost_center {:type String},
                            :general_ledger_account {:type String},
@@ -23,7 +23,7 @@
                                   :viewers {:type (list ID)}}},
   :DeleteRequestInput {:fields {:id {:type (non-null ID)}}},
   :MainCategoryInput {:fields {:budget_limits {:type (list
-                                                       :BudgetLimitInput)},
+                                                      :BudgetLimitInput)},
                                :categories {:type (list :CategoryInput)},
                                :id {:type ID},
                                :name {:type String},
@@ -60,9 +60,9 @@
   :ProcurementSettingsInput {:fields {:contact_url {:type String},
                                       :inspection_comments
                                       {:type (list String)}}},
-  ; NOTE: For the purpose of UI and required fields (*) an extra key
-  ; `:required`
-  ; should be used rather then using `non-null` and the schema information.
+    ; NOTE: For the purpose of UI and required fields (*) an extra key
+    ; `:required`
+    ; should be used rather then using `non-null` and the schema information.
   :RequestInput {:fields {:accounting_type {:type String},
                           :approved_quantity {:type Int},
                           :article_name {:type String},
@@ -96,7 +96,7 @@
   :RequestCategoryInput {:fields {:category {:type ID}, :id {:type ID}}},
   :RequesterOrganizationInput {:fields {:department {:type (non-null String)},
                                         :organization {:type (non-null
-                                                               String)},
+                                                              String)},
                                         :user_id {:type (non-null ID)}}},
   :TemplateInput {:fields {:article_name {:type String},
                            :article_number {:type String},
@@ -119,7 +119,7 @@
                    :resolve :update-budget-periods,
                    :type (list :BudgetPeriod)},
   :categories_viewers {:args {:input_data {:type (list
-                                                   :CategoryViewersInput)}},
+                                                  :CategoryViewersInput)}},
                        :resolve :update-categories-viewers,
                        :type (list :Category)},
   :change_request_budget_period {:args {:input_data
@@ -457,7 +457,7 @@
   :new_request {:args {:budget_period {:type (non-null ID)},
                        :category {:type ID},
                        :template {:type ID},
-                       ; :for_user {:type (non-null ID)}
+                         ; :for_user {:type (non-null ID)}
                        },
                 :resolve :new-request,
                 :type :Request},

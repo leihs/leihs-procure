@@ -18,4 +18,4 @@
   (get-room-by-id (-> context
                       :request
                       :tx-next)
-                  (:value value)))                          ; for RequestFieldRoom
+                  (:value value))) ; for RequestFieldRoom

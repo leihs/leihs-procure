@@ -208,6 +208,7 @@ describe 'budget periods' do
       expect(BudgetPeriod.all.map(&:name)).to be == ['bp_to_delete', 'bp_1']
     end
 
+
     it 'updates successfully for an authorized user' do
       user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: user.id)

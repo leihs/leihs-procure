@@ -172,7 +172,7 @@ Feature: Requests' filter for inspector, viewer and procurement admin
       | Product J | Neu        |
 
     And I click on "Filter zurücksetzen"
-
+ 
     When I uncheck "nur Kategorien mit Anträgen" filter
     And I expand all categories
     And I see "9 Anträge"

@@ -21,12 +21,12 @@
 
 (defn get-organization-of-requester
   [tx user-id]
-  (let [query (spy (-> (sql/select :procurement_organizations.*)
+  (let [query  (-> (sql/select :procurement_organizations.*)
                        (sql/from :procurement_requesters_organizations)
                        (sql/join :procurement_organizations
                                  [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
-                       (sql/where [:= :procurement_requesters_organizations.user_id [:cast (spy user-id) :uuid]])
-                       sql-format))]
+                       (sql/where [:= :procurement_requesters_organizations.user_id [:cast user-id :uuid]])
+                       sql-format)]
     (jdbc/execute-one! tx query)))
 
 
@@ -36,7 +36,7 @@
         org-name (:organization data)
         department (or (organization/get-department-by-name tx dep-name) ;; nil
                        (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
-                                                 (sql/values [{:name (spy dep-name)}])
+                                                 (sql/values [{:name dep-name}])
                                                  (sql/returning :*)
                                                  sql-format)))
         organization (or (organization/get-organization-by-name-and-dep-id ;;
@@ -49,15 +49,15 @@
                                                    (sql/returning :*)
                                                    sql-format)))]
     (jdbc/execute! tx (-> (sql/insert-into :procurement_requesters_organizations)
-                          (sql/values [{:user_id [:cast (spy (:user_id data)) :uuid],
+                          (sql/values [{:user_id [:cast (:user_id data) :uuid],
                                         :organization_id [:cast (:id organization) :uuid]}])
                           (sql/returning :*)
                           sql-format))))
 
 (defn delete-all
   [tx]
-  (spy (jdbc/execute! tx (->> (sql/delete-from :procurement_requesters_organizations)
-                              sql-format))))
+   (jdbc/execute! tx (->> (sql/delete-from :procurement_requesters_organizations)
+                              sql-format)))
 
 (defn update-requesters-organizations!
   [context args value]

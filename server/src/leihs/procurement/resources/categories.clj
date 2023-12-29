@@ -6,7 +6,7 @@
     [leihs.procurement.permissions.user :as user-perms]
     (leihs.procurement.resources [category :as category]
                                  [inspectors :as inspectors] [viewers :as viewers])
-    [leihs.procurement.utils.helpers :refer [ cast-uuids]]
+    [leihs.procurement.utils.helpers :refer [cast-uuids]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -40,9 +40,9 @@
   [tx ids]
   (if (empty? ids)
     []
-    (spy (jdbc/execute! tx (-> categories-base-query
+    (jdbc/execute! tx (-> categories-base-query
                                (sql/where [:in :procurement_categories.id (cast-uuids ids)])
-                               sql-format)))))
+                               sql-format))))
 
 (defn get-for-main-category-id
   [tx main-cat-id]

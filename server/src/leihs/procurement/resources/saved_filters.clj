@@ -7,10 +7,10 @@
 
 (defn saved-filters-query
   [user-id]
-  (spy (-> (sql/select :*)
-           (sql/from :procurement_users_filters)
-           (sql/where [:= :user_id [:cast user-id :uuid]])
-           sql-format)))
+  (-> (sql/select :*)
+      (sql/from :procurement_users_filters)
+      (sql/where [:= :user_id [:cast user-id :uuid]])
+      sql-format))
 
 (defn get-saved-filters
   [context args value]

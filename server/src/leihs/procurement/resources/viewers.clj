@@ -20,13 +20,13 @@
 
 (defn delete-viewers-for-category-id!
   [tx c-id]
-  (let [result (spy (jdbc/execute-one! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
+  (let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_category_viewers :pcv)
                                               (sql/where [:= :pcv.category_id [:cast c-id :uuid]])
-                                              sql-format)))
+                                              sql-format))
 
         res (spy (:update-count result))                    ;; TODO: fixme
         result (spy (:next.jdbc/update-count result))]
-    (spy (list result))))
+     (list result)))
 
 (defn insert-viewers!
   [tx row-maps]

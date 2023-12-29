@@ -16,18 +16,18 @@
 
 (defn get-template-by-id
   [tx id]
-  (spy (-> templates-base-query
-           (sql/where [:= :procurement_templates.id [:cast id :uuid]])
-           sql-format
-           (->> (jdbc/execute-one! tx)))))
+  (-> templates-base-query
+      (sql/where [:= :procurement_templates.id [:cast id :uuid]])
+      sql-format
+      (->> (jdbc/execute-one! tx))))
 
 
 (defn insert-template!
   [tx tmpl]
   (let [tmpl (my-cast tmpl)
-        result (spy (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
+        result  (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
                                               (sql/values [tmpl])
-                                              sql-format))))
+                                              sql-format)))
         result (:update-count result)]
     (:update-count result)))
 
@@ -38,7 +38,7 @@
                    (sql/where [:= :template_id (:id tmpl)])
                    sql-format
                    (->> (jdbc/execute-one! tx)))
-        req-exist? (-> (spy result)
+        req-exist? (-> result
                        :count
                        (> 0))]
     (if req-exist?
@@ -47,21 +47,21 @@
 
 (defn update-template!
   [tx tmpl]
-  (let [casted-tmpl (my-cast (spy tmpl))
+  (let [casted-tmpl (my-cast  tmpl)
         casted-tmpl (validate-update-attributes tx casted-tmpl)]
     (-> (jdbc/execute-one! tx (-> (sql/update :procurement_templates)
-                                  (sql/set (spy casted-tmpl))
+                                  (sql/set  casted-tmpl)
                                   (sql/where [:= :procurement_templates.id (:id casted-tmpl)])
                                   sql-format))
         :next.jdbc/update-count
-        list
-        )))
+        list)))
 
 (defn delete-template!
   [tx id]
-  (jdbc/execute! tx (-> (sql/delete-from :procurement_templates)
-                        (sql/where [:= :procurement_templates.id [:cast id :uuid]])
-                        sql-format)))
+  (jdbc/execute! tx
+                 (-> (sql/delete-from :procurement_templates)
+                     (sql/where [:= :procurement_templates.id [:cast id :uuid]])
+                     sql-format)))
 
 (defn get-template
   ([context _ value]
@@ -72,9 +72,8 @@
                            (:template_id value))))
 
   ([tx tmpl]
-   (let [
-         tmpl (my-cast tmpl)
-         where-clause (sqlp/map->where-clause :procurement_templates (spy tmpl))]
+   (let [tmpl (my-cast tmpl)
+         where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
      (-> templates-base-query
          (sql/where where-clause)
          sql-format

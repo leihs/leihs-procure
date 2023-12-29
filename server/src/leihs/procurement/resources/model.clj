@@ -12,12 +12,12 @@
       (sql/where [:= :models.id [:cast id :uuid]])
       sql-format))
 
-(defn get-model-by-id [tx id] (jdbc/execute-one! tx (spy (model-query id))))
+(defn get-model-by-id [tx id] (jdbc/execute-one! tx  (model-query id)))
 
 (defn get-model
   [context _ value]
   (get-model-by-id (-> context
                        :request
                        :tx-next)
-                   (or (:value value)                       ; for RequestFieldModel
+                   (or (:value value) ; for RequestFieldModel
                        (:model_id value))))

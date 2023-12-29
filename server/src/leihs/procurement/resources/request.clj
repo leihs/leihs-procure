@@ -121,13 +121,13 @@
                    (cons :case))
           result [[map]]] result)))
 
-(def sql-order-by-expr                                      ;;toRemove
+(def sql-order-by-expr
   (str "concat("
        "lower(coalesce(procurement_requests.article_name, '')), "
        "lower(coalesce(models.product, '')), "
        "lower(coalesce(models.version, ''))" ")"))
 
-(def requests-base-query                                    ;;ok
+(def requests-base-query
   (let [conc sql-order-by-expr]
     (-> (sql/select [[:raw (str "DISTINCT ON (procurement_requests.id, "
                                 conc
@@ -149,7 +149,8 @@
   (cond-> m
           (:order_status m) (update :order_status to-name-and-lower-case)
           (:priority m) (update :priority to-name-and-lower-case)
-          (:inspector_priority m) (update :inspector_priority to-name-and-lower-case)))
+          (:inspector_priority m) (update :inspector_priority
+                                          to-name-and-lower-case)))
 
 (defn upper-case-keyword-value
   [row attr]
@@ -189,11 +190,10 @@
 
 (defn enum-state
   [row]
-  (let [result (->> row
-                    :state
-                    keyword
-                    (assoc row :state))]
-    result))
+  (->> row
+       :state
+       keyword
+       (assoc row :state)))
 
 (defn add-general-ledger-account
   [row]
@@ -236,7 +236,7 @@
 (defn query-requests
   [tx auth-entity query]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)
-        result (->> (jdbc/execute! tx (spy query))
+        result (->> (jdbc/execute! tx query)
                     (map #(transform-row % advanced-user?)))]
     result))
 
@@ -307,15 +307,12 @@
                                      sql-format))]
     result))
 
-
 (defn update!
   [tx req-id data]
-  (let [
-        result (jdbc/execute-one! tx (-> (sql/update :procurement_requests) ;;fixme
+  (let [result (jdbc/execute-one! tx (-> (sql/update :procurement_requests)
                                          (sql/set (my-cast data))
                                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                                          sql-format))
-
         result (list (:next.jdbc/update-count result))] result))
 
 (defn- filter-attachments [m as]
@@ -471,7 +468,7 @@
                       (dissoc <> :attachments)
                       (cond-> <>
                               (:order_status <>)
-                              (update :order_status cast-to-order-status-enum)) ;;TODO
+                              (update :order_status cast-to-order-status-enum))
                       (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
                       (cond-> <> (:inspector_priority <>) (update :inspector_priority to-name-and-lower-case))
                       (cond-> <> organization-id (assoc :organization_id organization-id)))
@@ -515,7 +512,7 @@
              result-count (spy (:update-count (spy result))) ;; fails
              result-count (spy (:next.jdbc/update-count (spy result))) ;; works
              ]
-         (= (spy result-count) 1))
+         (= result-count 1))
       :if-only
       #(:DELETE field-perms))))
 

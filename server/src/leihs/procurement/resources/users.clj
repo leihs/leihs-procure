@@ -41,7 +41,11 @@
       (-> (cond-> users-base-query
                   is-requester (sql/join :procurement_requesters_organizations
                                          [:= :procurement_requesters_organizations.user_id :users.id])
-                  term-parts (sql/where (into [:and] (map (fn [x] [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar] :users.lastname]] [:unaccent [:cast x :varchar]]]) term-parts)))
+                  term-parts (sql/where
+                               (into [:and] (map (fn [x]
+                                                   [:ilike [:unaccent [:concat :users.firstname [:cast " " :varchar]
+                                                                       :users.lastname]]
+                                                    [:unaccent [:cast x :varchar]]]) term-parts)))
                   exclude-ids (sql/where [:not-in :users.id (cast-uuids exclude-ids)])
                   offset (sql/offset offset)
                   limit (sql/limit limit))
