@@ -24,3 +24,6 @@ gem 'rb-readline'
 gem 'pry'
 
 gem 'rexml'
+
+# dev 
+gem 'solargraph'
