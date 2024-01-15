@@ -14,7 +14,6 @@ Feature: Create, read, update, delete, etc.
     And I click on "Budgetperioden"
     And I click on the + button
     And I set the name as "3000" on line 1
-    And I pry
     And I set the start date as "3000-01-01" on line 1
     And I set the end date as "3000-06-30" on line 1
     And I click on "Speichern"
