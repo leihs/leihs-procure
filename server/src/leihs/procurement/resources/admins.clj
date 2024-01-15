@@ -37,7 +37,8 @@
     (delete-all tx)
     (doseq [d users]
       (jdbc/execute! tx (-> (sql/insert-into :procurement_admins)
-                            (sql/values [(my-cast d)])
+                            ;(sql/values [(my-cast d)])
+                            (sql/values [d])
                             sql-format)))
     (let [admins (get-admins context args value)]
       (map #(conj % {:user (->> % :user_id (user/get-user-by-id tx))}) admins))))

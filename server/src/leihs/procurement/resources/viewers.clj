@@ -31,7 +31,8 @@
 (defn insert-viewers!
   [tx row-maps]
   (-> (jdbc/execute-one! tx (-> (sql/insert-into :procurement_category_viewers)
-                                (sql/values (map #(my-cast %) row-maps))
+                                ;(sql/values (map #(my-cast %) row-maps))
+                                (sql/values  row-maps)
                                 sql-format))
       :next.jdbc/update-count
       list))

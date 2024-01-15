@@ -30,7 +30,8 @@
 (defn insert-budget-limit!
   [tx bl]
   (jdbc/execute! tx (-> (sql/insert-into :procurement_budget_limits)
-                        (sql/values [(my-cast bl)])
+                        ;(sql/values [(my-cast bl)])
+                        (sql/values [bl])
                         sql-format)))
 
 (defn delete-budget-limit!

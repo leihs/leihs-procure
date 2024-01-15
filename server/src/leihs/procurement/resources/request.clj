@@ -310,7 +310,8 @@
 (defn update!
   [tx req-id data]
   (let [result (jdbc/execute-one! tx (-> (sql/update :procurement_requests)
-                                         (sql/set (my-cast data))
+                                         ;(sql/set (my-cast data))
+                                         (sql/set data)
                                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                                          sql-format))
         result (list (:next.jdbc/update-count result))] result))
@@ -357,7 +358,8 @@
     (authorization/authorize-and-apply
       #(jdbc/execute! tx
                       (-> (sql/update :procurement_requests)
-                          (sql/set (my-cast {:budget_period_id new-budget-period-id}))
+                          ;(sql/set (my-cast {:budget_period_id new-budget-period-id}))
+                          (sql/set  {:budget_period_id new-budget-period-id})
                           (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                           sql-format))
       :if-only
