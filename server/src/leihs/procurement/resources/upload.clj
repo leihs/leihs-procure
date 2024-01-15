@@ -18,7 +18,8 @@
 
 (defn insert-file-upload!
   [tx m]
-  (let [m (my-cast m)
+  (let [
+        ;m (my-cast m)
         result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
                                          (sql/values [m])   ;metadata _> jsonb
                                          sql-format))]

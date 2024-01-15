@@ -42,6 +42,7 @@
 (defn create!
   [tx data]
   (jdbc/execute! tx (-> (sql/insert-into :procurement_attachments)
-                        (sql/values [(my-cast data)])
+                        ;(sql/values [(my-cast data)])
+                        (sql/values [data])
                         sql-format)))
 

@@ -29,7 +29,8 @@
   [tx row-maps]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_category_inspectors)
-                     (sql/values (map #(my-cast %) row-maps))
+                     ;(sql/values (map #(my-cast %) row-maps))
+                     (sql/values row-maps)
                      sql-format)))
 
 (defn update-inspectors!

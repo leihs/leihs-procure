@@ -45,7 +45,8 @@
   [tx data]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_images)
-                     (sql/values [(my-cast data)])
+                     (sql/values [data])
+                     ;(sql/values [(my-cast data)])
                      sql-format)))
 
 (defn create-for-main-category-id-and-upload!
