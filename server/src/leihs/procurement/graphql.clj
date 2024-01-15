@@ -9,23 +9,25 @@
                              [schema :as graphql-schema] [util :as graphql-util])
     [leihs.core.db :as db]
     [leihs.core.graphql :as core-graphql]
+    [leihs.procurement.graphql.scalars :as scalars]
     [leihs.procurement.graphql.helpers :as helpers]
     [leihs.procurement.graphql.resolver :as resolver]
     [leihs.procurement.utils.ring-exception :refer [get-cause]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
 
-(def CUSTOM_SCALARS
-  {:ID {:parse identity :serialize str}
-   :Int {:parse (fn [v]
-                  (if (number? v) v (Integer/parseInt v)))
-         :serialize identity}})
+;(def CUSTOM_SCALARS
+;  {:ID {:parse identity :serialize str}
+;   :Int {:parse (fn [v]
+;                  (if (number? v) v (Integer/parseInt v)))
+;         :serialize identity}})
 
 (defn load-schema! []
   (or (some-> (io/resource "schema.edn")
               slurp edn/read-string
               (graphql-util/attach-resolvers resolver/resolvers)
-              (assoc-in [:scalars] CUSTOM_SCALARS)
+              (graphql-util/attach-scalar-transformers scalars/scalars)
+              ;(assoc-in [:scalars] CUSTOM_SCALARS)
               graphql-schema/compile)
       (throw (ex-info "Failed to load schema" {}))))
 
