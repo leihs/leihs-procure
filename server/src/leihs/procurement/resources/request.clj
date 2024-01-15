@@ -311,7 +311,7 @@
   [tx req-id data]
   (let [result (jdbc/execute-one! tx (-> (sql/update :procurement_requests)
                                          ;(sql/set (my-cast data))
-                                         (sql/set data)
+                                         (sql/set data)     ;; FIXME: order-status cast
                                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                                          sql-format))
         result (list (:next.jdbc/update-count result))] result))

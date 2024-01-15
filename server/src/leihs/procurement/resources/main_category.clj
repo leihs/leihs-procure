@@ -68,7 +68,8 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     (sql/set (my-cast mc))
+                     ;(sql/set (my-cast mc))
+                     (sql/set  mc)
                      (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 

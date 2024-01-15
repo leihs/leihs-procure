@@ -24,7 +24,8 @@
 
 (defn insert-template!
   [tx tmpl]
-  (let [tmpl (my-cast tmpl)
+  (let [
+        ;tmpl (my-cast tmpl)
         result  (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
                                               (sql/values [tmpl])
                                               sql-format)))
@@ -47,11 +48,15 @@
 
 (defn update-template!
   [tx tmpl]
-  (let [casted-tmpl (my-cast  tmpl)
-        casted-tmpl (validate-update-attributes tx casted-tmpl)]
+  (let [
+        ;;casted-tmpl (my-cast  tmpl)
+        ;;casted-tmpl (validate-update-attributes tx casted-tmpl)
+
+        casted-tmpl (validate-update-attributes tx tmpl)]
     (-> (jdbc/execute-one! tx (-> (sql/update :procurement_templates)
                                   (sql/set  casted-tmpl)
-                                  (sql/where [:= :procurement_templates.id (:id casted-tmpl)])
+                                  ;(sql/where [:= :procurement_templates.id (:id casted-tmpl)])
+                                  (sql/where [:= :procurement_templates.id (:id tmpl)])
                                   sql-format))
         :next.jdbc/update-count
         list)))
@@ -72,7 +77,8 @@
                            (:template_id value))))
 
   ([tx tmpl]
-   (let [tmpl (my-cast tmpl)
+   (let [
+         ;;tmpl (my-cast tmpl)
          where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
      (-> templates-base-query
          (sql/where where-clause)

@@ -20,7 +20,7 @@
   [tx m]
   (let [m (my-cast m)
         result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
-                                         (sql/values [m])
+                                         (sql/values [m])   ;metadata _> jsonb
                                          sql-format))]
     (:update-count result)))
 
