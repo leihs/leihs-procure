@@ -3,7 +3,7 @@
                      [string :refer [lower-case upper-case]])
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
-            [leihs.core.utils :refer [my-cast]]
+            [leihs.procurement.utils.helpers :refer [my-cast]]
             [leihs.procurement.authorization :as authorization]
             (leihs.procurement.permissions [request-fields :as request-fields-perms]
                                            [request-helpers :as request-perms] [user :as user-perms])

@@ -2,7 +2,7 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
+    [leihs.procurement.utils.helpers :refer [my-cast]]
     [leihs.procurement.utils.sql :as sqlp]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
