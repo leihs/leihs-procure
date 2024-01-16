@@ -2,7 +2,6 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.resources.user :as user]
     [leihs.procurement.resources.users :refer [sql-order-users]]
     [next.jdbc :as jdbc]
@@ -37,7 +36,6 @@
     (delete-all tx)
     (doseq [d users]
       (jdbc/execute! tx (-> (sql/insert-into :procurement_admins)
-                            ;(sql/values [(my-cast d)])
                             (sql/values [d])
                             sql-format)))
     (let [admins (get-admins context args value)]

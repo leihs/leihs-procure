@@ -5,7 +5,6 @@
             [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
-            [leihs.core.utils :refer [my-cast]]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.utils [exif :as exif])
             [next.jdbc :as jdbc]
@@ -18,10 +17,8 @@
 
 (defn insert-file-upload!
   [tx m]
-  (let [
-        ;m (my-cast m)
-        result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
-                                         (sql/values [m])   ;metadata _> jsonb
+  (let [result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
+                                         (sql/values [m])
                                          sql-format))]
     (:update-count result)))
 

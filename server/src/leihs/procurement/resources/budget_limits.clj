@@ -2,10 +2,8 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-    ))
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def budget-limits-base-query
   (-> (sql/select :procurement_budget_limits.*)
@@ -30,7 +28,6 @@
 (defn insert-budget-limit!
   [tx bl]
   (jdbc/execute! tx (-> (sql/insert-into :procurement_budget_limits)
-                        ;(sql/values [(my-cast bl)])
                         (sql/values [bl])
                         sql-format)))
 

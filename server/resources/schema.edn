@@ -1,10 +1,5 @@
 {:scalars {:ID {:parse :uuid-parse :serialize :uuid-serialize}
-           ;:DateTime {:parse :date-time-parse :serialize :date-time-serialize}
-           ;:Date {:parse :date-parse :serialize :date-serialize}
-           :Int {:parse :int-parse :serialize :int-serialize}
-           ;:NonEmptyText {:parse :non-empty-text-parse
-           ; :serialize :non-empty-text-serialize }
-           }
+           :Int {:parse :int-parse :serialize :int-serialize}}
 :enums {:InspectorPriority {:values [:LOW :MEDIUM :HIGH :MANDATORY]},
          :Priority {:values [:NORMAL :HIGH]},
          :State {:values [:APPROVED :DENIED :IN_APPROVAL :NEW

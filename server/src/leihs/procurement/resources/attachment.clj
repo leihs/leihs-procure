@@ -3,7 +3,6 @@
     [compojure.core :as cpj]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.paths :refer [path]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]])
@@ -42,7 +41,6 @@
 (defn create!
   [tx data]
   (jdbc/execute! tx (-> (sql/insert-into :procurement_attachments)
-                        ;(sql/values [(my-cast data)])
                         (sql/values [data])
                         sql-format)))
 

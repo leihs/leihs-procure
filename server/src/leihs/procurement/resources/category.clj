@@ -2,7 +2,6 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.utils.sql :as sqlp]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
@@ -28,7 +27,6 @@
                                           [:cast (:category_id value) :uuid]))))
   ([tx catmap]
    (let [where-clause (sqlp/map->where-clause :procurement_categories catmap)]
-   ;(let [where-clause (sqlp/map->where-clause :procurement_categories (my-cast catmap))]
      (jdbc/execute-one! tx
                         (-> category-base-query
                             (sql/where where-clause)
@@ -66,7 +64,6 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_categories)
                      (sql/set c)
-                     ;(sql/set (my-cast c))
                      (sql/where [:= :procurement_categories.id [:cast (:id c) :uuid]])
                      sql-format)))
 
@@ -74,6 +71,5 @@
   [tx c]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_categories)
-                     ;(sql/values [(my-cast c)])
                      (sql/values [c])
                      sql-format)))

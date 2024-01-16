@@ -2,7 +2,6 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.resources.users :refer [users-base-query]]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]))
@@ -29,7 +28,6 @@
   [tx row-maps]
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_category_inspectors)
-                     ;(sql/values (map #(my-cast %) row-maps))
                      (sql/values row-maps)
                      sql-format)))
 

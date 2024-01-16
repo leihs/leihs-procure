@@ -4,7 +4,6 @@
             [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
-            [leihs.core.utils :refer [my-cast]]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
             [next.jdbc :as jdbc]
@@ -46,7 +45,6 @@
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_images)
                      (sql/values [data])
-                     ;(sql/values [(my-cast data)])
                      sql-format)))
 
 (defn create-for-main-category-id-and-upload!

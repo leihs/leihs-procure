@@ -2,7 +2,6 @@
   (:require
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     [leihs.procurement.utils.sql :as sqlp]
     [next.jdbc :as jdbc]
     [taoensso.timbre :refer [debug error info spy warn]]
@@ -24,13 +23,11 @@
 
 (defn insert-template!
   [tx tmpl]
-  (let [
-        ;tmpl (my-cast tmpl)
-        result  (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
-                                              (sql/values [tmpl])
-                                              sql-format)))
-        result (:update-count result)]
-    (:update-count result)))
+  (let [result (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
+                                         (sql/values [tmpl])
+                                         sql-format)))
+        count (:update-count result)]
+    (:update-count count)))
 
 (defn validate-update-attributes [tx tmpl]
   (let [
@@ -48,14 +45,9 @@
 
 (defn update-template!
   [tx tmpl]
-  (let [
-        ;;casted-tmpl (my-cast  tmpl)
-        ;;casted-tmpl (validate-update-attributes tx casted-tmpl)
-
-        casted-tmpl (validate-update-attributes tx tmpl)]
+  (let [casted-tmpl (validate-update-attributes tx tmpl)]
     (-> (jdbc/execute-one! tx (-> (sql/update :procurement_templates)
-                                  (sql/set  casted-tmpl)
-                                  ;(sql/where [:= :procurement_templates.id (:id casted-tmpl)])
+                                  (sql/set casted-tmpl)
                                   (sql/where [:= :procurement_templates.id (:id tmpl)])
                                   sql-format))
         :next.jdbc/update-count
@@ -77,9 +69,7 @@
                            (:template_id value))))
 
   ([tx tmpl]
-   (let [
-         ;;tmpl (my-cast tmpl)
-         where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
+   (let [where-clause (sqlp/map->where-clause :procurement_templates tmpl)]
      (-> templates-base-query
          (sql/where where-clause)
          sql-format

@@ -3,7 +3,6 @@
     [clojure.tools.logging :as log]
     [honey.sql :refer [format] :rename {format sql-format}]
     [honey.sql.helpers :as sql]
-    [leihs.core.utils :refer [my-cast]]
     (leihs.procurement.resources [image :as image] [uploads :as uploads])
     (leihs.procurement.utils [helpers :refer [submap?]])
     [next.jdbc :as jdbc]
@@ -68,8 +67,7 @@
   [tx mc]
   (jdbc/execute! tx
                  (-> (sql/update :procurement_main_categories)
-                     ;(sql/set (my-cast mc))
-                     (sql/set  mc)
+                     (sql/set mc)
                      (sql/where [:= :procurement_main_categories.id [:cast (:id mc) :uuid]])
                      sql-format)))
 
