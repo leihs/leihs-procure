@@ -508,10 +508,7 @@
       #(let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_requests)
                                               (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
                                               sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
-             ;; TODO: FIXME, namespace shouldn't be needed here
-             result-count (spy (:update-count (spy result))) ;; fails
-             result-count (spy (:next.jdbc/update-count (spy result))) ;; works
-             ]
+             result-count (:next.jdbc/update-count result)]
          (= result-count 1))
       :if-only
       #(:DELETE field-perms))))
