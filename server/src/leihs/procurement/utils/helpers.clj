@@ -32,16 +32,10 @@
       (update :updated_at #(if (contains? entry :updated_at) (format-date %)))))
 
 (defn my-cast [data]
-  ;data)
-
   (let [update-cast (fn [data key cast-type]
                       (if (contains? data key)
                         (assoc data key [[:cast (get data key) cast-type]])
                         data))]
     (-> data
-        ;(update-cast :order_status :order_status_enum)
-
-        ;./spec/graphql/admin/budget_periods_spec.rb:212
         (update-cast :inspection_start_date :timestamptz)
-        (update-cast :end_date :timestamptz)
-        )))
+        (update-cast :end_date :timestamptz))))
