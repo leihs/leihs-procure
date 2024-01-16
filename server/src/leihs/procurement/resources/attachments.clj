@@ -3,6 +3,7 @@
              {generate-string to-json}]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.resources [attachment :as attachment]
                                          [upload :as upload])
@@ -30,8 +31,6 @@
                :request
                :tx-next)]
     (get-attachments-for-request-id tx (:request-id value))))
-
-(defn cast-to-json [comment] [:cast comment :json])
 
 (defn create-for-request-id-and-uploads!
   [tx req-id uploads]

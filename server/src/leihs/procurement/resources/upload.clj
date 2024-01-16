@@ -4,6 +4,7 @@
             [clojure.string :as string]
             [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.utils [exif :as exif])
@@ -12,8 +13,6 @@
 
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))
-
-(defn cast-to-json [comment] [:cast comment :json])
 
 (defn insert-file-upload!
   [tx m]

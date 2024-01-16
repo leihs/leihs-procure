@@ -23,6 +23,8 @@
 (defn format-date [timestamp]
   (.format (timestamp-to-zoneddatetime timestamp) (DateTimeFormatter/ISO_INSTANT)))
 
+(defn cast-to-json [comment] [:cast comment :json])
+
 (defn convert-dates [entry]
   (-> entry
       (update :start_date #(if (contains? entry :start_date) (format-date %)))
