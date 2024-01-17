@@ -1,13 +1,12 @@
 (ns leihs.procurement.resources.budget-periods
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.resources.budget-period :as budget-period]
-    [leihs.procurement.utils.helpers :refer [convert-dates]]
-    [leihs.procurement.utils.helpers :refer [cast-uuids]]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
-
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.resources.budget-period :as budget-period]
+   [leihs.procurement.utils.helpers :refer [convert-dates]]
+   [leihs.procurement.utils.helpers :refer [cast-uuids]]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn insert-test-period-budget [tx data]
   (jdbc/execute-one! tx (-> (sql/insert-into :procurement_budget_periods)
@@ -23,11 +22,11 @@
   [args]
   (let [ids (:id args)
         result (cond-> budget-periods-base-query
-                       ids (sql/where [:in :procurement_budget_periods.id (cast-uuids ids)])
-                       (-> args
-                           :whereRequestsCanBeMovedTo
-                           empty?
-                           not) (sql/where [:< :current_date :procurement_budget_periods.end_date]))]
+                 ids (sql/where [:in :procurement_budget_periods.id (cast-uuids ids)])
+                 (-> args
+                     :whereRequestsCanBeMovedTo
+                     empty?
+                     not) (sql/where [:< :current_date :procurement_budget_periods.end_date]))]
     result))
 
 (defn get-budget-periods
@@ -44,7 +43,6 @@
                                            :tx-next) (-> args
                                                          budget-periods-query
                                                          sql-format))))))
-
 
 (defn delete-budget-periods-not-in!
   [tx ids]

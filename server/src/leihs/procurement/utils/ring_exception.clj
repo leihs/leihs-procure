@@ -27,15 +27,15 @@
           (cond
             (and (instance? clojure.lang.ExceptionInfo e)
                  (contains? (ex-data e) :status))
-              {:status (:status (ex-data e)),
-               :body (helpers/error-as-graphql "API_ERROR" (.getMessage e))}
+            {:status (:status (ex-data e)),
+             :body (helpers/error-as-graphql "API_ERROR" (.getMessage e))}
             (instance? org.postgresql.util.PSQLException e)
-              {:status 409,
-               :body (helpers/error-as-graphql "DATABASE_ERROR"
-                                               (.getMessage e))}
+            {:status 409,
+             :body (helpers/error-as-graphql "DATABASE_ERROR"
+                                             (.getMessage e))}
             :else
-              {:status 500,
-               :body
-                 (helpers/error-as-graphql
-                   "UNKNOWN_SERVER_ERROR"
-                   "Unclassified error, see the server logs for details.")}))))))
+            {:status 500,
+             :body
+             (helpers/error-as-graphql
+              "UNKNOWN_SERVER_ERROR"
+              "Unclassified error, see the server logs for details.")}))))))

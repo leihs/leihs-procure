@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.organizations
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def organizations-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -15,10 +15,10 @@
   (let [root-only (:root_only args)
         id (:id value)]
     (sql-format
-      (cond-> organizations-base-query
-              root-only (sql/where [:= :procurement_organizations.parent_id
-                                    nil])
-              id (sql/where [:= :procurement_organizations.parent_id [:cast id :uuid]])))))
+     (cond-> organizations-base-query
+       root-only (sql/where [:= :procurement_organizations.parent_id
+                             nil])
+       id (sql/where [:= :procurement_organizations.parent_id [:cast id :uuid]])))))
 
 (defn get-organizations
   [context args value]

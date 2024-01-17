@@ -1,13 +1,13 @@
 (ns leihs.procurement.resources.main-categories
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.paths :refer [path]]
-    (leihs.procurement.resources [budget-limits :as budget-limits]
-                                 [categories :as categories] [image :as image]
-                                 [main-category :as main-category])
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.paths :refer [path]]
+   (leihs.procurement.resources [budget-limits :as budget-limits]
+                                [categories :as categories] [image :as image]
+                                [main-category :as main-category])
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def main-categories-base-query
   (-> (sql/select :procurement_main_categories.*)
@@ -29,9 +29,9 @@
   (as-> row <>
     (merge-image-path tx <>)
     (assoc <>
-      :categories (->> <>
-                       :id
-                       (categories/get-for-main-category-id tx)))))
+           :categories (->> <>
+                            :id
+                            (categories/get-for-main-category-id tx)))))
 
 (defn get-main-categories
   ([tx]

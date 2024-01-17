@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.user
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def user-base-query
   (-> (sql/select :id :firstname :lastname)
@@ -18,7 +18,7 @@
                          (sql/where [:= :users.id [:cast (or (:user_id value) ; for
                                                              ; RequesterOrganization
                                                              (:value value) ; for RequestFieldUser
-                                                             ) :uuid]])
+                                                             ):uuid]])
                          sql-format)))
 
 (defn get-user-by-id

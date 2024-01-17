@@ -1,11 +1,11 @@
 (ns leihs.procurement.resources.template
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.utils.sql :as sqlp]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-    [taoensso.timbre :refer [debug error info warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.utils.sql :as sqlp]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]
+   [taoensso.timbre :refer [debug error info warn]]))
 
 (def ALLOWED-KEYS-FOR-USED-TEMPLATE #{:is_archived})
 
@@ -20,7 +20,6 @@
       sql-format
       (->> (jdbc/execute-one! tx))))
 
-
 (defn insert-template!
   [tx tmpl]
   (let [result (-> (jdbc/execute! tx (-> (sql/insert-into :procurement_templates)
@@ -30,8 +29,7 @@
     (:update-count count)))
 
 (defn validate-update-attributes [tx tmpl]
-  (let [
-        result (-> (sql/select :%count.*)
+  (let [result (-> (sql/select :%count.*)
                    (sql/from :procurement_requests)
                    (sql/where [:= :template_id (:id tmpl)])
                    sql-format

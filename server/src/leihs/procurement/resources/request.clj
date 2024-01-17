@@ -62,26 +62,26 @@
          [:> :procurement_requests.approved_quantity 0]]
         approved-zero [:= :procurement_requests.approved_quantity 0]]
     (cond->
-      {:NEW (if advanced-user?
-              approved-not-set
-              [:or
-               [:and [:< :procurement_budget_periods.end_date :current_date]
-                approved-not-set]
-               [:< :current_date
-                :procurement_budget_periods.inspection_start_date]]),
-       :APPROVED (if advanced-user?
-                   approved-greater-equal-than-requested
-                   [:and [:< :procurement_budget_periods.end_date :current_date]
-                    approved-greater-equal-than-requested]),
-       :PARTIALLY_APPROVED (if advanced-user?
-                             approved-smaller-than-requested
-                             [:and
-                              [:< :procurement_budget_periods.end_date
-                               :current_date] approved-smaller-than-requested]),
-       :DENIED (if advanced-user?
-                 approved-zero
-                 [:and [:< :procurement_budget_periods.end_date :current_date]
-                  approved-zero])}
+     {:NEW (if advanced-user?
+             approved-not-set
+             [:or
+              [:and [:< :procurement_budget_periods.end_date :current_date]
+               approved-not-set]
+              [:< :current_date
+               :procurement_budget_periods.inspection_start_date]]),
+      :APPROVED (if advanced-user?
+                  approved-greater-equal-than-requested
+                  [:and [:< :procurement_budget_periods.end_date :current_date]
+                   approved-greater-equal-than-requested]),
+      :PARTIALLY_APPROVED (if advanced-user?
+                            approved-smaller-than-requested
+                            [:and
+                             [:< :procurement_budget_periods.end_date
+                              :current_date] approved-smaller-than-requested]),
+      :DENIED (if advanced-user?
+                approved-zero
+                [:and [:< :procurement_budget_periods.end_date :current_date]
+                 approved-zero])}
       (not advanced-user?)
       (assoc :IN_APPROVAL
              [:and
@@ -146,10 +146,10 @@
 (defn to-name-and-lower-case-enums
   [m]
   (cond-> m
-          (:order_status m) (update :order_status to-name-and-lower-case)
-          (:priority m) (update :priority to-name-and-lower-case)
-          (:inspector_priority m) (update :inspector_priority
-                                          to-name-and-lower-case)))
+    (:order_status m) (update :order_status to-name-and-lower-case)
+    (:priority m) (update :priority to-name-and-lower-case)
+    (:inspector_priority m) (update :inspector_priority
+                                    to-name-and-lower-case)))
 
 (defn upper-case-keyword-value
   [row attr]
@@ -272,19 +272,19 @@
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
-                         (not user-arg) (assoc :user (:user_id auth-entity)))
+                   (not user-arg) (assoc :user (:user_id auth-entity)))
         fields
         (->> req-stub
              submap-with-id-for-associated-resources
              (request-fields-perms/get-for-user-and-request tx auth-entity))]
     (authorization/authorize-and-apply
-      #(as-> fields <>
-         (reject-keys <> request-perms/special-perms)
-         (map (fn [f] (apply consider-default f)) <>)
-         (into {} <>)
-         (assoc <> :state :NEW))
-      :if-only
-      #(request-perms/can-write-any-field? fields))))
+     #(as-> fields <>
+        (reject-keys <> request-perms/special-perms)
+        (map (fn [f] (apply consider-default f)) <>)
+        (into {} <>)
+        (assoc <> :state :NEW))
+     :if-only
+     #(request-perms/can-write-any-field? fields))))
 
 (defn get-last-created-request
   [tx auth-entity]
@@ -353,18 +353,18 @@
         (budget-period/get-budget-period-by-id tx new-budget-period-id)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(jdbc/execute! tx
-                      (-> (sql/update :procurement_requests)
-                          (sql/set {:budget_period_id new-budget-period-id})
-                          (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                          sql-format))
-      :if-only
-      #(and (not (budget-period/past? tx budget-period-new))
-            (request-perms/authorized-to-write-all-fields?
-              tx
-              auth-entity
-              proc-request
-              {:budget_period {:id new-budget-period-id}})))
+     #(jdbc/execute! tx
+                     (-> (sql/update :procurement_requests)
+                         (sql/set {:budget_period_id new-budget-period-id})
+                         (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                         sql-format))
+     :if-only
+     #(and (not (budget-period/past? tx budget-period-new))
+           (request-perms/authorized-to-write-all-fields?
+            tx
+            auth-entity
+            proc-request
+            {:budget_period {:id new-budget-period-id}})))
     (->> req-id
          (get-request-by-id tx auth-entity)
          (request-perms/apply-permissions tx auth-entity))))
@@ -385,21 +385,21 @@
         cat-id (:category input-data)
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(jdbc/execute!
-         tx
-         (-> (sql/update :procurement_requests)
-             (sql/set
-               (cond-> {:category_id [:cast cat-id :uuid]}
-                       (and (not (user-perms/inspector? tx auth-entity cat-id))
-                            (not (user-perms/admin? tx auth-entity)))
-                       (merge change-category-reset-attrs)))
-             (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-             sql-format))
-      :if-only
-      #(request-perms/authorized-to-write-all-fields? tx
-                                                      auth-entity
-                                                      proc-request
-                                                      {:category {:id cat-id}}))
+     #(jdbc/execute!
+       tx
+       (-> (sql/update :procurement_requests)
+           (sql/set
+            (cond-> {:category_id [:cast cat-id :uuid]}
+              (and (not (user-perms/inspector? tx auth-entity cat-id))
+                   (not (user-perms/admin? tx auth-entity)))
+              (merge change-category-reset-attrs)))
+           (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+           sql-format))
+     :if-only
+     #(request-perms/authorized-to-write-all-fields? tx
+                                                     auth-entity
+                                                     proc-request
+                                                     {:category {:id cat-id}}))
     (->> req-id
          (get-request-by-id tx auth-entity)
          (request-perms/apply-permissions tx auth-entity))))
@@ -424,27 +424,27 @@
                        to-name-and-lower-case-enums)]
     (let [req-id (atom nil)]
       (authorization/authorize-and-apply
-        #(do (insert! tx
-                      (-> write-data
-                          (cond-> template (merge (dissoc data-from-template :is_archived)))
-                          exchange-attrs))
-             (reset! req-id
-                     (-> (get-last-created-request tx auth-entity)
-                         :id))
-             (if-not (empty? attachments)
-               (deal-with-attachments! tx @req-id attachments)))
-        :if-all
-        [#(->> input-data
-               submap-with-id-for-associated-resources
-               (request-perms/authorized-to-write-all-fields? tx auth-entity))
-         #(or (not template) (not (:is_archived template)))])
+       #(do (insert! tx
+                     (-> write-data
+                         (cond-> template (merge (dissoc data-from-template :is_archived)))
+                         exchange-attrs))
+            (reset! req-id
+                    (-> (get-last-created-request tx auth-entity)
+                        :id))
+            (if-not (empty? attachments)
+              (deal-with-attachments! tx @req-id attachments)))
+       :if-all
+       [#(->> input-data
+              submap-with-id-for-associated-resources
+              (request-perms/authorized-to-write-all-fields? tx auth-entity))
+        #(or (not template) (not (:is_archived template)))])
       (as-> @req-id <>
         (get-request-by-id tx auth-entity <>)
         (request-perms/apply-permissions tx
                                          auth-entity
                                          <>
                                          #(assoc %
-                                            :request-id @req-id))))))
+                                                 :request-id @req-id))))))
 
 (defn cast-to-order-status-enum [a]
   [[:cast (to-name-and-lower-case a) :order_status_enum]])
@@ -458,31 +458,31 @@
         req-id (:id input-data)
         attachments (:attachments input-data)
         organization-id (some->> input-data
-                          :user
-                          (requesters/get-organization-of-requester tx)
-                          :id)
+                                 :user
+                                 (requesters/get-organization-of-requester tx)
+                                 :id)
         update-data (as-> input-data <>
                       (dissoc <> :id)
                       (dissoc <> :attachments)
                       (cond-> <>
-                              (:order_status <>)
-                              (update :order_status cast-to-order-status-enum))
+                        (:order_status <>)
+                        (update :order_status cast-to-order-status-enum))
                       (cond-> <> (:priority <>) (update :priority to-name-and-lower-case))
                       (cond-> <> (:inspector_priority <>) (update :inspector_priority to-name-and-lower-case))
                       (cond-> <> organization-id (assoc :organization_id organization-id)))
         proc-request (get-request-by-id tx auth-entity req-id)]
     (authorization/authorize-and-apply
-      #(do (update! tx req-id (exchange-attrs update-data))
-           (if-not (empty? attachments)
-             (deal-with-attachments! tx req-id attachments)))
-      :if-only
-      #(request-perms/authorized-to-write-all-fields?
-         tx
-         auth-entity
-         proc-request
-         (-> input-data
-             (reject-keys request-perms/attrs-to-skip)
-             submap-with-id-for-associated-resources)))
+     #(do (update! tx req-id (exchange-attrs update-data))
+          (if-not (empty? attachments)
+            (deal-with-attachments! tx req-id attachments)))
+     :if-only
+     #(request-perms/authorized-to-write-all-fields?
+       tx
+       auth-entity
+       proc-request
+       (-> input-data
+           (reject-keys request-perms/attrs-to-skip)
+           submap-with-id-for-associated-resources)))
     (as-> req-id <>
       (get-request-by-id tx auth-entity <>)
       (request-perms/apply-permissions tx
@@ -503,13 +503,13 @@
                                                                    auth-entity
                                                                    request)]
     (authorization/authorize-and-apply
-      #(let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_requests)
-                                              (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
-                                              sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
-             result-count (:next.jdbc/update-count result)]
-         (= result-count 1))
-      :if-only
-      #(:DELETE field-perms))))
+     #(let [result (jdbc/execute-one! tx (-> (sql/delete-from :procurement_requests)
+                                             (sql/where [:= :procurement_requests.id [:cast req-id :uuid]])
+                                             sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
+            result-count (:next.jdbc/update-count result)]
+        (= result-count 1))
+     :if-only
+     #(:DELETE field-perms))))
 
 (defn requested-by?
   [tx auth-entity request]

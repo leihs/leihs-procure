@@ -35,9 +35,9 @@
    (apply-permissions tx auth-user proc-request identity))
   ([tx auth-user proc-request transform-fn]
    (let [field-perms (request-fields-perms/get-for-user-and-request
-                       tx
-                       auth-user
-                       proc-request)]
+                      tx
+                      auth-user
+                      proc-request)]
      (->> proc-request
           (map #(apply value-with-permissions field-perms transform-fn %))
           (include-special-perms field-perms)
@@ -51,7 +51,7 @@
    "For updating an existing request"
    (let [request* (cond-> request
                     (not (:user request)) (assoc :user
-                                            {:id (:user_id auth-user)}))
+                                                 {:id (:user_id auth-user)}))
          request-data-with-perms (apply-permissions tx auth-user request*)]
      (->> write-data
           (map first)
@@ -83,7 +83,7 @@
                                  :write)
         can-delete? (:DELETE req)]
     (assoc req
-      :actionPermissions {:edit (can-write-any-field? req),
-                          :delete can-delete?,
-                          :moveBudgetPeriod can-change-budget-period?,
-                          :moveCategory can-change-category?})))
+           :actionPermissions {:edit (can-write-any-field? req),
+                               :delete can-delete?,
+                               :moveBudgetPeriod can-change-budget-period?,
+                               :moveCategory can-change-category?})))

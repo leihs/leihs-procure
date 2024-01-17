@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.main-category
   (:require
-    [clojure.tools.logging :as log]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    (leihs.procurement.resources [image :as image] [uploads :as uploads])
-    (leihs.procurement.utils [helpers :refer [submap?]])
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [clojure.tools.logging :as log]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   (leihs.procurement.resources [image :as image] [uploads :as uploads])
+   (leihs.procurement.utils [helpers :refer [submap?]])
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def main-category-base-query
   (-> (sql/select :procurement_main_categories.*)
@@ -74,31 +74,31 @@
 (defn can-delete?
   [context _ value]
   (->
-    (jdbc/execute-one!
-      (-> context
-          :request
-          :tx-next)
-      (-> [:and
-           [:not
-            [:exists
-             (-> (sql/select true)
-                 (sql/from [:procurement_requests :pr])
-                 (sql/join [:procurement_categories :pc]
-                           [:= :pc.id :pr.category_id])
-                 (sql/where [:= :pc.main_category_id
-                             [:cast (:id value) :uuid]]))]]
-           [:not
-            [:exists
-             (-> (sql/select true)
-                 (sql/from [:procurement_templates :pt])
-                 (sql/join [:procurement_categories :pc]
-                           [:= :pc.id :pt.category_id])
-                 (sql/where [:= :pc.main_category_id
-                             [:cast (:id value) :uuid]]))]]]
-          (vector :result)
-          sql/select
-          sql-format))
-    :result))
+   (jdbc/execute-one!
+    (-> context
+        :request
+        :tx-next)
+    (-> [:and
+         [:not
+          [:exists
+           (-> (sql/select true)
+               (sql/from [:procurement_requests :pr])
+               (sql/join [:procurement_categories :pc]
+                         [:= :pc.id :pr.category_id])
+               (sql/where [:= :pc.main_category_id
+                           [:cast (:id value) :uuid]]))]]
+         [:not
+          [:exists
+           (-> (sql/select true)
+               (sql/from [:procurement_templates :pt])
+               (sql/join [:procurement_categories :pc]
+                         [:= :pc.id :pt.category_id])
+               (sql/where [:= :pc.main_category_id
+                           [:cast (:id value) :uuid]]))]]]
+        (vector :result)
+        sql/select
+        sql-format))
+   :result))
 
 (defn delete!
   [tx id]

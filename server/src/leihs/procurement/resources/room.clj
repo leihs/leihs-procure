@@ -1,8 +1,8 @@
 (ns leihs.procurement.resources.room
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]))
 
 (defn room-query
   [id]

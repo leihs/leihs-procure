@@ -1,11 +1,11 @@
 (ns leihs.procurement.resources.budget-period
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.utils.sql :as sqlp]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-    [tick.core :as tick]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.utils.sql :as sqlp]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]
+   [tick.core :as tick]))
 
 (def budget-period-base-query
   (-> (sql/select :procurement_budget_periods.*)
@@ -58,10 +58,9 @@
                    (sql-format-date <>)
                    [:cast <> :date])
         query (-> (sql/select
-                    [[:and
-                      [:>= :current_date inspection-start-date]
-                      [:< :current_date end-date]
-                      ] :result])
+                   [[:and
+                     [:>= :current_date inspection-start-date]
+                     [:< :current_date end-date]] :result])
                   sql-format)]
     (:result (jdbc/execute-one! tx query))))
 

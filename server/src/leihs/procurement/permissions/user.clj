@@ -1,11 +1,11 @@
 (ns leihs.procurement.permissions.user
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.core.core :refer [raise]]
-    [leihs.procurement.permissions.categories :as categories-perms]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.core.core :refer [raise]]
+   [leihs.procurement.permissions.categories :as categories-perms]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn admin?
   [tx auth-entity]
@@ -23,7 +23,7 @@
                                                     (cond-> (-> (sql/select [true :exists])
                                                                 (sql/from :procurement_category_inspectors)
                                                                 (sql/where [:= :procurement_category_inspectors.user_id [:cast (:user_id auth-entity) :uuid]]))
-                                                            c-id (sql/where [:= :procurement_category_inspectors.category_id [:cast c-id :uuid]]))] :result])
+                                                      c-id (sql/where [:= :procurement_category_inspectors.category_id [:cast c-id :uuid]]))] :result])
                                       sql-format)))))
 
 (defn viewer?
@@ -33,7 +33,7 @@
                                                     (cond-> (-> (sql/select [true :exists])
                                                                 (sql/from :procurement_category_viewers)
                                                                 (sql/where [:= :procurement_category_viewers.user_id [:cast (:user_id auth-entity) :uuid]]))
-                                                            c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))] :result])
+                                                      c-id (sql/where [:= :procurement_category_viewers.category_id [:cast c-id :uuid]]))] :result])
                                       sql-format)))))
 
 (defn requester?

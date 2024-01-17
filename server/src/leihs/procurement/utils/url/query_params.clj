@@ -15,16 +15,16 @@
   [query-string]
   (->> (if-not (presence query-string) [] (string/split query-string #"&"))
        (reduce
-         (fn [m part]
-           (let [[k v] (string/split part #"=" 2)]
-             (assoc m
-               (-> k
-                   shared/decode
-                   keyword)
-                 (-> v
-                     shared/decode
-                     try-parse-json))))
-         {})
+        (fn [m part]
+          (let [[k v] (string/split part #"=" 2)]
+            (assoc m
+                   (-> k
+                       shared/decode
+                       keyword)
+                   (-> v
+                       shared/decode
+                       try-parse-json))))
+        {})
        keywordize-keys))
 
 (defn encode-query-params

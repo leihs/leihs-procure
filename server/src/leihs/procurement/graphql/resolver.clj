@@ -1,10 +1,10 @@
 (ns leihs.procurement.graphql.resolver
   (:require
-    [clojure.tools.logging :as log]
-    [com.walmartlabs.lacinia.resolve :as graphql-resolve]
-    [leihs.procurement.graphql [mutations :as mutations]
-     [queries :as queries]]
-    [leihs.procurement.utils.ring-exception :refer [get-cause]]))
+   [clojure.tools.logging :as log]
+   [com.walmartlabs.lacinia.resolve :as graphql-resolve]
+   [leihs.procurement.graphql [mutations :as mutations]
+    [queries :as queries]]
+   [leihs.procurement.utils.ring-exception :refer [get-cause]]))
 
 (defn wrap-resolver-with-error
   [resolver]

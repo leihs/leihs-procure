@@ -1,8 +1,8 @@
 (ns leihs.procurement.permissions.requests
   (:require
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.permissions.user :as user-perms]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.permissions.user :as user-perms]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn apply-scope
   [tx sqlmap auth-entity]

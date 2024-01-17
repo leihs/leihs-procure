@@ -4,9 +4,7 @@
              [auth-dissect host-port-dissect parse-int]]
             ring.util.codec))
 
-
 (defn jdbc-url? [url] (boolean (re-matches #"(?i)^jdbc:.+" url)))
-
 
 (defn replace-str
   [s match replacement]

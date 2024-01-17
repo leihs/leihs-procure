@@ -1,10 +1,10 @@
 (ns leihs.procurement.resources.category
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.utils.sql :as sqlp]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.utils.sql :as sqlp]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def category-base-query
   (-> (sql/select :procurement_categories.*)
@@ -41,22 +41,22 @@
 (defn can-delete?
   [context _ value]
   (-> (jdbc/execute-one!
-        (-> context
-            :request
-            :tx-next) (-> [:and
-                           [:not
-                            [:exists
-                             (-> (sql/select true)
-                                 (sql/from [:procurement_requests :pr])
-                                 (sql/where [:= :pr.category_id [:cast (:id value) :uuid]]))]]
-                           [:not
-                            [:exists
-                             (-> (sql/select true)
-                                 (sql/from [:procurement_templates :pt])
-                                 (sql/where [:= :pt.category_id [:cast (:id value) :uuid]]))]]]
-                          (vector :result)
-                          sql/select
-                          sql-format))
+       (-> context
+           :request
+           :tx-next) (-> [:and
+                          [:not
+                           [:exists
+                            (-> (sql/select true)
+                                (sql/from [:procurement_requests :pr])
+                                (sql/where [:= :pr.category_id [:cast (:id value) :uuid]]))]]
+                          [:not
+                           [:exists
+                            (-> (sql/select true)
+                                (sql/from [:procurement_templates :pt])
+                                (sql/where [:= :pt.category_id [:cast (:id value) :uuid]]))]]]
+                         (vector :result)
+                         sql/select
+                         sql-format))
       :result))
 
 (defn update-category!

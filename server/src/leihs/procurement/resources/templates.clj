@@ -1,15 +1,14 @@
 (ns leihs.procurement.resources.templates
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.authorization :as authorization]
-    [leihs.procurement.permissions.user :as user-perms]
-    (leihs.procurement.resources [categories :as categories]
-                                 [template :as template])
-    [leihs.procurement.utils.helpers :refer [cast-uuids]]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]
-    ))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.authorization :as authorization]
+   [leihs.procurement.permissions.user :as user-perms]
+   (leihs.procurement.resources [categories :as categories]
+                                [template :as template])
+   [leihs.procurement.utils.helpers :refer [cast-uuids]]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def templates-base-query
   (-> (sql/select :procurement_templates.*)
@@ -21,7 +20,7 @@
 (defn get-templates
   [context _ value]
   (let [query (cond-> templates-base-query
-                      value (sql/where [:= :procurement_templates.category_id [:cast (:id value) :uuid]]))]
+                value (sql/where [:= :procurement_templates.category_id [:cast (:id value) :uuid]]))]
     (->> query
          sql-format
          (jdbc/execute! (-> context
@@ -57,14 +56,14 @@
            tmpl-ids []]
       (if tmpl
         (do (authorization/authorize-and-apply
-              #(if-let [id (:id tmpl)]
-                 (if (:to_delete tmpl)
-                   (template/delete-template! tx id)
-                   (template/update-template! tx tmpl))
-                 (template/insert-template! tx (dissoc tmpl :id)))
-              :if-only
-              #(or (user-perms/admin? tx auth-entity)
-                   (user-perms/inspector? tx auth-entity (:category_id tmpl))))
+             #(if-let [id (:id tmpl)]
+                (if (:to_delete tmpl)
+                  (template/delete-template! tx id)
+                  (template/update-template! tx tmpl))
+                (template/insert-template! tx (dissoc tmpl :id)))
+             :if-only
+             #(or (user-perms/admin? tx auth-entity)
+                  (user-perms/inspector? tx auth-entity (:category_id tmpl))))
             (->> tmpl
                  (get-template-id tx)
                  (conj tmpl-ids)

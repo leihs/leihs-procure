@@ -23,7 +23,7 @@
   [args value]
   (let [building_id (or (:building_id args) (:id value))]
     (cond-> rooms-base-query
-            building_id (sql/where [:= :rooms.building_id [:cast building_id :uuid]]))))
+      building_id (sql/where [:= :rooms.building_id [:cast building_id :uuid]]))))
 
 (defn get-rooms
   [context args value]

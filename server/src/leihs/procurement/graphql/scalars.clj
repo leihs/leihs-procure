@@ -1,7 +1,7 @@
 (ns leihs.procurement.graphql.scalars
   (:require
-    [java-time]
-    [taoensso.timbre :refer [debug error info spy warn]])
+   [java-time]
+   [taoensso.timbre :refer [debug error info spy warn]])
   (:import (java.util UUID)))
 
 (defn int-parse [x]

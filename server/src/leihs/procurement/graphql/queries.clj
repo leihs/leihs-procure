@@ -46,20 +46,20 @@
    :building building/get-building,
    :can-delete-budget-period? (-> budget-period/can-delete?
                                   (authorization/wrap-ensure-one-of
-                                    [user-perms/admin?])),
+                                   [user-perms/admin?])),
    :can-delete-category? (-> category/can-delete?
                              (authorization/wrap-ensure-one-of
-                               [user-perms/admin?])),
+                              [user-perms/admin?])),
    :can-delete-main-category? (-> main-category/can-delete?
                                   (authorization/wrap-ensure-one-of
-                                    [user-perms/admin?])),
+                                   [user-perms/admin?])),
    :category category/get-category,
    :categories categories/get-categories,
    :current-user current-user/get-current-user,
    :dashboard dashboard/get-dashboard,
    :department organization/get-department-of-organization,
    :department-of-requester-organization
-     organization/get-department-of-requester-organization,
+   organization/get-department-of-requester-organization,
    :inspectors (-> inspectors/get-inspectors
                    (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :main-category main-category/get-main-category,
@@ -71,8 +71,8 @@
    :organizations organizations/get-organizations,
    :requests requests/get-requests,
    :requesters-organizations
-     (-> requesters-organizations/get-requesters-organizations
-         (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   (-> requesters-organizations/get-requesters-organizations
+       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :requests-count template/requests-count,
    :permissions user-perms/get-permissions,
    :room room/get-room,
@@ -84,19 +84,19 @@
    :templates templates/get-templates,
    :total-price-cents-new-requests (-> requests/total-price-cents-new-requests
                                        (authorization/wrap-ensure-one-of
-                                         [user-perms/admin?])),
+                                        [user-perms/admin?])),
    :total-price-cents-inspected-requests
-     (-> requests/total-price-cents-inspected-requests
-         (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   (-> requests/total-price-cents-inspected-requests
+       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-requested-quantities
-     (-> requests/total-price-cents-requested-quantities
-         (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   (-> requests/total-price-cents-requested-quantities
+       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-approved-quantities
-     (-> requests/total-price-cents-approved-quantities
-         (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   (-> requests/total-price-cents-approved-quantities
+       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :total-price-cents-order-quantities
-     (-> requests/total-price-cents-order-quantities
-         (authorization/wrap-ensure-one-of [user-perms/admin?])),
+   (-> requests/total-price-cents-order-quantities
+       (authorization/wrap-ensure-one-of [user-perms/admin?])),
    :user (-> user/get-user (authorization/wrap-ensure-one-of [user-perms/admin? user-perms/inspector?])),
    :users (-> users/get-users (authorization/wrap-ensure-one-of [user-perms/admin? user-perms/inspector?])),
    :viewers (fn [context args value]
@@ -105,9 +105,9 @@
                     auth-entity (:authenticated-entity rrequest)]
                 ((-> viewers/get-viewers
                      (authorization/wrap-ensure-one-of
-                       [user-perms/admin?
-                        (fn [tx auth-entity]
-                          (user-perms/inspector? tx auth-entity (:id value)))]))
-                  context
-                  args
-                  value)))})
+                      [user-perms/admin?
+                       (fn [tx auth-entity]
+                         (user-perms/inspector? tx auth-entity (:id value)))]))
+                 context
+                 args
+                 value)))})

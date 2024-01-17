@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.organization
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def organization-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -75,11 +75,11 @@
   [tx org-name dep-id]
 
   (jdbc/execute-one!
-    tx
-    (-> organization-base-query
-        (sql/where [:and [:= :procurement_organizations.name org-name]
-                    [:= :procurement_organizations.parent_id dep-id]])
-        sql-format)))
+   tx
+   (-> organization-base-query
+       (sql/where [:and [:= :procurement_organizations.name org-name]
+                   [:= :procurement_organizations.parent_id dep-id]])
+       sql-format)))
 
 (defn get-department-of-requester-organization
   [context _ value]

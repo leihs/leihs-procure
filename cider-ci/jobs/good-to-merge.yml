@@ -10,6 +10,11 @@ depends_on: &GOOD_TO_MERGE_DEPENDENCIES
     job_key: backend-specs
     states: [passed]
 
+  lints were successful:
+    type: job
+    job_key: lint
+    states: [passed]
+
   client-lint-and-specs was successful:
     type: job
     job_key: client-specs
