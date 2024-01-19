@@ -23,8 +23,7 @@
    (when-let [user @current-user/state*]
      [breadcrumbs/nav-component
       @breadcrumbs/left*
-      [[breadcrumbs/li :admin-audits-legacy " Audits legacy " {} {} :authorizers [auth/admin-scopes?]]
-       [breadcrumbs-audits/audits-li]
+      [[breadcrumbs-audits/audits-li]
        [breadcrumbs/buildings-li]
        [breadcrumbs/groups-li]
        [breadcrumbs-inventory/inventory-li]
