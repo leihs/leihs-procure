@@ -6,9 +6,6 @@
 
 (defn reject-keys [m ks] (reduce #(dissoc %1 %2) m ks))
 
-(defn cast-uuids [uuids]
-  (map (fn [uuid-str] [:cast uuid-str :uuid]) (set uuids)))
-
 (import [java.time ZonedDateTime]
         [java.time.format DateTimeFormatter]
         [java.sql Timestamp]

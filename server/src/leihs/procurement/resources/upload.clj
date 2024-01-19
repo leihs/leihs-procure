@@ -17,8 +17,8 @@
 (defn insert-file-upload!
   [tx m]
   (let [result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
-                                         (sql/values [m])
-                                         sql-format))]
+                     (sql/values [m])
+                     sql-format))]
     (:update-count result)))
 
 (defn prepare-upload-row-map
@@ -45,7 +45,7 @@
   [tx id]
   (-> (sql/select :procurement_uploads.*)
       (sql/from :procurement_uploads)
-      (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
+      (sql/where [:= :procurement_uploads.id id])
       sql-format
       (->> (jdbc/execute-one! tx))))
 
@@ -71,5 +71,5 @@
   [tx id]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_uploads)
-                     (sql/where [:= :procurement_uploads.id [:cast id :uuid]])
+                     (sql/where [:= :procurement_uploads.id id])
                      sql-format)))

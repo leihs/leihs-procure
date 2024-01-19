@@ -1,10 +1,10 @@
 (ns leihs.procurement.resources.category
   (:require
-   [honey.sql :refer [format] :rename {format sql-format}]
-   [honey.sql.helpers :as sql]
-   [leihs.procurement.utils.sql :as sqlp]
-   [next.jdbc :as jdbc]
-   [taoensso.timbre :refer [debug error info spy warn]]))
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    [leihs.procurement.utils.sql :as sqlp]
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def category-base-query
   (-> (sql/select :procurement_categories.*)
@@ -24,7 +24,7 @@
                       (category-query (or (:value value)
                                           ; for
                                           ; RequestFieldCategory
-                                          [:cast (:category_id value) :uuid]))))
+                                          (:category_id value)))))
   ([tx catmap]
    (let [where-clause (sqlp/map->where-clause :procurement_categories catmap)]
      (jdbc/execute-one! tx
@@ -41,22 +41,22 @@
 (defn can-delete?
   [context _ value]
   (-> (jdbc/execute-one!
-       (-> context
-           :request
-           :tx-next) (-> [:and
-                          [:not
-                           [:exists
-                            (-> (sql/select true)
-                                (sql/from [:procurement_requests :pr])
-                                (sql/where [:= :pr.category_id [:cast (:id value) :uuid]]))]]
-                          [:not
-                           [:exists
-                            (-> (sql/select true)
-                                (sql/from [:procurement_templates :pt])
-                                (sql/where [:= :pt.category_id [:cast (:id value) :uuid]]))]]]
-                         (vector :result)
-                         sql/select
-                         sql-format))
+        (-> context
+            :request
+            :tx-next) (-> [:and
+                           [:not
+                            [:exists
+                             (-> (sql/select true)
+                                 (sql/from [:procurement_requests :pr])
+                                 (sql/where [:= :pr.category_id (:id value)]))]]
+                           [:not
+                            [:exists
+                             (-> (sql/select true)
+                                 (sql/from [:procurement_templates :pt])
+                                 (sql/where [:= :pt.category_id (:id value)]))]]]
+            (vector :result)
+            sql/select
+            sql-format))
       :result))
 
 (defn update-category!
@@ -64,7 +64,7 @@
   (jdbc/execute! tx
                  (-> (sql/update :procurement_categories)
                      (sql/set c)
-                     (sql/where [:= :procurement_categories.id [:cast (:id c) :uuid]])
+                     (sql/where [:= :procurement_categories.id (:id c)])
                      sql-format)))
 
 (defn insert-category!

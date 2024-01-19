@@ -6,7 +6,6 @@
                                            [requests :as requests-perms] [user :as user-perms])
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.resources.request-helpers :as request-helpers]
-            [leihs.procurement.utils.helpers :refer [cast-uuids]]
             [leihs.procurement.utils.sql :as sqlp]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
@@ -24,21 +23,21 @@
         ; (sql/join :users [:= :procurement_requests.user_id :users.id])
         ; NOTE: models are joined in the base-query already
         (sql/where
-         [:or [:ilike :buildings.name term-percent]
+          [:or [:ilike :buildings.name term-percent]
            ;  [:ilike :procurement_requests.id term-percent]
-          [:ilike :procurement_requests.short_id term-percent]
-          [:ilike :procurement_requests.article_name term-percent]
-          [:ilike :procurement_requests.article_number term-percent]
-          [:ilike :procurement_requests.inspection_comment term-percent]
-          [:ilike :procurement_requests.order_comment term-percent]
-          [:ilike :procurement_requests.motivation term-percent]
-          [:ilike :procurement_requests.receiver term-percent]
-          [:ilike :procurement_requests.supplier_name term-percent]
-          [:ilike :rooms.name term-percent]
-          [:ilike :models.product term-percent]
-          [:ilike :models.version term-percent]
-          [:ilike :users.firstname term-percent]
-          [:ilike :users.lastname term-percent]]))))
+           [:ilike :procurement_requests.short_id term-percent]
+           [:ilike :procurement_requests.article_name term-percent]
+           [:ilike :procurement_requests.article_number term-percent]
+           [:ilike :procurement_requests.inspection_comment term-percent]
+           [:ilike :procurement_requests.order_comment term-percent]
+           [:ilike :procurement_requests.motivation term-percent]
+           [:ilike :procurement_requests.receiver term-percent]
+           [:ilike :procurement_requests.supplier_name term-percent]
+           [:ilike :rooms.name term-percent]
+           [:ilike :models.product term-percent]
+           [:ilike :models.version term-percent]
+           [:ilike :users.firstname term-percent]
+           [:ilike :users.lastname term-percent]]))))
 
 (defn requests-query-map
   [context arguments value]
@@ -48,11 +47,11 @@
         budget-period-id (:budget_period_id arguments)
         organization-id (:organization_id arguments)
         priority (some->> arguments
-                          :priority
-                          (map request/to-name-and-lower-case))
+                   :priority
+                   (map request/to-name-and-lower-case))
         inspector-priority (some->> arguments
-                                    :inspector_priority
-                                    (map request/to-name-and-lower-case))
+                             :inspector_priority
+                             (map request/to-name-and-lower-case))
         requested-by-auth-user (:requested_by_auth_user arguments)
         state (:state arguments)
         search-term (:search arguments)
@@ -64,30 +63,30 @@
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
                          request-helpers/join-and-nest-associated-resources)]
     (cond-> start-sqlmap
-      id (sql/where [:= :procurement_requests.id [:cast id :uuid]])
-            ; short_id (sql/where [:in :procurement_requests.short_id short_id])
-      category-id (-> (sql/where [:in :procurement_requests.category_id (cast-uuids category-id)])
+      id (sql/where [:= :procurement_requests.id id])
+      ; short_id (sql/where [:in :procurement_requests.short_id short_id])
+      category-id (-> (sql/where [:in :procurement_requests.category_id category-id])
                       (sqlp/merge-where-false-if-empty category-id))
       budget-period-id (-> (sql/where
-                            [:in :procurement_requests.budget_period_id (cast-uuids budget-period-id)])
+                             [:in :procurement_requests.budget_period_id budget-period-id])
                            (sqlp/merge-where-false-if-empty budget-period-id))
       organization-id (-> (sql/where
-                           [:in :procurement_requests.organization_id (cast-uuids organization-id)])
+                            [:in :procurement_requests.organization_id organization-id])
                           (sqlp/merge-where-false-if-empty organization-id))
       priority (-> (sql/where [:in :procurement_requests.priority priority])
                    (sqlp/merge-where-false-if-empty priority))
       inspector-priority (-> (sql/where [:in :procurement_requests.inspector_priority inspector-priority])
-                             (sqlp/merge-where-false-if-empty inspector-priority))
+          (sqlp/merge-where-false-if-empty inspector-priority))
       state (-> (sql/where
-                 (request/get-where-conds-for-states state advanced-user?))
+                  (request/get-where-conds-for-states state advanced-user?))
                 (sqlp/merge-where-false-if-empty state))
       order-status (-> (sql/where [:in :procurement_requests.order_status (create-order-status-enum-entries order-status)])
                        (sqlp/merge-where-false-if-empty order-status))
       requested-by-auth-user (sql/where [:= :procurement_requests.user_id
-                                         (-> context
-                                             :request
-                                             :authenticated-entity
-                                             :user_id)])
+                                               (-> context
+                                                   :request
+                                                   :authenticated-entity
+                                                   :user_id)])
       search-term (search-query search-term))))
 
 (defn get-requests
@@ -101,13 +100,13 @@
                 (sql-format <>))
         proc-requests (request/query-requests tx auth-entity query)]
     (->> proc-requests
-         (map (fn [proc-req]
-                (as-> proc-req <>
-                  (request-perms/apply-permissions tx
-                                                   auth-entity
-                                                   <>
-                                                   #(assoc % :request-id (:id <>)))
-                  (request-perms/add-action-permissions <>)))))))
+      (map (fn [proc-req]
+             (as-> proc-req <>
+               (request-perms/apply-permissions tx
+                                                auth-entity
+                                                <>
+                                                #(assoc % :request-id (:id <>)))
+               (request-perms/add-action-permissions <>)))))))
 
 (defn get-total-price-cents
   [tx sqlmap]
@@ -129,7 +128,7 @@
   (-> (sql/select :procurement_requests.budget_period_id
                   [(sql-sum qty-type) :result])
       (sql/from :procurement_requests)
-      (sql/where [:= :procurement_requests.budget_period_id [:cast bp-id :uuid]])
+      (sql/where [:= :procurement_requests.budget_period_id bp-id])
       (sql/group-by :procurement_requests.budget_period_id)))
 
 (defn specific-total-price-cents
@@ -169,7 +168,7 @@
                :tx-next)
         bp-id (:id value)]
     (-> :requested_quantity
-        (total-price-sqlmap [:cast bp-id :uuid])
+        (total-price-sqlmap bp-id)
         (sql/where [:= :procurement_requests.approved_quantity nil])
         (->> (get-total-price-cents tx)))))
 
@@ -180,11 +179,8 @@
                :tx-next)
         bp-id (:id value)]
     (-> [[:coalesce
-          :procurement_requests.order_quantity
-          :procurement_requests.approved_quantity]]
+                  :procurement_requests.order_quantity
+                  :procurement_requests.approved_quantity]]
         (total-price-sqlmap bp-id)
         (sql/where [:!= :procurement_requests.approved_quantity nil])
         (->> (get-total-price-cents tx)))))
-
-;[logbug.debug :as debug]
-;(debug/debug-ns *ns*)

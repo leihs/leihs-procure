@@ -18,12 +18,12 @@
 (defn image-query
   [id]
   (-> image-base-query
-      (sql/where [:= :procurement_images.id [:cast id :uuid]])))
+      (sql/where [:= :procurement_images.id id])))
 
 (defn image-query-for-main-category
   [id]
   (-> image-base-query
-      (sql/where [:= :procurement_images.main_category_id [:cast id :uuid]])))
+      (sql/where [:= :procurement_images.main_category_id id])))
 
 (defn image
   [{tx :tx-next, {image-id :image-id} :route-params}]

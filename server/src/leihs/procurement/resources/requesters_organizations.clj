@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.requesters-organizations
   (:require
-   [honey.sql :refer [format] :rename {format sql-format}]
-   [honey.sql.helpers :as sql]
-   (leihs.procurement.resources [organization :as organization]
-                                [organizations :as organizations] [saved-filters :as saved-filters]
-                                [user :as user])
-   [next.jdbc :as jdbc]
-   [taoensso.timbre :refer [debug error info spy warn]]))
+    [honey.sql :refer [format] :rename {format sql-format}]
+    [honey.sql.helpers :as sql]
+    (leihs.procurement.resources [organization :as organization]
+                                 [organizations :as organizations] [saved-filters :as saved-filters]
+                                 [user :as user])
+    [next.jdbc :as jdbc]
+    [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def requesters-organizations-base-query
   (-> (sql/select :procurement_requesters_organizations.*)
@@ -15,19 +15,20 @@
 (defn get-requesters-organizations
   [context _ _]
   (jdbc/execute! (-> context
-                     :request
-                     :tx-next)
-                 (sql-format requesters-organizations-base-query)))
+                  :request
+                  :tx-next)
+              (sql-format requesters-organizations-base-query)))
 
 (defn get-organization-of-requester
   [tx user-id]
-  (let [query  (-> (sql/select :procurement_organizations.*)
-                   (sql/from :procurement_requesters_organizations)
-                   (sql/join :procurement_organizations
-                             [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
-                   (sql/where [:= :procurement_requesters_organizations.user_id [:cast user-id :uuid]])
-                   sql-format)]
+  (let [query (-> (sql/select :procurement_organizations.*)
+                  (sql/from :procurement_requesters_organizations)
+                  (sql/join :procurement_organizations
+                            [:= :procurement_requesters_organizations.organization_id :procurement_organizations.id])
+                  (sql/where [:= :procurement_requesters_organizations.user_id user-id])
+                  sql-format)]
     (jdbc/execute-one! tx query)))
+
 
 (defn create-requester-organization
   [tx data]
@@ -39,17 +40,17 @@
                                                  (sql/returning :*)
                                                  sql-format)))
         organization (or (organization/get-organization-by-name-and-dep-id ;;
-                          tx
-                          org-name
-                          (:id department))
+                           tx
+                           org-name
+                           (:id department))
                          (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
                                                    (sql/values [{:name org-name,
-                                                                 :parent_id [:cast (:id department) :uuid]}])
+                                                                 :parent_id (:id department)}])
                                                    (sql/returning :*)
                                                    sql-format)))]
     (jdbc/execute! tx (-> (sql/insert-into :procurement_requesters_organizations)
-                          (sql/values [{:user_id [:cast (:user_id data) :uuid],
-                                        :organization_id [:cast (:id organization) :uuid]}])
+                          (sql/values [{:user_id (:user_id data),
+                                        :organization_id (:id organization)}])
                           (sql/returning :*)
                           sql-format))))
 
@@ -68,18 +69,18 @@
     (organizations/delete-unused tx)
     (saved-filters/delete-unused tx)
     (let [req-orgs (jdbc/execute! tx (sql-format requesters-organizations-base-query))]
-      (->> req-orgs
-           (map #(conj %
-                       {:organization (->> %
-                                           :organization_id
-                                           (organization/get-organization-by-id
-                                            tx))}))
-           (map #(conj %
-                       {:department (->> %
-                                         :organization
-                                         :parent_id
-                                         (organization/get-department-by-id tx))}))
-           (map #(conj %
-                       {:user (->> %
-                                   :user_id
-                                   (user/get-user-by-id tx))}))))))
+       (->> req-orgs
+        (map #(conj %
+                    {:organization (->> %
+                                        :organization_id
+                                        (organization/get-organization-by-id
+                                          tx))}))
+        (map #(conj %
+                    {:department (->> %
+                                      :organization
+                                      :parent_id
+                                      (organization/get-department-by-id tx))}))
+        (map #(conj %
+                    {:user (->> %
+                                :user_id
+                                (user/get-user-by-id tx))}))))))

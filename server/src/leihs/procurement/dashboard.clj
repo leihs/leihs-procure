@@ -6,7 +6,6 @@
             [leihs.procurement.resources.categories :as categories]
             [leihs.procurement.resources.main-categories :as main-categories]
             [leihs.procurement.resources.requests :as requests]
-            [leihs.procurement.utils.helpers :refer [cast-uuids]]
             [leihs.procurement.utils.helpers :refer [convert-dates]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
@@ -25,38 +24,38 @@
 
 (defn create-budget [bps tx requests dashboard-cache-key main-cats]
   (->>
-   bps
-   (map (fn [bp]
-          (let [main-cats* (->> main-cats
-                                (map (fn [mc]
-                                       (let [cats* (->> mc
-                                                        :id
-                                                        (categories/get-for-main-category-id tx)
-                                                        (map (fn [c] (let [requests* (->> requests
-                                                                                          (filter #(and (= (-> % :category :value :id) (str (:id c)))
-                                                                                                        (= (-> % :budget_period :value :id) (str (:id bp)))))
-                                                                                          (sort-by #(-> % :article_name :value)))]
-                                                                       (-> c
-                                                                           (assoc :requests requests*)
-                                                                           (assoc :total_price_cents (sum-total-price requests*))
-                                                                           (assoc :cacheKey
-                                                                                  (cache-key
-                                                                                   dashboard-cache-key
-                                                                                   bp
-                                                                                   mc
-                                                                                   c)))))))
-                                             merged-path (-> mc
-                                                             (assoc :categories cats*)
-                                                             (assoc :total_price_cents (sum-total-price cats*))
-                                                             (assoc :cacheKey
-                                                                    (cache-key dashboard-cache-key bp mc))
-                                                             (->> (main-categories/merge-image-path
-                                                                   tx)))]
-                                         merged-path))))]
-            (-> bp
-                (assoc :main_categories main-cats*)
-                (assoc :cacheKey (cache-key dashboard-cache-key bp))
-                (assoc :total_price_cents (sum-total-price main-cats*))))))))
+    bps
+    (map (fn [bp]
+           (let [main-cats* (->> main-cats
+                                 (map (fn [mc]
+                                        (let [
+                                              cats* (->> mc
+                                                         :id
+                                                         (categories/get-for-main-category-id tx)
+                                                         (map (fn [c] (let [requests* (->> requests
+                                                                                           (filter #(and (= (-> % :category :value :id) (str (:id c)))
+                                                                                                         (= (-> % :budget_period :value :id) (str (:id bp))))))]
+                                                                        (-> c
+                                                                            (assoc :requests requests*)
+                                                                            (assoc :total_price_cents (sum-total-price requests*))
+                                                                            (assoc :cacheKey
+                                                                                   (cache-key
+                                                                                     dashboard-cache-key
+                                                                                     bp
+                                                                                     mc
+                                                                                     c)))))))
+                                              merged-path (-> mc
+                                                              (assoc :categories cats*)
+                                                              (assoc :total_price_cents (sum-total-price cats*))
+                                                              (assoc :cacheKey
+                                                                     (cache-key dashboard-cache-key bp mc))
+                                                              (->> (main-categories/merge-image-path
+                                                                     tx)))]
+                                          merged-path))))]
+             (-> bp
+                 (assoc :main_categories main-cats*)
+                 (assoc :cacheKey (cache-key dashboard-cache-key bp))
+                 (assoc :total_price_cents (sum-total-price main-cats*))))))))
 
 (defn cache-key
   [& args]
@@ -75,7 +74,7 @@
                       (->> (jdbc/execute! tx)))
         bps (if (or (not bp-ids) (not-empty bp-ids))
               (-> budget-periods/budget-periods-base-query
-                  (cond-> bp-ids (sql/where [:in :procurement_budget_periods.id (cast-uuids bp-ids)]))
+                  (cond-> bp-ids (sql/where [:in :procurement_budget_periods.id bp-ids]))
                   sql-format
                   (->> (jdbc/execute! tx)))
               [])

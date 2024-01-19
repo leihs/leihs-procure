@@ -7,7 +7,6 @@
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.resources [attachment :as attachment]
                                          [upload :as upload])
-            [leihs.procurement.utils.helpers :refer [cast-uuids]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -19,7 +18,7 @@
   [tx request-id]
   (let [query (-> attachments-base-query
                   (sql/where [:= :procurement_attachments.request_id
-                              request-id])
+                                    request-id])
                   sql-format)]
     (->> query
          (jdbc/execute! tx)
@@ -52,5 +51,5 @@
   [tx ids]
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_attachments)
-                     (sql/where [:in :procurement_attachments.id (cast-uuids ids)])
+                     (sql/where [:in :procurement_attachments.id ids])
                      sql-format)))
