@@ -1,6 +1,6 @@
 (ns leihs.procurement.resources.current-user
-  (:require [leihs.core.remote-navbar.shared :refer [navbar-props]]
-            [leihs.core.json :refer [to-json]]
+  (:require [leihs.core.json :refer [to-json]]
+            [leihs.core.remote-navbar.shared :refer [navbar-props]]
             [leihs.procurement.resources [saved-filters :as saved-filters]
              [user :as user]]))
 

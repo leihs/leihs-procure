@@ -1,7 +1,6 @@
-Leihs Procurement
-=================
+# Leihs Procurement
 
-Development
+## Development
 -----------
 
 See and run
@@ -10,7 +9,13 @@ See and run
     ./bin/dev-run-frontend
 
 
-Production build
-----------------
+## Production build
 
 See `./bin/build`
+
+
+### Formatting Code
+
+Use `./bin/cljfmt check` and  `./bin/cljfmt fix`.
+
+From vim you can use `:! ./bin/cljfmt fix %` to format the current file.

@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.building
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.resources.buildings :as buildings]
-    [next.jdbc :as jdbc]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.resources.buildings :as buildings]
+   [next.jdbc :as jdbc]))
 
 (defn building-query
   [id]
@@ -28,7 +28,6 @@
                      (building-query (:building_id value))))
 
 ;#### debug ###################################################################
-
 
 ; (debug/debug-ns 'cider-ci.utils.shutdown)
 ; (debug/debug-ns *ns*)

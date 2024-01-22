@@ -2,10 +2,10 @@
   (:refer-clojure :exclude [format update])
   (:require
     ;; all needed imports
-    [honey.sql.helpers :as sql]
-    (honeysql [format :as format] [helpers :as helpers]
-              [types :as types] [util :refer [defalias]])
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql.helpers :as sql]
+   (honeysql [format :as format] [helpers :as helpers]
+             [types :as types] [util :refer [defalias]])
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 ; regex
 (defmethod format/fn-handler "~*"
@@ -15,9 +15,9 @@
 (defn dedup-join
   [honeymap]
   (assoc honeymap
-    :join (reduce #(let [[k v] %2] (conj %1 k v))
-            []
-            (clojure.core/distinct (partition 2 (:join honeymap))))))
+         :join (reduce #(let [[k v] %2] (conj %1 k v))
+                       []
+                       (clojure.core/distinct (partition 2 (:join honeymap))))))
 
 (defn format
   "Calls honeysql.format/format with removed join duplications in sql-map."
@@ -31,12 +31,12 @@
    [:and [:= baz.foo 1] [:= :baz.bar 2]] or
    [:and [:in baz.foo [1 2]] [:= :baz.bar 3]]"
    (letfn [(add-table-name [k]
-                           (if table
-                             (-> table
-                                 name
-                                 (str "." (name k))
-                                 keyword)
-                             k))]
+             (if table
+               (-> table
+                   name
+                   (str "." (name k))
+                   keyword)
+               k))]
      (->> m
           (map (fn [[k v]]
                  (let [op (if (coll? v) :in :=)] [op (add-table-name k) v])))

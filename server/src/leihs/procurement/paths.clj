@@ -8,19 +8,19 @@
 
 (def paths
   (branch
-    ""
-    leihs.core.paths/core-paths
-    (branch
-      "/procure"
-      (leaf "/shutdown" :shutdown)
-      (leaf "/upload" :upload)
-      (leaf "/graphql" :graphql)
-      (leaf "/status" :status)
-      (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))
+   ""
+   leihs.core.paths/core-paths
+   (branch
+    "/procure"
+    (leaf "/shutdown" :shutdown)
+    (leaf "/upload" :upload)
+    (leaf "/graphql" :graphql)
+    (leaf "/status" :status)
+    (branch "/attachments/" (param :attachment-id) (leaf "" :attachment))
       ; NOTE: don't rename the handler-key for image as it may break the
       ; workaround for the problem with hanging requests
-      (branch "/images/" (param :image-id) (leaf "" :image)))
-    (leaf true :not-found)))
+    (branch "/images/" (param :image-id) (leaf "" :image)))
+   (leaf true :not-found)))
 
 (reset! leihs.core.paths/paths* paths)
 

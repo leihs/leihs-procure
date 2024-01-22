@@ -45,10 +45,10 @@
   [original-path root-path options request]
   (logging/debug {:original-path original-path})
   (add-never-expires-header
-    (resource/resource-request
-      (assoc request :path-info (codec/url-encode original-path))
-      root-path
-      (dissoc options :cache-bust-paths :never-expire-paths))))
+   (resource/resource-request
+    (assoc request :path-info (codec/url-encode original-path))
+    root-path
+    (dissoc options :cache-bust-paths :never-expire-paths))))
 
 (defn resource-response-with-optionally-never-expires-header
   [path options uncached-response]
@@ -62,20 +62,20 @@
   (if-let [uncached-response (resource/resource-request request
                                                         root-path
                                                         (dissoc
-                                                          options
-                                                          :cache-bust-paths
-                                                          :never-expire-paths
-                                                          :enabled?))]
+                                                         options
+                                                         :cache-bust-paths
+                                                         :never-expire-paths
+                                                         :enabled?))]
     (if (and (:enabled? options)
              (:body uncached-response)
              (path-matches? path (:cache-bust-paths options)))
       (ring.util.response/redirect
-        (str (:context request)
-             (cache-bust-path! path (:body uncached-response))))
+       (str (:context request)
+            (cache-bust-path! path (:body uncached-response))))
       (resource-response-with-optionally-never-expires-header
-        path
-        options
-        uncached-response))
+       path
+       options
+       uncached-response))
     (handler request)))
 
 (defn resource

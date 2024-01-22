@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.image
   (:require [cheshire.core :refer [generate-string] :rename {generate-string to-json}]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [leihs.procurement.resources.upload :as upload]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))

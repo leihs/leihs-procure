@@ -3,10 +3,10 @@
              {generate-string to-json}]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.resources [attachment :as attachment]
                                          [upload :as upload])
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -18,7 +18,7 @@
   [tx request-id]
   (let [query (-> attachments-base-query
                   (sql/where [:= :procurement_attachments.request_id
-                                    request-id])
+                              request-id])
                   sql-format)]
     (->> query
          (jdbc/execute! tx)

@@ -1,15 +1,15 @@
 (ns leihs.procurement.graphql
   (:require
-    [clojure.edn :as edn]
-    (clojure.java [io :as io])
-    (clojure.java [io :as io])
+   [clojure.edn :as edn]
+   (clojure.java [io :as io])
+   (clojure.java [io :as io])
     ;; all needed imports
-    [com.walmartlabs.lacinia :as lacinia]
-    (com.walmartlabs.lacinia [schema :as graphql-schema] [util :as graphql-util])
-    [leihs.core.graphql :as core-graphql]
-    [leihs.procurement.graphql.resolver :as resolver]
-    [leihs.procurement.graphql.scalars :as scalars]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [com.walmartlabs.lacinia :as lacinia]
+   (com.walmartlabs.lacinia [schema :as graphql-schema] [util :as graphql-util])
+   [leihs.core.graphql :as core-graphql]
+   [leihs.procurement.graphql.resolver :as resolver]
+   [leihs.procurement.graphql.scalars :as scalars]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn load-schema! []
   (or (some-> (io/resource "schema.edn")

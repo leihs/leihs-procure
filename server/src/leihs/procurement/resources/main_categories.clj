@@ -1,13 +1,13 @@
 (ns leihs.procurement.resources.main-categories
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.paths :refer [path]]
-    (leihs.procurement.resources [budget-limits :as budget-limits]
-                                 [categories :as categories] [image :as image]
-                                 [main-category :as main-category])
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.paths :refer [path]]
+   (leihs.procurement.resources [budget-limits :as budget-limits]
+                                [categories :as categories] [image :as image]
+                                [main-category :as main-category])
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def main-categories-base-query
   (-> (sql/select :procurement_main_categories.*)
@@ -29,9 +29,9 @@
   (as-> row <>
     (merge-image-path tx <>)
     (assoc <>
-      :categories (->> <>
-                       :id
-                       (categories/get-for-main-category-id tx)))))
+           :categories (->> <>
+                            :id
+                            (categories/get-for-main-category-id tx)))))
 
 (defn get-main-categories
   ([tx]
@@ -47,10 +47,10 @@
 (defn get-main-categories-by-names
   [tx names]
   (jdbc/execute! tx
-              (-> main-categories-base-query
-                  (sql/where [:in :procurement_main_categories.name names])
-                  (sql/order-by [:procurement_main_categories.name :asc])
-                  sql-format)))
+                 (-> main-categories-base-query
+                     (sql/where [:in :procurement_main_categories.name names])
+                     (sql/order-by [:procurement_main_categories.name :asc])
+                     sql-format)))
 
 (defn update-main-categories!
   [context args _]
@@ -74,9 +74,9 @@
                                  :id))))
               (let [image (:new_image_url mc)
                     budget-limits
-                      (->> mc
-                           :budget_limits
-                           (map #(merge % {:main_category_id @mc-id})))
+                    (->> mc
+                         :budget_limits
+                         (map #(merge % {:main_category_id @mc-id})))
                     categories (->> mc
                                     :categories
                                     (map #(merge %

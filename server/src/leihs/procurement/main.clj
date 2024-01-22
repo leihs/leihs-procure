@@ -1,17 +1,16 @@
 (ns leihs.procurement.main
   (:require
-    [clj-yaml.core :as yaml]
-    [clojure.pprint :refer [pprint]]
-    [clojure.tools.cli :as cli :refer [parse-opts]]
-    [environ.core :refer [env]]
-    [leihs.core.logging]
-    [leihs.core.repl :as repl]
-    [leihs.procurement.run :as run]
-    [logbug.catcher :as catcher]
-    [logbug.debug :as debug]
-    [logbug.thrown :as thrown]
-    [taoensso.timbre :refer [debug info warn error]]
-    )
+   [clj-yaml.core :as yaml]
+   [clojure.pprint :refer [pprint]]
+   [clojure.tools.cli :as cli :refer [parse-opts]]
+   [environ.core :refer [env]]
+   [leihs.core.logging]
+   [leihs.core.repl :as repl]
+   [leihs.procurement.run :as run]
+   [logbug.catcher :as catcher]
+   [logbug.debug :as debug]
+   [logbug.thrown :as thrown]
+   [taoensso.timbre :refer [debug info warn error]])
   (:gen-class))
 
 (thrown/reset-ns-filter-regex #"^(leihs|cider)\..*")
@@ -20,12 +19,12 @@
 
 (def cli-options
   (concat
-    [["-h" "--help"]
-     [nil "--dev-mode DEV_MODE" "dev mode"
-      :default (or (some-> :dev-mode env yaml/parse-string) false)
-      :parse-fn #(yaml/parse-string %)
-      :validate [boolean? "Must parse to a boolean"]]]
-    repl/cli-options))
+   [["-h" "--help"]
+    [nil "--dev-mode DEV_MODE" "dev mode"
+     :default (or (some-> :dev-mode env yaml/parse-string) false)
+     :parse-fn #(yaml/parse-string %)
+     :validate [boolean? "Must parse to a boolean"]]]
+   repl/cli-options))
 
 (defn main-usage [options-summary & more]
   (->> ["Leihs Procure"
@@ -41,7 +40,6 @@
            (with-out-str (pprint more))
            "-------------------------------------------------------------------"])]
        flatten (clojure.string/join \newline)))
-
 
 (defonce args* (atom nil))
 

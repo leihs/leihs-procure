@@ -1,6 +1,6 @@
 (ns leihs.procurement.backend.html
   (:require
-    [ring.util.response :refer [resource-response content-type status]]))
+   [ring.util.response :refer [resource-response content-type status]]))
 
 (defn index-html-response
   []

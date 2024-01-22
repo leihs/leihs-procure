@@ -1,7 +1,7 @@
 (ns leihs.procurement.utils.exif
-  (:require [clojure.tools.logging :as log]
-            [clojure.java.shell :refer [sh]]
-            [clojure.string :as string]))
+  (:require [clojure.java.shell :refer [sh]]
+            [clojure.string :as string]
+            [clojure.tools.logging :as log]))
 
 (defn exiftool-version []
   (->> ["exiftool" "-ver"]

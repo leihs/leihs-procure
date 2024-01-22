@@ -4,10 +4,10 @@
             [clojure.string :as string]
             [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.utils [exif :as exif])
+            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]])
 
@@ -17,8 +17,8 @@
 (defn insert-file-upload!
   [tx m]
   (let [result (jdbc/execute-one! tx (-> (sql/insert-into :procurement_uploads)
-                     (sql/values [m])
-                     sql-format))]
+                                         (sql/values [m])
+                                         sql-format))]
     (:update-count result)))
 
 (defn prepare-upload-row-map

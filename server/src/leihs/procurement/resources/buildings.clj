@@ -1,8 +1,8 @@
 (ns leihs.procurement.resources.buildings
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]))
 
 (def general-id #uuid "abae04c5-d767-425e-acc2-7ce04df645d1")
 
@@ -19,6 +19,6 @@
 (defn get-buildings
   [context args _]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (sql-format (buildings-query args))))
+                     :request
+                     :tx-next)
+                 (sql-format (buildings-query args))))

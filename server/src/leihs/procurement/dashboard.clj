@@ -22,39 +22,42 @@
        (map :id)
        (string/join "_")))
 
+(defn generate_categories [mc requests bp dashboard-cache-key tx]
+  (->> mc
+       :id
+       (categories/get-for-main-category-id tx)
+       (map (fn [c] (let [requests* (->> requests
+                                         (filter #(and (= (-> % :category :value :id) (str (:id c)))
+                                                       (= (-> % :budget_period :value :id) (str (:id bp))))))]
+                      (-> c
+                          (assoc :requests requests*)
+                          (assoc :total_price_cents (sum-total-price requests*))
+                          (assoc :cacheKey
+                                 (cache-key
+                                  dashboard-cache-key
+                                  bp
+                                  mc
+                                  c))))))))
+
 (defn create-budget [bps tx requests dashboard-cache-key main-cats]
   (->>
-    bps
-    (map (fn [bp]
-           (let [main-cats* (->> main-cats
-               (map (fn [mc]
-                      (let [cats* (->> mc
-                           :id
-                           (categories/get-for-main-category-id tx)
-                           (map (fn [c] (let [requests* (->> requests
-                                                 (filter #(and (= (-> % :category :value :id) (str (:id c)))
-                                                               (= (-> % :budget_period :value :id) (str (:id bp))))))]
-                                          (-> c
-                                              (assoc :requests requests*)
-                                              (assoc :total_price_cents (sum-total-price requests*))
-                                              (assoc :cacheKey
-                                                     (cache-key
-                                                       dashboard-cache-key
-                                                       bp
-                                                       mc
-                                                       c)))))))
-                            merged-path (-> mc
-                                            (assoc :categories cats*)
-                                            (assoc :total_price_cents (sum-total-price cats*))
-                                            (assoc :cacheKey
-                                                   (cache-key dashboard-cache-key bp mc))
-                                            (->> (main-categories/merge-image-path
-                                                   tx)))]
-                        merged-path))))]
-             (-> bp
-                 (assoc :main_categories main-cats*)
-                 (assoc :cacheKey (cache-key dashboard-cache-key bp))
-                 (assoc :total_price_cents (sum-total-price main-cats*))))))))
+   bps
+   (map (fn [bp]
+          (let [main-cats* (->> main-cats
+                                (map (fn [mc]
+                                       (let [cats* (generate_categories mc requests bp dashboard-cache-key tx)
+                                             merged-path (-> mc
+                                                             (assoc :categories cats*)
+                                                             (assoc :total_price_cents (sum-total-price cats*))
+                                                             (assoc :cacheKey
+                                                                    (cache-key dashboard-cache-key bp mc))
+                                                             (->> (main-categories/merge-image-path
+                                                                   tx)))]
+                                         merged-path))))]
+            (-> bp
+                (assoc :main_categories main-cats*)
+                (assoc :cacheKey (cache-key dashboard-cache-key bp))
+                (assoc :total_price_cents (sum-total-price main-cats*))))))))
 
 (defn cache-key
   [& args]

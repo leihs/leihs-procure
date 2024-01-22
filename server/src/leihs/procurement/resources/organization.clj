@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.organization
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def organization-base-query
   (-> (sql/select :procurement_organizations.*)
@@ -17,7 +17,7 @@
                   (-> (sql/select :procurement_organizations.parent_id)
                       (sql/from :procurement_organizations)
                       (sql/where [:= :procurement_organizations.id
-                                        organization-id]))])
+                                  organization-id]))])
       sql-format))
 
 (def department-base-query
@@ -62,24 +62,24 @@
                          :tx-next)
                      (-> organization-base-query
                          (sql/where [:= :procurement_organizations.id
-                                           (or (:organization_id value)
+                                     (or (:organization_id value)
                                                ; for
                                                ; RequesterOrganization
-                                               (:value value)
+                                         (:value value)
                                                ; for
                                                ; RequestFieldOrganization
-                                             )])
+                                         )])
                          sql-format)))
 
 (defn get-organization-by-name-and-dep-id
   [tx org-name dep-id]
 
   (jdbc/execute-one!
-    tx
-    (-> organization-base-query
-        (sql/where [:and [:= :procurement_organizations.name org-name]
-                    [:= :procurement_organizations.parent_id dep-id]])
-        sql-format)))
+   tx
+   (-> organization-base-query
+       (sql/where [:and [:= :procurement_organizations.name org-name]
+                   [:= :procurement_organizations.parent_id dep-id]])
+       sql-format)))
 
 (defn get-department-of-requester-organization
   [context _ value]
@@ -87,8 +87,8 @@
        :organization_id
        department-query
        (jdbc/execute-one! (-> context
-                       :request
-                       :tx-next))))
+                              :request
+                              :tx-next))))
 
 (defn get-department-of-organization
   [context _ value]

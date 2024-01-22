@@ -1,19 +1,19 @@
 (ns leihs.procurement.authorization
   (:require
-    [leihs.core.core :refer [presence]]
-    [leihs.core.sign-in.external-authentication.back :as ext-auth]
-    [leihs.procurement.graphql.helpers :as helpers]
-    [leihs.procurement.paths :refer [path]]
-    [leihs.procurement.permissions.user :as user-perms]
-    [logbug.debug :refer [I>]]
-    [ring.util.response :as response]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [leihs.core.core :refer [presence]]
+   [leihs.core.sign-in.external-authentication.back :as ext-auth]
+   [leihs.procurement.graphql.helpers :as helpers]
+   [leihs.procurement.paths :refer [path]]
+   [leihs.procurement.permissions.user :as user-perms]
+   [logbug.debug :refer [I>]]
+   [ring.util.response :as response]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (defn throw-unauthorized []
   (throw (ex-info
-           (str  "UnauthorizedException"
+          (str  "UnauthorizedException"
                 " - " "Not authorized for this query path and arguments.")
-           {:status 403})))
+          {:status 403})))
 
 (defn wrap-ensure-one-of
   [resolver predicates]
@@ -25,8 +25,7 @@
                (map #(% tx auth-entity))
                (some true?))
         (resolver context args value)
-        (throw-unauthorized)
-        ))))
+        (throw-unauthorized)))))
 
 (defn authorize-and-apply
   [func &
@@ -80,11 +79,11 @@
                                             "Not authenticated!")}
     :else
     (response/redirect
-      (path :sign-in
-            nil
-            {:return-to (cond-> uri
-                          (presence query-string)
-                          (str "?" query-string))}))))
+     (path :sign-in
+           nil
+           {:return-to (cond-> uri
+                         (presence query-string)
+                         (str "?" query-string))}))))
 
 (defn wrap-authenticate
   [handler]
@@ -100,8 +99,8 @@
     (handler request)
     {:status 403,
      :body (helpers/error-as-graphql-object
-             "NOT_AUTHORIZED_FOR_APP"
-             "Not authorized to access procurement!")}))
+            "NOT_AUTHORIZED_FOR_APP"
+            "Not authorized to access procurement!")}))
 
 (defn wrap-authorize
   [handler]

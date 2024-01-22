@@ -28,6 +28,6 @@
 (defn get-rooms
   [context args value]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (sql-format (rooms-query args value))))
+                     :request
+                     :tx-next)
+                 (sql-format (rooms-query args value))))

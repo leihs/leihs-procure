@@ -1,11 +1,11 @@
 (ns leihs.procurement.resources.attachment
   (:require
-    [compojure.core :as cpj]
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [leihs.procurement.paths :refer [path]]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]])
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.paths :refer [path]]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
 
 (def attachment-base-query
@@ -28,10 +28,10 @@
          (.decode (Base64/getMimeDecoder))
          (hash-map :body)
          (merge
-           {:headers {"Content-Type" (:content_type a),
-                      "Content-Transfer-Encoding" "binary",
-                      "Content-Disposition"
-                        (str "inline; " "filename=\"" (:filename a) "\"")}}))
+          {:headers {"Content-Type" (:content_type a),
+                     "Content-Transfer-Encoding" "binary",
+                     "Content-Disposition"
+                     (str "inline; " "filename=\"" (:filename a) "\"")}}))
     {:status 404}))
 
 (def attachment-path (path :attachment {:attachment-id ":attachment-id"}))

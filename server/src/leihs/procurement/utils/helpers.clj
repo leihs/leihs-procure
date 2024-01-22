@@ -1,8 +1,8 @@
 (ns leihs.procurement.utils.helpers
   (:require [clojure.set :refer [subset?]]
             [taoensso.timbre :refer [debug error info spy warn]])
-  (:import (java.time ZonedDateTime)
-           (java.time ZoneId)
+  (:import (java.time ZoneId)
+           (java.time ZonedDateTime)
            (java.time.format DateTimeFormatter)
            (java.util UUID)))
 

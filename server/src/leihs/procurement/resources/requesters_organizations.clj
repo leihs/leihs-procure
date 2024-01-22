@@ -1,12 +1,12 @@
 (ns leihs.procurement.resources.requesters-organizations
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    (leihs.procurement.resources [organization :as organization]
-                                 [organizations :as organizations] [saved-filters :as saved-filters]
-                                 [user :as user])
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   (leihs.procurement.resources [organization :as organization]
+                                [organizations :as organizations] [saved-filters :as saved-filters]
+                                [user :as user])
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def requesters-organizations-base-query
   (-> (sql/select :procurement_requesters_organizations.*)
@@ -15,9 +15,9 @@
 (defn get-requesters-organizations
   [context _ _]
   (jdbc/execute! (-> context
-                  :request
-                  :tx-next)
-              (sql-format requesters-organizations-base-query)))
+                     :request
+                     :tx-next)
+                 (sql-format requesters-organizations-base-query)))
 
 (defn get-organization-of-requester
   [tx user-id]
@@ -29,7 +29,6 @@
                   sql-format)]
     (jdbc/execute-one! tx query)))
 
-
 (defn create-requester-organization
   [tx data]
   (let [dep-name (:department data)
@@ -40,9 +39,9 @@
                                                  (sql/returning :*)
                                                  sql-format)))
         organization (or (organization/get-organization-by-name-and-dep-id ;;
-                           tx
-                           org-name
-                           (:id department))
+                          tx
+                          org-name
+                          (:id department))
                          (jdbc/execute-one! tx (-> (sql/insert-into :procurement_organizations)
                                                    (sql/values [{:name org-name,
                                                                  :parent_id (:id department)}])
@@ -69,18 +68,18 @@
     (organizations/delete-unused tx)
     (saved-filters/delete-unused tx)
     (let [req-orgs (jdbc/execute! tx (sql-format requesters-organizations-base-query))]
-       (->> req-orgs
-        (map #(conj %
-                    {:organization (->> %
-                                        :organization_id
-                                        (organization/get-organization-by-id
-                                          tx))}))
-        (map #(conj %
-                    {:department (->> %
-                                      :organization
-                                      :parent_id
-                                      (organization/get-department-by-id tx))}))
-        (map #(conj %
-                    {:user (->> %
-                                :user_id
-                                (user/get-user-by-id tx))}))))))
+      (->> req-orgs
+           (map #(conj %
+                       {:organization (->> %
+                                           :organization_id
+                                           (organization/get-organization-by-id
+                                            tx))}))
+           (map #(conj %
+                       {:department (->> %
+                                         :organization
+                                         :parent_id
+                                         (organization/get-department-by-id tx))}))
+           (map #(conj %
+                       {:user (->> %
+                                   :user_id
+                                   (user/get-user-by-id tx))}))))))

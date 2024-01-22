@@ -1,8 +1,8 @@
 (ns leihs.procurement.utils.url.http
   (:require
-    [clojure.set]
-    [leihs.procurement.utils.url.shared :refer [auth-dissect host-port-dissect parse-int path-dissect]]
-    [clj-yaml.core :as yaml]))
+   [clj-yaml.core :as yaml]
+   [clojure.set]
+   [leihs.procurement.utils.url.shared :refer [auth-dissect host-port-dissect parse-int path-dissect]]))
 
 (def pattern
   #"(?i)(https?)://([^@]+@)?([^/^\?]+)(/[^\?^#]*)?(\?[^#]+)?(#.*)?"

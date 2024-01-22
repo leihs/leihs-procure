@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.budget-limits
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def budget-limits-base-query
   (-> (sql/select :procurement_budget_limits.*)
@@ -17,13 +17,13 @@
   [context _ value]
   (let [main_category_id (:id value)]
     (jdbc/execute!
-      (-> context
-          :request
-          :tx-next)
-      (-> budget-limits-base-query
-          (sql/where [:= :procurement_budget_limits.main_category_id
-                            main_category_id])
-          sql-format))))
+     (-> context
+         :request
+         :tx-next)
+     (-> budget-limits-base-query
+         (sql/where [:= :procurement_budget_limits.main_category_id
+                     main_category_id])
+         sql-format))))
 
 (defn insert-budget-limit!
   [tx bl]
@@ -35,11 +35,11 @@
 (defn delete-budget-limit!
   [tx bl]
   (jdbc/execute!
-    tx
-    (-> (sql/delete-from :procurement_budget_limits :pbl)
-        (sql/where [:and [:= :pbl.main_category_id (:main_category_id bl)]
-                    [:= :pbl.budget_period_id (:budget_period_id bl)]])
-        sql-format)))
+   tx
+   (-> (sql/delete-from :procurement_budget_limits :pbl)
+       (sql/where [:and [:= :pbl.main_category_id (:main_category_id bl)]
+                   [:= :pbl.budget_period_id (:budget_period_id bl)]])
+       sql-format)))
 
 (defn update-budget-limits!
   [tx bls]

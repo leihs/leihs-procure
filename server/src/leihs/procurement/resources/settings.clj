@@ -1,9 +1,9 @@
 (ns leihs.procurement.resources.settings
   (:require
-    [honey.sql :refer [format] :rename {format sql-format}]
-    [honey.sql.helpers :as sql]
-    [next.jdbc :as jdbc]
-    [taoensso.timbre :refer [debug error info spy warn]]))
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]]))
 
 (def settings-base-query
   (-> (sql/select :procurement_settings.*)
@@ -32,6 +32,6 @@
         settings (-> input-data
                      (assoc :inspection_comments inspection-comments))]
     (jdbc/execute-one! tx (-> (sql/update :procurement_settings)
-                       (sql/set settings)
-                       sql-format))
+                              (sql/set settings)
+                              sql-format))
     (get-settings tx)))
