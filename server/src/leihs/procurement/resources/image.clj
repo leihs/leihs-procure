@@ -5,8 +5,7 @@
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
+            [leihs.procurement.utils.helpers :refer [cast-to-json to-uuid]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
@@ -18,7 +17,7 @@
 (defn image-query
   [id]
   (-> image-base-query
-      (sql/where [:= :procurement_images.id id])))
+      (sql/where [:= :procurement_images.id (to-uuid id)])))
 
 (defn image-query-for-main-category
   [id]
