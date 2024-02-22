@@ -7,8 +7,10 @@
             (leihs.procurement.resources [attachment :as attachment]
                                          [upload :as upload])
             [leihs.procurement.utils.helpers :refer [cast-to-json]]
+            [logbug.debug :as debug]
+
             [next.jdbc :as jdbc]
-            [taoensso.timbre :refer [debug error info spy warn]]))
+            [taoensso.timbre :refer [ error info spy warn]]))
 
 (def attachments-base-query
   (-> (sql/select :procurement_attachments.*)
@@ -16,16 +18,22 @@
 
 (defn get-attachments-for-request-id
   [tx request-id]
+
+  (println ">o> get-attachments-for-request-id" get-attachments-for-request-id)
   (let [query (-> attachments-base-query
                   (sql/where [:= :procurement_attachments.request_id
                               request-id])
-                  sql-format)]
+                  sql-format
+                  spy
+                  )]
     (->> query
          (jdbc/execute! tx)
          (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))))
 
 (defn get-attachments
   [context _ value]
+
+  (println ">o> get-attachments value=" value)
   (let [tx (-> context
                :request
                :tx-next)]
@@ -33,6 +41,7 @@
 
 (defn create-for-request-id-and-uploads!
   [tx req-id uploads]
+  (println ">o> create-for-request-id-and-uploads! uploads=" uploads)
   (doseq [{u-id :id} uploads]
     (let [u-row (upload/get-by-id tx u-id)
           md (-> u-row
@@ -49,7 +58,11 @@
 
 (defn delete!
   [tx ids]
+  (println ">o> delete!")
   (jdbc/execute! tx
                  (-> (sql/delete-from :procurement_attachments)
                      (sql/where [:in :procurement_attachments.id ids])
                      sql-format)))
+
+
+(debug/debug-ns *ns*)

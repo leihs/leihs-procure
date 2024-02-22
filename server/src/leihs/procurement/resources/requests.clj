@@ -8,7 +8,11 @@
             [leihs.procurement.resources.request-helpers :as request-helpers]
             [leihs.procurement.utils.sql :as sqlp]
             [next.jdbc :as jdbc]
-            [taoensso.timbre :refer [debug error info spy warn]]))
+
+            [logbug.debug :as debug]
+
+
+            [taoensso.timbre :refer [ error info spy warn]]))
 
 (defn create-order-status-enum-entries [order-stati]
   (map (fn [status] [:cast status :order_status_enum]) order-stati))
@@ -185,3 +189,5 @@
         (total-price-sqlmap bp-id)
         (sql/where [:!= :procurement_requests.approved_quantity nil])
         (->> (get-total-price-cents tx)))))
+
+;(debug/debug-ns *ns*)

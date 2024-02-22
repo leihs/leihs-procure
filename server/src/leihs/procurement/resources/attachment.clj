@@ -5,7 +5,10 @@
    [honey.sql.helpers :as sql]
    [leihs.procurement.paths :refer [path]]
    [next.jdbc :as jdbc]
-   [taoensso.timbre :refer [debug error info spy warn]])
+
+   [logbug.debug :as debug]
+
+   [taoensso.timbre :refer [ error info spy warn]])
   (:import java.util.Base64))
 
 (def attachment-base-query
@@ -14,11 +17,15 @@
 
 (defn attachment-query
   [id]
+
+  (println ">o> attachment-query" )
   (-> attachment-base-query
       (sql/where [:= :procurement_attachments.id id])))
 
 (defn attachment
   [{tx :tx-next, {attachment-id :attachment-id} :route-params}]
+
+  (println ">o> attachment" )
   (if-let [a (->> attachment-id
                   attachment-query
                   sql-format
@@ -40,8 +47,12 @@
 
 (defn create!
   [tx data]
+
+  (println ">o> create!" data)
   (jdbc/execute! tx
                  (-> (sql/insert-into :procurement_attachments)
                      (sql/values [data])
                      sql-format)))
 
+
+(debug/debug-ns *ns*)
