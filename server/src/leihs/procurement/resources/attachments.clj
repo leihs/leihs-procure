@@ -10,7 +10,7 @@
             [logbug.debug :as debug]
 
             [next.jdbc :as jdbc]
-            [taoensso.timbre :refer [ error info spy warn]]))
+            [taoensso.timbre :refer [error info spy warn]]))
 
 (def attachments-base-query
   (-> (sql/select :procurement_attachments.*)
@@ -24,8 +24,7 @@
                   (sql/where [:= :procurement_attachments.request_id
                               request-id])
                   sql-format
-                  spy
-                  )]
+                  spy)]
     (->> query
          (jdbc/execute! tx)
          (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))))
@@ -63,6 +62,5 @@
                  (-> (sql/delete-from :procurement_attachments)
                      (sql/where [:in :procurement_attachments.id ids])
                      sql-format)))
-
 
 (debug/debug-ns *ns*)

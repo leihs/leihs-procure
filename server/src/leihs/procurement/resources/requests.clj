@@ -7,12 +7,11 @@
             [leihs.procurement.resources.request :as request]
             [leihs.procurement.resources.request-helpers :as request-helpers]
             [leihs.procurement.utils.sql :as sqlp]
-            [next.jdbc :as jdbc]
-
             [logbug.debug :as debug]
 
+            [next.jdbc :as jdbc]
 
-            [taoensso.timbre :refer [ error info spy warn]]))
+            [taoensso.timbre :refer [error info spy warn]]))
 
 (defn create-order-status-enum-entries [order-stati]
   (map (fn [status] [:cast status :order_status_enum]) order-stati))

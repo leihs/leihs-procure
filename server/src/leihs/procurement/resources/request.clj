@@ -11,9 +11,9 @@
                                          [requesters-organizations :as requesters] [template :as template]
                                          [uploads :as uploads])
             (leihs.procurement.utils [helpers :refer [reject-keys submap?]])
-            [next.jdbc :as jdbc]
             [logbug.debug :as debug]
-            [taoensso.timbre :refer [ error info spy warn]]))
+            [next.jdbc :as jdbc]
+            [taoensso.timbre :refer [error info spy warn]]))
 
 (def attrs-mapping
   {:budget_period :budget_period_id,
@@ -518,6 +518,5 @@
          (->> (query-requests tx auth-entity))
          first
          :user_id)))
-
 
 ;(debug/debug-ns *ns*)
