@@ -29,6 +29,10 @@
                      (.encodeToString (Base64/getMimeEncoder)))
         metadata (-> tempfile
                      exif/extract-metadata
+<<<<<<< Updated upstream
+=======
+                     ;to-json
+>>>>>>> Stashed changes
                      cast-to-json)
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")

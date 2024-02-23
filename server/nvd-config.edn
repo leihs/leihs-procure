@@ -1,0 +1,3 @@
+{:suppression-file ".github/example_nvd_suppressions.xml"
+ :nvd-api {:key "38ad30c3-1311-44ea-aaba-2978bf96f1c3"}
+ :analyzer {:ossindex-warn-only-on-remote-errors true}}
