@@ -29,7 +29,7 @@
                      (.encodeToString (Base64/getMimeEncoder)))
         metadata (-> tempfile
                      exif/extract-metadata
-                     to-json
+                     ;to-json
                      cast-to-json)
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")
