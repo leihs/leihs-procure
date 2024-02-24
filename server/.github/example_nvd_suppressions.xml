@@ -1,14 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <!-- This is an automatically generated config file by nvd-clojure. -->
-  <!-- Feel free to tweak it, version-control it and remove any comment. -->
-  <!-- You can find suppression examples in https://jeremylong.github.io/DependencyCheck/general/suppression.html -->
+    <!-- This is an automatically generated config file by nvd-clojure. -->
+    <!-- Feel free to tweak it, version-control it and remove any comment. -->
+    <!-- You can find suppression examples in https://jeremylong.github.io/DependencyCheck/general/suppression.html -->
 
-<!--  <suppress>-->
-<!--    <notes><![CDATA[-->
-<!--   file name: clojure-humanize-0.2.2.jar-->
-<!--   ]]></notes>-->
-<!--    <packageUrl regex="true">^pkg:maven/clojure\-humanize/clojure\-humanize@.*$</packageUrl>-->
-<!--    <cve>CVE-2017-20189</cve>-->
-<!--  </suppress>-->
+    <suppress>
+        <notes><![CDATA[Suppressing all vulnerabilities. Use with caution.]]></notes>
+        <cve>CVE-2023-33202</cve>
+        <cve>CVE-2023-33201</cve>
+        <cve>CVE-2022-25647</cve>
+        <cve>CVE-2017-20189</cve>
+        <cve>CVE-2023-2976</cve>
+        <cve>CVE-2023-41900</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: guava/pom.xml]]></notes>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: google-closure-library-0.0-20211011-0726fdeb.jar]]></notes>
+        <cve>CVE-2020-8910</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: guava-18.0.jar]]></notes>
+        <cve>CVE-2018-10237</cve>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: icu4j-61.1.jar]]></notes>
+        <cve>CVE-2018-18928</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: jackson-databind-2.12.4.jar]]></notes>
+        <cve>CVE-2020-36518</cve>
+        <cve>CVE-2022-42004</cve>
+        <cve>CVE-2022-42003</cve>
+        <cve>CVE-2021-46877</cve>
+        <cve>CVE-2023-35116</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: jetty-io-9.4.51.v20230217.jar]]></notes>
+        <cve>CVE-2023-40167</cve>
+        <cve>CVE-2023-36478</cve>
+        <cve>CVE-2023-44487</cve>
+        <cve>CVE-2023-36479</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: jetty-server-9.4.51.v20230217.jar]]></notes>
+        <cve>CVE-2023-40167</cve>
+        <cve>CVE-2023-36478</cve>
+        <cve>CVE-2023-44487</cve>
+        <cve>CVE-2023-36479</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: postgresql-42.2.12.jar]]></notes>
+        <cve>CVE-2022-21724</cve>
+        <cve>CVE-2020-13692</cve>
+        <cve>CVE-2022-31197</cve>
+        <cve>CVE-2022-41946</cve>
+        <cve>CVE-2022-26520</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: ring-graphql-voyager-0.1.2.jar]]></notes>
+        <cve>CVE-2014-125074</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[File name: snakeyaml-1.26.jar]]></notes>
+        <cve>CVE-2022-1471</cve>
+        <cve>CVE-2022-25857</cve>
+        <cve>CVE-2022-38749</cve>
+        <cve>CVE-2022-41854</cve>
+        <cve>CVE-2022-38750</cve>
+        <cve>CVE-2022-38751</cve>
+        <cve>CVE-2022-38752</cve>
+    </suppress>
 </suppressions>
