@@ -6,7 +6,7 @@
             [leihs.core.db :as db]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.resources [attachment :as attachment]
-              [upload :as upload])
+                                         [upload :as upload])
             [leihs.procurement.utils.helpers :refer [cast-to-json]]
 
             [logbug.debug :as debug]
@@ -33,9 +33,7 @@
         p (println ">o> result" (class result))
 
         result (->> result
-                 (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))
-
-        ]
+                    (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))]
 
     result
 
@@ -48,8 +46,6 @@
     ;     (jdbc/execute! tx)
     ;     (map #(merge % {:url (path :attachment {:attachment-id (:id %)})}))))
     ))
-
-
 (defn get-attachments-for-request-id
   [tx request-id]
 
@@ -69,37 +65,24 @@
         p (println ">o> result ??2" meta)
         p (println ">o> result ??3" (class meta))
 
-
-
         result (map #(merge % {:url (path :attachment {:attachment-id (:id %)})}) result)
 
         p (println ">o> result !!4"  result)
-        p (println ">o> result !!5" (class result))
-        ]
+        p (println ">o> result !!5" (class result))]
 
     result
 
 ;(->> query
 ;  (jdbc/execute! tx)
 ;  (map #(merge % {:url (path :attachment {:attachment-id (:id %)})})))
-
-
-))
-
-
+    ))
 (comment
-  (let [
-      result [{:id 1 :name "Item 1"}
-              {:id 2 :name "Item 2"}]
+  (let [result [{:id 1 :name "Item 1"}
+                {:id 2 :name "Item 2"}]
 
-    result (map #(merge % {:url (path :attachment {:attachment-id (:id %)})}) result)
-p (println ">o> data=" result)
-        ]
-    result
-    )
-
-  )
-
+        result (map #(merge % {:url (path :attachment {:attachment-id (:id %)})}) result)
+        p (println ">o> data=" result)]
+    result))
 
 ;(ns leihs.my.back.html
 ;    (:refer-clojure :exclude [keyword str])
@@ -118,8 +101,7 @@ p (println ">o> data=" result)
 
 (comment
 
-  (let [
-        tx (db/get-ds-next)
+  (let [tx (db/get-ds-next)
         req_id #uuid "95528687-f538-5618-b3eb-98bba5c904c7" ; correct json
         req_id #uuid "5f2da6e2-9125-40ea-92e8-88bf4532fb6d" ; ERROR
         req_id #uuid "ff2b226a-719a-4dbb-8e01-7ee7559d1a62" ; null
@@ -128,8 +110,7 @@ p (println ">o> data=" result)
 
         res (get-attachments-for-request-id tx req_id)
 
-
-        ;request {:route-params {:user-id #uuid "c0777d74-668b-5e01-abb5-f8277baa0ea8"}
+;request {:route-params {:user-id #uuid "c0777d74-668b-5e01-abb5-f8277baa0ea8"}
         ;         :tx           tx}
         ;user-id #uuid "37bb3d3d-3a61-4f98-863e-c549568317f0"
         ;query (sql-format {:select :*
@@ -147,13 +128,9 @@ p (println ">o> data=" result)
         ;p (println "\n res0" res)
         ;p (println "\n res1" (:metadata (first res)))
         p (println "\n res2" (class (:metadata (first res))))
-        p (println "\n res2  !!!! (expected=image/png )" (:File:MIMEType(first (:metadata (first res)))))
-        ]
-    res
-    )                                                       ;HERE
+        p (println "\n res2  !!!! (expected=image/png )" (:File:MIMEType (first (:metadata (first res)))))]
+    res)                                                       ;HERE
   )
-
-
 (defn get-attachments
   [context _ value]
 
@@ -173,19 +150,19 @@ p (println ">o> data=" result)
                  to-json
                  cast-to-json)]
       (attachment/create! tx
-        (-> u-row
-            (dissoc :id)
-            (dissoc :created_at)
-            (assoc :metadata md)
-            (assoc :request_id req-id)))
+                          (-> u-row
+                              (dissoc :id)
+                              (dissoc :created_at)
+                              (assoc :metadata md)
+                              (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
 (defn delete!
   [tx ids]
   (println ">o> delete!")
   (jdbc/execute! tx
-    (-> (sql/delete-from :procurement_attachments)
-        (sql/where [:in :procurement_attachments.id ids])
-        sql-format)))
+                 (-> (sql/delete-from :procurement_attachments)
+                     (sql/where [:in :procurement_attachments.id ids])
+                     sql-format)))
 
 (debug/debug-ns *ns*)
