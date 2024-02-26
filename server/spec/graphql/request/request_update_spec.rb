@@ -37,6 +37,7 @@ describe 'request' do
     end
 
     it 'updates if required general permission exists' do
+      # NOTE: this test fails with local setup
       admin = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: admin.id)
 
@@ -89,6 +90,10 @@ describe 'request' do
         expect(result['data']['request']['id']).to be == request.id
         attachments = result['data']['request']['attachments']['value']
         expect(attachments.count).to be == 2
+
+        puts ">> #{attachments}"
+        puts ">> #{attachments.map { |a| a['filename'] }}"
+
         attachments
           .map { |a| a['filename'] }
           .each { |fn| expect(fn).not_to be_blank }
