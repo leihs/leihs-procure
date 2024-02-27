@@ -97,6 +97,12 @@ describe 'request' do
         expect(Attachment.all.map(&:id)).to include attachment_1.id
         expect(request.reload.article_name).to be == user_name
 
+        pdf_response = get_request("procure/attachments/#{attachment_1.id}")
+        expect(pdf_response.status).to be == 200
+        expect(pdf_response.headers['Content-Type']).to be == 'application/pdf'
+        expect(pdf_response.headers['Content-Disposition']).to be == "inline; filename=\"#{attachment_1.filename}\""
+        expect(pdf_response.headers['content-length']).to be == attachment_1.size.to_s
+
         Attachment.dataset.delete
         Upload.dataset.delete
       end

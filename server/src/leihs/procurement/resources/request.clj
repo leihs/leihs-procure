@@ -55,7 +55,7 @@
         [:>= :procurement_requests.approved_quantity
          :procurement_requests.requested_quantity]
         approved-smaller-than-requested
-          ; but greater than zero
+        ; but greater than zero
         [:and
          [:< :procurement_requests.approved_quantity
           :procurement_requests.requested_quantity]
@@ -232,6 +232,13 @@
     (->> (jdbc/execute! tx query)
          (map #(transform-row % advanced-user?)))))
 
+(defn query-request
+  [tx auth-entity query]
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)
+        result (jdbc/execute-one! tx query)]
+    (when result
+      (transform-row result advanced-user?))))
+
 (defn get-request-by-id-sqlmap
   [tx auth-entity id]
   (let [advanced-user? (user-perms/advanced? tx auth-entity)]
@@ -245,8 +252,7 @@
        (get-request-by-id-sqlmap tx auth-entity)
        request-helpers/join-and-nest-associated-resources
        sql-format
-       (query-requests tx auth-entity)
-       first))
+       (query-request tx auth-entity)))
 
 (defn- consider-default
   [attr p-spec]
@@ -280,23 +286,23 @@
      #(request-perms/can-write-any-field? fields))))
 
 (defn get-last-created-request
-  [tx auth-entity]
-  (let [advanced-user? (user-perms/advanced? tx auth-entity)]
-    (-> advanced-user?
-        requests-base-query-with-state
-        ; NOTE: reselect because of:
-        ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
-        (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
-        (sql/order-by [:created_at :desc])
-        (sql/limit 1)
-        sql-format
-        (->> (query-requests tx auth-entity))
-        first)))
+  [tx auth-entity insert-result]
+  (let [advanced-user? (user-perms/advanced? tx auth-entity)
+        query (-> advanced-user?
+                  requests-base-query-with-state
+                  ; NOTE: reselect because of:
+                  ; ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
+                  (sql/select :procurement_requests.* [(state-sql advanced-user?) :state])
+                  (sql/where [:= :procurement_requests.id (:id (first insert-result))])
+                  (sql/limit 1)
+                  sql-format)]
+    (query-request tx auth-entity query)))
 
 (defn insert!
   [tx data]
   (jdbc/execute! tx (-> (sql/insert-into :procurement_requests)
                         (sql/values [data])
+                        (sql/returning :id)
                         sql-format)))
 
 (defn update!
@@ -416,15 +422,16 @@
                        to-name-and-lower-case-enums)]
     (let [req-id (atom nil)]
       (authorization/authorize-and-apply
-       #(do (insert! tx
-                     (-> write-data
-                         (cond-> template (merge (dissoc data-from-template :is_archived)))
-                         exchange-attrs))
-            (reset! req-id
-                    (-> (get-last-created-request tx auth-entity)
-                        :id))
-            (if-not (empty? attachments)
-              (deal-with-attachments! tx @req-id attachments)))
+       #(do
+          (let [insert-result (insert! tx
+                                       (-> write-data
+                                           (cond-> template (merge (dissoc data-from-template :is_archived)))
+                                           exchange-attrs))
+                reset-result (-> (get-last-created-request tx auth-entity insert-result)
+                                 :id)]
+            (reset! req-id reset-result))
+          (when (not-empty attachments)
+            (deal-with-attachments! tx @req-id attachments)))
        :if-all
        [#(->> input-data
               submap-with-id-for-associated-resources
@@ -514,6 +521,5 @@
      (-> requests-base-query
          (sql/where [:= :procurement_requests.id (:id request)])
          sql-format
-         (->> (query-requests tx auth-entity))
-         first
+         (->> (query-request tx auth-entity))
          :user_id)))

@@ -4,6 +4,7 @@
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
    [leihs.procurement.paths :refer [path]]
+   [leihs.procurement.utils.helpers :refer [to-uuid]]
    [next.jdbc :as jdbc]
    [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
@@ -19,7 +20,7 @@
 
 (defn attachment
   [{tx :tx-next, {attachment-id :attachment-id} :route-params}]
-  (if-let [a (->> attachment-id
+  (if-let [a (->> (to-uuid attachment-id)
                   attachment-query
                   sql-format
                   (jdbc/execute-one! tx))]
@@ -44,4 +45,3 @@
                  (-> (sql/insert-into :procurement_attachments)
                      (sql/values [data])
                      sql-format)))
-

@@ -36,7 +36,7 @@
 
 (defn get-main-category-by-name
   [tx mc-name]
-  (first (jdbc/execute! tx (main-category-query-by-name mc-name))))
+  (jdbc/execute-one! tx (main-category-query-by-name mc-name)))
 
 (defn insert!
   [tx mc]

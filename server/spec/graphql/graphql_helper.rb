@@ -57,6 +57,10 @@ class GraphqlQuery
 end
 
 RSpec.shared_context 'graphql client' do
+  def get_request(path)
+    Faraday.get("#{http_base_url}/#{path}")
+  end
+
   def query(q, user_id = nil, variables = {})
     GraphqlQuery.new(q, user_id, variables).perform.result
   end
