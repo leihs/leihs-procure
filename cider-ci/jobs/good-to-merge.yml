@@ -25,10 +25,16 @@ depends_on: &GOOD_TO_MERGE_DEPENDENCIES
     job_key: procure-uberjar-build
     states: [passed]
 
-  good to merge of the database:
-    job_key: good-to-merge
+  database merged to master:
+    job_key: merged-to-master
     type: job
     submodule: ['server/database']
+    states: [passed]
+
+  shared-clj merged to master:
+    job_key: merged-to-master
+    type: job
+    submodule: [server/shared-clj]
     states: [passed]
 
 run_when: *GOOD_TO_MERGE_DEPENDENCIES
