@@ -14,10 +14,16 @@ depends_on: &GOOD_TO_MERGE_DEPENDENTS
     job_key: lint
     states: [passed]
 
-  good to merge of the database:
-    job_key: good-to-merge
+  database merged to master:
+    job_key: merged-to-master
     type: job
     submodule: [database]
+    states: [passed]
+
+  shared-clj merged to master:
+    job_key: merged-to-master
+    type: job
+    submodule: [shared-clj]
     states: [passed]
 
   admin-build-uberjar was successful:
