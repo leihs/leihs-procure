@@ -1,5 +1,5 @@
 clojure 1.10.3.1093
-firefox 78.15.0esr
+firefox 115.8.0esr
 geckodriver 0.30.0
 java zulu-11.60.19
 nodejs 16.20.0
