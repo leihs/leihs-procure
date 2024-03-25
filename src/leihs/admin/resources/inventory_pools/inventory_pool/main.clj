@@ -6,7 +6,6 @@
    [clojure.set :refer [rename-keys]]
    [compojure.core :as cpj]
    [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.mail-templates :as mail-templates]
    [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
    [leihs.core.sql :as sql]
    [logbug.catcher :as catcher]
@@ -33,11 +32,7 @@
   (if-let [inventory-pool (first (jdbc/insert!
                                   tx :inventory_pools
                                   (select-keys data fields)))]
-    (do
-      (jdbc/insert! tx :workdays
-                    {:inventory_pool_id (:id inventory-pool)})
-      (mail-templates/create-for-inventory-pool tx (:id inventory-pool))
-      {:body inventory-pool})
+    {:body inventory-pool}
     {:status 422
      :body "No inventory-pool has been created."}))
 
