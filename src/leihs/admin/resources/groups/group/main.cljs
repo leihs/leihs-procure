@@ -1,13 +1,10 @@
 (ns leihs.admin.resources.groups.group.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.navigation.back :as back]
-   [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.group.core :refer [clean-and-fetch data*
                                                     debug-component
                                                     group-name-component]]
-   [leihs.admin.resources.groups.group.core :refer [data*]]
    [leihs.admin.resources.groups.group.delete :as delete]
    [leihs.admin.resources.groups.group.edit :as edit]
    [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools]

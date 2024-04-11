@@ -1,21 +1,15 @@
 (ns leihs.admin.resources.users.user.groups
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
-   [leihs.admin.common.components.table :as table]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.main :as groups-core]
-   [leihs.admin.resources.users.user.core :as user-core :refer [user-id* user-data*]]
-   [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [go <!]]
+            [cljs.pprint :refer [pprint]]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.resources.groups.main :as groups-core]
+            [leihs.admin.resources.users.user.core :as user-core :refer [user-data*
+                                                                         user-id*]]
+            [leihs.admin.state :as state]
+            [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
@@ -37,11 +31,6 @@
        [:h3 "Groups @data*"]
        [:pre (with-out-str (pprint @data*))]]])])
 
-(defn group-td-component [row]
-  [:td
-   [:a {:href (path :group {:group-id (:group_id row)})}
-    (:name row)]])
-
 (defn table-component []
   [:div.user-groups
    [routing/hidden-state-component
@@ -60,4 +49,3 @@
         groups-core/users-count-td-component]
        @data*]
       [debug-component]])])
-

@@ -1,5 +1,5 @@
 (ns leihs.admin.common.components.filter
-  (:refer-clojure :exclude [str keyword])
+  (:refer-clojure :exclude [str])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :refer [<! go timeout]]
@@ -163,11 +163,6 @@
    :query-params-key :per-page
    :options (map str defaults/PER-PAGE-VALUES)
    :default-option (str defaults/PER-PAGE)])
-
-(defn form-term [& {:keys [placeholder]
-                    :or {placeholder "name of the group"}}]
-  [routing/form-term-filter-component
-   :placeholder placeholder])
 
 (defn form-including-user []
   [choose-user-component

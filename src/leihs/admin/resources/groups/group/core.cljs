@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.groups.group.core
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
@@ -9,9 +6,8 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
 
@@ -33,7 +29,7 @@
   (fetch-group))
 
 (defn group-name-component []
-  [:<> (str (:name @data*))])
+  [:<> (:name @data*)])
 
 (defn debug-component []
   (when (:debug @state/global-state*)

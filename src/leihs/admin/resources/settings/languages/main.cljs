@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.settings.languages.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.table :as table]
@@ -8,7 +7,6 @@
    [leihs.admin.resources.settings.languages.edit :as edit]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Form]]
    [reagent.core :as reagent]))
@@ -66,4 +64,3 @@
        [info-table]
        [edit-button]
        [debug-component]]])])
-

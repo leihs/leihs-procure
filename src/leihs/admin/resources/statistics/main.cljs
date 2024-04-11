@@ -1,12 +1,10 @@
 (ns leihs.admin.resources.statistics.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :as async :refer [<! go-loop]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.statistics.breadcrumbs :as breadcrumbs]
    [leihs.admin.state :as state]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent]))

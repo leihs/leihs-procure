@@ -1,22 +1,16 @@
 (ns leihs.admin.common.http-client.core
-  (:refer-clojure :exclude [str keyword send-off])
-  (:require-macros
-   [cljs.core.async.macros :refer [go go-loop]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [cljs-http.client :as http-client]
-   [cljs-uuid-utils.core :as uuid]
-   [cljs.core.async :as async :refer [timeout]]
-   [clojure.pprint :refer [pprint]]
-   [clojure.string :as str]
-   [goog.string :as gstring]
-   [goog.string.format]
-   [leihs.core.anti-csrf.front :as anti-csrf]
-   [leihs.core.constants :as constants]
-   [leihs.core.core :refer [str keyword deep-merge presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]
-   [taoensso.timbre :refer [error]]))
+  (:refer-clojure :exclude [str])
+  (:require [cljs-http.client :as http-client]
+            [cljs-uuid-utils.core :as uuid]
+            [cljs.core.async :as async :refer [timeout go go-loop <! >!]]
+            [clojure.string :refer [starts-with? upper-case]]
+            [goog.string.format]
+            [leihs.core.anti-csrf.front :as anti-csrf]
+            [leihs.core.constants :as constants]
+            [leihs.core.core :refer [presence str]]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent]
+            [taoensso.timbre :refer [error]]))
 
 (def base-delay* (reagent/atom 0))
 
@@ -27,8 +21,8 @@
 
 (defn set-defaults [data]
   (-> data
-      (update :id #(uuid/uuid-string (uuid/make-random-uuid)))
-      (update :timestamp #(js/Date.))
+      (assoc :id (uuid/uuid-string (uuid/make-random-uuid)))
+      (assoc :timestamp (js/Date.))
       (update :method #(or % :get))
       (update :url #(or % (-> @routing/state* :url)))
       (update :delay #(+ (or % 0) @base-delay*))
@@ -82,7 +76,7 @@
     [:i.fas.fa-spinner.fa-spin.fa-5x]]
    [:div.text-center
     {:style {}}
-    "Wait for " (-> req :method str str/upper-case)
+    "Wait for " (-> req :method str upper-case)
     " " (:url req)]])
 
 (defn error-component [resp req]
@@ -97,7 +91,7 @@
         [:span.text-monospace status]]]
       [:hr]
       [:div.request
-       [:pre  (-> req :method str str/upper-case) " " (:url req)]]
+       [:pre  (-> req :method str upper-case) " " (:url req)]]
       (when-let [body (-> resp :body presence)]
         [:div.body [:pre body]])
       [:hr]
@@ -142,6 +136,6 @@
           (when (< (:status resp) 300)
             (swap! data* assoc route (-> resp :body)))))
       (<! (timeout (* 3 60 1000)))
-      (if (str/starts-with? (:route @routing/state*) route)
+      (if (starts-with? (:route @routing/state*) route)
         (recur reload)
         (swap! data* dissoc route)))))

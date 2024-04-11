@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.suspension.core
-  (:refer-clojure :exclude [str keyword])
   (:require
    ["/admin-ui" :as UI]
    ["date-fns" :as date-fns]
@@ -11,7 +10,7 @@
    [leihs.admin.utils.misc :refer [humanize-datetime-component wait-component]]
    [leihs.core.core :refer [presence]]
    [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent :refer [reaction]]
+   [reagent.core :as reagent]
    [taoensso.timbre]))
 
 (defn suspended? [suspended-until ref-date]
@@ -67,23 +66,6 @@
     :rows 3
     :disabled disabled
     :label "Reason"]])
-
-(defn suspension-submit-component [supension edit-data* edit-mode?*]
-  (let [changed* (reaction (not= supension @edit-data*))]
-    [:div.row.mt-1
-     [:div.col
-      (if @changed*
-        [:button.btn.btn-secondary
-         {:type :button
-          :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Cancel"]
-        [:button.btn.btn-secondary
-         {:type :button
-          :on-click #(reset! edit-mode?* false)}
-         [icons/delete] " Close"])]
-     [:div.col
-      [form-components/save-submit-component
-       :disabled (not @changed*)]]]))
 
 (defn suspension-edit-header []
   [:h4 "Edit Suspension"])

@@ -1,14 +1,11 @@
 (ns leihs.admin.utils.misc
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   ["date-fns" :as date-fns]
-   [cljs.pprint :refer [pprint]]
-   [goog.string :as gstring]
-   [leihs.admin.common.icons :as icons]
-
-   [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.digest]))
+  (:require ["date-fns" :as date-fns]
+            [clojure.string :as clj-str]
+            [goog.string :as gstring]
+            [leihs.admin.common.icons :as icons]
+            [leihs.admin.state :as state]
+            [leihs.core.core :refer [presence]]
+            [leihs.core.digest]))
 
 ; TODO stuff in this namespace should be moved removed completely
 
@@ -36,8 +33,8 @@
      (gstring/format
       "https://www.gravatar.com/avatar/?s=%d&d=blank" size)
      (let [md5 (->> email
-                    clojure.string/trim
-                    clojure.string/lower-case
+                    clj-str/trim
+                    clj-str/lower-case
                     leihs.core.digest/md5-hex)]
        (gstring/format
         "https://www.gravatar.com/avatar/%s?s=%d&d=retro"

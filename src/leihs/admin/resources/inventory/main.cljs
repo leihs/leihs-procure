@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]))

@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.delete
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
@@ -38,4 +37,3 @@
                             (onHide)
                             (post))}
      "Delete"]]])
-

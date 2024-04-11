@@ -1,7 +1,4 @@
-(ns leihs.admin.utils.clipboard
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [leihs.core.core :refer [keyword str presence]]))
+(ns leihs.admin.utils.clipboard)
 
 ; copy-text taken from
 ; https://github.com/metosin/komponentit/blob/master/src/cljs/komponentit/clipboard.cljs

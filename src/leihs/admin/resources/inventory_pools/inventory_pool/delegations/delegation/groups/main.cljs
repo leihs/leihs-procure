@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.groups.main :as groups-membership]

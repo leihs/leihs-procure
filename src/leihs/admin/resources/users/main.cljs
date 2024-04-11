@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.users.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components :as components]
@@ -20,10 +17,9 @@
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
    [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Alert]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (def current-query-params*
   (reaction (merge shared/default-query-params
@@ -40,12 +36,6 @@
 
 (def on-first-page?*
   (reaction (= 1 (get-in @routing/state* [:query-params :page] 1))))
-
-(defn page-path-for-query-params [query-params]
-  (path (:handler-key @routing/state*)
-        (:route-params @routing/state*)
-        (merge @current-query-params*
-               query-params)))
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -105,15 +95,6 @@
   [:td (if (:account_enabled user)
          [:span.text-success "yes"]
          [:span.text-warning "no"])])
-
-(defn protected-th-component []
-  [:th {:key :admin_protected} "Protected"])
-
-(defn protected-td-component [group]
-  [:td {:key :admin_protected}
-   (if (:admin_protected group)
-     "yes"
-     "no")])
 
 ;;; org_id
 
@@ -189,7 +170,7 @@
   [hds tds &
    {:keys [membership-filter? role-filter?]
     :or {membership-filter? false
-         role-filer? false}}]
+         role-filter? false}}]
   [:<>
    [routing/hidden-state-component
     {:did-change fetch-users}]

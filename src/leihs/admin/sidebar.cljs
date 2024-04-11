@@ -8,7 +8,7 @@
    [leihs.core.routing.front :as routing]))
 
 (def data [{:section-title "Manage"
-            :items [{:icon solids/faWarehouse #_solids/faLayerGroup
+            :items [{:icon solids/faWarehouse
                      :href "/admin/inventory-pools/"
                      :children "Inventory Pools"
                      :authorizers [auth/admin-scopes?
@@ -43,10 +43,6 @@
                               :href "/admin/audited/requests/"
                               :children "Requests"
                               :authorizers [auth/system-admin-scopes?]}]}]}
-                                        ;; {:icon solids/faHistory
-                                        ;;  :href "/admin/audits/"
-                                        ;;  :children "Legacy"
-                                        ;;  :authorizers [auth/admin-scopes?]}]}]}
            {:section-title "Configuration"
             :items [{:icon solids/faTableList
                      :href "/admin/inventory-fields/"

@@ -1,11 +1,5 @@
 (ns leihs.admin.resources.mail-templates.shared
-  (:require [leihs.admin.constants :as defaults]
-            [leihs.core.constants :refer [GENERAL_BUILDING_UUID]]))
-
-(def default-fields
-  #{:id
-    :name
-    :code})
+  (:require [leihs.admin.constants :as defaults]))
 
 (def default-query-params
   {:page 1

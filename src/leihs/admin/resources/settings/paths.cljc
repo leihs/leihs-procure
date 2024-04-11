@@ -1,9 +1,6 @@
 (ns leihs.admin.resources.settings.paths
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [bidi.verbose :refer [branch param leaf]]
-
-   [leihs.core.core :refer [keyword str presence]]))
+   [bidi.verbose :refer [branch  leaf]]))
 
 (def paths
   (branch "/settings/"

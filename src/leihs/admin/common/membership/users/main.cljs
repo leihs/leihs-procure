@@ -1,10 +1,6 @@
 (ns leihs.admin.common.membership.users.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [cljs.core.async :as async]
+   [cljs.core.async :as async :refer [go <!]]
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
@@ -141,5 +137,3 @@
         [:a.btn.btn-outline-primary.btn-sm
          {:href (path-fn user {} {:membership "any"})}
          [:span [icons/add] " Add "]])]]))
-
-

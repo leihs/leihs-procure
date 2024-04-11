@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.audits.requests.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [go timeout <!]]
@@ -13,8 +12,6 @@
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.audits.core :as audits]
-   [leihs.admin.resources.audits.requests.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
    [leihs.admin.resources.users.user.core :as user]
    [leihs.admin.state :as state]

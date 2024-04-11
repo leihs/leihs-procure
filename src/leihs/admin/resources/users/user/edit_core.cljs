@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.users.user.edit-core
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.form-components :refer [checkbox-component
@@ -22,11 +21,6 @@
   (reaction (try (.parse js/JSON (get @data* :extended_info))
                  true
                  (catch :default _ false))))
-
-(def form-is-invalid*
-  (reaction (or @admin-protected-is-invalid*
-                @system-admin-protected-is-invalid*
-                (not @extended-info-is-valid*))))
 
 (defn json-component
   [kw & {:keys [label hint classes]

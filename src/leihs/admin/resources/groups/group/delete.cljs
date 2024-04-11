@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.groups.group.delete
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [go <!]]

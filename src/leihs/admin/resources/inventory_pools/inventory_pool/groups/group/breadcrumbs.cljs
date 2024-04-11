@@ -1,19 +1,11 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.groups.group.breadcrumbs
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [cljs.core.async :as async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.string :refer [split trim]]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.breadcrumbs :as breadcrumbs-parent]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre]))
+  (:require [leihs.admin.common.icons :as icons]
+            [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+            [leihs.admin.resources.inventory-pools.inventory-pool.groups.breadcrumbs :as breadcrumbs-parent]
+            [leihs.core.auth.core :as auth]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent :refer [reaction]]
+            [taoensso.timbre]))
 
 (def li breadcrumbs-parent/li)
 (def nav-component breadcrumbs-parent/nav-component)

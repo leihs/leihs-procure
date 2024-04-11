@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.filter :as filter]
@@ -12,9 +9,8 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce data* (reagent/atom {}))
 (defonce current-route* (reaction (:route @routing/state*)))

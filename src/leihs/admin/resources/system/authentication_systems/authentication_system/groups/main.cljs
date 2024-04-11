@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.groups.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.membership.groups.main :as groups-membership]
    [leihs.admin.paths :as paths :refer [path]]

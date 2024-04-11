@@ -1,19 +1,15 @@
 (ns leihs.admin.resources.audits.changes.change.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.audits.changes.change.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.audits.core :as audits]
    [leihs.admin.utils.clipboard :as clipboard]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]))
 
 ;;; changes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defonce change* (reagent/atom nil))
 
 (defonce audited-change-id*
   (reaction (or (-> @routing/state* :route-params :audited-change-id)

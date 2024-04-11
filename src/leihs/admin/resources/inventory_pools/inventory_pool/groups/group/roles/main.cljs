@@ -1,36 +1,20 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.components :refer [roles-component fetch-roles< put-roles<]]
-   [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :as group :refer [group-id*]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.breadcrumbs :as breadcrumbs]
-   [leihs.admin.state :as state]
-
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [go <!]]
+            [cljs.pprint :refer [pprint]]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.common.roles.components :refer [put-roles<
+                                                         roles-component]]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.resources.groups.group.core :as group]
+            [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+            [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.breadcrumbs :as breadcrumbs]
+            [leihs.admin.state :as state]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent]))
 
 (defonce changed?* (reagent/atom false))
 
 (defonce data* (reagent/atom nil))
-
-(def edit-mode?*
-  (reaction
-   (= (-> @routing/state* :handler-key) :inventory-pool-group-roles)))
 
 (defn debug-component []
   (when (:debug @state/global-state*)

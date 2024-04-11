@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.groups.group.users.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [go <!]]
@@ -20,7 +17,8 @@
    [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.front :as current-user]
-   [react-bootstrap :as react-bootstrap :refer [Button Nav]]))
+   [react-bootstrap :as react-bootstrap :refer [Nav]]
+   [reagent.core :refer [reaction]]))
 
 ;### helpers ##################################################################
 

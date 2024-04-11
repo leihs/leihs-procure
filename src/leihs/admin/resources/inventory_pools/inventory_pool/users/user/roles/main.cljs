@@ -1,34 +1,17 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.components :as roles-ui :refer [fetch-roles< put-roles<]]
-   [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
-   [leihs.admin.resources.users.user.core :as user :refer [user-id* user-data*]]
-   [leihs.admin.state :as state]
-
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [go <!]]
+            [cljs.pprint :refer [pprint]]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.common.roles.components :as roles-ui :refer [put-roles<]]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+            [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
+            [leihs.admin.resources.users.user.core :as user]
+            [leihs.admin.state :as state]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent]))
 
 (defonce roles-data* (reagent/atom nil))
-
-(def edit-mode?*
-  (reaction
-   (= (-> @routing/state* :handler-key) :inventory-pool-user-roles)))
 
 (defn debug-component []
   (when (:debug @state/global-state*)

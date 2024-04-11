@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.suppliers.supplier.edit
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
@@ -37,4 +36,3 @@
     [:> Button {:type "submit"
                 :form "supplier-form"}
      "Save"]]])
-

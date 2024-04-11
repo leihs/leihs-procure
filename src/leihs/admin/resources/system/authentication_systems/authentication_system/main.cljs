@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.table :as table]
@@ -14,7 +11,7 @@
    [leihs.core.routing.front :as routing]
    [leihs.core.url.shared]
    [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :authentication-system-id)
@@ -123,86 +120,3 @@
        [edit-button]
        [delete-button]
        [debug-component]]])])
-
-;; (defn show-page []
-;;   [:div.authentication-system
-;;    ;; [show-breadcrumbs]
-;;    [routing/hidden-state-component
-;;     {:did-change fetch}]
-;;    [:div.row
-;;     [:div.col-lg
-;;      [:h1
-;;       [:span " Authentication-System "]
-;;       [name-component]]
-;;      [authentication-system-id-component]]]
-;;    [authentication-system-component]
-;;    [debug-component]])
-
-;;; edit ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (defn patch [& args]
-;;   (let [route (path :authentication-system {:authentication-system-id @id*})]
-;;     (go (when (some->
-;;                {:url route
-;;                 :method :patch
-;;                 :json-params  (dissoc @auth-core/data* :users_count)
-;;                 :chan (async/chan)}
-;;                http-client/request :chan <!
-;;                http-client/filter-success!)
-;;           (accountant/navigate! route)))))
-
-;; (defn edit-form []
-;;   [:form.form
-;;    {:on-submit (fn [e]
-;;                  (.preventDefault e)
-;;                  (patch))}
-;;    [authentication-system-component]
-;;    [form-components/save-submit-component]])
-
-;; (defn edit-page []
-;;   [:div.edit-authentication-system
-;;    [routing/hidden-state-component
-;;     {:did-mount clean-and-fetch
-;;      :did-change clean-and-fetch}]
-;;    [breadcrumbs/nav-component
-;;     (conj @breadcrumbs/left* [breadcrumbs/edit-li]) []]
-;;    [:div.row
-;;     [:div.col-lg
-;;      [:h1
-;;       [:span " Edit Authentication-System "]
-;;       [name-component]]
-;;      [authentication-system-id-component]]]
-;;    [edit-form]
-;;    [debug-component]])
-
-;;; delete ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (defn delete-authentication-system [& args]
-;;   (go (when
-;;        (some->
-;;         {:url (path :authentication-system (-> @routing/state* :route-params))
-;;          :method :delete
-;;          :chan (async/chan)}
-;;         http-client/request :chan <!
-;;         http-client/filter-success!
-;;         (accountant/navigate!
-;;          (path :authentication-systems))))))
-;;
-;; (defn delete-form []
-;;   [:form.form
-;;    {:on-submit (fn [e]
-;;                  (.preventDefault e)
-;;                  (delete-authentication-system))}
-;;    [form-components/delete-submit-component]])
-;;
-;; (defn delete-page []
-;;   [:div.authentication-system-delete
-;;    [routing/hidden-state-component
-;;     {:did-mount clean-and-fetch
-;;      :did-change clean-and-fetch}]
-;;    [breadcrumbs/nav-component
-;;     (conj @breadcrumbs/left* [breadcrumbs/delete-li]) []]
-;;    [:h1 "Delete Authentication-System "
-;;     [name-component]]
-;;    [authentication-system-id-component]
-;;    [delete-form]])

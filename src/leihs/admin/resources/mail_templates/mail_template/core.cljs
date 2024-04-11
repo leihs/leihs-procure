@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.mail-templates.mail-template.core
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
@@ -95,4 +94,3 @@
      [:div.mail-template-data
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
-

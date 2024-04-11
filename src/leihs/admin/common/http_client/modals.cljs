@@ -1,7 +1,5 @@
 (ns leihs.admin.common.http-client.modals
-  (:refer-clojure :exclude [str keyword send-off])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
+  (:refer-clojure :exclude [str])
   (:require
    [clojure.pprint :refer [pprint]]
    [clojure.string :as string]
@@ -10,7 +8,8 @@
    [leihs.admin.utils.clipboard :as clipboard]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.constants :as constants]
-   [leihs.core.core :refer [presence str]]))
+   [leihs.core.core :refer [presence str]]
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defn status [request]
   (cond (empty? (-> request :response)) :pending

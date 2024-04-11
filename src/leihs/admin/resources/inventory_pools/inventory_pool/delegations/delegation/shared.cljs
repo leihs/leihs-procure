@@ -17,7 +17,6 @@
                          (rename-keys params {:user-uid :responsible_user_id})))
     (when (empty? @data*)
       (reset! data* {:pool_protected true})))
-  ;; return data
   data*)
 
 (defn responsible-user-choose-component []

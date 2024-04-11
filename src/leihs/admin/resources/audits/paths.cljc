@@ -1,13 +1,9 @@
 (ns leihs.admin.resources.audits.paths
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [bidi.verbose :refer [branch param leaf]]
-
-   [leihs.core.core :refer [keyword str presence]]))
+  (:require [bidi.verbose :refer [branch leaf param]]))
 
 (def paths
   (branch "/audited"
-          (leaf "/" :audits)
+          (leaf "" :audits)
           (branch "/changes"
                   (leaf "/" :audited-changes)
                   (branch "/"

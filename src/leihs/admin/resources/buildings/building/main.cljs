@@ -1,10 +1,9 @@
 (ns leihs.admin.resources.buildings.building.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.buildings.building.core :as building :refer [clean-and-fetch data*]]
+   [leihs.admin.resources.buildings.building.core :as building :refer [clean-and-fetch]]
    [leihs.admin.resources.buildings.building.delete :as delete]
    [leihs.admin.resources.buildings.building.edit :as edit]
    [leihs.admin.utils.misc :refer [wait-component]]

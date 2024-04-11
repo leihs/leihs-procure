@@ -1,8 +1,8 @@
 (ns leihs.admin.resources.users.user.inventory-pools
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
+   [clojure.string :refer [join]]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.roles.core :as roles]
@@ -12,7 +12,6 @@
                                                                 user-id*]]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent]))
 
@@ -65,8 +64,8 @@
 (defn roles-td-component [row]
   [:td
    (->> row :role roles/expand-to-hierarchy
-        (map str)
-        (clojure.string/join ", "))])
+        (map name)
+        (join ", "))])
 
 (defn contracts-td-component [row]
   [:td
@@ -104,4 +103,3 @@
                 [contracts-td-component row]])}]
      [wait-component])
    [debug-component]])
-

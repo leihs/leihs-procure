@@ -1,27 +1,16 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.components :refer [roles-component put-roles<]]
-   [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.users.user.core :as user]
-   [leihs.admin.state :as state]
-
-   [leihs.admin.utils.regex :as regex]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [go <!]]
+            [cljs.pprint :refer [pprint]]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.common.icons :as icons]
+            [leihs.admin.common.roles.components :refer [put-roles<
+                                                         roles-component]]
+            [leihs.admin.common.roles.core :as roles]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+            [leihs.admin.state :as state]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent :refer [reaction]]))
 
 (def roles-path*
   (reaction (path :inventory-pool-user-groups-roles

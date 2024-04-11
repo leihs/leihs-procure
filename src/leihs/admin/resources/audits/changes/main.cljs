@@ -1,11 +1,8 @@
 (ns leihs.admin.resources.audits.changes.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
+   [clojure.string :refer [join]]
    [leihs.admin.common.components :as components]
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.components.table :as table]
@@ -13,12 +10,11 @@
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.audits.changes.shared :refer [default-query-params]]
-   [leihs.admin.resources.audits.core :as audits]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [presence str]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 ;;; data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -94,7 +90,7 @@
      :query-params-key :txid
      :input-options {:placeholder "transaction id"}]
     [filter/delayed-query-params-input-component
-     :label "Primarky key"
+     :label "Primary key"
      :query-params-key :pkey]
     [table-filter-component]
     [tg-op-filter-component]
@@ -126,7 +122,7 @@
    [:td.tg-op (:tg_op change)]
    [:td.changed-attributes
     {:style {:max-width "20em"}}
-    (->> change :changed_attributes (map str) (str/join ", "))]
+    (->> change :changed_attributes (map str) (join ", "))]
    [:td.request
     (when (:has_request change)
       [:a {:href (path :audited-request {:request-id (:request-id change)})}

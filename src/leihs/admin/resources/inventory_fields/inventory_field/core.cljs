@@ -1,32 +1,22 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.core
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-   [clojure.string :as string]
-   [com.rpl.specter :as specter]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
-   [leihs.admin.state :as state]
-   [leihs.core.core :refer [detect dissoc-in flip presence str]]
-   ;; [leihs.core.core :refer [detect presence str]]
-   ;; [leihs.core.core :refer [dissoc-in]]
-   [leihs.core.routing.front :as routing]
-   [leihs.core.user.shared :refer [short-id]]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [<! go]]
+            [cljs.pprint :refer [pprint]]
+            [clojure.string :as string]
+            [com.rpl.specter :as specter]
+            [leihs.admin.common.form-components :as form-components]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
+            [leihs.admin.state :as state]
+            [leihs.core.core :refer [detect dissoc-in flip presence]]
+            [leihs.core.routing.front :as routing]
+            [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :inventory-field-id presence)
                 ":inventory-field-id")))
 
 (def new-dynamic-field-defaults field-specs/new-dynamic-field-defaults)
-(def simple-types field-specs/simple-types)
 (def advanced-types field-specs/advanced-types)
 
 (defonce data* (reagent/atom nil))
@@ -38,11 +28,6 @@
 (defonce inventory-field-usage-data* (reagent/atom nil))
 
 (defonce edit-mode?* (reagent/atom true))
-;; (defonce edit-mode?*
-;;   (reaction
-;;    (and (map? @data*)
-;;         (boolean ((set '(:inventory-field-edit :inventory-field-create))
-;;                   (:handler-key @routing/state*))))))
 
 (defn strip-of-uuids [data]
   (-> data
@@ -411,8 +396,6 @@
     :values [["" "Item+License"]
              ["item" "Item"]
              ["license" "License"]]]
-   ;; [select-type-component (when isEditing?
-   ;;                          {:disabled? true})]
    [select-type-component]])
 
 ;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

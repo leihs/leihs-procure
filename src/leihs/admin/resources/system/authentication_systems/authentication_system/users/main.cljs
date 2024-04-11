@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.users.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.users.main :as users-membership]

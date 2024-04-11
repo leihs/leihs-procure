@@ -1,10 +1,8 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [clojure.core :as core]
-   [clojure.string :as str]
+   [clojure.string :refer [join]]
    [leihs.admin.common.components.table :as table]
-   [leihs.admin.common.icons :as icons]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.delete :as delete]
@@ -81,7 +79,7 @@
      [:article.inventory-pool.my-5
       [:h1.my-5
        [inventory-pool/name-component]]
-      [nav/tabs (str/join ["/admin/inventory-pools/" @inventory-pool/id*])]
+      [nav/tabs (join ["/admin/inventory-pools/" @inventory-pool/id*])]
       [inventory-pool-info-table]
       [edit-inventory-pool]
       [delete-inventory-pool]

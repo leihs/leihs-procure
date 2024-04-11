@@ -1,17 +1,14 @@
 (ns leihs.admin.resources.buildings.building.core
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [presence str]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Form]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :building-id presence)

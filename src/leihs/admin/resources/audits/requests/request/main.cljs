@@ -1,5 +1,5 @@
 (ns leihs.admin.resources.audits.requests.request.main
-  (:refer-clojure :exclude [str keyword])
+  (:refer-clojure :exclude [keyword])
   (:require
    [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
@@ -7,7 +7,6 @@
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.audits.changes.change.main :as change]
    [leihs.admin.resources.audits.core :as audits]
-   [leihs.admin.resources.audits.requests.request.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.users.user.core :as user]
    [leihs.admin.state :as state]
    [leihs.admin.utils.clipboard :as clipboard]

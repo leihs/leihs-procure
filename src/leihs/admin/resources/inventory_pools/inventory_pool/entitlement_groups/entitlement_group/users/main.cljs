@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.users.main :as membership-users]

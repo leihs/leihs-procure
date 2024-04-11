@@ -1,15 +1,14 @@
 (ns leihs.admin.resources.users.user.core
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :as async :refer [go timeout <!]]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :refer [split trim]]
+   [clojure.string :refer [trim]]
    [leihs.admin.common.components :as components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [presence str]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]
    [taoensso.timbre :refer [error]]))
@@ -52,13 +51,6 @@
       (some-> user :login presence)
       (some-> user :org_id presence)
       (some-> user :id)))
-
-(defn some-id-component [user]
-  [:span.text-monospace
-   (or (some-> user :email presence)
-       (some-> user :login presence)
-       (some-> user :org_id presence)
-       (some-> user :id (split "-") first))])
 
 (defn fullname-or-some-uid [user]
   (or (fullname user) (some-uid user)))

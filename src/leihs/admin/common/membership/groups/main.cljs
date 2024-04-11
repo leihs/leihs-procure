@@ -1,11 +1,7 @@
 (ns leihs.admin.common.membership.groups.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [accountant.core :as accountant]
-   [cljs.core.async :as async]
+   [cljs.core.async :as async :refer [go <!]]
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]

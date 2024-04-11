@@ -1,10 +1,7 @@
 (ns leihs.admin.resources.inventory-pools.paths
-
-  (:refer-clojure :exclude [str keyword])
   (:require
    [bidi.verbose :refer [branch param leaf]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]
-   [leihs.core.core :refer [keyword str presence]]))
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.paths :as delegations]))
 
 (def entitlement-groups-paths
   (branch "/entitlement-groups/"

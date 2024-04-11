@@ -1,16 +1,11 @@
 (ns leihs.admin.state
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [clojure.pprint :refer [pprint]]
    [leihs.core.auth.core :as authorization]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.dom :as dom]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.front :as current-user]
-   [reagent.core :as reagent]
-   [timothypratley.patchin :as patchin]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce global-state* (reagent/atom {:debug false
                                       :users-query-params {}

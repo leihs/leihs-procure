@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
@@ -15,7 +12,7 @@
    [leihs.core.user.front]
    [leihs.core.user.shared :refer [short-id]]
    [react-bootstrap :as react-bootstrap]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id* (reaction (or (-> @routing/state* :route-params :delegation-id)
                            ":delegation-id")))
@@ -110,7 +107,3 @@
                              {:inventory-pool-id @inventory-pool/id*})}]
    [:h1.mt-3 [delegation-name]]
    [:h6 "Inventory Pool " [inventory-pool/name-component]]])
-
-(defn delegation-id-component []
-  [:p "delegation id: " [:span {:style {:font-family "monospace"}} (:id @data*)]])
-

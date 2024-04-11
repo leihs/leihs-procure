@@ -1,8 +1,5 @@
 (ns leihs.admin.resources.inventory.paths
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [bidi.verbose :refer [branch param leaf]]
-   [leihs.core.core :refer [keyword str presence]]))
+  (:require [bidi.verbose :refer [branch leaf]]))
 
 (def paths
   (branch "/inventory/"

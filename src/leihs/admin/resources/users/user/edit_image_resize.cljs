@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.users.user.edit-image-resize
-  (:refer-clojure :exclude [str keyword])
   (:require
    ["@jimp/custom"]
    ["jimp" :as Jimp]))

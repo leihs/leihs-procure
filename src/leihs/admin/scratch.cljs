@@ -1,8 +1,4 @@
-(ns leihs.admin.scratch
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [clojure.string :as string]
-   [leihs.core.core :refer [keyword str presence]]))
+(ns leihs.admin.scratch)
 
 (def pools [{:id "8a4fa6e3-2b36-46b9-9508-212d4f5125c6", :name "AV-Services", :index 1}
             {:id "82a48074-8a4d-5d3b-b1dd-8e35954137e8", :name "AVS-Ausstattung", :index 2}

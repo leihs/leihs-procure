@@ -1,7 +1,5 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups.main
-  (:refer-clojure :exclude [str keyword])
   (:require [cljs.core.async :as async :refer [<! go]]
-            [leihs.admin.common.components.table :as table]
             [leihs.admin.common.http-client.core :as http-client]
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.groups.main :as groups-core]

@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.mail-templates.mail-template.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.components.table :as table]

@@ -1,7 +1,5 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   ["react-bootstrap" :as react-bootstrap :refer [Button]]
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.filter :as filter]
@@ -14,7 +12,6 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.nav :as nav]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.users.user.create :as create]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.resources.users.user.core :as user2]
    [leihs.admin.state :as state]
@@ -83,12 +80,8 @@
 
 ;### groups roles #############################################################
 
-(defn groups-roles-th-component []
-  [:th {:key :groups-roles} " Roles via groups "])
-
 (defn groups-roles-td-component [user]
-  (let [has-a-role? (some->> user :groups_roles vals (reduce #(or %1 %2)))
-        path (partial path :inventory-pool-groups
+  (let [path (partial path :inventory-pool-groups
                       {:inventory-pool-id @inventory-pool/id*})]
     [:td {:key :groups-roles}
      [roles-component
@@ -169,7 +162,6 @@
    [user-th-component
     roles-th-component
     direct-roles-th-component
-    ;; groups-roles-th-component
     suspension-th-component]
    [user-td-component
     roles-td-component
@@ -177,17 +169,6 @@
     groups-roles-td-component
     suspension-td-component]
    :role-filter? true])
-
-(defn create-user []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:className "ml-3"
-         :onClick #(reset! show true)}
-        [icons/add]  " Add User"]
-       [create/dialog {:show @show
-                       :onHide #(reset! show false)}]])))
 
 (defn page []
   [:article.inventory-pool-users

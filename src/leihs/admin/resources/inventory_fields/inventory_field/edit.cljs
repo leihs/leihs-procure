@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.edit
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
@@ -67,4 +66,3 @@
     [:> Button {:type "submit"
                 :form "inventory-field-form"}
      "Save"]]])
-

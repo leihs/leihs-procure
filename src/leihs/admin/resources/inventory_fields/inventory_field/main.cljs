@@ -1,7 +1,5 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [com.rpl.specter :as specter :refer [ALL]]
    [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
@@ -12,14 +10,9 @@
    [leihs.admin.resources.inventory-fields.inventory-field.edit :as edit]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [str]] ;; [leihs.core.core :refer [dissoc-in keyword str presence flip drop-at]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent]))
-
-(comment (specter/select [:data :values specter/ALL #(-> % :value (= "none"))]
-                         ; #(assoc % :label "foo")
-                         @inventory-field-data*))
 
 (defn info-table []
   (let [data @inventory-field/data*]

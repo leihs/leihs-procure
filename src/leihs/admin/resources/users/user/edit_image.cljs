@@ -1,29 +1,19 @@
 (ns leihs.admin.resources.users.user.edit-image
   (:refer-clojure :exclude [str keyword])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.contrib.inflect :refer [pluralize-noun]]
-   [leihs.admin.common.breadcrumbs :as breadcrumbs]
-   [leihs.admin.common.form-components :refer [input-component]]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.users.user.core :as core :refer [user-id*]]
-   [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
-   [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
-   [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
+  (:require [leihs.admin.common.form-components :refer [input-component]]
+            [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
+            [leihs.admin.resources.users.user.edit-image-resize :as image-resize]
+            [leihs.core.core :refer [keyword presence str]]
+            [leihs.core.digest :as digest]
+            [reagent.core :as reagent]))
 
 ;;; image ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn update-img-digest [& args]
+(defn update-img-digest
   "sets img_digest to the md5 hex of the concatenated img256_url and img32_url
-  or to nil if both are empty; call this if either the fields :img256_url or :img32_url
-  have been updated via the form; or via image drop or delete"
+    or to nil if both are empty; call this if either the fields :img256_url or :img32_url
+    have been updated via the form; or via image drop or delete"
+  [& args]
   (swap! data*
          (fn [user-data]
            (assoc user-data
@@ -31,7 +21,7 @@
                                            " "
                                            (:img32_url user-data))
                                       presence
-                                      leihs.core.digest/md5-hex)))))
+                                      digest/md5-hex)))))
 
 (def img-processing* (reagent/atom {}))
 
@@ -69,13 +59,12 @@
 
 (defn handle-img-drop [evt]
   (reset! img-processing* {})
-  (do
-    (allow-drop evt)
-    (.stopPropagation evt)
-    (let [data-transfer (.. evt -dataTransfer)]
-      (if (< 0 (-> data-transfer .-files .-length))
-        (get-file-data data-transfer img-handler)
-        (get-img-data data-transfer img-handler)))))
+  (allow-drop evt)
+  (.stopPropagation evt)
+  (let [data-transfer (.. evt -dataTransfer)]
+    (if (< 0 (-> data-transfer .-files .-length))
+      (get-file-data data-transfer img-handler)
+      (get-img-data data-transfer img-handler))))
 
 (defn handle-img-chosen [evt]
   (reset! img-processing* {})
@@ -152,4 +141,3 @@
              "This field is meant to set and used by syncs via the API. "
              "Some sort of digest based on the original source can hint to prevent unecessary and costly updates of image fields. "
              [:strong "Proceed judiciously when overriding this field manually!"]]]]]])
-

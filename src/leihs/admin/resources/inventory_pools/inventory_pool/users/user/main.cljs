@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
@@ -7,7 +6,6 @@
    [leihs.admin.common.roles.components :as roles-ui]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :refer [roles-update-handler]]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as groups-roles]
@@ -18,10 +16,7 @@
    [leihs.admin.resources.users.user.main :as user-main]
    [leihs.admin.state :as state]
    [leihs.core.core :refer [presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]))
-
-(defonce inventory-pool-user-data* (reagent/atom nil))
+   [leihs.core.routing.front :as routing]))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -86,16 +81,6 @@
    [roles-via-groups-component @user-data*]])
 
 ;;; overview ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn roles-th-component  []
-  [:th.pl-5 {:key :roles} " Roles "])
-
-(defn roles-td-component [group]
-  [:td.pl-5 {:key :roles}
-   [roles-component
-    (get group :roles)
-    :compact true
-    :update-handler #(roles-update-handler % group)]])
 
 (defn groups []
   [:div

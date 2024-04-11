@@ -1,21 +1,19 @@
 (ns leihs.admin.resources.users.user.password-reset.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    ["date-fns" :as date-fns]
    [cljs.core.async :as async :refer [<! go]]
+   [clojure.string :refer [join]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.user.core :as core :refer [user-data*]]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [presence str]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [leihs.core.url.core :as url]
    [qrcode.react :as qrcode-recat]
    [react-bootstrap :as react-bootstrap :refer [Button Modal InputGroup FormControl]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce data* (reagent/atom {}))
 
@@ -57,7 +55,7 @@
       :disabled (not (@data* :token))
       :href (str "mailto:" email-address
                  "?subject=" (url/encode "Password Reset for Leihs")
-                 "&body=" (url/encode (clojure.string/join
+                 "&body=" (url/encode (join
                                        "\n"
                                        [(str "Click on " (reset-full-url (:token @data*)))
                                         "" "" "or visit "  " " (str "  " (reset-path-url))

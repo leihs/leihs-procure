@@ -1,7 +1,4 @@
 (ns leihs.admin.resources.system.authentication-systems.main
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.filter :as filter]
@@ -13,19 +10,18 @@
    [leihs.admin.resources.system.authentication-systems.shared :as shared]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
-(def current-query-paramerters*
+(def current-query-parameters*
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
 (def current-route* (reaction (:route @routing/state*)))
 
-(def current-query-paramerters-normalized*
-  (reaction (shared/normalized-query-parameters @current-query-paramerters*)))
+(def current-query-parameters-normalized*
+  (reaction (shared/normalized-query-parameters @current-query-parameters*)))
 
 (def data* (reagent/atom {}))
 
@@ -96,24 +92,14 @@
      [:hr]
      [:h2 "Page Debug"]
      [:div
-      [:h3 "@current-query-paramerters-normalized*"]
-      [:pre (with-out-str (pprint @current-query-paramerters-normalized*))]]
+      [:h3 "@current-query-parameters-normalized*"]
+      [:pre (with-out-str (pprint @current-query-parameters-normalized*))]]
      [:div
       [:h3 "@current-route*"]
       [:pre (with-out-str (pprint @current-route*))]]
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
-
-(defn main-page-content-component []
-  [:div
-   [routing/hidden-state-component
-    {:did-change fetch-authentication-systems}]
-   [filter-component]
-   [table/pagination]
-   [authentication-systems-table-component]
-   [table/pagination]
-   [debug-component]])
 
 (defn page []
   [:article.authentication-systems

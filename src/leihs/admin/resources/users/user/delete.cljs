@@ -1,15 +1,12 @@
 (ns leihs.admin.resources.users.user.delete
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
-   [cljs.pprint :refer [pprint]]
    [clojure.set :refer [rename-keys]]
    [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.user.core :as user-core :refer [user-id*]]
-   [leihs.admin.state :as state]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Modal]]
    [reagent.core :as reagent]))
@@ -89,19 +86,19 @@
     :placeholder "email-address, login, or id, or choose by clicking the button"
     :append target-user-choose-component]])
 
-(defn debug-component []
-  (when (:debug @state/global-state*)
-    [:div
-     [:div.data
-      [:h3 "transfer-data*"]
-      [:pre (with-out-str (pprint @transfer-data*))]]
-     [:div.data
-      [:h3 "transfer-data*"]
-      [:pre (with-out-str
-              (pprint
-               (path :user-transfer-data
-                     {:user-id @user-id*
-                      :target-user-uid (:target-user-uid @transfer-data*)})))]]]))
+#_(defn debug-component []
+    (when (:debug @state/global-state*)
+      [:div
+       [:div.data
+        [:h3 "transfer-data*"]
+        [:pre (with-out-str (pprint @transfer-data*))]]
+       [:div.data
+        [:h3 "transfer-data*"]
+        [:pre (with-out-str
+                (pprint
+                 (path :user-transfer-data
+                       {:user-id @user-id*
+                        :target-user-uid (:target-user-uid @transfer-data*)})))]]]))
 
 (defn dialog [& {:keys [show onHide]
                  :or {show false}}]

@@ -1,6 +1,4 @@
-(ns leihs.admin.resources.groups.group.users.shared
-  (:require
-   [leihs.core.json :as json]))
+(ns leihs.admin.resources.groups.group.users.shared)
 
 (def default-query-params
   {:membership "yes"})

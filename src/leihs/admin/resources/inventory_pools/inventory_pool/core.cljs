@@ -1,12 +1,8 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.core
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
   (:require
-   [cljs.core.async :as async]
+   [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
-   [clojure.string :as str]
+   [clojure.string :refer [join]]
    [leihs.admin.common.components :as components]
    [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
@@ -14,31 +10,17 @@
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [keyword presence str]]
+   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as core-user]
    [leihs.core.user.shared :refer [short-id]]
    [react-bootstrap :as react-bootstrap]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
   (reaction (or (-> @routing/state* :route-params :inventory-pool-id presence)
                 ":inventory-pool-id")))
 
 (defonce data* (reagent/atom nil))
-
-(defonce role-for-inventory-pool* (reaction
-                                   (some->> @core-user/state* :access-rights
-                                            (filter #(= (:inventory_pool_id %) @id*))
-                                            first
-                                            :role
-                                            keyword)))
-
-(defonce edit-mode?*
-  (reaction
-   (and (map? @data*)
-        (boolean ((set '(:inventory-pool-edit :inventory-pool-create))
-                  (:handler-key @routing/state*))))))
 
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -102,7 +84,7 @@
                            :defaultActiveKey active}
    [:> react-bootstrap/Nav.Item
     [:> react-bootstrap/Nav.Link
-     {:href (str/join ["/admin/inventory-pools/" @id*])}
+     {:href (join ["/admin/inventory-pools/" @id*])}
      [icons/inventory-pools]
      " Settings "]]
    [:> react-bootstrap/Nav.Item
@@ -159,13 +141,3 @@
                  [:em (str (:name @data*))]
                  [:span {:style {:font-family "monospace"}} (short-id @id*)])]
      [components/link inner p])])
-
-(defn link-to-legacy-component []
-  [:div
-   (when (= @role-for-inventory-pool* :inventory_manager)
-     [:a {:href (str "/manage/inventory_pools/" @id* "/edit")}
-      "Edit " [name-link-component]
-      " in the leihs-legacy interface. "])])
-
-
-

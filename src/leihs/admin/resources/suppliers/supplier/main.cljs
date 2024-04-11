@@ -1,10 +1,9 @@
 (ns leihs.admin.resources.suppliers.supplier.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.suppliers.supplier.core :as supplier-core :refer [clean-and-fetch data*]]
+   [leihs.admin.resources.suppliers.supplier.core :as supplier-core :refer [clean-and-fetch]]
    [leihs.admin.resources.suppliers.supplier.delete :as delete]
    [leihs.admin.resources.suppliers.supplier.edit :as edit]
    [leihs.admin.resources.suppliers.supplier.items :as items]

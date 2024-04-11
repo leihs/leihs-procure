@@ -53,5 +53,3 @@
    :per-page defaults/PER-PAGE
    :term ""})
 
-(defn normalized-query-parameters [query-params]
-  (merge default-query-params query-params))

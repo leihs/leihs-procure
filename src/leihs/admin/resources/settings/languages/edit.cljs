@@ -34,4 +34,3 @@
     [:> Button {:type "submit"
                 :form "languages-form"}
      "Save"]]])
-

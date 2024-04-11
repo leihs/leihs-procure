@@ -1,19 +1,12 @@
 (ns leihs.admin.resources.groups.group.inventory-pools
   (:refer-clojure :exclude [str keyword])
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
-   [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.roles.components :refer [put-roles< roles-component]]
-   [leihs.admin.common.roles.core :as roles]
+   [leihs.admin.common.roles.components :refer [put-roles<
+                                                roles-component]]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :as group.shared]
-   [leihs.admin.resources.groups.main :as group-main]
-   [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as groups-main]
-   [leihs.admin.state :as state]
-   [leihs.core.core :refer [str]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Alert]]
    [reagent.core :as reagent]))
@@ -40,16 +33,6 @@
 (defn clean-and-fetch [& args]
   (reset! data* nil)
   (fetch-inventory-pools-roles))
-
-(defn inventory-pools-roles-debug-component []
-  [:div
-   (when (:debug @state/global-state*)
-     [:div.inventory-pools-roles-debug
-      [:hr]
-      [:div.inventory-pools-roles-data
-       [:h3 "@data*"]
-       [:pre (with-out-str (pprint @data*))]]])
-   [group.shared/debug-component]])
 
 (defn roles-update-handler [roles row]
   (go (<! (put-roles<

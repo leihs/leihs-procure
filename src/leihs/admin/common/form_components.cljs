@@ -1,21 +1,10 @@
 (ns leihs.admin.common.form-components
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :refer [timeout]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.core.match :refer [match]]
-   [clojure.string :as string]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.paths :refer [path]]
-   [leihs.core.constants :as constants]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+  (:refer-clojure :exclude [str])
+  (:require [clojure.string :as string]
+            [leihs.admin.common.icons :as icons]
+            [leihs.core.constants :as constants]
+            [leihs.core.core :refer [presence str]]
+            [reagent.core :as reagent]))
 
 (def TAB-INDEX constants/TAB-INDEX)
 
@@ -102,51 +91,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn select-component
-  [data* ks options default-option & {:keys [label classes disabled inline-label required]
-                                      :or {label "Select"
-                                           classes []
-                                           disabled false
-                                           required false
-                                           inline-label false}}]
-  (let [id (last ks)
-        options (cond
-                  (map? options) (->> options
-                                      (map (fn [[k v]] [(str k) (str v)]))
-                                      (into {}))
-                  (sequential? options) (->> options
-                                             (map (fn [x]
-                                                    (match x
-                                                      [k v] [(str k) (str v)]
-                                                      :else [(str x) (str x)]))))
-                  :else {"" ""})
-        default-option (or default-option
-                           (-> options first first))]
-    [:div.form-group
-     (when-not inline-label
-       [:label {:for id}
-        (if (= label id)
-          [:strong label]
-          [:span [:strong label] [:small " (" [:span.text-monospace id] ")"]])])
-     [:div.input-group {:id id}
-      (when inline-label
-        [:div.input-group-prepend [:label.input-group-text {:for id} label]])
-      [:select.custom-select
-       {:id id
-        :disabled disabled
-        :required required
-        :value (let [val (get-in @data* ks)]
-                 (if (some #{val} (map first options))
-                   val
-                   default-option))
-        :on-change (fn [e]
-                     (let [val (or (-> e .-target .-value presence) "")]
-                       (swap! data* assoc-in ks val)))}
-       (for [[k n] options]
-         [:option {:key k :value k} n])]]]))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defn submit-component
   [& {:keys [outer-classes btn-classes icon inner disabled]
       :or {outer-classes [:mb-3]
@@ -165,43 +109,12 @@
      icon " " inner]]
    [:div.clearfix]])
 
-(defn create-submit-component [& args]
-  [apply submit-component
-   (concat [:btn-classes [:btn-primary]
-            :icon [icons/add]
-            :inner "Create"]
-           args)])
-
-(defn delete-submit-component []
-  [submit-component
-   :btn-classes [:btn-danger]
-   :icon [icons/delete]
-   :inner "Delete"])
-
 (defn save-submit-component [& args]
   [apply submit-component
    (concat [:btn-classes [:btn-warning]
             :icon [icons/save]
             :inner "Save"]
            args)])
-
-(defn small-save-submit-component [& args]
-  [apply submit-component
-   (concat
-    [:btn-classes [:btn-warning :btn-sm]
-     :icon [icons/save]
-     :inner "Save"]
-    args)])
-
-(defn small-add-submit-component []
-  [:button.btn.btn-primary.btn-sm
-   {:type :submit}
-   [:span [icons/add] " Add "]])
-
-(defn small-remove-submit-component []
-  [:button.btn.btn-warning.btn-sm
-   {:type :submit}
-   [:span [icons/delete] " Remove "]])
 
 ;;;
 

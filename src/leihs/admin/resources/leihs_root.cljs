@@ -1,25 +1,10 @@
 (ns leihs.admin.resources.leihs-root
-  (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async]
-   [cljs.pprint :refer [pprint]]
-
-   [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.breadcrumbs :as breadcrumbs]
-   [leihs.admin.state :as state]
-
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [leihs.core.user.front :as core-user]
-   [reagent.core :as reagent]))
+  (:require [leihs.admin.resources.breadcrumbs :as breadcrumbs]
+            [leihs.core.user.front :as core-user]))
 
 (defn page []
   [:div.home
-   (when-let [user @core-user/state*]
+   (when @core-user/state*
      (breadcrumbs/nav-component
       [[breadcrumbs/leihs-li]]
       [[breadcrumbs/admin-li]

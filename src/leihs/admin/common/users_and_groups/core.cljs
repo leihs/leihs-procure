@@ -1,5 +1,4 @@
 (ns leihs.admin.common.users-and-groups.core
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.form-components :refer [checkbox-component

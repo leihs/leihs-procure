@@ -1,22 +1,15 @@
 (ns leihs.admin.common.roles.components
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [accountant.core :as accountant]
-   [cljs-uuid-utils.core :as uuid]
-   [cljs.core.async :as async]
-   [cljs.core.async :refer [go]]
-   [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]
-   [reagent.core :as reagent :refer [reaction]]
-   [taoensso.timbre :refer []]))
+  (:refer-clojure :exclude [str])
+  (:require [cljs-uuid-utils.core :as uuid]
+            [cljs.core.async :as async :refer [go >! <!]]
+            [cljs.pprint :refer [pprint]]
+            [leihs.admin.common.form-components :as form-components]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.common.icons :as icons]
+            [leihs.admin.common.roles.core :as roles]
+            [leihs.admin.state :as state]
+            [leihs.core.core :refer [str]]
+            [reagent.core :as reagent]))
 
 (defn fetch-roles< [path]
   (let [chan (async/chan)]

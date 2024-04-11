@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.edit
-  (:refer-clojure :exclude [str keyword])
   (:require
    [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
@@ -38,4 +37,3 @@
     [:> Button {:type "submit"
                 :form "auth-form"}
      "Save"]]])
-

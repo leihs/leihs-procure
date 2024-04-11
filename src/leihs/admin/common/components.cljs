@@ -1,16 +1,10 @@
 (ns leihs.admin.common.components
   (:refer-clojure :exclude [str keyword])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]]
-   [reagent.ratom :as ratom :refer [reaction]])
-  (:require
-   [cljs.pprint :refer [pprint]]
-   [clojure.string :as string]
-   [leihs.admin.common.icons :as icons]
-   [leihs.admin.utils.clipboard :as clipboard]
-   [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.front :as routing]))
+  (:require [clojure.string :as string]
+            [leihs.admin.utils.clipboard :as clipboard]
+            [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
+            [leihs.core.core :refer [keyword presence str]]
+            [leihs.core.routing.front :as routing]))
 
 (defn link [inner path]
   (if (not= (:path @routing/state*) path)
@@ -33,9 +27,6 @@
                                (-> user :id)) 32))
     :style {:max-width 32 :max-height 32}}])
 
-(defn pre-component [data]
-  [:pre (with-out-str (pprint data))])
-
 (defn truncated-id-component
   [id & {:keys [key copy-to-clipboard max-length]
          :or {key :id
@@ -54,8 +45,3 @@
              id)]
           (when copy-to-clipboard
             [:sup " " [clipboard/button-tiny id]])])])
-
-(defn truncated-url-component [url & {:keys [max-length]
-                                      :or {max-length 20}}]
-
-  [:a {:href url}])

@@ -1,5 +1,4 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.groups.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [cljs.core.async :refer [<! go]]
    [leihs.admin.common.components.filter :as filter]

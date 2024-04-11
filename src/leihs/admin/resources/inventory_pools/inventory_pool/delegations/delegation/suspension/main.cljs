@@ -1,7 +1,6 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.suspension.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [cljs.core.async :as async :refer [go]]
+   [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]

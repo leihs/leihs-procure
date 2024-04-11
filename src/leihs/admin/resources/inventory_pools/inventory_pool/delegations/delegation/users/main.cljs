@@ -1,11 +1,10 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main
-  (:refer-clojure :exclude [str keyword])
   (:require
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.membership.users.main :as users-membership]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation] ;; [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.main :as dele]
+   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.state :as state]

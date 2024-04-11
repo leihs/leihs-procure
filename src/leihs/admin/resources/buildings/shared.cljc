@@ -2,11 +2,6 @@
   (:require [leihs.admin.constants :as defaults]
             [leihs.core.constants :refer [GENERAL_BUILDING_UUID]]))
 
-(def default-fields
-  #{:id
-    :name
-    :code})
-
 (def default-query-params
   {:page 1
    :per-page defaults/PER-PAGE

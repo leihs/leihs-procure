@@ -1,19 +1,13 @@
 (ns leihs.admin.resources.suppliers.supplier.items
-  (:refer-clojure :exclude [str keyword])
-  (:require
-   [cljs.core.async :as async :refer [<! go]]
-   [cljs.pprint :refer [pprint]]
-   [clojure.string :as string]
-   [leihs.admin.common.components.table :as table]
-   [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :as group.shared]
-   [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.core :refer [str]]
-   [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Alert]]
-   [reagent.core :as reagent]))
+  (:require [cljs.core.async :as async :refer [<! go]]
+            [clojure.string :as string]
+            [leihs.admin.common.components.table :as table]
+            [leihs.admin.common.http-client.core :as http-client]
+            [leihs.admin.paths :as paths :refer [path]]
+            [leihs.admin.utils.misc :refer [wait-component]]
+            [leihs.core.routing.front :as routing]
+            [react-bootstrap :as react-bootstrap :refer [Alert]]
+            [reagent.core :as reagent]))
 
 (defonce data* (reagent/atom nil))
 
@@ -30,16 +24,6 @@
 (defn clean-and-fetch []
   (reset! data* nil)
   (fetch-items))
-
-#_(defn items-debug-component []
-    [:div
-     (when (:debug @state/global-state*)
-       [:div.inventory-pools-roles-debug
-        [:hr]
-        [:div.inventory-pools-roles-data
-         [:h3 "@data*"]
-         [:pre (with-out-str (pprint @data*))]]])
-     [group.shared/debug-component]])
 
 (defn model-name [row]
   (-> row
@@ -82,4 +66,3 @@
                   [:a {:href (item-url row)} (:inventory_code row)]]
                  [:td
                   [:a {:href (model-url row)} (model-name row)]]])}]])])
-
