@@ -80,6 +80,9 @@
 
 ;### groups roles #############################################################
 
+(defn groups-roles-th-component []
+  [:th {:key :groups-roles} " Roles via groups "])
+
 (defn groups-roles-td-component [user]
   (let [path (partial path :inventory-pool-groups
                       {:inventory-pool-id @inventory-pool/id*})]
@@ -162,6 +165,7 @@
    [user-th-component
     roles-th-component
     direct-roles-th-component
+    groups-roles-th-component
     suspension-th-component]
    [user-td-component
     roles-td-component
