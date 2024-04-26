@@ -6,18 +6,13 @@
    [leihs.admin.paths]
    [leihs.admin.routes :as routes]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.db :as db]
    [leihs.core.http-server :as http-server]
    [leihs.core.shutdown :as shutdown]
    [leihs.core.status :as status]
-   [leihs.core.url.http :as http-url]
    [leihs.core.url.jdbc]
-   [leihs.core.url.jdbc :as jdbc-url]
    [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
-   [logbug.thrown :as thrown]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [taoensso.timbre :refer [info]]))
 
 (defn run [options]
   (catcher/snatch

@@ -1,16 +1,9 @@
 (ns leihs.admin.resources.inventory-pools.authorization
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [clojure.set :refer [rename-keys]]
-   [compojure.core :as cpj]
    [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.shared :as shared :refer [inventory-pool-path]]
    [leihs.core.auth.core :refer [http-safe?]]
-   [leihs.core.core :refer [keyword str presence]]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]))
+   [leihs.core.core :refer [str]]))
 
 (defn some-lending-manager? [request]
   (if (some
@@ -26,7 +19,7 @@
 (defn pool-access-right-for-route [request]
   (let [inventory-pool-id (-> request :route-params :inventory-pool-id)]
     (->> request :authenticated-entity :access-rights
-         (filter #(= (str (:inventory_pool_id %)) inventory-pool-id))
+         (filter #(= (:inventory_pool_id %) inventory-pool-id))
          first)))
 
 (defn pool-lending-manager? [request]

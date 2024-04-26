@@ -1,38 +1,31 @@
 (ns leihs.admin.resources.settings.misc.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [clojure.string :as string]
-   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
    [leihs.admin.utils.jdbc :as utils-jdbc]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-   [leihs.core.sql :as sql]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]))
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+   [taoensso.timbre :refer [debug]]))
 
-(defn get-misc-settings [{tx :tx}]
+(defn get-misc-settings [{tx :tx-next}]
   {:body (-> (sql/select :*)
              (sql/from :settings)
-             sql/format
-             (->> (jdbc/query tx) first)
+             sql-format
+             (->> (jdbc-query tx) first)
              (or (throw (ex-info "misc-settings not found" {:status 404})))
              (dissoc :id))})
 
-(defn upsert [{tx :tx data :body :as request}]
-  (utils-jdbc/insert-or-update! tx :settings ["id = 0"] data)
-  (get-misc-settings request))
+(defn upsert [{tx :tx-next data :body :as request}]
+  (-> data
+      (dissoc :updated_at :created_at)
+      (->> (utils-jdbc/insert-or-update! tx :settings ["id = 0"])))
+  (-> (get-misc-settings request) (assoc :status 200)))
 
-(def misc-settings-path (path :misc-settings {}))
-
-(def routes
-  (-> (cpj/routes
-       (cpj/GET misc-settings-path [] #'get-misc-settings)
-       (cpj/PATCH misc-settings-path [] #'upsert)
-       (cpj/PUT misc-settings-path [] #'upsert))))
+(defn routes [request]
+  (case (:request-method request)
+    :get (get-misc-settings request)
+    :patch (upsert request)
+    :put (upsert request)))
 
 ;#### debug ###################################################################
 

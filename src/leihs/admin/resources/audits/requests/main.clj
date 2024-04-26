@@ -1,22 +1,14 @@
 (ns leihs.admin.resources.audits.requests.main
-  (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
    [clojure.string :as string]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.audits.requests.shared :refer [default-query-params]]
    [leihs.admin.resources.users.user.core :refer [sql-where-unique-user]]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.routing.back :as routing :refer [set-per-page-and-offset wrap-mixin-default-query-params]]
-   [leihs.core.uuid :refer [uuid]]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
-   [next.jdbc :as jdbc]
-   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [leihs.core.core :refer [presence]]
+   [leihs.core.routing.back :as routing :refer [mixin-default-query-params
+                                                set-per-page-and-offset]]
+   [next.jdbc :as jdbc]))
 
 (def auditec-requests-select
   [[:audited_requests.id :id]
@@ -67,11 +59,11 @@
               sql-format
               (->> (jdbc/execute! tx-next)))}})
 
-(def routes
-  (-> (cpj/routes
-        ;(cpj/GET (path :audited-changes-meta {}) [] #'audited-changes-meta)
-       (cpj/GET (path :audited-requests {}) [] #'audited-requests))
-      (wrap-mixin-default-query-params default-query-params)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (-> request
+             (mixin-default-query-params default-query-params)
+             audited-requests)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

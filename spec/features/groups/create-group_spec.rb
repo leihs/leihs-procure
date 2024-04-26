@@ -142,7 +142,7 @@ feature 'Creating groups', type: :feature do
 
         scenario "can create a new group" do
           resp = http_client.post "/admin/groups/", {name: name}.to_json
-          expect(resp.status).to be== 200
+          expect(resp.status).to be== 201
           new_group = Group.where(name: name).first
           expect(new_group).to be
         end
@@ -150,7 +150,7 @@ feature 'Creating groups', type: :feature do
         scenario "can set the admin_protected attribute" do
           resp = http_client.post "/admin/groups/",
             {name: name, admin_protected: true }.to_json
-          expect(resp.status).to be== 200
+          expect(resp.status).to be== 201
           new_group = Group.where(name: name).first
           expect(new_group).to be
         end
@@ -240,7 +240,7 @@ feature 'Creating groups', type: :feature do
         scenario "can create a new group" do
           resp = http_client.post "/admin/groups/",
             {name: name}.to_json
-          expect(resp.status).to be== 200
+          expect(resp.status).to be== 201
           new_group = Group.where(name: name).first
           expect(new_group).to be
         end

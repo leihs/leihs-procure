@@ -1,6 +1,7 @@
 (ns leihs.admin.resources.buildings.shared
-  (:require [leihs.admin.constants :as defaults]
-            [leihs.core.constants :refer [GENERAL_BUILDING_UUID]]))
+  (:require
+   [leihs.admin.constants :as defaults]
+   [leihs.core.constants :refer [GENERAL_BUILDING_UUID]]))
 
 (def default-query-params
   {:page 1

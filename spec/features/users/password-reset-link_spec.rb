@@ -45,7 +45,7 @@ shared_examples :create_password_reset_link_via_api do
     url = "/admin/users/#{target_user[:id]}/password-reset"
     payload = {valid_for_hours: 48}
     resp = @http_client.post url, payload.to_json
-    expect(resp.status).to be== 200
+    expect(resp.status).to be== 201
     expect(resp.body['token']).to be
     expect(resp.body['user_id']).to be== target_user[:id]
     expect( DateTime.parse(resp.body['valid_until']) ).to be>= Time.now + 2.days - 1.hour
@@ -124,6 +124,3 @@ feature "Password Reset Link" do
     end
   end
 end
-
-
-

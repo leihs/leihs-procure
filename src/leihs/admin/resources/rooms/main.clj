@@ -2,18 +2,13 @@
   (:refer-clojure :exclude [str keyword])
   (:require
    [clojure.set]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.rooms.room.main :as room]
    [leihs.admin.resources.rooms.shared :as shared]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [keyword presence str]]
    [leihs.core.uuid :refer [uuid]]
-   [logbug.debug :as debug]
-   [next.jdbc.sql :as jdbc]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :as jdbc]))
 
 (def count-items-select-query
   (-> (sql/select :%count.*)
@@ -100,18 +95,16 @@
                               (-> data
                                   (select-keys shared/default-fields)
                                   (update :building_id uuid)))]
-    {:body room}
+    {:status 201, :body room}
     {:status 422
      :body "No room has been created."}))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def rooms-path (path :rooms))
-
-(def routes
-  (cpj/routes
-   (cpj/GET rooms-path [] #'rooms)
-   (cpj/POST rooms-path [] #'create-room)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (rooms request)
+    :post (create-room request)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

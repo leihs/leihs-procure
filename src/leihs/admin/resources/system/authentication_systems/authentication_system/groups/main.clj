@@ -1,26 +1,23 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.groups.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [clojure.set :as set]
-   [compojure.core :as cpj]
+   [bidi.bidi :refer [match-route]]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.membership.groups.main :refer [extend-with-membership]]
-   [leihs.admin.paths :refer [path]]
+   [leihs.admin.paths :refer [paths]]
    [leihs.admin.resources.groups.main :as groups]
    [leihs.admin.utils.jdbc :as utils.jdbc]
-   [leihs.admin.utils.regex :as regex]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [delete! query] :rename {query jdbc-query, delete! jdbc-delete!}]))
 
 (defn member-expr [authentication-system-id]
   [:exists
    (-> (sql/select true)
        (sql/from [:authentication_systems_groups :asgs])
-       (sql/merge-where [:= :groups.id :asgs.group_id])
-       (sql/merge-where [:= :asgs.authentication_system_id
-                         authentication-system-id]))])
+       (sql/where [:= :groups.id :asgs.group_id])
+       (sql/where [:= :asgs.authentication_system_id
+                   authentication-system-id]))])
 
 (defn groups-query
   [{{authentication-system-id :authentication-system-id} :route-params
@@ -29,21 +26,21 @@
       (extend-with-membership  (member-expr authentication-system-id) request)))
 
 (defn groups-formated-query [request]
-  (-> request groups-query sql/format))
+  (-> request groups-query sql-format))
 
-(defn groups [{tx :tx :as request}]
+(defn groups [{tx :tx-next :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body
-     {:groups (-> query sql/format
+     {:groups (-> query sql-format
                   (->>
-                   (jdbc/query tx)
+                   (jdbc-query tx)
                    (seq/with-index offset)
                    seq/with-page-index))}}))
 
 ;;; put-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-group [{tx :tx :as request
+(defn put-group [{tx :tx-next :as request
                   body :body
                   {authentication-system-id :authentication-system-id
                    group-id :group-id} :route-params}]
@@ -55,32 +52,24 @@
 
 ;;; remove-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-group [{tx :tx :as request
+(defn remove-group [{tx :tx-next :as request
                      {group-id :group-id
                       authentication-system-id :authentication-system-id} :route-params}]
   (if (= 1 (->> ["group_id = ? AND authentication_system_id = ?"
                  group-id authentication-system-id]
-                (jdbc/delete! tx :authentication_systems_groups)
-                first))
+                (jdbc-delete! tx :authentication_systems_groups)
+                ::jdbc/update-count))
     {:status 204}
     (throw (ex-info "Remove authentication_systems_groups failed" {:status 409}))))
 
 ;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def authentication-system-group-path
-  (path :authentication-system-group
-        {:authentication-system-id ":authentication-system-id"
-         :group-id ":group-id"}))
-
-(def authentication-system-groups-path
-  (path :authentication-system-groups
-        {:authentication-system-id ":authentication-system-id"}))
-
-(def routes
-  (-> (cpj/routes
-       (cpj/PUT authentication-system-group-path [] #'put-group)
-       (cpj/DELETE authentication-system-group-path [] #'remove-group)
-       (cpj/GET authentication-system-groups-path [] #'groups))))
+(defn routes [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (case [(:request-method request) handler-key]
+      [:get :authentication-system-groups] (groups request)
+      [:put :authentication-system-group] (put-group request)
+      [:delete :authentication-system-group] (remove-group request))))
 
 ;#### debug ###################################################################
 

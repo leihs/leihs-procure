@@ -1,21 +1,25 @@
 (ns leihs.admin.resources.groups.group.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.java.jdbc :as jdbc]
+   [bidi.bidi :refer [match-route]]
+   [clojure.core.match :refer [match]]
    [clojure.set :as set]
-   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.users-and-groups.core :as  users-and-groups]
-   [leihs.admin.paths :refer [path]]
+   [leihs.admin.paths :refer [path paths]]
    [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.utils.jdbc :as utils.jdbc]
-   [leihs.admin.utils.regex :as regex]
    [leihs.admin.utils.seq :as seq]
    [leihs.core.auth.core :as auth]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [leihs.core.core :refer [presence str]]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [delete! insert-multi! query] :rename {delete! jdbc-delete!,
+                                                                insert-multi! jdbc-insert-multi!,
+                                                                query jdbc-query}]
+   [taoensso.timbre :refer [spy]]))
 
 (defn protected-checked-group! [request]
   (let [group (-> request group/get-group :body)]
@@ -31,18 +35,17 @@
   "Get the id, i.e. the pkey, given either the id or the org_id and
   enforce some sanity checks like uniqueness and presence"
   (assert (presence group-id) "group-id must not be empty!")
-  (let [group-id (str group-id)
-        where-clause  (if (re-matches regex/uuid-pattern group-id)
+  (let [where-clause  (if (instance? java.util.UUID group-id)
                         [:or
                          [:= :groups.id group-id]
-                         [:= :groups.org_id group-id]]
-                        [:= :groups.org_id group-id])
-        ids (->> (-> (sql/select :id)
-                     (sql/from :groups)
-                     (sql/merge-where where-clause)
-                     sql/format)
-                 (jdbc/query tx)
-                 (map :id))]
+                         [:= :groups.org_id (str group-id)]]
+                        [:= :groups.org_id (str group-id)])
+        ids (-> (sql/select :id)
+                (sql/from :groups)
+                (sql/where where-clause)
+                sql-format
+                (->> (jdbc-query tx)
+                     (map :id)))]
     (assert (= 1 (count ids))
             "exactly one group must match the given group-id either by id or org_id")
     (first ids)))
@@ -51,11 +54,11 @@
 
 (defn base-users-query [group-id request]
   (-> request users/users-query
-      (sql/merge-left-join :groups_users
-                           [:and
-                            [:= :groups_users.user_id :users.id]
-                            [:= :groups_users.group_id group-id]])
-      (sql/merge-select [:groups_users.group_id :group_id])))
+      (sql/left-join :groups_users
+                     [:and
+                      [:= :groups_users.user_id :users.id]
+                      [:= :groups_users.group_id group-id]])
+      (sql/select [:groups_users.group_id :group_id])))
 
 (defn users-query [group-id {query-params :query-params :as request}]
   (let [query (base-users-query group-id request)]
@@ -63,17 +66,17 @@
               (-> default-query-params :membership))
       "any" query
       ("yes" "member")  (-> query
-                            (sql/merge-where
+                            (sql/where
                              [:= :groups_users.group_id group-id])))))
 
 (defn users [{{group-id :group-id} :route-params
-              tx :tx :as request}]
+              tx :tx-next :as request}]
   (let [group-id (normalized-group-id! group-id tx)
         query (users-query group-id request)
         offset (:offset query)]
     {:body
-     {:users  (-> query sql/format
-                  (->> (jdbc/query tx)
+     {:users  (-> query sql-format
+                  (->> (jdbc-query tx)
                        (seq/with-index offset)
                        seq/with-page-index))}}))
 
@@ -84,14 +87,13 @@
   group-id must be an existing id (pkey) of a group"
   (->> (-> (sql/select :user_id)
            (sql/from :groups_users)
-           (sql/merge-where [:= :group_id group-id])
-           (sql/format))
-       (jdbc/query tx)
+           (sql/where [:= :group_id group-id])
+           (sql-format))
+       (jdbc-query tx)
        (map :user_id)
-       (map str)
        set))
 
-(defn batch-update-users [{tx :tx body :body
+(defn batch-update-users [{tx :tx-next body :body
                            {group-id :group-id} :route-params
                            :as request}]
   (when-let [extra-keys (some-> body keys set (disj :ids) not-empty)]
@@ -105,12 +107,12 @@
         to-be-added-ids (set/difference target-ids existing-ids)]
     (when-not (empty? to-be-removed-ids)
       (->> (-> (sql/delete-from :groups_users)
-               (sql/merge-where [:= :group_id group-id])
-               (sql/merge-where [:in :user_id to-be-removed-ids])
-               (sql/format))
+               (sql/where [:= :group_id group-id])
+               (sql/where [:in :user_id to-be-removed-ids])
+               (sql-format))
            (jdbc/execute! tx)))
     (when-not (empty? to-be-added-ids)
-      (jdbc/insert-multi! tx :groups_users
+      (jdbc-insert-multi! tx :groups_users
                           (->> to-be-added-ids
                                (map (fn [id] {:group_id group-id
                                               :user_id id})))))
@@ -120,7 +122,7 @@
 
 ;;; put-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-user [{tx :tx :as request
+(defn put-user [{tx :tx-next :as request
                  {group-id :group-id
                   user-id :user-id} :route-params}]
   (let [group (protected-checked-group! request)
@@ -132,14 +134,14 @@
 
 ;;; remove-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-user [{tx :tx :as request
+(defn remove-user [{tx :tx-next :as request
                     {group-id :group-id
                      user-id :user-id} :route-params}]
   (let [group (protected-checked-group! request)
         group-id (:id group)]
     (if (= 1 (->> ["group_id = ? AND user_id = ?" group-id user-id]
-                  (jdbc/delete! tx :groups_users)
-                  first))
+                  (jdbc-delete! tx :groups_users)
+                  ::jdbc/update-count))
       {:status 204}
       (throw (ex-info (str "Remove group-user failed. "
                            "It seems the user is not a member of the group.")
@@ -153,12 +155,13 @@
 (def group-users-path
   (path :group-users {:group-id ":group-id"}))
 
-(def routes
-  (cpj/routes
-   (cpj/PUT group-user-path [] #'put-user)
-   (cpj/DELETE group-user-path [] #'remove-user)
-   (cpj/GET group-users-path [] #'users)
-   (cpj/PUT group-users-path [] #'batch-update-users)))
+(defn routes [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (match [(:request-method request) handler-key]
+      [:put :group-user] (put-user request)
+      [:delete :group-user] (remove-user request)
+      [:get :group-users] (users request)
+      [:put :group-users] (batch-update-users request))))
 
 ;#### debug ###################################################################
 

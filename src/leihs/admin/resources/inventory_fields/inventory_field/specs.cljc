@@ -1,8 +1,9 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.specs
-  (:require [clojure.set :refer [union difference]]
-            [clojure.spec.alpha :as s]
-            [clojure.string :refer [blank? lower-case]]
-            [leihs.core.core :refer [presence?]]))
+  (:require
+   [clojure.set :refer [union]]
+   [clojure.spec.alpha :as s]
+   [clojure.string :refer [blank? lower-case]]
+   [leihs.core.core :refer [presence?]]))
 
 (def simple-types #{"date" "text" "textarea"})
 (def advanced-types #{"checkbox" "radio" "select"})

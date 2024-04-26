@@ -1,9 +1,6 @@
 (ns leihs.admin.routes
   (:refer-clojure :exclude [str keyword])
   (:require
-   [bidi.bidi :as bidi]
-   [bidi.ring :refer [make-handler]]
-   [compojure.core :as cpj]
    [leihs.admin.html :as html]
    [leihs.admin.paths :refer [path paths]]
    [leihs.admin.resources.audits.changes.change.main :as audited-change]
@@ -29,6 +26,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups-roles.main :as inventory-pool-user-groups-roles]
@@ -60,10 +58,10 @@
    [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
    [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
+   [leihs.admin.utils.params :as params]
    [leihs.core.anti-csrf.back :as anti-csrf]
    [leihs.core.auth.core :as auth]
-   [leihs.core.constants :as constants]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [keyword presence]]
    [leihs.core.db :as db]
    [leihs.core.http-cache-buster2 :as cache-buster :refer [wrap-resource]]
    [leihs.core.json :as json]
@@ -75,17 +73,14 @@
    [leihs.core.routing.dispatch-content-type :as dispatch-content-type]
    [leihs.core.settings :as settings]
    [leihs.core.status :as status]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug :refer [I>]]
+   [logbug.debug :refer [I>]]
    [logbug.ring :refer [wrap-handler-with-logging]]
-   [logbug.thrown :as thrown]
    [ring.middleware.accept]
    [ring.middleware.content-type :refer [wrap-content-type]]
    [ring.middleware.cookies]
    [ring.middleware.json]
    [ring.middleware.params]
-   [ring.util.response :refer [redirect]]
-   [taoensso.timbre :refer [debug info warn error spy]]))
+   [ring.util.response :refer [redirect]]))
 
 (declare redirect-to-root-handler)
 
@@ -139,7 +134,7 @@
           :group-user {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-users {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :groups {:handler groups/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
-          :inventory-pool {:handler inventory-pools/routes
+          :inventory-pool {:handler inventory-pool/routes
                            :authorizers [auth/admin-scopes?
                                          pool-auth/pool-inventory-manager?
                                          pool-auth/pool-lending-manager-and-http-safe?]}
@@ -182,11 +177,11 @@
           :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
-          :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/groups-roles :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-roles {:handler inventory-pool-user-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user {:handler inventory-pool-user/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-suspension {:handler inventory-pool-user-suspension/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
-          :inventory-pool-users {:handler inventory-pool-users/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-users {:handler inventory-pool-users/users :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pools {:handler inventory-pools/routes
                             :authorizers [auth/admin-scopes?
                                           pool-auth/some-lending-manager-and-http-safe?]}
@@ -287,6 +282,7 @@
   (-> ; I> wrap-handler-with-logging
    routing/dispatch-to-handler
    (auth/wrap resolve-table)
+   params/wrap-decode-and-cast-to-uuids
    wrap-dispatch-content-type
    ring-audits/wrap
    anti-csrf/wrap

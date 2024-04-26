@@ -1,62 +1,53 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.java.jdbc :as jdbc]
    [clojure.set :as set]
    [clojure.set :refer [rename-keys]]
-   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.roles.core :as roles]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.shared :refer [normalized-inventory-pool-id!]]
    [leihs.admin.resources.users.user.main :as root-user]
-   [leihs.admin.utils.jdbc :as utils.jdbc]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [logbug.debug :as debug]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query, delete! jdbc-delete!}]))
 
 (defn contracts-count [inventory-pool-id state]
   (-> (sql/select :%count.*)
       (sql/from :contracts)
-      (sql/merge-where [:= :user_id :users.id])
-      (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
-      (sql/merge-where [:= :state state])))
+      (sql/where [:= :user_id :users.id])
+      (sql/where [:= :inventory_pool_id inventory-pool-id])
+      (sql/where [:= :state state])))
 
 (defn reservations-count [inventory-pool-id state]
   (-> (sql/select :%count.*)
       (sql/from :reservations)
-      (sql/merge-where [:= :user_id :users.id])
-      (sql/merge-where [:= :inventory_pool_id inventory-pool-id])
-      (sql/merge-where [:= :status state])))
+      (sql/where [:= :user_id :users.id])
+      (sql/where [:= :inventory_pool_id inventory-pool-id])
+      (sql/where [:= :status state])))
 
 (defn user-query [inventory-pool-id user-id]
   (-> (root-user/user-query user-id)
-      (sql/merge-select [(contracts-count inventory-pool-id "open") :contracts_open_count])
-      (sql/merge-select [(contracts-count inventory-pool-id "closed") :contracts_closed_count])
-      (sql/merge-select [(reservations-count inventory-pool-id "submitted") :reservations_submitted_count])
-      (sql/merge-select [(reservations-count inventory-pool-id "approved") :reservations_approved_count])
+      (sql/select [(contracts-count inventory-pool-id "open") :contracts_open_count])
+      (sql/select [(contracts-count inventory-pool-id "closed") :contracts_closed_count])
+      (sql/select [(reservations-count inventory-pool-id "submitted") :reservations_submitted_count])
+      (sql/select [(reservations-count inventory-pool-id "approved") :reservations_approved_count])
       identity))
 
 ;;; user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn user [{{inventory-pool-id :inventory-pool-id
               user-id :user-id} :route-params
-             tx :tx :as request}]
+             tx :tx-next :as request}]
   {:body
-   (or (->> (-> (user-query inventory-pool-id user-id) sql/format)
-            (jdbc/query tx) first)
+   (or (->> (-> (user-query inventory-pool-id user-id) sql-format)
+            (jdbc-query tx) first)
        (throw (ex-info "User not found" {:status 404})))})
 
-;;; routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def inventory-pool-user-path
-  (path :inventory-pool-user {:inventory-pool-id ":inventory-pool-id" :user-id ":user-id"}))
-
-(def inventory-pool-users-path
-  (path :inventory-pool-users {:inventory-pool-id ":inventory-pool-id"}))
-
 (def routes
-  (cpj/routes
-   (cpj/GET inventory-pool-user-path [] #'user)))
+  (fn [request]
+    (case (:request-method request)
+      :get (user request))))
 
 ;#### debug ###################################################################
 

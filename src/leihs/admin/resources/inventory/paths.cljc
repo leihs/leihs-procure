@@ -1,5 +1,6 @@
 (ns leihs.admin.resources.inventory.paths
-  (:require [bidi.verbose :refer [branch leaf]]))
+  (:require
+   [bidi.verbose :refer [branch leaf]]))
 
 (def paths
   (branch "/inventory/"

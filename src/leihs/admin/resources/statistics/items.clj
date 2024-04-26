@@ -1,14 +1,11 @@
 (ns leihs.admin.resources.statistics.items
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
    [clojure.set]
-   [compojure.core :as cpj]
-   [leihs.admin.paths :refer [path]]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.resources.statistics.shared :as shared]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]))
 
 ;;; items ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -16,28 +13,28 @@
   [:exists
    (-> (sql/select :1)
        (sql/from :reservations)
-       (sql/merge-where [:= :items.id :reservations.item_id])
-       (sql/merge-where active_reservations_cond))])
+       (sql/where [:= :items.id :reservations.item_id])
+       (sql/where active_reservations_cond))])
 
 (defn merge-select-items [query]
   (-> query
-      (sql/merge-select [(-> (sql/select :%count.*)
-                             (sql/from :items))
-                         :items_count])
-      (sql/merge-select [(-> (sql/select :%count.*)
-                             (sql/from :items)
-                             (sql/merge-where (active_item_cond
-                                               shared/active_reservations_0m_12m_cond)))
-                         :active_items_0m_12m_count])
-      (sql/merge-select [(-> (sql/select :%count.*)
-                             (sql/from :items)
-                             (sql/merge-where (active_item_cond
-                                               shared/active_reservations_12m_24m_cond)))
-                         :active_items_12m_24m_count])))
+      (sql/select [(-> (sql/select :%count.*)
+                       (sql/from :items))
+                   :items_count])
+      (sql/select [(-> (sql/select :%count.*)
+                       (sql/from :items)
+                       (sql/where (active_item_cond
+                                   shared/active_reservations_0m_12m_cond)))
+                   :active_items_0m_12m_count])
+      (sql/select [(-> (sql/select :%count.*)
+                       (sql/from :items)
+                       (sql/where (active_item_cond
+                                   shared/active_reservations_12m_24m_cond)))
+                   :active_items_12m_24m_count])))
 
-(defn routes [{tx :tx :as request}]
-  {:body (-> {} merge-select-items sql/format
-             (->> (jdbc/query tx) first))})
+(defn routes [{tx :tx-next :as request}]
+  {:body (-> {} merge-select-items sql-format
+             (->> (jdbc-query tx) first))})
 
 ;#### debug ###################################################################
 

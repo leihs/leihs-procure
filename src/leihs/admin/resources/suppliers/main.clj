@@ -1,19 +1,14 @@
 (ns leihs.admin.resources.suppliers.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.set]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.suppliers.shared :as shared]
    [leihs.admin.resources.suppliers.supplier.main :as supplier]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence str]]
    [leihs.core.uuid :refer [uuid]]
-   [logbug.debug :as debug]
-   [next.jdbc.sql :as jdbc]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :as jdbc]))
 
 (def suppliers-base-query
   (-> (sql/select-distinct :suppliers.id
@@ -85,18 +80,16 @@
   (if-let [supplier (jdbc/insert! tx-next
                                   :suppliers
                                   (select-keys data supplier/fields))]
-    {:body supplier}
+    {:status 201, :body supplier}
     {:status 422
      :body "No supplier has been created."}))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def suppliers-path (path :suppliers))
-
-(def routes
-  (cpj/routes
-   (cpj/GET suppliers-path [] #'suppliers)
-   (cpj/POST suppliers-path [] #'create-supplier)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (suppliers request)
+    :post (create-supplier request)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

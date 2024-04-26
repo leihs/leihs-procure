@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.settings.paths
   (:require
-   [bidi.verbose :refer [branch  leaf]]))
+   [bidi.verbose :refer [branch leaf]]))
 
 (def paths
   (branch "/settings/"

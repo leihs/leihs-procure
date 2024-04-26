@@ -5,7 +5,7 @@
        [[reagent.ratom :as ratom :refer [reaction]]
         [leihs.core.routing.front :as routing]])
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.core.core :refer [keyword str presence]]))
+   [leihs.core.core :refer [keyword]]))
 
 (def hierarchy
   [:customer

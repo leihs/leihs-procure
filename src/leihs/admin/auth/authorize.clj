@@ -1,6 +1,5 @@
 (ns leihs.admin.auth.authorize
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
    [logbug.catcher :as catcher]
    [logbug.debug :as debug]))

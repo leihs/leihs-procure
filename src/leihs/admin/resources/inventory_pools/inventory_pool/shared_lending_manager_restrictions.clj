@@ -1,12 +1,10 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.shared-lending-manager-restrictions
-  (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.java.jdbc :as jdbc]
+   [honey.sql :refer [format] :rename {format sql-format}]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.resources.inventory-pools.authorization :refer [pool-access-right-for-route]]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
+   [taoensso.timbre :refer [spy]]))
 
 (defn acts-as-lending-manger? [{authenticated-entity :authenticated-entity :as request}]
   (boolean (and (not (:scope_admin_write authenticated-entity))
@@ -30,13 +28,13 @@
 (defn protect-inventory-manager-restriction-by-lending-manager!
   [access-rights-query
    {{inventory-pool-id :inventory-pool-id user-id :user-id group-id :group-id} :route-params
-    tx :tx roles :body :as request}]
+    tx :tx-next roles :body :as request}]
   (assert-roles-structure! roles)
   (when (and (not (:inventory_manager roles))
              (acts-as-lending-manger? request))
     (when-let [existing-access-right (->> (access-rights-query
                                            inventory-pool-id (or group-id  user-id))
-                                          sql/format (jdbc/query tx) first)]
+                                          sql-format (jdbc-query tx) first)]
       (when (= (:role existing-access-right) "inventory_manager")
         (throw
          (ex-info

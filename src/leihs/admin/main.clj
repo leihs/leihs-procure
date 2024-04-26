@@ -8,10 +8,8 @@
    [leihs.admin.run :as run]
    [leihs.core.logging]
    [leihs.core.repl :as repl]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
    [logbug.thrown :as thrown]
-   [taoensso.timbre :refer [debug info warn error]])
+   [taoensso.timbre :refer [info]])
   (:gen-class))
 
 (thrown/reset-ns-filter-regex #"^(leihs|cider)\..*")

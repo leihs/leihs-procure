@@ -1,16 +1,12 @@
 (ns leihs.admin.resources.mail-templates.main
   (:require
    [clojure.set]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.mail-templates.shared :as shared]
    [leihs.admin.utils.seq :as seq]
    [leihs.core.core :refer [presence]]
-   [logbug.debug :as debug]
-   [next.jdbc.sql :as jdbc]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :as jdbc]))
 
 (def mail-templates-base-query
   (-> (sql/select :*)
@@ -82,9 +78,9 @@
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def routes
-  (cpj/routes
-   (cpj/GET (path :mail-templates) [] #'mail-templates)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (mail-templates request)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

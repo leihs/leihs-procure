@@ -3,8 +3,8 @@
   (:require
    [clj-yaml.core :as yaml]
    [clojure.java.io :as io]
-   [leihs.core.core :refer [keyword str presence]]
-   [taoensso.timbre :refer [error warn info debug spy]]
+   [leihs.core.core :refer [str]]
+   [taoensso.timbre :refer [info]]
    [tick.core :as tick]))
 
 (defonce state* (atom {}))

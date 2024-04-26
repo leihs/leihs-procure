@@ -1,20 +1,13 @@
 (ns leihs.admin.resources.rooms.room.main
-  (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.set :refer [rename-keys]]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.rooms.shared :as shared]
-   [leihs.core.auth.core :as auth]
    [leihs.core.uuid :refer [uuid]]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
    [next.jdbc :as jdbc]
-   [next.jdbc.sql :refer [query update! delete! insert!] :rename {query jdbc-query update! jdbc-update! delete! jdbc-delete! insert! jdbc-insert!}]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :refer [insert! query update!] :rename {query jdbc-query,
+                                                          insert! jdbc-insert!,
+                                                          update! jdbc-update!}]))
 
 ;;; room ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -73,13 +66,11 @@
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def room-path (path :room {:room-id ":room-id"}))
-
-(def routes
-  (cpj/routes
-   (cpj/GET room-path [] #'get-room)
-   (cpj/PATCH room-path [] #'patch-room)
-   (cpj/DELETE room-path [] #'delete-room)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (get-room request)
+    :patch (patch-room request)
+    :delete (delete-room request)))
 
 ;#### debug ###################################################################
 

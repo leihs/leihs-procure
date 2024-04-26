@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.system.authentication-systems.paths
   (:require
-   [bidi.verbose :refer [branch param leaf]]))
+   [bidi.verbose :refer [branch leaf param]]))
 
 (def paths
   (branch "/authentication-systems"

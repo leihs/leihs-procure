@@ -1,20 +1,24 @@
 (ns leihs.admin.resources.users.user.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.java.jdbc :as jdbc]
+   [bidi.bidi :refer [match-route]]
+   [clojure.core.match :refer [match]]
    [clojure.set :refer [rename-keys]]
-   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.users-and-groups.core :as users-and-groups]
-   [leihs.admin.paths :refer [path]]
+   [leihs.admin.paths :refer [paths]]
    [leihs.admin.resources.users.choose-core :as choose-core]
    [leihs.admin.resources.users.user.core :refer [sql-merge-unique-user]]
    [leihs.core.auth.core :as auth]
-   [leihs.core.sql :as sql]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
+   [leihs.core.core :refer [presence str]]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [delete! insert! query update!] :rename {query jdbc-query,
+                                                                  insert! jdbc-insert!,
+                                                                  update! jdbc-update!,
+                                                                  delete! jdbc-delete!}]
    [slingshot.slingshot :refer [try+]]
-   [taoensso.timbre :refer [error warn info debug spy]])
+   [taoensso.timbre :refer [warn]])
   (:import
    [java.awt.image BufferedImage]
    [java.io ByteArrayInputStream ByteArrayOutputStream]
@@ -55,11 +59,11 @@
    :zip
    [(-> (sql/select :%count.*)
         (sql/from :contracts)
-        (sql/merge-where [:= :contracts.user_id :users.id]))
+        (sql/where [:= :contracts.user_id :users.id]))
     :contracts_count]
    [(-> (sql/select :%count.*)
         (sql/from :access_rights)
-        (sql/merge-where [:= :access_rights.user_id :users.id]))
+        (sql/where [:= :access_rights.user_id :users.id]))
     :inventory_pool_roles_count]])
 
 (def user-write-keys
@@ -115,12 +119,12 @@
   (-> (apply sql/select user-selects)
       (sql/from :users)
       (sql-merge-unique-user uid)
-      (sql/merge-where [:= :delegator_user_id nil])))
+      (sql/where [:= :delegator_user_id nil])))
 
-(defn get-user [{tx :tx {uid :user-id} :route-params}]
+(defn get-user [{tx :tx-next {uid :user-id} :route-params}]
   {:body
-   (or (->> (-> uid user-query sql/format)
-            (jdbc/query tx) first)
+   (or (->> (-> uid user-query sql-format)
+            (jdbc-query tx) first)
        (throw (ex-info "User not found" {:status 404})))})
 
 ;;; delete user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -154,11 +158,12 @@
                     (:admin_protected user) (throw-forbidden!)
                     :else :OK)))
 
-(defn delete-user [{tx :tx :as request}]
+(defn delete-user [{tx :tx-next :as request}]
   (if-let [user (-> request get-user :body)]
     (do (assert-deletion-permitted! request user)
         (try+
-         (if (= [1] (jdbc/delete! tx :users ["id = ?" (:id user)]))
+         (if (= 1 (::jdbc/update-count
+                   (jdbc-delete! tx :users ["id = ?" (:id user)])))
            {:status 204}
            (throw (ex-info "User deleted failed" {:status 500})))
          (catch #(clojure.string/includes?
@@ -179,18 +184,18 @@
                           [:orders [:user_id]]
                           [:reservations [:user_id :handed_over_by_user_id :returned_to_user_id :delegated_user_id]]]]
     (doseq [field fields]
-      (jdbc/update! tx table
+      (jdbc-update! tx table
                     {(str field) target-user-id}
                     [(str field " = ?") user-id]))))
 
 (defn transfer-data-and-delete-user
   [{{uid :user-id target-user-uid :target-user-uid} :route-params
-    tx :tx :as request}]
+    tx :tx-next :as request}]
   (let [target-user (-> target-user-uid (choose-core/find-user-by-some-uid! tx))
         del-user (->> uid
                       user-query
-                      sql/format
-                      (jdbc/query tx)
+                      sql-format
+                      (jdbc-query tx)
                       first)]
     (when-not del-user
       (throw (ex-info "To be deleted user not found." {:status 404})))
@@ -256,7 +261,7 @@
 (defn password-hash
   ([password tx]
    (->> ["SELECT crypt(?,gen_salt('bf',10)) AS pw_hash" password]
-        (jdbc/query tx)
+        (jdbc-query tx)
         first :pw_hash)))
 
 (defn insert-pw-hash [data tx]
@@ -268,9 +273,7 @@
 
 (defn prepare-write-data [data]
   (-> data
-      spy
       (select-keys user-write-keys)
-      spy
       (rename-keys user-write-keymap)))
 
 (defn protect-admin! [data user]
@@ -296,7 +299,7 @@
                       :organization :org_id])))
 
 (defn patch-user
-  ([{tx :tx data :body :as request}]
+  ([{tx :tx-next data :body :as request}]
    (patch-user (prepare-write-data data) tx request))
   ([data tx request]
    (if-let [user (-> request get-user :body)]
@@ -304,15 +307,16 @@
          (users-and-groups/protect-leihs-core! data)
          (protect-admin-and-system-admin! user request)
          (protect-attribute-de-escalation! user request)
-         (or (= [1] (jdbc/update! tx :users data ["id = ?" (:id user)]))
+         (or (= 1 (::jdbc/update-count
+                   (jdbc-update! tx :users data ["id = ?" (:id user)])))
              (throw (ex-info "Number of updated rows does not equal one." {})))
-         (get-user request))
+         (-> (get-user request) (assoc :status 200)))
      {:status 404})))
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-user
-  ([{tx :tx data :body :as request}]
+  ([{tx :tx-next data :body :as request}]
    (create-user (prepare-write-data data) tx request))
   ([data tx request]
    (users-and-groups/protect-leihs-core! data)
@@ -323,31 +327,25 @@
      (users-and-groups/assert-attributes-are-not-set!
       data system-admin-restricted-attributes))
    (warn data)
-   (if-let [user (first (jdbc/insert! tx :users data))]
-     {:body user}
+   (if-let [user (jdbc-insert! tx :users data)]
+     {:status 201, :body user}
      {:status 422
       :body "No user has been created."})))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def user-path (path :user {:user-id ":user-id"}))
-
-(def user-transfer-path
-  (path :user-transfer-data {:user-id ":user-id"
-                             :target-user-uid ":target-user-uid"}))
-
-(def routes
-  (cpj/routes
-   (cpj/GET user-path [] #'get-user)
-   (cpj/PATCH user-path [] #'patch-user)
-   (cpj/DELETE user-path [] #'delete-user)
-   (cpj/DELETE user-transfer-path [] #'transfer-data-and-delete-user)
-   (cpj/POST (path :users) [] #'create-user)))
+(defn routes [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (match [(:request-method request) handler-key]
+      [:get :user] (get-user request)
+      [:patch :user] (patch-user request)
+      [:delete :user] (delete-user request)
+      [:delete :user-transfer-data] (transfer-data-and-delete-user request)
+      [:post :users] (create-user request))))
 
 ;#### debug ###################################################################
 
 ;(debug/wrap-with-log-debug #'data-url-img->buffered-image)
 ;(debug/wrap-with-log-debug #'buffered-image->data-url-img)
 ;(debug/wrap-with-log-debug #'resized-img)
-
 ;(debug/debug-ns *ns*)

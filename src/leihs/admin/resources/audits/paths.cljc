@@ -1,5 +1,6 @@
 (ns leihs.admin.resources.audits.paths
-  (:require [bidi.verbose :refer [branch leaf param]]))
+  (:require
+   [bidi.verbose :refer [branch leaf param]]))
 
 (def paths
   (branch "/audited"

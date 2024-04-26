@@ -1,39 +1,40 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.users.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [compojure.core :as cpj]
+   [bidi.bidi :refer [match-route]]
+   [clojure.core.match :refer [match]]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.membership.users.main :refer [extend-with-membership]]
-   [leihs.admin.paths :refer [path]]
+   [leihs.admin.paths :refer [path paths]]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.utils.jdbc :as utils.jdbc]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :refer [delete! query] :rename {query jdbc-query, delete! jdbc-delete!}]))
 
 (defn member-expr [delegation-id]
   [:exists
    (-> (sql/select true)
        (sql/from :delegations_users)
-       (sql/merge-where [:= :users.id :delegations_users.user_id])
-       (sql/merge-where [:= :delegations_users.delegation_id delegation-id]))])
+       (sql/where [:= :users.id :delegations_users.user_id])
+       (sql/where [:= :delegations_users.delegation_id delegation-id]))])
 
 (defn direct-member-expr [delegation-id]
   [:exists
    (-> (sql/select true)
        (sql/from :delegations_direct_users)
-       (sql/merge-where [:= :users.id :delegations_direct_users.user_id])
-       (sql/merge-where [:= :delegations_direct_users.delegation_id delegation-id]))])
+       (sql/where [:= :users.id :delegations_direct_users.user_id])
+       (sql/where [:= :delegations_direct_users.delegation_id delegation-id]))])
 
 (defn group-member-expr [delegation-id]
   [:exists
    (-> (sql/select true)
        (sql/from :delegations_groups)
-       (sql/merge-where [:= :delegations_groups.delegation_id delegation-id])
-       (sql/merge-join :groups [:= :delegations_groups.group_id :groups.id])
-       (sql/merge-join :groups_users [:= :groups_users.group_id :groups.id])
-       (sql/merge-where [:= :users.id :groups_users.user_id]))])
+       (sql/where [:= :delegations_groups.delegation_id delegation-id])
+       (sql/join :groups [:= :delegations_groups.group_id :groups.id])
+       (sql/join :groups_users [:= :groups_users.group_id :groups.id])
+       (sql/where [:= :users.id :groups_users.user_id]))])
 
 (defn users-query [{{delegation-id :delegation-id} :route-params
                     :as request}]
@@ -47,20 +48,20 @@
 (defn users-formated-query [request]
   (-> request
       users-query
-      sql/format))
+      sql-format))
 
-(defn users [{tx :tx :as request}]
+(defn users [{tx :tx-next :as request}]
   (let [query (users-query request)
         offset (:offset query)]
     {:body
-     {:users (-> query sql/format
-                 (->> (jdbc/query tx)
+     {:users (-> query sql-format
+                 (->> (jdbc-query tx)
                       (seq/with-index offset)
                       seq/with-page-index))}}))
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-user [{tx :tx :as request
+(defn put-user [{tx :tx-next :as request
                  {delegation-id :delegation-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
@@ -70,12 +71,12 @@
 
 ;;; remove ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-user [{tx :tx :as request
+(defn remove-user [{tx :tx-next :as request
                     {delegation-id :delegation-id
                      user-id :user-id} :route-params}]
   (if (= 1 (->> ["delegation_id = ? AND user_id = ?" delegation-id user-id]
-                (jdbc/delete! tx :delegations_direct_users)
-                first))
+                (jdbc-delete! tx :delegations_direct_users)
+                ::jdbc/update-count))
     {:status 204}
     (throw (ex-info "Remove delegation-user failed" {:request request}))))
 
@@ -92,11 +93,12 @@
         {:inventory-pool-id ":inventory-pool-id"
          :delegation-id ":delegation-id"}))
 
-(def routes
-  (cpj/routes
-   (cpj/PUT delegation-user-path [] #'put-user)
-   (cpj/DELETE delegation-user-path [] #'remove-user)
-   (cpj/GET delegation-users-path [] #'users)))
+(defn routes [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (match [(:request-method request) handler-key]
+      [:put :inventory-pool-delegation-user] (put-user request)
+      [:delete :inventory-pool-delegation-user] (remove-user request)
+      [:get :inventory-pool-delegation-users] (users request))))
 
 ;#### debug ###################################################################
 

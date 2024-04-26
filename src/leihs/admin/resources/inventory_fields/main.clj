@@ -1,22 +1,19 @@
 (ns leihs.admin.resources.inventory-fields.main
   (:refer-clojure :exclude [str keyword])
   (:require
+   [bidi.bidi :refer [match-route]]
+   [clojure.core.match :refer [match]]
    [clojure.spec.alpha :as spec]
    [clojure.string :as string]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
+   [leihs.admin.paths :refer [paths]]
    [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
    [leihs.admin.resources.inventory-fields.shared :as shared]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
+   [leihs.core.core :refer [presence str]]
    [leihs.core.db :as db]
-   [leihs.core.uuid :refer [uuid]]
-   [logbug.debug :as debug]
-   [next.jdbc.sql :as jdbc]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :as jdbc]))
 
 (def inventory-fields-base-query
   (-> (sql/select :fields.id :fields.dynamic :fields.active :fields.data)
@@ -135,21 +132,22 @@
                              (->> (spec/assert ::field-specs/new-dynamic-field))
                              (merge field-specs/new-dynamic-field-constant-defaults)
                              (assoc :id (make-id new-field))))]
-    {:body inventory-field}
+    {:status 201, :body inventory-field}
     {:status 422
      :body "No inventory-field has been created."}))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def inventory-fields-path (path :inventory-fields))
+(defn groups-route [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (match [(:request-method request) handler-key]
+      [:get :inventory-fields-groups] (inventory-fields-groups request))))
 
-(def groups-route
-  (cpj/GET (path :inventory-fields-groups) [] #'inventory-fields-groups))
-
-(def routes
-  (cpj/routes
-   (cpj/GET inventory-fields-path [] #'inventory-fields)
-   (cpj/POST inventory-fields-path [] #'create-inventory-field)))
+(defn routes [request]
+  (let [handler-key (->> request :uri (match-route paths) :handler)]
+    (match [(:request-method request) handler-key]
+      [:get :inventory-fields] (inventory-fields request)
+      [:post :inventory-fields] (create-inventory-field request))))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)

@@ -32,7 +32,7 @@ shared_examples :create_via_api_ok do |extra_props|
   scenario "I can create the a user via the API with extra_props #{extra_props}" do
     properties = BASIC_USER_PROPERTIES.merge(extra_props)
     resp = @http_client.post "/admin/users/", properties.to_json
-    expect(resp.status).to be== 200
+    expect(resp.status).to be== 201
     data = resp.body.with_indifferent_access
     properties.each do |k,v|
       expect(data[k]).to be== properties[k]

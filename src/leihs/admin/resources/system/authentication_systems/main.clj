@@ -1,23 +1,24 @@
 (ns leihs.admin.resources.system.authentication-systems.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
    [clojure.set]
-   [compojure.core :as cpj]
-   [leihs.admin.paths :refer [path]]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
    [leihs.admin.resources.system.authentication-systems.authentication-system.main :as authentication-system]
    [leihs.admin.resources.system.authentication-systems.shared :as shared]
    [leihs.admin.utils.seq :as seq]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [leihs.core.core :refer [keyword presence]]
+   [next.jdbc.sql :refer [query] :rename {query jdbc-query,
+                                          insert! jdbc-insert!,
+                                          update! jdbc-update!,
+                                          delete! jdbc-delete!}]))
 
 (def authentication-systems-base-query
   (-> (apply sql/select shared/default-fields)
-      (sql/merge-select
+      (sql/select
        [(-> (sql/select :%count.*)
             (sql/from :authentication-systems_users)
-            (sql/merge-where
+            (sql/where
              [:= :authentication-systems_users.authentication-system_id :authentication-systems.id]))
         :count_users])
       (sql/from :authentication-systems)
@@ -56,25 +57,23 @@
         (set-per-page-and-offset query-params)
         (select-fields request))))
 
-(defn authentication-systems [{tx :tx :as request}]
+(defn authentication-systems [{tx :tx-next :as request}]
   (let [query (authentication-systems-query request)
         offset (:offset query)]
     {:body
      {:authentication-systems
       (-> query
-          sql/format
-          (->> (jdbc/query tx)
+          sql-format
+          (->> (jdbc-query tx)
                (seq/with-key :id)
                (seq/with-index offset)
                seq/with-page-index))}}))
 
-(def routes
-  (-> (cpj/routes
-       (cpj/GET (path :authentication-systems) [] #'authentication-systems)
-       (cpj/POST (path :authentication-systems) [] #'authentication-system/routes))))
+(defn routes [request]
+  (case (:request-method request)
+    :get (authentication-systems request)
+    :post (authentication-system/create-authentication-system request)))
 
 ;#### debug ###################################################################
 ;(debug/debug-ns *ns*)
 ;(debug/wrap-with-log-debug #'authentication-systems-formated-query)
-
-

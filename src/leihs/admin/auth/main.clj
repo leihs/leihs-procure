@@ -1,20 +1,11 @@
 (ns leihs.admin.auth.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [clojure.set :refer [rename-keys subset?]]
    [clojure.walk]
-   [compojure.core :as cpj]
    [leihs.admin.auth.authorize :as authorize]
    [leihs.admin.paths :refer [path]]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.constants :refer [USER_SESSION_COOKIE_NAME]]
-   [leihs.core.core :refer [keyword str presence deep-merge]]
-   [leihs.core.sql :as sql]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
-   [pandect.core]
-   [ring.util.response :refer [redirect]]))
+   [leihs.core.core :refer [deep-merge presence str]]
+   [pandect.core]))
 
 (defn redirect-target [{{query-target :target} :query-params}]
   (or (presence query-target)

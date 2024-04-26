@@ -1,19 +1,11 @@
 (ns leihs.admin.html
   (:require
-   [clj-http.client :as client]
    [hiccup.page :refer [html5 include-js]]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.state :refer [state*]]
-   [leihs.admin.utils.release-info :as release-info]
    [leihs.core.http-cache-buster2 :as cache-buster]
    [leihs.core.json :refer [to-json]]
    [leihs.core.remote-navbar.shared :refer [navbar-props]]
-   [leihs.core.url.core :as url]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug :refer [I>]]
-   [logbug.ring :refer [wrap-handler-with-logging]]
-   [logbug.thrown :as thrown]
-   [taoensso.timbre :refer [debug info warn error spy]]))
+   [leihs.core.url.core :as url]))
 
 (defn include-site-css []
   (hiccup.page/include-css

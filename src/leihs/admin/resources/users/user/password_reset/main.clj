@@ -1,20 +1,15 @@
 (ns leihs.admin.resources.users.user.password-reset.main
-  (:refer-clojure :exclude [str keyword])
   (:require
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
-   [leihs.admin.resources.users.main :as users]
-   [leihs.core.core :refer [keyword str presence]]
    [leihs.core.random :refer [base32-crockford-rand-str]]
-   [logbug.debug :as debug]
    [next.jdbc :as jdbc]
    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-   [taoensso.timbre :refer [error warn info debug spy]]
+   [taoensso.timbre :refer [debug]]
    [tick.core :as tick])
-  (:import [java.sql Timestamp]
-           [java.util UUID]))
+  (:import
+   [java.sql Timestamp]
+   [java.util UUID]))
 
 (defn token
   ([] (token 6))
@@ -31,8 +26,8 @@
 (defn user-by-id [tx-next user-id]
   (some-> (sql/select :email :id)
           (sql/from :users)
-          (sql/where [:= :users.id (UUID/fromString user-id)])
-          (sql-format {:inline false})
+          (sql/where [:= :users.id user-id])
+          sql-format
           (->> (jdbc-query tx-next) first)))
 
 (defn create-token
@@ -55,11 +50,11 @@
     {valid-hrs :valid_for_hours} :body tx-next :tx-next :as request}]
   (debug {'user-id user-id 'request request})
   (if-let [user (user-by-id tx-next user-id)]
-    {:body (create-token tx-next valid-hrs user)}
+    {:status 201, :body (create-token tx-next valid-hrs user)}
     (throw (ex-info "taget user not found" {:status 404}))))
 
-(def routes
-  (cpj/routes
-   (cpj/POST (path :user-password-reset {:user-id ":user-id"}) [] #'create)))
+(defn routes [request]
+  (case (:request-method request)
+    :post (create request)))
 
 ;(debug/debug-ns *ns*)

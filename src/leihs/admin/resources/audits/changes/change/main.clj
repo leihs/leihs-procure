@@ -1,16 +1,9 @@
 (ns leihs.admin.resources.audits.changes.change.main
-  (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.core.uuid :refer [uuid]]
-   [logbug.debug :as debug]
-   [next.jdbc :as jdbc]
-   [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc :as jdbc]))
 
 (defn get-change
   [{{id :audited-change-id} :route-params

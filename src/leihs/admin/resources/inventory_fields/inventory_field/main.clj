@@ -1,22 +1,16 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.main
   (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [dissoc-in raise keyword str presence deep-merge]])
   (:require
-   [clojure.set :refer [rename-keys intersection]]
+   [clojure.set :refer [intersection]]
    [clojure.spec.alpha :as spec]
-   [compojure.core :as cpj]
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
-   [leihs.admin.paths :refer [path]]
    [leihs.admin.resources.inventory-fields.inventory-field.specs :as field-specs]
-   [leihs.core.auth.core :as auth]
+   [leihs.core.core :refer [deep-merge dissoc-in raise]]
    [leihs.core.db :as db]
-   [leihs.core.uuid :refer [uuid]]
-   [logbug.catcher :as catcher]
-   [logbug.debug :as debug]
    [next.jdbc :as jdbc]
-   [next.jdbc.sql :refer [query update! delete! insert!] :rename {query jdbc-query update! jdbc-update! delete! jdbc-delete! insert! jdbc-insert!}]
-   [taoensso.timbre :refer [error warn info debug spy]]))
+   [next.jdbc.sql :refer [query update!] :rename {query jdbc-query,
+                                                  update! jdbc-update!}]))
 
 ;;; inventory-field ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -107,14 +101,11 @@
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def inventory-field-path
-  (path :inventory-field {:inventory-field-id ":inventory-field-id"}))
-
-(def routes
-  (cpj/routes
-   (cpj/GET inventory-field-path [] #'get-inventory-field)
-   (cpj/PATCH inventory-field-path [] #'patch-inventory-field)
-   (cpj/DELETE inventory-field-path [] #'delete-inventory-field)))
+(defn routes [request]
+  (case (:request-method request)
+    :get (get-inventory-field request)
+    :patch (patch-inventory-field request)
+    :delete (delete-inventory-field request)))
 
 ;#### debug ###################################################################
 

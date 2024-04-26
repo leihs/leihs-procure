@@ -1,75 +1,65 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.users.user.queries
-  (:refer-clojure :exclude [str keyword])
-  (:require [leihs.core.core :refer [keyword str presence]])
   (:require
-   [leihs.admin.utils.regex :refer [uuid-pattern]]
-
-   [leihs.core.sql :as sql]))
+   [honey.sql.helpers :as sql]))
 
 (def contracts-count
   (-> (sql/select :%count.*)
       (sql/from :contracts)
-      (sql/merge-where [:= :contracts.inventory_pool_id :inventory-pools.id])
-      (sql/merge-where [:= :contracts.user_id :users.id])))
+      (sql/where [:= :contracts.inventory_pool_id :inventory-pools.id])
+      (sql/where [:= :contracts.user_id :users.id])))
 
 (def open-contracts-count
   (-> (sql/select :%count.*)
       (sql/from :contracts)
-      (sql/merge-where [:= :contracts.user_id :users.id])
-      (sql/merge-where [:= :contracts.inventory_pool_id :inventory-pools.id])
-      (sql/merge-where [:= :contracts.state "open"])))
+      (sql/where [:= :contracts.user_id :users.id])
+      (sql/where [:= :contracts.inventory_pool_id :inventory-pools.id])
+      (sql/where [:= :contracts.state "open"])))
 
 (def closed-contracts-count
   (-> (sql/select :%count.*)
       (sql/from :contracts)
-      (sql/merge-where [:= :contracts.user_id :users.id])
-      (sql/merge-where [:= :contracts.inventory_pool_id :inventory-pools.id])
-      (sql/merge-where [:= :contracts.state "closed"])))
+      (sql/where [:= :contracts.user_id :users.id])
+      (sql/where [:= :contracts.inventory_pool_id :inventory-pools.id])
+      (sql/where [:= :contracts.state "closed"])))
 
 (defn contracts-count-per-pool [inventory-pool-id]
   (-> (sql/select :%count.*)
       (sql/from :contracts)
-      (sql/merge-where [:= :contracts.user_id :users.id])
-      (sql/merge-where [:= :contracts.inventory_pool_id inventory-pool-id])))
+      (sql/where [:= :contracts.user_id :users.id])
+      (sql/where [:= :contracts.inventory_pool_id inventory-pool-id])))
 
 (def direct-users-count
   (-> (sql/select :%count.*)
       (sql/from :users_direct_users)
-      (sql/merge-where
-       [:= :users_direct_users.delegation_id
-        :users.id])))
+      (sql/where [:= :users_direct_users.delegation_id :users.id])))
 
 (def groups-count
   (-> (sql/select :%count.*)
       (sql/from :users_groups)
-      (sql/merge-where
-       [:= :users_groups.delegation_id
-        :users.id])))
+      (sql/where [:= :users_groups.delegation_id :users.id])))
 
 (def pools-count
   (-> (sql/select :%count.*)
       (sql/from :access_rights)
-      (sql/merge-where
-       [:= :users.id :access_rights.user_id])))
+      (sql/where [:= :users.id :access_rights.user_id])))
 
 (def users-count
   (-> (sql/select :%count.*)
       (sql/from :users_users)
-      (sql/merge-where
-       [:= :users_users.delegation_id :users.id])))
+      (sql/where [:= :users_users.delegation_id :users.id])))
 
 (def responsible-user
-  (-> (sql/select (sql/raw "json_build_object('id', id, 'email', email, 'firstname', firstname, 'lastname', lastname, 'img32_url', img32_url) "))
+  (-> (sql/select [[:raw "json_build_object('id', id, 'email', email, 'firstname', firstname, 'lastname', lastname, 'img32_url', img32_url) "]])
       (sql/from :users)
-      (sql/merge-where [:= :users.id :users.delegator_user_id])))
+      (sql/where [:= :users.id :users.delegator_user_id])))
 
 (defn find-responsible-user [unique-id]
   (-> (sql/select :*)
       (sql/from :users)
-      (sql/merge-where [:= nil :delegator_user_id])
-      (sql/merge-where
+      (sql/where [:= nil :delegator_user_id])
+      (sql/where
        [:or
         (when (clojure.string/includes? unique-id "@")
-          [:= (sql/call :lower :users.email) (sql/call :lower unique-id)])
-        (when (re-matches uuid-pattern unique-id)
+          [:= [:lower :users.email] [:lower unique-id]])
+        (when (instance? java.util.UUID unique-id)
           [:= :users.id unique-id])])))

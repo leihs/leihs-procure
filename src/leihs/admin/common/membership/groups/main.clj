@@ -1,13 +1,9 @@
 (ns leihs.admin.common.membership.groups.main
   (:refer-clojure :exclude [str keyword])
   (:require
-   [clojure.java.jdbc :as jdbc]
-   [compojure.core :as cpj]
+   [honey.sql.helpers :as sql]
    [leihs.admin.common.membership.groups.shared :as shared]
-   [leihs.admin.paths :refer [path]]
-   [leihs.core.core :refer [keyword str presence]]
-   [leihs.core.sql :as sql]
-   [logbug.debug :as debug]))
+   [leihs.core.core :refer [presence str]]))
 
 (defn filter-by-membership
   [query member-expr request]
@@ -15,15 +11,15 @@
              shared/default-query-params
              (:query-params request))
             :membership presence str)
-    ("" "member") (sql/merge-where query member-expr)
+    ("" "member") (sql/where query member-expr)
     "any" query
-    "non" (sql/merge-where query [:not member-expr])))
+    "non" (sql/where query [:not member-expr])))
 
 (defn extend-with-membership [query member-expr request]
   (-> query
-      (sql/merge-select [(sql/call :case
-                                   member-expr true
-                                   :else false) :member])
+      (sql/select [[:case
+                    member-expr true
+                    :else false] :member])
       (filter-by-membership member-expr request)))
 
 ;#### debug ###################################################################
