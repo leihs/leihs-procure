@@ -24,7 +24,7 @@
   [context args value]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (organizations-query context args value)))
 
 (defn delete-unused

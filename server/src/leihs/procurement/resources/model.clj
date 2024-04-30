@@ -18,6 +18,6 @@
   [context _ value]
   (get-model-by-id (-> context
                        :request
-                       :tx-next)
+                       :tx)
                    (or (:value value) ; for RequestFieldModel
                        (:model_id value))))

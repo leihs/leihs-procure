@@ -267,7 +267,7 @@
 (defn get-new
   [context args value]
   (let [ring-req (:request context)
-        tx (:tx-next ring-req)
+        tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         user-arg (:user args)
         req-stub (cond-> args
@@ -342,7 +342,7 @@
 (defn change-budget-period!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx-next ring-req)
+        tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -376,7 +376,7 @@
 (defn change-category!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx-next ring-req)
+        tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -405,7 +405,7 @@
 (defn create-request!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx-next ring-req)
+        tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         attachments (:attachments input-data)
@@ -451,7 +451,7 @@
 (defn update-request!
   [context args _]
   (let [ring-req (:request context)
-        tx (:tx-next ring-req)
+        tx (:tx ring-req)
         auth-entity (:authenticated-entity ring-req)
         input-data (:input_data args)
         req-id (:id input-data)
@@ -496,7 +496,7 @@
 (defn delete-request!
   [context args _]
   (let [ring-request (:request context)
-        tx (:tx-next ring-request)
+        tx (:tx ring-request)
         auth-entity (:authenticated-entity ring-request)
         req-id (-> args
                    :input_data
@@ -509,7 +509,7 @@
      #(let [result (jdbc/execute-one! tx
                                       (-> (sql/delete-from :procurement_requests)
                                           (sql/where [:= :procurement_requests.id req-id])
-                                          sql-format) {:builder-fn next.jdbc.result-set/as-unqualified-maps})
+                                          sql-format))
             result-count (:next.jdbc/update-count result)]
         (= result-count 1))
      :if-only

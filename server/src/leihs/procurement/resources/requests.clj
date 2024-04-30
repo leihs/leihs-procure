@@ -57,7 +57,7 @@
         search-term (:search arguments)
         order-status (some->> arguments :order_status (map request/to-name-and-lower-case))
         rrequest (:request context)
-        tx (:tx-next rrequest)
+        tx (:tx rrequest)
         advanced-user? (user-perms/advanced? tx
                                              (:authenticated-entity rrequest))
         start-sqlmap (-> (request/requests-base-query-with-state advanced-user?)
@@ -93,7 +93,7 @@
 (defn get-requests
   [context arguments value]
   (let [ring-request (:request context)
-        tx (:tx-next ring-request)
+        tx (:tx ring-request)
         auth-entity (:authenticated-entity ring-request)
         query (as-> context <>
                 (requests-query-map <> arguments value)
@@ -142,7 +142,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx-next)
+                                  :tx)
                               :procurement_requests.requested_quantity
                               (:id value)))
 
@@ -150,7 +150,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx-next)
+                                  :tx)
                               :procurement_requests.approved_quantity
                               (:id value)))
 
@@ -158,7 +158,7 @@
   [context _ value]
   (specific-total-price-cents (-> context
                                   :request
-                                  :tx-next)
+                                  :tx)
                               :procurement_requests.order_quantity
                               (:id value)))
 
@@ -166,7 +166,7 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         bp-id (:id value)]
     (-> :requested_quantity
         (total-price-sqlmap bp-id)
@@ -177,7 +177,7 @@
   [context _ value]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         bp-id (:id value)]
     (-> [[:coalesce
           :procurement_requests.order_quantity

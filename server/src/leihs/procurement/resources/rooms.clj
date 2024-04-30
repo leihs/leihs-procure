@@ -29,5 +29,5 @@
   [context args value]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (sql-format (rooms-query args value))))

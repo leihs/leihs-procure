@@ -13,7 +13,7 @@
   ([context _ _]
    (get-settings (-> context
                      :request
-                     :tx-next)))
+                     :tx)))
   ([tx]
    (-> settings-base-query
        sql-format
@@ -23,7 +23,7 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         input-data (:input_data args)
         inspection-comments (->> input-data
                                  :inspection_comments

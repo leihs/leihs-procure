@@ -42,7 +42,7 @@
   ([context _ _]
    (get-main-categories (-> context
                             :request
-                            :tx-next))))
+                            :tx))))
 
 (defn get-main-categories-by-names
   [tx names]
@@ -56,7 +56,7 @@
   [context args _]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         mcs (:input_data args)]
     (loop [[mc & rest-mcs] mcs]
       (when mc

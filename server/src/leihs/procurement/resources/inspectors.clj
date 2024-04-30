@@ -10,7 +10,7 @@
   [context _ value]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (-> users-base-query
                      (sql/where [:in :users.id (-> (sql/select :pci.user_id)
                                                    (sql/from [:procurement_category_inspectors :pci])

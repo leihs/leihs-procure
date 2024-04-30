@@ -19,7 +19,7 @@
   (jdbc/execute!
    (-> context
        :request
-       :tx-next)
+       :tx)
    (let [search-term (:search_term args)
          term-parts (and search-term
                          (map (fn [part] (str "%" part "%"))

@@ -19,7 +19,7 @@
   [context _ _]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (sql-format admins-base-query)))
 
 (defn delete-all [tx] (->> (sql/delete-from :procurement_admins)
@@ -30,7 +30,7 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         users (:input_data args)]
     (delete-all tx)
     (doseq [d users]

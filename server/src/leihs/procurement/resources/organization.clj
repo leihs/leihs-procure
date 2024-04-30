@@ -59,7 +59,7 @@
   [context _ value]
   (jdbc/execute-one! (-> context
                          :request
-                         :tx-next)
+                         :tx)
                      (-> organization-base-query
                          (sql/where [:= :procurement_organizations.id
                                      (or (:organization_id value)
@@ -88,13 +88,13 @@
        department-query
        (jdbc/execute-one! (-> context
                               :request
-                              :tx-next))))
+                              :tx))))
 
 (defn get-department-of-organization
   [context _ value]
   (let [tx (-> context
                :request
-               :tx-next)]
+               :tx)]
     (->> value
          :parent_id
          (get-department-by-id tx))))

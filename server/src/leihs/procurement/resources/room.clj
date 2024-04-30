@@ -17,5 +17,5 @@
   [context _ value]
   (get-room-by-id (-> context
                       :request
-                      :tx-next)
+                      :tx)
                   (:value value))) ; for RequestFieldRoom

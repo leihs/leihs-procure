@@ -18,6 +18,6 @@
   [context _ value]
   (get-supplier-by-id (-> context
                           :request
-                          :tx-next)
+                          :tx)
                       (or (:value value) ; for RequestFieldSupplier
                           (:supplier_id value))))

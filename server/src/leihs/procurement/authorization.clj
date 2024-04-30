@@ -19,7 +19,7 @@
   [resolver predicates]
   (fn [context args value]
     (let [rrequest (:request context)
-          tx (:tx-next rrequest)
+          tx (:tx rrequest)
           auth-entity (:authenticated-entity rrequest)]
       (if (->> predicates
                (map #(% tx auth-entity))
@@ -94,7 +94,7 @@
   (if (or (skip? (:handler-key request))
           (->> [user-perms/admin? user-perms/inspector? user-perms/viewer?
                 user-perms/requester?]
-               (map #(% (:tx-next request) (:authenticated-entity request)))
+               (map #(% (:tx request) (:authenticated-entity request)))
                (some true?)))
     (handler request)
     {:status 403,

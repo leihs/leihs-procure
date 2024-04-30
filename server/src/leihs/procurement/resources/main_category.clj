@@ -31,7 +31,7 @@
       main-category-query-by-id
       (->> (jdbc/execute! (-> context
                               :request
-                              :tx-next)))
+                              :tx)))
       first))
 
 (defn get-main-category-by-name
@@ -78,7 +78,7 @@
    (jdbc/execute-one!
     (-> context
         :request
-        :tx-next)
+        :tx)
     (-> [:and
          [:not
           [:exists

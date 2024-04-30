@@ -61,7 +61,7 @@
   ([context _ value]
    (get-template-by-id (-> context
                            :request
-                           :tx-next)
+                           :tx)
                        (or (:value value) ; for RequestFieldTemplate
                            (:template_id value))))
   ([tx tmpl]

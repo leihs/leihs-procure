@@ -14,7 +14,7 @@
   [context _ value]
   (jdbc/execute-one! (-> context
                          :request
-                         :tx-next)
+                         :tx)
                      (-> user-base-query
                          (sql/where [:= :users.id (or (:user_id value) ; for
                                          ; RequesterOrganization

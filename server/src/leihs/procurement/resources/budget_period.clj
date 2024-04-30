@@ -22,7 +22,7 @@
   ([context _ value]
    (get-budget-period-by-id (-> context
                                 :request
-                                :tx-next)
+                                :tx)
                             (or (:budget_period_id value)
                                 ; for BudgetLimit
                                 (:value value)
@@ -78,20 +78,20 @@
   [context _ value]
   (:result (-> (jdbc/execute-one! (-> context
                                       :request
-                                      :tx-next) (-> [:and
-                                                     [:not
-                                                      [:exists
-                                                       (-> (sql/select true)
-                                                           (sql/from [:procurement_requests :pr])
-                                                           (sql/where [:= :pr.budget_period_id (:id value)]))]]
-                                                     [:not
-                                                      [:exists
-                                                       (-> (sql/select true)
-                                                           (sql/from [:procurement_budget_limits :pbl])
-                                                           (sql/where [:= :pbl.budget_period_id (:id value)]))]]]
-                                                    (vector :result)
-                                                    sql/select
-                                                    sql-format)))))
+                                      :tx) (-> [:and
+                                                [:not
+                                                 [:exists
+                                                  (-> (sql/select true)
+                                                      (sql/from [:procurement_requests :pr])
+                                                      (sql/where [:= :pr.budget_period_id (:id value)]))]]
+                                                [:not
+                                                 [:exists
+                                                  (-> (sql/select true)
+                                                      (sql/from [:procurement_budget_limits :pbl])
+                                                      (sql/where [:= :pbl.budget_period_id (:id value)]))]]]
+                                               (vector :result)
+                                               sql/select
+                                               sql-format)))))
 
 (defn update-budget-period!
   [tx bp]

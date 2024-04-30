@@ -39,9 +39,9 @@
      []
      (map convert-dates (jdbc/execute! (-> context
                                            :request
-                                           :tx-next) (-> args
-                                                         budget-periods-query
-                                                         sql-format))))))
+                                           :tx) (-> args
+                                                    budget-periods-query
+                                                    sql-format))))))
 
 (defn delete-budget-periods-not-in!
   [tx ids]
@@ -53,7 +53,7 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx-next)
+               :tx)
         bps (:input_data args)
         result (loop [[bp & rest-bps] bps
                       bp-ids []]

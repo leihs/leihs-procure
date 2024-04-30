@@ -56,7 +56,7 @@
     (->> (categories-query context arguments value)
          (jdbc/execute! (-> context
                             :request
-                            :tx-next)))))
+                            :tx)))))
 
 (defn delete-categories-for-main-category-id-and-not-in-ids!
   [tx mc-id ids]
@@ -86,7 +86,7 @@
 (defn update-categories-viewers!
   [context args value]
   (let [request (:request context)
-        tx (:tx-next request)
+        tx (:tx request)
         auth-user (:authenticated-entity request)
         categories (:input_data args)]
     (loop [[c & rest-cs] categories]

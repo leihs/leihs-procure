@@ -24,7 +24,7 @@
   [context args value]
   (jdbc/execute-one! (-> context
                          :request
-                         :tx-next)
+                         :tx)
                      (building-query (:building_id value))))
 
 ;#### debug ###################################################################

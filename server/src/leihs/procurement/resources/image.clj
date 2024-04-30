@@ -25,7 +25,7 @@
       (sql/where [:= :procurement_images.main_category_id id])))
 
 (defn image
-  [{tx :tx-next, {image-id :image-id} :route-params}]
+  [{tx :tx, {image-id :image-id} :route-params}]
   (if-let [i (->> image-id
                   image-query
                   sql-format

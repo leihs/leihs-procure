@@ -20,5 +20,5 @@
   [context args _]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (sql-format (buildings-query args))))

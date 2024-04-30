@@ -19,7 +19,7 @@
       (sql/where [:= :procurement_attachments.id id])))
 
 (defn attachment
-  [{tx :tx-next, {attachment-id :attachment-id} :route-params}]
+  [{tx :tx, {attachment-id :attachment-id} :route-params}]
   (if-let [a (->> (to-uuid attachment-id)
                   attachment-query
                   sql-format

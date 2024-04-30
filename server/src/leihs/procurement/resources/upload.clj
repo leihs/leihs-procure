@@ -50,7 +50,7 @@
       (->> (jdbc/execute-one! tx))))
 
 (defn upload
-  [{params :params, tx :tx-next}]
+  [{params :params, tx :tx}]
   (let [files (:files params)
         files-data (if (vector? files) files [files])]
     (doseq [fd files-data]

@@ -16,7 +16,7 @@
   [context _ _]
   (jdbc/execute! (-> context
                      :request
-                     :tx-next)
+                     :tx)
                  (sql-format requesters-organizations-base-query)))
 
 (defn get-organization-of-requester
@@ -62,7 +62,7 @@
   [context args value]
   (let [tx (-> context
                :request
-               :tx-next)]
+               :tx)]
     (delete-all tx)
     (doseq [d (:input_data args)] (create-requester-organization tx d))
     (organizations/delete-unused tx)

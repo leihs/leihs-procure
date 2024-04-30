@@ -68,7 +68,7 @@
 (defn get-dashboard
   [ctx args value]
   (let [ring-request (:request ctx)
-        tx (:tx-next ring-request)
+        tx (:tx ring-request)
         cat-ids (:category_id args)
         bp-ids (:budget_period_id args)
         main-cats (-> main-categories/main-categories-base-query
