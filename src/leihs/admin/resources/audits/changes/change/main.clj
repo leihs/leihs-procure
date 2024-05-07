@@ -7,12 +7,12 @@
 
 (defn get-change
   [{{id :audited-change-id} :route-params
-    tx-next :tx-next :as request}]
+    tx :tx :as request}]
   {:body (-> (sql/select :audited_changes.*)
              (sql/from :audited_changes)
              (sql/where [:= :id (uuid id)])
              sql-format
-             (->> (jdbc/execute-one! tx-next)))})
+             (->> (jdbc/execute-one! tx)))})
 
 (defn routes [request]
   (case (:handler-key request)

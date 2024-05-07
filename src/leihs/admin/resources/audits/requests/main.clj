@@ -50,14 +50,14 @@
     (sql/where query [:= :audited_requests.method method])
     query))
 
-(defn audited-requests [{tx-next :tx-next :as request}]
+(defn audited-requests [{tx :tx :as request}]
   {:body {:requests
           (-> requests-base-query
               (filter-by-user-uid request)
               (filter-by-method request)
               (set-per-page-and-offset request)
               sql-format
-              (->> (jdbc/execute! tx-next)))}})
+              (->> (jdbc/execute! tx)))}})
 
 (defn routes [request]
   (case (:request-method request)

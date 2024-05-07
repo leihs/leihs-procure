@@ -76,20 +76,20 @@
         (set-per-page-and-offset query-params)
         (term-filter request))))
 
-(defn buildings [{tx-next :tx-next :as request}]
+(defn buildings [{tx :tx :as request}]
   (let [query (buildings-query request)
         offset (:offset query)]
     {:body
      {:buildings (-> query
                      sql-format
-                     (->> (jdbc/query tx-next)
+                     (->> (jdbc/query tx)
                           (seq/with-index offset)
                           seq/with-page-index))}}))
 
 ;;; create building ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-building [{tx-next :tx-next data :body :as request}]
-  (if-let [building (jdbc/insert! tx-next
+(defn create-building [{tx :tx data :body :as request}]
+  (if-let [building (jdbc/insert! tx
                                   :buildings
                                   (select-keys data building/fields))]
     {:status 201, :body building}

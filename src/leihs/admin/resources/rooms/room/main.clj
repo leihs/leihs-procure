@@ -16,34 +16,34 @@
       (sql/from :rooms)
       (sql/where [:= :id room-id])))
 
-(defn room [tx-next room-id]
+(defn room [tx room-id]
   (-> room-id
       uuid
       room-query
       (sql/select [:general :is_general])
       sql-format
-      (->> (jdbc-query tx-next))
+      (->> (jdbc-query tx))
       first))
 
 (defn get-room
-  [{tx-next :tx-next {room-id :room-id} :route-params}]
-  {:body (room tx-next room-id)})
+  [{tx :tx {room-id :room-id} :route-params}]
+  {:body (room tx room-id)})
 
 ;;; delete group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-room
-  [{tx-next :tx-next {room-id :room-id} :route-params}]
+  [{tx :tx {room-id :room-id} :route-params}]
   (assert room-id)
   (let [room (-> (sql/select :*)
                  (sql/from :rooms)
                  (sql/where [:= :id (uuid room-id)])
                  sql-format
-                 (->> (jdbc-query tx-next))
+                 (->> (jdbc-query tx))
                  first)]
     (when (:general room)
       (throw (ex-info "A general room cannot be deleted." {:status 403}))))
   (if (= (uuid room-id)
-         (:id (jdbc/execute-one! tx-next
+         (:id (jdbc/execute-one! tx
                                  ["DELETE FROM rooms WHERE id = ?" (uuid room-id)]
                                  {:return-keys true})))
     {:status 204}
@@ -52,11 +52,11 @@
 ;;; update room ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-room
-  [{{room-id :room-id} :route-params tx-next :tx-next data :body :as request}]
+  [{{room-id :room-id} :route-params tx :tx data :body :as request}]
   (when (->> ["SELECT true AS exists FROM rooms WHERE id = ?" (uuid room-id)]
-             (jdbc-query tx-next)
+             (jdbc-query tx)
              first :exists)
-    (jdbc-update! tx-next :rooms
+    (jdbc-update! tx :rooms
                   (-> data
                       (select-keys shared/default-fields)
                       (update :building_id uuid)

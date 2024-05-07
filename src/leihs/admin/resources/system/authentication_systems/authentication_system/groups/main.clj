@@ -28,7 +28,7 @@
 (defn groups-formated-query [request]
   (-> request groups-query sql-format))
 
-(defn groups [{tx :tx-next :as request}]
+(defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body
@@ -40,7 +40,7 @@
 
 ;;; put-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-group [{tx :tx-next :as request
+(defn put-group [{tx :tx :as request
                   body :body
                   {authentication-system-id :authentication-system-id
                    group-id :group-id} :route-params}]
@@ -52,7 +52,7 @@
 
 ;;; remove-group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-group [{tx :tx-next :as request
+(defn remove-group [{tx :tx :as request
                      {group-id :group-id
                       authentication-system-id :authentication-system-id} :route-params}]
   (if (= 1 (->> ["group_id = ? AND authentication_system_id = ?"

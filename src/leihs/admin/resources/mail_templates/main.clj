@@ -66,13 +66,13 @@
         (language-locale-filter request)
         (type-filter request))))
 
-(defn mail-templates [{tx-next :tx-next :as request}]
+(defn mail-templates [{tx :tx :as request}]
   (let [query (mail-templates-query request)
         offset (:offset query)]
     {:body
      {:mail-templates (-> query
                           sql-format
-                          (->> (jdbc/query tx-next)
+                          (->> (jdbc/query tx)
                                (seq/with-index offset)
                                seq/with-page-index))}}))
 

@@ -12,7 +12,7 @@
    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]))
 
 (defn audited-changes-meta
-  [{tx :tx-next :as request}]
+  [{tx :tx :as request}]
   {:body
    {:tables
     (->> ["SELECT DISTINCT table_name FROM audited_changes"]
@@ -92,7 +92,7 @@
     (sql/where query [:= :audited_changes.tg_op tg-op])
     query))
 
-(defn audited-changes [{tx :tx-next :as request}]
+(defn audited-changes [{tx :tx :as request}]
   {:body
    {:meta {:tables
            (->> ["SELECT DISTINCT table_name FROM audited_changes"]

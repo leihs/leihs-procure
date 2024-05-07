@@ -52,7 +52,7 @@
        (jdbc-query tx)))
 
 (defn user-inventory-pools
-  [{tx :tx-next data :body {uid :user-id} :route-params}]
+  [{tx :tx data :body {uid :user-id} :route-params}]
   {:body {:user-inventory-pools (inventory-pools uid tx)}})
 
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

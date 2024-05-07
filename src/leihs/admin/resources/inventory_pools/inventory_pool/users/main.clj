@@ -154,7 +154,7 @@
 ;;; users ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn users [{{inventory-pool-id :inventory-pool-id} :route-params
-              tx :tx-next :as request}]
+              tx :tx :as request}]
   (let [inventory-pool-id (normalized-inventory-pool-id! inventory-pool-id tx)
         query (users-query inventory-pool-id request)
         offset (:offset query)]

@@ -34,7 +34,7 @@
   {:body (-> pools-query sql-format
              (->> (jdbc-query tx) first))})
 
-(defn routes [{tx :tx-next :as request}]
+(defn routes [{tx :tx :as request}]
   (get-pools tx))
 
 ;#### debug ###################################################################

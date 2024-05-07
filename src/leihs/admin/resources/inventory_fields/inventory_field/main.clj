@@ -19,43 +19,43 @@
       (sql/from :fields)
       (sql/where [:= :id inventory-field-id])))
 
-(defn inventory-field [tx-next inventory-field-id]
+(defn inventory-field [tx inventory-field-id]
   (-> inventory-field-id
       inventory-field-query
       sql-format
-      (->> (jdbc-query tx-next))
+      (->> (jdbc-query tx))
       first))
 
-(comment (inventory-field (db/get-ds-next) "attachments"))
+(comment (inventory-field (db/get-ds) "attachments"))
 
-(defn usage [tx-next inventory-field]
+(defn usage [tx inventory-field]
   (let [property (-> inventory-field :data :attribute second)]
     (-> (sql/select :%count.*)
         (sql/from :items)
         (sql/where [:raw (format "items.properties::json->>'%s' IS NOT NULL" property)])
         sql-format
-        (->> (jdbc-query tx-next))
+        (->> (jdbc-query tx))
         first
         :count)))
 
 (defn get-inventory-field
-  [{tx-next :tx-next {inventory-field-id :inventory-field-id} :route-params}]
-  (let [inventory-field (inventory-field tx-next inventory-field-id)]
+  [{tx :tx {inventory-field-id :inventory-field-id} :route-params}]
+  (let [inventory-field (inventory-field tx inventory-field-id)]
     {:body {:inventory-field-data inventory-field
             :inventory-field-usage (when (:dynamic inventory-field)
-                                     (usage tx-next inventory-field))}}))
+                                     (usage tx inventory-field))}}))
 
 ;;; delete inventory-field ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-inventory-field
-  [{tx-next :tx-next {inventory-field-id :inventory-field-id} :route-params}]
-  (when-let [field (inventory-field tx-next (assert inventory-field-id))]
+  [{tx :tx {inventory-field-id :inventory-field-id} :route-params}]
+  (when-let [field (inventory-field tx (assert inventory-field-id))]
     (when (or (-> field :dynamic not)
               (-> field :data :required)
-              (->> field (usage tx-next) (> 0)))
+              (->> field (usage tx) (> 0)))
       (raise "This inventory-field cannot be deleted.")))
   (if (= inventory-field-id
-         (:id (jdbc/execute-one! tx-next
+         (:id (jdbc/execute-one! tx
                                  ["DELETE FROM fields WHERE id = ?" inventory-field-id]
                                  {:return-keys true})))
     {:status 204}
@@ -63,10 +63,10 @@
 
 ;;; update inventory-field ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn validated-merge [tx-next old-f new-f]
+(defn validated-merge [tx old-f new-f]
   (let [dynamic? (:dynamic old-f)
         required? (-> old-f :data :required boolean)
-        field-usage (usage tx-next old-f)
+        field-usage (usage tx old-f)
         spec (case [dynamic? required?]
                [true true] ::field-specs/dynamic-required-field
                [true false] ::field-specs/dynamic-not-required-field
@@ -92,10 +92,10 @@
 
 (defn patch-inventory-field
   [{{inventory-field-id :inventory-field-id} :route-params
-    tx-next :tx-next body-data :body :as request}]
-  (when-let [field (inventory-field tx-next inventory-field-id)]
-    (jdbc-update! tx-next :fields
-                  (validated-merge tx-next field body-data)
+    tx :tx body-data :body :as request}]
+  (when-let [field (inventory-field tx inventory-field-id)]
+    (jdbc-update! tx :fields
+                  (validated-merge tx field body-data)
                   ["id = ?" inventory-field-id])
     {:status 204}))
 

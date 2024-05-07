@@ -24,7 +24,7 @@
 
 (defn get-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (let [direct-access-rights (->> (direct-access-rights-query inventory-pool-id user-id)
                                   sql-format (jdbc-query tx) first)
         roles (-> direct-access-rights :role keyword
@@ -34,7 +34,7 @@
 
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next roles :body :as request}]
+    tx :tx roles :body :as request}]
   (protect-inventory-manager-escalation-by-lending-manager! request)
   (protect-inventory-manager-restriction-by-lending-manager! direct-access-rights-query request)
   (if-let [allowed-role-key (some->> roles/allowed-states
@@ -53,7 +53,7 @@
 
 (defn delete-direct-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next body :body :as request}]
+    tx :tx body :body :as request}]
   (jdbc-delete! tx :direct_access_rights ["inventory_pool_id = ? AND user_id = ?" inventory-pool-id user-id])
   {:status 204})
 

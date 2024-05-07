@@ -38,7 +38,7 @@
 
 (defn user [{{inventory-pool-id :inventory-pool-id
               user-id :user-id} :route-params
-             tx :tx-next :as request}]
+             tx :tx :as request}]
   {:body
    (or (->> (-> (user-query inventory-pool-id user-id) sql-format)
             (jdbc-query tx) first)

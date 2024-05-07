@@ -20,25 +20,25 @@
       (sql/from :suppliers)
       (sql/where [:= :id supplier-id])))
 
-(defn supplier [tx-next supplier-id]
+(defn supplier [tx supplier-id]
   (-> supplier-id
       uuid
       supplier-query
       sql-format
-      (->> (jdbc-query tx-next))
+      (->> (jdbc-query tx))
       first))
 
 (defn get-supplier
-  [{tx-next :tx-next {supplier-id :supplier-id} :route-params}]
-  {:body (supplier tx-next supplier-id)})
+  [{tx :tx {supplier-id :supplier-id} :route-params}]
+  {:body (supplier tx supplier-id)})
 
 ;;; delete group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-supplier
-  [{tx-next :tx-next {supplier-id :supplier-id} :route-params}]
+  [{tx :tx {supplier-id :supplier-id} :route-params}]
   (assert supplier-id)
   (if (= (uuid supplier-id)
-         (:id (jdbc/execute-one! tx-next
+         (:id (jdbc/execute-one! tx
                                  ["DELETE FROM suppliers WHERE id = ?" (uuid supplier-id)]
                                  {:return-keys true})))
     {:status 204}
@@ -47,11 +47,11 @@
 ;;; update supplier ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-supplier
-  [{{supplier-id :supplier-id} :route-params tx-next :tx-next data :body :as request}]
+  [{{supplier-id :supplier-id} :route-params tx :tx data :body :as request}]
   (when (->> ["SELECT true AS exists FROM suppliers WHERE id = ?" (uuid supplier-id)]
-             (jdbc-query tx-next)
+             (jdbc-query tx)
              first :exists)
-    (jdbc-update! tx-next :suppliers
+    (jdbc-update! tx :suppliers
                   (select-keys data fields)
                   ["id = ?" (uuid supplier-id)])
     {:status 204}))

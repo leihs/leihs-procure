@@ -66,7 +66,7 @@
 
 (defn entitlement-groups
   [{{inventory-pool-id :inventory-pool-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   {:body
    {:entitlement-groups
     (->> request

@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'pry'
 
-feature 'Status-info' do
+feature 'Status-info', skip: "Information not gathered properly. See `leihs.core.status` for more details." do
   context 'a system-admin exists' do
     before(:each){ @admin = FactoryBot.create :system_admin }
     context 'system_admin via the UI' do

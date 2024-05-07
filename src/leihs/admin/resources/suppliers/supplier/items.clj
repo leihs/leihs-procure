@@ -24,14 +24,14 @@
       (sql/order-by [:inventory_pool_name :asc] [:items.inventory_code :asc])
       sql-format))
 
-(defn supplier-items [tx-next supplier-id]
+(defn supplier-items [tx supplier-id]
   (->> supplier-id
        supplier-items-query
-       (jdbc-query tx-next)))
+       (jdbc-query tx)))
 
 (defn get-supplier-items
-  [{tx-next :tx-next {supplier-id :supplier-id} :route-params}]
-  {:body {:items (supplier-items tx-next supplier-id)}})
+  [{tx :tx {supplier-id :supplier-id} :route-params}]
+  {:body {:items (supplier-items tx supplier-id)}})
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

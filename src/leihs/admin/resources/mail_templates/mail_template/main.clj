@@ -16,12 +16,12 @@
       (sql/from :mail_templates)
       (sql/where [:= :id mail-template-id])))
 
-(defn mail-template [tx-next mail-template-id]
+(defn mail-template [tx mail-template-id]
   (-> mail-template-id
       uuid
       mail-template-query
       sql-format
-      (->> (jdbc-query tx-next))
+      (->> (jdbc-query tx))
       first))
 
 (defn assert-global [template]
@@ -30,21 +30,21 @@
                     {:status 403}))))
 
 (defn get-mail-template
-  [{tx-next :tx-next {mail-template-id :mail-template-id} :route-params}]
-  (let [template (mail-template tx-next mail-template-id)]
+  [{tx :tx {mail-template-id :mail-template-id} :route-params}]
+  (let [template (mail-template tx mail-template-id)]
     (assert-global template)
     {:body template}))
 
 ;;; update mail-template ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-mail-template
-  [{{mail-template-id :mail-template-id} :route-params tx-next :tx-next data :body :as request}]
-  (let [template (mail-template tx-next mail-template-id)]
+  [{{mail-template-id :mail-template-id} :route-params tx :tx data :body :as request}]
+  (let [template (mail-template tx mail-template-id)]
     (assert-global template))
   (when (->> ["SELECT true AS exists FROM mail_templates WHERE id = ?" (uuid mail-template-id)]
-             (jdbc-query tx-next)
+             (jdbc-query tx)
              first :exists)
-    (jdbc-update! tx-next :mail_templates
+    (jdbc-update! tx :mail_templates
                   (select-keys data write-fields)
                   ["id = ?" (uuid mail-template-id)])
     {:status 204}))

@@ -19,25 +19,25 @@
       (sql/from :buildings)
       (sql/where [:= :id building-id])))
 
-(defn building [tx-next building-id]
+(defn building [tx building-id]
   (-> building-id
       uuid
       building-query
       sql-format
-      (->> (jdbc-query tx-next))
+      (->> (jdbc-query tx))
       first))
 
 (defn get-building
-  [{tx-next :tx-next {building-id :building-id} :route-params}]
-  {:body (building tx-next building-id)})
+  [{tx :tx {building-id :building-id} :route-params}]
+  {:body (building tx building-id)})
 
 ;;; delete group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-building
-  [{tx-next :tx-next {building-id :building-id} :route-params}]
+  [{tx :tx {building-id :building-id} :route-params}]
   (assert building-id)
   (if (= (uuid building-id)
-         (:id (jdbc/execute-one! tx-next
+         (:id (jdbc/execute-one! tx
                                  ["DELETE FROM buildings WHERE id = ?" (uuid building-id)]
                                  {:return-keys true})))
     {:status 204}
@@ -46,11 +46,11 @@
 ;;; update building ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-building
-  [{{building-id :building-id} :route-params tx-next :tx-next data :body :as request}]
+  [{{building-id :building-id} :route-params tx :tx data :body :as request}]
   (when (->> ["SELECT true AS exists FROM buildings WHERE id = ?" (uuid building-id)]
-             (jdbc-query tx-next)
+             (jdbc-query tx)
              first :exists)
-    (jdbc-update! tx-next :buildings
+    (jdbc-update! tx :buildings
                   (select-keys data fields)
                   ["id = ?" (uuid building-id)])
     {:status 204}))

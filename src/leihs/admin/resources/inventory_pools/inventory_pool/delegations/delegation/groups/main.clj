@@ -25,7 +25,7 @@
   (-> (groups/groups-query request)
       (extend-with-membership  (member-expr delegation-id) request)))
 
-(defn groups [{tx :tx-next :as request}]
+(defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body
@@ -40,7 +40,7 @@
 (defn add-group
   [{{delegation-id :delegation-id
      group-id :group-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (utils.jdbc/insert-or-update!
    tx :delegations_groups
    ["delegation_id = ? AND group_id = ?  " delegation-id group-id]
@@ -52,7 +52,7 @@
 (defn remove-group
   [{{delegation-id :delegation-id
      group-id :group-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (if (= 1 (::jdbc/update-count
             (jdbc-delete! tx :delegations_groups
                           ["delegation_id= ? AND group_id = ?

@@ -57,7 +57,7 @@
         (set-per-page-and-offset query-params)
         (select-fields request))))
 
-(defn authentication-systems [{tx :tx-next :as request}]
+(defn authentication-systems [{tx :tx :as request}]
   (let [query (authentication-systems-query request)
         offset (:offset query)]
     {:body

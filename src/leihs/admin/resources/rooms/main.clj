@@ -77,20 +77,20 @@
         (building-filter request)
         (general-filter request))))
 
-(defn rooms [{tx-next :tx-next :as request}]
+(defn rooms [{tx :tx :as request}]
   (let [query (rooms-query request)
         offset (:offset query)]
     {:body
      {:rooms (-> query
                  sql-format
-                 (->> (jdbc/query tx-next)
+                 (->> (jdbc/query tx)
                       (seq/with-index offset)
                       seq/with-page-index))}}))
 
 ;;; create room ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-room [{tx-next :tx-next data :body :as request}]
-  (if-let [room (jdbc/insert! tx-next
+(defn create-room [{tx :tx data :body :as request}]
+  (if-let [room (jdbc/insert! tx
                               :rooms
                               (-> data
                                   (select-keys shared/default-fields)

@@ -87,7 +87,7 @@
   (-> (sql/select-distinct :organization)
       (sql/from :users)))
 
-(defn users [{tx :tx-next :as request}]
+(defn users [{tx :tx :as request}]
   (let [query (users-query request)
         offset (:offset query)]
     {:body

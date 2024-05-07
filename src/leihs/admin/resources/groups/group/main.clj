@@ -71,12 +71,12 @@
       (sql/from :groups)
       (sql/where [:= :id group-id])))
 
-(defn get-group [{tx :tx-next {group-id :group-id} :route-params}]
+(defn get-group [{tx :tx {group-id :group-id} :route-params}]
   {:body (->> group-id group-query sql-format (jdbc-query tx) first)})
 
 ;;; delete group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn delete-group [{tx :tx-next {group-id :group-id} :route-params :as request}]
+(defn delete-group [{tx :tx {group-id :group-id} :route-params :as request}]
   (if-let [group (-> request get-group :body)]
     (do (when-not (requester-is-admin? request)
           (users-and-groups/assert-not-admin-proteced! group))
@@ -108,7 +108,7 @@
   (users-and-groups/assert-not-system-admin-proteced! group))
 
 (defn patch-group
-  ([{tx :tx-next data :body {group-id :group-id} :route-params :as request}]
+  ([{tx :tx data :body {group-id :group-id} :route-params :as request}]
    (patch-group group-id (prepare-write-data data tx) tx request))
   ([group-id data tx request]
    (if-let [group (-> request get-group :body)]
@@ -127,7 +127,7 @@
 ;;; create group ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-group
-  ([{tx :tx-next data :body :as request}]
+  ([{tx :tx data :body :as request}]
    (create-group (prepare-write-data data tx) tx request))
   ([data tx request]
    (users-and-groups/protect-leihs-core! data)
@@ -156,7 +156,7 @@
        (jdbc-query tx)))
 
 (defn group-inventory-pools-roles
-  [{tx :tx-next data :body {group-id :group-id} :route-params}]
+  [{tx :tx data :body {group-id :group-id} :route-params}]
   {:body
    {:inventory_pools_roles
     (inventory-pools-roles group-id tx)}})

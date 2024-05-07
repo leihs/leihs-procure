@@ -7,7 +7,7 @@
    [next.jdbc :as jdbc]
    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]))
 
-(defn get-languages-settings [{tx :tx-next}]
+(defn get-languages-settings [{tx :tx}]
   {:body
    (-> (sql/select :*)
        (sql/from :languages)
@@ -18,7 +18,7 @@
             (into {}))
        (or (throw (ex-info "no languages found" {:status 404}))))})
 
-(defn put [{tx :tx-next data :body :as request}]
+(defn put [{tx :tx data :body :as request}]
   (doseq [[locale lang] data]
     (-> (sql/update :languages)
         (sql/set (->> (select-keys lang [:default :active])

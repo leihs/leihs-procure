@@ -70,7 +70,7 @@
                              [:= :groups_users.group_id group-id])))))
 
 (defn users [{{group-id :group-id} :route-params
-              tx :tx-next :as request}]
+              tx :tx :as request}]
   (let [group-id (normalized-group-id! group-id tx)
         query (users-query group-id request)
         offset (:offset query)]
@@ -93,7 +93,7 @@
        (map :user_id)
        set))
 
-(defn batch-update-users [{tx :tx-next body :body
+(defn batch-update-users [{tx :tx body :body
                            {group-id :group-id} :route-params
                            :as request}]
   (when-let [extra-keys (some-> body keys set (disj :ids) not-empty)]
@@ -122,7 +122,7 @@
 
 ;;; put-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-user [{tx :tx-next :as request
+(defn put-user [{tx :tx :as request
                  {group-id :group-id
                   user-id :user-id} :route-params}]
   (let [group (protected-checked-group! request)
@@ -134,7 +134,7 @@
 
 ;;; remove-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-user [{tx :tx-next :as request
+(defn remove-user [{tx :tx :as request
                     {group-id :group-id
                      user-id :user-id} :route-params}]
   (let [group (protected-checked-group! request)

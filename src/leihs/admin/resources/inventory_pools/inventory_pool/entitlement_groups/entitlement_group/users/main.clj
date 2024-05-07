@@ -48,7 +48,7 @@
        (group-member-expr entitlement-group-id)
        request)))
 
-(defn users [{tx :tx-next :as request}]
+(defn users [{tx :tx :as request}]
   (let [query (-> request users-query)
         offset (:offset query)]
     {:body
@@ -63,7 +63,7 @@
   [{{inventory-pool-id :inventory-pool-id
      entitlement-group-id :entitlement-group-id
      user-id :user-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (if (= 1 (::jdbc/update-count
             (jdbc-delete! tx :entitlement_groups_direct_users
                           ["entitlement_group_id = ? AND user_id = ?"
@@ -77,7 +77,7 @@
   [{{inventory-pool-id :inventory-pool-id
      entitlement-group-id :entitlement-group-id
      user-id :user-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (utils.jdbc/insert-or-update!
    tx :entitlement_groups_direct_users
    ["entitlement_group_id = ? AND user_id = ?  " entitlement-group-id user-id]

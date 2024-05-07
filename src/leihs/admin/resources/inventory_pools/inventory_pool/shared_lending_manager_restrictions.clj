@@ -28,7 +28,7 @@
 (defn protect-inventory-manager-restriction-by-lending-manager!
   [access-rights-query
    {{inventory-pool-id :inventory-pool-id user-id :user-id group-id :group-id} :route-params
-    tx :tx-next roles :body :as request}]
+    tx :tx roles :body :as request}]
   (assert-roles-structure! roles)
   (when (and (not (:inventory_manager roles))
              (acts-as-lending-manger? request))

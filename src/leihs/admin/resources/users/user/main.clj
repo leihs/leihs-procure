@@ -121,7 +121,7 @@
       (sql-merge-unique-user uid)
       (sql/where [:= :delegator_user_id nil])))
 
-(defn get-user [{tx :tx-next {uid :user-id} :route-params}]
+(defn get-user [{tx :tx {uid :user-id} :route-params}]
   {:body
    (or (->> (-> uid user-query sql-format)
             (jdbc-query tx) first)
@@ -158,7 +158,7 @@
                     (:admin_protected user) (throw-forbidden!)
                     :else :OK)))
 
-(defn delete-user [{tx :tx-next :as request}]
+(defn delete-user [{tx :tx :as request}]
   (if-let [user (-> request get-user :body)]
     (do (assert-deletion-permitted! request user)
         (try+
@@ -190,7 +190,7 @@
 
 (defn transfer-data-and-delete-user
   [{{uid :user-id target-user-uid :target-user-uid} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (let [target-user (-> target-user-uid (choose-core/find-user-by-some-uid! tx))
         del-user (->> uid
                       user-query
@@ -299,7 +299,7 @@
                       :organization :org_id])))
 
 (defn patch-user
-  ([{tx :tx-next data :body :as request}]
+  ([{tx :tx data :body :as request}]
    (patch-user (prepare-write-data data) tx request))
   ([data tx request]
    (if-let [user (-> request get-user :body)]
@@ -316,7 +316,7 @@
 ;;; create user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-user
-  ([{tx :tx-next data :body :as request}]
+  ([{tx :tx data :body :as request}]
    (create-user (prepare-write-data data) tx request))
   ([data tx request]
    (users-and-groups/protect-leihs-core! data)

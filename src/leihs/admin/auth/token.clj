@@ -38,7 +38,7 @@
       (sql/where [:raw "now() < api_tokens.expires_at"])
       sql-format))
 
-(defn user-auth-entity! [token-secret {tx :tx-next}]
+(defn user-auth-entity! [token-secret {tx :tx}]
   (if-let [uae (or (->> (user-with-valid-token-query token-secret)
                         (jdbc-query tx) first))]
     (assoc uae

@@ -72,7 +72,7 @@
       (term-filter request)
       (with-items-from-suppliers-filter request)))
 
-(defn inventory-pools [{tx :tx-next :as request}]
+(defn inventory-pools [{tx :tx :as request}]
   (let [query (inventory-pools-query request)
         offset (:offset query)]
     {:body {:inventory-pools

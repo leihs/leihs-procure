@@ -19,7 +19,7 @@
     :shortname})
 
 (defn inventory-pool
-  [{{inventory-pool-id :inventory-pool-id} :route-params tx :tx-next :as request}]
+  [{{inventory-pool-id :inventory-pool-id} :route-params tx :tx :as request}]
   {:body (-> (apply sql/select fields)
              (sql/from :inventory-pools)
              (sql/where [:= :id inventory-pool-id])
@@ -27,7 +27,7 @@
              (->> (jdbc-query tx))
              first)})
 
-(defn create-inventory-pool [{tx :tx-next data :body :as request}]
+(defn create-inventory-pool [{tx :tx data :body :as request}]
   (if-let [inventory-pool (jdbc-insert! tx :inventory_pools
                                         (select-keys data fields))]
     {:status 201, :body inventory-pool}
@@ -36,7 +36,7 @@
 
 (defn patch-inventory-pool
   [{{inventory-pool-id :inventory-pool-id} :route-params
-    tx :tx-next data :body :as request}]
+    tx :tx data :body :as request}]
   (when (->> ["SELECT true AS exists FROM inventory_pools WHERE id = ?" inventory-pool-id]
              (jdbc-query tx)
              first :exists)
@@ -45,7 +45,7 @@
                   ["id = ?" inventory-pool-id])
     {:status 204}))
 
-(defn delete-inventory-pool [{tx :tx-next {inventory-pool-id :inventory-pool-id} :route-params}]
+(defn delete-inventory-pool [{tx :tx {inventory-pool-id :inventory-pool-id} :route-params}]
   (assert inventory-pool-id)
   (if (= 1 (::jdbc/update-count
             (jdbc-delete! tx :inventory_pools ["id = ?" inventory-pool-id])))

@@ -29,7 +29,7 @@
 
 (defn get-suspension
   [{{inventory-pool-id :inventory-pool-id :as route-params} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (let [user-id (or (:user-id route-params) (:delegation-id route-params))]
     (if-let [suspension (suspension tx inventory-pool-id user-id)]
       {:status 200, :body suspension}
@@ -37,7 +37,7 @@
 
 (defn set-suspension
   [{{inventory-pool-id :inventory-pool-id :as route-params} :route-params
-    tx :tx-next body :body :as request}]
+    tx :tx body :body :as request}]
   (let [user-id (or (:user-id route-params) (:delegation-id route-params))]
     (jdbc-delete! tx :suspensions ["inventory_pool_id = ? AND user_id = ?" inventory-pool-id user-id])
     (let [data (-> body
@@ -53,7 +53,7 @@
 
 (defn delete-suspension
   [{{inventory-pool-id :inventory-pool-id :as route-params} :route-params
-    tx :tx-next body :body :as request}]
+    tx :tx body :body :as request}]
   (let [user-id (or (:user-id route-params) (:delegation-id route-params))]
     (jdbc-delete! tx :suspensions ["inventory_pool_id = ? AND user_id = ?" inventory-pool-id user-id])
     {:status 204}))

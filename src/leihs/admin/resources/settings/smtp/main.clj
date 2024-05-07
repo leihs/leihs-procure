@@ -6,7 +6,7 @@
    [leihs.admin.utils.jdbc :as utils-jdbc]
    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]))
 
-(defn get-smtp-settings [{tx :tx-next}]
+(defn get-smtp-settings [{tx :tx}]
   {:body (-> (sql/select :*)
              (sql/from :smtp_settings)
              sql-format
@@ -14,7 +14,7 @@
              (or (throw (ex-info "smtp-settings not found" {:status 404})))
              (dissoc :id))})
 
-(defn upsert [{tx :tx-next data :body :as request}]
+(defn upsert [{tx :tx data :body :as request}]
   (utils-jdbc/insert-or-update! tx :smtp_settings ["id = 0"] data)
   (-> (get-smtp-settings request) (assoc :status 200)))
 

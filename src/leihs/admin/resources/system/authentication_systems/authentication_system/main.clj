@@ -34,14 +34,14 @@
       sql-format))
 
 (defn authentication-system
-  [{tx :tx-next {authentication-system-id :authentication-system-id} :route-params}]
+  [{tx :tx {authentication-system-id :authentication-system-id} :route-params}]
   {:body
    (first (jdbc-query tx (authentication-system-query authentication-system-id)))})
 
 ;;; delete authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn delete-authentication-system
-  [{tx :tx-next {authentication-system-id :authentication-system-id} :route-params}]
+  [{tx :tx {authentication-system-id :authentication-system-id} :route-params}]
   (assert authentication-system-id)
   (if (= 1 (::jdbc/update-count
             (jdbc-delete! tx :authentication_systems ["id = ?" authentication-system-id])))
@@ -51,7 +51,7 @@
 ;;; update authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn patch-authentication-system
-  ([{tx :tx-next data :body {authentication-system-id :authentication-system-id} :route-params}]
+  ([{tx :tx data :body {authentication-system-id :authentication-system-id} :route-params}]
    (patch-authentication-system authentication-system-id data tx))
   ([authentication-system-id data tx]
    (when (->> ["SELECT true AS exists FROM authentication_systems WHERE id = ?" authentication-system-id]
@@ -65,7 +65,7 @@
 ;;; create authentication-system ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-authentication-system
-  ([{tx :tx-next data :body}]
+  ([{tx :tx data :body}]
    (create-authentication-system data tx))
   ([data tx]
    (if-let [authentication-system (jdbc-insert! tx :authentication_systems data)]

@@ -64,20 +64,20 @@
         (term-filter request)
         (inventory-pool-filter request))))
 
-(defn suppliers [{tx-next :tx-next :as request}]
+(defn suppliers [{tx :tx :as request}]
   (let [query (suppliers-query request)
         offset (:offset query)]
     {:body
      {:suppliers (-> query
                      sql-format
-                     (->> (jdbc/query tx-next)
+                     (->> (jdbc/query tx)
                           (seq/with-index offset)
                           seq/with-page-index))}}))
 
 ;;; create supplier ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-supplier [{tx-next :tx-next data :body :as request}]
-  (if-let [supplier (jdbc/insert! tx-next
+(defn create-supplier [{tx :tx data :body :as request}]
+  (if-let [supplier (jdbc/insert! tx
                                   :suppliers
                                   (select-keys data supplier/fields))]
     {:status 201, :body supplier}

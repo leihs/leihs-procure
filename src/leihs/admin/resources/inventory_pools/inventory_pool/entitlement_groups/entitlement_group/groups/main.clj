@@ -30,7 +30,7 @@
 (defn groups-formated-query [request]
   (-> request groups-query sql-format))
 
-(defn groups [{tx :tx-next :as request}]
+(defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body
@@ -45,7 +45,7 @@
   [{{inventory-pool-id :inventory-pool-id
      entitlement-group-id :entitlement-group-id
      group-id :group-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (utils.jdbc/insert-or-update!
    tx :entitlement_groups_groups
    ["entitlement_group_id = ? AND group_id = ?  " entitlement-group-id group-id]
@@ -58,7 +58,7 @@
   [{{inventory-pool-id :inventory-pool-id
      entitlement-group-id :entitlement-group-id
      group-id :group-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (if (= 1 (::jdbc/update-count
             (jdbc-delete! tx :entitlement_groups_groups
                           ["entitlement_group_id = ? AND group_id = ?

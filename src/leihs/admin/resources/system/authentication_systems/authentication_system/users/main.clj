@@ -50,7 +50,7 @@
        (group-member-expr authentication-system-id)
        request)))
 
-(defn users [{tx :tx-next :as request}]
+(defn users [{tx :tx :as request}]
   (let [query (users-query request)
         offset (:offset query)]
     {:body
@@ -108,7 +108,7 @@
        (map str)
        set))
 
-(defn batch-update-users [{tx :tx-next body :body
+(defn batch-update-users [{tx :tx body :body
                            {authentication-system-id :authentication-system-id} :route-params
                            :as request}]
   (let [target-ids (target-ids body tx)
@@ -132,7 +132,7 @@
 
 ;;; put-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-user [{tx :tx-next :as request
+(defn put-user [{tx :tx :as request
                  body :body
                  {authentication-system-id :authentication-system-id
                   user-id :user-id} :route-params}]
@@ -149,7 +149,7 @@
 
 ;;; remove-user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-user [{tx :tx-next :as request
+(defn remove-user [{tx :tx :as request
                     {authentication-system-id :authentication-system-id
                      user-id :user-id} :route-params}]
   (if (= 1 (->> ["authentication_system_id = ? AND user_id = ?" authentication-system-id user-id]
@@ -160,7 +160,7 @@
 
 ;;; user-data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn user-data [{tx :tx-next
+(defn user-data [{tx :tx
                   {authentication-system-id :authentication-system-id
                    user-id :user-id} :route-params}]
   (when-let [row (->> (-> (sql/select :*)

@@ -20,7 +20,7 @@
 
 (defn get-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (let [access-rights (->> (access-rights-query inventory-pool-id user-id)
                            sql-format (jdbc-query tx) first)
         roles (-> access-rights :role keyword
@@ -30,7 +30,7 @@
 
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next roles :body :as request}]
+    tx :tx roles :body :as request}]
   (if-let [allowed-role-key (some->> roles/allowed-states
                                      (into [])
                                      (filter #(= roles (second %)))

@@ -30,7 +30,7 @@
                                    shared/active_reservations_12m_24m_cond)))
                    :active_contracts_12m_24m_count])))
 
-(defn routes [{handler-key :handler-key tx :tx-next :as request}]
+(defn routes [{handler-key :handler-key tx :tx :as request}]
   {:body (-> {} merge-select-contracts sql-format
              (->> (jdbc-query tx) first))})
 

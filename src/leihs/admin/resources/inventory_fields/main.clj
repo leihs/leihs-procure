@@ -87,20 +87,20 @@
         (group-filter request)
         (target-type-filter request))))
 
-(defn inventory-fields [{tx-next :tx-next :as request}]
+(defn inventory-fields [{tx :tx :as request}]
   (let [query (inventory-fields-query request)
         offset (:offset query)]
     {:body
      {:inventory-fields (-> query
                             sql-format
-                            (->> (jdbc/query tx-next)
+                            (->> (jdbc/query tx)
                                  (seq/with-index offset)
                                  seq/with-page-index))}}))
 
-(defn get-inventory-fields-groups [tx-next]
+(defn get-inventory-fields-groups [tx]
   (-> inventory-fields-base-query
       sql-format
-      (->> (jdbc/query tx-next)
+      (->> (jdbc/query tx)
            (map :data)
            (map :group)
            (filter identity)
@@ -109,25 +109,25 @@
 (comment
   (-> inventory-fields-base-query
       sql-format
-      (->> (jdbc/query (db/get-ds-next))
+      (->> (jdbc/query (db/get-ds))
            (map :fields/data)
            (map :target_type)
            (filter identity)
            distinct)))
 
-(defn inventory-fields-groups [{tx-next :tx-next}]
+(defn inventory-fields-groups [{tx :tx}]
   {:body
    {:inventory-fields-groups
-    (get-inventory-fields-groups tx-next)}})
+    (get-inventory-fields-groups tx)}})
 
 ;;; create inventory-field ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn make-id [field]
   (string/join "_" (-> field :data :attribute)))
 
-(defn create-inventory-field [{tx-next :tx-next new-field :body :as request}]
+(defn create-inventory-field [{tx :tx new-field :body :as request}]
   (if-let [inventory-field
-           (jdbc/insert! tx-next :fields
+           (jdbc/insert! tx :fields
                          (-> new-field
                              (->> (spec/assert ::field-specs/new-dynamic-field))
                              (merge field-specs/new-dynamic-field-constant-defaults)

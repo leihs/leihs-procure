@@ -32,7 +32,7 @@
                                    shared/active_reservations_12m_24m_cond)))
                    :active_items_12m_24m_count])))
 
-(defn routes [{tx :tx-next :as request}]
+(defn routes [{tx :tx :as request}]
   {:body (-> {} merge-select-items sql-format
              (->> (jdbc-query tx) first))})
 

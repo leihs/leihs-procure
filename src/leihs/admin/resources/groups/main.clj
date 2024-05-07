@@ -83,7 +83,7 @@
   (-> (sql/select-distinct :organization)
       (sql/from :groups)))
 
-(defn groups [{tx :tx-next :as request}]
+(defn groups [{tx :tx :as request}]
   (let [query (groups-query request)
         offset (:offset query)]
     {:body

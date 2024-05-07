@@ -16,7 +16,7 @@
 
 (defn get-request
   [{{request-id :request-id} :route-params
-    tx-next :tx-next :as request}]
+    tx :tx :as request}]
   (assert request-id)
   {:body (-> (apply sql/select selects)
              (sql/from :audited_requests)
@@ -25,7 +25,7 @@
               :audited_responses
               [:= :audited_requests.txid :audited_responses.txid])
              sql-format
-             (#(jdbc/execute-one! tx-next %)))})
+             (#(jdbc/execute-one! tx %)))})
 
 (defn routes [request]
   (case (:handler-key request)

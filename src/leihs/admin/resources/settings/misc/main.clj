@@ -7,7 +7,7 @@
    [next.jdbc.sql :refer [query] :rename {query jdbc-query}]
    [taoensso.timbre :refer [debug]]))
 
-(defn get-misc-settings [{tx :tx-next}]
+(defn get-misc-settings [{tx :tx}]
   {:body (-> (sql/select :*)
              (sql/from :settings)
              sql-format
@@ -15,7 +15,7 @@
              (or (throw (ex-info "misc-settings not found" {:status 404})))
              (dissoc :id))})
 
-(defn upsert [{tx :tx-next data :body :as request}]
+(defn upsert [{tx :tx data :body :as request}]
   (-> data
       (dissoc :updated_at :created_at)
       (->> (utils-jdbc/insert-or-update! tx :settings ["id = 0"])))

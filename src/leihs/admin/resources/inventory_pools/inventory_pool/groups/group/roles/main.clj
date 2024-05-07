@@ -18,12 +18,12 @@
 
 (defn get-roles
   [{{inventory-pool-id :inventory-pool-id group-id :group-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   {:body (group-roles tx inventory-pool-id group-id)})
 
 (defn set-roles
   [{{inventory-pool-id :inventory-pool-id group-id :group-id} :route-params
-    tx :tx-next roles :body :as request}]
+    tx :tx roles :body :as request}]
   (lmr/protect-inventory-manager-escalation-by-lending-manager! request)
   (lmr/protect-inventory-manager-restriction-by-lending-manager! role-query request)
   (if-let [allowed-role-key (some->> roles/allowed-states

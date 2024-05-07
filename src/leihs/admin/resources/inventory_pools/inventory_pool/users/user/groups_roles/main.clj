@@ -23,7 +23,7 @@
 
 (defn groups-roles
   [{{inventory-pool-id :inventory-pool-id user-id :user-id} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (let [groups-roles (->> (groups-roles-query inventory-pool-id user-id)
                           sql-format (jdbc-query tx)
                           (map #(update-in % [:roles]

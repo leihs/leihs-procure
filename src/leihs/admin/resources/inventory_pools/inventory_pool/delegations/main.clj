@@ -87,7 +87,7 @@
       (term-fitler request)))
 
 (defn delegations
-  [{:as request tx :tx-next}]
+  [{:as request tx :tx}]
   (let [query (delegations-query request)
         offset (:offset query)]
     {:body
@@ -105,7 +105,7 @@
 ;;; create delegation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn create-delegation
-  [{tx :tx-next
+  [{tx :tx
     {inventory-pool-id :inventory-pool-id} :route-params
     {protected :pool_protected name :name uid :responsible_user_id} :body}]
   (if-let [ruid (-> uid (responsible-user/find-by-unique-property tx) :id)]

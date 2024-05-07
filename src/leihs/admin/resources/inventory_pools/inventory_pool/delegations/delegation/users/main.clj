@@ -50,7 +50,7 @@
       users-query
       sql-format))
 
-(defn users [{tx :tx-next :as request}]
+(defn users [{tx :tx :as request}]
   (let [query (users-query request)
         offset (:offset query)]
     {:body
@@ -61,7 +61,7 @@
 
 ;;; add ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn put-user [{tx :tx-next :as request
+(defn put-user [{tx :tx :as request
                  {delegation-id :delegation-id
                   user-id :user-id} :route-params}]
   (utils.jdbc/insert-or-update!
@@ -71,7 +71,7 @@
 
 ;;; remove ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-user [{tx :tx-next :as request
+(defn remove-user [{tx :tx :as request
                     {delegation-id :delegation-id
                      user-id :user-id} :route-params}]
   (if (= 1 (->> ["delegation_id = ? AND user_id = ?" delegation-id user-id]

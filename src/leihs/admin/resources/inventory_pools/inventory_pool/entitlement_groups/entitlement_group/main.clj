@@ -14,7 +14,7 @@
 (defn entitlement-group
   [{{inventory-pool-id :inventory-pool-id
      entitlement-group-id :entitlement-group-id :as route-params} :route-params
-    tx :tx-next :as request}]
+    tx :tx :as request}]
   (if-let [eg (->> (query inventory-pool-id entitlement-group-id)
                    sql-format
                    (jdbc-query tx)
