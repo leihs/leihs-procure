@@ -81,6 +81,12 @@
     (cond->> inner-comp
       (:is_general room) (vector :i))))
 
+(defn description-th-component []
+  [:th {:key :description} "Description"])
+
+(defn description-td-component [room]
+  [:td {:key :description} (-> room :description)])
+
 (defn building-link-th-component []
   [:th {:key :building_name} "Building"])
 
@@ -171,9 +177,11 @@
     [filter-component]
     [table-component
      [name-th-component
+      description-th-component
       building-link-th-component
       items-count-th-component]
      [name-td-component
+      description-td-component
       building-link-td-component
       items-count-td-component]]
     [debug-component]]])
