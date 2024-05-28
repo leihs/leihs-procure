@@ -76,9 +76,30 @@
     :on-drag-over #(allow-drop %)
     :on-drop #(handle-img-drop %)
     :on-drag-enter #(allow-drop %)}
-   [:div.text-center
+   [:div
     {:style
      {:position :relative
+      :left 0
+      :top 0
+      :width 256
+      :height 256}}
+    (if-let [img-data (:img256_url @data*)]
+      [:img {:src img-data
+             :style {:display :block
+                     :margin :auto
+                     :max-width "256px"
+                     :max-height "256px"
+                     :opacity 0.4}}]
+      [:div.bg-light
+       {:style {:position :absolute
+                :left 0
+                :top 0
+                :width "256px"
+                :height "256px"}}])]
+   [:div.text-center
+    {:style
+     {:position :absolute
+      :top 0
       :width "256px"
       :height "256px"}}
     [:div.pt-2
@@ -99,30 +120,7 @@
          [:a.btn.btn-sm.btn-dark
           {:href "#"
            :on-click #(swap! data* assoc :img256_url nil :img32_url nil :img_digest nil)}
-          [:i.fas.fa-times] " Remove image "]])]]]
-   [:div
-    {:style
-     {:position :absolute
-      :left 0
-      :top 0
-      :width 256
-      :height 256
-      :z-index -1}}
-    (if-let [img-data (:img256_url @data*)]
-      [:img {:src img-data
-             :style {:display :block
-                     :margin :auto
-                     :max-width "256px"
-                     :max-height "256px"
-                     :opacity 0.4
-                     :z-index -1}}]
-      [:div.bg-light
-       {:style {:position :absolute
-                :left 0
-                :top 0
-                :width "256px"
-                :height "256px"
-                :z-index -1}}])]])
+          [:i.fas.fa-times] " Remove image "]])]]]])
 
 (defn image-component []
   [:div
