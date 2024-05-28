@@ -9,6 +9,7 @@
    [leihs.admin.resources.users.user.groups :as groups]
    [leihs.admin.resources.users.user.inventory-pools :as inventory-pools]
    [leihs.admin.resources.users.user.password-reset.main :as password-reset]
+   [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.auth.core :as auth]
    [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
@@ -98,27 +99,29 @@
                   :onHide #(reset! show* false)}])
 
 (defn basic-properties []
-  [:div.basic-properties.mb-3
-   [:h2 "Basic User Properties"]
-   [:div.row
-    [:div.col-md-3.mb-2
-     [:hr]
-     [:h3 " Image / Avatar "]
-     [user-core/img-avatar-component @user-data*]]
-    [:div.col-md
-     [:hr]
-     [:h3 "Personal Properties"]
-     [user-core/personal-properties-component @user-data*]]
-    [:div.col-md
-     [:hr]
-     [:h3 "Account Properties"]
-     [user-core/account-properties-component @user-data*]]]
-   [:div.mt-3
-    [:> ButtonGroup {:className "mr-3"}
-     [edit-user-button]
-     [reset-password-button]]
-    [user-home-button]
-    [delete-button]]])
+  (let [data @user-data*]
+    (fn []
+      [:div.basic-properties.mb-3
+       [:h2 "Basic User Properties"]
+       [:div.row
+        [:div.col-md-3.mb-2
+         [:hr]
+         [:h3 " Image / Avatar "]
+         [user-core/img-avatar-component data]]
+        [:div.col-md
+         [:hr]
+         [:h3 "Personal Properties"]
+         [user-core/personal-properties-component data]]
+        [:div.col-md
+         [:hr]
+         [:h3 "Account Properties"]
+         [user-core/account-properties-component data]]]
+       [:div.mt-3
+        [:> ButtonGroup {:className "mr-3"}
+         [edit-user-button]
+         [reset-password-button]]
+        [user-home-button]
+        [delete-button]]])))
 
 (defn extended-info []
   [:div.mt-3
@@ -128,23 +131,35 @@
      [:div.alert.alert-secondary.text-center
       "There is no extended info available for this user."])])
 
+(defn header []
+  (let [name (str (:firstname @user-data*)
+                  " "
+                  (:lastname @user-data*))]
+    (fn []
+      [:header.my-5
+       [back/button {:href (path :users {})}]
+       [:h1.mt-3 name]])))
+
 (defn page []
-  [:article.users
-   [routing/hidden-state-component
-    {:did-mount #(do
-                   (clean-and-fetch)
-                   (check-user-chosen))}]
-   [:header.my-5
-    [back/button {:href (path :users {})}]
-    [:h1.mt-3 (when-not (empty? @user-data*)
-                [user-core/name-component @user-data*])]]
-   [basic-properties]
-   [:> Tabs {:className "mt-5" :defaultActiveKey "inventory-pools" :transition false}
-    [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
-     [inventory-pools/table-component {:chrome false}]]
-    [:> Tab {:eventKey "groups" :title "Groups"}
-     [groups/table-component]]
-    [:> Tab {:eventKey "extended-info" :title "Extended Info"}
-     [extended-info]]]
-   [delete-user-dialog]
-   [user-core/debug-component]])
+  (if (empty? @user-data*)
+    [:div.mt-5
+     [wait-component]
+     [routing/hidden-state-component
+      {:did-mount #(do
+                     (clean-and-fetch)
+                     (check-user-chosen))}]]
+
+    [:article.users
+     [header]
+     [basic-properties]
+     [:> Tabs {:className "mt-5"
+               :defaultActiveKey "inventory-pools"
+               :transition false}
+      [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
+       [inventory-pools/table-component {:chrome false}]]
+      [:> Tab {:eventKey "groups" :title "Groups"}
+       [groups/table-component]]
+      [:> Tab {:eventKey "extended-info" :title "Extended Info"}
+       [extended-info]]]
+     [delete-user-dialog]
+     [user-core/debug-component]]))

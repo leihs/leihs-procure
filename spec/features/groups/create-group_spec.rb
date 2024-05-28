@@ -53,10 +53,11 @@ feature 'Creating groups', type: :feature do
           click_on name
           expect(page).to have_content "#{name}"
 
-          within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
-          within("dl", text: "System-admin protected"){ expect(find("dd").text).to be== "yes" }
-          within("dl", text: "Organization"){ expect(find("dd").text).to be== "example.com" }
-          within("dl", text: "Org ID"){ expect(find("dd").text).to be== "123" }
+
+          within("tr.admin_protected") { expect(page).to have_text("yes") }
+          within("tr.system_admin_protected") { expect(page).to have_text("yes") }
+          within("tr.organization") { expect(page).to have_text("example.com") }
+          within("tr.org_id") { expect(page).to have_text("123") }
 
           # we can see the full description here too
           expect(page.text.tr("\n\r\s"," ")).to have_content description.tr("\n\r\s"," ")
@@ -107,10 +108,10 @@ feature 'Creating groups', type: :feature do
           click_on name
           expect(page).to have_content "#{name}"
 
-          within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
-          within("dl", text: "System-admin protected"){ expect(find("dd").text).to be== "no" }
-          within("dl", text: "Organization"){ expect(find("dd").text).to be== "example.com" }
-          within("dl", text: "Org ID"){ expect(find("dd").text).to be== "123" }
+          within("tr.admin_protected") { expect(page).to have_text("yes") }
+          within("tr.system_admin_protected") { expect(page).to have_text("no") }
+          within("tr.organization") { expect(page).to have_text("example.com") }
+          within("tr.org_id") { expect(page).to have_text("123") }
 
           # we can see the full description here too
           expect(page.text.tr("\n\r\s"," ")).to have_content description.tr("\n\r\s"," ")

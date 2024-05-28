@@ -148,21 +148,23 @@
   [:article.group.my-5
    [routing/hidden-state-component
     {:did-mount group-core/clean-and-fetch}]
-   [:header.my-5
-    [back/button  {:href (path :groups {})}]
-    [:h1.mt-3 [group-core/group-name-component]]]
-   [group/properties-component]
+   [group/header]
+   [:section
+    [group/properties-table]
+    [group/edit-button]
+    [group/delete-button]]
 
-   [:> Nav {:variant "tabs" :className "mt-5"
-            :defaultActiveKey "users"}
-    [:> Nav.Item
-     [:> Nav.Link
-      {:href (clojure.core/str
-              "/admin/groups/"
-              (-> @routing/state* :route-params :group-id))}
-      "Inventory-Pools"]]
-    [:> Nav.Item
-     [:> Nav.Link
-      {:active true}
-      "Users"]]]
-   [main-page-component]])
+   [:section
+    [:> Nav {:variant "tabs" :className "mt-5"
+             :defaultActiveKey "users"}
+     [:> Nav.Item
+      [:> Nav.Link
+       {:href (clojure.core/str
+               "/admin/groups/"
+               (-> @routing/state* :route-params :group-id))}
+       "Inventory-Pools"]]
+     [:> Nav.Item
+      [:> Nav.Link
+       {:active true}
+       "Users"]]]
+    [main-page-component]]])

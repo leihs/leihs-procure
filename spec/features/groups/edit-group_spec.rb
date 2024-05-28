@@ -26,14 +26,17 @@ feature 'Editing groups', type: :feature do
         fill_in 'term', with: group.name
         click_on group.name
         click_on 'Edit'
+
         name = Faker::Name.name
         description = Faker::Lorem.sentences.join(' ')
+
         fill_in 'name', with: name
         fill_in 'description', with: description
         click_on 'Save'
         wait_until { page.has_content? "#{name}" }
-        expect(find("dl", text: 'Name')).to have_content name
-        expect(find("dl", text: 'Description')).to have_content description
+
+        within("tr.name") { expect(page).to have_text name } 
+        within("tr.description") { expect(page).to have_text description } 
       end
 
     end
@@ -46,35 +49,34 @@ feature 'Editing groups', type: :feature do
       end
 
       scenario 'edits an admin protected group ' do
-        visit '/admin/'
-        click_on 'Groups'
-        group = @groups.filter{|g| g[:admin_protected] == true && g[:system_admin_protected] == false }.sample # pick a random group
-        fill_in 'term', with: group.name
-        click_on group.name
+      visit '/admin/'
+      click_on 'Groups'
 
-        #####################################################################
-        # NOTE: Capybara finds the button and clicks it but nothing happens.
-        # It has to be retried some times until the modal is displayed.
-        # Some UI hooks/callbacks not initialized yet on first try?
-        sleep 1
-        click_on 'Edit'
-        wait_until do
-          page.has_content?("Edit Group")
-        end
-        #####################################################################
-       
-        name = Faker::Name.name
-        description = Faker::Lorem.sentences.join(' ')
-        fill_in 'name', with: name
-        fill_in 'description', with: description
-        click_on 'Save'
-        wait_until { page.has_content? "#{name}" }
-        within("dl", text: "Admin protected"){ expect(find("dd").text).to be== "yes" }
-        expect(find("dl", text: 'Name')).to have_content name
-        expect(find("dl", text: 'Description')).to have_content description
+      # Select a random group
+      group = @groups.find { |g| g[:admin_protected] && !g[:system_admin_protected] }
+
+      fill_in 'term', with: group.name
+      click_on group.name
+
+      # Retry until the modal is displayed
+      click_on 'Edit'; page.has_content?("Edit Group")
+
+      # Generate random name and description
+      name = Faker::Name.name
+      description = Faker::Lorem.sentences.join(' ')
+
+      fill_in 'name', with: name
+      fill_in 'description', with: description
+      click_on 'Save'
+
+      # Wait until the page has the new name
+      wait_until { page.has_content? name }
+
+      # Check if the page has the correct content
+      expect(page).to have_selector("tr.admin_protected", text: "yes")
+      expect(page).to have_selector("tr.name", text: name)
+      expect(page).to have_selector("tr.description", text: description)
       end
-
-
 
       context 'via the API' do
 
@@ -130,10 +132,12 @@ feature 'Editing groups', type: :feature do
           fill_in 'name', with: name
           fill_in 'description', with: description
           click_on 'Save'
-          wait_until { page.has_content? "#{name}" }
-          expect(find("dl", text: 'Admin protected')).to have_content 'no'
-          expect(find("dl", text: 'Name')).to have_content name
-          expect(find("dl", text: 'Description')).to have_content description
+
+          expect(page).to have_content(name, wait: 10)
+
+          within("tr.admin_protected") { expect(page).to have_text "no" } 
+          within("tr.name") { expect(page).to have_text name }
+          within("tr.description") { expect(page).to have_text description } 
         end
 
         scenario 'can not edit a protected group' do

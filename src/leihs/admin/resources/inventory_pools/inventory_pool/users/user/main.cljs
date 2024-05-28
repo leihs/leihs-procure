@@ -12,9 +12,11 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups.main :as groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
-   [leihs.admin.resources.users.user.core :as user :refer [user-data* user-id*]]
-   [leihs.admin.resources.users.user.main :as user-main]
+   [leihs.admin.resources.users.user.core :as user :refer [clean-and-fetch
+                                                           user-data*]]
+   [leihs.admin.resources.users.user.main :as user-main :refer [check-user-chosen]]
    [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]))
 
@@ -27,15 +29,6 @@
       [:h3 "@user-data*"]
       [:pre (with-out-str (pprint @user-data*))]]]))
 
-(defn name-component []
-  [:span
-   [routing/hidden-state-component
-    {:did-mount #(user/clean-and-fetch)}]
-   (let [p (path :inventory-pool-user {:inventory-pool-id @inventory-pool/id*
-                                       :user-id @user-id*})
-         name-or-id (user/fullname-or-some-uid @user-data*)]
-     [:<> name-or-id])])
-
 ;;; suspension ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn suspension-component []
@@ -47,8 +40,8 @@
 
 (defn effective-roles-component []
   [:div.effective-roles
-   [routing/hidden-state-component
-    {:did-change user-roles/clean-and-fetch}]
+   ;; [routing/hidden-state-component
+   ;;  {:did-change user-roles/clean-and-fetch}]
    [:h2 "Roles"]
    [:p "This section shows the effective roles. This is an aggregate computed from "
     "direct roles, and roles via groups. "]
@@ -125,50 +118,64 @@
      "Closed contracts" :contracts_closed_count]]])
 
 (defn overview-component []
-  [:div.overview
-   [:div.row
-    [:div.col-lg-3
-     [:hr]
-     [:h3 " Image / Avatar "]
-     [user/img-avatar-component @user-data*]]
-    [:div.col-lg-3
-     [:hr]
-     [:h3 "Pool Related Properties"]
-     [overview-pool-data-component @user-data*]]
-    [:div.col-lg-3
-     [:hr]
-     [:h3 "Personal Properties"]
-     [user/personal-properties-component @user-data*]]
-    [:div.col-lg-3
-     [:hr]
-     [:h3 "Account Properties"]
-     [user/account-properties-component @user-data*]]
-    [user-main/edit-user-button]]])
+  (let [data @user-data*]
+    (fn []
+      [:div.overview
+       [:div.row
+        [:div.col-lg-3
+         [:hr]
+         [:h3 " Image / Avatar "]
+         [user/img-avatar-component data]]
+        [:div.col-lg-3
+         [:hr]
+         [:h3 "Pool Related Properties"]
+         [overview-pool-data-component data]]
+        [:div.col-lg-3
+         [:hr]
+         [:h3 "Personal Properties"]
+         [user/personal-properties-component data]]
+        [:div.col-lg-3
+         [:hr]
+         [:h3 "Account Properties"]
+         [user/account-properties-component data]]
+        [user-main/edit-user-button]]])))
 
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn header []
-  [:header.my-5
-   [back/button {:href (path :inventory-pool-users {:inventory-pool-id @inventory-pool/id*})}]
-   [:h1.mt-3 [name-component]]
-   [:h6 "In Pool " [inventory-pool/name-component]]])
+  (let [data @user-data*]
+    (fn []
+      [:header.my-5
+       [back/button {:href (path :inventory-pool-users {:inventory-pool-id @inventory-pool/id*})}]
+       [:h1.mt-3 (:firstname data) " " (:lastname data)]
+       [:h6 "In Pool " [inventory-pool/name-component]]])))
 
 (defn page []
-  [:article.user-roles
-   [header]
-   [overview-component]
-   [:div.row
-    [:div.col-md-6
-     [:hr] [roles-component]]
-    [:div.col-md-6
-     [:hr] [suspension-component]]]
-   [:div.row
-    [:div.col-md-6
-     [:hr] [groups]]
-    [:div.col-md-6
-     [:hr]
-     [:h2 "Extended User Info"]
-     (when-let [ext-info (-> @user-data* :extended_info presence)]
-       [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]]
+  [:<>
+   [routing/hidden-state-component
+    {:did-mount #(do
+                   (clean-and-fetch)
+                   (user-roles/clean-and-fetch))
+     :will-unmount #(reset! user-data* nil)}]
 
-   [debug-component]])
+   (if (empty? @user-data*)
+     [:div.mt-5
+      [wait-component]]
+     [:article.user-roles
+      [header]
+      [overview-component]
+      [:div.row
+       [:div.col-md-6
+        [:hr] [roles-component]]
+       [:div.col-md-6
+        [:hr] [suspension-component]]]
+      [:div.row
+       [:div.col-md-6
+        [:hr] [groups]]
+       [:div.col-md-6
+        [:hr]
+        [:h2 "Extended User Info"]
+        (when-let [ext-info (-> @user-data* :extended_info presence)]
+          [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]]
+
+      [debug-component]])])

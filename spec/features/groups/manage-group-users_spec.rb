@@ -216,29 +216,26 @@ feature 'Managing group users ', type: :feature do
 
           visit '/admin/'
           click_on 'Groups'
+
           fill_in 'Search', with: @group.name
-          wait_until do
-            first('table.groups') and \
-              find('table.groups').has_content? @group.name
-          end
+          find('table.groups', text: @group.name)
+
           click_on @group.name
           within ".nav-tabs" do
             click_on 'Users'
           end
+
           select('members and non-members', from: 'Membership')
           select(1000, from: "Per page")
-          sleep 2
+          fill_in 'Search', with: ""
+
           within("table.users tbody") do
-            wait_until{ all("button").count >= 100 }
-            all("button").each do |button|
-              expect(button).to be_disabled # the key property in this spec
-            end
+            expect(page).to have_css("button[disabled]", minimum: 100)
           end
+
           expect( all("button", text: "Remove").count).to be== 33
           expect( all("button", text: "Add").count).to be>= 100-33 # some extra admins, and lending_manager
-
         end
-
       end
 
 

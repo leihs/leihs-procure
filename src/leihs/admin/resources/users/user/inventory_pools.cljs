@@ -42,24 +42,26 @@
        [:pre (with-out-str (pprint @data*))]]])])
 
 (defn user-in-pool-td-component [row]
-  (let [inventory-pool-id (:inventory_pool_id row)
-        has-access? (pool-auth/current-user-is-some-manager-of-pool? inventory-pool-id)
-        pool-path (path :inventory-pool
-                        {:inventory-pool-id (:inventory_pool_id row)})
-        user-in-pool-path (path :inventory-pool-user
-                                {:inventory-pool-id (:inventory_pool_id row)
-                                 :user-id @user-id*})
-        user-in-pool-inner [:<> (user-core/fullname-or-some-uid @user-data*)]
-        pool-inner [:em (:inventory_pool_name row)]]
-    [:td
-     [:span
-      (if has-access?
-        [:a {:href user-in-pool-path} user-in-pool-inner]
-        user-in-pool-inner)
-      " in "
-      (if has-access?
-        [:a {:href pool-path} pool-inner]
-        pool-inner)]]))
+  (let [data @user-data*]
+    (fn []
+      (let [inventory-pool-id (:inventory_pool_id row)
+            has-access? (pool-auth/current-user-is-some-manager-of-pool? inventory-pool-id)
+            pool-path (path :inventory-pool
+                            {:inventory-pool-id (:inventory_pool_id row)})
+            user-in-pool-path (path :inventory-pool-user
+                                    {:inventory-pool-id (:inventory_pool_id row)
+                                     :user-id @user-id*})
+            user-in-pool-inner [:<> (user-core/fullname-or-some-uid data)]
+            pool-inner [:em (:inventory_pool_name row)]]
+        [:td
+         [:span
+          (if has-access?
+            [:a {:href user-in-pool-path} user-in-pool-inner]
+            user-in-pool-inner)
+          " in "
+          (if has-access?
+            [:a {:href pool-path} pool-inner]
+            pool-inner)]]))))
 
 (defn roles-td-component [row]
   [:td
