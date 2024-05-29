@@ -50,7 +50,7 @@
       [:div.form-group.m-2
        [:label {:for :table}
         [:span "Table name " [:small.text_monspache "(table)"]]]
-       [:select#table.form-control
+       [:select#table.custom-select
         {:value (:table (merge default-query-params
                                (:query-params-raw @routing/state*)))
          :disabled @disabled*
@@ -66,7 +66,7 @@
   [:div.form-group.m-2
    [:label {:for :tg-op}
     [:span "Operation " [:small.text_monspache "(tg-op)"]]]
-   [:select#tg-op.form-control
+   [:select#tg-op.custom-select
     {:value (:tg-op (merge default-query-params
                            (:query-params-raw @routing/state*)))
      :on-change (fn [e]
@@ -166,5 +166,5 @@
       [wait-component]
       (if-let [changes (-> @data* (get (:route @routing/state*) {}) :changes seq)]
         [table-component changes]
-        [:div.alert.alert-warning.text-center "No (more) audited-changes found."]))
+        [:div.alert.alert-info.text-center "No (more) audited-changes found."]))
     [debug-component]]])

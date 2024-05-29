@@ -82,7 +82,7 @@
 
 (defn empty-alert []
   #?(:cljs
-     [:div.alert.alert-warning.text-center
+     [:div.alert.alert-info.text-center
       [:p "This collection is empty for current role filter: "
        [:code @role-query-param*]]
       [:p [:a.btn.btn-outline-primary

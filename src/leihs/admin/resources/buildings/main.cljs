@@ -114,7 +114,7 @@
                       (doall (for [building buildings]
                                ^{:key (:id building)}
                                [building-row-component building tds]))}]
-    [:div.alert.alert-warning.text-center "No (more) buildings found."]))
+    [:div.alert.alert-info.text-center "No (more) buildings found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))

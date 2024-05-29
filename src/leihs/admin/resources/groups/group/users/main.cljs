@@ -80,7 +80,7 @@
 (defn form-group-users-filter []
   [:div.form-group.ml-2.mr-2.mt-2
    [:label.mr-1 {:for :users-filter-enabled} "Membership"]
-   [:select#users-filter-enabled.form-control
+   [:select#users-filter-enabled.custom-select
     {:value (or (-> @routing/state* :query-params :membership presence)
                 (:membership default-query-params))
      :on-change (fn [e]

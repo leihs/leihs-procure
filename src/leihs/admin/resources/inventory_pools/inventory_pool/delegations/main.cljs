@@ -197,7 +197,7 @@
                 per-page (:per-page @current-query-parameters-normalized*)]
             (for [[k delegation] (map-indexed vector delegations)]
               ^{:key k} [delegation-row delegation]))]]
-        [:div.alert.alert-warning.text-center "No (more) delegations found."]))))
+        [:div.alert.alert-info.text-center "No (more) delegations found."]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

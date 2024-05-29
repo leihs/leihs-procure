@@ -55,7 +55,7 @@
   [:div.form-group.m-2
    [:label {:for :method}
     [:span "Method" [:small.text_monspache " (method)"]]]
-   [:select#method.form-control
+   [:select#method.custom-select
     {:value (:method (merge default-query-params
                             (:query-params-raw @routing/state*)))
      :on-change (fn [e]
@@ -148,7 +148,7 @@
      [wait-component]
      (if-let [requests (-> @requests* (get  @routing/current-url* {}) seq)]
        [table-component requests]
-       [:div.alert.alert-warning.text-center "No (more) audited-requests found."]))])
+       [:div.alert.alert-info.text-center "No (more) audited-requests found."]))])
 
 (defn debug-component []
   (when @state/debug?*

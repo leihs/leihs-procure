@@ -109,7 +109,7 @@
            (when-not compact [supension-inner-form-component
                               true (reagent/atom data)])]
           [:div
-           [:div
+           [:div.text-nowrap
             (when (suspended? suspended-until (:timestamp @state/global-state*))
               [:button.btn.btn-warning.mr-2
                {:class (when compact "btn-sm py-0")

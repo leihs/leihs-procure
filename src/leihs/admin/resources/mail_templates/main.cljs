@@ -127,7 +127,7 @@
                       :body (doall (for [mail-template mail-templates]
                                      ^{:key (:id mail-template)}
                                      [mail-template-row-component mail-template tds]))}]
-    [:div.alert.alert-warning.text-center "No (more) mail-templates found."]))
+    [:div.alert.alert-info.text-center "No (more) mail-templates found."]))
 
 (defn table-component [hds tds]
   (if-not (contains? @data* (:route @routing/state*))

@@ -66,7 +66,7 @@
                          :header (entitlement-groups-thead)
                          :body (doall (for [entitlement-group entitlement-groups]
                                         (entitlement-group-row entitlement-group)))}]
-       [:div.alert.alert-warning.text-center "No (more) entitlement-groups found."]))])
+       [:div.alert.alert-info.text-center "No (more) entitlement-groups found."]))])
 
 (defn debug-info []
   (when (:debug @state/global-state*)

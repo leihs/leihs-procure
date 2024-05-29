@@ -93,7 +93,7 @@
      [:a.btn.btn-outline-primary.btn-sm.py-0
       {:href (path {:including-user (or (-> user :email presence) (:id user))
                     :role ""})}
-      [:span [icons/view] " " [icons/edit] " Manage "]]]))
+      [:span [icons/view] " Manage "]]]))
 
 ;### suspended ################################################################
 

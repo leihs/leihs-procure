@@ -128,7 +128,7 @@
      [:label {:for query-params-key}
       [:span label [:small.text-monospace " (" query-params-key ")"]]]
      [:div.input-group
-      [:select.form-control
+      [:select.custom-select
        {:id query-params-key
         :value (let [val (get-in @routing/state* [:query-params-raw query-params-key])]
                  (if (some #{val} (map first options))

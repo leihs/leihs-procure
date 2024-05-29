@@ -82,7 +82,7 @@
                          :header [authentication-systems-thead-component]
                          :body (doall (for [authentication-system authentication-systems]
                                         (authentication-system-row-component authentication-system)))}]
-      [:div.alert.alert-warning.text-center "No (more) authentication-systems found."])))
+      [:div.alert.alert-info.text-center "No (more) authentication-systems found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

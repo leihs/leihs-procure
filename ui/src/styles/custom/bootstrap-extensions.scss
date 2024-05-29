@@ -30,3 +30,14 @@
     box-shadow: $input-focus-box-shadow !important;
   }
 }
+
+// custom styling for disabled primary outline button
+.btn-outline-primary.disabled {
+  border-color: #999999;
+  color: #999999;
+}
+
+// buttons should never wrap
+.btn {
+  white-space: nowrap;
+}

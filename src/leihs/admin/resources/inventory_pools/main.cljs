@@ -114,7 +114,7 @@
       [table/container {:className "inventory-pools"
                         :header (table-head hds)
                         :body (table-body inventory-pools tds)}]
-      [:div.alert.alert-warning.text-center "No (more) inventory-pools found."])))
+      [:div.alert.alert-info.text-center "No (more) inventory-pools found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

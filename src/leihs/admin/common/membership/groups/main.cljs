@@ -13,7 +13,7 @@
 (defn form-membership-filter []
   [:div.form-group.ml-2.mr-2.mt-2
    [:label.mr-1 {:for :groups-membership} " Membership "]
-   [:select#groups-membership.form-control
+   [:select#groups-membership.custom-select
     {:value (:membership (merge default-query-params
                                 (:query-params @routing/state*)))
      :on-change (fn [e]

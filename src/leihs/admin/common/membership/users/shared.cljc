@@ -30,7 +30,7 @@
 
 (defn empty-members-alert []
   #?(:cljs
-     [:div.alert.alert-warning.text-center
+     [:div.alert.alert-info.text-center
       [:p "No users found but the current filter seetings seem to include only members."]
       [:p [:a.btn.btn-outline-primary
            {:href (path (:path @routing/state*) {}
