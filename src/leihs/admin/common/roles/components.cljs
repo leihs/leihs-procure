@@ -1,6 +1,7 @@
 (ns leihs.admin.common.roles.components
   (:refer-clojure :exclude [str])
-  (:require [cljs-uuid-utils.core :as uuid]
+  (:require ["react-bootstrap" :as react-bootstrap :refer [Alert Button]]
+            [cljs-uuid-utils.core :as uuid]
             [cljs.core.async :as async :refer [go >! <!]]
             [cljs.pprint :refer [pprint]]
             [leihs.admin.common.form-components :as form-components]
@@ -50,8 +51,15 @@
                                  {:for (str role-id-prefix "_" role)}
                                  [:span " " role]]]))))]))
 
+(defonce message* (reagent/atom nil))
+
 (defn edit-roles-form-elements [roles*]
-  [inner-roles-component roles* true])
+  [:<>
+   (when @message*
+     [:> Alert {:variant "danger"}
+      [:div "By changing the roles of this group, "
+       [:div.font-weight-bold @message* " Users will be affected!"]]])
+   [inner-roles-component roles* true]])
 
 (defn edit-roles-header-component []
   [:h3 "Edit roles"])
@@ -63,11 +71,13 @@
     :abort-handler #(reset! edit-mode?* false)
     :submit-handler update-handler]])
 
-(defn roles-component [roles & {:keys [compact update-handler]
+(defn roles-component [roles & {:keys [compact update-handler message]
                                 :or {compact false
-                                     update-handler nil}}]
+                                     update-handler nil
+                                     message nil}}]
   (reagent/with-let [edit-mode?* (reagent/atom false)]
     [:div
+     (reset! message* message)
      (when @edit-mode?*
        [roles-edit-component roles edit-mode?*
         :update-handler (fn [updated-roles]

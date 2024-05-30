@@ -30,6 +30,7 @@
   [:td.pl-5 {:key :roles}
    [roles-component
     (get group :roles)
+    :message (str (:count_users group))
     :compact true
     :update-handler #(roles-update-handler % group)
 
