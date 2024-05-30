@@ -843,6 +843,56 @@
   environment_variables:
     FEATURE_NAME: "Managing admin users: all types of useres exist, as an admin as an system-admin via the UI 01"
     FEATURE: './spec/features/users/admin_spec.rb[1:1:2:3:1:1]'
+'./spec/features/users/api-tokens_spec.rb[1:1:1]':
+  name: "API Tokens signed in as an admin 01"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin 01"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:1]'
+'./spec/features/users/api-tokens_spec.rb[1:1:2:1]':
+  name: "API Tokens signed in as an admin an API-Token for the current user has been added 01"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin an API-Token for the current user has been added 01"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:2:1]'
+'./spec/features/users/api-tokens_spec.rb[1:1:2:2]':
+  name: "API Tokens signed in as an admin an API-Token for the current user has been added 02"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin an API-Token for the current user has been added 02"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:2:2]'
+'./spec/features/users/api-tokens_spec.rb[1:1:2:3]':
+  name: "API Tokens signed in as an admin an API-Token for the current user has been added 03"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin an API-Token for the current user has been added 03"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:2:3]'
+'./spec/features/users/api-tokens_spec.rb[1:1:2:4]':
+  name: "API Tokens signed in as an admin an API-Token for the current user has been added 04"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin an API-Token for the current user has been added 04"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:2:4]'
+'./spec/features/users/api-tokens_spec.rb[1:1:2:5]':
+  name: "API Tokens signed in as an admin an API-Token for the current user has been added 05"
+  environment_variables:
+    FEATURE_NAME: "API Tokens signed in as an admin an API-Token for the current user has been added 05"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:1:2:5]'
+'./spec/features/users/api-tokens_spec.rb[1:2:1]':
+  name: "API Tokens check different access rights 01"
+  environment_variables:
+    FEATURE_NAME: "API Tokens check different access rights 01"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:2:1]'
+'./spec/features/users/api-tokens_spec.rb[1:2:2]':
+  name: "API Tokens check different access rights 02"
+  environment_variables:
+    FEATURE_NAME: "API Tokens check different access rights 02"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:2:2]'
+'./spec/features/users/api-tokens_spec.rb[1:2:3]':
+  name: "API Tokens check different access rights 03"
+  environment_variables:
+    FEATURE_NAME: "API Tokens check different access rights 03"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:2:3]'
+'./spec/features/users/api-tokens_spec.rb[1:2:4]':
+  name: "API Tokens check different access rights 04"
+  environment_variables:
+    FEATURE_NAME: "API Tokens check different access rights 04"
+    FEATURE: './spec/features/users/api-tokens_spec.rb[1:2:4]'
 './spec/features/users/create-user_spec.rb[1:1:1:1:1]':
   name: "Creating a user all types of useres exist, as a pool manager via the UI 01"
   environment_variables:

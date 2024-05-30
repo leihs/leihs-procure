@@ -52,6 +52,7 @@
    [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
    [leihs.admin.resources.users.choose-main :as users-choose]
    [leihs.admin.resources.users.main :as users]
+   [leihs.admin.resources.users.user.api-tokens.show :as user-api-token]
    [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
    [leihs.core.routing.front :as routing]))
@@ -108,6 +109,7 @@
    :suppliers #'suppliers/page
    :syssec-settings #'syssec-settings/page
    :user #'user/page
+   :user-api-token #'user-api-token/page
    :user-password-reset #'user-password-reset/page
    :users #'users/page
    :users-choose #'users-choose/page})

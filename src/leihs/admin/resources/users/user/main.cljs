@@ -2,6 +2,7 @@
   (:require
    [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.users.user.api-tokens.main :as api-tokens]
    [leihs.admin.resources.users.user.core :as user-core :refer [clean-and-fetch user-data*
                                                                 user-id*]]
    [leihs.admin.resources.users.user.delete :as delete]
@@ -11,7 +12,6 @@
    [leihs.admin.resources.users.user.password-reset.main :as password-reset]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.auth.core :as auth]
-   [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button ButtonGroup DropdownButton Dropdown Tabs Tab]]
    [reagent.core :as reagent]))
@@ -40,7 +40,7 @@
 (defn edit-user-button []
   (let [show (reagent/atom false)]
     (fn []
-      (when (auth/allowed?  [modifieable?])
+      (when (auth/allowed? [modifieable?])
         [:<>
          [:> Button
           {:onClick #(reset! show true)}
@@ -132,6 +132,11 @@
        [back/button {:href (path :users {})}]
        [:h1.mt-3 name]])))
 
+(defn own-user-admin-scopes? [user-state _routing-state]
+  (and (= (-> user-state :id)
+          (-> _routing-state :route-params :user-id))
+       (auth/admin-scopes? user-state _routing-state)))
+
 (defn page []
   (if (empty? @user-data*)
     [:div.mt-5
@@ -150,6 +155,10 @@
       [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
        [inventory-pools/table-component {:chrome false}]]
       [:> Tab {:eventKey "groups" :title "Groups"}
-       [groups/table-component]]]
+       [groups/table-component]]
+      (when (auth/allowed?
+             [auth/system-admin-scopes? own-user-admin-scopes?])
+        [:> Tab {:eventKey "api-tokens" :title "API Tokens"}
+         [api-tokens/table-component]])]
      [delete-user-dialog]
      [user-core/debug-component]]))

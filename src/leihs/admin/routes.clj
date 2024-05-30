@@ -57,6 +57,8 @@
    [leihs.admin.resources.system.authentication-systems.authentication-system.users.main :as authentication-system-users]
    [leihs.admin.resources.system.authentication-systems.main :as authentication-systems]
    [leihs.admin.resources.users.main :as users]
+   [leihs.admin.resources.users.user.api-tokens.api-token.main :as user-api-token]
+   [leihs.admin.resources.users.user.api-tokens.main :as user-api-tokens]
    [leihs.admin.resources.users.user.inventory-pools :as user-inventory-pools]
    [leihs.admin.resources.users.user.main :as user]
    [leihs.admin.resources.users.user.password-reset.main :as user-password-reset]
@@ -96,6 +98,11 @@
    core-routes/no-spa-handler-keys
    #{:redirect-to-root
      :not-found}))
+
+(defn own-user-admin-scopes? [request]
+  (and (= (-> request :authenticated-entity :id)
+          (-> request :route-params :user-id))
+       (auth/admin-scopes? request)))
 
 (def resolve-table
   (merge core-routes/resolve-table
@@ -222,6 +229,8 @@
                             :authorizers [auth/system-admin-scopes?]}
 
           :user {:handler user/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
+          :user-api-token {:handler user-api-token/routes :authorizers [auth/system-admin-scopes? own-user-admin-scopes?]}
+          :user-api-tokens {:handler user-api-tokens/routes :authorizers [auth/system-admin-scopes? own-user-admin-scopes?]}
           :user-password-reset {:handler user-password-reset/routes
                                 :authorizers [auth/admin-hierarchy?]}
           :user-inventory-pools {:handler user-inventory-pools/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}

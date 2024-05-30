@@ -41,6 +41,15 @@
                   (leaf "/delete" :user-delete)
                   (leaf "/edit" :user-edit)
                   (leaf "/inventory-pools/" :user-inventory-pools)
+                  (branch "/api-tokens"
+                          (branch "/"
+                                  (leaf "" :user-api-tokens)
+                                  (leaf "create" :user-api-tokens-create))
+                          (branch "/"
+                                  (param :api-token-id)
+                                  (leaf "" :user-api-token)
+                                  (leaf "delete" :user-api-token-delete)
+                                  (leaf "edit" :user-api-token-edit)))
                   (branch "/transfer/"
                           (param [#"[^/]+" :target-user-uid])
                           (leaf "" :user-transfer-data)))))
