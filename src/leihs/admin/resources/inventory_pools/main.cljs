@@ -53,18 +53,6 @@
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn add-inventory-pool []
-  (when (auth-core/allowed? [auth-core/admin-scopes?])
-    (let [modal-show (reagent/atom false)]
-      (fn []
-        [:<>
-         [:> Button
-          {:className "ml-3"
-           :onClick #(reset! modal-show true)}
-          "Add Inventory Pool"]
-         [create/dialog {:show @modal-show
-                         :onHide #(reset! modal-show false)}]]))))
-
 (defn table-head [& [more-cols]]
   [:tr
    [:th "Index"]
@@ -141,8 +129,8 @@
      {:did-change #(http/route-cached-fetch data*)}]
     [filter-section]
     [table/toolbar
-     [add-inventory-pool]]
+     [create/button]]
     [inventory-pools-table]
     [table/toolbar
-     [add-inventory-pool]]
+     [create/button]]
     [debug-component]]])

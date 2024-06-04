@@ -4,13 +4,13 @@
    [cljs.pprint :refer [pprint]]
    [clojure.string :refer [join]]
    [leihs.admin.common.components :as components]
-   [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.workdays.core :as workdays]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.core :refer [presence]]
+   [leihs.core.front.debug :refer [spy]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.shared :refer [short-id]]
    [react-bootstrap :as react-bootstrap]
@@ -48,33 +48,6 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 ;;; components ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn inventory-pool-form [& {:keys [is-editing]
-                              :or {is-editing false}}]
-  (if-not @data*
-    [wait-component]
-    [:div.inventory-pool.mt-3
-     [:div.mb-3
-      [form-components/checkbox-component data* [:is_active]
-       :label "Active"]]
-     [:div
-      [form-components/input-component data* [:shortname]
-       :label "Short name"
-       :disabled is-editing
-       :required true]]
-     [:div
-      [form-components/input-component data* [:name]
-       :label "Name"
-       :required true]]
-     [:div
-      [form-components/input-component data* [:email]
-       :label "Email"
-       :type :email
-       :required true]]
-     [form-components/input-component data* [:description]
-      :label "Description"
-      :element :textarea
-      :rows 10]]))
 
 ;; shared tabs for main view
 (defn tabs [active]

@@ -50,6 +50,9 @@
                   (leaf "" :inventory-pool)
                   (leaf "/delete" :inventory-pool-delete)
                   (leaf "/edit" :inventory-pool-edit)
+                  (leaf "/holidays" :inventory-pool-holidays)
+                  (leaf "/opening-times" :inventory-pool-opening-times)
+                  (leaf "/workdays" :inventory-pool-workdays)
                   users-paths
                   delegations/paths
                   groups-paths

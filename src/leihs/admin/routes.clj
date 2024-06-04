@@ -26,6 +26,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.holidays.main :as inventory-pool-holidays]
    [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
@@ -33,6 +34,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.main :as inventory-pool-user]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as inventory-pool-user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as inventory-pool-user-suspension]
+   [leihs.admin.resources.inventory-pools.inventory-pool.workdays.main :as inventory-pool-workdays]
    [leihs.admin.resources.inventory-pools.main :as inventory-pools]
    [leihs.admin.resources.mail-templates.mail-template.main :as mail-template]
    [leihs.admin.resources.mail-templates.main :as mail-templates]
@@ -176,12 +178,20 @@
 
           :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-holidays {:handler inventory-pool-holidays/routes
+                                    :authorizers [auth/admin-scopes?
+                                                  pool-auth/pool-inventory-manager?
+                                                  pool-auth/pool-lending-manager-and-http-safe?]}
           :inventory-pool-user-direct-roles {:handler inventory-pool-user-direct-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-groups-roles {:handler inventory-pool-user-groups-roles/groups-roles :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-roles {:handler inventory-pool-user-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user {:handler inventory-pool-user/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-user-suspension {:handler inventory-pool-user-suspension/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-users {:handler inventory-pool-users/users :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
+          :inventory-pool-workdays {:handler inventory-pool-workdays/routes
+                                    :authorizers [auth/admin-scopes?
+                                                  pool-auth/pool-inventory-manager?
+                                                  pool-auth/pool-lending-manager-and-http-safe?]}
           :inventory-pools {:handler inventory-pools/routes
                             :authorizers [auth/admin-scopes?
                                           pool-auth/some-lending-manager-and-http-safe?]}

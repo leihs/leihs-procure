@@ -12,6 +12,37 @@
   (swap! data* assoc-in ks value)
   value)
 
+(defn switch-component
+  [data* ks & {:keys [disabled hint label
+                      classes
+                      key pre-change post-change
+                      invalid-feedback]
+               :or {disabled false
+                    hint nil
+                    classes []
+                    label (last ks)
+                    key (last ks)
+                    pre-change identity
+                    post-change identity}}]
+  [:div.custom-control.custom-switch
+   [:input.custom-control-input
+    {:id key
+     :class classes
+     :type :checkbox
+     :checked (boolean (get-in @data* ks))
+     :on-change #(-> @data* (get-in ks) boolean not
+                     pre-change
+                     (set-value data* ks)
+                     post-change)
+     :tab-index TAB-INDEX
+     :disabled disabled}]
+   [:label.custom-control-label {:for key}
+    (if (= label (last ks))
+      [:strong label]
+      [:span [:strong  label] [:small " (" [:span.text-monospace (last ks)] ")"]])]
+   [:<> (when hint [:div [:small hint]])]
+   [:<> (when invalid-feedback [:div.invalid-feedback invalid-feedback])]])
+
 (defn checkbox-component
   [data* ks & {:keys [disabled hint label
                       classes

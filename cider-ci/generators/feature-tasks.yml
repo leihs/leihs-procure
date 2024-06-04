@@ -433,6 +433,16 @@
   environment_variables:
     FEATURE_NAME: "Manage inventory-pools an admin and several pools  a inventory-pool manager via the UI 01"
     FEATURE: './spec/features/inventory-pools/edit_spec.rb[1:1:2:1:1]'
+'./spec/features/inventory-pools/edit_spec.rb[1:1:2:1:2:1]':
+  name: "Manage inventory-pools an admin and several pools  a inventory-pool manager via the UI edits the opening times 01"
+  environment_variables:
+    FEATURE_NAME: "Manage inventory-pools an admin and several pools  a inventory-pool manager via the UI edits the opening times 01"
+    FEATURE: './spec/features/inventory-pools/edit_spec.rb[1:1:2:1:2:1]'
+'./spec/features/inventory-pools/edit_spec.rb[1:1:2:1:2:2]':
+  name: "Manage inventory-pools an admin and several pools  a inventory-pool manager via the UI edits the opening times 02"
+  environment_variables:
+    FEATURE_NAME: "Manage inventory-pools an admin and several pools  a inventory-pool manager via the UI edits the opening times 02"
+    FEATURE: './spec/features/inventory-pools/edit_spec.rb[1:1:2:1:2:2]'
 './spec/features/inventory-pools/edit_spec.rb[1:1:2:2:1:1]':
   name: "Manage inventory-pools an admin and several pools  a inventory-pool manager a lending manager via the UI 01"
   environment_variables:

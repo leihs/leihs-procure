@@ -24,6 +24,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.main :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.opening-times.main :as inventory-pool-opening-times]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as inventory-pool-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as inventory-pool-user-direct-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.edit :as inventory-pool-user-edit]
@@ -87,6 +88,7 @@
    :inventory-pool-entitlement-groups #'inventory-pool-entitlement-groups/page
    :inventory-pool-group-roles #'inventory-pool-group-roles/page
    :inventory-pool-groups #'inventory-pool-groups/page
+   :inventory-pool-opening-times #'inventory-pool-opening-times/page
    :inventory-pool-user #'inventory-pool-user/page
    :inventory-pool-user-edit #'inventory-pool-user-edit/page
    :inventory-pool-user-direct-roles #'inventory-pool-user-direct-roles/page

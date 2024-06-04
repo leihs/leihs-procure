@@ -4,8 +4,10 @@
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :refer [Button Modal]]))
+   [react-bootstrap :refer [Button Modal]]
+   [reagent.core :as reagent]))
 
 (defn delete []
   (go (when (some->
@@ -32,3 +34,17 @@
                 :type "button"
                 :onClick delete}
      "Delete"]]])
+
+(defn button []
+  (when (auth/allowed? [auth/admin-scopes?])
+    (let [show (reagent/atom false)]
+      (fn []
+        [:<>
+         [:> Button
+          {:className "ml-3"
+           :variant "danger"
+           :onClick #(reset! show true)}
+          "Delete"]
+         [dialog {:show @show
+                  :onHide #(reset! show false)}]]))))
+

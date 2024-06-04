@@ -1,6 +1,7 @@
 (ns leihs.admin.common.components
   (:refer-clojure :exclude [str keyword])
   (:require [clojure.string :as string]
+            [leihs.admin.common.icons :as icons]
             [leihs.admin.utils.clipboard :as clipboard]
             [leihs.admin.utils.misc :as front-shared :refer [gravatar-url]]
             [leihs.core.core :refer [keyword presence str]]
@@ -45,3 +46,6 @@
              id)]
           (when copy-to-clipboard
             [:sup " " [clipboard/button-tiny id]])])])
+
+(defn toggle-component [bool]
+  (if bool [icons/toggle-on] [icons/toggle-off]))

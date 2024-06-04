@@ -27,7 +27,7 @@ feature 'Manage inventory-pools', type: :feature do
       fill_in 'description', with: description
       fill_in 'shortname', with: shortname
       fill_in 'email', with: email
-      check 'is_active'
+      click_on_toggle 'is_active'
       click_on 'Save'
       wait_until { all(".modal").empty? }
       wait_until { not page.has_content? "Add Inventory Pool" }

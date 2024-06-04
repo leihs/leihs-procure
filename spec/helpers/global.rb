@@ -34,6 +34,8 @@ module Helpers
       end
     end
 
-
+    def click_on_toggle(id)
+      page.execute_script("document.getElementById('#{id}').click()")
+    end
   end
 end

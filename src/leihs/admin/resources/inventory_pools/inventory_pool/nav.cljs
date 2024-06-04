@@ -19,6 +19,14 @@
      " Settings "]]
    [:> react-bootstrap/Nav.Item
     [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-opening-times
+                      {:inventory-pool-id @inventory-pool/id*})]
+       {:active (clojure.string/includes? (:path @routing/state*) href)
+        :href href})
+     [icons/opening-times]
+     " Opening-Times "]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
      (let [href (path :inventory-pool-users
                       {:inventory-pool-id @inventory-pool/id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
