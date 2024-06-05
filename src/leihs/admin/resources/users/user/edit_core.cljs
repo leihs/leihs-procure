@@ -164,12 +164,7 @@
        :hint [:span "The login can be used alternatively to the primary email-address to sign in. "
               "Each value must be " [:strong " unique accross all users "] " and  "
               "only consist of the characters " [:strong " a-z, and 0-9. "]]]]]
-    [users-and-groups/org-form-fields-row-component data*]
-    [:div
-     [json-component :extended_info
-      :classes [(when-not @extended-info-is-valid* :is-invalid)]
-      :label "Extended info"
-      :hint [:span "This field can hold any structured data in JSON format."]]]]])
+    [users-and-groups/org-form-fields-row-component data*]]])
 
 (defn debug-component []
   (when (:debug @state/global-state*)

@@ -1218,11 +1218,6 @@
   environment_variables:
     FEATURE_NAME: "Editing and updating a user all types of useres exist, as a system admin via the UI 04"
     FEATURE: './spec/features/users/edit-user_spec.rb[1:1:3:1:4]'
-'./spec/features/users/extended-info-json_spec.rb[1:1:1]':
-  name: "Extended info of users  bunch of users exist, as an admin via the UI 01"
-  environment_variables:
-    FEATURE_NAME: "Extended info of users  bunch of users exist, as an admin via the UI 01"
-    FEATURE: './spec/features/users/extended-info-json_spec.rb[1:1:1]'
 './spec/features/users/filter-by-account-enabled_spec.rb[1:1:1:1]':
   name: "Filter users by account status a bunch of users exist, as an Admin via the UI account enabled filters 01"
   environment_variables:

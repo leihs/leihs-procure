@@ -123,14 +123,6 @@
         [user-home-button]
         [delete-button]]])))
 
-(defn extended-info []
-  [:div.mt-3
-   (if-let [ext-info (some-> @user-data* :extended_info presence
-                             (->> (.parse js/JSON)) presence)]
-     [:div.bg-light [:pre (.stringify js/JSON ext-info nil 2)]]
-     [:div.alert.alert-secondary.text-center
-      "There is no extended info available for this user."])])
-
 (defn header []
   (let [name (str (:firstname @user-data*)
                   " "
@@ -158,8 +150,6 @@
       [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
        [inventory-pools/table-component {:chrome false}]]
       [:> Tab {:eventKey "groups" :title "Groups"}
-       [groups/table-component]]
-      [:> Tab {:eventKey "extended-info" :title "Extended Info"}
-       [extended-info]]]
+       [groups/table-component]]]
      [delete-user-dialog]
      [user-core/debug-component]]))
