@@ -169,7 +169,6 @@ feature 'Creating groups', type: :feature do
     end
 
     context "some inventory-pool's lending-manager " do
-
       before :each do
         @pool =  FactoryBot.create :inventory_pool
         @lending_manager = FactoryBot.create :user
@@ -178,13 +177,11 @@ feature 'Creating groups', type: :feature do
       end
 
       context 'via the UI' do
-
         before :each do
           sign_in_as @lending_manager
         end
 
         scenario 'creates a new group ' do
-
           description = <<~TEXT
           Describir es explicar, de manera detallada y ordenada, cómo son las personas, animales, lugares, objetos, etc.
           La descripción sirve sobre todo para ambientar la acción y crear una que haga más creíbles los hechos que se narran.
@@ -212,10 +209,7 @@ feature 'Creating groups', type: :feature do
 
           # we can see the full description here too
           expect(page.text.tr("\n\r\s"," ")).to have_content description.tr("\n\r\s"," ")
-
         end
-
-
       end
 
       context 'via the API' do

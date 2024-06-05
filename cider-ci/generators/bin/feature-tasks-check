@@ -30,7 +30,7 @@ if [ -z "$(git status --porcelain $FEATURE_TASKS_FILE)" ]; then
   echo "$FEATURE_TASKS_FILE is up to date"
 else
   echoerr "$FEATURE_TASKS_FILE is not up to date"
-  echoerr "call ./cider-ci/generators/bin/feature-tasks-create and commit"
+  echoerr "call DB_NAME=... ./cider-ci/generators/bin/feature-tasks-create (DB_NAME must be one of installed DBs, see -> psql -l) and commit"
   exit 1
 fi
 

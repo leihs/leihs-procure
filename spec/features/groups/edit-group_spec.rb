@@ -2,9 +2,7 @@ require 'spec_helper'
 require 'pry'
 
 feature 'Editing groups', type: :feature do
-
   context 'some admins, a bunch of users and a bunch of groups exist' do
-
     before :each do
       @admins = 3.times.map { FactoryBot.create :admin }
       @system_admins = 3.times.map { FactoryBot.create :system_admin}
@@ -181,11 +179,7 @@ feature 'Editing groups', type: :feature do
           resp = http_client.patch "/admin/groups/#{group[:id]}", {name: "New Name"}.to_json
           expect(resp.status).to be== 403
         end
-
       end
-
     end
-
   end
-
 end

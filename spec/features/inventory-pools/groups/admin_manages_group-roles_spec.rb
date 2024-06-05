@@ -25,9 +25,32 @@ feature 'Manage inventory-pool groups ', type: :feature do
         wait_until { all("table tbody tr").count == 1 }
         expect(page.find("table")).not_to have_content "customer"
         expect(page.find("table")).not_to have_content "inventory_manager"
-        click_on "Edit"
-        wait_until{ not all(".modal").empty? }
+
+        header = page.find('table thead tr', text: '# Users')
+        column_index = header.all('th').index { |th| th.text == '# Users' } + 1
+
+        # Get the number from the first row of the "# Users" column
+        number = page.find(
+          "table tbody tr:first-child td:nth-child(#{column_index})").text.to_i
+
+        #####################################################################
+        # NOTE: Capybara finds the button and clicks it but nothing happens.
+        # It has to be retried some times until the modal is displayed.
+        # Some UI hooks/callbacks not initialized yet on first try?
+        wait_until do
+          within find("table tbody tr", text: @group.name) do
+            find("button", text: "Edit").click
+          end
+          page.has_selector?(".modal")
+        end
+        #####################################################################
         # set access_right
+
+        expect(page).to have_css(
+          '.modal .fade.alert.alert-danger', 
+          text: "#{number} Users will be affected!"
+        )
+          
         check "inventory_manager"
         click_on "Save"
         wait_until do

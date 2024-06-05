@@ -158,6 +158,11 @@
   environment_variables:
     FEATURE_NAME: "Editing groups some admins, a bunch of users and a bunch of groups exist some inventory-pool's lending-manager  via the API 02"
     FEATURE: './spec/features/groups/edit-group_spec.rb[1:1:3:2:2]'
+'./spec/features/groups/edit-roles_spec.rb[1:1:1:1]':
+  name: "Editing roles  some admins, a bunch of users and a bunch of groups exist an system-admin via the UI 01"
+  environment_variables:
+    FEATURE_NAME: "Editing roles  some admins, a bunch of users and a bunch of groups exist an system-admin via the UI 01"
+    FEATURE: './spec/features/groups/edit-roles_spec.rb[1:1:1:1]'
 './spec/features/groups/manage-group-users_batch-api_spec.rb[1:1:1]':
   name: "Managing group users via API batch put an system admin, one group and some prepared users exist 01"
   environment_variables:

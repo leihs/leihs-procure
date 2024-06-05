@@ -30,7 +30,6 @@ feature 'Manage inventory-pool users ', type: :feature do
       # NOTE: Capybara finds the button and clicks it but nothing happens.
       # It has to be retried some times until the modal is displayed.
       # Some UI hooks/callbacks not initialized yet on first try?
-      #
       wait_until do
         within find("table tbody tr", text: @group.name) do
           find("button", text: "Edit").click
@@ -39,13 +38,14 @@ feature 'Manage inventory-pool users ', type: :feature do
       end
       #####################################################################
 
+      expect(page).to have_css(
+        '.modal .fade.alert.alert-danger', 
+        text: "Users will be affected!"
+      )
       # set access_right
       check "inventory_manager"
       click_on "Save"
-      wait_until do
-        GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id])
-          .try(:role) == "inventory_manager"
-      end
+      expect(GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id]).role).to eq "inventory_manager"
 
       # remove all access_rights
       within("table tbody tr", text: @group.name) do
@@ -54,9 +54,7 @@ feature 'Manage inventory-pool users ', type: :feature do
       wait_until{ not all(".modal").empty? }
       uncheck :customer
       click_on "Save"
-      wait_until do
-        GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id]).nil?
-      end
+      expect(GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id])).to be_nil
 
     end
   end

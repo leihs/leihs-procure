@@ -75,9 +75,9 @@
                                 :or {compact false
                                      update-handler nil
                                      message nil}}]
+  (reset! message* message)
   (reagent/with-let [edit-mode?* (reagent/atom false)]
     [:div
-     (reset! message* message)
      (when @edit-mode?*
        [roles-edit-component roles edit-mode?*
         :update-handler (fn [updated-roles]
