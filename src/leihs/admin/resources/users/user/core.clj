@@ -3,16 +3,20 @@
    [clojure.string :as string]
    [honey.sql.helpers :as sql]
    [leihs.admin.utils.regex :refer [org-id-org-pattern uuid-pattern]]
-   [leihs.core.uuid :refer [uuid]]))
+   [leihs.core.uuid :refer [uuid] :as uuid]))
 
 (defn sql-merge-unique-user
   "where-merges a unique user condition in and for honeysql1"
   [query uid]
   (cond
 
-    ; case UUID must be the primary ID
+    ; case UUID class
     (instance? java.util.UUID uid)
     (sql/where query [:= :users.id uid])
+
+    ; case string which is castable to UUID
+    (uuid/castable? uid)
+    (sql/where query [:= :users.id (uuid uid)])
 
     ; case ORG_ID and ORG
     (re-matches org-id-org-pattern uid)
@@ -26,12 +30,12 @@
     (clojure.string/includes? uid "@")
     (sql/where query [:= [:lower :users.email] [:lower uid]])
 
-; case login
+    ; case login
     (and (not (clojure.string/includes? uid "@"))
          (not (clojure.string/includes? uid "|")))
     (sql/where query [:= :users.login uid])
 
-; sure nothing matches else
+    ; sure nothing matches else
     :else (sql/where query [:= true false])))
 
 (defn sql-where-unique-user

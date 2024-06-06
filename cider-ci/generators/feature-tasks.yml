@@ -1368,6 +1368,11 @@
   environment_variables:
     FEATURE_NAME: "Searching users a bunch of users, as an admin via the UI searching and filtering users searching for a user 04"
     FEATURE: './spec/features/users/search_spec.rb[1:1:1:4:2]'
+'./spec/features/users/show-user-groups_spec.rb[1:1:1]':
+  name: "Show users groups an admin via the UI 01"
+  environment_variables:
+    FEATURE_NAME: "Show users groups an admin via the UI 01"
+    FEATURE: './spec/features/users/show-user-groups_spec.rb[1:1:1]'
 './spec/features/users/show-user-inventory-pools_spec.rb[1:1:1:1:1]':
   name: "Show users inventory-pools some users exist one @user has two roles in different pools an admin via the UI 01"
   environment_variables:
