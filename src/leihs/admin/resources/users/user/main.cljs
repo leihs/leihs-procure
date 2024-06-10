@@ -29,14 +29,6 @@
                 (or (nil? user-data*) (:admin_protected @user-data*)) false
                 :else true)))
 
-(defn user-home-button []
-  (when (auth/allowed?  [modifieable?])
-    [:<>
-     [:> Button
-      {:variant "secondary"
-       :href (clojure.core/str "/my/user/" @user-id*)}
-      "User Home"]]))
-
 (defn edit-user-button []
   (let [show (reagent/atom false)]
     (fn []
@@ -120,7 +112,6 @@
         [:> ButtonGroup {:className "mr-3"}
          [edit-user-button]
          [reset-password-button]]
-        [user-home-button]
         [delete-button]]])))
 
 (defn header []

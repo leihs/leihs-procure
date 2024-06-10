@@ -23,7 +23,6 @@
     :inventory-quick-csv
     :inventory-quick-excel
     :lending
-    :my-user
     :procurement
     :status})
 
