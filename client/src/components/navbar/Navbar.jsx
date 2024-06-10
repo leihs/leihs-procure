@@ -52,7 +52,7 @@ export default class Navbar extends React.Component {
       children,
       csrfToken
     } = props
-    const { me, appTitle, appMenu, subApps, returnTo } = config
+    const { me, appTitle, appMenu, subApps, returnTo, languageSwitchPath } = config
     const user = f.get(me, 'user')
     const isLoggedIn = f.get(user, 'id')
     const { homeUrl } = defaults
@@ -111,7 +111,7 @@ export default class Navbar extends React.Component {
 
             <LocalesDropdown
               locales={config.locales}
-              isLoggedIn={isLoggedIn}
+              action={languageSwitchPath}
               csrfToken={csrfToken}
             />
           </Nav>
@@ -234,7 +234,7 @@ const SubAppDropdown = ({ t, subApps }) => {
   )
 }
 
-const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
+const LocalesDropdown = ({ locales, action, csrfToken }) => {
   // NOTE: `locale` is the pkey (instead of `id`)
   if (f.isEmpty(locales)) return false
   const currentLang =
@@ -242,7 +242,7 @@ const LocalesDropdown = ({ locales, isLoggedIn, csrfToken }) => {
   return (
     <form
       method="POST"
-      action={isLoggedIn ? '/my/user/me' : '/my/language'}
+      action={action}
       className="ui-lang-selection"
     >
       <UncontrolledDropdown nav inNavbar>

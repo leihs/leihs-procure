@@ -86,12 +86,6 @@ step "user does not have a prefered language" do
   expect(@user.language_id).to be_nil
 end
 
-step "I log out" do
-  visit "/my/user/me"
-  find(".fa-user-circle").click
-  click_on "Logout"
-end
-
 step "I wait for :seconds seconds" do |seconds|
   sleep seconds.to_i
 end
