@@ -24,7 +24,7 @@
              :show show}
    [:> Modal.Header {:closeButton true
                      :onHide onHide}
-    [:> Modal.Title "Edit Miscellaneous"]]
+    [:> Modal.Title "Edit System and Security"]]
    [:> Modal.Body
     [syssec-core/form put]]
    [:> Modal.Footer

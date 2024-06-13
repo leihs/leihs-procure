@@ -56,7 +56,7 @@
              :show show}
    [:> Modal.Header {:closeButton true
                      :onHide onHide}
-    [:> Modal.Title "Edit Room"]]
+    [:> Modal.Title "Edit Field"]]
    [:> Modal.Body
     [form]]
    [:> Modal.Footer

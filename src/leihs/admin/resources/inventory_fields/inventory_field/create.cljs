@@ -43,7 +43,7 @@
              :show show}
    [:> Modal.Header {:closeButton true
                      :onHide onHide}
-    [:> Modal.Title "Add a Room"]]
+    [:> Modal.Title "Add a Field"]]
    [:> Modal.Body
     [form]]
    [:> Modal.Footer
