@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.users.user.api-tokens.show
   (:require [cljs.core.async :as async :refer [<! go]]
-            [leihs.admin.common.components.navigation.back :as back]
+            [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
             [leihs.admin.common.http-client.core :as http-client]
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.users.user.api-tokens.core :as core]
@@ -62,7 +62,7 @@
    (if-let [api-token @data*]
      [:div
       [:header.mb-5
-       [back/button {:href (path :user {:user-id (-> api-token :user_id)})}]
+       [breadcrumbs/main {:href (path :user {:user-id (-> api-token :user_id)})}]
        [:h1.mt-3 "API Token " [:code (-> api-token :token_part)]]
        [:h6 (:firstname @user-core/user-data*) " " (:lastname @user-core/user-data*)]]
 

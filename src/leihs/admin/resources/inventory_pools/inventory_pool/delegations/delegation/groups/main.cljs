@@ -41,11 +41,6 @@
    [debug-component]
    [groups/debug-component]])
 
-;; (defn breadcrumbs []
-;;   [breadcrumbs/nav-component
-;;    (conj  @breadcrumbs/left*
-;;           [breadcrumbs/groups-li]) []])
-
 (defn page []
   [:article.inventory-pool-groups.my-5
    [delegation/header]

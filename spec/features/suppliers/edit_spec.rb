@@ -56,7 +56,11 @@ feature 'Manage suppliers', type: :feature do
 
       expect(page.text).to have_content name
       expect(page.text).to have_content note
-      click_on 'Back'
+
+      within("aside nav") do
+        click_on "Suppliers"
+      end
+
       wait_until { current_path ==  "/admin/suppliers/" }
       expect(page).to have_content name
     end

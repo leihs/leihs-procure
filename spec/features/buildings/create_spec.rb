@@ -32,7 +32,11 @@ feature 'Manage Buildings', type: :feature do
       expect(page.text).to have_content name
       expect(page.text).to have_content code
 
-      click_on "Back"
+
+      within("aside nav") do
+        click_on("Buildings")
+      end
+
       wait_until { current_path == "/admin/buildings/" }
       wait_until { page.has_content? name }
       click_on name

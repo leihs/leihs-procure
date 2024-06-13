@@ -51,7 +51,9 @@ feature 'Manage inventory-pool users ', type: :feature do
         end
       end
 
-      click_on "Back"
+      within(".breadcrumb") do
+        find("[data-test-id='#{@pool.name}']").click
+      end
       select 'any', from: 'Role'
       fill_in 'Search', with: @users.first.email
       wait_until { all("table tbody tr").count == 1 }

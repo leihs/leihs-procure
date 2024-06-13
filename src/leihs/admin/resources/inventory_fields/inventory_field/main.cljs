@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.main
   (:require
-   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-fields.inventory-field.core :as inventory-field
@@ -85,7 +85,7 @@
   (let [data  @inventory-field/inventory-field-data*]
     (fn []
       [:header.my-5
-       [back/button  {:to (path :inventory-fields)}]
+       [breadcrumbs/main  {:to (path :inventory-fields)}]
        [:h1.mt-3 (-> data :data :label)]
        [:p "( " (:id data) " )"]])))
 

@@ -5,7 +5,6 @@
             [leihs.admin.common.roles.components :as roles-ui :refer [put-roles<]]
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-            [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
             [leihs.admin.resources.users.user.core :as user]
             [leihs.admin.state :as state]
             [leihs.core.routing.front :as routing]
@@ -62,9 +61,6 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   [breadcrumbs/nav-component
-    (conj @breadcrumbs/left*
-          [breadcrumbs/roles-li]) []]
    [header-component]
    [remarks-component]
    [roles-ui/roles-component @roles-data*

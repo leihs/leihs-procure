@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.buildings.building.main
   (:require
-   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.buildings.building.core :as building :refer [clean-and-fetch]]
@@ -53,7 +53,7 @@
   (let [name (:name @building/data*)]
     (fn []
       [:header.my-5
-       [back/button {:to (path :buildings)}]
+       [breadcrumbs/main {:to (path :buildings)}]
        [:h1.mt-3 name]])))
 
 (defn page []

@@ -2,7 +2,7 @@
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.components.navigation.back :as  back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.roles.components :as roles-ui]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
@@ -146,7 +146,7 @@
   (let [data @user-data*]
     (fn []
       [:header.my-5
-       [back/button {:href (path :inventory-pool-users {:inventory-pool-id @inventory-pool/id*})}]
+       [breadcrumbs/main]
        [:h1.mt-3 (:firstname data) " " (:lastname data)]
        [:h6 "In Pool " [inventory-pool/name-component]]])))
 

@@ -33,8 +33,11 @@ feature 'Manage suppliers', type: :feature do
       expect(page.text).to have_content name
       expect(page.text).to have_content note
 
-      # The inventory pools path includes the newly created inventory pool and
-      click_on 'Back'
+      within("aside nav") do
+        click_on "Suppliers"
+      end
+
+
       wait_until { current_path == "/admin/suppliers/" }
       wait_until { page.has_content? name }
       click_on name

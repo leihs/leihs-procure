@@ -4,7 +4,6 @@
    [cljs.pprint :refer [pprint]]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
    [leihs.admin.state :as state]
@@ -43,8 +42,6 @@
 
 (defn page []
   [:div.inventory-pool-delegation-suspension
-   [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/suspension-li]) []]
    [header-component]
    [delegation-page-suspension-component]
    [debug-component]])

@@ -2,6 +2,7 @@
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.edit :as edit]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]

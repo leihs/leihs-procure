@@ -7,7 +7,6 @@
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.groups.group.core :as group]
             [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-            [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.breadcrumbs :as breadcrumbs]
             [leihs.admin.state :as state]
             [leihs.core.routing.front :as routing]
             [reagent.core :as reagent]))
@@ -54,9 +53,6 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
-   [breadcrumbs/nav-component
-    (conj @breadcrumbs/left*
-          [breadcrumbs/group-roles-li]) []]
    [header-component]
    [:div.form
     [roles-component @data*

@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.users.user.main
   (:require
-   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.user.api-tokens.main :as api-tokens]
    [leihs.admin.resources.users.user.core :as user-core :refer [clean-and-fetch user-data*
@@ -120,7 +120,7 @@
                   (:lastname @user-data*))]
     (fn []
       [:header.my-5
-       [back/button {:href (path :users {})}]
+       [breadcrumbs/main]
        [:h1.mt-3 name]])))
 
 (defn own-user-admin-scopes? [user-state _routing-state]

@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.suppliers.supplier.main
   (:require
-   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.suppliers.supplier.core :as supplier-core :refer [clean-and-fetch]]
@@ -53,7 +53,7 @@
   (let [name (:name @supplier-core/data*)]
     (fn []
       [:header.my-5
-       [back/button  {:to (path :suppliers)}]
+       [breadcrumbs/main  {:to (path :suppliers)}]
        [:h1.mt-3 name]])))
 
 (defn page []

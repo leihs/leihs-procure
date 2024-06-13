@@ -25,9 +25,8 @@
 
 (defn page []
   [:article.inventory-pool-opening-times
-   [:header.my-5
-    [:h1.mt-3 [inventory-pool/name-component]]]
-   [nav/tabs]
+   [inventory-pool/header]
+   [inventory-pool/tabs]
    [:article.m-0.mb-5.container
     [:div.row
      [:div.col-6 [workdays/component]]

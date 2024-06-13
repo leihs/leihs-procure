@@ -19,7 +19,11 @@ feature 'Manage inventory-pools', type: :feature do
     scenario ' creates a new inventory-pool ' do
 
       visit '/admin/'
-      click_on 'Inventory Pools'
+
+      within("aside nav") do
+        click_on "Inventory Pools"
+      end
+
       expect(all("a, button", text: 'Add Inventory Pool')).not_to be_empty
       first("button", text: 'Add Inventory Pool').click
       # click_on 'Add Inventory Pool'
@@ -42,7 +46,11 @@ feature 'Manage inventory-pools', type: :feature do
 
       # The inventory pools path includes the newly created inventory pool and
       # we can get to it via clicking its name
-      click_on "Inventory Pools"
+
+      within("aside nav") do
+        click_on "Inventory Pools"
+      end
+
       wait_until { current_path == "/admin/inventory-pools/" }
       wait_until { page.has_content? name }
       click_on name
@@ -66,7 +74,9 @@ feature 'Manage inventory-pools', type: :feature do
       before(:each){ sign_in_as @manager }
 
       scenario 'there is no create button' do
-        click_on 'Inventory Pools'
+      within("aside nav") do
+        click_on "Inventory Pools"
+      end
         wait_until { page.has_content? @pool.name }
         expect(all("a, button", text: 'Add Inventory Pool')).to be_empty
       end

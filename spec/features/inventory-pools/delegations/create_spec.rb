@@ -25,9 +25,6 @@ shared_examples :create do
     end
     expect(find_field('pool_protected')).to be_checked
     click_on 'Add'
-    wait_until do
-      current_path.match? %{/admin/inventory-pools/[^/]+/delegations/[^/]+}
-    end
     expect(page).to have_content 'Foo-Delegation'
     expect(page).to have_content resp_user.email
     expect(find('tr', text: 'Protected').text).to have_content 'yes'

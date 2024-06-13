@@ -33,7 +33,10 @@ feature 'Manage Mail Templates', type: :feature do
       input_values = all("input").map(&:value).join(" ")
       expect(page.text + input_values).to have_content mt_body
 
-      click_on 'Back'
+      within("aside nav") do
+        click_on "Mail Templates"
+      end
+
       wait_until { current_path ==  "/admin/mail-templates/" }
       expect(page).to have_selector("tr.mail-template",
                                     text: /#{@mail_template.name}.*#{@mail_template.language_locale}/)

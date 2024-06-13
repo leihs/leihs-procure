@@ -1,9 +1,10 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.core
   (:require
-   [cljs.core.async :as async :refer [go <!]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
    [clojure.string :refer [join]]
    [leihs.admin.common.components :as components]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
@@ -62,6 +63,14 @@
      " Settings "]]
    [:> react-bootstrap/Nav.Item
     [:> react-bootstrap/Nav.Link
+     (let [href (path :inventory-pool-opening-times
+                      {:inventory-pool-id @id*})]
+       {:active (clojure.string/includes? (:path @routing/state*) href)
+        :href href})
+     [icons/opening-times]
+     " Opening-Times "]]
+   [:> react-bootstrap/Nav.Item
+    [:> react-bootstrap/Nav.Link
      (let [href (path :inventory-pool-users
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
@@ -103,7 +112,8 @@
 
 (defn header []
   [:header.my-5
-   [:h1.mt-3 [name-component]]])
+   [breadcrumbs/main]
+   [:h1 [name-component]]])
 
 (defn name-link-component []
   [:span

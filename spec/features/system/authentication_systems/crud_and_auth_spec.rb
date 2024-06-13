@@ -29,7 +29,6 @@ feature 'Authentication-Systems', type: :feature do
         before(:each){ sign_in_as @current_user }
 
         scenario 'CRUD' do
-          binding.pry
           within 'aside nav' do
             click_on 'Settings'
             click_on 'Authentication Systems'
@@ -77,7 +76,6 @@ feature 'Authentication-Systems', type: :feature do
             click_on 'Settings'
             click_on 'Authentication Systems'
           end
-          binding.pry
           click_on @auth_system.id
           within '.nav-tabs' do
             click_on "Users"

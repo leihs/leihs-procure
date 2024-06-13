@@ -26,7 +26,9 @@ feature 'Manage inventory-pools', type: :feature do
 
       scenario 'edits an inventory pool' do
         visit '/admin/'
-        click_on 'Inventory Pools'
+        within("aside nav") do
+          click_on "Inventory Pools"
+        end
         click_on @pool.name
         @inventory_pool_path = current_path
         click_on 'Edit'
@@ -48,7 +50,10 @@ feature 'Manage inventory-pools', type: :feature do
         # expect(page.text).to have_content shortname
         expect(page.text).to have_content email
         expect(page.text).to have_content description
-        click_on 'Inventory Pools'
+
+        within("aside nav") do
+          click_on "Inventory Pools"
+        end
         wait_until { current_path ==  "/admin/inventory-pools/" }
         expect(page).to have_content name
       end
@@ -82,7 +87,9 @@ feature 'Manage inventory-pools', type: :feature do
 
         scenario 'edits the pool settings' do
           visit '/admin/'
-          click_on 'Inventory Pools'
+          within("aside nav") do
+            click_on "Inventory Pools"
+          end
           click_on @pool.name
           @inventory_pool_path = current_path
           click_on 'Edit'
@@ -204,7 +211,9 @@ feature 'Manage inventory-pools', type: :feature do
           before(:each){ sign_in_as @manager }
           scenario 'edits the pool' do
             visit '/admin/'
-            click_on 'Inventory Pools'
+            within("aside nav") do
+              click_on "Inventory Pools"
+            end
             click_on @pool.name
             expect(all("a, button", text: 'Edit')).to be_empty
           end

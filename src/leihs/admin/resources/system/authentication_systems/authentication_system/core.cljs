@@ -1,7 +1,7 @@
 (ns leihs.admin.resources.system.authentication-systems.authentication-system.core
   (:require
    [cljs.core.async :as async :refer [<! go]]
-   [leihs.admin.common.components.navigation.back :as back]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
@@ -122,7 +122,7 @@
   (let [name (:name @data*)]
     (fn []
       [:header.my-5
-       [back/button {:href (path :authentication-systems {})}]
+       [breadcrumbs/main {:href (path :authentication-systems {})}]
        [:h1.mt-3
         [:span " Authentication System - " name]]])))
 

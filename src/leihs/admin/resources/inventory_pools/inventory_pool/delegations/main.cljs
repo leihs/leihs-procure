@@ -7,7 +7,7 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool :refer [tabs]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.create :as create]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
@@ -215,10 +215,8 @@
    [routing/hidden-state-component
     {:did-change fetch-delegations}
     {:did-mount (check-user-chosen)}]
-
-   [:h1.my-5
-    [inventory-pool/name-component]]
-   [tabs]
+   [inventory-pool/header]
+   [inventory-pool/tabs]
    [filter-section]
    [table/toolbar
     [add-button]]

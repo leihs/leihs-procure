@@ -3,6 +3,7 @@
    ["/admin-ui" :as UI]
    ["react-bootstrap" :as BS]
    [accountant.core :as accountant]
+   [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.http-client.modals]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.constants :as constants]
@@ -31,7 +32,8 @@
 (defn main []
   (if-let [page (:page @routing/state*)]
     [:div.mx-5
-     [page]]
+     [page]
+     [breadcrumbs/watcher]]
     [:div.page
      [:h1.text-danger
       [:b "Error 404 - There is no handler for the current path defined."]]

@@ -4,7 +4,6 @@
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
             [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as core]
-            [leihs.admin.resources.inventory-pools.inventory-pool.users.user.breadcrumbs :as breadcrumbs]
             [leihs.admin.resources.users.user.core :as user]
             [leihs.admin.state :as state]
             [leihs.core.routing.front :as routing]
@@ -43,8 +42,6 @@
 
 (defn page []
   [:div.inventory-pool-user-suspension
-   [breadcrumbs/nav-component
-    (conj @breadcrumbs/left* [breadcrumbs/suspension-li]) []]
    [header-component]
    [user-page-suspension-component]
    [debug-component]])

@@ -37,10 +37,10 @@ feature 'Manage rooms', type: :feature do
       expect(page.text).to have_content description
       expect(page.text).to have_content @building.name
 
-      click_on 'Back'
-      # within find("aside nav", match: :first) do
-      #   click_on "Rooms"
-      # end
+      within("aside nav") do
+        click_on "Rooms"
+      end
+
       wait_until { current_path ==  "/admin/rooms/" }
       expect(page).to have_content name
     end

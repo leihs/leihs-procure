@@ -4,7 +4,6 @@
    [cljs.core.async :as async :refer [go <!]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.filter :as filter]
-   [leihs.admin.common.components.navigation.back :as back]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]

@@ -31,8 +31,9 @@ feature 'Manage rooms', type: :feature do
       expect(page.text).to have_content @building.name
 
       # The inventory pools path includes the newly created inventory pool and
-      # we can get to it via clicking its name
-      click_on 'Back'
+      within find("aside nav", match: :first) do
+        click_on "Rooms"
+      end
 
       wait_until { current_path == "/admin/rooms/" }
       wait_until { page.has_content? name }

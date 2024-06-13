@@ -9,7 +9,6 @@
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.nav :as nav]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
    [leihs.admin.resources.users.main :as users]
@@ -178,9 +177,8 @@
   [:article.inventory-pool-users
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch users/fetch-users))}]
-   [:header.my-5
-    [:h1.mt-3 [inventory-pool/name-component]]]
-   [nav/tabs]
+   [inventory-pool/header]
+   [inventory-pool/tabs]
    [filter-section]
    [table/toolbar]
    [table-section]

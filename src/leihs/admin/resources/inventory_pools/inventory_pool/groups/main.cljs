@@ -8,7 +8,6 @@
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.main :as groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
-   [leihs.admin.resources.inventory-pools.inventory-pool.nav :as nav]
    [leihs.admin.state :as state]
    [leihs.core.routing.front :as routing]))
 
@@ -66,16 +65,12 @@
   (when (:debug @state/global-state*)
     [:div]))
 
-(defn header []
-  [:header.my-5
-   [:h1.mt-5 [inventory-pool/name-component]]])
-
 (defn page []
   [:article.inventory-pool-groups
    [routing/hidden-state-component
     {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
-   [header]
-   [nav/tabs]
+   [inventory-pool/header]
+   [inventory-pool/tabs]
    [routing/hidden-state-component
     {:did-change groups/fetch-groups}]
    [filter-section]
