@@ -25,7 +25,16 @@ feature 'Show users groups', type: :feature do
 
       fill_in 'Search', with: "#{@user.firstname} #{@user.lastname}"
       click_on_first_user @user
-      find(".nav-item", text: "Groups").click
+
+      wait_until { page.has_content? @user.firstname } 
+      find("h1", text: @user.firstname)
+
+      loop do
+        group = find(".nav-item", text: "Groups")
+        group.click
+        break if group['aria-selected'] == 'true'
+      end
+
       within ".tab-content" do
         @user.groups.each do |group|
           expect(current_scope).to have_content(group.name)

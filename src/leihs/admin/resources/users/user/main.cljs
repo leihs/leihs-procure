@@ -129,27 +129,30 @@
        (auth/admin-scopes? user-state _routing-state)))
 
 (defn page []
-  (if (empty? @user-data*)
-    [:div.mt-5
-     [wait-component]
-     [routing/hidden-state-component
-      {:did-mount #(do
-                     (clean-and-fetch)
-                     (check-user-chosen))}]]
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(do
+                    (clean-and-fetch)
+                    (check-user-chosen))
+     :will-unmount #(reset! user-data* nil)}]
 
-    [:article.users
-     [header]
-     [basic-properties]
-     [:> Tabs {:className "mt-5"
-               :defaultActiveKey "inventory-pools"
-               :transition false}
-      [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
-       [inventory-pools/table-component {:chrome false}]]
-      [:> Tab {:eventKey "groups" :title "Groups"}
-       [groups/table-component]]
-      (when (auth/allowed?
-             [auth/system-admin-scopes? own-user-admin-scopes?])
-        [:> Tab {:eventKey "api-tokens" :title "API Tokens"}
-         [api-tokens/table-component]])]
-     [delete-user-dialog]
-     [user-core/debug-component]]))
+   (if-not @user-data*
+     [:div.mt-5
+      [wait-component]]
+     [:article.users
+      [header]
+      [basic-properties]
+
+      [:> Tabs {:className "mt-5"
+                :defaultActiveKey "inventory-pools"
+                :transition false}
+       [:> Tab {:eventKey "inventory-pools" :title "Inventory Pools"}
+        [inventory-pools/table-component {:chrome false}]]
+       [:> Tab {:eventKey "groups" :title "Groups"}
+        [groups/table-component]]
+       (when (auth/allowed?
+              [auth/system-admin-scopes? own-user-admin-scopes?])
+         [:> Tab {:eventKey "api-tokens" :title "API Tokens"}
+          [api-tokens/table-component]])]
+      [delete-user-dialog]
+      [user-core/debug-component]])])

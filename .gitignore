@@ -12,6 +12,7 @@
 /resources/public/admin/js/
 /target
 /tmp
+/.clj-kondo/rewrite-clj/
 figwheel_server.log
 profiles.clj
 resources/built-info.yml
