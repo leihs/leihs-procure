@@ -45,10 +45,13 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change auth-core/clean-and-fetch}]
+    {:did-change (fn []
+                   (users/fetch-users)
+                   (auth-core/clean-and-fetch))}]
+
    (if-not @auth-core/data*
      [:div.my-5
-      [wait-component " Loading Authentication System Data ..."]]
+      [wait-component]]
      [:article.authentication-system.my-5
       [auth-core/header]
       [:section

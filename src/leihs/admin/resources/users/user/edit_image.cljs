@@ -122,7 +122,7 @@
            :on-click #(swap! data* assoc :img256_url nil :img32_url nil :img_digest nil)}
           [:i.fas.fa-times] " Remove image "]])]]]])
 
-(defn image-component []
+(defn image-component [data*]
   [:div
    [:div.form-row
     [:div.col-md-4 [file-upload]]

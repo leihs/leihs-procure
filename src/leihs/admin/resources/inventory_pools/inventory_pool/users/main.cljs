@@ -8,7 +8,7 @@
    [leihs.admin.common.roles.components :refer [put-roles< roles-component]]
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.shared :refer [default-query-params]]
    [leihs.admin.resources.users.main :as users]
@@ -33,9 +33,10 @@
   [:th "User"])
 
 (defn user-inner-component [user]
-  [:a {:href (path :inventory-pool-user
+  [:a {:data-test-id (:id user)
+       :href (path :inventory-pool-user
                    {:user-id (:id user)
-                    :inventory-pool-id @inventory-pool/id*})}
+                    :inventory-pool-id @pool-core/id*})}
    [:ul.list-unstyled
     (for [[idx item] (map-indexed vector (user2/fullname-some-uid-seq user))]
       ^{key idx} [:li {:key idx} item])]])
@@ -66,7 +67,7 @@
              [(:route @routing/state*) :users (:page-index user) :direct_roles]
              (<! (put-roles<
                   (path :inventory-pool-user-direct-roles
-                        {:inventory-pool-id @inventory-pool/id*
+                        {:inventory-pool-id @pool-core/id*
                          :user-id (:id user)})
                   roles)))))
 
@@ -84,7 +85,7 @@
 
 (defn groups-roles-td-component [user]
   (let [path (partial path :inventory-pool-groups
-                      {:inventory-pool-id @inventory-pool/id*})]
+                      {:inventory-pool-id @pool-core/id*})]
     [:td {:key :groups-roles}
      [roles-component
       (:groups_roles user)
@@ -107,7 +108,7 @@
     :update-handler (fn [updated]
                       (go (let [data (<! (suspension/put-suspension<
                                           (path :inventory-pool-user-suspension
-                                                {:inventory-pool-id @inventory-pool/id*
+                                                {:inventory-pool-id @pool-core/id*
                                                  :user-id (:id user)})
                                           updated))]
                             (swap! users/data* assoc-in
@@ -176,9 +177,12 @@
 (defn page []
   [:article.inventory-pool-users
    [routing/hidden-state-component
-    {:did-mount (fn [_] (inventory-pool/clean-and-fetch users/fetch-users))}]
-   [inventory-pool/header]
-   [inventory-pool/tabs]
+    {:did-mount #(do
+                   (pool-core/fetch)
+                   (users/fetch-users))}]
+
+   [pool-core/header]
+   [pool-core/tabs]
    [filter-section]
    [table/toolbar]
    [table-section]

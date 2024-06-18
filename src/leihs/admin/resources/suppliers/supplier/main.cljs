@@ -3,54 +3,28 @@
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.suppliers.supplier.core :as supplier-core :refer [clean-and-fetch]]
+   [leihs.admin.resources.suppliers.supplier.core :as core]
    [leihs.admin.resources.suppliers.supplier.delete :as delete]
    [leihs.admin.resources.suppliers.supplier.edit :as edit]
    [leihs.admin.resources.suppliers.supplier.items :as items]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent]))
+   [leihs.core.routing.front :as routing]))
 
 (defn info-table []
-  (let [data @supplier-core/data*]
-    (fn []
-      [table/container
-       {:borders false
-        :header [:tr [:th "Property"] [:th.w-75 "Value"]]
-        :body
-        [:<>
-         [:tr.name
-          [:td "Name" [:small " (name)"]]
-          [:td.name (:name data)]]
-         [:tr.description
-          [:td "Note" [:small " (note)"]]
-          [:td.note {:style {:white-space "break-spaces"}} (:note data)]]]}])))
-
-(defn edit-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:onClick #(reset! show true)}
-        "Edit"]
-       [edit/dialog {:show @show
-                     :onHide #(reset! show false)}]])))
-
-(defn delete-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:variant "danger"
-         :className "ml-3"
-         :onClick #(reset! show true)}
-        "Delete"]
-       [delete/dialog {:show @show
-                       :onHide #(reset! show false)}]])))
+  [table/container
+   {:borders false
+    :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+    :body
+    [:<>
+     [:tr.name
+      [:td "Name" [:small " (name)"]]
+      [:td.name (:name @core/data*)]]
+     [:tr.description
+      [:td "Note" [:small " (note)"]]
+      [:td.note {:style {:white-space "break-spaces"}} (:note @core/data*)]]]}])
 
 (defn header []
-  (let [name (:name @supplier-core/data*)]
+  (let [name (:name @core/data*)]
     (fn []
       [:header.my-5
        [breadcrumbs/main  {:to (path :suppliers)}]
@@ -59,14 +33,30 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change clean-and-fetch}]
-   (if-not @supplier-core/data*
+    {:did-mount (fn []
+                  (core/fetch)
+                  (core/fetch-items))
+     :will-unmount (fn []
+                     (reset! core/data* nil)
+                     (reset! core/data-items* nil))}]
+
+   (if-not (or
+            @core/data*
+            @core/data-items*)
      [:div.my-5
-      [wait-component " Loading Room Data ..."]]
+      [wait-component]]
+
      [:article.supplier
       [header]
-      [info-table]
-      [edit-button]
-      [delete-button]
-      [items/component]
-      [supplier-core/debug-component]])])
+
+      [:section
+       [info-table]
+       [edit/button]
+       [edit/dialog]
+       [delete/button]
+       [delete/dialog]]
+
+      [:section
+       [items/component]]
+
+      [core/debug-component]])])

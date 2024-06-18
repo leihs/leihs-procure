@@ -70,7 +70,7 @@
     "user" template-variables-for-user-component
     nil))
 
-(defn form [action]
+(defn form [action data*]
   [:> Row
    [:> Col {:md 12 :lg 8}
     [:> Form {:id "mail-template-form"

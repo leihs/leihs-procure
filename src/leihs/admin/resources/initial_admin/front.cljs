@@ -1,11 +1,23 @@
 (ns leihs.admin.resources.initial-admin.front
   (:require
+   [accountant.core :as accountant]
+   [cljs.core.async :as async :refer [<! go]]
+   [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.core.anti-csrf.front :as anti-csrf]
    [leihs.core.core :refer [presence]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (def form-data* (reagent/atom {}))
+
+(defn post []
+  (go (when (some->
+             {:chan (async/chan)
+              :url (path :initial-admin)
+              :json-params @form-data*
+              :method :post}
+             http-client/request :chan <!
+             http-client/filter-success! :body)
+        (accountant/navigate! (path :home)))))
 
 (def email-valid*?
   (reaction
@@ -21,9 +33,9 @@
 
 (defn form-component []
   [:form#initial-admin-form.form
-   {:method :post
-    :action (path :initial-admin)}
-   [anti-csrf/hidden-form-group-token-component]
+   {:on-submit (fn [e]
+                 (.preventDefault e)
+                 (post))}
    [:div.form-group
     [:label {:for :email} "email "]
     [:div

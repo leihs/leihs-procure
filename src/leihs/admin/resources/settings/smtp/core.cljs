@@ -14,11 +14,7 @@
                       http-client/request :chan <!
                       http-client/filter-success :body))))
 
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
-
-(defn form [action]
+(defn form [action data*]
   [:> Form
    {:id "smtp-form"
     :on-submit (fn [e]

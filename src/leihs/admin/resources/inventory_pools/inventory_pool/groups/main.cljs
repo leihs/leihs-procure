@@ -7,7 +7,7 @@
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.main :as groups]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.state :as state]
    [leihs.core.routing.front :as routing]))
 
@@ -18,7 +18,7 @@
              [(:route @routing/state*) :groups (:page-index group) :roles]
              (<! (put-roles<
                   (path :inventory-pool-group-roles
-                        {:inventory-pool-id @inventory-pool/id*
+                        {:inventory-pool-id @pool-core/id*
                          :group-id (:id group)})
                   roles)))))
 
@@ -66,18 +66,22 @@
     [:div]))
 
 (defn page []
-  [:article.inventory-pool-groups
+  [:<>
    [routing/hidden-state-component
-    {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
-   [inventory-pool/header]
-   [inventory-pool/tabs]
-   [routing/hidden-state-component
-    {:did-change groups/fetch-groups}]
-   [filter-section]
-   [table/toolbar]
-   [groups/table-component
-    [groups/name-th-component groups/users-count-th-component roles-th-component]
-    [groups/name-td-component groups/users-count-td-component roles-td-component]]
-   [table/toolbar]
-   [debug-component]
-   [groups/debug-component]])
+    {:did-mount #(pool-core/fetch)
+     :did-change #(groups/fetch-groups)}]
+
+   [:article.inventory-pool-groups
+    [pool-core/header]
+
+    [:section.mb-5
+     [pool-core/tabs]
+     [filter-section]
+     [table/toolbar]
+     [groups/table-component
+      [groups/name-th-component groups/users-count-th-component roles-th-component]
+      [groups/name-td-component groups/users-count-td-component roles-td-component]]
+     [table/toolbar]]
+
+    [debug-component]
+    [groups/debug-component]]])

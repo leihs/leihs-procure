@@ -10,13 +10,11 @@
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.common.users-and-groups.core :as users-and-groups]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.users.shared :as shared]
    [leihs.admin.resources.users.user.core :as user]
    [leihs.admin.resources.users.user.create :as create]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :as front-shared :refer [wait-component]]
-   [leihs.core.auth.core :as auth]
+   [leihs.admin.utils.misc :as front-shared :refer [wait-component fetch-route*]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Alert]]
    [reagent.core :as reagent :refer [reaction]]))
@@ -25,12 +23,16 @@
   (reaction (merge shared/default-query-params
                    (:query-params-raw @routing/state*))))
 
-(def current-route* (reaction (:route @routing/state*)))
+(def current-route*
+  (reaction (path (:handler-key @routing/state*)
+                  (:route-params @routing/state*))))
 
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
-  (http/route-cached-fetch data*))
+  (when (string? @fetch-route*)
+    (http/route-cached-fetch data* {:route @fetch-route*
+                                    :reload true})))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -152,20 +154,6 @@
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col user])])
 
-(defn add-button []
-  (let [show (reagent/atom false)]
-    (reset! user/user-data* {})
-    (fn []
-      (when (auth/allowed?
-             [auth/admin-scopes? pool-auth/some-lending-manager?])
-        [:<>
-         [:> Button
-          {:className "ml-3"
-           :onClick #(reset! show true)}
-          "Add User"]
-         [create/dialog {:show @show
-                         :onHide #(reset! show false)}]]))))
-
 (defn users-table
   [hds tds &
    {:keys [membership-filter? role-filter?]
@@ -173,21 +161,25 @@
          role-filter? false}}]
   [:<>
    [routing/hidden-state-component
-    {:did-change fetch-users}]
-   (if-not (contains? @data* @current-route*)
+    {:did-change #(fetch-users)}]
+
+   (if-not (contains? @data* @fetch-route*)
      [wait-component]
-     (if-let [users (-> @data* (get  @current-route* {}) :users seq)]
-       [table/container
-        {:className "users"
-         :header (table-head hds)
-         :body (doall (for [user users]
-                        (table-row user tds)))}]
-       (if @on-first-page?*
-         (cond
-           (and membership-filter? @users-membership/filtered-by-member?*) (users-membership/empty-members-alert)
-           (and role-filter? @roles/filtered-by-role?*) (roles/empty-alert)
-           :else [:> Alert {:variant "info" :className "my-3 text-center"} "No users found."])
-         [:> Alert {:variant "info" :className "my-3 text-center"} "No more users found."])))])
+     [:<>
+      (if-let [users (->> @fetch-route*
+                          (get @data*)
+                          :users seq)]
+        [table/container
+         {:className "users"
+          :header (table-head hds)
+          :body (doall (for [user users]
+                         (table-row user tds)))}]
+        (if @on-first-page?*
+          (cond
+            (and membership-filter? @users-membership/filtered-by-member?*) (users-membership/empty-members-alert)
+            (and role-filter? @roles/filtered-by-role?*) (roles/empty-alert)
+            :else [:> Alert {:variant "info" :className "my-3 text-center"} "No users found."])
+          [:> Alert {:variant "info" :className "my-3 text-center"} "No more users found."]))])])
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -206,11 +198,14 @@
 
 (defn page []
   [:article.users.my-5
+   ;; [routing/hidden-state-component
+   ;;  {:did-change #(reset! user-core/user-data* nil)}]
+
    [:h1.my-5
     [icons/users] " Users"]
    [:section
     [filter-component]
-    [table/toolbar  [add-button]]
+    [table/toolbar [create/button]]
     [users-table
      [user-th-component
       org-th-component
@@ -224,5 +219,6 @@
       contracts-count-td-component
       pools-count-td-component
       groups-count-td-component]]
-    [table/toolbar  [add-button]]
+    [table/toolbar [create/button]]
+    [create/dialog]
     [debug-component]]])

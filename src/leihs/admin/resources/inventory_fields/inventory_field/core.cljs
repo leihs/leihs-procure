@@ -109,8 +109,8 @@
                          ; #(assoc % :label "foo")
                          @inventory-field-data*))
 
-(defn select-component [& {:keys [ks label values editable]
-                           :or {editable @edit-mode?*}}]
+(defn select-component [data* & {:keys [ks label values editable]
+                                 :or {editable @edit-mode?*}}]
   (let [id (get-id-from-ks ks)]
     [:div.mt-3.form-group
      [:label {:for id}
@@ -128,8 +128,8 @@
                           :value (first v)}
                  (second v)]))]]]))
 
-(defn select-type-component [& {:keys [disabled?]
-                                :or {disabled? false}}]
+(defn select-type-component [data* & {:keys [disabled?]
+                                      :or {disabled? false}}]
   (let [old-values (atom (->> @data* :data :values (map :value)))]
     (fn []
       (let [ks [:data :type],
@@ -236,7 +236,7 @@
                                                  [(sorted-map :value nil :label nil :uuid (random-uuid))]))}
                              " + "]]])])]))))
 
-(defn groups-radio-buttons-component []
+(defn groups-radio-buttons-component [data*]
   (let [id "data:group", ks [:data :group],
         custom-group-label (reagent/atom "")
         custom-group-checked? (reagent/atom false)]
@@ -287,8 +287,8 @@
                                                 (set-value @custom-group-label data* ks)))
                                  :value @custom-group-label}]])]])))
 
-(defn input-attribute-component [& {:keys [disabled?]
-                                    :or {disabled? false}}]
+(defn input-attribute-component [data* & {:keys [disabled?]
+                                          :or {disabled? false}}]
   (let [id "data:attribute", ks [:data :attribute]]
     [:div.form-group
      [:label {:for id}
@@ -310,7 +310,7 @@
      [:div [:small (str "This attribute is used as the unique ID of the field and "
                         "identifies the respective portion of data stored in the items and/or licenses.")]]]))
 
-(defn input-label-component []
+(defn input-label-component [data*]
   (let [id "data:label", ks [:data :label]]
     [:div.form-group
      [:label {:for id}
@@ -328,7 +328,7 @@
                :disabled (not @edit-mode?*)}]]
      [:div [:small "The label to be shown in the edit item/license form."]]]))
 
-(defn checkbox-component [& {:keys [ks label]}]
+(defn checkbox-component [data* & {:keys [ks label]}]
   (let [id (get-id-from-ks ks)]
     [:div.form-check.form-check.mb-2
      [:input.form-check-input
@@ -342,14 +342,14 @@
      [:label.form-check-label {:for id}
       [:span [:strong label] [:small " (" [:span.text-monospace id] ")"]]]]))
 
-(defn inventory-field-data-component []
+(defn inventory-field-data-component [data*]
   [:<>
    [:strong "Data"]
    [:div.mt-1.mb-3
     [:code {:style {:white-space "pre-wrap"}}
      (-> @data* strip-of-uuids pprint with-out-str)]]])
 
-(defn core-inventory-field-form-component []
+(defn inventory-field-form-component [data*]
   [:<>
    (let [required-field? (-> @inventory-field-data* :data :required)]
      [:div.mb-3
@@ -358,10 +358,10 @@
        :disabled (or (not @edit-mode?*) required-field?)]
       (when (and @edit-mode?* required-field?)
         [:div.alert.alert-info "This is a required field and thus cannot be deactivated."])])
-   [input-label-component]])
+   [input-label-component data*]])
 
-(defn dynamic-inventory-field-form-component [& {:keys [isEditing?]
-                                                 :or {isEditing? false}}]
+(defn dynamic-inventory-field-form-component [data* & {:keys [isEditing?]
+                                                       :or {isEditing? false}}]
   [:<>
    [:div.mb-4
     [form-components/checkbox-component data* [:active]
@@ -371,32 +371,31 @@
    (-> @id* :dynamic boolean)
    (when (or (= @id* ":inventory-field-id")
              (:dynamic @inventory-field-data*))
-     [input-attribute-component (when isEditing?
-                                  {:disabled? true})])
-   [input-label-component]
-   [checkbox-component
+     [input-attribute-component data* (when isEditing? {:disabled? true})])
+   [input-label-component data*]
+   [checkbox-component data*
     :label "Enabled for packages"
     :ks [:data :forPackage]
     :disabled (or (not @edit-mode?*)
                   (not (:dynamic @inventory-field-data*)))]
-   [checkbox-component
+   [checkbox-component data*
     :label "Editable by owner only"
     :ks [:data :permissions :owner]
     :disabled (or (not @edit-mode?*)
                   (not (:dynamic @inventory-field-data*)))]
-   [select-component
+   [select-component data*
     :ks [:data :permissions :role]
     :label "Minimum role required for view"
     :values [["lending_manager" "lending_manager"]
              ["inventory_manager" "inventory_manager"]]]
-   [groups-radio-buttons-component]
-   [select-component
+   [groups-radio-buttons-component data*]
+   [select-component data*
     :ks [:data :target_type]
     :label "Target"
     :values [["" "Item+License"]
              ["item" "Item"]
              ["license" "License"]]]
-   [select-type-component]])
+   [select-type-component data*]])
 
 ;;; debug ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

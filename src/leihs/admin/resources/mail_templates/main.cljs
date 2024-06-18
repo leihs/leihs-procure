@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.mail-templates.main
   (:require
-   [cljs.core.async :as async :refer [go <!]]
+   [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.components.table :as table]
@@ -9,7 +9,7 @@
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.mail-templates.shared :as shared]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Alert]]
@@ -24,12 +24,12 @@
 (def current-query-parameters-normalized*
   (reaction (shared/normalized-query-parameters @current-query-parameters*)))
 
-(def data* (reagent/atom {}))
-
+(def data* (reagent/atom nil))
 (defonce languages-data* (reagent/atom nil))
 
-(defn fetch-mail-templates []
-  (http/route-cached-fetch data*))
+(defn fetch []
+  (http/route-cached-fetch data* {:route @fetch-route*
+                                  :reload true}))
 
 (defn fetch-languages []
   (go (reset! languages-data*
@@ -130,10 +130,12 @@
     [:div.alert.alert-info.text-center "No (more) mail-templates found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
-    [wait-component]
-    [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :mail-templates)]))
+  (if-not (contains? @data* @fetch-route*)
+    [:<>
+     [wait-component]]
+    [core-table-component hds tds (-> @data*
+                                      (get @fetch-route*)
+                                      :mail-templates)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -156,19 +158,22 @@
       [:pre (with-out-str (pprint @languages-data*))]]]))
 
 (defn page []
-  [:article.mail-templates
-   [:header.my-5
-    [:h1 [icons/mail-template] " Mail Templates"]]
-   [:section
-    [routing/hidden-state-component
-     {:did-change fetch-mail-templates
-      :did-mount fetch-languages}]
-    [:> Alert {:variant "info"
-               :className "text-center"}
-     "These are intial mail templates which are copied for a new inventory pool when it gets created. "
-     "They can then be further edited inside a particular inventory pool."]
-    [filter-component]
-    [table-component
-     [name-th-component type-th-component language-locale-th-component]
-     [name-td-component type-td-component language-locale-td-component]]
-    [debug-component]]])
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(fetch)
+     :did-mount #(fetch-languages)}]
+
+   [:article.mail-templates
+    [:header.my-5
+     [:h1 [icons/mail-template] " Mail Templates"]]
+
+    [:section
+     [:> Alert {:variant "info"
+                :className "text-center"}
+      "These are intial mail templates which are copied for a new inventory pool when it gets created. "
+      "They can then be further edited inside a particular inventory pool."]
+     [filter-component]
+     [table-component
+      [name-th-component type-th-component language-locale-th-component]
+      [name-td-component type-td-component language-locale-td-component]]
+     [debug-component]]]])

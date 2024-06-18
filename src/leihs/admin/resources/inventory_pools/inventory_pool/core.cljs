@@ -8,13 +8,12 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.workdays.core :as workdays]
    [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.core :refer [presence]]
-   [leihs.core.front.debug :refer [spy]]
    [leihs.core.routing.front :as routing]
    [leihs.core.user.shared :refer [short-id]]
-   [react-bootstrap :as react-bootstrap]
+   [react-bootstrap :as react-bootstrap :refer [Nav]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
@@ -34,7 +33,11 @@
                http-client/request :chan <!
                http-client/filter-success! :body))))
 
-(defn clean-and-fetch [& args]
+(defn fetch-pool []
+  (http-client/route-cached-fetch
+   data* {:route @fetch-route*}))
+
+(defn clean-and-fetch []
   (reset! data* nil)
   (fetch))
 
@@ -52,49 +55,52 @@
 
 ;; shared tabs for main view
 (defn tabs [active]
-  [:> react-bootstrap/Nav {:className "mb-3"
-                           :justify false
-                           :variant "tabs"
-                           :defaultActiveKey active}
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+  [:> Nav {:className "mb-3"
+           :justify false
+           :variant "tabs"
+           :defaultActiveKey active}
+   [:> Nav.Item
+    [:> Nav.Link
      {:href (join ["/admin/inventory-pools/" @id*])}
      [icons/inventory-pools]
      " Settings "]]
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+   [:> Nav.Item
+    [:> Nav.Link
      (let [href (path :inventory-pool-opening-times
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/opening-times]
      " Opening-Times "]]
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+   [:> Nav.Item
+    [:> Nav.Link
      (let [href (path :inventory-pool-users
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/users]
      " Users "]]
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+
+   [:> Nav.Item
+    [:> Nav.Link
      (let [href (path :inventory-pool-groups
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/groups]
      " Groups "]]
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+
+   [:> Nav.Item
+    [:> Nav.Link
      (let [href (path :inventory-pool-delegations
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/delegations]
      " Delegations "]]
-   [:> react-bootstrap/Nav.Item
-    [:> react-bootstrap/Nav.Link
+
+   [:> Nav.Item
+    [:> Nav.Link
      (let [href (path :inventory-pool-entitlement-groups
                       {:inventory-pool-id @id*})]
        {:active (clojure.string/includes? (:path @routing/state*) href)
@@ -106,19 +112,29 @@
   [:<>
    [routing/hidden-state-component
     {:did-change fetch}]
+
    (let [inner (when @data*
                  [:<> (str (:name @data*))])]
      [:<> inner])])
 
+(defn pool-name []
+  (let [name (:name @data*)]
+    (fn []
+      [:h1 name])))
+
 (defn header []
-  [:header.my-5
-   [breadcrumbs/main]
-   [:h1 [name-component]]])
+  (if-not @data*
+    [:div.my-5
+     [wait-component]]
+    [:header.my-5
+     [breadcrumbs/main]
+     [pool-name]]))
 
 (defn name-link-component []
   [:span
    [routing/hidden-state-component
     {:did-change fetch}]
+
    (let [p (path :inventory-pool {:inventory-pool-id @id*})
          inner (if @data*
                  [:em (str (:name @data*))]

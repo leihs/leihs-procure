@@ -1,29 +1,11 @@
 (ns leihs.admin.resources.suppliers.supplier.items
-  (:require [cljs.core.async :as async :refer [<! go]]
-            [clojure.string :as string]
-            [leihs.admin.common.components.table :as table]
-            [leihs.admin.common.http-client.core :as http-client]
-            [leihs.admin.paths :as paths :refer [path]]
-            [leihs.admin.utils.misc :refer [wait-component]]
-            [leihs.core.routing.front :as routing]
-            [react-bootstrap :as react-bootstrap :refer [Alert]]
-            [reagent.core :as reagent]))
-
-(defonce data* (reagent/atom nil))
-
-(defn fetch-items []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :supplier-items
-                           (-> @routing/state* :route-params))}
-               http-client/request :chan <!
-               http-client/filter-success!
-               :body :items))))
-
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch-items))
+  (:require
+   [clojure.string :as string]
+   [leihs.admin.common.components.table :as table]
+   [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.suppliers.supplier.core :as core]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [react-bootstrap :as react-bootstrap :refer [Alert]]))
 
 (defn model-name [row]
   (-> row
@@ -39,16 +21,18 @@
   (str "/manage/" (:inventory_pool_id row) "/models/" (:model_id row) "/edit"))
 
 (defn component []
-  [:div.mt-5
-   [routing/hidden-state-component
-    {:did-change clean-and-fetch}]
+  [:<>
    (cond
-     (nil? @data*) [:<>
-                    [:h1.my-5 "Items"]
-                    [wait-component "Loading Items ..."]]
-     (empty? @data*) [:> Alert {:variant "info"
-                                :className "text-center"}
-                      "No Items"]
+     (nil? @core/data-items*)
+     [:<>
+      [:h1.my-5 "Items"]
+      [wait-component]]
+
+     (empty? @core/data-items*)
+     [:> Alert {:variant "info"
+                :className "text-center"}
+      "No Items"]
+
      :else [:<>
             [:h1.my-3 "Items"]
             [table/container
@@ -56,7 +40,7 @@
               :borders false
               :header [:tr [:th "Inventory-Pool"] [:th "Inventory-Code"] [:th "Model-Name"]]
               :body
-              (for [row @data*]
+              (for [row @core/data-items*]
                 [:tr.item {:key (:inventory_code row)}
                  [:td
                   [:a {:href (path :inventory-pool

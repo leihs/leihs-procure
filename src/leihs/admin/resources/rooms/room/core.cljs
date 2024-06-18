@@ -15,30 +15,26 @@
                 ":room-id")))
 
 (defonce data* (reagent/atom nil))
+(defonce data-buildings* (reagent/atom nil))
 
-(defonce buildings-data* (reagent/atom nil))
+(defn fetch-room []
+  (go (reset! data*
+              (some->
+               {:chan (async/chan)
+                :url (path :room
+                           (-> @routing/state* :route-params))}
+               http/request :chan <!
+               http/filter-success! :body))))
 
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (reset! buildings-data* nil)
-  (go (reset! buildings-data*
+(defn fetch-buildings []
+  (go (reset! data-buildings*
               (some-> {:chan (async/chan)
                        :url (path :buildings)}
                       http/request :chan <!
                       http/filter-success!
-                      :body :buildings))
-      (if (= (:route @routing/state*) (path :rooms))
-        (reset! data* {:building_id nil})
-        (reset! data*
-                (some->
-                 {:chan (async/chan)
-                  :url (path :room
-                             (-> @routing/state* :route-params))}
-                 http/request :chan <!
-                 http/filter-success! :body)))
-      (http/route-cached-fetch data*)))
+                      :body :buildings))))
 
-(defn room-form [action]
+(defn room-form [action data*]
   [:> Form {:id "room-form"
             :on-submit (fn [e] (.preventDefault e) (action))}
    [:> Form.Group {:control-id "name"}
@@ -68,7 +64,7 @@
       :as "select"}
      [:option {:value "" :disabled true}
       "Select Building"]
-     (->> @buildings-data*
+     (->> @data-buildings*
           (map-indexed
            #(vector :option {:key %1
                              :value (:id %2)}
@@ -88,4 +84,4 @@
       [:hr]
       [:div.room-data
        [:h2 "@buildings-data*"]
-       [:pre (with-out-str (pprint @buildings-data*))]]]]))
+       [:pre (with-out-str (pprint @data-buildings*))]]]]))

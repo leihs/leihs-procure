@@ -1,6 +1,6 @@
 (ns leihs.admin.resources.users.user.core
   (:require
-   [cljs.core.async :as async :refer [go timeout <!]]
+   [cljs.core.async :as async :refer [<! go timeout]]
    [cljs.pprint :refer [pprint]]
    [clojure.string :refer [trim]]
    [leihs.admin.common.components :as components]
@@ -8,6 +8,7 @@
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
+   [leihs.core.auth.core :as auth]
    [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]
@@ -38,6 +39,19 @@
                         http-client/request
                         :chan <! http-client/filter-success! :body
                         (update-in [:extended_info] stringify-json))))))))
+
+(defn modifieable? [current-user-state _]
+  (cond
+    (auth/system-admin-scopes?
+     current-user-state _) true
+    (auth/admin-scopes?
+     current-user-state
+     _)  (cond (or (nil? @user-data*) (:is_system_admin @user-data*)) false
+               (or (nil? @user-data*) (:system_admin_protected @user-data*)) false
+               :else true)
+    :else (cond (or (nil? @user-data*) (:is_admin @user-data*)) false
+                (or (nil? user-data*) (:admin_protected @user-data*)) false
+                :else true)))
 
 ;;; some display helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

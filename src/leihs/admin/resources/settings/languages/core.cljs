@@ -12,14 +12,10 @@
 (defn fetch []
   (go (reset! data*
               (some-> {:chan (async/chan)}
-                      http-client/request
-                      :chan <! http-client/filter-success :body))))
+                      http-client/request :chan <!
+                      http-client/filter-success :body))))
 
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
-
-(defn form [action]
+(defn form [action data*]
   [:> Form
    {:id "languages-form"
     :on-submit (fn [e]

@@ -1,27 +1,21 @@
 (ns leihs.admin.resources.inventory-pools.inventory-pool.holidays.edit
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go <!]]
-   [clojure.string :refer [capitalize]]
+   [cljs.core.async :as async :refer [<! go]]
    [com.rpl.specter :as s]
    [leihs.admin.common.components.table :as table]
-   [leihs.admin.common.form-components :as form-components]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.holidays.core :as core]
    [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.search-params :as search-params]
    [leihs.core.auth.core :as auth]
-   [leihs.core.constants :as constants]
-   [leihs.core.core :refer [presence]]
-   [leihs.core.front.debug :refer [spy]]
+   [leihs.core.routing.front :as routing]
    [react-bootstrap :as BS :refer [Button Form Modal]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (defonce data* (reagent/atom nil))
-(comment (deref data*)
-         @pool-core/data*)
 
 (defn prepare-for-patch [data]
   (->> data
@@ -37,8 +31,8 @@
                 :chan (async/chan)}
                http-client/request :chan <!
                http-client/filter-success!)
-          (reset! data* nil)
-          (core/clean-and-fetch)))))
+          (core/fetch)
+          (search-params/delete-from-url "action")))))
 
 (defn add-new-holiday-comp []
   (let [new-holiday (reagent/atom {:inventory_pool_id (:id @pool-core/data*)})
@@ -93,8 +87,7 @@
            "Add"]]]))))
 
 (defn holiday-row-comp [holiday]
-  [:tr {:key (:id holiday)
-        :class (when (:delete holiday) "table-danger")}
+  [:<>
    [:td (cond->> (:name holiday) (:delete holiday) (vector :s))]
    [:td (cond->> (:start_date holiday) (:delete holiday) (vector :s))]
    [:td (cond->> (:end_date holiday) (:delete holiday) (vector :s))]
@@ -120,51 +113,58 @@
           :variant "outline-danger" :size "sm"}
          "Delete"]))]])
 
-(defn form [on-hide]
-  (let [new-holiday (reagent/atom nil)]
-    (fn [on-hide]
-      (if-not @data*
-        [wait-component]
-        [:<>
-         [add-new-holiday-comp]
-         [:> Form {:id "workdays-form"
-                   :on-submit (fn [e] (.preventDefault e) (on-hide) (patch))}
-          [table/container
-           {:borders false
-            :header [:tr [:th "Day"] [:th "From"] [:th "To"] [:th]]
-            :body
-            (doall (for [holiday @data*]
-                     [holiday-row-comp holiday]))}]]]))))
+(defn form []
+  (if-not @pool-core/data*
+    [wait-component]
+    [:<>
+     [add-new-holiday-comp]
+     [:> Form {:id "workdays-form"
+               :on-submit (fn [e]
+                            (.preventDefault e)
+                            (patch))}
+      [table/container
+       {:borders false
+        :header [:tr [:th "Day"] [:th "From"] [:th "To"] [:th]]
+        :body
+        (doall (for [holiday @data*]
+                 [:tr {:key (:id holiday)
+                       :class (when (:delete holiday) "table-danger")}
+                  [holiday-row-comp holiday]]))}]]]))
 
 (comment (let [hs [{:id 1} {:id 2}]]
            (s/transform [s/ALL #(= (:id %) 1)]
                         #(assoc % :delete true)
                         hs)))
 
-(defn dialog [& {:keys [show onHide] :or {show false}}]
+(def open*
+  (reaction
+   (reset! data* @core/data*)
+   (->> (:query-params @routing/state*)
+        :action
+        (= "edit-holidays"))))
+
+(defn dialog []
   [:> Modal {:size "lg"
              :scrollable true
              :centered true
-             :show show}
-   [:> Modal.Header {:closeButton true
-                     :onHide onHide}
+             :show @open*}
+   [:> Modal.Header {:close-button true
+                     :on-hide #(search-params/delete-from-url "action")}
     [:> Modal.Title "Edit Holidays"]]
-   [:> Modal.Body [form onHide]]
+   [:> Modal.Body [form]]
    [:> Modal.Footer
-    [:> Button {:variant "secondary" :onClick onHide}
+    [:> Button {:variant "secondary"
+                :on-click #(search-params/delete-from-url "action")}
      "Cancel"]
-    [:> Button {:type "submit" :form "workdays-form"}
+    [:> Button {:type "submit"
+                :form "workdays-form"}
      "Save"]]])
 
 (defn button []
   (when (auth/allowed? [pool-auth/pool-inventory-manager?
                         auth/admin-scopes?])
-    (let [show (reagent/atom false)]
-      (fn []
-        [:<>
-         [:> Button
-          {:onClick #(do (when-not @data* (reset! data* @core/data*))
-                         (reset! show true))}
-          "Edit"]
-         [dialog {:show @show
-                  :onHide #(reset! show false)}]]))))
+    [:<>
+     [:> Button
+      {:on-click #(search-params/append-to-url
+                   {:action "edit-holidays"})}
+      "Edit"]]))

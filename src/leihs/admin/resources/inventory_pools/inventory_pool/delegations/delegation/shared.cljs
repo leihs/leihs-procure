@@ -6,7 +6,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.core :as delegation]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Form]]
-   [reagent.core :as reagent]
+   [reagent.core :as reagent :refer [reaction]]
    [taoensso.timbre]))
 
 (defonce data* (reagent/atom {}))
@@ -18,6 +18,9 @@
     (when (empty? @data*)
       (reset! data* {:pool_protected true})))
   data*)
+
+(def user-delegation*
+  (reaction (set-user-id-from-params)))
 
 (defn responsible-user-choose-component []
   [:div.input-group-append
@@ -35,7 +38,9 @@
   (let [data* (set-user-id-from-params)]
     (fn []
       [:> Form {:id id
-                :on-submit (fn [e] (.preventDefault e) (action @data*))}
+                :on-submit (fn [e]
+                             (.preventDefault e)
+                             (action @data*))}
        [form-components/input-component data* [:name]
         :label "Name"]
        [form-components/input-component data* [:responsible_user_id]

@@ -1,43 +1,67 @@
 (ns leihs.admin.resources.groups.group.edit
   (:require
-   [accountant.core :as accountant]
-   [cljs.core.async :as async :refer [go <!]]
+   [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :refer [data* group-id* clean-and-fetch]]
+   [leihs.admin.resources.groups.group.core :as core :refer [clean-and-fetch group-id*]]
    [leihs.admin.resources.groups.group.edit-core :as edit-core]
-   [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]))
+   [leihs.admin.utils.search-params :as search-params]
+   [leihs.core.auth.core :as auth]
+   [leihs.core.routing.front :as routing]
+   [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]
+   [reagent.core :as reagent :refer [reaction]]))
+
+(defonce data* (reagent/atom nil))
 
 (defn patch []
-  (go (when (some->
-             {:chan (async/chan)
-              :url (path :group {:group-id @group-id*})
-              :method :patch
-              :json-params @data*}
-             http-client/request :chan <!
-             http-client/filter-success!)
-        (clean-and-fetch))))
+  (go (when-let [res (some->
+                      {:chan (async/chan)
+                       :url (path :group {:group-id @group-id*})
+                       :method :patch
+                       :json-params @data*}
+                      http-client/request :chan <!
+                      http-client/filter-success! :body)]
+        (search-params/delete-from-url "action")
+        (reset! core/data* res))))
 
-(defn dialog [& {:keys [show onHide]
-                 :or {show false}}]
+(def open*
+  (reaction
+   (reset! data* @core/data*)
+   (->> (:query-params @routing/state*)
+        :action
+        (= "edit"))))
+
+(defn dialog []
   [:> Modal {:size "xl"
              :centered true
              :scrollable true
-             :show show}
-   [:> Modal.Header {:closeButton true
-                     :onHide onHide}
+             :show @open*}
+   [:> Modal.Header {:close-button true
+                     :on-hide #(search-params/delete-from-url "action")}
     [:> Modal.Title "Edit Group"]]
+
    [:> Modal.Body
-    [:> Form {:id "add-user-form"
+    [:> Form {:id "edit-group-form"
               :on-submit (fn [e]
                            (.preventDefault e)
-                           (patch)
-                           (onHide))}
-     [edit-core/inner-form-component]]]
+                           (patch))}
+     [edit-core/inner-form-component data*]]]
+
    [:> Modal.Footer
     [:> Button {:variant "secondary"
-                :onClick onHide}
+                :on-click #(search-params/delete-from-url "action")}
      "Cancel"]
+
     [:> Button {:type "submit"
-                :form "add-user-form"}
+                :form "edit-group-form"}
      "Save"]]])
+
+(defn button []
+  (when (auth/allowed?
+         [core/admin-and-group-not-system-admin-protected?
+          auth/system-admin-scopes?
+          core/some-lending-manager-and-group-unprotected?])
+    [:<>
+     [:> Button
+      {:onClick #(search-params/append-to-url {:action "edit"})}
+      "Edit"]]))

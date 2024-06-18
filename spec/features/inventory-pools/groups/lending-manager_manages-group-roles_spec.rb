@@ -23,46 +23,31 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
           @inventory_pool_id = @pool[:id]
           click_on "Inventory Pools"
           click_on @pool.name
-          within('.nav-tabs') { click_on "Groups" }
+          within('.nav-tabs') { 
+            click_on "Groups" 
+          }
           select 'any', from: 'Role'
           fill_in 'Search', with: @groups.first.name
           wait_until { find("table").has_content?(@group.name) }
           expect(page.find("table")).not_to have_content "customer"
           expect(page.find("table")).not_to have_content "inventory_manager"
-
-          #####################################################################
-          # NOTE: Capybara finds the button and clicks it but nothing happens.
-          # It has to be retried some times until the modal is displayed.
-          # Some UI hooks/callbacks not initialized yet on first try?
-          wait_until do
-            within find("table tbody tr", text: @group.name) do
-              find("button", text: "Edit").click
-            end
-            page.has_selector?(".modal")
+          expect(page).to have_selector("table tbody tr", count: 1)
+          within find("table tbody tr", text: @group.name) do
+            click_on "Edit"
           end
-          #####################################################################
-
-          expect(page).to have_css('.modal .fade.alert.alert-danger', )
         end
 
         scenario 'can manage roles up to lending_manager' do
           # set access_right
+          expect(page).to have_css('.modal')
           check "lending_manager"
           click_on "Save"
+          expect(page).not_to have_css('.modal')
+          
           expect(GroupAccessRight.find(inventory_pool_id: @pool[:id], group_id: @group[:id]).role).to eq "lending_manager"
-
-          # remove all access_rights
-          #####################################################################
-          # NOTE: Capybara finds the button and clicks it but nothing happens.
-          # It has to be retried some times until the modal is displayed.
-          # Some UI hooks/callbacks not initialized yet on first try?
-          wait_until do
-            within find("table tbody tr", text: @group.name) do
-              find("button", text: "Edit").click
-            end
-            page.has_selector?(".modal")
+          within find("table tbody tr", text: @group.name) do
+            click_on "Edit"
           end
-          #####################################################################
 
           uncheck :customer
           click_on "Save"
@@ -72,6 +57,7 @@ feature 'Manage inventory-pool roles of groups', type: :feature do
         end
 
         scenario "can not escalate roles up to inventory_manager" do
+          expect(page).to have_css('.modal', text: "Edit roles")
           check "inventory_manager"
           click_on "Save"
           wait_until { page.has_content? "ERROR 403" }

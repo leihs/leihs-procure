@@ -32,7 +32,7 @@
   (reset! data* nil)
   (fetch))
 
-(defn form [action]
+(defn form [action data*]
   [:> Form
    {:id "auth-form"
     :on-submit (fn [e]

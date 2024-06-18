@@ -14,8 +14,7 @@ shared_examples :create_password_reset_link_via_ui do
     # click_on 'Create'
     # there is an "send pass word reset link via e-mail" button
     expect(page).to have_content  'Send per Mail'
-    within('.modal-body'){ expect(find('svg'))}
-
+    within('.action.modal .modal-body'){ expect(find('svg'))}
     token = find_field('reset-token', disabled: true).value
     user_password_reset = database[:user_password_resets].where(token: token).first
     expect( user_password_reset ).to be

@@ -16,6 +16,8 @@ feature 'Initial admin and password sign-in', type: :feature do
       click_on 'Create'
     end
 
+    expect(page).to have_content "Request OK"
+
     # we sign-in as the admin
     within('.navbar-leihs form.ui-form-signin', match: :first) do
       fill_in 'user', with: 'admin@example.com'
@@ -58,6 +60,7 @@ feature 'Initial admin and password sign-in', type: :feature do
     end
 
     expect(current_path).to eq "/admin/initial-admin"
+    expect(page).to have_content "An admin user already exists!"
     expect(User.count).to eq 1
   end
 end

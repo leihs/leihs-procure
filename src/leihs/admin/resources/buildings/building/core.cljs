@@ -26,16 +26,15 @@
                http-client/request :chan <!
                http-client/filter-success! :body))))
 
-(defn clean-and-fetch [& args]
-  (reset! data* nil)
-  (fetch))
-
-(defn building-form [action]
+(defn building-form [action data*]
   [:div.building.mt-3
    (when (:is_general @data*)
      [:div.alert.alert-info "This is a general building which is used for unknown locations of items."])
+
    [:> Form {:id "building-form"
-             :on-submit (fn [e] (.preventDefault e) (action))}
+             :on-submit (fn [e]
+                          (.preventDefault e)
+                          (action))}
     [:> Form.Group {:control-id "name"}
      [:> Form.Label "Name"]
      [:input.form-control

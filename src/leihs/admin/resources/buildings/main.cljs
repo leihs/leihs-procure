@@ -9,10 +9,9 @@
    [leihs.admin.resources.buildings.building.create :as create]
    [leihs.admin.resources.buildings.shared :as shared]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as BS :refer [Button]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (def current-query-parameters*
@@ -26,8 +25,9 @@
 
 (def data* (reagent/atom {}))
 
-(defn fetch-buildings []
-  (http/route-cached-fetch data*))
+(defn fetch []
+  (http/route-cached-fetch data* {:route @fetch-route*
+                                  :reload true}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -81,17 +81,6 @@
 
 ;;;;;
 
-(defn add-building-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:className "ml-3"
-         :onClick #(reset! show true)}
-        "Add Building"]
-       [create/dialog {:show @show
-                       :onHide #(reset! show false)}]])))
-
 (defn buildings-thead-component [more-cols]
   [:tr
    [:th {:key :index} "Index"]
@@ -108,7 +97,7 @@
 (defn core-table-component [hds tds buildings]
   (if-let [buildings (seq buildings)]
     [table/container {:className "buildings"
-                      :actions [table/toolbar [add-building-button]]
+                      :actions [table/toolbar [create/button]]
                       :header [buildings-thead-component hds]
                       :body
                       (doall (for [building buildings]
@@ -117,10 +106,12 @@
     [:div.alert.alert-info.text-center "No (more) buildings found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
+  (if-not (contains? @data* @fetch-route*)
     [wait-component]
     [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :buildings)]))
+     (-> @data*
+         (get @fetch-route*)
+         :buildings)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -145,7 +136,8 @@
     [:h1 [icons/building] " Buildings"]]
    [:section
     [routing/hidden-state-component
-     {:did-change fetch-buildings}]
+     {:did-change #(fetch)}]
+
     [filter-component]
     [table-component
      [name-th-component
@@ -156,4 +148,5 @@
       code-td-component
       rooms-count-td-component
       items-count-td-component]]
+    [create/dialog]
     [debug-component]]])

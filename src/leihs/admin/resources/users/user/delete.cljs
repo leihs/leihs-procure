@@ -7,9 +7,11 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.user.core :as user-core :refer [user-id*]]
+   [leihs.admin.utils.search-params :as search-params]
+   [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Modal]]
-   [reagent.core :as reagent]))
+   [reagent.core :as reagent :refer [reaction]]))
 
 (def transfer-data* (reagent/atom {}))
 
@@ -27,6 +29,7 @@
               :chan (async/chan)}
              http-client/request :chan <!
              http-client/filter-success!)
+        (search-params/delete-from-url "action")
         (accountant/navigate! (path :users)))))
 
 (defn transfer-data-and-delete-user [& _]
@@ -38,6 +41,7 @@
               :chan (async/chan)}
              http-client/request :chan <!
              http-client/filter-success!)
+        (search-params/delete-from-url "action")
         (accountant/navigate! (path :users)))))
 
 (defn delete-without-reasignment-component []
@@ -57,6 +61,7 @@
      :href (path :users-choose {}
                  {:return-to (path (:handler-key @routing/state*)
                                    (:route-params @routing/state*)
+                                   (:query-params @routing/state*)
                                    @transfer-data*)})}
     [:i.fas.fa-rotate-90.fa-hand-pointer.px-2]
     " Choose user "]])
@@ -65,6 +70,7 @@
   [:<>
    [routing/hidden-state-component
     {:did-mount set-transfer-data-by-query-params}]
+
    [:p.font-weight-bold.mt-5 "Transfer Data"]
    [:p
     "Contracts, reserverations, and orders of this user will be "
@@ -100,21 +106,26 @@
                        {:user-id @user-id*
                         :target-user-uid (:target-user-uid @transfer-data*)})))]]]))
 
-(defn dialog [& {:keys [show onHide]
-                 :or {show false}}]
+(def open*
+  (reaction
+   (->> (:query-params @routing/state*)
+        :action
+        (= "delete"))))
+
+(defn dialog []
   [:> Modal {:size "lg"
              :centered true
              :scrollable true
-             :show show}
-   [:> Modal.Header {:closeButton true
-                     :onHide onHide}
+             :show @open*}
+   [:> Modal.Header {:close-button true
+                     :on-hide #(search-params/delete-all-from-url)}
     [:> Modal.Title "Delete User"]]
    [:> Modal.Body
     [delete-without-reasignment-component]
     [delete-with-transfer-component]]
    [:> Modal.Footer
     [:> Button {:variant "secondary"
-                :onClick onHide}
+                :on-click #(search-params/delete-all-from-url)}
      "Cancel"]
     (if (empty? (:target-user-uid @transfer-data*))
       [:> Button {:variant "danger"
@@ -123,3 +134,13 @@
       [:> Button {:variant "danger"
                   :onClick #(transfer-data-and-delete-user)}
        "Transfer and delete"])]])
+
+(defn button []
+  (when (auth/allowed? [user-core/modifieable?])
+    [:<>
+     [:> Button
+      {:className "ml-3"
+       :variant "danger"
+       :onClick #(search-params/append-to-url
+                  {:action "delete"})}
+      "Delete User"]]))

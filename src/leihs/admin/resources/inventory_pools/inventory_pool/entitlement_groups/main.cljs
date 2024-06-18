@@ -6,17 +6,18 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.routing.front :as routing]
    [reagent.core :as reagent :refer [reaction]]))
 
 (defonce data* (reagent/atom {}))
 (defonce current-route* (reaction (:route @routing/state*)))
 
-(defn fetch-entitlement-groups []
-  (http-client/route-cached-fetch data*))
+(defn fetch []
+  (http-client/route-cached-fetch
+   data* {:route @fetch-route*}))
 
 (defn entitlement-groups-thead []
   [:tr
@@ -31,30 +32,30 @@
   ^{:key id}
   [:tr.entitlement-group.text-left
    [:td
-    [:a {:href (path :inventory-pool-entitlement-group {:inventory-pool-id @inventory-pool/id* :entitlement-group-id id})}
+    [:a {:href (path :inventory-pool-entitlement-group {:inventory-pool-id @pool-core/id* :entitlement-group-id id})}
      (:name entitlement-group)]]
    [:td.entitlements-count.text-right (-> entitlement-group :entitlements_count)]
    [:td.users-count.text-right
     [:a {:href (path :inventory-pool-entitlement-group-users
-                     {:inventory-pool-id @inventory-pool/id*
+                     {:inventory-pool-id @pool-core/id*
                       :entitlement-group-id id}
                      {:membership :member})}
      (-> entitlement-group :users_count)
      " " [icons/edit] " "]]
    [:td.direct-users-count.text-right
     [:a {:href (path :inventory-pool-entitlement-group-users
-                     {:inventory-pool-id @inventory-pool/id*
+                     {:inventory-pool-id @pool-core/id*
                       :entitlement-group-id id}
                      {:membership :direct})}
      (-> entitlement-group :direct_users_count)
      " " [icons/edit] " "]]
    [:td.groups-count.text-right
     [:a {:href (path :inventory-pool-entitlement-group-groups
-                     {:inventory-pool-id @inventory-pool/id*
+                     {:inventory-pool-id @pool-core/id*
                       :entitlement-group-id id})}
      (-> entitlement-group :groups_count)
      " " [icons/edit] " "]]
-   [:td.text-center [:a {:href  (str "/manage/" @inventory-pool/id* "/groups/" id "/edit")}
+   [:td.text-center [:a {:href  (str "/manage/" @pool-core/id* "/groups/" id "/edit")}
                      [icons/edit] " Edit "]]])
 
 (defn entitlement-groups-table []
@@ -86,13 +87,19 @@
     [filter/reset]]])
 
 (defn page []
-  [:article.inventory-pool-entitlement-groups
+  [:<>
    [routing/hidden-state-component
-    {:did-change fetch-entitlement-groups}]
-   [inventory-pool/header]
-   [inventory-pool/tabs]
-   [filter-section]
-   [table/toolbar]
-   [entitlement-groups-table]
-   [table/toolbar]
-   [debug-info]])
+    {:did-mount #(pool-core/fetch)
+     :did-change #(fetch)}]
+
+   [:article.inventory-pool-entitlement-groups
+    [pool-core/header]
+
+    [:section.mb-5
+     [pool-core/tabs]
+     [filter-section]
+     [table/toolbar]
+     [entitlement-groups-table]
+     [table/toolbar]]
+
+    [debug-info]]])

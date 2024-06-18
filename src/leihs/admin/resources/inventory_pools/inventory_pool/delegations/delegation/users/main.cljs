@@ -8,7 +8,8 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as pool-users]
    [leihs.admin.resources.users.main :as users]
    [leihs.admin.state :as state]
-   [leihs.core.core :refer [presence]]))
+   [leihs.core.core :refer [presence]]
+   [leihs.core.routing.front :as routing]))
 
 ;;; path helpers  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -53,12 +54,14 @@
 (defn page []
   [:article.delegation.my-5
    [delegation/header]
-   [delegation/tabs]
-   [:section
+
+   [:section.mb-5
+    [delegation/tabs]
     [users-membership/filter-component]
     [table/toolbar]
     [table]
-    [table/toolbar]
-    [debug-component]
-    [users/debug-component]
-    [delegation/debug-component]]])
+    [table/toolbar]]
+
+   [debug-component]
+   [users/debug-component]
+   [delegation/debug-component]])

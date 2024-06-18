@@ -16,27 +16,17 @@ feature 'SMTP-Settings' do
         scenario 'updates the Miscellaneous-Settings' do
           click_on "Settings"
           click_on "Languages"
-          wait_until { page.has_content? "de-CH" }
+          expect(page).to(have_content "de-CH")
 
-          # within '.modal' do
-          #   within("tr", text: "de-CH") do
-          #     expect(find_field('active', disabled: true)).to be_checked
-          #     expect(find_field('default', disabled: true)).not_to be_checked
-          #   end
-          # end
-          #
+          within("tr", text: "de-CH") do
+            expect(page).to have_selector('td.active span[data-toggle="on"]')
+            expect(page).to have_selector('td.default span[data-toggle="off"]')
+          end
 
-          # within("tr", text: "en-GB") do
-          #   expect(find_field('en-GB-active', disabled: true)).to be_checked
-          #   expect(find_field('en-GB-default', disabled: true)).to be_checked
-          # end
-
-          # The commented approaches above are not working because the element is invisible
-          expect(page.execute_script("return document.getElementById('de-CH-active').hasAttribute('checked');")).to be_truthy
-          expect(page.execute_script("return document.getElementById('de-CH-default').hasAttribute('checked');")).to be_falsey
-
-          expect(page.execute_script("return document.getElementById('en-GB-active').hasAttribute('checked');")).to be_truthy
-          expect(page.execute_script("return document.getElementById('en-GB-default').hasAttribute('checked');")).to be_truthy
+          within("tr", text: "en-GB") do
+            expect(page).to have_selector('td.active span[data-toggle="on"]')
+            expect(page).to have_selector('td.default span[data-toggle="on"]')
+          end
 
           click_on "Edit"
           within '.modal' do
@@ -55,19 +45,15 @@ feature 'SMTP-Settings' do
             click_on "Save"
           end
 
-          # within("tr", text: "de-CH") do
-          #   expect(find_field('active', disabled: true)).to be_checked
-          #   expect(find_field('default', disabled: true)).to be_checked
-          # end
-          # within("tr", text: "en-GB") do
-          #   expect(find_field('active', disabled: true)).not_to be_checked
-          #   expect(find_field('default', disabled: true)).not_to be_checked
-          # end
-          expect(page.execute_script("return document.getElementById('de-CH-active').hasAttribute('checked');")).to be_truthy
-          expect(page.execute_script("return document.getElementById('de-CH-default').hasAttribute('checked');")).to be_truthy
+          within("tr", text: "de-CH") do
+            expect(page).to have_selector('td.active span[data-toggle="on"]')
+            expect(page).to have_selector('td.default span[data-toggle="on"]')
+          end
 
-          expect(page.execute_script("return document.getElementById('en-GB-active').hasAttribute('checked');")).to be_falsey
-          expect(page.execute_script("return document.getElementById('en-GB-default').hasAttribute('checked');")).to be_falsey
+          within("tr", text: "en-GB") do
+            expect(page).to have_selector('td.active span[data-toggle="off"]')
+            expect(page).to have_selector('td.default span[data-toggle="off"]')
+          end
         end
       end
     end

@@ -1,12 +1,14 @@
 (ns leihs.admin.common.membership.users.main
   (:require
-   [cljs.core.async :as async :refer [go <!]]
+   [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.components.filter :as filter]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.common.membership.users.shared :refer [DEFAULT-MEMBERSHIP-QUERY-PARAM
-                                                       MEMBERSHIP-QUERY-PARAM-KEY QUERY-OPTIONS]]
+                                                       MEMBERSHIP-QUERY-PARAM-KEY
+                                                       QUERY-OPTIONS]]
    [leihs.admin.resources.users.main :as users]
+   [leihs.admin.utils.misc :refer [fetch-route*]]
    [leihs.core.routing.front :as routing]))
 
 ;;; filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,14 +43,14 @@
 ;;; direct member ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn update-aggregated-membership [user]
-  (swap! users/data* update-in [(:route @routing/state*)
+  (swap! users/data* update-in [@fetch-route*
                                 :users (:page-index user)]
          (fn [row]
            (assoc row :member (or (:direct_member row)
                                   (:group_member row))))))
 
 (defn update-membership-in-table [new-state user]
-  (swap! users/data* assoc-in [(:route @routing/state*)
+  (swap! users/data* assoc-in [@fetch-route*
                                :users (:page-index user)
                                :direct_member] new-state)
   (update-aggregated-membership user))

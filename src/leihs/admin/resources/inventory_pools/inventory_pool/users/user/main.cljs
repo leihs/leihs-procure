@@ -4,7 +4,6 @@
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.roles.components :as roles-ui]
-   [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.direct-roles.main :as direct-roles]
@@ -14,7 +13,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
    [leihs.admin.resources.users.user.core :as user :refer [clean-and-fetch
                                                            user-data*]]
-   [leihs.admin.resources.users.user.main :as user-main :refer [check-user-chosen]]
+   [leihs.admin.resources.users.user.edit :as user-edit]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.core :refer [presence]]
@@ -138,7 +137,7 @@
          [:hr]
          [:h3 "Account Properties"]
          [user/account-properties-component data]]
-        [user-main/edit-user-button]]])))
+        [user-edit/button]]])))
 
 ;;; page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -153,10 +152,9 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount #(do
-                   (clean-and-fetch)
-                   (user-roles/clean-and-fetch))
-     :will-unmount #(reset! user-data* nil)}]
+    {:did-change #(do
+                    (clean-and-fetch)
+                    (user-roles/clean-and-fetch))}]
 
    (if (empty? @user-data*)
      [:div.mt-5
@@ -178,4 +176,5 @@
         (when-let [ext-info (-> @user-data* :extended_info presence)]
           [:pre (.stringify js/JSON (.parse js/JSON ext-info) nil 2)])]]
 
+      [user-edit/dialog]
       [debug-component]])])

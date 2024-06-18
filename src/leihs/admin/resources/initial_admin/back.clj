@@ -68,7 +68,8 @@
                              (:password data)
                              tx))
        (assert (make-procurement-admin user tx))
-       (redirect (path :home) :see-other)))))
+       {:status 201
+        :body "Added initial admin user!"}))))
 
 (defn routes [request]
   (case (:request-method request)

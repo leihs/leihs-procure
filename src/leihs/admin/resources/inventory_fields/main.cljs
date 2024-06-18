@@ -7,10 +7,12 @@
    [leihs.admin.common.http-client.core :as http]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-fields.inventory-field.core :as field-core]
    [leihs.admin.resources.inventory-fields.inventory-field.create :as create]
    [leihs.admin.resources.inventory-fields.shared :as shared]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
+   [leihs.admin.utils.search-params :as search-params]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Alert Button]]
@@ -29,8 +31,9 @@
 
 (defonce inventory-fields-groups-data* (reagent/atom nil))
 
-(defn fetch-inventory-fields []
-  (http/route-cached-fetch data*))
+(defn fetch []
+  (http/route-cached-fetch data* {:route @fetch-route*
+                                  :reload true}))
 
 (defn fetch-inventory-fields-groups []
   (go (reset! inventory-fields-groups-data*
@@ -79,17 +82,6 @@
     [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn add-inventory-field-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:className "ml-3"
-         :onClick #(reset! show true)}
-        "Add Field"]
-       [create/dialog {:show @show
-                       :onHide #(reset! show false)}]])))
 
 (defn id-th-component []
   [:th {:key :id} "ID"])
@@ -159,7 +151,7 @@
   (if-let [inventory-fields (seq inventory-fields)]
     [table/container
      {:className "inventory-fields"
-      :actions [table/toolbar [add-inventory-field-button]]
+      :actions [table/toolbar [create/button]]
       :header  [inventory-fields-thead-component hds]
       :body (doall (for [inventory-field inventory-fields]
                      ^{:key (:id inventory-field)}
@@ -169,10 +161,12 @@
      "No (more) inventory-fields found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
+  (if-not (contains? @data* @fetch-route*)
     [wait-component]
     [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :inventory-fields)]))
+     (-> @data*
+         (get @fetch-route*)
+         :inventory-fields)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -200,8 +194,9 @@
     [:h1 [icons/table-list] " Inventory-Fields"]]
    [:section
     [routing/hidden-state-component
-     {:did-change fetch-inventory-fields
-      :did-mount fetch-inventory-fields-groups}]
+     {:did-change #(fetch)
+      :did-mount #(fetch-inventory-fields-groups)}]
+
     [filter-component]
     [table-component
      [id-th-component
@@ -216,4 +211,5 @@
       active-td-component
       label-td-component
       group-td-component]]
+    [create/dialog]
     [debug-component]]])

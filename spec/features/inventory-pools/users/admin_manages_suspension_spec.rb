@@ -23,7 +23,8 @@ feature 'Manage inventory-pool users ', type: :feature do
         within('.nav-tabs') { click_on "Users" }
         select 'any', from: 'Role'
         fill_in 'Search', with: @user.email
-        wait_until { all("table tbody tr").count == 1 }
+        expect(page).to have_selector("table tbody tr", count: 1)
+
         within("td.suspension"){ click_on 'Edit' }
         expect { page.not.to have_content "Suspended for" }
         fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
@@ -42,16 +43,23 @@ feature 'Manage inventory-pool users ', type: :feature do
         within('.nav-tabs') { click_on "Users" }
         select 'any', from: 'Role'
         fill_in 'Search', with: @user.email
-        click_on_first_user @user
-        wait_until { page.has_content? "Not suspended" }
+        expect(page).to have_selector("table tbody tr", count: 1)
 
-        within("#suspension"){ click_on "Edit" }
-        wait_until{ not all(".modal").empty? }
+        click_on_first_user @user
+        expect(page).to have_content("Not suspended")
+
+        within("#suspension") do
+          click_on "Edit" 
+        end
+
+        expect(page).to have_css(".modal" , text: "Edit Suspension") 
+
         fill_in 'suspended_until', with: (Date.today + 1.day).iso8601
         fill_in 'suspended_reason', with: 'Some reason'
         click_on 'Save'
-        wait_until{ all(".modal").empty? }
-        wait_until { page.has_content? "Suspended for" }
+        expect(page).not_to have_selector(".modal")
+        expect(page).to have_content "Suspended for" 
+
         expect(database[:suspensions].where(user_id: @user.id).first).to be
 
         # reset within modal
@@ -77,28 +85,30 @@ feature 'Manage inventory-pool users ', type: :feature do
         wait_until{ all(".modal").empty? }
         wait_until { page.has_content? "Not suspended" }
         expect(database[:suspensions].where(user_id: @user.id).first).not_to be
-
       end
 
       scenario' suspend forever and test suspension filter' do
         # suspend on the users table
         click_on 'Inventory Pools'
+        expect(page).to have_content(@pool.name)
         click_on @pool.name
         within('.nav-tabs') { click_on "Users" }
         select 'any', from: 'Role'
         fill_in 'Search', with: @user.email
-        wait_until { all("table tbody tr").count == 1 }
+        expect(page).to have_selector("table tbody tr", count: 1)
         within("td.suspension"){ click_on "Edit" }
-        wait_until{ not all(".modal").empty? }
+
+        expect(page).to have_content('suspended_until')
         fill_in 'suspended_until', with: (Date.today + 100.years).iso8601
         click_on 'Save'
-        wait_until{ all(".modal").empty? }
+        expect(page).not_to have_selector(".modal")
+
         select 'any', from: 'Role'
         select('suspended', from: 'Suspension')
-        wait_until { all("table tbody tr").count == 1 }
+        expect(page).to have_selector("table tbody tr", count: 1)
+
         expect(page.find("table")).to have_content 'forever'
       end
-
     end
   end
 end

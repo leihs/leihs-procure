@@ -17,20 +17,19 @@
 
 (defonce data* (reagent/atom nil))
 
-(defn fetch-inventory-pools []
-  (go (reset!
-       data*
-       (some->
-        {:chan (async/chan)
-         :url (path :user-inventory-pools
-                    (-> @routing/state* :route-params))}
-        http-client/request :chan <!
-        http-client/filter-success!
-        :body :user-inventory-pools))))
+(defn fetch []
+  (go (reset! data*
+              (some->
+               {:chan (async/chan)
+                :url (path :user-inventory-pools
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success!
+               :body :user-inventory-pools))))
 
-(defn clean-and-fetch-inventory-pools [& args]
+(defn clean-and-fetch []
   (reset! data* nil)
-  (fetch-inventory-pools))
+  (fetch))
 
 (defn debug-component []
   [:div
@@ -87,8 +86,8 @@
                           :or {chrome true}}]
   [:div.user-inventory-pools
    [routing/hidden-state-component
-    {:did-mount clean-and-fetch-inventory-pools
-     :did-change clean-and-fetch-inventory-pools}]
+    {:did-mount #(fetch)}]
+
    (if (and @data* @user-data*)
      [table/container
       {:borders chrome

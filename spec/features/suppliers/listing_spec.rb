@@ -54,6 +54,7 @@ feature 'Managing suppliers:', type: :feature do
         pool = @pools.sample
         suppliers = pool.items.map(&:supplier).uniq
 
+        binding.pry
         select pool.name, from: 'Inventory Pool'
         wait_until { not page.has_content? "Please wait" }
         expect(all("table.suppliers tbody tr").count).to eq suppliers.count

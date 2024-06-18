@@ -9,6 +9,8 @@
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.group.core :as group-core :refer [group-id*]]
+   [leihs.admin.resources.groups.group.delete :as group-delete]
+   [leihs.admin.resources.groups.group.edit :as group-edit]
    [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.shared :refer [default-query-params]]
    [leihs.admin.resources.users.main :as users]
@@ -146,12 +148,13 @@
 (defn page []
   [:article.group.my-5
    [routing/hidden-state-component
-    {:did-mount group-core/clean-and-fetch}]
+    {:did-mount #(group-core/fetch)}]
+
    [group/header]
    [:section
     [group/properties-table]
-    [group/edit-button]
-    [group/delete-button]]
+    [group-edit/button]
+    [group-delete/button]]
 
    [:section
     [:> Nav {:variant "tabs" :className "mt-5"

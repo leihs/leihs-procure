@@ -4,8 +4,10 @@
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.utils.search-params :as search-params]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button Modal]]))
+   [react-bootstrap :as react-bootstrap :refer [Button Modal]]
+   [reagent.core :refer [reaction]]))
 
 (defn post [& args]
   (go (when (some->
@@ -16,23 +18,37 @@
              http-client/filter-success!)
         (accountant/navigate! (path :buildings)))))
 
-(defn dialog [& {:keys [show onHide]
-                 :or {show false}}]
+(def open?*
+  (reaction
+   (->> (:query-params @routing/state*)
+        :action
+        (= "delete"))))
+
+(defn dialog []
   [:> Modal {:size "sm"
              :centered true
              :scrollable true
-             :show show}
+             :show @open?*}
    [:> Modal.Header {:closeButton true
-                     :onHide onHide}
+                     :on-hide #(search-params/delete-from-url
+                                "action")}
     [:> Modal.Title "Delete Building"]]
    [:> Modal.Body
     "Are you sure you want to delete this building? This action cannot be undone."]
    [:> Modal.Footer
     [:> Button {:variant "secondary"
-                :onClick onHide}
+                :on-click #(search-params/delete-from-url
+                            "action")}
      "Cancel"]
     [:> Button {:variant "danger"
-                :onClick #(do
-                            (onHide)
-                            (post))}
+                :onClick #(post)}
      "Delete"]]])
+
+(defn button []
+  [:<>
+   [:> Button
+    {:variant "danger"
+     :className "ml-3"
+     :on-click #(search-params/append-to-url
+                 {:action "delete"})}
+    "Delete"]])

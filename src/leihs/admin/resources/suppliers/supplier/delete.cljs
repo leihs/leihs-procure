@@ -4,8 +4,10 @@
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.utils.search-params :as search-params]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button Modal]]))
+   [react-bootstrap :as react-bootstrap :refer [Button Modal]]
+   [reagent.core :refer [reaction]]))
 
 (defn post []
   (go (when (some->
@@ -14,26 +16,41 @@
               :chan (async/chan)}
              http-client/request :chan <!
              http-client/filter-success!)
+        (search-params/delete-from-url "action")
         (accountant/navigate! (path :suppliers)))))
+
+(def open?*
+  (reaction
+   (->> (:query-params @routing/state*)
+        :action
+        (= "delete"))))
 
 (defn dialog [& {:keys [show onHide]
                  :or {show false}}]
   [:> Modal {:size "sm"
              :centered true
              :scrollable true
-             :show show}
+             :show @open?*}
    [:> Modal.Header {:closeButton true
-                     :onHide onHide}
+                     :on-hide #(search-params/delete-from-url
+                                "action")}
     [:> Modal.Title "Delete Supplier"]]
    [:> Modal.Body
     [:p "Are you sure you want to delete this Supplier?"]
     [:p.font-weight-bold "This action cannot be undone."]]
    [:> Modal.Footer
     [:> Button {:variant "secondary"
-                :onClick onHide}
+                :on-click #(search-params/delete-from-url
+                            "action")}
      "Cancel"]
     [:> Button {:variant "danger"
-                :onClick #(do
-                            (onHide)
-                            (post))}
+                :on-click #(post)}
      "Delete"]]])
+
+(defn button []
+  [:> Button
+   {:variant "danger"
+    :class-name "ml-3"
+    :on-click #(search-params/append-to-url
+                {:action "delete"})}
+   "Delete"])

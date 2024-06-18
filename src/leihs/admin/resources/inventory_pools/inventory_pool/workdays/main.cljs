@@ -6,14 +6,13 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.workdays.core :as core]
    [leihs.admin.resources.inventory-pools.inventory-pool.workdays.edit :as edit]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.constants :as constants]
-   [leihs.core.front.debug :refer [spy]]
    [leihs.core.routing.front :as routing]))
 
-(defn component [data]
+(defn component []
   [:<>
    [routing/hidden-state-component
-    {:did-mount core/clean-and-fetch}]
+    {:did-mount core/fetch}]
+
    (if-not @core/data*
      [wait-component]
      [:div#workdays
@@ -27,4 +26,5 @@
                         [:td (toggle-component (day @core/data*))]
                         [:td (or ((core/DAYS day) (@core/data* :max_visits))
                                  "unlimited")]]))}]
-      [edit/button]])])
+      [edit/button]
+      [edit/dialog]])])

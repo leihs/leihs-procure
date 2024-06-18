@@ -53,6 +53,7 @@
    [routing/hidden-state-component
     {:did-mount clean-and-fetch
      :did-change clean-and-fetch}]
+
    [header-component]
    [:div.form
     [roles-component @data*

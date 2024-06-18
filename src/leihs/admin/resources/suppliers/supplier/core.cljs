@@ -15,6 +15,7 @@
                 ":supplier-id")))
 
 (defonce data* (reagent/atom nil))
+(defonce data-items* (reagent/atom nil))
 
 (defn fetch []
   (go (reset! data*
@@ -25,9 +26,15 @@
                http-client/request :chan <!
                http-client/filter-success! :body))))
 
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
+(defn fetch-items []
+  (go (reset! data-items*
+              (some->
+               {:chan (async/chan)
+                :url (path :supplier-items
+                           (-> @routing/state* :route-params))}
+               http-client/request :chan <!
+               http-client/filter-success!
+               :body :items))))
 
 (defn debug-component []
   (when (:debug @state/global-state*)
@@ -37,7 +44,7 @@
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
 
-(defn form [action]
+(defn form [action data*]
   [:> Form {:id "supplier-form"
             :on-submit (fn [e] (.preventDefault e) (action))}
    [:> Form.Group {:id "name"}

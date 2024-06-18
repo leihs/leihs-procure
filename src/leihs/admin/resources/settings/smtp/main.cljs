@@ -3,82 +3,72 @@
    [cljs.pprint :refer [pprint]]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.common.icons :as icons]
-   [leihs.admin.resources.settings.smtp.core :as smtp-core]
+   [leihs.admin.resources.settings.smtp.core :as core]
    [leihs.admin.resources.settings.smtp.edit :as edit]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent]))
+   [leihs.core.routing.front :as routing]))
 
 (defn info-table []
-  (let [data @smtp-core/data*]
-    (fn []
-      [table/container
-       {:borders false
-        :header [:tr [:th "Property"] [:th.w-75 "Value"]]
-        :body
-        [:<>
-         [:tr.enabled
-          [:td "Sending EMails enabled" [:small " (enabled)"]]
-          [:td (str (:enabled data))]]
-         [:tr.port
-          [:td "Server Port" [:small " (port)"]]
-          [:td (:port data)]]
-         [:tr.address
-          [:td "Server Address" [:small " (address)"]]
-          [:td (:address data)]]
-         [:tr.domain
-          [:td "Domain Name" [:small " (domain)"]]
-          [:td (:domain data)]]
-         [:tr.default-from-address
-          [:td "From" [:small " (default_from_address)"]]
-          [:td (:default_from_address data)]]
-         [:tr.sender-address
-          [:td "Sender Address" [:small " (sender_address)"]]
-          [:td (:sender_address data)]]
-         [:tr.username
-          [:td "User Name" [:small " (username)"]]
-          [:td (:username data)]]
-         [:tr.password
-          [:td "Password" [:small " (password)"]]
-          [:td (:password data)]]
-         [:tr.authentication-type
-          [:td "Authentication Type" [:small " (authentication_type)"]]
-          [:td (:authentication_type data)]]
-         [:tr.openssl-verify-mode
-          [:td "OpenSSL Verify Mode" [:small " (openssl_verify_mode)"]]
-          [:td (:openssl_verify_mode data)]]
-         [:tr.enable-starttls-auto
-          [:td "Enable Starttls Auto" [:small " (enable_starttls_auto)"]]
-          [:td (str (:enable_starttls_auto data))]]]}])))
+  [table/container
+   {:borders false
+    :header [:tr [:th "Property"] [:th.w-75 "Value"]]
+    :body
+    [:<>
+     [:tr.enabled
+      [:td "Sending EMails enabled" [:small " (enabled)"]]
+      [:td (str (:enabled @core/data*))]]
+     [:tr.port
+      [:td "Server Port" [:small " (port)"]]
+      [:td (:port @core/data*)]]
+     [:tr.address
+      [:td "Server Address" [:small " (address)"]]
+      [:td (:address @core/data*)]]
+     [:tr.domain
+      [:td "Domain Name" [:small " (domain)"]]
+      [:td (:domain @core/data*)]]
+     [:tr.default-from-address
+      [:td "From" [:small " (default_from_address)"]]
+      [:td (:default_from_address @core/data*)]]
+     [:tr.sender-address
+      [:td "Sender Address" [:small " (sender_address)"]]
+      [:td (:sender_address @core/data*)]]
+     [:tr.username
+      [:td "User Name" [:small " (username)"]]
+      [:td (:username @core/data*)]]
+     [:tr.password
+      [:td "Password" [:small " (password)"]]
+      [:td (:password @core/data*)]]
+     [:tr.authentication-type
+      [:td "Authentication Type" [:small " (authentication_type)"]]
+      [:td (:authentication_type @core/data*)]]
+     [:tr.openssl-verify-mode
+      [:td "OpenSSL Verify Mode" [:small " (openssl_verify_mode)"]]
+      [:td (:openssl_verify_mode @core/data*)]]
+     [:tr.enable-starttls-auto
+      [:td "Enable Starttls Auto" [:small " (enable_starttls_auto)"]]
+      [:td (str (:enable_starttls_auto @core/data*))]]]}])
 
 (defn debug-component []
   (when @state/debug?*
     [:div.debug
      [:h3 "@data*"]
-     [:pre (with-out-str (pprint @smtp-core/data*))]]))
-
-(defn edit-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:onClick #(reset! show true)}
-        "Edit"]
-       [edit/dialog {:show @show
-                     :onHide #(reset! show false)}]])))
+     [:pre (with-out-str (pprint @core/data*))]]))
 
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change smtp-core/clean-and-fetch}]
-   (if-not @smtp-core/data*
+    {:did-mount #(core/fetch)}]
+
+   (if-not @core/data*
      [wait-component]
      [:article.settings-page.smtp
       [:header.my-5
        [:h1 [icons/paper-plane] " SMTP Settings"]]
-      [:section
+
+      [:section.mb-5
        [info-table]
-       [edit-button]
-       [debug-component]]])])
+       [edit/button]
+       [edit/dialog]]
+
+      [debug-component]])])

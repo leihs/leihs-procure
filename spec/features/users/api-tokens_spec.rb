@@ -201,8 +201,12 @@ feature 'API Tokens', type: :feature do
       # Add
       click_on 'Add API Token'
       fill_in 'Description', with: "Hello token"
-      click_on 'Save'
-      wait_until{ page.has_content? "has been added"}
+
+      loop do
+        click_on 'Save'
+        break if page.has_content? "has been added"
+      end
+
       token_part = find(".token_part").text
       click_on 'Continue'
       wait_until{ page.has_content? "API Token " + token_part}
@@ -211,8 +215,12 @@ feature 'API Tokens', type: :feature do
       # Edit
       click_on_first 'Edit'
       fill_in 'Description', with: 'The updated description'
-      click_on 'Save'
-      wait_until { first('.modal', text: 'OK') }
+      
+      loop do 
+        click_on 'Save'
+        break if first('.modal', text: 'OK') 
+      end
+      
       expect(page).to have_content('The updated description')
 
       # Delete

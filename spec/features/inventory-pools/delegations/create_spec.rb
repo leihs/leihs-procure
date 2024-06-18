@@ -7,6 +7,7 @@ shared_examples :create do
     click_on @pool.name
     click_on 'Delegations'
     first("button", text: 'Add Delegation').click
+
     expect(find_field('pool_protected')).to be_checked
     fill_in :name , with: 'Foo-Delegation'
     uncheck :pool_protected

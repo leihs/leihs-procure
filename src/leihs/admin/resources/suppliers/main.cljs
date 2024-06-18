@@ -8,9 +8,10 @@
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.suppliers.shared :as shared]
+   [leihs.admin.resources.suppliers.supplier.core :as supplier-core]
    [leihs.admin.resources.suppliers.supplier.create :as create]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Alert Button]]
@@ -29,8 +30,9 @@
 
 (defonce inventory-pools-data* (reagent/atom nil))
 
-(defn fetch-suppliers []
-  (http/route-cached-fetch data*))
+(defn fetch []
+  (http/route-cached-fetch data* {:route @fetch-route*
+                                  :reload true}))
 
 (defn fetch-inventory-pools []
   (go (reset! inventory-pools-data*
@@ -59,7 +61,8 @@
     [filter/form-term-filter-component {:placeholder "Supplier Name"}]
     [filter/select-component
      :label "Inventory Pool"
-     :query-params-key :inventory_pool_id
+     :query-params-key
+     :inventory_pool_id
      :options (cons ["" "(any)"]
                     (->> @inventory-pools-data*
                          :inventory-pools
@@ -120,10 +123,11 @@
      "No (more) suppliers found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
+  (if-not (contains? @data* @fetch-route*)
     [wait-component]
-    [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :suppliers)]))
+    [core-table-component hds tds (-> @data*
+                                      (get @fetch-route*)
+                                      :suppliers)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -146,19 +150,25 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:article.suppliers
-   [:header.my-5
-    [:h1 [icons/suppliers] " Suppliers"]]
-   [:section
-    [routing/hidden-state-component
-     {:did-change fetch-suppliers
-      :did-mount fetch-inventory-pools}]
-    [filter-component]
-    [table/toolbar [add-supplier-button]]
-    [table-component
-     [name-th-component
-      items-count-th-component]
-     [name-td-component
-      items-count-td-component]]
-    [table/toolbar [add-supplier-button]]
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(fetch)
+     :did-mount #(fetch-inventory-pools)}]
+
+   [:article.suppliers
+    [:header.my-5
+     [:h1 [icons/suppliers] " Suppliers"]]
+
+    [:section
+     [filter-component]
+     [table/toolbar [create/button]]
+     [table-component
+      [name-th-component
+       items-count-th-component]
+      [name-td-component
+       items-count-td-component]]
+
+     [table/toolbar [create/button]]
+     [create/dialog]]
+
     [debug-component]]])

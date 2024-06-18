@@ -32,7 +32,6 @@ feature 'System and Security-Settings' do
           wait_until{ all(".modal").empty? }
           visit current_url
           wait_until { page.has_content? "Base URL" }
-
           expect(page.text).to have_content '3600'
           within find('tr', text: "Sessions Force Secure") do
             expect(page.text).to have_content 'true'

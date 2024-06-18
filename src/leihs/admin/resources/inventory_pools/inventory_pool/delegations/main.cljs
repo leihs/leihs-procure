@@ -7,15 +7,15 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.create :as create]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.shared :refer [default-query-params]]
    [leihs.admin.resources.inventory-pools.inventory-pool.suspension.core :as suspension]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.main :as users]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button Table]]
+   [react-bootstrap :as react-bootstrap :refer [Table]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (def current-query-parameters*
@@ -26,12 +26,20 @@
   (reaction (merge default-query-params
                    @current-query-parameters*)))
 
-(def data* (reagent/atom {}))
+(def current-route*
+  (reaction
+   (when (-> @routing/state*
+             :route-params
+             :inventory-pool-id)
 
-(defn fetch-delegations []
-  (http-client/route-cached-fetch data*))
+     (path :inventory-pool-delegations
+           (:route-params @routing/state*)))))
 
-;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(def data* (reagent/atom nil))
+
+(defn fetch []
+  (http-client/route-cached-fetch data* {:route @fetch-route*
+                                         :reload true}))
 
 (defn filter-section []
   [filter/container
@@ -47,31 +55,6 @@
     [filter/form-suspension]
     [filter/form-per-page]
     [filter/reset]]])
-
-;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; NOTE: This is a workaround and should be fixed
-;; currently the issue is that a user is selected by navigating to the user route
-;; on mount it is checked if user uid exists in query params
-;; if so the modal opens
-;; it would be nicer if the user selection would happen in the modal with a e.g. a combobox
-(def show* (reagent/atom false))
-
-(defn check-user-chosen []
-  (when (contains?
-         (get @routing/state* :query-params) :user-uid)
-    (reset! show* true)))
-
-(defn add-button []
-  [:<>
-   [:> Button
-    {:className "ml-3"
-     :onClick #(reset! show* true)}
-    "Add Delegation"]])
-
-(defn create-delegation-dialog []
-  [create/dialog {:show @show*
-                  :onHide #(reset! show* false)}])
 
 (defn delegations-thead []
   [:thead
@@ -89,7 +72,7 @@
 
 (defn link-to-delegation [id inner-component]
   [:a {:href (path :inventory-pool-delegation
-                   {:inventory-pool-id @inventory-pool/id*
+                   {:inventory-pool-id @pool-core/id*
                     :delegation-id id})}
    inner-component])
 
@@ -116,12 +99,12 @@
   (go (when (some->
              {:chan (async/chan)
               :url (path :inventory-pool-delegation
-                         {:inventory-pool-id @inventory-pool/id*
+                         {:inventory-pool-id @pool-core/id*
                           :delegation-id (:id delegation)})
               :method method}
              http-client/request :chan <!
              http-client/filter-success!)
-        (fetch-delegations))))
+        (fetch))))
 
 (defn action-td
   [{member :member id :id protected :pool_protected
@@ -152,11 +135,11 @@
     :update-handler (fn [updated]
                       (go (let [data (<! (suspension/put-suspension<
                                           (path :inventory-pool-delegation-suspension
-                                                {:inventory-pool-id @inventory-pool/id*
+                                                {:inventory-pool-id @pool-core/id*
                                                  :delegation-id (:id delegation)})
                                           updated))]
                             (swap! data* assoc-in
-                                   [(:route @routing/state*) :delegations
+                                   [@fetch-route* :delegations
                                     (:page-index delegation) :suspension] data)))))])
 
 (defn delegation-row [{id :id :as delegation}]
@@ -182,22 +165,23 @@
    [suspension-td delegation]])
 
 (defn delegations-table []
-  (let [current-url (:route @routing/state*)]
-    (if-not (contains? @data* current-url)
-      [wait-component]
-      (if-let [delegations (-> @data* (get  current-url  {}) :delegations seq)]
-        [:> Table {:striped true
-                   :hover true
-                   :borderless true
-                   :className "border-top border-bottom"}
+  (if-not (contains? @data* @fetch-route*)
+    [wait-component]
+    (if-let [delegations (-> @data*
+                             (get @fetch-route*)
+                             :delegations seq)]
+      [:> Table {:striped true
+                 :hover true
+                 :borderless true
+                 :className "border-top border-bottom"}
 
-         [delegations-thead]
-         [:tbody
-          (let [page (:page @current-query-parameters-normalized*)
-                per-page (:per-page @current-query-parameters-normalized*)]
-            (for [[k delegation] (map-indexed vector delegations)]
-              ^{:key k} [delegation-row delegation]))]]
-        [:div.alert.alert-info.text-center "No (more) delegations found."]))))
+       [delegations-thead]
+       [:tbody
+        (let [page (:page @current-query-parameters-normalized*)
+              per-page (:per-page @current-query-parameters-normalized*)]
+          (for [[k delegation] (map-indexed vector delegations)]
+            ^{:key k} [delegation-row delegation]))]]
+      [:div.alert.alert-info.text-center "No (more) delegations found."])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -211,17 +195,20 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:article.delegations
+  [:<>
    [routing/hidden-state-component
-    {:did-change fetch-delegations}
-    {:did-mount (check-user-chosen)}]
-   [inventory-pool/header]
-   [inventory-pool/tabs]
-   [filter-section]
-   [table/toolbar
-    [add-button]]
-   [delegations-table]
-   [table/toolbar
-    [add-button]]
-   [create-delegation-dialog]
-   [debug-component]])
+    {:did-mount #(pool-core/fetch)
+     :did-change #(fetch)}]
+
+   [:article.delegations
+    [pool-core/header]
+
+    [:section.mb-5
+     [pool-core/tabs]
+     [filter-section]
+     [table/toolbar [create/button]]
+     [delegations-table]
+     [table/toolbar [create/button]]
+     [create/dialog]]
+
+    [debug-component]]])

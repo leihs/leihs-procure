@@ -44,8 +44,11 @@ feature 'Managing inventory-fields:', type: :feature do
         select 'yes', from: 'Configurable'
         wait_until { not page.has_content? "Please wait" }
         select("1000", from: "Per page")
+        wait_until { all("table.inventory-fields tbody tr").count > 1 }
+        
         fields = @fields.select(&:dynamic)
         expect(all("table.inventory-fields tbody tr").count).to eq fields.count
+
         within "table.inventory-fields tbody" do
           fields.each do |field|
             expect(current_scope).to have_content field.id
@@ -69,10 +72,10 @@ feature 'Managing inventory-fields:', type: :feature do
       scenario 'filtering by form-group attribute works' do
         form_groups = @fields.map { |f| f.data["group"] }.uniq.compact
         form_group = form_groups.sample
-
         select form_group, from: 'Form-Group'
         wait_until { not page.has_content? "Please wait" }
         select("1000", from: "Per page")
+        wait_until { all("table.inventory-fields tbody tr").count > 1 }
         fields = @fields.select { |f| f.data["group"] == form_group }
         expect(all("table.inventory-fields tbody tr").count).to eq fields.count
         within "table.inventory-fields tbody" do

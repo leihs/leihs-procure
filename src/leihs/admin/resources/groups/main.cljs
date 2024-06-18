@@ -11,25 +11,30 @@
    [leihs.admin.resources.groups.shared :as shared]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button Alert]]
+   [react-bootstrap :as react-bootstrap :refer [Alert]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (def current-query-parameters*
   (reaction (-> @routing/state* :query-params
                 (assoc :term (-> @routing/state* :query-params-raw :term)))))
 
-(def current-url* (reaction (:route @routing/state*)))
-
 (def current-query-parameters-normalized*
-  (reaction (shared/normalized-query-parameters @current-query-parameters*)))
+  (reaction (shared/normalized-query-parameters
+             @current-query-parameters*)))
 
-(def data* (reagent/atom {}))
+(def current-url*
+  (reaction
+   (path (:handler-key @routing/state*)
+         (:route-params @routing/state*))))
+
+(def data* (reagent/atom nil))
 
 (defn fetch-groups []
-  (http/route-cached-fetch data*))
+  (http/route-cached-fetch data* {:route @fetch-route*
+                                  :reload true}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -115,17 +120,6 @@
    (for [[idx col] (map-indexed vector more-cols)]
      ^{:key idx} [col group])])
 
-(defn add-group-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:className "ml-3"
-         :onClick #(reset! show true)}
-        "Add Group"]
-       [create/dialog  {:show @show
-                        :onHide #(reset! show false)}]])))
-
 (defn core-table-component [hds tds groups]
   (if-let [groups (seq groups)]
     [:<>
@@ -140,10 +134,11 @@
      "No (more) groups found."]))
 
 (defn table-component [hds tds]
-  (if-not (contains? @data* (:route @routing/state*))
+  (if-not (contains? @data* @fetch-route*)
     [wait-component]
-    [core-table-component hds tds
-     (-> @data* (get (:route @routing/state*) {}) :groups)]))
+    [core-table-component hds tds (-> @data*
+                                      (get @fetch-route*)
+                                      :groups seq)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -163,22 +158,28 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:article.groups.my-5
-   [:h1.my-5
-    [icons/groups] " Groups"]
-   [:section
-    [routing/hidden-state-component
-     {:did-change fetch-groups}]
-    [filter-component]
-    [table/toolbar [add-group-button]]
-    [table-component
-     [name-th-component
-      org-th-component
-      org-id-th-component
-      users-count-th-component]
-     [name-td-component
-      org-td-component
-      org-id-td-component
-      users-count-td-component]]
-    [table/toolbar [add-group-button]]
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(fetch-groups)}]
+
+   [:article.groups.my-5
+    [:header.my-5
+     [:h1
+      [icons/groups] " Groups"]]
+
+    [:section.mb-5
+     [filter-component]
+     [table/toolbar [create/button]]
+     [table-component
+      [name-th-component
+       org-th-component
+       org-id-th-component
+       users-count-th-component]
+      [name-td-component
+       org-td-component
+       org-id-td-component
+       users-count-td-component]]
+     [table/toolbar [create/button]]
+     [create/dialog]]
+
     [debug-component]]])

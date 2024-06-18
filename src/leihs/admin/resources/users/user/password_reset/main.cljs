@@ -8,14 +8,17 @@
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.users.user.core :as core :refer [user-data*]]
    [leihs.admin.state :as state]
+   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.search-params :as search-params]
    [leihs.core.core :refer [presence]]
    [leihs.core.routing.front :as routing]
    [leihs.core.url.core :as url]
    [qrcode.react :as qrcode-recat]
-   [react-bootstrap :as react-bootstrap :refer [Button Modal InputGroup FormControl]]
+   [react-bootstrap :as react-bootstrap :refer [Button FormControl InputGroup
+                                                Modal]]
    [reagent.core :as reagent :refer [reaction]]))
 
-(defonce data* (reagent/atom {}))
+(defonce data* (reagent/atom nil))
 
 (defn format-date [date]
   (-> date date-fns/parseISO
@@ -28,13 +31,16 @@
         (or (-> @user-data* :email presence)
             (-> @user-data* :login presence)))))
 
-(defn submit [& {:keys [valid_for]
-                 :or {valid_for 24}}]
+(def valid-for*
+  (reaction
+   (:valid-for (:query-params @routing/state*))))
+
+(defn get-reset-data []
   (go (let [res (some->
                  {:chan (async/chan)
-                  :url (-> @routing/state* :route (str "/password-reset"))
+                  :url (-> @routing/state* :path (str "/password-reset"))
                   :method :post
-                  :json-params {:valid_for_hours valid_for}}
+                  :json-params {:valid_for_hours @valid-for*}}
                  http-client/request :chan <!
                  http-client/filter-success! :body)]
         (reset! data* res))))
@@ -67,7 +73,7 @@
                                                     (-> @data* :valid_until format-date)))])))}
      [icons/email] " Send per Mail"]))
 
-(defn show-component []
+(defn form []
   (let [url (reset-full-url (:token @data*))]
     [:<>
      [:> InputGroup {:className "mb-3"}
@@ -107,30 +113,49 @@
     [:li "The  " [:code "password_sign_in_enabled"] " property must be set, and"]
     [:li "the account must have an " [:code "email"] " address."]]])
 
-(defn dialog [& {:keys [show onHide]
-                 :or {show false}}]
-  [:> Modal {:size "md"
-             :centered true
-             :scrollable true
-             :show show}
-   [:> Modal.Header {:closeButton true
-                     :onHide onHide}
-    [:> Modal.Title "Reset Password"]]
-   [:> Modal.Body
-    (if-not @user-password-resetable?*
-      [reset-link-no-possible-warning-component]
-      (when (seq @data*)
-        [show-component data*]))]
-   [:> Modal.Footer
-    [:> Button {:variant "secondary"
-                :onClick onHide}
-     "Cancel"]
-    [mail-link-button data*]]])
+(def open*
+  (reaction
+   (->> (:query-params @routing/state*)
+        :action
+        (= "reset-password"))))
+
+(defn dialog []
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(when (and
+                         @open*
+                         @user-password-resetable?*
+                         (not @data*))
+                    (get-reset-data))}]
+
+   [:> Modal {:size "md"
+              :centered true
+              :scrollable true
+              :show @open*
+              :class-name "action"}
+    [:> Modal.Header {:closeButton true
+                      :on-hide #(search-params/delete-from-url
+                                 ["action" "valid-for"])}
+     [:> Modal.Title "Reset Password"]]
+    [:> Modal.Body
+     (if (and @user-password-resetable?*
+              @data*)
+       [form]
+       [reset-link-no-possible-warning-component])]
+    [:> Modal.Footer
+     [:> Button {:variant "secondary"
+                 :on-click #(search-params/delete-from-url
+                             ["action" "valid-for"])}
+      "Cancel"]
+     (when (and @user-password-resetable?*
+                @data*)
+       [mail-link-button])]]])
 
 (defn page []
   [:div.user-password-reset
    [routing/hidden-state-component
     {:did-change #(core/clean-and-fetch)}]
+
    [:h1 "Password Reset Link for "
     [core/name-link-component]]])
 

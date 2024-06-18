@@ -48,4 +48,7 @@
             [:sup " " [clipboard/button-tiny id]])])])
 
 (defn toggle-component [bool]
-  (if bool [icons/toggle-on] [icons/toggle-off]))
+  [:span {:data-toggle (if bool "on" "off")}
+   (if bool
+     [icons/toggle-on]
+     [icons/toggle-off])])

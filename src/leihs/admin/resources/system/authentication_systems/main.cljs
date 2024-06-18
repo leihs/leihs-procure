@@ -9,7 +9,7 @@
    [leihs.admin.resources.system.authentication-systems.authentication-system.create :as create]
    [leihs.admin.resources.system.authentication-systems.shared :as shared]
    [leihs.admin.state :as state]
-   [leihs.admin.utils.misc :refer [wait-component]]
+   [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent :refer [reaction]]))
@@ -25,8 +25,9 @@
 
 (def data* (reagent/atom {}))
 
-(defn fetch-authentication-systems []
-  (http-client/route-cached-fetch data*))
+(defn fetch []
+  (http-client/route-cached-fetch data* {:route @fetch-route*
+                                         :reload true}))
 
 ;;; Filter ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -74,11 +75,13 @@
    [:td (link-to-authentication-system authentication-system (:name authentication-system))]])
 
 (defn authentication-systems-table-component []
-  (if-not (contains? @data* @current-route*)
+  (if-not (contains? @data* @fetch-route*)
     [wait-component]
-    (if-let [authentication-systems (-> @data* (get  @current-route* {}) :authentication-systems seq)]
+    (if-let [authentication-systems (-> @data*
+                                        (get  @fetch-route*)
+                                        :authentication-systems seq)]
       [table/container  {:borders true
-                         :actions [table/toolbar [add-button]]
+                         :actions [table/toolbar [create/button]]
                          :header [authentication-systems-thead-component]
                          :body (doall (for [authentication-system authentication-systems]
                                         (authentication-system-row-component authentication-system)))}]
@@ -102,12 +105,17 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:article.authentication-systems
-   [:header.my-5
-    [:h1 [icons/key-icon] " Authentication Systems"]]
-   [:section
-    [routing/hidden-state-component
-     {:did-change fetch-authentication-systems}]
-    [filter-component]
-    [authentication-systems-table-component]
+  [:<>
+   [routing/hidden-state-component
+    {:did-change #(fetch)}]
+
+   [:article.authentication-systems
+    [:header.my-5
+     [:h1 [icons/key-icon] " Authentication Systems"]]
+
+    [:section.mb-5
+     [filter-component]
+     [authentication-systems-table-component]
+     [create/dialog]]
+
     [debug-component]]])

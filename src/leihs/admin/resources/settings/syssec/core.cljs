@@ -18,7 +18,7 @@
   (reset! data* nil)
   (fetch))
 
-(defn form [action]
+(defn form [action data*]
   [:> Form
    {:id "syssec-form"
     :on-submit (fn [e] (.preventDefault e) (action))}
