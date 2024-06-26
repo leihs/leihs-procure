@@ -72,7 +72,7 @@
           [:td (str (:external_sign_out_url data))]]
          [:tr.internal_private_key
           [:td "Internal Private Key" [:small " (internal_private_key)"]]
-          [:td {:style {:white-space :break-spaces}}
+          [:td {:style {:white-space :break-spaces :filter "blur(7px)"}}
            (str (:internal_private_key data))]]
          [:tr.internal_public_key
           [:td "Internal Public Key" [:small " (internal_public_key)"]]
