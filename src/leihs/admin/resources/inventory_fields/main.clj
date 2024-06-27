@@ -13,6 +13,7 @@
    [leihs.admin.utils.seq :as seq]
    [leihs.core.core :refer [presence str]]
    [leihs.core.db :as db]
+   [next.jdbc :refer [execute!] :rename {execute! jdbc-execute!}]
    [next.jdbc.sql :as jdbc]))
 
 (def inventory-fields-base-query
@@ -125,16 +126,23 @@
 (defn make-id [field]
   (string/join "_" (-> field :data :attribute)))
 
+(defn disable-field-for-all-active-pools! [tx field-id]
+  (jdbc-execute! tx
+                 ["INSERT INTO disabled_fields (field_id, inventory_pool_id)
+                  SELECT ?, id FROM inventory_pools WHERE is_active = TRUE",
+                  field-id]))
+
 (defn create-inventory-field [{tx :tx new-field :body :as request}]
-  (if-let [inventory-field
-           (jdbc/insert! tx :fields
-                         (-> new-field
-                             (->> (spec/assert ::field-specs/new-dynamic-field))
-                             (merge field-specs/new-dynamic-field-constant-defaults)
-                             (assoc :id (make-id new-field))))]
-    {:status 201, :body inventory-field}
-    {:status 422
-     :body "No inventory-field has been created."}))
+  (let [inventory-field
+        (jdbc/insert! tx :fields
+                      (-> new-field
+                          (->> (spec/assert ::field-specs/new-dynamic-field))
+                          (merge field-specs/new-dynamic-field-constant-defaults)
+                          (assoc :id (make-id new-field))))]
+    (if-not inventory-field
+      {:status 422, :body "No inventory-field has been created."}
+      (do (disable-field-for-all-active-pools! tx (:id inventory-field))
+          {:status 201, :body inventory-field}))))
 
 ;;; routes and paths ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -77,6 +77,9 @@ feature 'Create inventory-fields', type: :feature do
 
       wait_until { current_path ==  "/admin/inventory-fields/" }
       expect(page).to have_content label
+
+      expect(DisabledField.where(field_id: "properties_#{attribute}").count)
+        .to eq InventoryPool.where(is_active: false).count
     end
   end
 end
