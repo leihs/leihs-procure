@@ -10,6 +10,7 @@
    [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.main :as group-users]
    [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.initial-admin.front :as initial-admin]
    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
    [leihs.admin.resources.inventory-pools.inventory-pool.delegations.delegation.groups.main :as delegation-groups]
@@ -75,6 +76,7 @@
    :group-users #'group-users/page
    :groups #'groups/page
    :home #'home/page
+   :initial-admin #'initial-admin/page
    :inventory #'inventory/page
    :inventory-pool #'inventory-pool/page
    :inventory-pool-delegation #'delegation/page

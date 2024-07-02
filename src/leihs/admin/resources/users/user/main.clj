@@ -256,19 +256,6 @@
       (remove-images data)
       data)))
 
-;;; password ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn password-hash
-  ([password tx]
-   (->> ["SELECT crypt(?,gen_salt('bf',10)) AS pw_hash" password]
-        (jdbc-query tx)
-        first :pw_hash)))
-
-(defn insert-pw-hash [data tx]
-  (if-let [password (-> data :password presence)]
-    (assoc data :pw_hash (password-hash password tx))
-    data))
-
 ;;; update user ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn prepare-write-data [data]

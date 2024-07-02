@@ -1,6 +1,7 @@
 (ns leihs.admin.routes
   (:refer-clojure :exclude [str keyword])
   (:require
+   [clojure.set]
    [leihs.admin.html :as html]
    [leihs.admin.paths :refer [path paths]]
    [leihs.admin.resources.audits.changes.change.main :as audited-change]
@@ -12,6 +13,7 @@
    [leihs.admin.resources.groups.group.main :as group]
    [leihs.admin.resources.groups.group.users.main :as group-users]
    [leihs.admin.resources.groups.main :as groups]
+   [leihs.admin.resources.initial-admin.back :as initial-admin]
    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
@@ -88,11 +90,6 @@
 
 (declare redirect-to-root-handler)
 
-(def skip-authorization-handler-keys
-  (clojure.set/union
-   core-routes/skip-authorization-handler-keys
-   #{:home}))
-
 (def no-spa-handler-keys
   (clojure.set/union
    core-routes/no-spa-handler-keys
@@ -143,6 +140,7 @@
           :group-user {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-users {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :groups {:handler groups/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
+          :initial-admin {:handler initial-admin/routes :authorizers [all-granted]}
           :inventory-pool {:handler inventory-pool/routes
                            :authorizers [auth/admin-scopes?
                                          pool-auth/pool-inventory-manager?

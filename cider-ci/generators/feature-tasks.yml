@@ -243,6 +243,16 @@
   environment_variables:
     FEATURE_NAME: "Managing group users  an admin user, bunch of other users and groups with users in groups exist some inventory-pool's lending-manager  via the API 01"
     FEATURE: './spec/features/groups/manage-group-users_spec.rb[1:1:3:2:1]'
+'./spec/features/initial-admin_and_password-sign-in_spec.rb[1:1]':
+  name: "Initial admin and password sign-in 01"
+  environment_variables:
+    FEATURE_NAME: "Initial admin and password sign-in 01"
+    FEATURE: './spec/features/initial-admin_and_password-sign-in_spec.rb[1:1]'
+'./spec/features/initial-admin_and_password-sign-in_spec.rb[1:2]':
+  name: "Initial admin and password sign-in 02"
+  environment_variables:
+    FEATURE_NAME: "Initial admin and password sign-in 02"
+    FEATURE: './spec/features/initial-admin_and_password-sign-in_spec.rb[1:2]'
 './spec/features/inventory-fields/create_spec.rb[1:1:1]':
   name: "Create inventory-fields an admin via the UI 01"
   environment_variables:
