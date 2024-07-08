@@ -1,4 +1,5 @@
 **/.DS_Store
+.cider-ci_private/
 .cpcache/
 .lein-env
 .lein-failures
