@@ -294,7 +294,7 @@
     (or (handler request)
         {:status 404})))
 
-(defn init []
+(defn init [options]
   (routing/init paths resolve-table)
   (-> ; I> wrap-handler-with-logging
    routing/dispatch-to-handler
@@ -303,7 +303,7 @@
    wrap-dispatch-content-type
    ring-audits/wrap
    anti-csrf/wrap
-   auth/wrap-authenticate
+   (auth/wrap-authenticate options)
    ring.middleware.cookies/wrap-cookies
    wrap-empty
    settings/wrap

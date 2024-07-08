@@ -1,9 +1,11 @@
 **/.DS_Store
+.cider-ci_private/
 .lein-env
 .lein-failures
 .lein-repl-history
 .nrepl-port
 .rebel_readline_history
+/.clj-kondo/rewrite-clj/
 /.cpcache
 /.sass-cache
 /.shadow-cljs
@@ -12,7 +14,6 @@
 /resources/public/admin/js/
 /target
 /tmp
-/.clj-kondo/rewrite-clj/
 figwheel_server.log
 profiles.clj
 resources/built-info.yml
@@ -21,3 +22,4 @@ resources/built-info.yml
 ui/storybook-static
 ui/node_modules
 ui/dist
+
