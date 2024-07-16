@@ -4,14 +4,14 @@
             [leihs.admin.common.membership.groups.main :as groups-membership]
             [leihs.admin.paths :as paths :refer [path]]
             [leihs.admin.resources.groups.main :as groups]
-            [leihs.admin.resources.inventory-pools.inventory-pool.core :as inventory-pool]
+            [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
             [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.core :as entitlement-group]
             [leihs.admin.state :as state]
             [leihs.core.routing.front :as routing]))
 
 (defn member-path [group]
   (path :inventory-pool-entitlement-group-group
-        {:inventory-pool-id @inventory-pool/id*
+        {:inventory-pool-id @pool-core/id*
          :entitlement-group-id @entitlement-group/id*
          :group-id (:id group)}))
 
@@ -50,7 +50,9 @@
 (defn page []
   [:article.inventory-pool-groups
    [routing/hidden-state-component
-    {:did-mount (fn [_] (inventory-pool/clean-and-fetch))}]
+    {:did-mount (fn []
+                  (pool-core/clean-and-fetch))}]
+
    [entitlement-group/header]
    [entitlement-group/tabs]
    [groups-table-section]])

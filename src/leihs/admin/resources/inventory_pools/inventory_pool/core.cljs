@@ -8,6 +8,8 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.holidays.core :as holidays-core]
+   [leihs.admin.resources.inventory-pools.inventory-pool.workdays.core :as workdays-core]
    [leihs.admin.state :as state]
    [leihs.admin.utils.misc :refer [fetch-route* wait-component]]
    [leihs.core.core :refer [presence]]
@@ -25,13 +27,26 @@
 ;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn fetch []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :inventory-pool
-                           (-> @routing/state* :route-params))}
-               http-client/request :chan <!
-               http-client/filter-success! :body))))
+  (let [id @id*]
+    (go
+      (when-let [res (some->
+                      {:chan (async/chan)
+                       :url (path :inventory-pool
+                                  (-> @routing/state* :route-params))}
+                      http-client/request :chan <!
+                      http-client/filter-success! :body)]
+
+        ;; only update data if the id is still the same 
+        ;; as when the request was started
+        ;; since the fetch cannot aborted and the async routine
+        ;; might still process an old fetch and write that result to data*
+        (when (= id @id*)
+          (reset! data* res))))))
+
+(defn reset []
+  (reset! data* nil)
+  (reset! holidays-core/data* nil)
+  (reset! workdays-core/data* nil))
 
 (defn fetch-pool []
   (http-client/route-cached-fetch

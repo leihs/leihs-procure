@@ -7,6 +7,7 @@
    [leihs.admin.common.roles.components :refer [put-roles< roles-component]]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.groups.group.core :as core]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Alert]]
@@ -46,7 +47,9 @@
 (defn table-component []
   [:div
    [routing/hidden-state-component
-    {:did-mount #(fetch)}]
+    {:did-mount (fn []
+                  (pool-core/reset)
+                  (fetch))}]
 
    (if-not @data*
      [:div.my-5

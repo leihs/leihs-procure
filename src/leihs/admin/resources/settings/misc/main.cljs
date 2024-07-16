@@ -74,7 +74,8 @@
     {:did-mount core/fetch}]
 
    (if-not @core/data*
-     [wait-component]
+     [:div.my-5
+      [wait-component]]
      [:article.settings-page
       [:header.my-5
        [:h1 [icons/list-icon] " Miscellaneous Settings"]]

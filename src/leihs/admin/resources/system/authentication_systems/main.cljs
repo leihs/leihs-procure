@@ -6,6 +6,7 @@
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.system.authentication-systems.authentication-system.core :as syssec-core]
    [leihs.admin.resources.system.authentication-systems.authentication-system.create :as create]
    [leihs.admin.resources.system.authentication-systems.shared :as shared]
    [leihs.admin.state :as state]
@@ -107,7 +108,8 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change #(fetch)}]
+    {:did-mount #(syssec-core/reset)
+     :did-change #(fetch)}]
 
    [:article.authentication-systems
     [:header.my-5

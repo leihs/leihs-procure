@@ -44,7 +44,8 @@
     {:did-mount #(core/fetch)}]
 
    (if-not @core/data*
-     [wait-component]
+     [:div.my-5
+      [wait-component]]
      [:article.settings-page.smtp
       [:header.my-5
        [:h1 [icons/language] " Languages Settings"]]

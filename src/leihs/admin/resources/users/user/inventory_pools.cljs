@@ -8,6 +8,7 @@
    [leihs.admin.common.roles.core :as roles]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.users.user.core :as user-core :refer [user-data*
                                                                 user-id*]]
    [leihs.admin.state :as state]
@@ -86,7 +87,9 @@
                           :or {chrome true}}]
   [:div.user-inventory-pools
    [routing/hidden-state-component
-    {:did-mount #(fetch)}]
+    {:did-mount (fn []
+                  (pool-core/reset)
+                  (fetch))}]
 
    (if (and @data* @user-data*)
      [table/container

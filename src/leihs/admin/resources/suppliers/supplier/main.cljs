@@ -3,6 +3,7 @@
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.suppliers.supplier.core :as core]
    [leihs.admin.resources.suppliers.supplier.delete :as delete]
    [leihs.admin.resources.suppliers.supplier.edit :as edit]
@@ -34,6 +35,7 @@
   [:<>
    [routing/hidden-state-component
     {:did-mount (fn []
+                  (pool-core/reset)
                   (core/fetch)
                   (core/fetch-items))
      :will-unmount (fn []

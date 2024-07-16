@@ -7,6 +7,7 @@
    [leihs.admin.common.icons :as icons]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
+   [leihs.admin.resources.inventory-pools.inventory-pool.core :as pool-core]
    [leihs.admin.resources.inventory-pools.inventory-pool.create :as create]
    [leihs.admin.resources.inventory-pools.shared :as shared]
    [leihs.admin.state :as state]
@@ -14,7 +15,6 @@
    [leihs.core.auth.core :as auth-core]
    [leihs.core.json :as json]
    [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button]]
    [reagent.core :as reagent :refer [reaction]]))
 
 (def current-query-parameters*
@@ -35,9 +35,8 @@
 (def data* (reagent/atom nil))
 
 (defn fetch []
-  (when (string? @fetch-route*)
-    (http-client/route-cached-fetch data* {:route @fetch-route*
-                                           :reload true})))
+  (http-client/route-cached-fetch data* {:route @fetch-route*
+                                         :reload true}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -134,22 +133,25 @@
       [:pre (with-out-str (pprint @data*))]]]))
 
 (defn page []
-  [:article.inventory-pools
+  [:<>
    [routing/hidden-state-component
-    {:did-change #(fetch)}]
+    {:did-mount #(pool-core/reset)
+     :did-change #(fetch)}]
 
-   [:header.my-5
-    [:h1
-     [icons/warehouse] " Inventory Pools"]]
+   [:article.inventory-pools
 
-   [:section
-    [filter-section]
-    [table/toolbar
-     [create/button]]
-    [inventory-pools-table]
-    [table/toolbar
-     [create/button]]]
+    [:header.my-5
+     [:h1
+      [icons/warehouse] " Inventory Pools"]]
 
-   [:section
-    [create/dialog]
-    [debug-component]]])
+    [:section
+     [filter-section]
+     [table/toolbar
+      [create/button]]
+     [inventory-pools-table]
+     [table/toolbar
+      [create/button]]]
+
+    [:section
+     [create/dialog]
+     [debug-component]]]])
