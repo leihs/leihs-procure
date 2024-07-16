@@ -20,14 +20,12 @@
                       :chan (async/chan)}
                      http-client/request :chan <!
                      http-client/filter-success! :body :id)]
-        (reset! core/data* @data*)
         (accountant/navigate!
          (path :building
                {:building-id id})))))
 
 (def open?*
   (reaction
-   (reset! data* nil)
    (->> (:query-params @routing/state*)
         :action
         (= "add"))))

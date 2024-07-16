@@ -2,8 +2,7 @@
   (:require
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
-   [leihs.admin.resources.groups.group.core :as core :refer [clean-and-fetch data*
-                                                             debug-component]]
+   [leihs.admin.resources.groups.group.core :as core :refer [data* debug-component]]
    [leihs.admin.resources.groups.group.delete :as delete]
    [leihs.admin.resources.groups.group.edit :as edit]
    [leihs.admin.resources.groups.group.inventory-pools :as inventory-pools]

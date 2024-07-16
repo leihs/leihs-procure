@@ -51,7 +51,7 @@
   [:article.inventory-pool-groups
    [routing/hidden-state-component
     {:did-mount (fn []
-                  (pool-core/clean-and-fetch))}]
+                  (pool-core/fetch))}]
 
    [entitlement-group/header]
    [entitlement-group/tabs]

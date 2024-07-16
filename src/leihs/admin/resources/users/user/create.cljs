@@ -7,19 +7,20 @@
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
    [leihs.admin.resources.users.user.core :as core]
    [leihs.admin.resources.users.user.edit :as edit]
-   [leihs.admin.resources.users.user.edit-core :as edit-core :refer [data*]]
    [leihs.admin.utils.search-params :as search-params]
    [leihs.core.auth.core :as auth]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]
-   [reagent.core :refer [reaction]]))
+   [reagent.core :as reagent :refer [reaction]]))
+
+(def data* (reagent/atom nil))
 
 (defn post []
   (go (when-let [data (some->
                        {:chan (async/chan)
                         :url (path :users)
                         :method :post
-                        :json-params  (-> @core/user-data*
+                        :json-params  (-> @data*
                                           (update-in [:extended_info]
                                                      (fn [s] (.parse js/JSON s))))}
                        http-client/request :chan <!
@@ -30,7 +31,7 @@
 
 (def open*
   (reaction
-   (reset! core/user-data* nil)
+   (reset! data* @core/user-data*)
    (->> (:query-params @routing/state*)
         :action
         (= "add"))))
@@ -51,7 +52,7 @@
               :on-submit (fn [e]
                            (.preventDefault e)
                            (post))}
-     [edit/inner-form-component core/user-data*]]]
+     [edit/inner-form-component data*]]]
 
    [:> Modal.Footer
     [:> Button {:variant "secondary"

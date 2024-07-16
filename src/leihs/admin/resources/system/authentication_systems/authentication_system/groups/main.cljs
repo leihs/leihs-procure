@@ -29,7 +29,8 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change auth-core/clean-and-fetch}]
+    {:did-mount #(auth-core/fetch)}]
+
    (if-not @auth-core/data*
      [:div.my-5
       [wait-component]]

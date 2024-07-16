@@ -15,22 +15,16 @@
   (reaction (or (-> @routing/state* :route-params :mail-template-id presence)
                 ":mail-template-id")))
 
-(defonce data* (reagent/atom nil))
+(defonce path*
+  (reaction
+   (path :mail-template {:mail-template-id @id*})))
 
-;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defonce cache* (reagent/atom nil))
+(defonce data*
+  (reaction (get @cache* @path*)))
 
 (defn fetch []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :mail-template
-                           (-> @routing/state* :route-params))}
-               http-client/request :chan <!
-               http-client/filter-success! :body))))
-
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
+  (http-client/route-cached-fetch cache* {:route @path*}))
 
 (def template-variables-for-order-component
   [:ul

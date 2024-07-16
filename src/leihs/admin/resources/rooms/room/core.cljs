@@ -2,7 +2,7 @@
   (:require
    [cljs.core.async :as async :refer [<! go]]
    [cljs.pprint :refer [pprint]]
-   [leihs.admin.common.http-client.core :as http]
+   [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.state :as state]
    [leihs.core.core :refer [presence]]
@@ -14,24 +14,25 @@
   (reaction (or (-> @routing/state* :route-params :room-id presence)
                 ":room-id")))
 
-(defonce data* (reagent/atom nil))
-(defonce data-buildings* (reagent/atom nil))
+(defonce cache* (reagent/atom nil))
+(defonce path*
+  (reaction (path :room {:room-id @id*})))
 
-(defn fetch-room []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :room
-                           (-> @routing/state* :route-params))}
-               http/request :chan <!
-               http/filter-success! :body))))
+(defonce data*
+  (reaction (get @cache* @path*)))
+
+(defn fetch []
+  (http-client/route-cached-fetch cache* {:route @path*}))
+
+(defonce data-buildings* (reagent/atom nil))
 
 (defn fetch-buildings []
   (go (reset! data-buildings*
               (some-> {:chan (async/chan)
                        :url (path :buildings)}
-                      http/request :chan <!
-                      http/filter-success!
+                      http-client/request
+                      :chan <!
+                      http-client/filter-success!
                       :body :buildings))))
 
 (defn room-form [action data*]

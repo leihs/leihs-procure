@@ -7,7 +7,7 @@
 
 (defn page []
   [:div.user-data
-   [routing/hidden-state-component {:did-mount core/clean-and-fetch}]
+   [routing/hidden-state-component {:did-mount core/fetch}]
    [:h1
     "Edit User "
     [core/name-link-component]

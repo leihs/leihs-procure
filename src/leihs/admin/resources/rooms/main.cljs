@@ -31,8 +31,7 @@
 (def data* (reagent/atom nil))
 
 (defn fetch []
-  (http/route-cached-fetch data* {:route @fetch-route*
-                                  :reload true}))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
 (defn link-to-room
   [room inner & {:keys [authorizers]

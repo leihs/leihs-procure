@@ -11,37 +11,11 @@
    [react-bootstrap :as react-bootstrap :refer [Form]]
    [reagent.core :as reagent :refer [reaction]]))
 
-(def data* user-data*)
+(def data* (reagent/atom nil))
 
 (def admin-protected-is-invalid* (reaction (and (:is_admin @data*)  (not (:admin_protected @data*)))))
 
 (def system-admin-protected-is-invalid* (reaction (and (:is_system_admin @data*)  (not (:system_admin_protected @data*)))))
-
-(def extended-info-is-valid*
-  (reaction (try (.parse js/JSON (get @data* :extended_info))
-                 true
-                 (catch :default _ false))))
-
-(defn json-component
-  [kw & {:keys [label hint classes]
-         :or {label kw
-              hint nil}}]
-  [:div.form-group
-   [:label {:for kw}
-    (if (= label kw)
-      [:strong  label]
-      [:span [:strong  label] [:small " (" [:span.text-monospace kw] ")"]])]
-   [:textarea.form-control
-    {:id kw
-     :class classes
-     :auto-complete :off
-     :value (or (kw @data*) "")
-     :on-change #(swap! data* assoc kw (-> % .-target .-value presence))
-     :tab-index 100
-     :disabled false}]
-   (when hint [:small hint])])
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn essentials-form-component [data*]
   [:div.essential-fields

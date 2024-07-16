@@ -28,23 +28,26 @@
 
 (def data* (reagent/atom {}))
 
-(defonce inventory-pools-data* (reagent/atom nil))
-
 (defn fetch []
-  (http/route-cached-fetch data* {:route @fetch-route*
-                                  :reload true}))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
-(defn fetch-inventory-pools []
-  (go (reset! inventory-pools-data*
-              (some->
-               {:chan (async/chan)
-                :url (path :inventory-pools {}
-                           {:with_items_from_suppliers "yes"
-                            :active "yes"
-                            :per-page 1000})}
-               http/request :chan <!
-               http/filter-success!
-               :body))))
+(defonce pools-res* (reagent/atom nil))
+
+(defonce pools-path*
+  (reaction (path :inventory-pools {}
+                  {:with_items_from_suppliers "yes"
+                   :active "yes"
+                   :per-page 1000})))
+
+(def pools-data*
+  (reaction (get @pools-res* @pools-path*)))
+
+(defn fetch-pools []
+  (http/route-cached-fetch
+   pools-res* {:route (path :inventory-pools {}
+                            {:with_items_from_suppliers "yes"
+                             :active "yes"
+                             :per-page 1000})}))
 
 (defn link-to-supplier
   [supplier inner & {:keys [authorizers]
@@ -64,24 +67,13 @@
      :query-params-key
      :inventory_pool_id
      :options (cons ["" "(any)"]
-                    (->> @inventory-pools-data*
+                    (->> @pools-data*
                          :inventory-pools
                          (map #(do [(:id %) (:name %)]))))]
     [filter/form-per-page]
     [filter/reset]]])
 
 ;;; Table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn add-supplier-button []
-  (let [show (reagent/atom false)]
-    (fn []
-      [:<>
-       [:> Button
-        {:className "ml-3"
-         :onClick #(reset! show true)}
-        "Add Supplier"]
-       [create/dialog {:show @show
-                       :onHide #(reset! show false)}]])))
 
 (defn name-th-component []
   [:th {:key :name} "Name"])
@@ -144,7 +136,7 @@
       [:pre (with-out-str (pprint @current-url*))]]
      [:div
       [:h3 "@inventory-pools-data*"]
-      [:pre (with-out-str (pprint @inventory-pools-data*))]]
+      [:pre (with-out-str (pprint @pools-data*))]]
      [:div
       [:h3 "@data*"]
       [:pre (with-out-str (pprint @data*))]]]))
@@ -153,7 +145,7 @@
   [:<>
    [routing/hidden-state-component
     {:did-change #(fetch)
-     :did-mount #(fetch-inventory-pools)}]
+     :did-mount #(fetch-pools)}]
 
    [:article.suppliers
     [:header.my-5

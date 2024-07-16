@@ -33,8 +33,7 @@
 (def data* (reagent/atom nil))
 
 (defn fetch-groups []
-  (http/route-cached-fetch data* {:route @fetch-route*
-                                  :reload true}))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

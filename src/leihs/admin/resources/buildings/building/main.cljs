@@ -33,8 +33,7 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount #(core/fetch)
-     :will-unmount #(reset! core/data* nil)}]
+    {:did-mount #(core/fetch)}]
 
    (if-not @core/data*
      [:div.my-5

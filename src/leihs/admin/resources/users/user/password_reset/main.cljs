@@ -154,7 +154,7 @@
 (defn page []
   [:div.user-password-reset
    [routing/hidden-state-component
-    {:did-change #(core/clean-and-fetch)}]
+    {:did-change #(core/fetch)}]
 
    [:h1 "Password Reset Link for "
     [core/name-link-component]]])

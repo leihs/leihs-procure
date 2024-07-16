@@ -9,24 +9,26 @@
    [leihs.admin.utils.search-params :as search-params]
    [leihs.core.routing.front :as routing]
    [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]
-   [reagent.core :refer [reaction]]))
+   [reagent.core :as reagent :refer [reaction]]))
+
+(defonce data* (reagent/atom nil))
 
 (defn post []
   (go (when-let [body (some->
                        {:chan (async/chan)
                         :url (path :groups)
                         :method :post
-                        :json-params @core/data*}
+                        :json-params @data*}
                        http-client/request
-                       :chan <! http-client/filter-success!
-                       :body)]
+                       :chan <!
+                       http-client/filter-success! :body)]
         (search-params/delete-from-url "action")
         (accountant/navigate!
          (path :group {:group-id (:id body)})))))
 
 (def open*
   (reaction
-   (reset! core/data* nil)
+   (reset! data* @core/data*)
    (->> (:query-params @routing/state*)
         :action
         (= "add"))))
@@ -44,7 +46,7 @@
    [:> Modal.Body
     [:> Form {:id "add-group-form"
               :on-submit (fn [e] (.preventDefault e) (post))}
-     [edit-core/inner-form-component core/data*]]]
+     [edit-core/inner-form-component data*]]]
 
    [:> Modal.Footer
     [:> Button {:variant "secondary"

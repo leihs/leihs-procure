@@ -45,9 +45,8 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change (fn []
-                   (users/fetch-users)
-                   (auth-core/clean-and-fetch))}]
+    {:did-mount #(auth-core/fetch)
+     :did-change #(users/fetch-users)}]
 
    (if-not @auth-core/data*
      [:div.my-5

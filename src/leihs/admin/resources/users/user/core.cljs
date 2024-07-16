@@ -19,26 +19,17 @@
                 "00000000-0000-0000-0000-000000000000")))
 
 ;;; data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(def path*
+  (reaction
+   (path :user {:user-id @user-id*})))
 
-(defonce user-data* (reagent/atom nil))
+(def cache* (reagent/atom nil))
 
-(defonce fetch-id* (atom nil))
+(def user-data*
+  (reaction (get @cache* @path*)))
 
-(defn stringify-json [json]
-  (.stringify js/JSON (clj->js json)))
-
-(defn clean-and-fetch [& _]
-  (reset! user-data* nil)
-  (let [fetch-id (reset! fetch-id* (rand-int (js/Math.pow 2 16)))]
-    (go (<! (timeout 50))
-        (when (= @fetch-id* fetch-id)
-          (let [path (path :user {:user-id @user-id*})]
-            (reset! user-data*
-                    (-> {:chan (async/chan)
-                         :url path}
-                        http-client/request
-                        :chan <! http-client/filter-success! :body
-                        (update-in [:extended_info] stringify-json))))))))
+(defn fetch []
+  (http-client/route-cached-fetch cache* {:route @path*}))
 
 (defn modifieable? [current-user-state _]
   (cond
@@ -84,8 +75,8 @@
 (defn name-link-component []
   [:span
    [routing/hidden-state-component
-    {:did-mount #(clean-and-fetch)
-     :did-change #(clean-and-fetch)}]
+    {:did-mount #(fetch)
+     :did-change #(fetch)}]
    (let [p (path :user {:user-id @user-id*})
          name-or-id (fullname-or-some-uid @user-data*)]
      [components/link [:em name-or-id] p])])

@@ -13,21 +13,19 @@
    [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]
    [reagent.core :as reagent :refer [reaction]]))
 
-(defonce data* (reagent/atom nil))
-
 (defn patch []
   (go (when-let [res (some->
                       {:chan (async/chan)
                        :url (path :user {:user-id @user-id*})
                        :method :patch
-                       :json-params  (-> @data*
+                       :json-params  (-> @edit-core/data*
                                          (update-in [:extended_info]
                                                     (fn [s] (.parse js/JSON s))))}
                       http-client/request :chan <!
                       http-client/filter-success! :body)]
-        (search-params/delete-from-url "action")
         (user-inventory-pools/clean-and-fetch)
-        (reset! core/user-data* res))))
+        (swap! core/cache* assoc @core/path* res)
+        (search-params/delete-from-url "action"))))
 
 (defn inner-form-component [data*]
   [:<>
@@ -40,7 +38,7 @@
 
 (def open*
   (reaction
-   (reset! data* @core/user-data*)
+   (reset! edit-core/data* @core/user-data*)
    (->> (:query-params @routing/state*)
         (:action)
         (= "edit"))))
@@ -60,7 +58,7 @@
               :on-submit (fn [e]
                            (.preventDefault e)
                            (patch))}
-     [inner-form-component data*]]]
+     [inner-form-component edit-core/data*]]]
    [:> Modal.Footer
     [:> Button {:variant "secondary"
                 :on-click #(search-params/delete-from-url "action")}

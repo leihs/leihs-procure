@@ -35,8 +35,9 @@
 (def data* (reagent/atom nil))
 
 (defn fetch []
-  (http-client/route-cached-fetch data* {:route @fetch-route*
-                                         :reload true}))
+  (http-client/route-cached-fetch
+   data* {:route @fetch-route*
+          :reload true}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -135,8 +136,7 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount #(pool-core/reset)
-     :did-change #(fetch)}]
+    {:did-change #(fetch)}]
 
    [:article.inventory-pools
 

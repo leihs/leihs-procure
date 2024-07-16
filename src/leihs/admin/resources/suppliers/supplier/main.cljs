@@ -35,12 +35,8 @@
   [:<>
    [routing/hidden-state-component
     {:did-mount (fn []
-                  (pool-core/reset)
                   (core/fetch)
-                  (core/fetch-items))
-     :will-unmount (fn []
-                     (reset! core/data* nil)
-                     (reset! core/data-items* nil))}]
+                  (core/fetch-items))}]
 
    (if-not (or
             @core/data*

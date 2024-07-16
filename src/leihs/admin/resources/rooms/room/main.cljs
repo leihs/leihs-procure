@@ -48,11 +48,8 @@
   [:<>
    [routing/hidden-state-component
     {:did-mount (fn []
-                  (core/fetch-room)
-                  (core/fetch-buildings))
-     :will-unmount (fn []
-                     (reset! core/data* nil)
-                     (reset! core/data-buildings* nil))}]
+                  (core/fetch)
+                  (core/fetch-buildings))}]
 
    (if-not (and @core/data*
                 @core/data-buildings*)

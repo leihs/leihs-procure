@@ -11,30 +11,35 @@
    [reagent.core :as reagent :refer [reaction]]))
 
 (defonce id*
-  (reaction (or (-> @routing/state* :route-params :supplier-id presence)
-                ":supplier-id")))
+  (reaction
+   (or (-> @routing/state* :route-params :supplier-id presence)
+       ":supplier-id")))
 
-(defonce data* (reagent/atom nil))
-(defonce data-items* (reagent/atom nil))
+(defonce path*
+  (reaction
+   (path :supplier {:supplier-id @id*})))
+
+(defonce cache* (reagent/atom nil))
+(defonce data*
+  (reaction
+   (get @cache* @path*)))
 
 (defn fetch []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :supplier
-                           (-> @routing/state* :route-params))}
-               http-client/request :chan <!
-               http-client/filter-success! :body))))
+  (http-client/route-cached-fetch
+   cache* {:route @path*}))
+
+(defonce path-items*
+  (reaction
+   (path :supplier-items {:supplier-id @id*})))
+
+(defonce cache-items* (reagent/atom nil))
+(defonce data-items*
+  (reaction
+   (:items (get @cache-items* @path-items*))))
 
 (defn fetch-items []
-  (go (reset! data-items*
-              (some->
-               {:chan (async/chan)
-                :url (path :supplier-items
-                           (-> @routing/state* :route-params))}
-               http-client/request :chan <!
-               http-client/filter-success!
-               :body :items))))
+  (http-client/route-cached-fetch
+   cache-items* {:route @path-items*}))
 
 (defn debug-component []
   (when (:debug @state/global-state*)

@@ -20,9 +20,9 @@
                 :json-params  (dissoc @data* :users_count)
                 :chan (async/chan)}
                http-client/request :chan <!
-               http-client/filter-success!)
-          (reset! core/data* @data*)
-          (search-params/delete-from-url "action")))))
+               http-client/filter-success!))
+        (swap! core/cache* assoc @core/path* @data*)
+        (search-params/delete-from-url "action"))))
 
 (def open?*
   (reaction

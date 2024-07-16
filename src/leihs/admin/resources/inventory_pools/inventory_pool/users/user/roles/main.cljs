@@ -35,8 +35,8 @@
 (defn clean-and-fetch []
   (reset! roles-data* nil)
   (fetch-inventory-pool-user-roles)
-  (user/clean-and-fetch)
-  (inventory-pool/clean-and-fetch))
+  (user/fetch)
+  (inventory-pool/fetch))
 
 ;;; roles component ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

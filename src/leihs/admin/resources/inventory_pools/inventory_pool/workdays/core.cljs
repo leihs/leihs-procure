@@ -17,15 +17,10 @@
 (defonce data* (reagent/atom nil))
 
 (defn fetch []
-  (go (<! (timeout 1))
-      (reset! data* (some->
+  (go (reset! data* (some->
                      {:chan (async/chan)
                       :url (path :inventory-pool-workdays
                                  (-> @routing/state* :route-params))}
                      http-client/request :chan <!
                      http-client/filter-success! :body))))
-
-(defn clean-and-fetch [& args]
-  (reset! data* nil)
-  (fetch))
 

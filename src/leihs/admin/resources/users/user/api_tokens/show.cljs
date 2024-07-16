@@ -16,7 +16,7 @@
 (defonce data* (reagent/atom nil))
 
 (defn fetch []
-  (user-core/clean-and-fetch)
+  (user-core/fetch)
   (go (reset!
        data*
        (some->

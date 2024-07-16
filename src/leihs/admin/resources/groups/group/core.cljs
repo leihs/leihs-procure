@@ -13,9 +13,14 @@
 
 (defonce group-id* (reaction (-> @routing/state* :route-params :group-id)))
 
-(def data* (reagent/atom nil))
+(def path*
+  (reaction
+   (path :group {:group-id @group-id*})))
 
-(def route* (reaction (path :group (:route-params @routing/state*))))
+(def cache* (reagent/atom nil))
+
+(def data*
+  (reaction (get @cache* @path*)))
 
 (defn some-lending-manager-and-group-unprotected? [current-user-state _]
   (and (pool-auth/some-lending-manager? current-user-state _)
@@ -28,30 +33,8 @@
   (and (auth/admin-scopes? current-user routing-state)
        (-> @data* :system_admin_protected not)))
 
-(defonce fetch-id* (atom nil))
-
 (defn fetch []
-  (go (reset! data*
-              (some-> {:chan (async/chan)
-                       :url @route*}
-                      http-client/request
-                      :chan <! http-client/filter-success! :body))))
-
-;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (defn fetch [& _]
-;;   (let [fetch-id (reset! fetch-id* (rand-int (js/Math.pow 2 16)))]
-;;     (go (<! (timeout 50))
-;;         (when (= @fetch-id* fetch-id)
-;;           (reset! data*
-;;                   (-> {:chan (async/chan)
-;;                        :url @route*}
-;;                       http-client/request
-;;                       :chan <! http-client/filter-success! :body))))))
-
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
+  (http-client/route-cached-fetch cache* {:route @path*}))
 
 (defn group-name-component []
   [:<> (:name @data*)])

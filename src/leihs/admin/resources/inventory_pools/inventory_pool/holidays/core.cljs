@@ -15,7 +15,3 @@
                                  (-> @routing/state* :route-params))}
                      http-client/request :chan <!
                      http-client/filter-success! :body))))
-
-(defn clean-and-fetch [& args]
-  (reset! data* nil)
-  (fetch))

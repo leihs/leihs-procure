@@ -11,21 +11,23 @@
    [react-bootstrap :as react-bootstrap :refer [Button Form Modal]]
    [reagent.core :as reagent :refer [reaction]]))
 
+(defonce data* (reagent/atom nil))
+
 (defn create []
   (go (when-let [id (some->
                      {:url (path :inventory-fields)
                       :method :post
                       :json-params (core/strip-of-uuids
-                                    @core/data*)
+                                    @data*)
                       :chan (async/chan)}
-                     http-client/request :chan <!
-                     http-client/filter-success!
-                     :body :id)]
+                     http-client/request
+                     :chan <!
+                     http-client/filter-success! :body :id)]
         (accountant/navigate!
          (path :inventory-field {:inventory-field-id id})))))
 
 (defn form []
-  (if-not @core/data*
+  (if-not @data*
     [wait-component]
     [:div.inventory-field.mt-3
      [:div.row
@@ -33,13 +35,13 @@
        [:> Form {:id "inventory-field-form"
                  :className "inventory-field mt-3"
                  :on-submit (fn [e] (.preventDefault e) (create))}
-        [core/dynamic-inventory-field-form-component core/data*]]]
+        [core/dynamic-inventory-field-form-component data*]]]
       [:div.col-md
-       [core/inventory-field-data-component core/data*]]]]))
+       [core/inventory-field-data-component data*]]]]))
 
 (def open?*
   (reaction
-   (core/clean-and-fetch-for-new)
+   (reset! data* core/new-dynamic-field-defaults)
    (->> (:query-params @routing/state*)
         :action
         (= "add"))))

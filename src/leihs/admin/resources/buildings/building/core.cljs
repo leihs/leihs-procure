@@ -14,17 +14,17 @@
   (reaction (or (-> @routing/state* :route-params :building-id presence)
                 ":building-id")))
 
-(defonce data* (reagent/atom nil))
+(defonce cache* (reagent/atom nil))
+
+(defonce path*
+  (reaction
+   (path :building {:building-id @id*})))
+
+@(defonce data*
+   (reaction (get @cache* @path*)))
 
 (defn fetch []
-  (go (reset! data*
-              (some->
-               {:chan (async/chan)
-                :url (path :building
-                           (-> @routing/state* :route-params))}
-
-               http-client/request :chan <!
-               http-client/filter-success! :body))))
+  (http-client/route-cached-fetch cache* {:route @path*}))
 
 (defn building-form [action data*]
   [:div.building.mt-3

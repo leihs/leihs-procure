@@ -12,32 +12,6 @@
             [leihs.core.routing.front :as routing]
             [reagent.core :as reagent :refer [reaction]]))
 
-(defonce id*
-  (reaction (or (-> @routing/state* :route-params :inventory-field-id presence)
-                ":inventory-field-id")))
-
-(def new-dynamic-field-defaults field-specs/new-dynamic-field-defaults)
-(def advanced-types field-specs/advanced-types)
-
-(defonce data* (reagent/atom nil))
-
-(defonce inventory-field-data* (reagent/atom nil))
-
-(defonce inventory-fields-groups-data* (reagent/atom nil))
-
-(defonce inventory-field-usage-data* (reagent/atom nil))
-
-(defonce edit-mode?* (reagent/atom true))
-
-(defn strip-of-uuids [data]
-  (-> data
-      (dissoc-in [:data :default-uuid])
-      (cond->> (contains? (:data data) :values)
-        (specter/transform [:data :values specter/ALL]
-                           #(dissoc % :uuid)))))
-
-;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defn select-put-keys [data]
   (-> data
       (select-keys field-specs/field-keys)
@@ -58,18 +32,47 @@
               (:uuid (detect #(= (:value %) (-> field :data :default))
                              (-> field :data :values))))))
 
+(defonce id*
+  (reaction (or (-> @routing/state* :route-params :inventory-field-id presence)
+                ":inventory-field-id")))
+
+(def new-dynamic-field-defaults field-specs/new-dynamic-field-defaults)
+(def advanced-types field-specs/advanced-types)
+
+(defonce cache* (reagent/atom nil))
+(defonce path*
+  (reaction (path :inventory-field {:inventory-field-id @id*})))
+
+(defonce route-data*
+  (reaction (get @cache* @path*)))
+
+(defonce inventory-field-data*
+  (reaction (:inventory-field-data @route-data*)))
+
+(defonce inventory-field-usage-data*
+  (reaction (:inventory-field-usage @route-data*)))
+
+(defonce data*
+  (reaction (-> @inventory-field-data*
+                select-put-keys
+                update-data-values-with-uuid
+                set-default-uuid)))
+
+(defonce inventory-fields-groups-data* (reagent/atom nil))
+
+(defonce edit-mode?* (reagent/atom true))
+
+(defn strip-of-uuids [data]
+  (-> data
+      (dissoc-in [:data :default-uuid])
+      (cond->> (contains? (:data data) :values)
+        (specter/transform [:data :values specter/ALL]
+                           #(dissoc % :uuid)))))
+
+;;; fetch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn fetch []
-  (go (let [body (some-> {:chan (async/chan)
-                          :url (path :inventory-field
-                                     (-> @routing/state* :route-params))}
-                         http-client/request :chan <!
-                         http-client/filter-success! :body)]
-        (reset! inventory-field-data* (:inventory-field-data body))
-        (reset! inventory-field-usage-data* (:inventory-field-usage body))
-        (reset! data* (-> @inventory-field-data*
-                          select-put-keys
-                          update-data-values-with-uuid
-                          set-default-uuid)))))
+  (http-client/route-cached-fetch cache* {:route @path*}))
 
 (defn fetch-inventory-fields-groups []
   (go (reset! inventory-fields-groups-data*
@@ -78,20 +81,6 @@
                       http-client/request :chan <!
                       http-client/filter-success!
                       :body :inventory-fields-groups sort))))
-
-(defn clean-and-fetch [& args]
-  (reset! data* nil)
-  (reset! inventory-fields-groups-data* nil)
-  (reset! inventory-field-usage-data* nil)
-  (fetch)
-  (fetch-inventory-fields-groups))
-
-(defn clean-and-fetch-for-new [& args]
-  (reset! data* new-dynamic-field-defaults)
-  (reset! inventory-field-data* nil)
-  (reset! inventory-fields-groups-data* nil)
-  (reset! inventory-field-usage-data* nil)
-  (fetch-inventory-fields-groups))
 
 (defn set-value [value data* ks]
   (swap! data* assoc-in ks value)

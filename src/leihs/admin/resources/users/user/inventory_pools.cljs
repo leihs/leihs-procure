@@ -87,9 +87,7 @@
                           :or {chrome true}}]
   [:div.user-inventory-pools
    [routing/hidden-state-component
-    {:did-mount (fn []
-                  (pool-core/reset)
-                  (fetch))}]
+    {:did-mount #(fetch)}]
 
    (if (and @data* @user-data*)
      [table/container

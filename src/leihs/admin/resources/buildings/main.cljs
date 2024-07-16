@@ -26,8 +26,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch []
-  (http/route-cached-fetch data* {:route @fetch-route*
-                                  :reload true}))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -128,7 +128,8 @@
             :or {reload false}}]
 
   (let [route (or route (-> @routing/state* :route))
-        chan (async/chan)]
+        chan (async/chan)
+        result-chan (async/chan 1)]
 
     (go-loop [do-fetch true]
       (when do-fetch
@@ -136,7 +137,8 @@
                             :url route})
               resp (<! chan)]
           (when (< (:status resp) 300)
-            (swap! data* assoc route (-> resp :body)))))
+            (swap! data* assoc route (-> resp :body))
+            (async/>! result-chan resp))))
 
       (<! (timeout (* 3 60 1000)))
 
@@ -145,4 +147,8 @@
            (starts-with? (:route @routing/state*) route))
 
         (recur reload)
-        (swap! data* dissoc route)))))
+        (do
+          (swap! data* dissoc route)
+          (async/close! result-chan))))
+
+    result-chan))

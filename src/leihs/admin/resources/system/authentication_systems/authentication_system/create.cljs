@@ -26,7 +26,6 @@
 
 (def open?*
   (reaction
-   (reset! data* nil)
    (->> (:query-params @routing/state*)
         :action
         (= "add"))))

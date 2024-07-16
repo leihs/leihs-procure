@@ -19,16 +19,16 @@
 (defn patch []
   (let [route (path :inventory-pool
                     {:inventory-pool-id @core/id*})]
-    (go (reset! core/data*
-                (when (some->
-                       {:url route
-                        :method :patch
-                        :json-params @data*
-                        :chan (async/chan)}
-                       http-client/request :chan <!
-                       http-client/filter-success!)))
-        (reset! core/data* @data*)
-        (search-params/delete-from-url "action"))))
+    (go (when (some->
+               {:url route
+                :method :patch
+                :json-params @data*
+                :chan (async/chan)}
+               http-client/request
+               :chan <!
+               http-client/filter-success!)
+          (swap! core/cache* assoc @core/path* @data*)
+          (search-params/delete-from-url "action")))))
 
 (defn form [& {:keys [is-editing]
                :or {is-editing false}}]
@@ -108,5 +108,6 @@
     [:<>
      [:> Button
       {:className ""
-       :on-click #(search-params/append-to-url {:action "edit"})}
+       :on-click #(search-params/append-to-url
+                   {:action "edit"})}
       "Edit"]]))

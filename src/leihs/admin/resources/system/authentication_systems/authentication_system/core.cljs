@@ -15,32 +15,18 @@
   (reaction (or (-> @routing/state* :route-params :authentication-system-id)
                 ":authentication-system-id")))
 
-(defonce data* (reagent/atom nil))
+(defonce path*
+  (reaction
+   (path :authentication-system {:authentication-system-id @id*})))
+
+(defonce cache* (reagent/atom nil))
+(defonce data*
+  (reaction
+   (get @cache* @path*)))
 
 (defn fetch []
-  (let [id @id*]
-    (go
-      (when-let [res (some->
-                      {:chan (async/chan)
-                       :url (path :authentication-system
-                                  (-> @routing/state* :route-params))}
-                      http-client/request :chan <!
-                      http-client/filter-success! :body)]
-
-       ;; only update data if the id is still the same 
-       ;; as when the request was started
-       ;; since the fetch cannot aborted and the async routine
-       ;; might still process an old fetch and write that result to data*
-        (when (= id @id*)
-          (reset! data* res))))))
-
-(defn reset []
-  (reset! data* nil))
-;;; reload logic ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn clean-and-fetch []
-  (reset! data* nil)
-  (fetch))
+  (http-client/route-cached-fetch
+   cache* {:route @path*}))
 
 (defn form [action data*]
   [:> Form

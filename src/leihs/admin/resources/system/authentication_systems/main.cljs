@@ -108,8 +108,7 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount #(syssec-core/reset)
-     :did-change #(fetch)}]
+    {:did-change #(fetch)}]
 
    [:article.authentication-systems
     [:header.my-5

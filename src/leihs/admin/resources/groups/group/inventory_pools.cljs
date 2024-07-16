@@ -47,33 +47,33 @@
 (defn table-component []
   [:div
    [routing/hidden-state-component
-    {:did-mount (fn []
-                  (pool-core/reset)
-                  (fetch))}]
+    {:did-mount #(fetch)}]
 
    (if-not @data*
      [:div.my-5
       [wait-component]]
      [:<>
-      (if (> (count @data*) 0)
-        [table/container
-         {:borders false
-          :className "group"
-          :header [:tr [:th "Pool"] [:th "Roles"]]
-          :body (for [row (->> @data* (sort-by :inventory_pool_name))]
-                  [:tr.pool {:key (:inventory_pool_id row)}
-                   [:td
-                    [:a {:href (path :inventory-pool
-                                     {:inventory-pool-id (:inventory_pool_id row)})}
-                     [:<> (:inventory_pool_name row)]] ""]
-                   [:td
-                    [roles-component
-                     (get-roles (clojure.core/keyword (:role row)))
-                     :compact true
-                     :message (clojure.core/str (:users_count @core/data*))
-                     :update-handler #(roles-update-handler % row)
-                     :label "Role"
-                     :query-params-key :role
-                     :default-option "customer"]]])}]
-        [:> Alert {:variant "secondary" :className "mt-3"}
-         "Not part of any Inventory Pool"])])])
+      (let [group @core/data*
+            pools @data*]
+        (if (> (count @data*) 0)
+          [table/container
+           {:borders false
+            :className "group"
+            :header [:tr [:th "Pool"] [:th "Roles"]]
+            :body (for [row (sort-by :inventory_pool_name pools)]
+                    [:tr.pool {:key (:inventory_pool_id row)}
+                     [:td
+                      [:a {:href (path :inventory-pool
+                                       {:inventory-pool-id (:inventory_pool_id row)})}
+                       [:<> (:inventory_pool_name row)]] ""]
+                     [:td
+                      [roles-component
+                       (get-roles (clojure.core/keyword (:role row)))
+                       :compact true
+                       :message (clojure.core/str (:users_count group))
+                       :update-handler #(roles-update-handler % row)
+                       :label "Role"
+                       :query-params-key :role
+                       :default-option "customer"]]])}]
+          [:> Alert {:variant "secondary" :className "mt-3"}
+           "Not part of any Inventory Pool"]))])])

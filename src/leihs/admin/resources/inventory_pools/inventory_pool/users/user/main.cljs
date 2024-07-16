@@ -11,7 +11,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.groups.main :as groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.roles.main :as user-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.users.user.suspension.main :as suspension]
-   [leihs.admin.resources.users.user.core :as user :refer [clean-and-fetch
+   [leihs.admin.resources.users.user.core :as user :refer [fetch
                                                            user-data*]]
    [leihs.admin.resources.users.user.edit :as user-edit]
    [leihs.admin.state :as state]
@@ -39,8 +39,6 @@
 
 (defn effective-roles-component []
   [:div.effective-roles
-   ;; [routing/hidden-state-component
-   ;;  {:did-change user-roles/clean-and-fetch}]
    [:h2 "Roles"]
    [:p "This section shows the effective roles. This is an aggregate computed from "
     "direct roles, and roles via groups. "]
@@ -152,9 +150,9 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-change #(do
-                    (clean-and-fetch)
-                    (user-roles/clean-and-fetch))}]
+    {:did-change (fn []
+                   (fetch)
+                   (user-roles/clean-and-fetch))}]
 
    (if (empty? @user-data*)
      [:div.mt-5

@@ -30,9 +30,7 @@
 (def data* (reagent/atom {}))
 
 (defn fetch-users []
-  (when (string? @fetch-route*)
-    (http/route-cached-fetch data* {:route @fetch-route*
-                                    :reload true})))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
 ;;; helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -198,9 +196,6 @@
 
 (defn page []
   [:article.users.my-5
-   ;; [routing/hidden-state-component
-   ;;  {:did-change #(reset! user-core/user-data* nil)}]
-
    [:h1.my-5
     [icons/users] " Users"]
    [:section

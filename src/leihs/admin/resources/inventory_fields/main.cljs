@@ -28,12 +28,10 @@
   (reaction (shared/normalized-query-parameters @current-query-parameters*)))
 
 (def data* (reagent/atom {}))
-
 (defonce inventory-fields-groups-data* (reagent/atom nil))
 
 (defn fetch []
-  (http/route-cached-fetch data* {:route @fetch-route*
-                                  :reload true}))
+  (http/route-cached-fetch data* {:route @fetch-route*}))
 
 (defn fetch-inventory-fields-groups []
   (go (reset! inventory-fields-groups-data*

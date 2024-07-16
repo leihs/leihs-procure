@@ -19,9 +19,10 @@
                 :method :patch
                 :json-params  @data*
                 :chan (async/chan)}
-               http-client/request :chan <!
+               http-client/request
+               :chan <!
                http-client/filter-success!)
-          (reset! core/data* @data*)
+          (swap! core/cache* assoc @core/path* @data*)
           (search-params/delete-from-url "action")))))
 
 (def open?*

@@ -1,9 +1,7 @@
 (ns leihs.admin.resources.inventory-fields.inventory-field.edit
   (:require
-   [accountant.core :as accountant]
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
-   [leihs.admin.paths :as paths :refer [path]]
    [leihs.admin.resources.inventory-fields.inventory-field.core :as core]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.admin.utils.search-params :as search-params]
@@ -15,17 +13,16 @@
 (def data* (reagent/atom nil))
 
 (defn patch []
-  (let [route (path :inventory-field
-                    {:inventory-field-id @core/id*})]
-    (go (when (some->
-               {:url route
-                :method :patch
-                :json-params (core/strip-of-uuids @data*)
-                :chan (async/chan)}
-               http-client/request :chan <!
-               http-client/filter-success!)
-          (reset! core/data* @data*)
-          (search-params/delete-from-url "action")))))
+  (go (when (some->
+             {:url @core/path*
+              :method :patch
+              :json-params (core/strip-of-uuids @data*)
+              :chan (async/chan)}
+             http-client/request :chan <!
+             http-client/filter-success!)
+        (go (<! (core/fetch))
+            (search-params/delete-from-url "action")))))
+           ;; (swap! core/cache* assoc @core/path* @data*))
 
 (defn form []
   (if-not @core/data*
@@ -48,7 +45,9 @@
 
        [:> Form {:id "inventory-field-form"
                  :className "inventory-field mt-3"
-                 :on-submit (fn [e] (.preventDefault e) (patch))}
+                 :on-submit (fn [e]
+                              (.preventDefault e)
+                              (patch))}
         (if (:dynamic @core/inventory-field-data*)
           [core/dynamic-inventory-field-form-component data* {:isEditing? true}]
           [core/inventory-field-form-component data*])]]

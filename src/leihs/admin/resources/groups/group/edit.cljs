@@ -3,7 +3,7 @@
    [cljs.core.async :as async :refer [<! go]]
    [leihs.admin.common.http-client.core :as http-client]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.groups.group.core :as core :refer [clean-and-fetch group-id*]]
+   [leihs.admin.resources.groups.group.core :as core :refer [group-id*]]
    [leihs.admin.resources.groups.group.edit-core :as edit-core]
    [leihs.admin.utils.search-params :as search-params]
    [leihs.core.auth.core :as auth]
@@ -21,8 +21,8 @@
                        :json-params @data*}
                       http-client/request :chan <!
                       http-client/filter-success! :body)]
-        (search-params/delete-from-url "action")
-        (reset! core/data* res))))
+        (swap! core/cache* assoc @core/path* res)
+        (search-params/delete-from-url "action"))))
 
 (def open*
   (reaction

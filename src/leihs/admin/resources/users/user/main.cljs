@@ -2,7 +2,7 @@
   (:require
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.resources.users.user.api-tokens.main :as api-tokens]
-   [leihs.admin.resources.users.user.core :as user-core :refer [clean-and-fetch
+   [leihs.admin.resources.users.user.core :as user-core :refer [fetch
                                                                 user-data*]]
    [leihs.admin.resources.users.user.delete :as delete]
    [leihs.admin.resources.users.user.edit :as edit]
@@ -110,7 +110,7 @@
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount #(clean-and-fetch)}]
+    {:did-mount #(fetch)}]
 
    (if-not @user-data*
      [:div.mt-5

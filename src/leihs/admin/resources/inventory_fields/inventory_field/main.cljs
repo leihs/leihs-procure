@@ -3,16 +3,11 @@
    [leihs.admin.common.components.navigation.breadcrumbs :as breadcrumbs]
    [leihs.admin.common.components.table :as table]
    [leihs.admin.paths :as paths :refer [path]]
-   [leihs.admin.resources.inventory-fields.inventory-field.core :as core
-    :refer [inventory-field-data*
-            inventory-field-usage-data*]]
+   [leihs.admin.resources.inventory-fields.inventory-field.core :as core]
    [leihs.admin.resources.inventory-fields.inventory-field.delete :as delete]
    [leihs.admin.resources.inventory-fields.inventory-field.edit :as edit]
    [leihs.admin.utils.misc :refer [wait-component]]
-   [leihs.core.auth.core :as auth]
-   [leihs.core.routing.front :as routing]
-   [react-bootstrap :as react-bootstrap :refer [Button]]
-   [reagent.core :as reagent]))
+   [leihs.core.routing.front :as routing]))
 
 (defn info-table []
   [:<>
@@ -52,17 +47,17 @@
           [:td.type (-> @core/data* :data :type)]]])]}]])
 
 (defn header []
-  (let [data  @core/inventory-field-data*]
-    (fn []
-      [:header.my-5
-       [breadcrumbs/main  {:to (path :inventory-fields)}]
-       [:h1.mt-3 (-> data :data :label)]
-       [:p "( " (:id data) " )"]])))
+  [:header.my-5
+   [breadcrumbs/main  {:to (path :inventory-fields)}]
+   [:h1.mt-3 (-> @core/inventory-field-data* :data :label)]
+   [:p "( " (:id @core/inventory-field-data*) " )"]])
 
 (defn page []
   [:<>
    [routing/hidden-state-component
-    {:did-mount core/clean-and-fetch}]
+    {:did-mount (fn []
+                  (core/fetch-inventory-fields-groups)
+                  (core/fetch))}]
 
    (if-not @core/data*
      [:div.my-5
