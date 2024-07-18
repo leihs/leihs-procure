@@ -6,6 +6,7 @@
    [leihs.admin.resources.inventory-fields.inventory-field.core :as core]
    [leihs.admin.resources.inventory-fields.inventory-field.delete :as delete]
    [leihs.admin.resources.inventory-fields.inventory-field.edit :as edit]
+   [leihs.admin.resources.inventory-fields.inventory-field.inventory-pools.main :as inventory-pools]
    [leihs.admin.utils.misc :refer [wait-component]]
    [leihs.core.routing.front :as routing]))
 
@@ -22,29 +23,33 @@
       [:tr.label
        [:td "Label" [:small " (data:label)"]]
        [:td.label (-> @core/data* :data :label)]]
-      (when (:dynamic @core/inventory-field-data*)
-        [:<>
-         [:tr.attribute
-          [:td "Unique ID-Attribute" [:small " (data:attribute)"]]
-          [:td.attribute (nth (-> @core/data* :data :attribute) 1)]]
-         [:tr.forPackage
-          [:td "Enabled for packages" [:small " (data:forPackage)"]]
-          [:td.forPackage (str (or (-> @core/data* :data :forPackage) false))]]
-         [:tr.owner
-          [:td "Editable by owner only" [:small " (data:permissions:owner)"]]
-          [:td.owner (str (or (-> @core/data* :data :permissions :owner) false))]]
-         [:tr.role
-          [:td "Minimum role required for view" [:small " (data:permissions:role)"]]
-          [:td.role (-> @core/data* :data :permissions :role)]]
-         [:tr.field-group
-          [:td "Field Group" [:small " (data:group)"]]
-          [:td.field-group (or (-> @core/data* :data :group) "None")]]
-         [:tr.target-type
-          [:td "Target" [:small " (data:target_type)"]]
-          [:td.target-type (or (-> @core/data* :data :target_type) "License+Item")]]
-         [:tr.type
-          [:td "Type" [:small " (data:type)"]]
-          [:td.type (-> @core/data* :data :type)]]])]}]])
+      [:tr.label
+       [:td "Configurable" [:small " (data:dynamic)"]]
+       [:td.dynamic (str (:dynamic @core/inventory-field-data*))]]
+      [:tr.required
+       [:td "Required" [:small " (data:required)"]]
+       [:td.required (-> @core/inventory-field-data* :data :required str)]]
+      [:tr.attribute
+       [:td "Unique ID-Attribute" [:small " (data:attribute)"]]
+       [:td.attribute (nth (-> @core/data* :data :attribute) 1)]]
+      [:tr.forPackage
+       [:td "Enabled for packages" [:small " (data:forPackage)"]]
+       [:td.forPackage (str (or (-> @core/data* :data :forPackage) false))]]
+      [:tr.owner
+       [:td "Editable by owner only" [:small " (data:permissions:owner)"]]
+       [:td.owner (str (or (-> @core/data* :data :permissions :owner) false))]]
+      [:tr.role
+       [:td "Minimum role required for view" [:small " (data:permissions:role)"]]
+       [:td.role (-> @core/data* :data :permissions :role)]]
+      [:tr.field-group
+       [:td "Field Group" [:small " (data:group)"]]
+       [:td.field-group (or (-> @core/data* :data :group) "None")]]
+      [:tr.target-type
+       [:td "Target" [:small " (data:target_type)"]]
+       [:td.target-type (or (-> @core/data* :data :target_type) "License+Item")]]
+      [:tr.type
+       [:td "Type" [:small " (data:type)"]]
+       [:td.type (-> @core/data* :data :type)]]]}]])
 
 (defn header []
   [:header.my-5
@@ -71,4 +76,6 @@
        [edit/dialog]
        [delete/button]
        [delete/dialog]
+       [:div.mt-5.mb-5
+        [inventory-pools/component]]
        [core/debug-component]]])])

@@ -14,6 +14,7 @@
    [leihs.admin.resources.groups.group.users.main :as group-users]
    [leihs.admin.resources.groups.main :as groups]
    [leihs.admin.resources.initial-admin.back :as initial-admin]
+   [leihs.admin.resources.inventory-fields.inventory-field.inventory-pools.main :as inventory-field-inventory-pools]
    [leihs.admin.resources.inventory-fields.inventory-field.main :as inventory-field]
    [leihs.admin.resources.inventory-fields.main :as inventory-fields]
    [leihs.admin.resources.inventory-pools.authorization :as pool-auth]
@@ -26,6 +27,7 @@
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.entitlement-group.users.main :as entitlement-group-users]
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement-groups.main :as entitlement-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.entitlement_groups.entitlement_group.groups.main :as entitlement-group-groups]
+   [leihs.admin.resources.inventory-pools.inventory-pool.fields.main :as inventory-pool-fields]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.group.roles.main :as inventory-pool-group-roles]
    [leihs.admin.resources.inventory-pools.inventory-pool.groups.main :as inventory-pool-groups]
    [leihs.admin.resources.inventory-pools.inventory-pool.holidays.main :as inventory-pool-holidays]
@@ -135,6 +137,7 @@
           :inventory-field {:handler inventory-field/routes :authorizers [auth/admin-scopes?]}
           :inventory-fields {:handler inventory-fields/routes :authorizers [auth/admin-scopes?]}
           :inventory-fields-groups {:handler inventory-fields/groups-route :authorizers [auth/admin-scopes?]}
+          :inventory-field-inventory-pools {:handler inventory-field-inventory-pools/routes :authorizers [auth/admin-scopes?]}
           :group {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-inventory-pools-roles {:handler group/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
           :group-user {:handler group-users/routes :authorizers [auth/admin-scopes? pool-auth/some-lending-manager?]}
@@ -181,6 +184,10 @@
           :inventory-pool-entitlement-groups-group {:handler entitlement-groups/routes
                                                     :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
 
+          :inventory-pool-fields {:handler inventory-pool-fields/routes
+                                  :authorizers [auth/admin-scopes?
+                                                pool-auth/pool-inventory-manager?
+                                                pool-auth/pool-lending-manager-and-http-safe?]}
           :inventory-pool-group-roles {:handler inventory-pool-group-roles/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-groups {:handler inventory-pool-groups/routes :authorizers [auth/admin-scopes? pool-auth/pool-lending-manager?]}
           :inventory-pool-holidays {:handler inventory-pool-holidays/routes

@@ -118,7 +118,7 @@
     [wait-component]
     [:<>
      [add-new-holiday-comp]
-     [:> Form {:id "workdays-form"
+     [:> Form {:id "holidays-form"
                :on-submit (fn [e]
                             (.preventDefault e)
                             (patch))}
@@ -157,7 +157,7 @@
                 :on-click #(search-params/delete-from-url "action")}
      "Cancel"]
     [:> Button {:type "submit"
-                :form "workdays-form"}
+                :form "holidays-form"}
      "Save"]]])
 
 (defn button []

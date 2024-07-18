@@ -101,7 +101,8 @@
                   (param :inventory-field-id)
                   (leaf "" :inventory-field)
                   (leaf "/delete" :inventory-field-delete)
-                  (leaf "/edit" :inventory-field-edit))))
+                  (leaf "/edit" :inventory-field-edit)
+                  (leaf "/inventory-pools" :inventory-field-inventory-pools))))
 
 (def buildings-paths
   (branch "/buildings"

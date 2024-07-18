@@ -273,6 +273,26 @@
   environment_variables:
     FEATURE_NAME: "Manage inventory-fields  an admin cannot delete 02"
     FEATURE: './spec/features/inventory-fields/delete_spec.rb[1:1:2:2]'
+'./spec/features/inventory-fields/disable_spec.rb[1:1:1]':
+  name: "Field status by pool an admin via the UI 01"
+  environment_variables:
+    FEATURE_NAME: "Field status by pool an admin via the UI 01"
+    FEATURE: './spec/features/inventory-fields/disable_spec.rb[1:1:1]'
+'./spec/features/inventory-fields/disable_spec.rb[1:1:2]':
+  name: "Field status by pool an admin via the UI 02"
+  environment_variables:
+    FEATURE_NAME: "Field status by pool an admin via the UI 02"
+    FEATURE: './spec/features/inventory-fields/disable_spec.rb[1:1:2]'
+'./spec/features/inventory-fields/disable_spec.rb[1:2:1]':
+  name: "Field status by pool a inventory manager via the ui 01"
+  environment_variables:
+    FEATURE_NAME: "Field status by pool a inventory manager via the ui 01"
+    FEATURE: './spec/features/inventory-fields/disable_spec.rb[1:2:1]'
+'./spec/features/inventory-fields/disable_spec.rb[1:3:1]':
+  name: "Field status by pool a lending manager via the ui 01"
+  environment_variables:
+    FEATURE_NAME: "Field status by pool a lending manager via the ui 01"
+    FEATURE: './spec/features/inventory-fields/disable_spec.rb[1:3:1]'
 './spec/features/inventory-fields/edit_spec.rb[1:1:1]':
   name: "Manage inventory-fields an admin via the UI 01"
   environment_variables:
@@ -523,6 +543,31 @@
   environment_variables:
     FEATURE_NAME: "Manage inventory-pool users   an admin, a pool, an entitlement-group, several users, each within at least one group as lending_manager via the UI 02"
     FEATURE: './spec/features/inventory-pools/entitlement_groups/membership_management_spec.rb[1:1:2:2]'
+'./spec/features/inventory-pools/fields_spec.rb[1:1:1]':
+  name: "Fields status in pool an admin via the UI 01"
+  environment_variables:
+    FEATURE_NAME: "Fields status in pool an admin via the UI 01"
+    FEATURE: './spec/features/inventory-pools/fields_spec.rb[1:1:1]'
+'./spec/features/inventory-pools/fields_spec.rb[1:2:1]':
+  name: "Fields status in pool a inventory manager via the ui 01"
+  environment_variables:
+    FEATURE_NAME: "Fields status in pool a inventory manager via the ui 01"
+    FEATURE: './spec/features/inventory-pools/fields_spec.rb[1:2:1]'
+'./spec/features/inventory-pools/fields_spec.rb[1:2:2]':
+  name: "Fields status in pool a inventory manager via the ui 02"
+  environment_variables:
+    FEATURE_NAME: "Fields status in pool a inventory manager via the ui 02"
+    FEATURE: './spec/features/inventory-pools/fields_spec.rb[1:2:2]'
+'./spec/features/inventory-pools/fields_spec.rb[1:3:1]':
+  name: "Fields status in pool a lending manager via the ui 01"
+  environment_variables:
+    FEATURE_NAME: "Fields status in pool a lending manager via the ui 01"
+    FEATURE: './spec/features/inventory-pools/fields_spec.rb[1:3:1]'
+'./spec/features/inventory-pools/fields_spec.rb[1:3:2]':
+  name: "Fields status in pool a lending manager via the ui 02"
+  environment_variables:
+    FEATURE_NAME: "Fields status in pool a lending manager via the ui 02"
+    FEATURE: './spec/features/inventory-pools/fields_spec.rb[1:3:2]'
 './spec/features/inventory-pools/groups/admin_manages_group-roles_spec.rb[1:1:1:1]':
   name: "Manage inventory-pool groups   an admin, a pool, and groups exist an admin via the UI 01"
   environment_variables:

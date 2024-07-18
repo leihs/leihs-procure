@@ -55,6 +55,7 @@
      {:href (join ["/admin/inventory-pools/" @id*])}
      [icons/inventory-pools]
      " Settings "]]
+
    [:> Nav.Item
     [:> Nav.Link
      (let [href (path :inventory-pool-opening-times
@@ -63,6 +64,16 @@
         :href href})
      [icons/opening-times]
      " Opening Times "]]
+
+   [:> Nav.Item
+    [:> Nav.Link
+     (let [href (path :inventory-pool-fields
+                      {:inventory-pool-id @id*})]
+       {:active (clojure.string/includes? (:path @routing/state*) href)
+        :href href})
+     [icons/table-list]
+     " Fields "]]
+
    [:> Nav.Item
     [:> Nav.Link
      (let [href (path :inventory-pool-users
