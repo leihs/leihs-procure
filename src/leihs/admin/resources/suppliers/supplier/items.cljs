@@ -38,7 +38,7 @@
             [table/container
              {:className "items"
               :borders false
-              :header [:tr [:th "Inventory-Pool"] [:th "Inventory-Code"] [:th "Model-Name"]]
+              :header [:tr [:th "Inventory Pool"] [:th "Inventory Code"] [:th "Model Name"]]
               :body
               (for [row @core/data-items*]
                 [:tr.item {:key (:inventory_code row)}

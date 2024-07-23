@@ -127,7 +127,7 @@ feature 'Manage inventory-pools', type: :feature do
             click_on 'Inventory Pools'
             click_on @pool.name
             @inventory_pool_path = current_path
-            click_on 'Opening-Times'
+            click_on 'Opening Times'
             within('#workdays') do
               click_on 'Edit'
             end
@@ -163,7 +163,7 @@ feature 'Manage inventory-pools', type: :feature do
             click_on 'Inventory Pools'
             click_on @pool.name
             @inventory_pool_path = current_path
-            click_on 'Opening-Times'
+            click_on 'Opening Times'
             within('#holidays') do
               click_on 'Edit'
             end

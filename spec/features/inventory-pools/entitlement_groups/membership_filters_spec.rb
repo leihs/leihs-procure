@@ -53,7 +53,7 @@ feature 'Entitlement-group Membership filtering ', type: :feature do
         visit '/admin/'
         click_on 'Inventory Pools'
         click_on @pool.name
-        click_on 'Entitlement-Groups'
+        click_on 'Entitlement Groups'
         click_on @entitlement_group.name
         within('.nav-tabs') { click_on 'Users' }
 

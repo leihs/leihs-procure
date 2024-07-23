@@ -164,7 +164,7 @@
        {:href (clojure.core/str
                "/admin/groups/"
                (-> @routing/state* :route-params :group-id))}
-       "Inventory-Pools"]]
+       "Inventory Pools"]]
      [:> Nav.Item
       [:> Nav.Link
        {:active true}

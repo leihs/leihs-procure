@@ -24,7 +24,7 @@
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/opening-times]
-     " Opening-Times "]]
+     " Opening Times "]]
    [:> react-bootstrap/Nav.Item
     [:> react-bootstrap/Nav.Link
      (let [href (path :inventory-pool-users
@@ -56,4 +56,4 @@
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/award]
-     " Entitlement-Groups "]]])
+     " Entitlement Groups "]]])

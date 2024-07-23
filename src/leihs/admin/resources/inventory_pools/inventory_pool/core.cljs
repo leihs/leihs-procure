@@ -62,7 +62,7 @@
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/opening-times]
-     " Opening-Times "]]
+     " Opening Times "]]
    [:> Nav.Item
     [:> Nav.Link
      (let [href (path :inventory-pool-users
@@ -97,7 +97,7 @@
        {:active (clojure.string/includes? (:path @routing/state*) href)
         :href href})
      [icons/award]
-     " Entitlement-Groups "]]])
+     " Entitlement Groups "]]])
 
 (defn name-component []
   [:<>

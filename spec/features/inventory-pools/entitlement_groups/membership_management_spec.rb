@@ -25,7 +25,7 @@ feature 'Manage inventory-pool users ', type: :feature do
         visit '/admin/'
         click_on 'Inventory Pools'
         click_on @pool.name
-        within('.nav-tabs') { click_on 'Entitlement-Groups' }
+        within('.nav-tabs') { click_on 'Entitlement Groups' }
         @entitlement_groups_path = current_path
         click_on @entitlement_group.name
         within('.nav-tabs') { click_on 'Users' }
@@ -61,7 +61,7 @@ feature 'Manage inventory-pool users ', type: :feature do
         user = @users.sample
         click_on 'Inventory Pools'
         click_on @pool.name
-        click_on 'Entitlement-Groups'
+        click_on 'Entitlement Groups'
         @entitlement_groups_path = current_path
         click_on @entitlement_group.name
         within('.nav-tabs') { click_on 'Users' }

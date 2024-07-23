@@ -54,7 +54,7 @@
    [:<>
     [filter/form-term-filter-component {:placeholder "Enter Inventory Field Name"}]
     [filter/select-component
-     :label "Target-Type"
+     :label "Target Type"
      :query-params-key :target_type
      :options {nil "(both)"
                "item" "Item"
@@ -72,7 +72,7 @@
                "yes" "yes"
                "no" "no"}]
     [filter/select-component
-     :label "Form-Group"
+     :label "Form Group"
      :query-params-key :group
      :options (concat [[nil "(any value)"] ["none" "<none>"]]
                       @inventory-fields-groups-data*)]
@@ -90,7 +90,7 @@
     :authorizers [auth/admin-scopes?]]])
 
 (defn target-type-th-component []
-  [:th {:key :target-type} "Target-Type"])
+  [:th {:key :target-type} "Target Type"])
 
 (defn target-type-td-component [inventory-field]
   [:td.text-left {:key :target-type}
@@ -125,7 +125,7 @@
   [:td.text-left {:key :label} (-> inventory-field :data :label)])
 
 (defn group-th-component []
-  [:th {:key :form-group} "Form-Group"])
+  [:th {:key :form-group} "Form Group"])
 
 (defn group-td-component [inventory-field]
   [:td.text-left {:key :form-group} (-> inventory-field :data :group)])
@@ -189,7 +189,7 @@
 (defn page []
   [:article.inventory-fields
    [:header.my-5
-    [:h1 [icons/table-list] " Inventory-Fields"]]
+    [:h1 [icons/table-list] " Inventory Fields"]]
    [:section
     [routing/hidden-state-component
      {:did-change #(fetch)

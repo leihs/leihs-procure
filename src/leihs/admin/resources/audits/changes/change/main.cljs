@@ -55,6 +55,6 @@
 (defn page []
   [:article.audited-change
    [:header.my-5
-    [:h1 audits/icon-change " Audited-Change "]]
+    [:h1 audits/icon-change " Audited Change "]]
    [:section
     [main-component @audited-change-id*]]])

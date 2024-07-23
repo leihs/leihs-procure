@@ -137,7 +137,7 @@ feature 'Breadcrumbs ', type: :feature do
 
 
       scenario 'navigates to a entitlement-group and back via breadcrumbs ' do
-        within(".nav-tabs") { click_on "Entitlement-Groups" }
+        within(".nav-tabs") { click_on "Entitlement Groups" }
         expect(page).to have_css('ol > li', count: 2)
 
         click_on @entitlement_group.name

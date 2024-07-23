@@ -77,7 +77,7 @@
                "order" "order"
                "user" "user"}]
     [filter/select-component
-     :label "Language-Locale"
+     :label "Language Locale"
      :query-params-key :language_locale
      :options (language-locales-options @data*)]
     [filter/reset]]])
@@ -99,7 +99,7 @@
   [:td.text-left {:key :type} (:type mail-template)])
 
 (defn language-locale-th-component []
-  [:th.text-left {:key :language_locale} "Language-Locale"])
+  [:th.text-left {:key :language_locale} "Language Locale"])
 
 (defn language-locale-td-component [mail-template]
   [:td.text-left {:key :language_locale} (:language_locale mail-template)])

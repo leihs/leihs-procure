@@ -129,7 +129,7 @@
                   (reset! changes-index* {})
                   (fetch-changes-index))}]
    [:header.my-5
-    [:h1 audits/icon-request " Audited-Request "]]
+    [:h1 audits/icon-request " Audited Request "]]
    [:section
     [request-fetch-component]
     [requester-component]

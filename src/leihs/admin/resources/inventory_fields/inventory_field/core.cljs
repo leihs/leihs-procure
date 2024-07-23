@@ -232,7 +232,7 @@
     (fn []
       [:div.form-group
        [:label {:for id}
-        [:span [:strong "Field-Group"]
+        [:span [:strong "Field Group"]
          [:small " (" [:span.text-monospace id] ")"]]]
        [:div {:id id}
         (let [field-group "none"]

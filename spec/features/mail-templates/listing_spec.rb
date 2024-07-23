@@ -68,7 +68,7 @@ feature 'Managing Mail Templates:', type: :feature do
       end
 
       scenario 'filtering by language_locale works' do
-        select @search_mail_template.language_locale, from: 'Language-Locale'
+        select @search_mail_template.language_locale, from: 'Language Locale'
         wait_until { not page.has_content? "Please wait" }
         matches = @mail_templates.select { |mt| mt.language_locale == @search_mail_template.language_locale }
         wait_until { all( "table.mail-templates tbody tr").count == matches.count }

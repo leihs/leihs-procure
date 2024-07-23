@@ -72,7 +72,7 @@ feature 'Managing inventory-fields:', type: :feature do
       scenario 'filtering by form-group attribute works' do
         form_groups = @fields.map { |f| f.data["group"] }.uniq.compact
         form_group = form_groups.sample
-        select form_group, from: 'Form-Group'
+        select form_group, from: 'Form Group'
         wait_until { not page.has_content? "Please wait" }
         select("1000", from: "Per page")
         wait_until { all("table.inventory-fields tbody tr").count > 1 }
@@ -86,7 +86,7 @@ feature 'Managing inventory-fields:', type: :feature do
       end
 
       scenario 'filtering by target-type attribute works' do
-        select "Item", from: 'Target-Type'
+        select "Item", from: 'Target Type'
         wait_until { not page.has_content? "Please wait" }
         select("1000", from: "Per page")
         fields = @fields.select { |f| f.data["target_type"] == "item" }

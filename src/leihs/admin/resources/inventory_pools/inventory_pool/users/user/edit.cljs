@@ -11,7 +11,7 @@
    [:h1
     "Edit User "
     [core/name-link-component]
-    " in the Inventory-Pool "
+    " in the Inventory Pool "
     [inventory-pool/name-link-component]]
    (when (not @data*)
      [wait-component])

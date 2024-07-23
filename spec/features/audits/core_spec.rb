@@ -43,7 +43,7 @@ feature 'Audits' do
           click_on 'Change'
         end
 
-        expect(page).to have_content 'Audited-Change'
+        expect(page).to have_content 'Audited Change'
         expect(page).to have_content @user.firstname
         expect(page).to have_content 'FooHans'
       end
