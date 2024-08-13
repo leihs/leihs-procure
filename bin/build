@@ -16,15 +16,11 @@ ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 function build_core {
   ./client/bin/build
   ./server/bin/clj-uberjar
-  rm -rf target
-  mv server/target target
 }
 
 ### MAIN ######################################################################
 
 build
-# link target dir to server/target for compatibility with deploy etc
-ln -s ${PROJECT_DIR}/target ${PROJECT_DIR}/server/target
 cd -
 echo "OK ✔"
 
