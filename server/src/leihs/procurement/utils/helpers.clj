@@ -18,8 +18,6 @@
 (defn format-date [timestamp]
   (.format (timestamp-to-zoneddatetime timestamp) (DateTimeFormatter/ISO_INSTANT)))
 
-(defn cast-to-json [comment] [:cast comment :json])
-
 (defn to-uuid [id] (if (instance? String id) (UUID/fromString id) id))
 
 (defn convert-dates [entry]

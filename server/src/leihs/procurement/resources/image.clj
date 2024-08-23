@@ -1,11 +1,10 @@
 (ns leihs.procurement.resources.image
-  (:require [cheshire.core :refer [generate-string] :rename {generate-string to-json}]
-            [compojure.core :as cpj]
+  (:require [compojure.core :as cpj]
             [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
             [leihs.procurement.resources.upload :as upload]
-            [leihs.procurement.utils.helpers :refer [cast-to-json to-uuid]]
+            [leihs.procurement.utils.helpers :refer [to-uuid]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64))
@@ -49,15 +48,12 @@
   [tx mc-id upload]
   (let [{u-id :id} upload
         u-row (upload/get-by-id tx u-id)
-        md (-> u-row
-               :metadata
-               to-json
-               cast-to-json)]
+        md (:metadata u-row)]
     (insert! tx
              (-> u-row
                  (dissoc :id)
                  (dissoc :created_at)
-                 (assoc :metadata md)
+                 (assoc :metadata [:lift md])
                  (assoc :main_category_id mc-id)))
     (upload/delete! tx u-id)))
 

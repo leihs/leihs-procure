@@ -1,12 +1,9 @@
 (ns leihs.procurement.resources.attachments
-  (:require [cheshire.core :refer [generate-string] :rename
-             {generate-string to-json}]
-            [honey.sql :refer [format] :rename {format sql-format}]
+  (:require [honey.sql :refer [format] :rename {format sql-format}]
             [honey.sql.helpers :as sql]
             [leihs.procurement.paths :refer [path]]
             (leihs.procurement.resources [attachment :as attachment]
                                          [upload :as upload])
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
             [next.jdbc :as jdbc]
             [taoensso.timbre :refer [debug error info spy warn]]))
 
@@ -35,15 +32,12 @@
   [tx req-id uploads]
   (doseq [{u-id :id} uploads]
     (let [u-row (upload/get-by-id tx u-id)
-          md (-> u-row
-                 :metadata
-                 to-json
-                 cast-to-json)]
+          md (:metadata u-row)]
       (attachment/create! tx
                           (-> u-row
                               (dissoc :id)
                               (dissoc :created_at)
-                              (assoc :metadata md)
+                              (assoc :metadata [:lift md])
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 
