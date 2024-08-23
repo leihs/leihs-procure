@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [str keyword replace])
   (:require
    [bidi.bidi :as bidi]
-   [cheshire.core :refer [parse-string]]
    [clojure.string :refer [starts-with? replace]]
    [clojure.tools.logging :as log]
    [clojure.tools.logging :as logging]

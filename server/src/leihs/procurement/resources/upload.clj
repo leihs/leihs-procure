@@ -1,16 +1,14 @@
 (ns leihs.procurement.resources.upload
-  (:require [cheshire.core :refer [generate-string] :rename
-             {generate-string to-json}]
-            [clojure.string :as string]
-            [compojure.core :as cpj]
-            [honey.sql :refer [format] :rename {format sql-format}]
-            [honey.sql.helpers :as sql]
-            [leihs.procurement.paths :refer [path]]
-            (leihs.procurement.utils [exif :as exif])
-            [leihs.procurement.utils.helpers :refer [cast-to-json]]
-            [next.jdbc :as jdbc]
-            [taoensso.timbre :refer [debug error info spy warn]])
-
+  (:require
+   [cheshire.core :as json]
+   [clojure.string :as string]
+   [compojure.core :as cpj]
+   [honey.sql :refer [format] :rename {format sql-format}]
+   [honey.sql.helpers :as sql]
+   [leihs.procurement.paths :refer [path]]
+   (leihs.procurement.utils [exif :as exif])
+   [next.jdbc :as jdbc]
+   [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64
            org.apache.commons.io.FileUtils))
 
@@ -27,16 +25,15 @@
         content (->> tempfile
                      (FileUtils/readFileToByteArray)
                      (.encodeToString (Base64/getMimeEncoder)))
-        metadata (-> tempfile
-                     exif/extract-metadata
-                     cast-to-json)
+        metadata (-> tempfile exif/extract-metadata
+                     json/parse-string first)
         content-type (or (:content-type file-data)
                          (get metadata "File:MIMEType")
                          "application/octet-stream")]
     (-> file-data
         (dissoc :tempfile)
         (assoc :content content)
-        (assoc :metadata metadata)
+        (assoc :metadata [:lift metadata])
         (assoc :content-type content-type)
         (assoc :exiftool_version (exif/exiftool-version))
         (assoc :exiftool_options (string/join " " exif/exiftool-options)))))
