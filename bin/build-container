@@ -21,8 +21,8 @@ cd "${PROJECT_DIR}"
 ### functions #################################################################
 
 function build_core {
-  ./client/bin/build
-  ./server/bin/clj-uberjar
+  ./client/bin/build $PROJECT_DIR 
+  ./server/bin/clj-uberjar $PROJECT_DIR
 }
 
 ### MAIN ######################################################################

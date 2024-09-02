@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-cd $PROJECT_DIR
-echo $PROJECT_DIR
+if [[ $@ ]]; then
+  echo "Using project directory $@"
+  PROJECT_DIR=$@
+  CLIENT_DIR=$@/client
+else
+  echo "Using project directory from script"
+  PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+  CLIENT_DIR=$PROJECT_DIR
+fi
 
-$PROJECT_DIR/bin/env/nodejs-setup
+${PROJECT_DIR}/bin/env/nodejs-setup
+
+cd $CLIENT_DIR
 
 npm ci --no-audit
 npm run build
