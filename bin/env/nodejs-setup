@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+echo "Setting up nodejs"
+
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
 PROJECT_NAME=leihs-procure
 ASDF_PLUGIN=nodejs
 ASDF_PLUGIN_URL=https://github.com/asdf-vm/asdf-nodejs.git
 
-source $PROJECT_DIR/server/shared-clj/bin/env/asdf-helper.bash
+source ${PROJECT_DIR}/bin/env/asdf-helper.bash
 asdf-update-plugin
 
 # vi: ft=sh
