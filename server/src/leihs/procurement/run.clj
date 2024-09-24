@@ -16,6 +16,11 @@
    [logbug.debug :as debug]
    [logbug.thrown :as thrown]))
 
+(def HTTP-MAX-BODY
+  "Max size of http body set to 24MB. Default of http-kit is 8MB.
+   This is the maximum size of a single file upload."
+  (* 1024 1024 24))
+
 (defn run [options]
   (catcher/snatch
    {:return-fn (fn [e] (System/exit -1))}
@@ -25,7 +30,8 @@
    (let [status (status/init)]
      (db/init options (:health-check-registry status)))
    (let [http-handler (routes/init)]
-     (http-server/start options http-handler))))
+     (http-server/start (assoc options :http-max-body HTTP-MAX-BODY)
+                        http-handler))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
