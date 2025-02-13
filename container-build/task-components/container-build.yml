@@ -1,5 +1,5 @@
 traits:
-  LXD: true
+  incus: true
 
 git_options:
   submodules:
@@ -10,24 +10,23 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
 
       # start container
 
-      lxc image list
-      lxc launch --ephemeral ${LXC_BASE_IMAGE} ${CONTAINER_NAME}
-      lxc list
+      incus image list
+      incus launch --ephemeral ${CONTAINER_BASE_IMAGE} ${CONTAINER_NAME}
+      incus list
 
       git repack -a
       git submodule foreach --recursive 'git repack -a'
 
-      lxc file push --recursive ${CIDER_CI_WORKING_DIR} ${CONTAINER_NAME}/tmp/
+      incus file push --recursive ${CIDER_CI_WORKING_DIR} ${CONTAINER_NAME}/tmp/
 
-      lxc exec ${CONTAINER_NAME} -- mv /tmp/${CIDER_CI_TRIAL_ID} /leihs-procure
-      lxc exec ${CONTAINER_NAME} -- chown -R root:root /leihs-procure
-      lxc exec ${CONTAINER_NAME} -- touch /leihs-procure/test.txt
-      lxc exec ${CONTAINER_NAME} -- ls -l /leihs-procure
-      lxc exec ${CONTAINER_NAME} -- rm /leihs-procure/test.txt
+      incus exec ${CONTAINER_NAME} -- mv /tmp/${CIDER_CI_TRIAL_ID} /leihs-procure
+      incus exec ${CONTAINER_NAME} -- chown -R root:root /leihs-procure
+      incus exec ${CONTAINER_NAME} -- touch /leihs-procure/test.txt
+      incus exec ${CONTAINER_NAME} -- ls -l /leihs-procure
+      incus exec ${CONTAINER_NAME} -- rm /leihs-procure/test.txt
 
   container-prepare:
     start_when:
@@ -36,10 +35,9 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
 
-      lxc exec ${CONTAINER_NAME} -- /leihs-procure/container-build/bin/prepare
-      lxc exec ${CONTAINER_NAME} -- /leihs-procure/container-build/bin/asdf-install
+      incus exec ${CONTAINER_NAME} -- /leihs-procure/container-build/bin/prepare
+      incus exec ${CONTAINER_NAME} -- /leihs-procure/container-build/bin/asdf-install
 
   container-build:
     start_when:
@@ -49,12 +47,11 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
 
       # odd
-      lxc exec ${CONTAINER_NAME} -- git config --global --add safe.directory /leihs-procure
+      incus exec ${CONTAINER_NAME} -- git config --global --add safe.directory /leihs-procure
 
-      lxc exec ${CONTAINER_NAME} -- /leihs-procure/bin/build-container
+      incus exec ${CONTAINER_NAME} -- /leihs-procure/bin/build-container
 
   container-destroy:
     start_when:
@@ -66,12 +63,11 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -euo pipefail
-      set -x
-      lxc list
-      lxc info "$CONTAINER_NAME"
+      incus list
+      incus info "$CONTAINER_NAME"
 
       # enable for debugging; keeps the container running for a while
       # sleep 1000
 
-      until lxc delete --force "$CONTAINER_NAME"; do sleep 10; done
-      lxc list
+      until incus delete --force "$CONTAINER_NAME"; do sleep 10; done
+      incus list
