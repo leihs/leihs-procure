@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-cd $PROJECT_DIR
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
+CLIENT_DIR=$PROJECT_DIR/client
 
-# ./bin/build
 ${PROJECT_DIR}/bin/env/nodejs-setup
-npm ci --no-audit
 
+cd $CLIENT_DIR
+
+npm ci --no-audit
 npm test
 
 # vi: ft=sh

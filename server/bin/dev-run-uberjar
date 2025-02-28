@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
+
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
+SERVER_DIR=$PROJECT_DIR/server
+
 $PROJECT_DIR/bin/env/java-setup
-cd $PROJECT_DIR
+$PROJECT_DIR/bin/env/clojure-setup
+
+cd $SERVER_DIR
+
 java -jar target/leihs-procure.jar --dev-mode true -r true run "$@"
 
 # vi: ft=sh

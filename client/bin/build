@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $@ ]]; then
-  echo "Using project directory $@"
-  PROJECT_DIR=$@
-  CLIENT_DIR=$@/client
-else
-  echo "Using project directory from script"
-  PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-  CLIENT_DIR=$PROJECT_DIR
-fi
+set -x
+
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
+CLIENT_DIR=$PROJECT_DIR/client
 
 ${PROJECT_DIR}/bin/env/nodejs-setup
 

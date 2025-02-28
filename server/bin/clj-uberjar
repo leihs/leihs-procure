@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $@ ]]; then
-  echo "Using project directory $@"
-  PROJECT_DIR=$@
-  SERVER_DIR=$@/server
-else
-  echo "Using project directory from script"
-  PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-  SERVER_DIR=$PROJECT_DIR
-fi
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
+SERVER_DIR=$PROJECT_DIR/server
 
 $PROJECT_DIR/bin/env/java-setup
 $PROJECT_DIR/bin/env/clojure-setup

@@ -6,7 +6,7 @@ PROJECT_NAME=leihs-procure
 ASDF_PLUGIN=ruby
 ASDF_PLUGIN_URL=https://github.com/asdf-vm/asdf-ruby.git
 
-source $PROJECT_DIR/server/shared-clj/bin/env/asdf-helper.bash
+source $PROJECT_DIR/bin/env/asdf-helper.bash
 asdf-update-plugin
 
 bundle install --quiet

@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-cd $PROJECT_DIR
-./bin/env/ruby-setup
+PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
+SERVER_DIR=$PROJECT_DIR/server
+
+$PROJECT_DIR/bin/env/java-setup
+$PROJECT_DIR/bin/env/clojure-setup
+$PROJECT_DIR/bin/env/ruby-setup
+
+cd $SERVER_DIR
+
+bundle install --quiet
 
 bundle exec rspec "$@"
 # vi: ft=sh

@@ -8,6 +8,7 @@ scripts:
     body: |
       #!/usr/bin/env bash
       set -euo pipefail
+      ${LEIHS_PROCURE_DIR}/bin/env/ruby-setup
       cd ${LEIHS_PROCURE_SERVER_DIR}
-      ./bin/env/ruby-setup
+      bundle install
 
