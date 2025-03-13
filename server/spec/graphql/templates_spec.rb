@@ -4,18 +4,18 @@ require_relative "graphql_helper"
 describe "templates" do
   context "mutation" do
     it "throws if not inspector of some category" do
-      category_A = FactoryBot.create(:category)
-      category_B = FactoryBot.create(:category)
+      category_a = FactoryBot.create(:category)
+      category_b = FactoryBot.create(:category)
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector,
         user: user,
-        category: category_A)
+        category: category_a)
 
       templates_before = [
         {article_name: "tmpl for category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl for category B",
-         category_id: category_B.id}
+         category_id: category_b.id}
       ]
       templates_before.each do |data|
         FactoryBot.create(:template, data)
@@ -26,11 +26,11 @@ describe "templates" do
           update_templates(input_data: [
             { id: "#{Template.find(article_name: "tmpl for category A").id}",
               article_name: "test",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               price_cents: 100 },
             { id: "#{Template.find(article_name: "tmpl for category B").id}",
               article_name: "test",
-              category_id: "#{category_B.id}",
+              category_id: "#{category_b.id}",
               price_cents: 100 }
           ]) {
             id
@@ -52,19 +52,19 @@ describe "templates" do
 
     context "throws for used templates" do
       before :each do
-        @category_A = FactoryBot.create(:category)
+        @category_a = FactoryBot.create(:category)
         @user = FactoryBot.create(:user)
         FactoryBot.create(:category_inspector,
           user: @user,
-          category: @category_A)
+          category: @category_a)
 
         @tmpl = FactoryBot.create(:template,
           article_name: "tmpl for category A",
-          category_id: @category_A.id)
+          category_id: @category_a.id)
 
         FactoryBot.create(:request,
           article_name: @tmpl.article_name,
-          category_id: @category_A.id,
+          category_id: @category_a.id,
           template_id: @tmpl.id)
       end
 
@@ -74,7 +74,7 @@ describe "templates" do
           update_templates(input_data: [
             { id: "#{@tmpl.id}",
               article_name: "test",
-              category_id: "#{@category_A.id}",
+              category_id: "#{@category_a.id}",
               price_cents: 100,
               to_delete: true}
           ]) {
@@ -95,32 +95,32 @@ describe "templates" do
     end
 
     it "updates correctly" do
-      category_A = FactoryBot.create(:category, name: "category A")
-      category_B = FactoryBot.create(:category, name: "category B")
+      category_a = FactoryBot.create(:category, name: "category A")
+      category_b = FactoryBot.create(:category, name: "category B")
       other_category = FactoryBot.create(:category, name: "other category")
       user = FactoryBot.create(:user)
       FactoryBot.create(:category_inspector,
         user: user,
-        category: category_A)
+        category: category_a)
       FactoryBot.create(:category_inspector,
         user: user,
-        category: category_B)
+        category: category_b)
 
       templates_before = [
         {article_name: "tmpl 1 category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl 2 category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl to delete category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl to archive",
-         category_id: category_A.id,
+         category_id: category_a.id,
          is_archived: false},
         {article_name: "tmpl to unarchive",
-         category_id: category_A.id,
+         category_id: category_a.id,
          is_archived: true},
         {article_name: "tmpl 1 category B",
-         category_id: category_B.id},
+         category_id: category_b.id},
         {article_name: "tmpl other category",
          category_id: other_category.id}
       ]
@@ -133,28 +133,28 @@ describe "templates" do
           update_templates(input_data: [
             { id: null,
               article_name: "new tmpl category A",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               price_cents: 100 },
             { id: "#{Template.find(article_name: "tmpl 1 category A").id}",
               article_name: "tmpl 1 category A",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               price_cents: 100 },
             { id: "#{Template.find(article_name: "tmpl to delete category A").id}",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               to_delete: true },
             { id: "#{Template.find(article_name: "tmpl to archive").id}",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               is_archived: true },
             { id: "#{Template.find(article_name: "tmpl to unarchive").id}",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               is_archived: false },
             { id: "#{Template.find(article_name: "tmpl 2 category A").id}",
               article_name: "new art name category A",
-              category_id: "#{category_A.id}",
+              category_id: "#{category_a.id}",
               price_cents: 100 },
             { id: "#{Template.find(article_name: "tmpl 1 category B").id}",
               article_name: "new art name category B",
-              category_id: "#{category_B.id}",
+              category_id: "#{category_b.id}",
               price_cents: 100 }
           ]) {
             name
@@ -189,19 +189,19 @@ describe "templates" do
       expect(Template.all.count).to be == 7
       templates_after = [
         {article_name: "new tmpl category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl 1 category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "new art name category A",
-         category_id: category_A.id},
+         category_id: category_a.id},
         {article_name: "tmpl to archive",
-         category_id: category_A.id,
+         category_id: category_a.id,
          is_archived: true},
         {article_name: "tmpl to unarchive",
-         category_id: category_A.id,
+         category_id: category_a.id,
          is_archived: false},
         {article_name: "new art name category B",
-         category_id: category_B.id},
+         category_id: category_b.id},
         {article_name: "tmpl other category",
          category_id: other_category.id}
       ]

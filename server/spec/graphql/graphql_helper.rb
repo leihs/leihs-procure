@@ -42,7 +42,7 @@ class GraphqlQuery
   end
 
   def get_cookies(user_id, csrf_token)
-    resp = if user = User.find(id: user_id)
+    resp = if (user = User.find(id: user_id))
       Faraday.post("#{http_base_url}/sign-in",
         {user: user.email, password: "password"}) do |req|
         req.headers["X-CSRF-Token"] = csrf_token

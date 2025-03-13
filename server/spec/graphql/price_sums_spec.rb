@@ -6,9 +6,9 @@ describe "price sums" do
     @main_category_1 = FactoryBot.create(:main_category,
       name: "main_category_1")
 
-    @category_1_A = FactoryBot.create(:category,
+    @category_1_a = FactoryBot.create(:category,
       main_category_id: @main_category_1.id,
-      name: "category_1_A")
+      name: "category_1_a")
   end
 
   def requester
@@ -20,7 +20,7 @@ describe "price sums" do
   def inspector
     user = FactoryBot.create(:user)
     FactoryBot.create(:category_inspector,
-      category_id: @category_1_A.id,
+      category_id: @category_1_a.id,
       user_id: user.id)
     user
   end
@@ -60,13 +60,13 @@ describe "price sums" do
   end
 
   let :variables do
-    {budgetPeriods: [@budget_period_I.id],
-     categories: [@category_1_A.id,
-       @category_1_B.id,
-       @category_1_C.id,
-       @category_2_A.id,
-       @category_2_B.id,
-       @category_2_C.id],
+    {budgetPeriods: [@budget_period_i.id],
+     categories: [@category_1_a.id,
+       @category_1_b.id,
+       @category_1_c.id,
+       @category_2_a.id,
+       @category_2_b.id,
+       @category_2_c.id],
      priority: ["NORMAL"]}
   end
 
@@ -75,45 +75,45 @@ describe "price sums" do
     # first main category and category assumed already to be created
 
     # DENIED
-    @request_I_1_A = FactoryBot.create(:request,
-      category_id: @category_1_A.id,
-      budget_period_id: @budget_period_I.id,
+    @request_i_1_a = FactoryBot.create(:request,
+      category_id: @category_1_a.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 101,
       requested_quantity: 1,
       approved_quantity: 0)
 
-    @category_1_B = FactoryBot.create(:category,
+    @category_1_b = FactoryBot.create(:category,
       main_category_id: @main_category_1.id,
-      name: "category_1_B")
+      name: "category_1_b")
     # APPROVED
-    @request_I_1_B = FactoryBot.create(:request,
+    @request_i_1_b = FactoryBot.create(:request,
       article_name: "Anaphoric Macro",
-      category_id: @category_1_B.id,
-      budget_period_id: @budget_period_I.id,
+      category_id: @category_1_b.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 103,
       requested_quantity: 1,
       approved_quantity: 1,
       order_quantity: 0)
     # PARTIALLY APPROVED
-    @request_II_1_B = FactoryBot.create(:request,
+    @request_ii_1_b = FactoryBot.create(:request,
       article_name: "Pandoric Macro",
-      category_id: @category_1_B.id,
-      budget_period_id: @budget_period_I.id,
+      category_id: @category_1_b.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 107,
       requested_quantity: 2,
       approved_quantity: 1,
       order_quantity: 1)
 
-    @category_1_C = FactoryBot.create(:category,
+    @category_1_c = FactoryBot.create(:category,
       main_category_id: @main_category_1.id,
-      name: "category_1_C")
+      name: "category_1_c")
 
-    @request_I_1_C = FactoryBot.create(:request,
-      category_id: @category_1_C.id,
-      budget_period_id: @budget_period_I.id,
+    @request_i_1_c = FactoryBot.create(:request,
+      category_id: @category_1_c.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 109,
       requested_quantity: 1)
@@ -123,56 +123,56 @@ describe "price sums" do
     @main_category_2 = FactoryBot.create(:main_category,
       name: "main_category_2")
 
-    @category_2_A = FactoryBot.create(:category,
+    @category_2_a = FactoryBot.create(:category,
       main_category_id: @main_category_2.id,
-      name: "category_2_A")
+      name: "category_2_a")
 
-    @request_I_2_A = FactoryBot.create(:request,
-      category_id: @category_2_A.id,
-      budget_period_id: @budget_period_I.id,
+    @request_i_2_a = FactoryBot.create(:request,
+      category_id: @category_2_a.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 113,
       requested_quantity: 1,
       approved_quantity: 1,
       order_quantity: 1)
 
-    @category_2_B = FactoryBot.create(:category,
+    @category_2_b = FactoryBot.create(:category,
       main_category_id: @main_category_2.id,
-      name: "category_2_B")
+      name: "category_2_b")
     # priority 'high'
-    @request_I_2_B = FactoryBot.create(:request,
-      category_id: @category_2_B.id,
-      budget_period_id: @budget_period_I.id,
+    @request_i_2_b = FactoryBot.create(:request,
+      category_id: @category_2_b.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       priority: "high",
       price_cents: 127,
       requested_quantity: 1)
 
-    @category_2_C = FactoryBot.create(:category,
+    @category_2_c = FactoryBot.create(:category,
       main_category_id: @main_category_2.id,
-      name: "category_2_C")
+      name: "category_2_c")
 
-    @category_2_D = FactoryBot.create(:category,
+    @category_2_d = FactoryBot.create(:category,
       main_category_id: @main_category_2.id,
-      name: "category_2_D")
+      name: "category_2_d")
 
     # from a category not set in filter
-    @request_I_2_D = FactoryBot.create(:request,
-      category_id: @category_2_D.id,
-      budget_period_id: @budget_period_I.id,
+    @request_i_2_d = FactoryBot.create(:request,
+      category_id: @category_2_d.id,
+      budget_period_id: @budget_period_i.id,
       user_id: @user.id,
       price_cents: 137,
       requested_quantity: 1)
 
     # =============================================================================
 
-    @budget_period_II = FactoryBot.create(:budget_period,
-      name: "budget_period_II")
+    @budget_period_ii = FactoryBot.create(:budget_period,
+      name: "budget_period_ii")
 
     # from a budget period not set in filter
-    @request_II_1_A = FactoryBot.create(:request,
-      category_id: @category_1_A.id,
-      budget_period_id: @budget_period_II.id,
+    @request_ii_1_a = FactoryBot.create(:request,
+      category_id: @category_1_a.id,
+      budget_period_id: @budget_period_ii.id,
       user_id: @user.id,
       price_cents: 139,
       requested_quantity: 1)
@@ -183,44 +183,44 @@ describe "price sums" do
       data: {
         dashboard: {
           budget_periods: [
-            {id: @budget_period_I.id,
+            {id: @budget_period_i.id,
              total_price_cents: "329",
              main_categories: [
                {id: @main_category_1.id,
                 total_price_cents: "216",
                 categories: [
-                  {id: @category_1_A.id,
+                  {id: @category_1_a.id,
                    total_price_cents: "0",
                    requests: [
-                     {id: @request_I_1_A.id}
+                     {id: @request_i_1_a.id}
                    ]},
-                  {id: @category_1_B.id,
+                  {id: @category_1_b.id,
                    total_price_cents: "107",
                    requests: [
-                     {id: @request_I_1_B.id},
-                     {id: @request_II_1_B.id}
+                     {id: @request_i_1_b.id},
+                     {id: @request_ii_1_b.id}
                    ]},
-                  {id: @category_1_C.id,
+                  {id: @category_1_c.id,
                    total_price_cents: "109",
                    requests: [
-                     {id: @request_I_1_C.id}
+                     {id: @request_i_1_c.id}
                    ]}
                 ]},
                {id: @main_category_2.id,
                 total_price_cents: "113",
                 categories: [
-                  {id: @category_2_A.id,
+                  {id: @category_2_a.id,
                    total_price_cents: "113",
                    requests: [
-                     {id: @request_I_2_A.id}
+                     {id: @request_i_2_a.id}
                    ]},
-                  {id: @category_2_B.id,
+                  {id: @category_2_b.id,
                    total_price_cents: "0",
                    requests: []},
-                  {id: @category_2_C.id,
+                  {id: @category_2_c.id,
                    total_price_cents: "0",
                    requests: []},
-                  {id: @category_2_D.id,
+                  {id: @category_2_d.id,
                    total_price_cents: "0",
                    requests: []}
                 ]}
@@ -242,44 +242,44 @@ describe "price sums" do
           data: {
             dashboard: {
               budget_periods: [
-                {id: @budget_period_I.id,
+                {id: @budget_period_i.id,
                  total_price_cents: "640",
                  main_categories: [
                    {id: @main_category_1.id,
                     total_price_cents: "527",
                     categories: [
-                      {id: @category_1_A.id,
+                      {id: @category_1_a.id,
                        total_price_cents: "101",
                        requests: [
-                         {id: @request_I_1_A.id}
+                         {id: @request_i_1_a.id}
                        ]},
-                      {id: @category_1_B.id,
+                      {id: @category_1_b.id,
                        total_price_cents: "317",
                        requests: [
-                         {id: @request_I_1_B.id},
-                         {id: @request_II_1_B.id}
+                         {id: @request_i_1_b.id},
+                         {id: @request_ii_1_b.id}
                        ]},
-                      {id: @category_1_C.id,
+                      {id: @category_1_c.id,
                        total_price_cents: "109",
                        requests: [
-                         {id: @request_I_1_C.id}
+                         {id: @request_i_1_c.id}
                        ]}
                     ]},
                    {id: @main_category_2.id,
                     total_price_cents: "113",
                     categories: [
-                      {id: @category_2_A.id,
+                      {id: @category_2_a.id,
                        total_price_cents: "113",
                        requests: [
-                         {id: @request_I_2_A.id}
+                         {id: @request_i_2_a.id}
                        ]},
-                      {id: @category_2_B.id,
+                      {id: @category_2_b.id,
                        total_price_cents: "0",
                        requests: []},
-                      {id: @category_2_C.id,
+                      {id: @category_2_c.id,
                        total_price_cents: "0",
                        requests: []},
-                      {id: @category_2_D.id,
+                      {id: @category_2_d.id,
                        total_price_cents: "0",
                        requests: []}
                     ]}
@@ -291,9 +291,9 @@ describe "price sums" do
       end
 
       it "requesting phase" do
-        @budget_period_I = FactoryBot.create(:budget_period,
+        @budget_period_i = FactoryBot.create(:budget_period,
           :requesting_phase,
-          name: "budget_period_I")
+          name: "budget_period_i")
         @user = requester
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
@@ -301,9 +301,9 @@ describe "price sums" do
       end
 
       it "inspection phase" do
-        @budget_period_I = FactoryBot.create(:budget_period,
+        @budget_period_i = FactoryBot.create(:budget_period,
           :inspection_phase,
-          name: "budget_period_I")
+          name: "budget_period_i")
         @user = requester
         data!
         result = query(q, @user.id, variables).deep_symbolize_keys
@@ -312,9 +312,9 @@ describe "price sums" do
     end
 
     it "budget period past" do
-      @budget_period_I = FactoryBot.create(:budget_period,
+      @budget_period_i = FactoryBot.create(:budget_period,
         :past,
-        name: "budget_period_I")
+        name: "budget_period_i")
       @user = requester
       data!
       result = query(q, @user.id, variables).deep_symbolize_keys
@@ -324,22 +324,22 @@ describe "price sums" do
 
   context "inspector" do
     it "budget period past" do
-      @budget_period_I = FactoryBot.create(:budget_period,
+      @budget_period_i = FactoryBot.create(:budget_period,
         :past,
-        name: "budget_period_I")
+        name: "budget_period_i")
     end
 
     context "budget period is not past" do
       it "requesting phase" do
-        @budget_period_I = FactoryBot.create(:budget_period,
+        @budget_period_i = FactoryBot.create(:budget_period,
           :requesting_phase,
-          name: "budget_period_I")
+          name: "budget_period_i")
       end
 
       it "inspection phase" do
-        @budget_period_I = FactoryBot.create(:budget_period,
+        @budget_period_i = FactoryBot.create(:budget_period,
           :inspection_phase,
-          name: "budget_period_I")
+          name: "budget_period_i")
       end
     end
 

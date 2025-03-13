@@ -1,3 +1,2 @@
 ignore:
   - "server/database/**/*"
-  - "spec/spec_helper.rb"

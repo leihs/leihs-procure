@@ -1,9 +1,9 @@
 step "I pry" do
-  binding.pry
+  binding.pry # standard:disable Lint/Debugger
 end
 
 step "I debug :code" do |code|
-  eval(code)
+  eval(code) # standard:disable Security/Eval
 end
 
 step "there is an empty database" do
@@ -42,7 +42,7 @@ step "I am on :path" do |path|
 end
 
 step "I am redirected to :url" do |url|
-  binding.pry if url == "?"
+  binding.pry if url == "?" # standard:disable Lint/Debugger
   expect(page.current_path).to eq url
 end
 

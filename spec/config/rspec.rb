@@ -65,7 +65,7 @@ RSpec.configure do |config|
     if !ENV["CIDER_CI_TRIAL_ID"].present? && ENV["PRY_ON_EXCEPTION"]
       unless example.exception.nil?
         puts decorate_exception(example.exception)
-        binding.pry if example.exception
+        binding.pry if example.exception # standard:disable Lint/Debugger
       end
     end
   end
@@ -88,7 +88,7 @@ end
 
 def decorate_exception(ex)
   div = Array.new(80, "-").join
-  msg = case true
+  msg = case true # standard:disable Lint/LiteralAsCondition
   when ex.is_a?(Turnip::Pending)
     "MISSING STEP! try this:\n\n" \
     "step \"#{ex.message}\" do\n  binding.pry\nend"
