@@ -5,7 +5,7 @@ PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 &
 cd $PROJECT_DIR
 
 echo $PROJECT_DIR
-ech pwd
+echo pwd
 
 echo ls | $PROJECT_DIR/bin/env
 
