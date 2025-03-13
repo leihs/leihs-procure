@@ -3,12 +3,12 @@ end
 
 FactoryBot.define do
   factory :image, class: Image do
-    transient do 
-      real_filename { 'lisp-machine.jpg' }
+    transient do
+      real_filename { "lisp-machine.jpg" }
     end
 
     filename { real_filename }
-    content_type { 'image/jpeg' }
+    content_type { "image/jpeg" }
     size { 160000 }
     main_category_id { create(:main_category).id }
     exiftool_version { MetadataExtractor::EXIFTOOL_VERSION }

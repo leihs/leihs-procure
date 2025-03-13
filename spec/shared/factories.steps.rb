@@ -1,36 +1,36 @@
 IP_UUID = "6bf7dc96-2b11-43c1-9f49-c58a5b332517"
 
-step 'there is a user' do
+step "there is a user" do
   @user = FactoryBot.create(:user)
 end
 
-step 'there is an initial admin' do
+step "there is an initial admin" do
   @initial_admin = FactoryBot.create(:user, is_admin: true, admin_protected: true,
-                                     is_system_admin: true, system_admin_protected: true)
+    is_system_admin: true, system_admin_protected: true)
 end
 
-step 'there is a leihs admin' do
+step "there is a leihs admin" do
   @leihs_admin = FactoryBot.create(:user, is_admin: true, admin_protected: true)
 end
 
-step 'there is a procurement admin' do
-  user = FactoryBot.create(:user, firstname: 'Procurement', lastname: 'Admin')
+step "there is a procurement admin" do
+  user = FactoryBot.create(:user, firstname: "Procurement", lastname: "Admin")
   @procurement_admin = FactoryBot.create(:procurement_admin, user: user).user
 end
 
-step 'the user is leihs admin' do
+step "the user is leihs admin" do
   User.where(id: @user.id).update(is_admin: true, admin_protected: true)
 end
 
 step "there is a user with an ultimate access" do
   @user = FactoryBot.create(:user, is_admin: true, admin_protected: true,
-                            is_system_admin: true, system_admin_protected: true)
+    is_system_admin: true, system_admin_protected: true)
   ip = FactoryBot.create(:inventory_pool, id: IP_UUID)
   FactoryBot.create(:procurement_admin, user_id: @user.id)
   FactoryBot.create(:access_right,
-                    user: @user,
-                    inventory_pool: ip,
-                    role: :inventory_manager)
+    user: @user,
+    inventory_pool: ip,
+    role: :inventory_manager)
 end
 
 step "the user does not have any pool access rights" do
@@ -40,8 +40,8 @@ end
 step "there is a language :lang with locale name :l_name" do |lang, l_name|
   unless Language.find(name: lang)
     FactoryBot.create(:language,
-                      name: lang,
-                      locale_name: l_name)
+      name: lang,
+      locale_name: l_name)
   end
 end
 
@@ -52,25 +52,25 @@ end
 step "the user is inventory manager of some pool" do
   @pool = FactoryBot.create(:inventory_pool)
   FactoryBot.create(:access_right,
-                    user_id: @user.id,
-                    inventory_pool_id: @pool.id,
-                    role: :inventory_manager)
+    user_id: @user.id,
+    inventory_pool_id: @pool.id,
+    role: :inventory_manager)
 end
 
 step "the user is inventory manager of pool :name" do |name|
   pool = FactoryBot.create(:inventory_pool, name: name)
   FactoryBot.create(:access_right,
-                    user_id: @user.id,
-                    inventory_pool_id: pool.id,
-                    role: :inventory_manager)
+    user_id: @user.id,
+    inventory_pool_id: pool.id,
+    role: :inventory_manager)
 end
 
 step "the user is group manager of pool :name" do |name|
   pool = FactoryBot.create(:inventory_pool, name: name)
   FactoryBot.create(:access_right,
-                    user_id: @user.id,
-                    inventory_pool_id: pool.id,
-                    role: :group_manager)
+    user_id: @user.id,
+    inventory_pool_id: pool.id,
+    role: :group_manager)
 end
 
 step "the user is procurement admin" do
@@ -87,15 +87,15 @@ step "there is an external authentication system" do
 end
 
 step "the user has external authentication" do
-  ext_sys = AuthenticationSystem.find(type: 'external')
+  ext_sys = AuthenticationSystem.find(type: "external")
   FactoryBot.create(:authentication_system_user,
-                    user_id: @user.id,
-                    authentication_system_id: ext_sys.id)
+    user_id: @user.id,
+    authentication_system_id: ext_sys.id)
 end
 
 step "the user does not have password authentication" do
   AuthenticationSystemUser
-    .where(user_id: @user.id, authentication_system_id: 'password')
+    .where(user_id: @user.id, authentication_system_id: "password")
     .delete
 end
 
