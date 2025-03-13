@@ -148,16 +148,16 @@ step "the request form has the following data:" do |table|
         expect(find("input").value).to eq v
       when "Menge beantragt"
         # a different "Antragsteller"
-        if @request_user and
-            @request_user != @user and
-            @budget_period.inspection_start_date > Date.today
+        if @request_user &&
+            (@request_user != @user) &&
+            (@budget_period.inspection_start_date > Date.today)
           find("span", text: v)
         else
           expect(find("input").value).to eq v
         end
       when "Begründung"
         # a different "Antragsteller"
-        if @request_user and @request_user != @user and !@procurement_admin
+        if @request_user && (@request_user != @user) && !@procurement_admin
           find("span", text: v)
         else
           expect(find("textarea").value).to eq v

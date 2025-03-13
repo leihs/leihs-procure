@@ -23,7 +23,7 @@ class GraphqlQuery
       cookies = {"leihs-anti-csrf-token" => @csrf_token}
 
       if @cookies["leihs-user-session"]
-        cookies.merge!("leihs-user-session" => @cookies["leihs-user-session"])
+        cookies["leihs-user-session"] = @cookies["leihs-user-session"]
       end
 
       req.headers["Cookie"] = cookies.map { |k, v| "#{k}=#{v}" }.join("; ")

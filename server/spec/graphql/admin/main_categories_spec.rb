@@ -210,49 +210,49 @@ describe "main categories" do
             {id: nil,
              name: "new_main_cat",
              budget_limits: [
-               {budget_period_id: "#{BudgetPeriod.find(name: "budget_period_1").id}",
+               {budget_period_id: BudgetPeriod.find(name: "budget_period_1").id.to_s,
                 amount_cents: 111},
-               {budget_period_id: "#{BudgetPeriod.find(name: "budget_period_2").id}",
+               {budget_period_id: BudgetPeriod.find(name: "budget_period_2").id.to_s,
                 amount_cents: 222}
              ],
              categories: [
                {id: nil,
                 name: "new_cat_for_new_main_cat",
-                inspectors: ["#{User.find(firstname: "user_1").id}",
-                  "#{User.find(firstname: "user_2").id}"],
-                viewers: ["#{User.find(firstname: "user_1").id}",
-                  "#{User.find(firstname: "user_2").id}"]}
+                inspectors: [User.find(firstname: "user_1").id.to_s,
+                  User.find(firstname: "user_2").id.to_s],
+                viewers: [User.find(firstname: "user_1").id.to_s,
+                  User.find(firstname: "user_2").id.to_s]}
              ]},
-            {id: "#{MainCategory.find(name: "main_cat_1").id}",
+            {id: MainCategory.find(name: "main_cat_1").id.to_s,
              name: "main_cat_1",
              budget_limits: [
-               {budget_period_id: "#{BudgetPeriod.find(name: "budget_period_1").id}",
+               {budget_period_id: BudgetPeriod.find(name: "budget_period_1").id.to_s,
                 amount_cents: 333},
-               {budget_period_id: "#{BudgetPeriod.find(name: "budget_period_2").id}",
+               {budget_period_id: BudgetPeriod.find(name: "budget_period_2").id.to_s,
                 amount_cents: 444}
              ],
              categories: [
-               {id: "#{Category.find(name: "cat_1_for_main_cat_1",
-                 main_category_id: MainCategory.find(name: "main_cat_1").id).id}",
+               {id: Category.find(name: "cat_1_for_main_cat_1",
+                 main_category_id: MainCategory.find(name: "main_cat_1").id).id.to_s,
                 name: "cat_1_for_main_cat_1",
                 general_ledger_account: "LEDG_ACC_NEW",
                 cost_center: "CC_NEW",
-                inspectors: ["#{User.find(firstname: "user_3").id}",
-                  "#{User.find(firstname: "user_4").id}"],
-                viewers: ["#{User.find(firstname: "user_3").id}",
-                  "#{User.find(firstname: "user_4").id}"]}
+                inspectors: [User.find(firstname: "user_3").id.to_s,
+                  User.find(firstname: "user_4").id.to_s],
+                viewers: [User.find(firstname: "user_3").id.to_s,
+                  User.find(firstname: "user_4").id.to_s]}
              ],
              new_image_url: [
-               {id: "#{@upload_1.id}",
+               {id: @upload_1.id.to_s,
                 to_delete: true,
                 typename: "Upload"},
-               {id: "#{@upload_2.id}",
+               {id: @upload_2.id.to_s,
                 to_delete: false,
                 typename: "Upload"}
              ]},
-            {id: "#{MainCategory.find(name: "main_cat_2").id}",
+            {id: MainCategory.find(name: "main_cat_2").id.to_s,
              name: "main_cat_2_new_name"},
-            {id: "#{MainCategory.find(name: "main_cat_to_delete").id}",
+            {id: MainCategory.find(name: "main_cat_to_delete").id.to_s,
              toDelete: true}
           ]
         }.as_json
@@ -383,7 +383,7 @@ describe "main categories" do
           parent = MainCategory.find(data[:parent])
           c = Category.find(
             data
-            .reject { |k, _| k == :parent }
+            .except(:parent)
             .merge(main_category_id: parent.id)
           )
           expect(c).to be

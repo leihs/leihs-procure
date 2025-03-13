@@ -75,7 +75,7 @@ describe "request total price" do
         price_cents: c[:price_cents]
       )
 
-      variables = {requestIds: ["#{request.id}"]}
+      variables = {requestIds: [request.id.to_s]}
       result = query(@q, @user_id, variables).deep_symbolize_keys
       request_data = result[:data][:requests].first
       expect(request_data[:id]).to eq(request.id)

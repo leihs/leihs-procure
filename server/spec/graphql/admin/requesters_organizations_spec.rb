@@ -151,23 +151,23 @@ describe "requesters organizations" do
       expect(result).to eq({
         "data" => {
           "requesters_organizations" => [
-            {"user" => {"id" => "#{User.find(firstname: "user_2").id}"},
+            {"user" => {"id" => User.find(firstname: "user_2").id.to_s},
              "organization" => {"name" => "org_B"},
              "department" => {"name" => "dep_II"}},
 
-            {"user" => {"id" => "#{User.find(firstname: "user_3").id}"},
+            {"user" => {"id" => User.find(firstname: "user_3").id.to_s},
              "organization" => {"name" => "org_C"},
              "department" => {"name" => "dep_X"}},
 
-            {"user" => {"id" => "#{User.find(firstname: "user_4").id}"},
+            {"user" => {"id" => User.find(firstname: "user_4").id.to_s},
              "organization" => {"name" => "org_X"},
              "department" => {"name" => "dep_IV"}},
 
-            {"user" => {"id" => "#{User.find(firstname: "user_5").id}"},
+            {"user" => {"id" => User.find(firstname: "user_5").id.to_s},
              "organization" => {"name" => "org_Y"},
              "department" => {"name" => "dep_XI"}},
 
-            {"user" => {"id" => "#{User.find(firstname: "user_7").id}"},
+            {"user" => {"id" => User.find(firstname: "user_7").id.to_s},
              "organization" => {"name" => "org_E"},
              "department" => {"name" => "dep_V"}}
           ]

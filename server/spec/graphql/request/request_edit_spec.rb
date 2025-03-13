@@ -206,7 +206,7 @@ describe "requests" do
     end
 
     after :example do
-      variables = {requestIds: ["#{@request.id}"]}
+      variables = {requestIds: [@request.id.to_s]}
       result = query(@q, @user.id, variables)
       expect(result["errors"]).not_to be
       expect(result["data"]["budget_periods"].map { |bp| bp["id"] })
@@ -231,7 +231,7 @@ describe "requests" do
         }
       GRAPHQL
 
-      variables = {requestIds: ["#{request.id}"]}
+      variables = {requestIds: [request.id.to_s]}
       result = query(q, user.id, variables)
       expect(result).to eq(
         {"data" => {
@@ -268,7 +268,7 @@ describe "requests" do
       GRAPHQL
 
       [inspector, admin].each do |user|
-        variables = {requestIds: ["#{request.id}"]}
+        variables = {requestIds: [request.id.to_s]}
         result = query(q, user.id, variables)
         expect(result).to eq(
           {"data" => {

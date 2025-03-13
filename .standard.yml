@@ -1,4 +1,3 @@
 ignore:
-  - "database/**/*"
-  # - 'cider-ci/**/*'
+  - "server/database/**/*"
   - "spec/spec_helper.rb"
