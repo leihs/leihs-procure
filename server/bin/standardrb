@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-cd $PROJECT_DIR
+SERVER_DIR=$PROJECT_DIR/server
+cd $SERVER_DIR
 
 bundle exec standardrb
