@@ -1,4 +1,4 @@
-RSpec.shared_context 'request helper' do
+RSpec.shared_context "request helper" do
   def transform_uuid_attrs(h)
     Request::UUID_ATTRS.reduce(h) do |mem, attr|
       if value = mem[attr]
@@ -14,5 +14,5 @@ RSpec.shared_context 'request helper' do
 end
 
 RSpec.configure do |config|
-  config.include_context 'request helper'
+  config.include_context "request helper"
 end

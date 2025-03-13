@@ -7,6 +7,6 @@ FactoryBot.define do
   end
 
   trait :general do
-    id { 'abae04c5-d767-425e-acc2-7ce04df645d1' } 
+    id { "abae04c5-d767-425e-acc2-7ce04df645d1" }
   end
 end
