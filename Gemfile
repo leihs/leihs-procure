@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
+gem "solargraph"
+gem "standard", group: [:development, :test]
+
 # test
 gem "rspec"
 gem "turnip"
@@ -24,7 +27,3 @@ gem "rb-readline"
 gem "pry"
 
 gem "rexml"
-
-# dev
-gem "solargraph"
-gem "standard", group: [:development, :test]
