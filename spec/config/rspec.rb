@@ -25,14 +25,12 @@ RSpec.configure do |config|
     srand 1
   end
 
-
   # Turnip:
   config.raise_error_for_unimplemented_steps = true # TODO: fix
 
   config.before(type: :feature) do
-
     fp = self.class.superclass.file_path
-    bn = File.basename(fp, '.feature')
+    bn = File.basename(fp, ".feature")
     dn = File.dirname(fp)
 
     require_shared_files(dn)
@@ -42,7 +40,7 @@ RSpec.configure do |config|
 
     begin
       page.driver.browser.manage.window.resize_to(*BROWSER_WINDOW_SIZE)
-    rescue => e
+    rescue
       page.driver.browser.manage.window.maximize
     end
   end
@@ -52,9 +50,9 @@ RSpec.configure do |config|
   end
 
   config.after(type: :feature) do |example|
-    if ENV['CIDER_CI_TRIAL_ID'].present?
+    if ENV["CIDER_CI_TRIAL_ID"].present?
       unless example.exception.nil?
-        take_screenshot('tmp/error-screenshots')
+        take_screenshot("tmp/error-screenshots")
       end
     end
 
@@ -62,18 +60,16 @@ RSpec.configure do |config|
     Capybara.current_driver = Capybara.default_driver
   end
 
-  #
   config.after(:each) do |example|
     # auto-pry after failures, except in CI!
-    if not ENV['CIDER_CI_TRIAL_ID'].present? and ENV['PRY_ON_EXCEPTION']
+    if !ENV["CIDER_CI_TRIAL_ID"].present? && ENV["PRY_ON_EXCEPTION"]
       unless example.exception.nil?
         puts decorate_exception(example.exception)
-        binding.pry if example.exception
+        binding.pry if example.exception # standard:disable Lint/Debugger
       end
     end
   end
 end
-
 
 # require files from any shared folders down the directory path
 def require_shared_files(dirpath)
@@ -90,12 +86,11 @@ def require_shared_files(dirpath)
   end
 end
 
-
 def decorate_exception(ex)
-  div = Array.new(80, '-').join
-  msg = case true
+  div = Array.new(80, "-").join
+  msg = case true # standard:disable Lint/LiteralAsCondition
   when ex.is_a?(Turnip::Pending)
-    "MISSING STEP! try this:\n\n"\
+    "MISSING STEP! try this:\n\n" \
     "step \"#{ex.message}\" do\n  binding.pry\nend"
   else
     "GOT ERROR: #{ex.class}: #{ex.message}"

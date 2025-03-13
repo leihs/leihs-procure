@@ -1,7 +1,7 @@
-require 'mail'
+require "mail"
 
-MAIL_SERVER_POP3_HOST = ENV.fetch('LEIHS_MAIL_SMTP_ADDRESS', 'localhost')
-MAIL_SERVER_POP3_PORT = ENV.fetch('LEIHS_MAIL_FAKE_SMTP_SERVER_POP3_PORT')
+MAIL_SERVER_POP3_HOST = ENV.fetch("LEIHS_MAIL_SMTP_ADDRESS", "localhost")
+MAIL_SERVER_POP3_PORT = ENV.fetch("LEIHS_MAIL_FAKE_SMTP_SERVER_POP3_PORT")
 
 RSpec.configure do |config|
   config.before :each do
@@ -22,8 +22,8 @@ def setup_email_client
       :pop3,
       address: MAIL_SERVER_POP3_HOST,
       port: MAIL_SERVER_POP3_PORT,
-      user_name: 'any',
-      password: 'any',
+      user_name: "any",
+      password: "any",
       enable_ssl: false
     )
   end

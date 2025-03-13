@@ -4,11 +4,11 @@ end
 FactoryBot.define do
   factory :upload, class: Upload do
     transient do
-      real_filename { 'secd.pdf' }
+      real_filename { "secd.pdf" }
     end
 
     filename { real_filename }
-    content_type { 'application/pdf' }
+    content_type { "application/pdf" }
     size { 56000 }
     exiftool_version { MetadataExtractor::EXIFTOOL_VERSION }
     exiftool_options { MetadataExtractor::EXIFTOOL_CMD_LINE_OPTIONS }
