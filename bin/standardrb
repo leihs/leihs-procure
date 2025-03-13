@@ -4,6 +4,9 @@ set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd ../.. > /dev/null 2>&1 && pwd -P)"
 cd $PROJECT_DIR
 
+echo $PROJECT_DIR
+echo ls | ./bin/env
+
 ./bin/env/ruby-setup
 
 bundle exec standardrb
