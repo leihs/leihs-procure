@@ -68,7 +68,7 @@ jobs:
               body: |
                 #!/usr/bin/env bash
                 set -euo pipefail
-                ./server/bin/standardrb
+                ./bin/standardrb
 
   good-to-merge:
     name: Good To Merge

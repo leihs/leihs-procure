@@ -6,4 +6,3 @@ gem "graphlient"
 
 # dev
 gem "solargraph"
-gem "standard", ">= 1.42.1", group: [:development, :test]
