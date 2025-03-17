@@ -61,8 +61,7 @@ jobs:
                 #!/usr/bin/env bash
                 set -euo pipefail
                 ./server/bin/cljfmt check
-
-        standardrb-lint:
+        ruby-lint:
           scripts:
             test:
               body: |
