@@ -1,10 +1,10 @@
-require 'spec_helper'
-require_relative '../graphql_helper'
+require "spec_helper"
+require_relative "../graphql_helper"
 
-describe 'settings' do
-  context 'mutation' do
-    it 'updates successfully' do
-      settings = FactoryBot.create(:settings)
+describe "settings" do
+  context "mutation" do
+    it "updates successfully" do
+      FactoryBot.create(:settings)
       user = User.find(id: FactoryBot.create(:admin).user_id)
 
       q = <<-GRAPHQL
@@ -24,10 +24,10 @@ describe 'settings' do
 
       result = query(q, user.id)
       expect(result).to eq({
-        'data' => {
-          'settings' => {
-            'contact_url' => 'test',
-            'inspection_comments' => ['foo', 'bar', 'baz']
+        "data" => {
+          "settings" => {
+            "contact_url" => "test",
+            "inspection_comments" => ["foo", "bar", "baz"]
           }
         }
       })

@@ -1,8 +1,8 @@
-eval_gemfile 'database/Gemfile'
+eval_gemfile "database/Gemfile"
 
-gem 'edn'
-gem 'faraday'
-gem 'graphlient'
+gem "edn"
+gem "faraday"
+gem "graphlient"
 
 # dev
-gem 'solargraph'
+gem "solargraph"

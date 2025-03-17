@@ -1,7 +1,7 @@
-require 'spec_helper'
-require_relative '../graphql_helper'
+require "spec_helper"
+require_relative "../graphql_helper"
 
-describe 'request total price' do
+describe "request total price" do
   before :example do
     @user_id = FactoryBot.create(:admin).user_id
 
@@ -15,49 +15,51 @@ describe 'request total price' do
     GRAPHQL
   end
 
-  it 'check all possible combinations' do
+  it "check all possible combinations" do
     cases = [
       {
         price_cents: 100,
         requested_quantity: 0,
-        total_price_cents: '0' },
+        total_price_cents: "0"
+      },
       {
         price_cents: 100,
         requested_quantity: 42,
-        total_price_cents: '4200' },
+        total_price_cents: "4200"
+      },
       {
         price_cents: 100,
         requested_quantity: 42,
         approved_quantity: 23,
-        total_price_cents: '2300'
+        total_price_cents: "2300"
       },
       {
         price_cents: 100,
         requested_quantity: 42,
         approved_quantity: 23,
         order_quantity: 5,
-        total_price_cents: '500'
+        total_price_cents: "500"
       },
       {
         price_cents: 250000,
         requested_quantity: 30,
         approved_quantity: nil,
         order_quantity: nil,
-        total_price_cents: '7500000'
+        total_price_cents: "7500000"
       },
       {
         price_cents: 250000,
         requested_quantity: 30,
         approved_quantity: 20,
         order_quantity: nil,
-        total_price_cents: '5000000'
+        total_price_cents: "5000000"
       },
       {
         price_cents: 250000,
         requested_quantity: 30,
         approved_quantity: 20,
         order_quantity: 0,
-        total_price_cents: '0'
+        total_price_cents: "0"
       }
     ]
 
@@ -73,7 +75,7 @@ describe 'request total price' do
         price_cents: c[:price_cents]
       )
 
-      variables = { requestIds: ["#{request.id}"] }
+      variables = {requestIds: [request.id.to_s]}
       result = query(@q, @user_id, variables).deep_symbolize_keys
       request_data = result[:data][:requests].first
       expect(request_data[:id]).to eq(request.id)

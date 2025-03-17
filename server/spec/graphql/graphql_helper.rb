@@ -1,6 +1,6 @@
-require 'edn'
-require 'faraday'
-require 'rack'
+require "edn"
+require "faraday"
+require "rack"
 
 class GraphqlQuery
   attr_reader :response
@@ -15,18 +15,18 @@ class GraphqlQuery
 
   def perform
     @response = Faraday.post("#{http_base_url}/procure/graphql") do |req|
-      req.headers['Accept'] = 'application/json'
-      req.headers['Content-Type'] = 'application/json'
-      req.headers['X-CSRF-Token'] = @csrf_token
-      req.body = { query: @query, variables: @variables }.to_json
+      req.headers["Accept"] = "application/json"
+      req.headers["Content-Type"] = "application/json"
+      req.headers["X-CSRF-Token"] = @csrf_token
+      req.body = {query: @query, variables: @variables}.to_json
 
-      cookies = { "leihs-anti-csrf-token" => @csrf_token }
+      cookies = {"leihs-anti-csrf-token" => @csrf_token}
 
-      if @cookies['leihs-user-session']
-        cookies.merge!("leihs-user-session" => @cookies['leihs-user-session'])
+      if @cookies["leihs-user-session"]
+        cookies["leihs-user-session"] = @cookies["leihs-user-session"]
       end
 
-      req.headers['Cookie'] = cookies.map { |k, v| "#{k}=#{v}" }.join('; ')
+      req.headers["Cookie"] = cookies.map { |k, v| "#{k}=#{v}" }.join("; ")
     end
 
     self
@@ -42,21 +42,21 @@ class GraphqlQuery
   end
 
   def get_cookies(user_id, csrf_token)
-    resp = if user = User.find(id: user_id)
-             Faraday.post("#{http_base_url}/sign-in",
-                          { user: user.email, password: 'password' }) do |req|
-                            req.headers['X-CSRF-Token'] = csrf_token
-                            req.headers['Cookie'] = "leihs-anti-csrf-token=#{csrf_token}"
-                          end
-           else
-             Faraday.post(http_base_url)
-           end
+    resp = if (user = User.find(id: user_id))
+      Faraday.post("#{http_base_url}/sign-in",
+        {user: user.email, password: "password"}) do |req|
+        req.headers["X-CSRF-Token"] = csrf_token
+        req.headers["Cookie"] = "leihs-anti-csrf-token=#{csrf_token}"
+      end
+    else
+      Faraday.post(http_base_url)
+    end
 
-    Rack::Utils.parse_cookies_header(resp.headers['set-cookie'])
+    Rack::Utils.parse_cookies_header(resp.headers["set-cookie"])
   end
 end
 
-RSpec.shared_context 'graphql client' do
+RSpec.shared_context "graphql client" do
   def get_request(path)
     Faraday.get("#{http_base_url}/#{path}")
   end
@@ -71,5 +71,5 @@ RSpec.shared_context 'graphql client' do
 end
 
 RSpec.configure do |config|
-  config.include_context 'graphql client'
+  config.include_context "graphql client"
 end

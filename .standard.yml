@@ -1,0 +1,5 @@
+ignore:
+  - "cider-ci/**/*"
+  - "client/**/*"
+  - "server/shared-clj/**/*"
+  - "server/database/**/*"

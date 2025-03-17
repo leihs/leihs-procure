@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe 'short id' do
-  it 'works' do
+describe "short id" do
+  it "works" do
     # create 1st budget period => create 1st counter
     bp1 = FactoryBot.create(:budget_period, :requesting_phase, name: "XYZ")
     rc1 = RequestCounter.find(prefix: "XYZ")
@@ -41,7 +41,7 @@ describe 'short id' do
     rc1 = RequestCounter.find(prefix: "XYZ")
     expect(RequestCounter.count).to eq 2
     expect(rc1.counter).to eq 1
-    
+
     # create request for the 2nd budget period => update 1st counter and get short_id
     r = FactoryBot.create(:request, budget_period_id: bp2.id)
     expect(r.short_id).to eq "XYZ.002"

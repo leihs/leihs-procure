@@ -23,7 +23,7 @@ FactoryBot.define do
     supplier_name { Faker::Company.name }
 
     after :build do |req|
-      if template = Template.find(id: req.template_id)
+      if (template = Template.find(id: req.template_id))
         req.article_name = template.article_name
         req.article_number = template.article_number
         req.model_id = template.model_id

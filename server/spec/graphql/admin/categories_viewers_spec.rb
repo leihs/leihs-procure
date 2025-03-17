@@ -1,14 +1,14 @@
-require 'spec_helper'
-require_relative '../graphql_helper'
+require "spec_helper"
+require_relative "../graphql_helper"
 
-describe 'categories viewers' do
-  context 'mutation' do
+describe "categories viewers" do
+  context "mutation" do
     before :example do
       @users_before = [
-        { firstname: 'user_1' },
-        { firstname: 'user_2' },
-        { firstname: 'user_3' },
-        { firstname: 'inspector' }
+        {firstname: "user_1"},
+        {firstname: "user_2"},
+        {firstname: "user_3"},
+        {firstname: "inspector"}
       ]
 
       @users_before.each do |data|
@@ -16,7 +16,7 @@ describe 'categories viewers' do
       end
 
       @main_categories_before = [
-        { name: 'main_cat_1' }
+        {name: "main_cat_1"}
       ]
 
       @main_categories_before.each do |data|
@@ -24,20 +24,20 @@ describe 'categories viewers' do
       end
 
       @categories_before = [
-        { name: 'cat_1', parent: { name: 'main_cat_1' } },
-        { name: 'cat_2', parent: { name: 'main_cat_1' } }
+        {name: "cat_1", parent: {name: "main_cat_1"}},
+        {name: "cat_2", parent: {name: "main_cat_1"}}
       ]
 
       @categories_before.each do |data|
         p = MainCategory.find(data[:parent])
         FactoryBot.create(:category,
-                          name: data[:name],
-                          main_category_id: p.id)
+          name: data[:name],
+          main_category_id: p.id)
       end
 
       @categories_viewers_before = [
-        { user: { firstname: 'user_2' }, category: { name: 'cat_1' } },
-        { user: { firstname: 'user_3' }, category: { name: 'cat_2' } }
+        {user: {firstname: "user_2"}, category: {name: "cat_1"}},
+        {user: {firstname: "user_3"}, category: {name: "cat_2"}}
       ]
 
       @categories_viewers_before.each do |data|
@@ -52,13 +52,13 @@ describe 'categories viewers' do
         mutation {
           categories_viewers (
             input_data: [
-              { id: "#{Category.find(name: 'cat_1').id}",
+              { id: "#{Category.find(name: "cat_1").id}",
                 viewers: [
-                  "#{User.find(firstname: 'user_1').id}",
-                  "#{User.find(firstname: 'user_2').id}",
-                  "#{User.find(firstname: 'user_3').id}"
+                  "#{User.find(firstname: "user_1").id}",
+                  "#{User.find(firstname: "user_2").id}",
+                  "#{User.find(firstname: "user_3").id}"
                 ] },
-              { id: "#{Category.find(name: 'cat_2').id}",
+              { id: "#{Category.find(name: "cat_2").id}",
                 viewers: [] }
             ]
           ) {
@@ -68,9 +68,9 @@ describe 'categories viewers' do
       GRAPHQL
     end
 
-    it 'returns error if not an inspector of a specific category' do
+    it "returns error if not an inspector of a specific category" do
       categories_inspectors_before = [
-        { user: { firstname: 'inspector' }, category: { name: 'cat_1' } }
+        {user: {firstname: "inspector"}, category: {name: "cat_1"}}
       ]
 
       categories_inspectors_before.each do |data|
@@ -81,10 +81,10 @@ describe 'categories viewers' do
         )
       end
 
-      result = query(@q, User.find(firstname: 'inspector').id)
+      result = query(@q, User.find(firstname: "inspector").id)
 
-      expect(result['data']['categories_viewers']).to be_blank
-      expect(result['errors'].first['message']).to match(/UnauthorizedException/)
+      expect(result["data"]["categories_viewers"]).to be_blank
+      expect(result["errors"].first["message"]).to match(/UnauthorizedException/)
 
       CategoryViewer
         .all
@@ -97,10 +97,10 @@ describe 'categories viewers' do
         end
     end
 
-    it 'updates successfully' do
+    it "updates successfully" do
       categories_inspectors_before = [
-        { user: { firstname: 'inspector' }, category: { name: 'cat_1' } },
-        { user: { firstname: 'inspector' }, category: { name: 'cat_2' } }
+        {user: {firstname: "inspector"}, category: {name: "cat_1"}},
+        {user: {firstname: "inspector"}, category: {name: "cat_2"}}
       ]
 
       categories_inspectors_before.each do |data|
@@ -111,21 +111,21 @@ describe 'categories viewers' do
         )
       end
 
-      result = query(@q, User.find(firstname: 'inspector').id)
+      result = query(@q, User.find(firstname: "inspector").id)
 
       expect(result).to eq({
-        'data' => {
-          'categories_viewers' => [
-            { 'id' => Category.find(name: 'cat_1').id },
-            { 'id' => Category.find(name: 'cat_2').id }
+        "data" => {
+          "categories_viewers" => [
+            {"id" => Category.find(name: "cat_1").id},
+            {"id" => Category.find(name: "cat_2").id}
           ]
         }
       })
 
       categories_viewers_after = [
-        { user: { firstname: 'user_1' }, category: { name: 'cat_1' } },
-        { user: { firstname: 'user_2' }, category: { name: 'cat_1' } },
-        { user: { firstname: 'user_3' }, category: { name: 'cat_1' } }
+        {user: {firstname: "user_1"}, category: {name: "cat_1"}},
+        {user: {firstname: "user_2"}, category: {name: "cat_1"}},
+        {user: {firstname: "user_3"}, category: {name: "cat_1"}}
       ]
 
       expect(CategoryViewer.all.count).to be == categories_viewers_after.count

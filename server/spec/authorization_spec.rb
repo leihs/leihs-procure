@@ -1,9 +1,9 @@
-require 'uuidtools'
-require 'spec_helper'
-require_relative 'graphql/graphql_helper'
+require "uuidtools"
+require "spec_helper"
+require_relative "graphql/graphql_helper"
 
-describe 'authorization' do
-  it 'returns 401 if not authenticated' do
+describe "authorization" do
+  it "returns 401 if not authenticated" do
     q = <<-GRAPHQL
       query {
         admins {
@@ -16,7 +16,7 @@ describe 'authorization' do
     expect(response.status).to eq(401)
   end
 
-  it 'returns 403 if not procurement access' do
+  it "returns 403 if not procurement access" do
     q = <<-GRAPHQL
       query {
         admins {

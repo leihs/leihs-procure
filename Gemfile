@@ -1,29 +1,30 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 # test
-gem 'rspec'
-gem 'turnip'
+gem "rspec"
+gem "turnip"
 
 # test in browser
-gem 'capybara', '~> 3.8'
-gem 'selenium-webdriver', '~> 3.14'
-gem 'geckodriver-helper'
+gem "capybara", "~> 3.8"
+gem "selenium-webdriver", "~> 3.14"
+gem "geckodriver-helper"
 
 # DB
-gem 'sequel'
-gem 'pg', platform: :mri
+gem "sequel"
+gem "pg", platform: :mri
 
 # factories
-gem 'factory_bot'
-gem 'faker'
+gem "factory_bot"
+gem "faker"
 
 # helpers
-gem 'activesupport'
-gem 'exiftool_vendored', '11.44.0', :groups => [:default, :production]
-gem 'rb-readline'
-gem 'pry'
+gem "activesupport"
+gem "exiftool_vendored", "11.44.0", groups: [:default, :production]
+gem "rb-readline"
+gem "pry"
 
-gem 'rexml'
+gem "rexml"
 
-# dev 
-gem 'solargraph'
+# dev
+gem "solargraph"
+gem "standard", group: [:development, :test]

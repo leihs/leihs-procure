@@ -6,7 +6,7 @@ class User < Sequel::Model
   end
 
   def short_name
-    "#{firstname.presence && firstname[0] + '.'} #{lastname}"
+    "#{firstname.presence && firstname[0] + "."} #{lastname}"
       .strip.presence \
     || login.to_s.strip.presence \
     || email
@@ -22,15 +22,15 @@ FactoryBot.define do
     after(:create) do |user|
       pw_hash = database[<<-SQL]
         SELECT crypt(
-          #{database.literal('password')},
+          #{database.literal("password")},
           gen_salt('bf')
         ) AS pw_hash
       SQL
         .first[:pw_hash]
 
       database[:authentication_systems_users].insert(
-        user_id: user.id, 
-        authentication_system_id: 'password',
+        user_id: user.id,
+        authentication_system_id: "password",
         data: pw_hash
       )
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-feature 'Unarchive Template(s)' do
+feature "Unarchive Template(s)" do
   before(:each) do
     @requester = FactoryBot.create(:user)
     @budget_period = FactoryBot.create(:procurement_budget_period, :inspection_phase)
@@ -15,17 +15,17 @@ feature 'Unarchive Template(s)' do
     @requests = Array(1..5).map.with_index do |_element, index|
       template_object = @templates[index]
       FactoryBot.create(:procurement_request, category: @category, template_id: template_object.id, user: @requester,
-                                              budget_period: @budget_period)
+        budget_period: @budget_period)
     end
   end
 
-  context 'as requester' do
+  context "as requester" do
     before(:each) do
       Helpers::User.sign_in_as @requester
-      click_on('Vorlagen')
+      click_on("Vorlagen")
     end
 
-    scenario 'unarchive single template' do
+    scenario "unarchive single template" do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click
@@ -34,7 +34,7 @@ feature 'Unarchive Template(s)' do
       find('button[type="submit"]').click
     end
 
-    scenario 'unarchive multiple templates' do
+    scenario "unarchive multiple templates" do
       show_archived_buttons = all('label[for^="archiveSwitch"]', visible: :all)
       # unhide archived templates
       show_archived_buttons.first.click

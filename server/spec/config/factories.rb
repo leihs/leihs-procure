@@ -1,9 +1,9 @@
-require 'active_support/all'
+require "active_support/all"
 
-require SERVER_DIR.join('database/spec/config/database').to_s
+require SERVER_DIR.join("database/spec/config/database").to_s
 
-require 'factory_bot'
-require 'faker'
+require "factory_bot"
+require "faker"
 
 Sequel::Model.db = database
 

@@ -1,6 +1,5 @@
 include: container-build/cider-ci.yml
 
-
 jobs:
   procure-uberjar-build:
     include: cider-ci/jobs/uberjar.yml
@@ -8,7 +7,7 @@ jobs:
       any branch has been updated:
         type: branch
         include_match: ^.*$
-        exclude_match: '^.*(no-ci|hotspot).*$'
+        exclude_match: "^.*(no-ci|hotspot).*$"
 
   backend-specs:
     depends_on: &SPEC_DEPENDS
@@ -20,7 +19,7 @@ jobs:
     include: cider-ci/jobs/backend-specs.yml
 
   client-specs:
-    name: 'Client/Frontend: Lint and Tests'
+    name: "Client/Frontend: Lint and Tests"
     run_when: *RUN_ALWAYS
     include: cider-ci/jobs/client.yml
 
@@ -48,7 +47,7 @@ jobs:
       any branch has been updated:
         type: branch
         include_match: ^.*$
-        exclude_match: '^.*(no-ci|hotspot).*$'
+        exclude_match: "^.*(no-ci|hotspot).*$"
     context:
       task_defaults:
         git_options:
@@ -62,6 +61,13 @@ jobs:
                 #!/usr/bin/env bash
                 set -euo pipefail
                 ./server/bin/cljfmt check
+        ruby-lint:
+          scripts:
+            test:
+              body: |
+                #!/usr/bin/env bash
+                set -euo pipefail
+                ./bin/rblint
 
   good-to-merge:
     name: Good To Merge

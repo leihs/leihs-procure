@@ -1,8 +1,8 @@
-require 'spec_helper'
-require_relative '../graphql_helper'
+require "spec_helper"
+require_relative "../graphql_helper"
 
-describe 'requests' do
-  context 'editing request should not yield any error' do
+describe "requests" do
+  context "editing request should not yield any error" do
     before :example do
       @q = <<-GRAPHQL
         query RequestForEdit($requestIds: [ID!]!) {
@@ -168,54 +168,54 @@ describe 'requests' do
       @bp_inspection_phase = FactoryBot.create(:budget_period, :inspection_phase)
     end
 
-    it 'as requester' do
+    it "as requester" do
       @user = FactoryBot.create(:user)
       FactoryBot.create(:requester_organization, user_id: @user.id)
       @request = FactoryBot.create(:request,
-                                   user_id: @user.id,
-                                   budget_period_id: @bp_requesting_phase.id)
+        user_id: @user.id,
+        budget_period_id: @bp_requesting_phase.id)
     end
 
-    it 'as admin' do
+    it "as admin" do
       @user = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: @user.id)
       @request = FactoryBot.create(:request,
-                                   budget_period_id: @bp_requesting_phase.id)
+        budget_period_id: @bp_requesting_phase.id)
     end
 
-    it 'as inspector' do
+    it "as inspector" do
       @user = FactoryBot.create(:user)
       category = FactoryBot.create(:category)
       FactoryBot.create(:category_inspector,
-                        user_id: @user.id,
-                        category_id: category.id)
+        user_id: @user.id,
+        category_id: category.id)
       @request = FactoryBot.create(:request,
-                                   category_id: category.id,
-                                   budget_period_id: @bp_requesting_phase.id)
+        category_id: category.id,
+        budget_period_id: @bp_requesting_phase.id)
     end
 
-    it 'as viewer' do
+    it "as viewer" do
       @user = FactoryBot.create(:user)
       category = FactoryBot.create(:category)
       FactoryBot.create(:category_viewer,
-                        user_id: @user.id,
-                        category_id: category.id)
+        user_id: @user.id,
+        category_id: category.id)
       @request = FactoryBot.create(:request,
-                                   category_id: category.id,
-                                   budget_period_id: @bp_requesting_phase.id)
+        category_id: category.id,
+        budget_period_id: @bp_requesting_phase.id)
     end
 
     after :example do
-      variables = { requestIds: ["#{@request.id}"] }
+      variables = {requestIds: [@request.id.to_s]}
       result = query(@q, @user.id, variables)
-      expect(result['errors']).not_to be
-      expect(result['data']['budget_periods'].map { |bp| bp['id'] })
+      expect(result["errors"]).not_to be
+      expect(result["data"]["budget_periods"].map { |bp| bp["id"] })
         .to match_array [@bp_requesting_phase.id, @bp_inspection_phase.id]
     end
   end
 
-  context 'change user' do
-    example 'not writable but readable' do
+  context "change user" do
+    example "not writable but readable" do
       user = FactoryBot.create(:user)
       FactoryBot.create(:requester_organization, user_id: user.id)
       request = FactoryBot.create(:request, user_id: user.id)
@@ -231,26 +231,25 @@ describe 'requests' do
         }
       GRAPHQL
 
-      variables = { requestIds: ["#{request.id}"] }
+      variables = {requestIds: [request.id.to_s]}
       result = query(q, user.id, variables)
       expect(result).to eq(
-        { 'data' => {
-          'requests' => [
-            { 'user' =>
-              { 'read' => true,
-                'write' => false }
-            }
+        {"data" => {
+          "requests" => [
+            {"user" =>
+              {"read" => true,
+               "write" => false}}
           ]
         }}
       )
     end
 
-    example 'readable/writable' do
+    example "readable/writable" do
       inspector = FactoryBot.create(:user)
       category = FactoryBot.create(:category)
       FactoryBot.create(:category_inspector,
-                        user_id: inspector.id,
-                        category_id: category.id)
+        user_id: inspector.id,
+        category_id: category.id)
 
       admin = FactoryBot.create(:user)
       FactoryBot.create(:admin, user_id: admin.id)
@@ -269,15 +268,14 @@ describe 'requests' do
       GRAPHQL
 
       [inspector, admin].each do |user|
-        variables = { requestIds: ["#{request.id}"] }
+        variables = {requestIds: [request.id.to_s]}
         result = query(q, user.id, variables)
         expect(result).to eq(
-          { 'data' => {
-            'requests' => [
-              { 'user' =>
-                { 'read' => true,
-                  'write' => true }
-              }
+          {"data" => {
+            "requests" => [
+              {"user" =>
+                {"read" => true,
+                 "write" => true}}
             ]
           }}
         )

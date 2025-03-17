@@ -1,16 +1,16 @@
-require 'spec_helper'
-require_relative 'graphql_helper'
+require "spec_helper"
+require_relative "graphql_helper"
 
-describe 'categories' do
-  context 'query' do
-    context 'fields' do
-      context 'can_delete' do
-        it 'false if referenced by requests' do
+describe "categories" do
+  context "query" do
+    context "fields" do
+      context "can_delete" do
+        it "false if referenced by requests" do
           cat = FactoryBot.create(:category)
           user = FactoryBot.create(:user)
           FactoryBot.create(:category_inspector,
-                            category_id: cat.id,
-                            user_id: user.id)
+            category_id: cat.id,
+            user_id: user.id)
           admin = User.find(id: FactoryBot.create(:admin).user_id)
 
           FactoryBot.create(:request, category_id: cat.id)
@@ -24,21 +24,21 @@ describe 'categories' do
           GRAPHQL
           result = query(q, admin.id)
           expect(result).to eq({
-            'data' => {
-              'categories' => [
-                { 'id' => cat.id,
-                  'can_delete' => false }
+            "data" => {
+              "categories" => [
+                {"id" => cat.id,
+                 "can_delete" => false}
               ]
             }
           })
         end
 
-        it 'false if referenced by templates' do
+        it "false if referenced by templates" do
           cat = FactoryBot.create(:category)
           user = FactoryBot.create(:user)
           FactoryBot.create(:category_inspector,
-                            category_id: cat.id,
-                            user_id: user.id)
+            category_id: cat.id,
+            user_id: user.id)
           FactoryBot.create(:template, category_id: cat.id)
           admin = User.find(id: FactoryBot.create(:admin).user_id)
 
@@ -53,10 +53,10 @@ describe 'categories' do
 
           result = query(q, admin.id)
           expect(result).to eq({
-            'data' => {
-              'categories' => [
-                { 'id' => cat.id,
-                  'can_delete' => false }
+            "data" => {
+              "categories" => [
+                {"id" => cat.id,
+                 "can_delete" => false}
               ]
             }
           })

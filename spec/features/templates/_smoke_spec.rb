@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-feature 'smoke test' do
+feature "smoke test" do
   before(:each) do
     @inspector = FactoryBot.create(:user)
     @main_category = FactoryBot.create(:procurement_main_category)
@@ -8,13 +8,13 @@ feature 'smoke test' do
     FactoryBot.create(:procurement_inspector, user: @inspector, category: @category)
   end
 
-  context 'as inspector' do
+  context "as inspector" do
     before(:each) do
       Helpers::User.sign_in_as @inspector
-      click_on('Vorlagen')
+      click_on("Vorlagen")
     end
 
-    scenario 'click on category' do
+    scenario "click on category" do
       first('h3[id^="mc"]').click
       find('button[type="submit"]').click
     end
