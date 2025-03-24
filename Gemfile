@@ -27,4 +27,3 @@ gem "rexml"
 
 # dev
 gem "solargraph"
-gem "standard", group: [:development, :test]
