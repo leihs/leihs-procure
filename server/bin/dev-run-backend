@@ -9,8 +9,6 @@ $PROJECT_DIR/bin/env/clojure-setup
 
 cd $SERVER_DIR
 
-clojure -M:outdated "$@"
-
 clj -M -m leihs.procurement.main --dev-mode true --repl true run "$@"
 
 # vi: ft=sh
