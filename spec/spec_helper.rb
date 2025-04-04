@@ -7,7 +7,6 @@ PROJECT_DIR = Pathname.new(__dir__)
 require PROJECT_DIR.join("..").join("server/database/spec/config/database")
 
 require "config/factories"
-require "config/metadata_extractor"
 require "config/screenshots"
 require "config/browser"
 require "config/rspec"

@@ -31,13 +31,11 @@
 (defn create-for-request-id-and-uploads!
   [tx req-id uploads]
   (doseq [{u-id :id} uploads]
-    (let [u-row (upload/get-by-id tx u-id)
-          md (:metadata u-row)]
+    (let [u-row (upload/get-by-id tx u-id)]
       (attachment/create! tx
                           (-> u-row
                               (dissoc :id)
                               (dissoc :created_at)
-                              (assoc :metadata [:lift md])
                               (assoc :request_id req-id)))
       (upload/delete! tx u-id))))
 

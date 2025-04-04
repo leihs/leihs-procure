@@ -5,7 +5,6 @@ SERVER_DIR = Pathname.new(__dir__).join("..")
 require SERVER_DIR.join("database/spec/config/database").to_s
 
 require "config/factories"
-require "config/metadata_extractor"
 
 def http_port
   @port ||= Integer(ENV["LEIHS_PROCURE_HTTP_PORT"].presence || 3230)
