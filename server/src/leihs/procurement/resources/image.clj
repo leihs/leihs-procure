@@ -47,13 +47,11 @@
 (defn create-for-main-category-id-and-upload!
   [tx mc-id upload]
   (let [{u-id :id} upload
-        u-row (upload/get-by-id tx u-id)
-        md (:metadata u-row)]
+        u-row (upload/get-by-id tx u-id)]
     (insert! tx
              (-> u-row
                  (dissoc :id)
                  (dissoc :created_at)
-                 (assoc :metadata [:lift md])
                  (assoc :main_category_id mc-id)))
     (upload/delete! tx u-id)))
 

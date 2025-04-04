@@ -6,7 +6,6 @@
    [honey.sql :refer [format] :rename {format sql-format}]
    [honey.sql.helpers :as sql]
    [leihs.procurement.paths :refer [path]]
-   (leihs.procurement.utils [exif :as exif])
    [next.jdbc :as jdbc]
    [taoensso.timbre :refer [debug error info spy warn]])
   (:import java.util.Base64
@@ -20,23 +19,15 @@
     (:update-count result)))
 
 (defn prepare-upload-row-map
-  [file-data]
+  [content-type file-data]
   (let [tempfile (:tempfile file-data)
         content (->> tempfile
                      (FileUtils/readFileToByteArray)
-                     (.encodeToString (Base64/getMimeEncoder)))
-        metadata (-> tempfile exif/extract-metadata
-                     json/parse-string first)
-        content-type (or (:content-type file-data)
-                         (get metadata "File:MIMEType")
-                         "application/octet-stream")]
+                     (.encodeToString (Base64/getMimeEncoder)))]
     (-> file-data
         (dissoc :tempfile)
         (assoc :content content)
-        (assoc :metadata [:lift metadata])
-        (assoc :content-type content-type)
-        (assoc :exiftool_version (exif/exiftool-version))
-        (assoc :exiftool_options (string/join " " exif/exiftool-options)))))
+        (assoc :content-type content-type))))
 
 (defn get-by-id
   [tx id]
@@ -49,10 +40,11 @@
 (defn upload
   [{params :params, tx :tx}]
   (let [files (:files params)
-        files-data (if (vector? files) files [files])]
+        files-data (if (vector? files) files [files])
+        content-type (-> params :files :content-type)]
     (doseq [fd files-data]
       (->> fd
-           prepare-upload-row-map
+           (prepare-upload-row-map content-type)
            (insert-file-upload! tx)))
     (let [upload-rows (-> (sql/select :id)
                           (sql/from :procurement_uploads)
