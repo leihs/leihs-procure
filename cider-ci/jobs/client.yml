@@ -19,7 +19,7 @@ context:
             set -euo pipefail
             ${LEIHS_PROCURE_DIR}/bin/env/nodejs-setup
             cd ${LEIHS_PROCURE_DIR}/client
-            npm ci --no-audit
+            npm ci --ignore-scripts --no-audit
 
         procure-client-build:
           timeout: 10 minutes

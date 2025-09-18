@@ -10,7 +10,7 @@ echo "hint: run 'npm run start' directly to avoid the setup steps"
 ${PROJECT_DIR}/bin/env/nodejs-setup
 
 cd $CLIENT_DIR
-npm ci
+npm ci --ignore-scripts
 npm run build
 
 echo "✔ OK, frontend setup steps done"

@@ -9,7 +9,7 @@ ${PROJECT_DIR}/bin/env/nodejs-setup
 
 cd $CLIENT_DIR
 
-npm ci --no-audit
+npm ci --ignore-scripts --no-audit
 npm run ci:lint
 
 # vi: ft=sh

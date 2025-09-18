@@ -1,5 +1,5 @@
 #!/bin/sh -eu
 
-test -d node_modules && npm i || { npm ci || npm i ;}
+npm ci --ignore-scripts
 npm run build:ui
 npm start
