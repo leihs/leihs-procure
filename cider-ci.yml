@@ -24,6 +24,11 @@ jobs:
     include: cider-ci/jobs/client.yml
 
   feature-specs:
+    context: 
+      task_defaults:
+        load: 1.5
+        max_trials: 10
+        eager_trials: 2
     depends_on: &FEATURE_DEPS
       backend-specs:
         type: job
