@@ -1,3 +1,5 @@
+require "base64"
+
 class Image < Sequel::Model(:procurement_images)
 end
 
