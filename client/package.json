@@ -80,6 +80,9 @@
     "jsdom": "^22.1.0",
     "vitest": "^0.34.6"
   },
+  "overrides": {
+    "minimatch": ">=5.1.7"
+  },
   "prettier": {
     "printWidth": 80,
     "singleQuote": true,
