@@ -9,6 +9,7 @@ step "the inspector is a requester too" do
 end
 
 step "I log in as the inspector" do
+  @user = @inspector
   step "I log in as the user"
 end
 
