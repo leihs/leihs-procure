@@ -18,7 +18,8 @@ const SELECTED_LANG = store.getItem('LEIHS_DEV_FAKE_USER_LANG')
 const setLang = l => {
   const old = store.getItem('LEIHS_DEV_FAKE_USER_LANG')
   store.setItem('LEIHS_DEV_FAKE_USER_LANG', l)
-  if (l !== old) window.location.reload()
+  // compare against effective lang (null falls back to DEFAULT_LANG at load time)
+  if (l !== (old || DEFAULT_LANG)) window.location.reload()
 }
 window && (window.setLang = setLang)
 
