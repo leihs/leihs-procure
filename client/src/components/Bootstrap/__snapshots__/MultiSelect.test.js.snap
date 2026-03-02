@@ -487,7 +487,7 @@ exports[`undefined: renders correctly 2`] = `
           >
             <span
               className="input-group-text"
-              title="Suchen…"
+              title="Suchen"
             >
               <svg
                 aria-hidden="true"
@@ -509,11 +509,11 @@ exports[`undefined: renders correctly 2`] = `
             </span>
           </div>
           <input
-            aria-label="Suchen…"
+            aria-label="Suchen"
             autoComplete="off"
             className="form-control"
             onChange={[Function]}
-            placeholder="Suchen…"
+            placeholder="Suchen"
             type="text"
             value=""
           />
@@ -731,7 +731,7 @@ exports[`undefined: renders correctly 2`] = `
           >
             <span
               className="input-group-text"
-              title="Suchen…"
+              title="Suchen"
             >
               <svg
                 aria-hidden="true"
@@ -753,11 +753,11 @@ exports[`undefined: renders correctly 2`] = `
             </span>
           </div>
           <input
-            aria-label="Suchen…"
+            aria-label="Suchen"
             autoComplete="off"
             className="form-control"
             onChange={[Function]}
-            placeholder="Suchen…"
+            placeholder="Suchen"
             type="text"
             value=""
           />
@@ -1036,7 +1036,7 @@ exports[`undefined: renders correctly 3`] = `
           >
             <span
               className="input-group-text"
-              title="Suchen…"
+              title="Suchen"
             >
               <svg
                 aria-hidden="true"
@@ -1058,11 +1058,11 @@ exports[`undefined: renders correctly 3`] = `
             </span>
           </div>
           <input
-            aria-label="Suchen…"
+            aria-label="Suchen"
             autoComplete="off"
             className="form-control"
             onChange={[Function]}
-            placeholder="Suchen…"
+            placeholder="Suchen"
             type="text"
             value=""
           />

@@ -14,7 +14,14 @@
     "confirm_move_budget_period": "Move to another budget period?",
     "confirm_move_category": "Move to another category?",
     "confirm_delete": "Delete Request?",
-    "give_reason_when_partially_accepting_or_denying": "When rejecting or partially rejecting you need to provide an inspection comment"
+    "give_reason_when_partially_accepting_or_denying": "When rejecting or partially rejecting you need to provide an inspection comment",
+    "link_to_request": "Link to request"
+  },
+  "multiselect": {
+    "select_all": "Select all",
+    "none_selected": "None selected",
+    "all_selected_prefix": "All ",
+    "selected_suffix": " selected"
   },
   "client": {
     "mutate_error": "Processing Error!",
@@ -54,8 +61,8 @@
     "reset_filters": "Reset Filter",
     "filter_titles": {
       "search": "Search",
-      "budget_periods": "Budget Period",
-      "categories": "Category",
+      "budget_periods": "Budget Periods",
+      "categories": "Categories",
       "only_inspected_categories": "My own (for Inspectors)",
       "only_viewed_categories": "My own (for Viewers)",
       "special": "Special Filter",
@@ -102,13 +109,13 @@
     "price_total_help": "incl. value-added tax",
     "inspection_comment": "Inspector's Comment",
     "attachments": "Attachments",
-    "accounting_type": "Abrechnungsart",
-    "accounting_type_label_investment": "Investition",
-    "accounting_type_label_aquisition": "Beschaffung",
+    "accounting_type": "Accounting Type",
+    "accounting_type_label_investment": "Investment",
+    "accounting_type_label_aquisition": "Procurement",
     "cost_center": "Cost Center",
-    "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
-    "internal_order_number": "Innenauftrag",
-    "procurement_account": "Sachkonto Ⅰ (ER)",
+    "general_ledger_account": "G/L Account II (IR)",
+    "internal_order_number": "Internal Order Number",
+    "procurement_account": "Procurement Account (ER)",
     "order_status": "Procuring-State",
     "order_comment": "Procuring-Comment",
     "id": "ID",
@@ -140,6 +147,11 @@
       "supplier_name": "Supplier",
       "toDelete": ""
     }
+  },
+  "nav": {
+    "admin": "Admin",
+    "settings": "Settings",
+    "contact": "Contact"
   },
   "admin": {
     "users": {
@@ -175,9 +187,9 @@
       "add_category_success": "Category successfully added",
       "delete_category_success": "Category successfully deleted",
       "subcategories": {
-        "cost_center": "Kostenstelle",
-        "general_ledger_account": "Sachkonto ⅠⅠ (IR)",
-        "procurement_account": "Sachkonto Ⅰ (ER)"
+        "cost_center": "Cost Center",
+        "general_ledger_account": "G/L Account II (IR)",
+        "procurement_account": "Procurement Account (ER)"
       }
     }
   },
@@ -187,7 +199,8 @@
       "confirm_navigation_when_editing": "Changes have not been save, do you want to delete changes?"
     },
     "InlineSearch": {
-      "placeholder": "Search"
+      "placeholder": "Search",
+      "clear_label": "Clear search"
     }
   },
   "errors": {

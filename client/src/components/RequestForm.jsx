@@ -716,7 +716,7 @@ class RequestForm extends React.Component {
                       to={`/requests/${request.id}`}
                     >
                       <small>
-                        <em>Link zum Antrag</em>
+                        <em>{t('request.link_to_request')}</em>
                       </small>
                     </Link>
                   )}

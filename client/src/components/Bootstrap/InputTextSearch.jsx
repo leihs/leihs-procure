@@ -5,6 +5,7 @@ import f from 'lodash'
 import { isNonEmptyValue } from '../../lib/utils'
 
 import Icon from '../Icons'
+import t from '../../locale/translate'
 
 const InputTextSearch = ({
   size,
@@ -67,8 +68,8 @@ export default InputTextSearch
 InputTextSearch.defaultProps = {
   value: '',
   onChange: f.noop,
-  label: 'Suchen…',
-  clearLabel: 'Suche zurücksetzen'
+  label: t('ui.InlineSearch.placeholder'),
+  clearLabel: t('ui.InlineSearch.clear_label')
 }
 
 InputTextSearch.propTypes = {

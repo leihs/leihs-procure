@@ -14,7 +14,14 @@
     "confirm_move_budget_period": "In andere Budgetperiode verschieben?",
     "confirm_move_category": "In andere Kategorie verschieben?",
     "confirm_delete": "Antrag löschen?",
-    "give_reason_when_partially_accepting_or_denying": "Bei Ablehnung oder Teilbewilligung muss ein Inspektionskommentar vorhanden sein"
+    "give_reason_when_partially_accepting_or_denying": "Bei Ablehnung oder Teilbewilligung muss ein Inspektionskommentar vorhanden sein",
+    "link_to_request": "Link zum Antrag"
+  },
+  "multiselect": {
+    "select_all": "Alle auswählen",
+    "none_selected": "Keine ausgewählt",
+    "all_selected_prefix": "Alle ",
+    "selected_suffix": " ausgewählt"
   },
   "client": {
     "mutate_error": "Bearbeitung fehlgeschlagen!",
@@ -141,6 +148,11 @@
       "toDelete": ""
     }
   },
+  "nav": {
+    "admin": "Admin",
+    "settings": "Einstellungen",
+    "contact": "Kontakt"
+  },
   "admin": {
     "users": {
       "title": "Benutzer",
@@ -187,7 +199,8 @@
       "confirm_navigation_when_editing": "Änderungen wurden noch nicht gespeichert, verwerfen?"
     },
     "InlineSearch": {
-      "placeholder": "Suchen"
+      "placeholder": "Suchen",
+      "clear_label": "Suche zurücksetzen"
     }
   },
   "errors": {
