@@ -11,9 +11,11 @@ source "${PROJECT_DIR}/bin/env/select-tool-versions-manager"
 
 # you can override here some of the vars defined in helpers/build.sh, e.g.
 SHARED_CLJ_DIR="${PROJECT_DIR}/server/shared-clj"
-ARTEFACT_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 
 source "${SHARED_CLJ_DIR}/bin/helpers/build.sh"
+
+# procure's jar is built in server/target/, not the default target/
+JAR_PATH="$PROJECT_DIR/server/target/$PROJECT_NAME.jar"
 
 cd "${PROJECT_DIR}"
 
