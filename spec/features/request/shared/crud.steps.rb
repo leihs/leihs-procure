@@ -29,13 +29,13 @@ end
 
 step "within the line of the budget period I click on +" do
   within find(".card.mb-3", text: @budget_period.name) do
-    find(".fa-plus-circle").click
+    find(".fa-circle-plus").click
   end
 end
 
 step "within the line of the budget period :bp I click on +" do |bp|
   within find(".card.mb-3", text: bp) do
-    find(".fa-plus-circle").click
+    find(".fa-circle-plus").click
   end
 end
 
@@ -63,13 +63,13 @@ end
 
 step "within the line of the category I click on +" do
   within find(".card.list-group-item", text: @category.name) do
-    find(".fa-plus-circle").click
+    find(".fa-circle-plus").click
   end
 end
 
 step "within the line of category :cat I click on +" do |cat|
   within find(".card.list-group-item", text: cat) do
-    find(".fa-plus-circle").click
+    find(".fa-circle-plus").click
   end
 end
 
@@ -110,13 +110,13 @@ step "I enter the following data into the request form:" do |table|
         find("label", text: /^#{v}$/).click
       when "Anhänge"
         if @request
-          all(".input-file-upload-list .fa-trash-alt").each(&:click)
+          all(".input-file-upload-list .fa-trash-can").each(&:click)
         end
 
         fp = File.absolute_path("spec/files/#{v}")
         find("input[type='file']", visible: false).attach_file(fp)
         # wait until the upload is finished
-        find(".input-file-upload-list li", text: v).find(".fa-trash-alt")
+        find(".input-file-upload-list li", text: v).find(".fa-trash-can")
       end
     end
   end
@@ -222,7 +222,7 @@ step "the procurement admin is a requester" do
 end
 
 step "I click on the + button" do
-  find(".fa-plus-circle").click
+  find(".fa-circle-plus").click
 end
 
 step "I set the name as :name on line :n" do |name, n|

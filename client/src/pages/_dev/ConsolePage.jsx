@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 
-import GraphiQL from 'graphiql'
-import 'graphiql/graphiql.css'
-import 'codemirror/theme/dracula.css'
+import { GraphiQL } from 'graphiql'
+import 'graphiql/style.css'
 
 import {
   endpointURL,
@@ -58,11 +57,7 @@ class DevConsole extends Component {
   render() {
     return (
       <div style={{ height: '100vh' }}>
-        <GraphiQL
-          fetcher={graphQLFetcher}
-          defaultQuery={exampleQuery}
-          editorTheme="dracula"
-        >
+        <GraphiQL fetcher={graphQLFetcher} defaultQuery={exampleQuery}>
           <GraphiQL.Logo>
             <b>API Console</b>
           </GraphiQL.Logo>

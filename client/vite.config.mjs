@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import $monacoEditorPlugin from 'vite-plugin-monaco-editor'
+
+const monacoEditorPlugin = $monacoEditorPlugin.default ?? $monacoEditorPlugin
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,7 +13,21 @@ export default defineConfig({
     minify: true,
     sourcemap: false
   },
-  plugins: [react(), nodePolyfills()],
+  plugins: [
+    react(),
+    nodePolyfills({
+      protocolImports: true
+    }),
+    monacoEditorPlugin({
+      languageWorkers: ['editorWorkerService', 'json'],
+      customWorkers: [
+        {
+          label: 'graphql',
+          entry: 'monaco-graphql/esm/graphql.worker.js'
+        }
+      ]
+    })
+  ],
   server: {
     port: 4000,
     proxy: {

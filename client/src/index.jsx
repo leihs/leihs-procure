@@ -1,6 +1,3 @@
-// polyfills first
-import 'react-app-polyfill/ie11'
-
 // non-polyfill imports
 import React from 'react'
 import Notification from './components/Notification'
