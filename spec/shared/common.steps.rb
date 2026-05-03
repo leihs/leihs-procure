@@ -74,6 +74,7 @@ step "I take Screenshot" do
 end
 
 step "I log in as the user" do
+  @user.update(language_locale: "de-CH")
   step "I log in with the email '#{@user.email}'"
 end
 

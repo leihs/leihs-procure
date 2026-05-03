@@ -23,9 +23,7 @@ Capybara.register_driver :firefox do |app|
   )
 
   profile = Selenium::WebDriver::Firefox::Profile.new
-  # TODO: configure language for locale testing
-  # profile["intl.accept_languages"] = "en"
-  #
+  profile["intl.accept_languages"] = "de"
   profile_config = {
     "browser.helperApps.neverAsk.saveToDisk" => "image/jpeg,application/pdf,application/json",
     "browser.download.folderList" => 2, # custom location

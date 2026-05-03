@@ -9,15 +9,16 @@ import DropdownToggle from 'reactstrap/lib/DropdownToggle'
 import DropdownMenu from 'reactstrap/lib/DropdownMenu'
 import DropdownItem from 'reactstrap/lib/DropdownItem'
 import SearchField from './InputTextSearch'
+import t from '../../locale/translate'
 const log = logger('app:ui:MultiSelect')
 
 const START_OPEN = false
-const txt_select_all = 'Alle auswählen'
-const txt_all_selected_a = 'Alle '
-const txt_all_selected_e = ' ausgewählt'
-const txt_none_selected = 'Keine ausgewählt'
+const txt_select_all = t('multiselect.select_all')
+const txt_all_selected_a = t('multiselect.all_selected_prefix')
+const txt_all_selected_e = t('multiselect.selected_suffix')
+const txt_none_selected = t('multiselect.none_selected')
 const txt_n_selected_a = ''
-const txt_n_selected_e = ` ausgewählt`
+const txt_n_selected_e = t('multiselect.selected_suffix')
 
 // styles
 const baseCls = 'grouped-multiselect'

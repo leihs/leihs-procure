@@ -1,6 +1,6 @@
 import React from 'react'
 import f from 'lodash'
-import { DateTime } from 'luxon'
+import { formatISO } from 'date-fns'
 import BrowserInfo from 'browser-info'
 import t from '../locale/translate'
 
@@ -39,7 +39,9 @@ export const FatalErrorScreen = ({ error, children, title }) => {
                 env: {
                   target: process.env.NODE_ENV,
                   browser: browserLine,
-                  time: (d => [new DateTime(d).toISO(), d.toJSON()])(new Date())
+                  time: (d => [formatISO(d), d.toJSON()])(
+                    new Date()
+                  )
                 }
               }}
             />

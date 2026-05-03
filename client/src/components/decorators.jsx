@@ -1,6 +1,6 @@
-import f, { has } from 'lodash'
+import f from 'lodash'
 
-import { DateTime } from 'luxon'
+import { parseISO } from 'date-fns'
 import { formatMoney } from 'accounting-js'
 import { isNonEmptyValue } from '../lib/utils'
 
@@ -72,9 +72,9 @@ export const DisplayName = (o, { short = false, abbr = false } = {}) => {
 }
 
 export const budgetPeriodDates = bp => {
-  const now = DateTime.local()
-  const inspectStartDate = DateTime.fromISO(bp.inspection_start_date)
-  const endDate = DateTime.fromISO(bp.end_date)
+  const now = new Date()
+  const inspectStartDate = parseISO(bp.inspection_start_date)
+  const endDate = parseISO(bp.end_date)
   const isPast = endDate <= now
   const isRequesting = !isPast && now <= inspectStartDate
   const isInspecting = !isPast && !isRequesting

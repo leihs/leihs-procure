@@ -158,6 +158,6 @@ function getUserLocale(data) {
     () =>
       JSON.parse(data.current_user.navbarProps).config.locales.filter(
         (l) => l.isSelected
-      )[0].locale_name
+      )[0].locale
   )
 }

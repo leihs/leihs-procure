@@ -7,6 +7,7 @@ module Helpers
     module_function
 
     def sign_in_as(user)
+      user.update(language_locale: "de-CH")
       Capybara.visit("/")
       Capybara.fill_in("user", with: user.email)
       Capybara.click_on("Continue")

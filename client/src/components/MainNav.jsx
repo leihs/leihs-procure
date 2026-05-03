@@ -16,7 +16,7 @@ import {
   NavLink
 } from 'reactstrap'
 
-// TODO: translate navigation items
+import t from '../locale/translate'
 
 function MainNav({ me, contactUrl, isDev }) {
   const { pathname } = useLocation()
@@ -33,7 +33,7 @@ function MainNav({ me, contactUrl, isDev }) {
   const brand = (
     <NavbarBrand href="/">
       <Icon.LeihsProcurement className="mr-2" />
-      Bedarfsermittlung
+      {t('app_title')}
     </NavbarBrand>
   )
 
@@ -48,7 +48,7 @@ function MainNav({ me, contactUrl, isDev }) {
           <>
             <NavItem>
               <RouterNavLink to="/requests" className="nav-link">
-                <Icon.Requests fixedWidth spaced /> Anträge
+                <Icon.Requests fixedWidth spaced /> {t('dashboard.requests_title_plural')}
               </RouterNavLink>
             </NavItem>
 
@@ -59,7 +59,7 @@ function MainNav({ me, contactUrl, isDev }) {
                   caret
                   className={cx({ active: pathname.match('admin') })}
                 >
-                  <Icon.Settings /> Admin
+                  <Icon.Settings /> {t('nav.admin')}
                 </DropdownToggle>
 
                 <DropdownMenu>
@@ -68,7 +68,7 @@ function MainNav({ me, contactUrl, isDev }) {
                     href="/procure/admin/budget-periods"
                     className="pl-3 text-decoration-none"
                   >
-                    <Icon.BudgetPeriod fixedWidth spaced /> Budgetperioden
+                    <Icon.BudgetPeriod fixedWidth spaced /> {t('dashboard.filter_titles.budget_periods')}
                   </DropdownItem>
 
                   <DropdownItem
@@ -76,7 +76,7 @@ function MainNav({ me, contactUrl, isDev }) {
                     href="/procure/admin/categories"
                     className="pl-3 text-decoration-none"
                   >
-                    <Icon.Categories fixedWidth spaced /> Kategorien
+                    <Icon.Categories fixedWidth spaced /> {t('dashboard.filter_titles.categories')}
                   </DropdownItem>
 
                   <DropdownItem
@@ -84,7 +84,7 @@ function MainNav({ me, contactUrl, isDev }) {
                     href="/procure/admin/users"
                     className="pl-3 text-decoration-none"
                   >
-                    <Icon.Users fixedWidth spaced /> Benutzer
+                    <Icon.Users fixedWidth spaced /> {t('admin.users.title')}
                   </DropdownItem>
 
                   <DropdownItem
@@ -92,7 +92,7 @@ function MainNav({ me, contactUrl, isDev }) {
                     href="/procure/admin/organizations"
                     className="pl-3 text-decoration-none"
                   >
-                    <Icon.Organizations fixedWidth spaced /> Organisationen
+                    <Icon.Organizations fixedWidth spaced /> {t('dashboard.filter_titles.orgs')}
                   </DropdownItem>
 
                   <DropdownItem divider />
@@ -102,7 +102,7 @@ function MainNav({ me, contactUrl, isDev }) {
                     href="/procure/admin/settings"
                     className="pl-3 text-decoration-none"
                   >
-                    <Icon.Settings fixedWidth spaced /> Einstellungen
+                    <Icon.Settings fixedWidth spaced /> {t('nav.settings')}
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
@@ -111,14 +111,14 @@ function MainNav({ me, contactUrl, isDev }) {
             {me.roles.isInspector && (
               <NavItem>
                 <Link to="/templates/edit" className="nav-link">
-                  <Icon.Templates fixedWidth spaced /> Vorlagen
+                  <Icon.Templates fixedWidth spaced /> {t('templates.title')}
                 </Link>
               </NavItem>
             )}
 
             {!!contactUrl && (
               <NavLink href={contactUrl} target="_blank">
-                <Icon.Contact fixedWidth spaced /> Kontakt
+                <Icon.Contact fixedWidth spaced /> {t('nav.contact')}
               </NavLink>
             )}
           </>

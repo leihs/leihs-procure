@@ -126,7 +126,7 @@ const spreadSheetCols = [
   { key: 'inspection_comment', label: 'Kommentar des Prüfers' },
   {
     key: 'accounting_type',
-    label: 'Abrechnungsart',
+    label: t('request_form_field.accounting_type'),
     fn: (r) => RequestFieldValue('accounting_type', r)
   },
   { key: 'cost_center', label: 'Kostenstelle' },

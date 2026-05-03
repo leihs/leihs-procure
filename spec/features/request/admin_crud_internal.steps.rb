@@ -102,7 +102,7 @@ step "I enter the following data category form:" do |table|
     fp = File.absolute_path("spec/files/#{ICON_IMAGE_NAME}")
     find("input[type='file']", visible: false).attach_file(fp)
 
-    find(".input-file-upload-list li", text: ICON_IMAGE_NAME).find(".fa-trash-alt")
+    find(".input-file-upload-list li", text: ICON_IMAGE_NAME).find(".fa-trash-can")
   end
 
   within find(".card-body") do
