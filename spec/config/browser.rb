@@ -17,11 +17,6 @@ end
 Selenium::WebDriver::Firefox.path = firefox_bin_path
 
 Capybara.register_driver :firefox do |app|
-  capabilities = Selenium::WebDriver::Remote::Capabilities.firefox(
-    # TODO: trust the cert used in container and remove this:
-    acceptInsecureCerts: true
-  )
-
   profile = Selenium::WebDriver::Firefox::Profile.new
   profile["intl.accept_languages"] = "de"
   profile_config = {
@@ -34,7 +29,9 @@ Capybara.register_driver :firefox do |app|
   opts = Selenium::WebDriver::Firefox::Options.new(
     binary: firefox_bin_path,
     profile: profile,
-    log_level: :trace
+    log_level: :trace,
+    # TODO: trust the cert used in container and remove this:
+    accept_insecure_certs: true
   )
 
   # NOTE: good for local dev
@@ -48,8 +45,7 @@ Capybara.register_driver :firefox do |app|
   Capybara::Selenium::Driver.new(
     app,
     browser: :firefox,
-    options: opts,
-    desired_capabilities: capabilities
+    options: opts
   )
 end
 
