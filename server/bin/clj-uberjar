@@ -9,6 +9,10 @@ $PROJECT_DIR/bin/env/clojure-setup
 
 cd $SERVER_DIR
 
-clojure -T:build uber
+if [ "${TOOL_VERSIONS_MANAGER:-}" = "mise" ]; then
+  mise exec -- clojure -T:build uber
+else
+  clojure -T:build uber
+fi
 
 # vi: ft=sh
