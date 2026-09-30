@@ -23,7 +23,7 @@
 
 (defn run [options]
   (catcher/snatch
-   {:return-fn (fn [e] (System/exit -1))}
+   {:return-fn (shutdown/run-return-fn options)}
    (logging/info "Invoking run with options: " options)
    (shutdown/init options)
    (graphql/init)
