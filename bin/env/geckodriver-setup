@@ -7,7 +7,7 @@ source $PROJECT_DIR/bin/env/project.sh
 source $PROJECT_DIR/bin/env/select-tool-versions-manager
 
 ASDF_PLUGIN=geckodriver
-ADSF_PLUGIN_URL=https://github.com/DrTom/asdf-geckodriver.git
+ASDF_PLUGIN_URL=https://github.com/DrTom/asdf-geckodriver.git
 
 
 case "$TOOL_VERSIONS_MANAGER" in

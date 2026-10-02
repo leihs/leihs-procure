@@ -25,6 +25,10 @@ context:
       LEIHS_PROCURE_HTTP_PORT:
         min: 3200
         max: 3299
+      # dedicated geckodriver port per trial, see spec/config/browser.rb
+      LEIHS_PROCURE_GECKODRIVER_PORT:
+        min: 4500
+        max: 4599
 
     git_options:
       submodules:
