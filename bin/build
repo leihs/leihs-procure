@@ -22,6 +22,9 @@ cd "${PROJECT_DIR}"
 ### functions #################################################################
 
 function build_core {
+  # unlike the other projects build.clj does not clean target (it would
+  # delete the tracked server/target/.gitkeep), remove stale classes here
+  rm -rf server/target/classes
   ./client/bin/build
   ./server/bin/clj-uberjar
 }
