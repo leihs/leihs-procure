@@ -1,6 +1,6 @@
 const js = require('@eslint/js')
 const react = require('eslint-plugin-react')
-const vitest = require('eslint-plugin-vitest')
+const vitest = require('@vitest/eslint-plugin')
 const vitestGlobals = require('eslint-plugin-vitest-globals')
 const prettier = require('eslint-config-prettier')
 const globals = require('globals')

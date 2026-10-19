@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import $monacoEditorPlugin from 'vite-plugin-monaco-editor'
 
 const monacoEditorPlugin = $monacoEditorPlugin.default ?? $monacoEditorPlugin
@@ -15,9 +14,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    nodePolyfills({
-      protocolImports: true
-    }),
     monacoEditorPlugin({
       languageWorkers: ['editorWorkerService', 'json'],
       customWorkers: [

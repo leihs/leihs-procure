@@ -1,0 +1,13 @@
+# osv-scanner config file
+# Suppress false positives or accepted risks here.
+# https://google.github.io/osv-scanner/configuration/
+
+[[IgnoredVulns]]
+id = "GHSA-4r6h-8v6p-xvw6"
+ignoreUntil = 2027-01-15
+reason = "xlsx 0.20.3 (client, from cdn.sheetjs.com): false positive, fixed in 0.19.3; OSV has an open-ended npm range because the npm registry stops at 0.18.5"
+
+[[IgnoredVulns]]
+id = "GHSA-5pgg-2g8v-p4x9"
+ignoreUntil = 2027-01-15
+reason = "xlsx 0.20.3 (client, from cdn.sheetjs.com): false positive, fixed in 0.20.2; OSV has an open-ended npm range because the npm registry stops at 0.18.5"
