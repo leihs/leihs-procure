@@ -8,7 +8,7 @@ git_options:
     include_match: ^.*$
 
 traits:
-  asdf: true
+  mise: true
 
 scripts:
 

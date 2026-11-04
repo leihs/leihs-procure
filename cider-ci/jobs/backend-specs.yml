@@ -14,7 +14,7 @@ context:
       - cider-ci/task-components/service.yml
 
     traits:
-      asdf: true
+      mise: true
 
     ports:
       LEIHS_PROCURE_HTTP_PORT:

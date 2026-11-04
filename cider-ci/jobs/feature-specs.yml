@@ -19,7 +19,7 @@ context:
     max_trials: 2
 
     traits:
-      asdf: true
+      mise: true
 
     ports:
       LEIHS_PROCURE_HTTP_PORT:
