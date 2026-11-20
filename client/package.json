@@ -79,6 +79,7 @@
   },
   "overrides": {
     "flatted": ">=3.4.1",
-    "esbuild": ">=0.28.1"
+    "esbuild": ">=0.28.1",
+    "minimatch": ">=11.0.1"
   }
 }

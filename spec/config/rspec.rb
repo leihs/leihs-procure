@@ -82,7 +82,10 @@ def require_shared_files(dirpath)
   end
 
   shared_folders.each do |sf|
-    Dir.glob("#{sf}/*.rb") { |f| require f }
+    # Load helpers before step files so shared methods are defined first.
+    helpers = File.join(sf, "helpers.rb")
+    require helpers if File.exist?(helpers)
+    Dir.glob("#{sf}/*.rb").sort.each { |f| require f }
   end
 end
 
