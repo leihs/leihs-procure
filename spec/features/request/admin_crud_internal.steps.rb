@@ -69,8 +69,13 @@ step "I see image-icon with correct response-status" do
 
   image_url = find("img.img-thumbnail")[:src]
   uri = URI.parse(image_url)
+  # Relative img src → resolve against the app under test.
+  uri = URI.join(Capybara.app_host || LEIHS_PROCURE_HTTP_BASE_URL, image_url) if uri.relative?
 
-  response = Net::HTTP.get_response(uri)
+  response = Net::HTTP.start(uri.host, uri.port,
+    use_ssl: uri.scheme == "https",
+    open_timeout: 5,
+    read_timeout: 10) { |http| http.request(Net::HTTP::Get.new(uri)) }
   expect(response.code).to eq "200"
 end
 

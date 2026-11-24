@@ -18,7 +18,7 @@ gem "factory_bot"
 gem "faker"
 
 # helpers
-gem "activesupport", "~> 8.0"
+gem "activesupport", "~> 8.1", ">= 8.1.4.1"
 gem "rb-readline"
 gem "pry"
 
