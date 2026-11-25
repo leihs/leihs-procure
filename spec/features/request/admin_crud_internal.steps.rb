@@ -31,36 +31,23 @@ step "I open the AdminKategorien menu" do
 end
 
 def wait_for_link_or_throw(text, timeout = 10)
-  sleep_interval = 0.2
-  start_time = Time.current
-
-  loop do
-    begin
-      if page.has_link?(text, wait: 2)
-        puts "Found the link with text: #{text}"
-        break
-      end
-    rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError
-      puts "Handled an unexpected alert."
-    rescue Selenium::WebDriver::Error::NoSuchAlertError
-      puts "No alert was present."
-    end
-
-    if Time.current - start_time > timeout
-      raise "Timeout: Failed to find the link with text '#{text}' within #{timeout} seconds."
-    end
-
-    puts "Sleep #{sleep_interval} seconds"
-    sleep sleep_interval
+  # Prefer CSS + text over has_link?: under FF 153 / geckodriver 0.37,
+  # Link Text find_elements can raise UnknownError ("Failed to interpret
+  # value as array"), especially with a leftover confirm dialog open.
+  wait_until(timeout) do
+    page.has_css?("a.nav-link", text: text, visible: true, wait: 0)
   end
+rescue Timeout::Error
+  raise "Timeout: Failed to find the link with text '#{text}' within #{timeout} seconds."
 end
 
 step "I click category :main_category_name" do |main_category_name|
   wait_for_link_or_throw(main_category_name)
 
-  link = find(".nav-link", text: main_category_name, visible: true, wait: 3, match: :first)
+  link = find("a.nav-link", text: main_category_name, visible: true, wait: 3, match: :first)
   expect(link).not_to be nil
   link.click
+  wait_for_procure_loading_gone
 end
 
 step "I see image-icon with correct response-status" do
@@ -69,8 +56,13 @@ step "I see image-icon with correct response-status" do
 
   image_url = find("img.img-thumbnail")[:src]
   uri = URI.parse(image_url)
+  # Relative img src → resolve against the app under test.
+  uri = URI.join(Capybara.app_host || LEIHS_PROCURE_HTTP_BASE_URL, image_url) if uri.relative?
 
-  response = Net::HTTP.get_response(uri)
+  response = Net::HTTP.start(uri.host, uri.port,
+    use_ssl: uri.scheme == "https",
+    open_timeout: 5,
+    read_timeout: 10) { |http| http.request(Net::HTTP::Get.new(uri)) }
   expect(response.code).to eq "200"
 end
 
@@ -116,4 +108,7 @@ step "I enter the following data category form:" do |table|
       expect(input.evaluate_script("this.validationMessage")).to eq ""
     end
   end
+
+  # Category FormField uses StatefulInput; flush before Speichern.
+  flush_stateful_input_debounce!
 end

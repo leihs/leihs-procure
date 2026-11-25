@@ -41,7 +41,10 @@ Capybara.register_driver :firefox do |app|
     profile: profile,
     log_level: :trace,
     # TODO: trust the cert used in container and remove this:
-    accept_insecure_certs: true
+    accept_insecure_certs: true,
+    # Keep confirms open so helpers can read Error! vs navigation leftovers.
+    # Default "dismiss" auto-closes and only leaves UnexpectedAlertOpenError.
+    unhandled_prompt_behavior: :ignore
   )
 
   # NOTE: good for local dev
