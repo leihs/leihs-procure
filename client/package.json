@@ -54,7 +54,7 @@
     "react-test-renderer": "^18.2.0",
     "reactstrap": "^8.10.1",
     "tachyons-type-scale": "^6.1.1",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "xlsx": "npm:@e965/xlsx@0.20.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -79,6 +79,10 @@
   },
   "overrides": {
     "flatted": ">=3.4.1",
-    "esbuild": ">=0.28.1"
+    "esbuild": ">=0.28.1",
+    "minimatch": ">=11.0.1",
+    "glob@7": {
+      "minimatch": "^3.1.2"
+    }
   }
 }
