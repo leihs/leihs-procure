@@ -11,18 +11,29 @@ step "there is an empty database" do
 end
 
 step "I click on button :txt" do |txt|
-  # FIXME: remove this sleep, after upgrading to vite/apollo this throws a api error
-  sleep 0.1
+  # Capture before click: after Speichern the request form may unmount.
+  saving = txt.to_s.match?(/Speichern|Save/i)
+  request_save = saving && request_save_context?
+  # StatefulInput (100ms) is used on request, AdminKategorien, and
+  # Budgetperioden forms — flush before any Speichern under FF 153.
+  flush_stateful_input_debounce! if saving
   find_button(txt).click
+  wait_after_request_save!(txt, request_save: request_save)
 end
 
 step "I click on :txt" do |txt|
-  sleep 0.1
+  saving = txt.to_s.match?(/Speichern|Save/i)
+  request_save = saving && request_save_context?
+  flush_stateful_input_debounce! if saving
   click_on(txt)
+  wait_after_request_save!(txt, request_save: request_save)
 end
 
 step "I click on :txt and accept the alert" do |txt|
   accept_alert { click_on txt }
+  # Category/budget-period move triggers refetch; wait for UI to settle.
+  sleep 0.2
+  wait_for_procure_loading_gone
 end
 
 step "I enter :value in the :name field" do |value, name|
