@@ -21,8 +21,8 @@ cd "${PROJECT_DIR}"
 osv-scanner scan source -r \
   --format markdown \
   --config "${PROJECT_DIR}/.osv-scanner-config.toml" \
-  --experimental-exclude server/database \
-  --experimental-exclude server/shared-clj \
+  --x-exclude server/database \
+  --x-exclude server/shared-clj \
   "$@" \
   .
 

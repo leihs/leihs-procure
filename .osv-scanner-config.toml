@@ -2,12 +2,21 @@
 # Suppress false positives or accepted risks here.
 # https://google.github.io/osv-scanner/configuration/
 
+# xlsx: stay on the public npm package. Latest on registry.npmjs.org is 0.18.5;
+# newer SheetJS builds are only on CDN / third-party mirrors, which we do not use
+# (see CLAUDE.md). OSV ranges stay open-ended past 0.18.5 for that reason.
+
 [[IgnoredVulns]]
 id = "GHSA-4r6h-8v6p-xvw6"
 ignoreUntil = 2027-01-15
-reason = "xlsx 0.20.3 (client, from cdn.sheetjs.com): false positive, fixed in 0.19.3; OSV has an open-ended npm range because the npm registry stops at 0.18.5"
+reason = "xlsx ^0.18.5 from registry.npmjs.org (latest npm release); newer fixes only via non-npm SheetJS sources we refuse"
 
 [[IgnoredVulns]]
 id = "GHSA-5pgg-2g8v-p4x9"
 ignoreUntil = 2027-01-15
-reason = "xlsx 0.20.3 (client, from cdn.sheetjs.com): false positive, fixed in 0.20.2; OSV has an open-ended npm range because the npm registry stops at 0.18.5"
+reason = "xlsx ^0.18.5 from registry.npmjs.org (latest npm release); newer fixes only via non-npm SheetJS sources we refuse"
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-01-15
+reason = "minimatch 10.2.6 via @typescript-eslint/typescript-estree 8 (dev, lint only): no 10.x fix; patterns come from config, not user input"
