@@ -39,13 +39,20 @@ step "within the line of the budget period :bp I click on +" do |bp|
   end
 end
 
+def request_form_scope
+  wait_for_request_edit_form!
+  find(request_edit_form_selector)
+end
+
 step "I expand the line of the main category :main_cat" do |main_cat|
   find("li", text: main_cat).click
+  wait_for_procure_loading_gone
 end
 
 step "I expand the line of the main category of the category :cat" do |cat|
   c = ProcurementCategory.find(name: cat)
   find("li", text: c.main_category.name).click
+  wait_for_procure_loading_gone
 end
 
 step "I don't see the main category of the category :cat" do |cat|
@@ -55,26 +62,46 @@ end
 
 step "I expand the line of the category :cat" do |cat|
   find("li", text: cat, match: :first).click
+  wait_for_procure_loading_gone
 end
 
 step "I expand the request line" do
-  find("li", text: @request.article_name, match: :first).click
+  # Prefer DB name after Speichern (dashboard refetch updates the closed line);
+  # fall back to the pre-save factory value if the line has not refreshed yet.
+  # Click the closed RequestLine row (.cursor-pointer), not a parent <li> that
+  # merely contains the article name text.
+  pre_save_name = @request.article_name
+  db_name = begin
+    @request.reload.article_name
+  rescue
+    pre_save_name
+  end
+  line = wait_until(10) do
+    [db_name, pre_save_name].uniq.lazy.map { |n|
+      page.all(".ui-subcat-items .cursor-pointer", text: n, wait: 0).first ||
+        page.all(".cursor-pointer", text: n, wait: 0).first
+    }.find(&:itself)
+  end
+  line.click
+  wait_for_request_edit_form!
 end
 
 step "within the line of the category I click on +" do
   within find(".card.list-group-item", text: @category.name) do
     find(".fa-circle-plus").click
   end
+  wait_for_request_edit_form!
 end
 
 step "within the line of category :cat I click on +" do |cat|
   within find(".card.list-group-item", text: cat) do
     find(".fa-circle-plus").click
   end
+  wait_for_request_edit_form!
 end
 
 step "I enter the following data into the request form:" do |table|
-  ctx = @request ? find("form[id='#{@request.id}']") : current_scope
+  ctx = request_form_scope
 
   table.hashes.each do |h|
     f = h["field"]
@@ -98,12 +125,16 @@ step "I enter the following data into the request form:" do |table|
         @request_user = User.find(firstname: fn, lastname: ln)
         find("input").set v
         within ".ui-interactive-text-field-results" do
+          wait_until(10) { !text.include?("Loading...") }
           find("div", text: v).click
         end
       when "Begründung", "Kommentar des Prüfers", "Beschaffungs-Kommentar"
         find("textarea").set v
-      when "Priorität", "Priorität des Prüfers", "Gebäude", "Raum", "Beschaffungs-Status"
+      when "Priorität", "Priorität des Prüfers", "Gebäude", "Beschaffungs-Status"
         find("select option", text: /^#{v}$/).select_option
+      when "Raum"
+        # Rooms load after Gebäude; wait for the option (not Loading… placeholder).
+        find("select:not([disabled]) option", text: /^#{v}$/).select_option
       when "Abrechnungsart"
         find("label.btn", text: v).click
       when "Ersatz / Neu"
@@ -120,14 +151,19 @@ step "I enter the following data into the request form:" do |table|
       end
     end
   end
+
+  # Let StatefulInput's 100ms debounce reach parent form state before Speichern.
+  flush_stateful_input_debounce!
 end
 
 step "I see a success message" do
   expect(page).to have_selector ".text-success"
+  wait_for_procure_loading_gone
+  expect(page).to have_css("form.ui-request-form")
 end
 
 step "the request form has the following data:" do |table|
-  ctx = @request ? find("form[id='#{@request.id}']") : current_scope
+  ctx = request_form_scope
 
   table.hashes.each do |h|
     f = h["field"]
@@ -145,6 +181,7 @@ step "the request form has the following data:" do |table|
         "Bestellmenge",
         "Innenauftrag",
         "Antragsteller"
+        settle(10) { find("input").value == v }
         expect(find("input").value).to eq v
       when "Menge beantragt"
         # a different "Antragsteller"
@@ -153,6 +190,7 @@ step "the request form has the following data:" do |table|
             (@budget_period.inspection_start_date > Date.today)
           find("span", text: v)
         else
+          settle(10) { find("input").value == v }
           expect(find("input").value).to eq v
         end
       when "Begründung"
@@ -160,19 +198,24 @@ step "the request form has the following data:" do |table|
         if @request_user && (@request_user != @user) && !@procurement_admin
           find("span", text: v)
         else
+          settle(10) { find("textarea").value == v }
           expect(find("textarea").value).to eq v
         end
-      when "Kommentar des Prüfers"
+      when "Kommentar des Prüfers", "Beschaffungs-Kommentar"
+        settle(10) { find("textarea").value == v }
         expect(find("textarea").value).to eq v
-      when "Priorität", "Priorität des Prüfers", "Gebäude", "Raum"
+      when "Priorität", "Priorität des Prüfers", "Gebäude", "Raum", "Beschaffungs-Status"
+        settle(10) { find("select option", text: /^#{v}$/).selected? }
         expect(
           find("select option", text: /^#{v}$/)
         ).to be_selected
       when "Abrechnungsart"
+        settle(10) { find("label.btn", text: /^#{v}$/).find("input").checked? }
         expect(
           find("label.btn", text: /^#{v}$/).find("input")
         ).to be_checked
       when "Ersatz / Neu"
+        settle(10) { find("label", text: /^#{v}$/).find("input").checked? }
         expect(
           find("label", text: /^#{v}$/).find("input")
         ).to be_checked
@@ -197,10 +240,12 @@ step "I click on the delete button and accept the alert" do
       find("button", text: "Löschen").click
     end
   end
+  wait_for_procure_loading_gone
 end
 
 step "I uncheck filter option :label" do |label|
   find("label", text: label).click
+  wait_for_procure_loading_gone
 end
 
 step "the category :cat for budget period :bp is expanded" do |cat, bp|
