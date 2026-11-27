@@ -39,6 +39,8 @@ depends_on: &GOOD_TO_MERGE_DEPENDENCIES
 
 run_when: *GOOD_TO_MERGE_DEPENDENCIES
 
+priority: 999 # "empty" job = high priority
+
 context:
   task_defaults:
     max_trials: 1
